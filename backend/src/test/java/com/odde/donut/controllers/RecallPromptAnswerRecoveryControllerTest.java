@@ -35,12 +35,12 @@ class RecallPromptAnswerRecoveryControllerTest extends RecallPromptAnswerRecover
     assertThat(original.answer().get("id").intValue(), equalTo(answerId));
     assertThat(original.answer().get("choiceIndex").intValue(), equalTo(choice));
     assertThat(original.answer().get("correct").booleanValue(), is(choice == 0));
-    assertThat(original.logs().size(), equalTo(1));
+    assertThat(original.tracker().logs().size(), equalTo(1));
     assertThat(
-        original.logs().get(0).get("productOutcome").textValue(),
+        original.tracker().logs().get(0).get("productOutcome").textValue(),
         equalTo((choice == 0 ? Grade.GOOD : Grade.AGAIN).name()));
-    assertThat(original.logs().get(0).get("answerId").intValue(), equalTo(answerId));
-    assertThat(original.recallCount(), equalTo(1));
+    assertThat(original.tracker().logs().get(0).get("answerId").intValue(), equalTo(answerId));
+    assertThat(original.tracker().recallCount(), equalTo(1));
     testabilitySettings.timeTravelTo(new Timestamp(original.createdAt().getTime() + 86_400_000));
 
     for (int retryChoice : new int[] {choice, 1 - choice, choice}) {

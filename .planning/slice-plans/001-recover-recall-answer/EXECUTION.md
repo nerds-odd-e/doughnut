@@ -11,6 +11,14 @@
   `./scripts/run.sh bash scripts/worktree_setup.sh`; applicable command
   `CURSOR_DEV=true nix develop -c pnpm --version` returned 12.14.0.
 
+## CI observer context
+
+- CI observer: GitHub `nerds-odd-e/doughnut`, verified selector `ci.yml`
+  (`donut CI`), target `codex/recover-a-recall-answer-after-a-failed-or-lost-s`.
+  Coordinator `airi-recall-cbbdfa3f`; directory `/tmp/dough-ci-501/watch-NInIyd`,
+  PID 25921, session 30714, yielded cell 9. The earlier trunk claim is
+  unobserved by this branch observer; execution increments use this stream.
+
 ## Slice 1 accepted evidence
 
 2026-10-21, claim revision 9de0b75a02cf7b8d5b92c0d80bfd2a753f41f095 plus
@@ -158,3 +166,41 @@ plus accepted reveal/history. Full frontend proof covers those consumers.
 The one-time whole-product old-alert reading found no live matches; the popup
 dependency and obsolete synthetic retry test were deleted. This is a reading,
 separate from the retained-input/recovery proof. No API/component generation.
+
+## Slice 4 accepted evidence
+
+Source-only reviewer `/root/source_review_4` received the original story and
+returned 38 commitments with qualifications/journeys; actual launch and return
+are retained in this conversation. At fresh-context spelling recovery, the source
+expects the first answer/outcome/creation time/timing and unchanged original
+Grade/Confusion/log/schedule effects, with current readable reveal context.
+`RecallPromptSpellingAnswerRecoveryControllerTest.repeatedRecoveryPreservesAcceptedSpellingAndLearningEffectsAfterNoteEdits`
+observes correct, wrong, OVERLAP, unique and multiple ACCIDENTAL_MATCH acceptance,
+then changed note title/content, changed retry spelling/time and three retries.
+Original answer JSON, identity, all six timing fields, creation time and reviewed
+and matched tracker state/log snapshots remain equal. Unique Confusion is linked
+to the original answer; multiple matches have no secondary adjustment; overlap
+keeps both schedules unchanged. Existing OVERLAP correctness is preserved.
+`acceptedMatchUsesCurrentReadAuthorizationAndOriginalOutcome` changes matching
+notebook ownership, observes filtered reveal with original outcome, and verifies
+anonymous/non-owner refusal with unchanged evidence. Shared concurrent controller
+proof now runs MCQ/spelling × commit/rollback with OSIV preloading, independent
+transactions and barriers: one committed answer/effect, or acceptance after rollback.
+
+`RecallPromptService.lockForAcceptance` owns lock/refresh for both answer routes.
+`SpellingRecallGrading` returns accepted answers before grading, using persisted
+spelling and the existing resolver only for ACCIDENTAL_MATCH reveal construction.
+Inspected controller, service, generic AnsweredQuestion projection, previous-answer,
+ConversationSubject and tracker-history consumers retain their purposes. Spelling
+input/Retry/once-only reveal/actions and distinct overlap continuation remain G2,
+owned by slice 5. MCQ web proof and original exclusions stay accepted.
+
+Command `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed before and
+after refactoring: 2,868 tests, zero failures/errors, two skips; spelling 6/6,
+concurrency 4/4, MCQ recovery 4/4. Active implementation 6–7 minutes; refactor about
+five, excluding suite waits. Initial detached-owner fixture failures were repaired
+by reloading the owner in its fixture transaction. Shared TrackerState now owns
+all schedule/log snapshots. No production or wire change from that refactor.
+Separate acceptance reading swept the retired spelling refusal literal/test;
+no live references remain, with dated observations preserved. No absence test.
+Whitespace passed through the project script; no schema/API generation trigger.

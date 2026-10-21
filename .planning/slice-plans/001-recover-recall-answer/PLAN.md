@@ -18,11 +18,7 @@ implementation or deployment is authorized by this preparation.
 ## Current decisions and reuse
 
 - [Execution context](EXECUTION.md#execution-context) retains identity and checkout setup.
-- CI observer: GitHub `nerds-odd-e/doughnut`, verified selector `ci.yml`
-  (`donut CI`), target `codex/recover-a-recall-answer-after-a-failed-or-lost-s`.
-  Coordinator `airi-recall-cbbdfa3f`; directory `/tmp/dough-ci-501/watch-NInIyd`,
-  PID 25921, session 30714, yielded cell 9. The earlier trunk claim is
-  unobserved by this branch observer; execution increments use this stream.
+- [CI observer context](EXECUTION.md#ci-observer-context) retains the active stream identity.
 
 - The existing prompt ID is the attempt identity. Extend the existing
   `RecallPromptController.answer` and `answerSpelling` operations: authorize,
@@ -161,7 +157,7 @@ record that sweep as a reading, not a permanent absence test.
 
 ### 4. Recover the accepted spelling outcome and its continuation data
 Type: Behavior
-Status: planned
+Status: done
 Proof: Fresh-context spelling controller cases in the proof table, including
 repeated unique-match Confusion and multiple-match reveal data; all backend tests.
 
@@ -243,3 +239,8 @@ observed during preparation. No person-owned product decision is pending.
 Reported: slice 2 — "Coordinator inspected the existing RecallPromptComponent error path; the backend's new recovery result still needs the planned retained-input Retry journey on the current page."
 Story clause: "Explain that submission could not be confirmed and offer a deliberate recovery action."
 Disposition: proved by slice 3: frontend/tests/pages/RecallPage.answerRecovery.spec.ts drives choice and Retry controls through repeated failures, retained submission, correct/wrong reveal/history and once-only progress; pending/navigation cases preserve the current attempt.
+
+### G2. Spelling recovery needs its deliberate web action
+Reported: slice 4 — "The spelling API now recovers accepted outcomes; coordinator inspection confirms the existing spelling form still needs the planned actionable failure and retained-input Retry journey."
+Story clause: "Explain that submission could not be confirmed and offer a deliberate recovery action."
+Disposition: receiving slice 5

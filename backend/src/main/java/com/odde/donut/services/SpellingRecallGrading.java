@@ -80,7 +80,12 @@ final class SpellingRecallGrading {
       throw new IllegalArgumentException("Recall prompt must be of type SPELLING");
     }
     if (recallPrompt.getAnswer() != null) {
-      throw new IllegalArgumentException("Recall prompt is already answered");
+      List<Note> matches =
+          recallPrompt.getAnswer().getOutcome() == AnswerOutcome.ACCIDENTAL_MATCH
+              ? wikiLinkResolver.findAllAccidentalMatches(
+                  recallPrompt.getAnswer().getSpellingAnswer(), recallPrompt.getNote(), user)
+              : List.of();
+      return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, matches);
     }
     MemoryTracker memoryTracker = recallPrompt.requireMemoryTracker();
     String spellingAnswer = answerSpellingDTO.getSpellingAnswer();

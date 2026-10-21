@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.AnswerDTO;
+import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
@@ -100,10 +101,7 @@ public class RecallPromptService {
 
   public RecallPrompt answer(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, Timestamp currentUTCTimestamp) {
-    recallPrompt = recallPromptRepository.findByIdForUpdate(recallPrompt.getId()).orElseThrow();
-    // Request binding may have loaded this entity before the acceptance transaction acquired its
-    // lock.
-    entityManager.refresh(recallPrompt, LockModeType.PESSIMISTIC_WRITE);
+    recallPrompt = lockForAcceptance(recallPrompt);
     if (recallPrompt.getAnswer() != null) {
       return recallPrompt;
     }
@@ -112,5 +110,23 @@ public class RecallPromptService {
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt;
+  }
+
+  public MemoryTrackerService.SpellingAnswerResult answerSpelling(
+      RecallPrompt recallPrompt,
+      AnswerSpellingDTO answerDTO,
+      User user,
+      Timestamp currentUTCTimestamp) {
+    return memoryTrackerService.answerSpelling(
+        lockForAcceptance(recallPrompt), answerDTO, user, currentUTCTimestamp);
+  }
+
+  private RecallPrompt lockForAcceptance(RecallPrompt recallPrompt) {
+    RecallPrompt locked =
+        recallPromptRepository.findByIdForUpdate(recallPrompt.getId()).orElseThrow();
+    // Request binding may have loaded this entity before the acceptance transaction acquired its
+    // lock.
+    entityManager.refresh(locked, LockModeType.PESSIMISTIC_WRITE);
+    return locked;
   }
 }

@@ -6,6 +6,7 @@ import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExtern
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.AnswerDTO;
+import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.AnsweredQuestion;
 import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.MemoryTracker;
@@ -79,6 +80,36 @@ abstract class RecallPromptAnswerRecoveryTestBase extends RecallPromptController
         });
   }
 
+  RecallPrompt createSpellingPrompt() {
+    return inCommittedTransaction(
+        transactionManager,
+        () -> {
+          currentUser.setUser(entityManager.find(User.class, currentUser.getUser().getId()));
+          Note note =
+              makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Correct").please();
+          MemoryTracker tracker = ownedSpellingTracker(note);
+          testabilitySettings.timeTravelTo(tracker.getNextRecallAt());
+          return spellingPrompt(tracker);
+        });
+  }
+
+  AnsweredQuestion acceptSpelling(RecallPrompt prompt, String spelling, boolean timed) {
+    AnswerSpellingDTO dto = spellingAnswer(spelling);
+    if (timed) {
+      dto.setThinkingTimeMs(5000);
+      dto.setAwayMs(1000);
+      dto.setAwayCount(2);
+      dto.setDetourMs(2000);
+      dto.setDetourCount(3);
+      dto.setIdleMs(500);
+    }
+    try {
+      return controller.answerSpelling(prompt, dto);
+    } catch (UnexpectedNoAccessRightException exception) {
+      throw new AssertionError(exception);
+    }
+  }
+
   AnswerDTO timedAnswer(int choice) {
     AnswerDTO dto = choiceAnswer(choice);
     dto.setThinkingTimeMs(5000);
@@ -104,10 +135,19 @@ abstract class RecallPromptAnswerRecoveryTestBase extends RecallPromptController
   }
 
   Evidence snapshot(RecallPrompt prompt) {
-    MemoryTracker tracker = prompt.requireMemoryTracker();
     return new Evidence(
         objectMapper.valueToTree(prompt.getAnswer()),
         prompt.getAnswer().getCreatedAt(),
+        trackerState(prompt.requireMemoryTracker()));
+  }
+
+  TrackerState trackerState(int id) {
+    return inCommittedTransaction(
+        transactionManager, () -> trackerState(entityManager.find(MemoryTracker.class, id)));
+  }
+
+  private TrackerState trackerState(MemoryTracker tracker) {
+    return new TrackerState(
         tracker.getStability(),
         tracker.getDifficulty(),
         tracker.getLastRecalledAt(),
@@ -118,9 +158,9 @@ abstract class RecallPromptAnswerRecoveryTestBase extends RecallPromptController
                 tracker.getId())));
   }
 
-  record Evidence(
-      JsonNode answer,
-      Timestamp createdAt,
+  record Evidence(JsonNode answer, Timestamp createdAt, TrackerState tracker) {}
+
+  record TrackerState(
       Float stability,
       Float difficulty,
       Timestamp lastRecalledAt,

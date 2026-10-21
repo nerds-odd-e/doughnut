@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -26,10 +26,10 @@ class RecallPromptConcurrentAnswerRecoveryControllerTest
   @Autowired EntityManagerFactory entityManagerFactory;
 
   @ParameterizedTest
-  @ValueSource(booleans = {false, true})
-  void overlappingPreloadedRequestRecoversCommitOrAcceptsAfterRollback(boolean rollback)
-      throws Exception {
-    RecallPrompt prompt = createPrompt(false);
+  @CsvSource({"false, false", "true, false", "false, true", "true, true"})
+  void overlappingPreloadedRequestRecoversCommitOrAcceptsAfterRollback(
+      boolean rollback, boolean spelling) throws Exception {
+    RecallPrompt prompt = spelling ? createSpellingPrompt() : createPrompt(false);
     User owner = currentUser.getUser();
     CountDownLatch preloaded = new CountDownLatch(1);
     CountDownLatch written = new CountDownLatch(1);
@@ -58,7 +58,11 @@ class RecallPromptConcurrentAnswerRecoveryControllerTest
                           () -> {
                             assertThat(entityManager.contains(loaded), is(true));
                             attemptingAnswer.countDown();
-                            return accept(loaded, choiceAnswer(1)).getAnswer().getId();
+                            return (spelling
+                                    ? acceptSpelling(loaded, "Wrong", false)
+                                    : accept(loaded, choiceAnswer(1)))
+                                .getAnswer()
+                                .getId();
                           });
                     } finally {
                       TransactionSynchronizationManager.unbindResource(entityManagerFactory);
@@ -78,7 +82,12 @@ class RecallPromptConcurrentAnswerRecoveryControllerTest
                           () -> {
                             RecallPrompt loaded =
                                 repository.findByIdForUpdate(prompt.getId()).orElseThrow();
-                            originalAnswer.set(accept(loaded, timedAnswer(0)).getAnswer().getId());
+                            originalAnswer.set(
+                                (spelling
+                                        ? acceptSpelling(loaded, "Correct", true)
+                                        : accept(loaded, timedAnswer(0)))
+                                    .getAnswer()
+                                    .getId());
                             entityManager.flush();
                             entityManager.refresh(loaded.requireMemoryTracker());
                             originalEvidence.set(snapshot(loaded));
@@ -98,13 +107,20 @@ class RecallPromptConcurrentAnswerRecoveryControllerTest
       int recoveredId = recovery.get(10, TimeUnit.SECONDS);
       Evidence persisted = evidence(prompt.getId());
       assertThat(persisted.answer().get("id").intValue(), equalTo(recoveredId));
-      assertThat(persisted.answer().get("choiceIndex").intValue(), equalTo(rollback ? 1 : 0));
-      assertThat(persisted.logs().size(), equalTo(1));
-      assertThat(persisted.logs().get(0).get("answerId").intValue(), equalTo(recoveredId));
+      if (spelling) {
+        assertThat(
+            persisted.answer().get("spellingAnswer").textValue(),
+            equalTo(rollback ? "Wrong" : "Correct"));
+      } else {
+        assertThat(persisted.answer().get("choiceIndex").intValue(), equalTo(rollback ? 1 : 0));
+      }
+      assertThat(persisted.tracker().logs().size(), equalTo(1));
       assertThat(
-          persisted.logs().get(0).get("productOutcome").textValue(),
+          persisted.tracker().logs().get(0).get("answerId").intValue(), equalTo(recoveredId));
+      assertThat(
+          persisted.tracker().logs().get(0).get("productOutcome").textValue(),
           equalTo((rollback ? Grade.AGAIN : Grade.GOOD).name()));
-      assertThat(persisted.recallCount(), equalTo(1));
+      assertThat(persisted.tracker().recallCount(), equalTo(1));
       if (!rollback) {
         assertThat(recoveredId, equalTo(originalAnswer.get()));
         assertThat(persisted, equalTo(originalEvidence.get()));
