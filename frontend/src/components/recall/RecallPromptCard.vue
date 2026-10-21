@@ -1,6 +1,6 @@
 <template>
   <div class="content h-full">
-    <ContentLoader v-if="!currentRecallPromptFetched || isCurrentMemoryTrackerFetching" />
+    <ContentLoader v-if="!currentRecallPromptLoad || currentRecallPromptLoad.status === 'loading'" />
     <template v-else>
       <div class="pt-5 h-full">
       <SpellingQuestionDisplay
@@ -14,7 +14,7 @@
         :key="`spelling-${currentMemoryTrackerId}-${props.spellingRetryNonce ?? 0}`"
       />
       <template v-else>
-        <div v-if="!currentRecallPrompt">
+        <div v-if="selfReviewTrackerIds.has(currentMemoryTrackerId!)">
           <JustReview
             v-bind="{
               memoryTrackerId: currentMemoryTrackerId,
@@ -22,7 +22,15 @@
             @reviewed="() => emit('just-reviewed', undefined)"
           />
         </div>
-        <template v-else>
+        <div v-else-if="currentRecallPromptLoad.status === 'failed'">
+          <p>We couldn't load this question.</p>
+          <button
+            class="daisy-btn daisy-btn-secondary mt-4"
+            data-testid="self-review"
+            @click="selfReviewTrackerIds.add(currentMemoryTrackerId!)"
+          >Self-review</button>
+        </div>
+        <template v-else-if="currentRecallPrompt">
          <div class="notebook-source mb-4">
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
           </div>
@@ -42,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted } from "vue"
+import { computed, watch, onMounted, ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   MemoryTrackerLite,
@@ -72,32 +80,23 @@ const emit = defineEmits<{
   (e: "just-reviewed", result: undefined): void
 }>()
 
-const { recallPromptCache, fetchRecallPrompts, fetchingMemoryTrackerIds } =
-  useRecallPromptFetching(props)
+const { recallPromptLoads, fetchRecallPrompts } = useRecallPromptFetching(props)
+const selfReviewTrackerIds = ref(new Set<number>())
 
 // Computed properties with better naming
 const currentMemoryTracker = computed(() => memoryTrackerAt(props.currentIndex))
 const currentMemoryTrackerId = computed(
   () => currentMemoryTracker.value?.memoryTrackerId
 )
-const isCurrentMemoryTrackerFetching = computed(() => {
-  const memoryTrackerId = currentMemoryTrackerId.value
-  return (
-    memoryTrackerId !== undefined &&
-    fetchingMemoryTrackerIds.value.has(memoryTrackerId)
-  )
-})
-const currentRecallPromptFetched = computed(() => {
-  const memoryTrackerId = currentMemoryTrackerId.value
-  return (
-    memoryTrackerId !== undefined && memoryTrackerId in recallPromptCache.value
-  )
-})
-const currentRecallPrompt = computed(() => {
+const currentRecallPromptLoad = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
   return memoryTrackerId !== undefined
-    ? recallPromptCache.value[memoryTrackerId]
+    ? recallPromptLoads.value[memoryTrackerId]
     : undefined
+})
+const currentRecallPrompt = computed(() => {
+  const load = currentRecallPromptLoad.value
+  return load?.status === "loaded" ? load.recallPrompt : undefined
 })
 
 // Methods

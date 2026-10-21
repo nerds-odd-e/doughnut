@@ -61,54 +61,12 @@ submission-recovery work or making it a prerequisite.
 
 ## Preparation observations and decisive premises
 
-Observed on 2026-10-21 in
-`/Users/terryyin/git/doughnut/.worktrees/retry-a-failed-recall-question-load-or-choose-se`
-at `c5e0b9ff1b315317d6ea53cf620a2a0f93ea599e`, with the temporary changes
-described below. All scratch edits were reverted before the preparation writes.
-These are local reproductions and bounded observations, not production incidents
-or evidence that the planned remedy is implemented.
-
-1. **Failure surfaces and prefetch ownership.** Temporary
-   `frontend/tests/recall/QuestionLoadPreparation.spec.ts` mounted the real
-   card/children using existing support and wrapped SDK errors. MCQ failure
-   rendered `Good Again`; a successful outer fetch followed by a failed spelling
-   child fetch rendered `Answer`. Each failed the expected visible Retry check.
-   A failed future prefetch left the current `.recall-prompt` present, but
-   navigating to that tracker also rendered `Good Again` and failed Retry.
-   Command:
-   `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/recall/QuestionLoadPreparation.spec.ts tests/recall/RecallPromptCard.spec.ts tests/pages/RecallPage.justReview.spec.ts tests/pages/RecallPage.queueProgress.spec.ts tests/pages/RecallPage.spelling.spec.ts`.
-   Result: three expected scratch failures, 20 existing tests passed, 4.17s.
-   This proves the reported UI seams through mounted components; mocked HTTP
-   does not prove database effects or a real transport outage.
-2. **Fetch relocation consumers.** A scratch edit passed the cached prompt
-   into `SpellingQuestionDisplay` and removed its own fetch, without changing
-   test fixtures or adding overlap invalidation. Command:
-   `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/recall/RecallPromptCard.spec.ts tests/pages/RecallPage.spelling.spec.ts tests/components/recall/SpellingQuestionDisplay.spec.ts`.
-   Result: 15 passed, three failed, 3.09s. The page's overlap scenario observed
-   no fresh request (one call before and after); standalone display fixtures
-   lacked the required prompt and emitted no prompt ID. This falsifies simple
-   pass-through reuse and establishes the invalidation and fixture work in
-   slice 3. After reverting, the five existing files named in these two commands
-   (excluding the scratch file, including `SpellingQuestionDisplay.spec.ts`)
-   passed all 28 tests with `pnpm frontend:test` under Nix, 4.17s. These baseline
-   checks cover normal self-review, progress, spelling feedback, focus and timing;
-   final recovery needs the new discriminating observations below.
-3. **Backend loading preserves learning state.** Temporary controller tests
-   `preparationRepeatedQuestionLoadsPreserveLearningState` and
-   `preparationFailedThenSuccessfulMcqLoadPreservesLearningState` in
-   `MemoryTrackerRecallPromptControllerTest` used real isolated MySQL and the
-   existing OpenAI response mock. Repeated spelling loads returned the same
-   unanswered prompt. MCQ generation returned failure, then a generated prompt
-   on the next controller call. Both retained `nextRecallAt`, the queried
-   RecallLog list and an unanswered prompt. Command:
-   `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
-   The first scratch compile used an unavailable getter; replacing it with
-   existing `recallLogsOf` corrected the observation. The rerun passed the full
-   backend suite (Gradle 58s), including both scratch cases and the existing
-   prompt reuse, ownership, 503 and self-review grade tests. Database:
-   `doughnut_wt_2baea056495d40eaa70473d09077ef73_test`.
-   This establishes endpoint reuse; it does not simulate a real lost response
-   or simultaneous requests. Backend implementation changes are not assumed.
+[Preparation evidence](EVIDENCE.md) retains the dated revision, commands,
+observations and limitations. Mounted-page observations reproduced MCQ fallback,
+failed future prefetch and empty spelling entry; pass-through spelling reuse
+broke OVERLAP continuation and direct fixtures. Real-database controller probes
+established safe endpoint reuse without learning-state changes. All scratch
+changes were reverted; retained regressions belong to slices 2 and 3.
 
 ## Outside-in proof ownership
 
@@ -147,11 +105,36 @@ transitively; inspect remaining `SpellingQuestionDisplay` call forms for the
 new prompt contract. Keep provenance in the observation above. Record the sweep
 as an acceptance reading, never a permanent absence test.
 
+## Execution context
+
+Established start resumed on 2026-10-21: story-branch mode, publisher
+`dashboard-territory.local-doughnut`, agent Eimi-chan, workspace
+`/Users/terryyin/git/doughnut/.worktrees/retry-a-failed-recall-question-load-or-choose-se`,
+branch `codex/retry-a-failed-recall-question-load-or-choose-se`, remote `origin`,
+trunk `main`. Starting revision `80e837bc8f0189e0b5564d89e5a378bd5fd87f17`;
+published claim and initial candidate `c10f6c2c288448026a3376861be3c8f93c14a0bc`.
+The established start reported Changed since readiness review; scope still
+aligns with the seed and the reviewed basis remains unchanged. Replanning is
+allowed within existing planning authority. The selected checkout is the owned
+execution worktree; no default-checkout mutation is needed for increments.
+
+Checkout setup passed `./scripts/run.sh bash scripts/worktree_setup.sh` against
+the current lockfile. The applicable project command
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/recall/RecallPromptCard.spec.ts`
+passed 7 tests before implementation. The installed pre-commit hook runs
+check-only `./scripts/run.sh pnpm lint:changed`; workspace author is Eimi-chan.
+
+CI source is GitHub Actions, verified selector `ci.yml` (display name `donut CI`),
+which runs on branch pushes. Observer coordinator `eimi-story-2`, directory
+`/tmp/dough-ci-501/watch-xb0ZSP`, PID `55116`, session `46925`, yielded cell `9`,
+is bound to this checkout and the execution branch. The earlier trunk claim is
+unobserved by this branch observer. Increments use managed delivery on this stream.
+
 ## Ordered slices
 
 ### 1. Choose self-review after an MCQ load failure
 Type: Behavior
-Status: planned
+Status: done
 Proof: First row of the proof table; preserve existing note/property context,
 grade controls, progress and authorization/error behavior.
 
@@ -235,3 +218,16 @@ slice 1's interim lack of direct Retry is explicitly replaced by slice 2.
 No remaining slice-specific concern was identified in this review. Production
 frequency and recovery savings remain unknown; neither is a premise of this
 bounded repair. Readiness records preparation judgment, not execution authority.
+
+
+## Story obligations
+
+### G1. MCQ Retry and request-isolation promises remain after slice 1
+Reported: slice 1 — "Retry, repeated failure, pending/late-result isolation and MCQ persistence regressions remain for slice 2."
+Story clause: "Offer deliberate Retry on the same tracker and session position, including after a repeated failure."
+Disposition: receiving slice 2
+
+### G2. Spelling question recovery and persistence remain after slice 1
+Reported: slice 1 — "Spelling fetch consolidation, failed-load and OVERLAP recovery, input preservation, attempt ownership and persistence regressions remain for slice 3."
+Story clause: "For spelling, make the stem and answer form usable only with a loaded prompt."
+Disposition: receiving slice 3

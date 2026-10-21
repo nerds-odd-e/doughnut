@@ -6,14 +6,18 @@ import type {
 import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
+type RecallPromptLoad =
+  | { status: "loading" }
+  | { status: "failed" }
+  | { status: "loaded"; recallPrompt: RecallPrompt }
+
 export function useRecallPromptFetching(props: {
   memoryTrackers: MemoryTrackerLite[]
   currentIndex: number
   eagerFetchCount: number
 }) {
-  const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
+  const recallPromptLoads = ref<Record<number, RecallPromptLoad>>({})
   const fetching = ref(false)
-  const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
 
   const fetchNextRecallPrompts = async () => {
     for (
@@ -26,23 +30,26 @@ export function useRecallPromptFetching(props: {
 
       const memoryTrackerId = memoryTracker.memoryTrackerId
 
-      const cachedValue = recallPromptCache.value[memoryTrackerId]
-      if (cachedValue !== undefined) continue
+      const previousLoad = recallPromptLoads.value[memoryTrackerId]
+      if (
+        previousLoad &&
+        (previousLoad.status !== "failed" || !memoryTracker.spelling)
+      )
+        continue
 
-      fetchingMemoryTrackerIds.value.add(memoryTrackerId)
-      try {
-        const { data: recallPrompt, error } = await apiCallWithLoading(() =>
-          MemoryTrackerController.getRecallPrompt({
-            path: { memoryTracker: memoryTrackerId },
-          })
-        )
-        if (!error) {
-          recallPromptCache.value[memoryTrackerId] = recallPrompt!
-        } else {
-          recallPromptCache.value[memoryTrackerId] = undefined
+      recallPromptLoads.value[memoryTrackerId] = { status: "loading" }
+      const { data: recallPrompt, error } = await apiCallWithLoading(() =>
+        MemoryTrackerController.getRecallPrompt({
+          path: { memoryTracker: memoryTrackerId },
+        })
+      )
+      if (!error) {
+        recallPromptLoads.value[memoryTrackerId] = {
+          status: "loaded",
+          recallPrompt: recallPrompt!,
         }
-      } finally {
-        fetchingMemoryTrackerIds.value.delete(memoryTrackerId)
+      } else {
+        recallPromptLoads.value[memoryTrackerId] = { status: "failed" }
       }
     }
   }
@@ -66,8 +73,7 @@ export function useRecallPromptFetching(props: {
   }
 
   return {
-    recallPromptCache,
+    recallPromptLoads,
     fetchRecallPrompts,
-    fetchingMemoryTrackerIds,
   }
 }
