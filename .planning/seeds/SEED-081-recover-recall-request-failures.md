@@ -37,8 +37,8 @@ when refining the selected story; preserve uncertainty about incidence and cost.
 
 ## Story Decomposition
 
-These are queued product stories, not executable plans. Both remain unrefined;
-implementation choices and precise proof belong to later refinement.
+These are queued product stories. Each story carries its own preparation facts;
+executable work belongs to its associated slice plan.
 
 <a id="story-1"></a>
 
@@ -46,47 +46,79 @@ implementation choices and precise proof belong to later refinement.
 
 **Identity:** SEED-081#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-recover-recall-answer/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"434d63e42a1df69d8d8f39d5320d478698d3bbf67e4259596bba13acf7d27453","plan":"82e02f232c227a4f7003acb508e9f3eb8f2fbdabcbc6c5b458a93d7ee1f019ba"}}
 ```
 
-- **For / why:** A learner submitting a multiple-choice or spelling answer can
-  recover the attempt and continue recall after its request fails, including
-  when the server recorded the answer but the response never reached the page.
-- **Scope:** Keep the current prompt, entered answer and session position
-  available through recovery. Make a failed submission understandable. Recover
-  the original recorded result when it exists; permit a deliberate retry when
-  no answer was recorded. The attempt retains one original answer and one set
-  of learning effects, with its original timing evidence. Repeated recovery
-  does not create another Grade, recall log or schedule transition. Preserve
-  existing ownership and ordinary answer/grading rules. Do not automatically
-  resubmit an uncertain outcome or treat a retry as permission to revise an
-  already recorded answer.
-- **Key examples / evaluation:**
-  1. A spelling submission fails before acceptance: the learner sees a failure,
-     keeps the typed answer, deliberately retries and reaches the answered
-     result without reloading or leaving the attempt.
-  2. A multiple-choice answer is committed but its response is lost: recovery
-     shows that original selected choice and mark, advances the current session
-     once, and leaves exactly the originally recorded learning effects.
-  3. The same accepted-response-loss case for a spelling answer recovers its
-     original outcome and any existing overlap or accidental-match continuation.
-  4. Repeating recovery, or attempting a different answer after acceptance,
-     keeps the first recorded result and its schedule rather than submitting
-     a second learning event. A genuinely unrecorded failed attempt remains
-     available for a deliberate retry.
+- **Goal:** A learner can finish the current multiple-choice or spelling recall
+  attempt after a failed submission, including a lost response after acceptance,
+  without losing the answer or applying learning effects twice.
+- **Scope:** Retain the current prompt, selected choice or typed answer, original
+  submission timing evidence, and session position until a result is known.
+  Explain that submission could not be confirmed and offer a deliberate recovery
+  action. That action returns the first accepted answer if present, or submits
+  the retained answer if the earlier request never recorded one. A further failure
+  leaves the same recovery action available. Recovery is available within the
+  current mounted recall session; reloading the page or restarting the app is
+  not required to recover.
+  The original answer, mark/outcome, creation time and timing metrics are
+  authoritative. Repeating recovery, submitting different answer content after
+  acceptance, or overlapping a slow original request with a deliberate retry
+  preserves one accepted answer and its original Grade, Confusion, recall-log
+  and scheduling effects. Existing ownership checks and ordinary grading rules
+  continue to apply. An uncertain request is never automatically resubmitted;
+  recovery is not permission to revise an accepted answer.
+  Feed a recovered result through the existing answer continuation exactly once:
+  ordinary results advance once and remain available in answered history;
+  OVERLAP keeps the tracker current and offers its existing more-specific-answer
+  continuation; ACCIDENTAL_MATCH retains its reveal and resolution continuation.
+  Note context and available resolution actions remain subject to current note
+  visibility and authorization, as on the ordinary reveal.
+- **Deferred promises:** Question-load recovery belongs to story 2. This story
+  adds no offline queue, automatic retry policy, cross-reload draft persistence,
+  generic transport framework, historical notebook-content snapshot, grading
+  policy change, or recovery for unrelated writes such as exclusion/contest.
+- **Key examples:**
+  1. A spelling answer `sedition` fails before acceptance. The same stem and
+     input remain, feedback explains the uncertain submission, and deliberate
+     recovery submits it successfully without reloading. Time spent waiting or
+     recovering does not replace the captured answer-timing evidence.
+  2. A multiple-choice answer is committed but its response is lost. Deliberate
+     recovery shows the first selected choice and mark, advances the session once,
+     and leaves exactly the original learning effects and timing. Sending a
+     different choice after acceptance still recovers the first result.
+  3. A spelling answer is committed but its response is lost. Recovery restores
+     the original outcome. An accidental match still offers its existing reveal
+     and resolution actions for readable matching notes; an overlap still asks
+     for a more specific answer on the same tracker without a Grade or schedule
+     transition for the overlap. This new overlap attempt is distinct from
+     retrying transport for the accepted overlap answer.
+  4. Recovery fails again, or the initial request completes while recovery is
+     pending. The learner keeps the current attempt until one result is known;
+     repeated recovery produces one accepted answer and one normal continuation.
+  5. Another learner attempts recovery for this prompt: the existing ownership
+     rule refuses access and mutation.
+- **UI:** Keep the unanswered card and its retained input visible during failure.
+  Show inline feedback such as “We couldn't confirm your answer. Retry to recover
+  this attempt.” Provide one deliberate Retry action using the retained
+  submission; disable duplicate actions while a request is pending. Do not
+  describe a generic request failure as a deleted or skipped tracker. Ordinary
+  navigation remains available; a late response must not advance a different
+  visible attempt.
 - **Evidence / response:** [DD-317](../../DonutRetrospectiveFindings.md#dd-317--a-failed-or-lost-answer-response-has-no-complete-recovery-journey).
-  This story is the queued response, not a resolution of the finding.
-- **Value / learning:** Protect everyday recall continuity and learning history
-  at a known UI/API failure seam. No failure rate or quantitative saving is
-  claimed.
-- **Effort hypothesis:** M–L, medium-low confidence until the recovery read and
-  request-outcome cases are refined. Keep the outcome to one existing attempt;
-  resplit if it cannot fit a few hours including delivery.
-- **Depends on:** No new prerequisite story. Reuse existing attempt, answer,
-  recall-history and scheduling responsibilities; a new generic retry service
-  or offline queue is not a prerequisite.
-- **Safe stopping point:** One failed answer can be recovered safely through the
-  existing recall journey even if question-loading improvements remain deferred.
+  This remains the queued response, not a resolution of the finding. Temporary
+  failure-boundary observations on 2026-10-21 at `c242d19afddb88b0f2a0246cc1c69290de7f23eb`
+  reproduced the disabled spelling control, rejected accepted MCQ resubmission,
+  and incomplete reloaded accidental-match projection. Commands, setup, results
+  and limitations are retained in the associated plan; scratch tests were removed.
+- **Value / learning:** Protect recall continuity and learning history at the
+  observed UI/API failure seam. Production incidence and quantitative savings
+  remain unknown.
+- **Effort hypothesis:** A few hours including delivery; medium confidence.
+  The early database probe bounds the remaining same-prompt serialization risk.
+- **Depends on:** No prerequisite story. Reuse prompt, answer, history,
+  scheduling and note-matching owners.
+- **Safe stopping point:** Answer recovery works independently of question-load
+  improvements.
 
 <a id="story-2"></a>
 
