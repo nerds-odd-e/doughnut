@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Navigate from a stable sidebar breadcrumb with aligned tools](seeds/SEED-080-command-bar-reconciliation.md#story-2) — SEED-080#story-2 ([plan](slice-plans/002-sidebar-location/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
