@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-081_story-2.json",
+      "identity": "SEED-081#story-2",
+      "completedAt": "2026-10-21T10:59:02.102Z",
+      "blob": "aae8b1b23a4cbcd84810bb8b24b5df0597eaa485"
+    },
+    {
       "fileName": "SEED-081_story-1.json",
       "identity": "SEED-081#story-1",
       "completedAt": "2026-10-21T08:01:52.721Z",

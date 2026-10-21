@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-081#story-2",
+  "title": "Retry a failed recall-question load or choose self-review explicitly",
+  "completedAt": "2026-10-21T10:59:02.102Z",
+  "developer": "Terry Yin",
+  "agent": "Eimi-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
