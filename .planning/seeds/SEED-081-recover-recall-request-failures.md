@@ -126,22 +126,32 @@ executable work belongs to its associated slice plan.
 
 **Identity:** SEED-081#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-recover-recall-question/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0a4d1c5e39299bd617b500beddc0c7135502602209e2832d67093f9a513e9ba8","plan":"0f64934989f5e165ed65ec35447657adc1bc9eccab141e0ad28dda224ba5ffb6"}}
 ```
 
-- **For / why:** A learner whose recall question cannot load can recover the
-  current question without mistaking the failure for an intended self-review
-  exercise or submitting an answer to an empty spelling question.
-- **Scope:** Distinguish question loading, failure and an available question on
-  the current recall card. Offer a deliberate retry that keeps the current
-  tracker and session position. For multiple-choice failures, preserve the
-  existing self-review capability as an explicit learner choice. A spelling
-  failure offers retry without exposing a blank question for answering; this
-  story does not introduce self-grading for spelling. Keep ordinary navigation
-  available and retain existing access/error handling. A failed background
-  prefetch must not change a different visible card. Loading or retrying alone
-  records no answer, Grade or schedule transition.
-- **Key examples / evaluation:**
+- **Goal:** A learner using web recall can recover a question-load failure on
+  the current card, or deliberately choose existing MCQ self-review, preserving
+  session continuity and keeping service failures distinct from learning actions.
+- **Scope:** Distinguish loading, failed loading and an available question for
+  the current tracker. Offer deliberate Retry on the same tracker and session
+  position, including after a repeated failure. During a request, show loading
+  and prevent duplicate recovery actions; ordinary navigation stays available.
+  For MCQ failures, offer Self-review explicitly. Selecting it reveals the
+  existing note context and Good/Again controls; only a subsequent grade changes
+  learning history. For spelling, make the stem and answer form usable only
+  with a loaded prompt. Retain existing access/error handling.
+  A failed future prefetch stays with its tracker: the visible attempt and its
+  input remain intact, and reaching the failed tracker offers its own recovery.
+  Late completion belongs to the request's tracker and attempt, not whichever
+  card is visible when it returns. Loading, retrying and choosing self-review
+  alone record no answer, Grade or schedule transition. Preserve the existing
+  spelling overlap continuation, which loads a fresh attempt on the same tracker.
+- **Deferred promises:** Answer-submission recovery belongs to story 1. This
+  story adds no spelling self-grading, automatic retry/backoff, offline queue,
+  cross-reload recovery, question-quality changes, generic transport framework,
+  or CLI/MCP recovery interface. These are delivery boundaries, not new rejection
+  rules. The web change keeps the existing backend API and grading policy.
+- **Key examples:**
   1. Current multiple-choice question loading returns the server's generation
      failure: the card explains the failure and offers Retry and an explicit
      self-review choice. Retry succeeds and displays a question for the same
@@ -155,13 +165,31 @@ executable work belongs to its associated slice plan.
   4. A prefetched future question fails while the learner answers another:
      the current attempt remains intact; reaching the failed question offers
      its own recovery, and a second failed retry remains recoverable.
+  5. A question retry is pending when the learner moves another tracker to the
+     current position. Its eventual success or failure belongs to the original
+     tracker; the new visible question and progress remain intact.
+  6. After a spelling OVERLAP, the next prompt load fails on the same tracker.
+     Retry loads the new attempt, retaining the overlap explanation and ordinary
+     focus behavior; the learner can submit a more specific answer.
+- **UI:** Inline failure feedback such as “We couldn't load this question.”
+  Show Retry, and Self-review for MCQ. Use the existing inline loading indicator
+  while fetching. Choosing Self-review opens the existing note and grade surface
+  in place. The loading/failure state occupies the spelling question area until
+  a real prompt can be presented.
 - **Evidence / response:** [DD-318](../../DonutRetrospectiveFindings.md#dd-318--a-failed-question-load-falls-through-to-an-unintended-recall-surface).
   This story is the queued response, not a resolution of the finding.
+  Disposable observations on 2026-10-21 at
+  `c5e0b9ff1b315317d6ea53cf620a2a0f93ea599e` reproduced MCQ fallback and the
+  empty spelling answer surface, and showed that naive fetch consolidation
+  breaks overlap continuation. The associated plan retains commands, results,
+  limits and the resulting design decision; all scratch edits were reverted.
 - **Value / learning:** Keep service availability failures distinct from
   deliberate learning actions and restore a useful question through the same
   recall surface. Production frequency and recovery-time savings are unknown.
-- **Effort hypothesis:** M, medium confidence; refine the shared loading state
-  and existing self-review entry before execution.
+- **Effort hypothesis:** Roughly 30–60 minutes including delivery; medium
+  confidence. Existing loading and grading owners support three bounded changes;
+  spelling overlap invalidation is the main integration concern, observed and
+  assigned to the spelling recovery slice.
 - **Depends on:** No hard block on story 1 or the question-context quality story.
   Loading a prompt and recovering a submitted answer are separate user outcomes.
 - **Safe stopping point:** A question-load failure has a useful recovery choice
