@@ -27,8 +27,15 @@ principle 7 and `unit-testing` skill supply the stricter removal convention.
 | MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
 | Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
 
-The question-load assessment below is source-backed, not a record of live
-occurrences. Its production frequency and cost remain unknown. The formal
+DD-317 and DD-318 (recall answer and question-load recovery) are retired:
+their responses, SEED-081#story-1 and SEED-081#story-2, completed on 2026-10-21.
+For DD-318, `bae8f72e04` and `8ee3143db6` keep pending, failed and loaded
+question state per tracker with a same-tracker Retry and explicit Self-review,
+proved by `RecallPage.questionRecovery.spec.ts`; current
+[recall question loading](docs/recall-question-loading.md) describes that
+behavior. Both were source-backed assessments without live occurrence counts.
+Full records remain at `1348cea71a:DonutRetrospectiveFindings.md` (DD-318) and
+`eae596d487:DonutRetrospectiveFindings.md` (DD-317). The formal
 contest candidate
 [SEED-073#story-6](.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#story-6)
 remains unqueued with its policy decisions intact.
@@ -44,44 +51,6 @@ Shared findings retained in DearDough include changed-boundary proof acceptance
 observation/delivery. Their remaining claims concern the shared workflow, not
 an unrepaired Donut helper or voice-control defect. Successful local practice
 is separated below from open problems and has no backlog entry.
-
-## Queued product improvements: Recall request recovery
-
-### DD-318 — A failed question load falls through to an unintended recall surface
-
-**Current source assessment:** At Donut
-`b46b36c9c1abdd6e31802b7ec2dac14330b583cb`,
-`useRecallPromptFetching.ts:fetchNextRecallPrompts` writes an `undefined` cache
-entry on an API error. `RecallPromptCard.vue` treats key presence as fetched and
-renders `JustReview` for that falsy prompt. The existing
-`frontend/tests/recall/RecallPromptCard.spec.ts` test "should show ContentLoader,
-not JustReview, when navigating to a memory tracker that previously failed"
-expects self-review after the initial failure and recovers only after changing
-the current tracker away and back. No direct question retry is offered there.
-`MemoryTrackerController.getRecallPrompt` returns 503 when question generation
-produces no prompt; the server does not identify that as successful self-review.
-Global error handling can show a toast, but does not supply a question-recovery
-choice on the card.
-
-The spelling branch loads its question separately in
-`SpellingQuestionDisplay.vue:fetchSpellingQuestion`; after an error it clears
-loading without a prompt, leaving an empty stem and the answer form available.
-
-**Ownership / limits:** These are Donut-owned failure presentations and learner
-choices, distinct from question-context quality and shared execution process.
-The source-backed paths were not exercised live in this assessment; production
-frequency, latency and cost are unknown. There is no active covering story.
-
-**Queued response:** [Retry a failed recall-question load or choose self-review
-explicitly](https://github.com/nerds-odd-e/doughnut/blob/2c3d5574d8e2f54567f562649fcb87987ca23be5/.planning/seeds/SEED-081-recover-recall-request-failures.md#story-2)
-(`SEED-081#story-2`). Retain explicit existing MCQ self-review while making the
-failed current question recoverable; do not add a spelling self-grading policy.
-Not resolved; implementation and adoption are pending.
-**Evaluation:** Fail the current question request and a future prefetch, then
-retry on the same recall surface. The same tracker and progress remain; a
-loaded spelling question is required for answering, and no Grade or schedule
-change occurs until the learner submits an answer or deliberately grades an
-explicit self-review.
 
 ## Open, not queued: Rebuilding a stale MinerU virtual environment
 
