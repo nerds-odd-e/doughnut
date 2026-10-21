@@ -33,13 +33,11 @@ export const givenSpellingRecoveryQueue = () => {
     createMemoryTrackerLite(1, true),
     createMemoryTrackerLite(2, true)
   )
-  const fetchPrompt = mockSdkService(
+  mockSdkService(
     MemoryTrackerController,
     "getRecallPrompt",
     prompt(102)
-  )
-    .mockResolvedValueOnce(wrapSdkResponse(prompt()))
-    .mockResolvedValueOnce(wrapSdkResponse(prompt()))
+  ).mockResolvedValueOnce(wrapSdkResponse(prompt()))
   mockSdkService(
     MemoryTrackerController,
     "showMemoryTracker",
@@ -48,7 +46,6 @@ export const givenSpellingRecoveryQueue = () => {
   mockSdkService(MemoryTrackerController, "getThresholdExceeded", {
     thresholdExceeded: false,
   })
-  return fetchPrompt
 }
 
 export const submit = async (wrapper: VueWrapper, text = "sedition") => {

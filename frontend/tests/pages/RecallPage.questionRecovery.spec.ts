@@ -2,13 +2,13 @@ import {
   MemoryTrackerController,
   RecallPromptController,
 } from "@generated/donut-backend-api/sdk.gen"
-import type { RecallPrompt } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
 import {
   createMemoryTrackerLite,
+  deferredRecallPromptResponse,
   givenRecallQueue,
   moveCurrentRecallToEnd,
   useRecallPageSpecContext,
@@ -24,20 +24,6 @@ const prompt = (id: number) =>
 const retry = (wrapper: VueWrapper) =>
   wrapper.find('[data-testid="retry-question"]')
 const progress = (wrapper: VueWrapper) => wrapper.find(".progress-bar").text()
-const deferred = () => {
-  let resolve!: (
-    value:
-      | ReturnType<typeof wrapSdkResponse<RecallPrompt>>
-      | ReturnType<typeof wrapSdkError>
-  ) => void
-  const promise = new Promise<
-    | ReturnType<typeof wrapSdkResponse<RecallPrompt>>
-    | ReturnType<typeof wrapSdkError>
-  >((done) => {
-    resolve = done
-  })
-  return { promise, resolve }
-}
 
 beforeEach(() => {
   givenRecallQueue(createMemoryTrackerLite(1), createMemoryTrackerLite(2))
@@ -45,7 +31,7 @@ beforeEach(() => {
 
 describe("RecallPage question recovery", () => {
   it("retries the same tracker through repeated failure and pending duplicate clicks without recording learning", async () => {
-    const pending = deferred()
+    const pending = deferredRecallPromptResponse()
     const getPrompt = mockSdkService(
       MemoryTrackerController,
       "getRecallPrompt",
@@ -89,7 +75,7 @@ describe("RecallPage question recovery", () => {
   it.each([true, false])(
     "keeps navigation and a different question intact after late retry success=%s",
     async (success) => {
-      const pending = deferred()
+      const pending = deferredRecallPromptResponse()
       mockSdkService(MemoryTrackerController, "getRecallPrompt", prompt(2))
         .mockResolvedValueOnce(wrapSdkError("unavailable"))
         .mockImplementationOnce(() => pending.promise)
@@ -114,7 +100,7 @@ describe("RecallPage question recovery", () => {
   )
 
   it("keeps a failed future prefetch local and offers recovery when reached", async () => {
-    const pending = deferred()
+    const pending = deferredRecallPromptResponse()
     const getPrompt = mockSdkService(
       MemoryTrackerController,
       "getRecallPrompt",

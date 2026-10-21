@@ -1,7 +1,4 @@
-import {
-  MemoryTrackerController,
-  RecallPromptController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import SpellingQuestionDisplay from "@/components/recall/SpellingQuestionDisplay.vue"
@@ -16,16 +13,6 @@ export function mockSpellingQuestionServices() {
     RecallPromptController,
     "answerSpelling",
     makeMe.anAnsweredQuestion.spelling().please()
-  )
-  mockSdkService(
-    MemoryTrackerController,
-    "getRecallPrompt",
-    makeMe.aRecallPrompt.withSpellingStem("Spell the word").please()
-  )
-  mockSdkService(
-    MemoryTrackerController,
-    "showMemoryTracker",
-    makeMe.aMemoryTracker.please()
   )
 }
 
@@ -49,12 +36,17 @@ export function flushCapturedAnimationFrames(
 }
 
 export async function mountSpellingQuestionDisplay(
-  props: { memoryTrackerId: number; nextIsSpelling?: boolean },
+  props: { nextIsSpelling?: boolean },
   options?: { attachTo?: HTMLElement; rafCallbacks?: FrameRequestCallback[] }
 ) {
   const wrapper = helper
     .component(SpellingQuestionDisplay)
-    .withProps(props)
+    .withProps({
+      recallPrompt: makeMe.aRecallPrompt
+        .withSpellingStem("Spell the word")
+        .please(),
+      ...props,
+    })
     .mount(options?.attachTo ? { attachTo: options.attachTo } : undefined)
   await flushPromises()
   if (options?.rafCallbacks) {

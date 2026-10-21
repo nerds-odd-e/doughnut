@@ -50,7 +50,7 @@ describe("SpellingQuestionDisplay", () => {
         expect(softKeyboardPrimerElement()).toBeTruthy()
 
         const wrapper = await mountSpellingQuestionDisplay(
-          { memoryTrackerId: 1, nextIsSpelling },
+          { nextIsSpelling },
           { attachTo: document.body, rafCallbacks }
         )
         await submitSpellingAnswer(wrapper)
@@ -66,10 +66,7 @@ describe("SpellingQuestionDisplay", () => {
   })
 
   it("submits answer with thinking time on submit", async () => {
-    const wrapper = await mountSpellingQuestionDisplay(
-      { memoryTrackerId: 1 },
-      { rafCallbacks }
-    )
+    const wrapper = await mountSpellingQuestionDisplay({}, { rafCallbacks })
 
     performanceNowSpy.mockReturnValue(5000)
     vi.advanceTimersByTime(5000)
@@ -89,10 +86,7 @@ describe("SpellingQuestionDisplay", () => {
   })
 
   it("submits away, detour, and idle fields alongside thinking time on submit", async () => {
-    const wrapper = await mountSpellingQuestionDisplay(
-      { memoryTrackerId: 1 },
-      { rafCallbacks }
-    )
+    const wrapper = await mountSpellingQuestionDisplay({}, { rafCallbacks })
 
     performanceNowSpy.mockReturnValue(5000)
     vi.advanceTimersByTime(5000)
@@ -114,10 +108,7 @@ describe("SpellingQuestionDisplay", () => {
   })
 
   it("accepts answer only once when submit is triggered multiple times", async () => {
-    const wrapper = await mountSpellingQuestionDisplay(
-      { memoryTrackerId: 1 },
-      { rafCallbacks }
-    )
+    const wrapper = await mountSpellingQuestionDisplay({}, { rafCallbacks })
     await wrapper
       .find("input[placeholder='put your answer here']")
       .setValue("cat")
@@ -149,10 +140,7 @@ describe("SpellingQuestionDisplay", () => {
       expectMessage: false,
     },
   ])("shows inactive mask when $case", async ({ trigger, expectMessage }) => {
-    const wrapper = await mountSpellingQuestionDisplay(
-      { memoryTrackerId: 1 },
-      { rafCallbacks }
-    )
+    const wrapper = await mountSpellingQuestionDisplay({}, { rafCallbacks })
     expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
       false
     )
@@ -168,10 +156,7 @@ describe("SpellingQuestionDisplay", () => {
   })
 
   it("disables submit button after form is submitted", async () => {
-    const wrapper = await mountSpellingQuestionDisplay(
-      { memoryTrackerId: 1 },
-      { rafCallbacks }
-    )
+    const wrapper = await mountSpellingQuestionDisplay({}, { rafCallbacks })
     const submitButton = wrapper.find("input[type='submit']")
     expect(submitButton.attributes("disabled")).toBeUndefined()
 

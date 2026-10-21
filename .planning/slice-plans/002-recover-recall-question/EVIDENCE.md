@@ -171,3 +171,56 @@ passed 20 tests; both frontend typechecks passed. Other accepted proof stayed
 compatible. CI repair e46d23deacb110a1cd861519810c311b5faeddbd changed only E2E and
 records; slice-2 saved work restored cleanly before this refactor.
 G1 is proved; G2 still belongs to slice 3. Preparation basis is not renewed.
+
+
+## Slice 3 acceptance
+
+Fresh source-only `/root/source_promises_3` received only the original complete
+Goal/Scope/exclusions/examples/UI, with no inherited history or file access.
+Its actual input and individual returned commitments remain in the conversation.
+All source promises were compared with the actual product and proof:
+
+- Spelling failure/repeated failure → Retry; pending → inline busy state and
+  unavailable entry; success → actual stem and enabled entry. The new
+  RecallPage.spellingQuestionRecovery.spec.ts first journey observes these
+  states, duplicate pending clicks, no answer/grade and 0/2 during recovery,
+  and returned prompt 71 in the subsequent real DOM submission.
+- Failed future prefetch while typing → input retained; reaching tracker →
+  its own Retry and loaded stem. Pending Retry then page Move-to-end → other
+  stem/input and 0/2 intact after late success or error; revisit → own result.
+- OVERLAP → fresh same-tracker load fails → explanation and Retry → pending →
+  loaded prompt 72. Final page journey observes retained explanation, empty
+  focused entry reachable at 375x667, 0/2, tracker-1 load paths, more-specific
+  answer using 72, and 3000ms thinking after a 20-second simulated load delay.
+- Shared loader owns tracker/request identity and cache invalidation. Required
+  child prompt mounts entry only when presented; standalone display tests keep
+  mask, keyboard, timing and submission behavior. Initial full-suite failure
+  exposed old duplicate-fetch fixtures in spelling submission-recovery tests;
+  those setups/counts were removed while retaining retry payload 101 and fresh
+  102 submission observations. Focused affected consumers passed 12/12.
+- Real controller/database repeated spelling loads retain the same unanswered
+  prompt, RecallLog and due time. MCQ regression moved alongside this in
+  MemoryTrackerRecallPromptRecoveryControllerTest and passed again. No API or
+  grading-policy change. Slice-1/2 Self-review, loading, Retry, navigation,
+  no-learning and wrapper/access promises remain covered in the full suites.
+  All original deferred promises remain excluded; no automatic retry added.
+
+Red command `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPage.spellingQuestionRecovery.spec.ts`
+failed on missing-prompt entry before implementation. Final
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` passed 388 files/2406 tests.
+Both exact frontend typecheck commands retained above passed on frozen final
+content. `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed: 2870
+tests, 2 skipped, zero failures/errors. `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/recall_quiz_spelling_question.feature,e2e_test/features/recall/overlap_try_again.feature`
+passed 4/4. The E2E overlap page method observes card-level feedback and retains
+empty/focused entry assertions. Active implementation/diagnosis about 5 minutes
+(agent estimate), verification waits excluded. Independent refactor extracted the shared typed deferred prompt response into
+recallPageTestSupport.ts. The MCQ/spelling question recovery specs retain all
+scenarios/assertions; their focused pair passed 9/9 and both frontend typechecks
+passed on refactored content. Other accepted proof stayed compatible. Coordinator
+inspected the helper and consumers before status mutation. G2 is proved; no open story gaps remain.
+
+Separate removal reading: `fetchSpellingQuestion` has zero runtime references
+across frontend/backend/CLI/MCP/packages/E2E/docs. PLAN's sweep instruction and
+DD-318's explicitly dated source observation retain the symbol as provenance;
+no observed action was renamed. Every direct SpellingQuestionDisplay call
+(Card and standalone mount helper) supplies a loaded prompt. No absence test.

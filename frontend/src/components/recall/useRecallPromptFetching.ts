@@ -7,7 +7,7 @@ import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 type RecallPromptLoad =
-  | { status: "loading" }
+  | { status: "loading"; requestId: number }
   | { status: "failed" }
   | { status: "loaded"; recallPrompt: RecallPrompt }
 
@@ -18,12 +18,15 @@ export function useRecallPromptFetching(props: {
 }) {
   const recallPromptLoads = ref<Record<number, RecallPromptLoad>>({})
 
+  let nextRequestId = 0
+
   const loadRecallPrompt = async (
     memoryTrackerId: number,
     foreground: boolean
   ) => {
     if (recallPromptLoads.value[memoryTrackerId]?.status === "loading") return
-    recallPromptLoads.value[memoryTrackerId] = { status: "loading" }
+    const requestId = ++nextRequestId
+    recallPromptLoads.value[memoryTrackerId] = { status: "loading", requestId }
     const request = () =>
       MemoryTrackerController.getRecallPrompt({
         path: { memoryTracker: memoryTrackerId },
@@ -31,6 +34,8 @@ export function useRecallPromptFetching(props: {
     const { data: recallPrompt, error } = await (foreground
       ? apiCallWithLoading(request)
       : request())
+    const current = recallPromptLoads.value[memoryTrackerId]
+    if (current?.status !== "loading" || current.requestId !== requestId) return
     recallPromptLoads.value[memoryTrackerId] = error
       ? { status: "failed" }
       : { status: "loaded", recallPrompt: recallPrompt! }
@@ -45,11 +50,7 @@ export function useRecallPromptFetching(props: {
       const memoryTrackerId = memoryTracker.memoryTrackerId
 
       const previousLoad = recallPromptLoads.value[memoryTrackerId]
-      if (
-        previousLoad &&
-        (previousLoad.status !== "failed" || !memoryTracker.spelling)
-      )
-        continue
+      if (previousLoad) continue
 
       await loadRecallPrompt(memoryTrackerId, offset === 0)
     }
@@ -64,5 +65,9 @@ export function useRecallPromptFetching(props: {
     recallPromptLoads,
     fetchRecallPrompts: fetchNextRecallPrompts,
     retryRecallPrompt,
+    startRecallAttempt: (memoryTrackerId: number) => {
+      delete recallPromptLoads.value[memoryTrackerId]
+      return loadRecallPrompt(memoryTrackerId, true)
+    },
   }
 }

@@ -129,6 +129,8 @@ which runs on branch pushes. Observer coordinator `eimi-story-2`, directory
 is bound to this checkout and the execution branch. The earlier trunk claim is
 unobserved by this branch observer. Increments use managed delivery on this stream. Slice 1 was accepted on the
 execution branch at `07606012773257fbb71ba09491cc96907e127b6a`.
+Slice 2 was accepted at `bae8f72e04e02563c58fc7429c812f263ba263b1`, after
+E2E repair `e46d23deacb110a1cd861519810c311b5faeddbd`.
 
 ## Ordered slices
 
@@ -170,7 +172,7 @@ recovery, with spelling still handled by its original path until slice 3.
 
 ### 3. Recover spelling loads through the shared question owner
 Type: Behavior
-Status: planned
+Status: done
 Proof: Spelling recovery, overlap/focus/timing, navigation and learning-state
 rows, plus the separate removal reading.
 
@@ -225,12 +227,12 @@ bounded repair. Readiness records preparation judgment, not execution authority.
 ### G1. MCQ Retry and request-isolation promises remain after slice 1
 Reported: slice 1 — "Retry, repeated failure, pending/late-result isolation and MCQ persistence regressions remain for slice 2."
 Story clause: "Offer deliberate Retry on the same tracker and session position, including after a repeated failure."
-Disposition: proved by slice 2: RecallPage.questionRecovery.spec.ts repeated failure, pending and navigation journeys; MemoryTrackerRecallPromptControllerTest.failedThenSuccessfulMcqLoadingPreservesLearningState
+Disposition: proved by slice 2: RecallPage.questionRecovery.spec.ts repeated failure, pending and navigation journeys; MemoryTrackerRecallPromptRecoveryControllerTest.failedThenSuccessfulMcqLoadingPreservesLearningState
 
 ### G2. Spelling question recovery and persistence remain after slice 1
 Reported: slice 1 — "Spelling fetch consolidation, failed-load and OVERLAP recovery, input preservation, attempt ownership and persistence regressions remain for slice 3."
 Story clause: "For spelling, make the stem and answer form usable only with a loaded prompt."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: RecallPage.spellingQuestionRecovery.spec.ts loaded-entry, prefetch, late-result and OVERLAP journeys; MemoryTrackerRecallPromptRecoveryControllerTest repeated spelling-load persistence
 
 
 ### G3. Existing E2E consumers expected automatic Self-review

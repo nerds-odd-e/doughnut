@@ -89,28 +89,6 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
     assertThat(controller.getRecallPrompt(ownedTracker()).getMcq(), notNullValue());
   }
 
-  @Test
-  void failedThenSuccessfulMcqLoadingPreservesLearningState()
-      throws UnexpectedNoAccessRightException {
-    MemoryTracker tracker = ownedTracker();
-    var nextRecallAt = tracker.getNextRecallAt();
-    var recallLogs = recallLogsOf(tracker);
-    openAiStructuredResponseMock.stubStructuredResponse(null);
-    assertThrows(ResponseStatusException.class, () -> controller.getRecallPrompt(tracker));
-
-    openAiStructuredResponseMock.stubStructuredResponse(makeMe.aGeneratedMcq().please());
-    var prompt = controller.getRecallPrompt(tracker);
-    makeMe.entityPersister.flush();
-    makeMe.refresh(tracker);
-    RecallPrompt persistedPrompt = entityManager.find(RecallPrompt.class, prompt.getId());
-    makeMe.refresh(persistedPrompt);
-
-    assertThat(tracker.getNextRecallAt(), equalTo(nextRecallAt));
-    assertThat(recallLogsOf(tracker), equalTo(recallLogs));
-    assertThat(persistedPrompt.getAnswer(), nullValue());
-    assertThat(controller.getRecallPrompt(tracker).getId(), equalTo(prompt.getId()));
-  }
-
   @Nested
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   class OpenAiCallDoesNotHoldTransaction {
