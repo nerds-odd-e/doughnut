@@ -17,6 +17,22 @@ implementation or deployment is authorized by this preparation.
 
 ## Current decisions and reuse
 
+- Execution resumed 2026-10-21 in the established owned worktree
+  `/Users/terryyin/git/doughnut/.worktrees/recover-a-recall-answer-after-a-failed-or-lost-s`,
+  branch `codex/recover-a-recall-answer-after-a-failed-or-lost-s`, Story Branch
+  Mode, origin/main integration target. Publisher
+  `dashboard-territory.local-doughnut`, agent Airi-chan; starting revision
+  `a9b42ad6f55242ab4df205b1ae672b913381e3e2`, published claim
+  `9de0b75a02cf7b8d5b92c0d80bfd2a753f41f095`. Existing planning authority
+  permits in-scope refinement. Checkout setup completed with
+  `./scripts/run.sh bash scripts/worktree_setup.sh`; applicable command
+  `CURSOR_DEV=true nix develop -c pnpm --version` returned 12.14.0.
+- CI observer: GitHub `nerds-odd-e/doughnut`, verified selector `ci.yml`
+  (`donut CI`), target `codex/recover-a-recall-answer-after-a-failed-or-lost-s`.
+  Coordinator `airi-recall-cbbdfa3f`; directory `/tmp/dough-ci-501/watch-NInIyd`,
+  PID 25921, session 30714, yielded cell 9. The earlier trunk claim is
+  unobserved by this branch observer; execution increments use this stream.
+
 - The existing prompt ID is the attempt identity. Extend the existing
   `RecallPromptController.answer` and `answerSpelling` operations: authorize,
   serialize acceptance for that prompt, return its accepted answer if present,
@@ -28,6 +44,8 @@ implementation or deployment is authorized by this preparation.
   establish fresh answer visibility after lock acquisition: the path-variable
   entity can already be managed before the transactional controller runs. A lock
   alone is not assumed to refresh that entity or its answer association.
+  See [probe reassessment](OBSERVATIONS.md#probe-reassessment) for the
+  failed inside-transaction snapshot and the required faithful-boundary follow-up.
 - Keep `Answer` / `RecallLog` authoritative for the accepted choice, spelling,
   timestamp, timing and mark/outcome. Reuse `AnsweredQuestion` for both fresh and
   recovered replies. Restore accidental-match presentation with the existing
@@ -63,19 +81,8 @@ implementation or deployment is authorized by this preparation.
 
 ## Preparation observations and decisive premises
 
-Observed on 2026-10-21 in
-`/Users/terryyin/git/doughnut/.worktrees/recover-a-recall-answer-after-a-failed-or-lost-s`
-at `c242d19afddb88b0f2a0246cc1c69290de7f23eb` plus temporary observation tests.
-These are bounded reproductions, not production incidents or proof of a remedy.
-All scratch tests were deleted before recording preparation.
-
-| Premise / consuming operation | Setup, literal observation and result | Limit / disposition |
-| --- | --- | --- |
-| A failed spelling request leaves no usable submission action | Temporary `frontend/tests/recall/AnswerRecoveryPreparation.spec.ts` mounted the real RecallPromptCard with its spelling child; existing test support supplied the prompt, SDK returned a wrapped network error, and the form submitted `cat`. `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/recall/AnswerRecoveryPreparation.spec.ts` failed at the expected enabled-submit assertion: `disabled` was `""`; retained input assertion passed. One test, one expected failure; browser run 4.13s. | Reproduces frontend failure through DOM input and form submission. SDK mock does not prove server acceptance; slices 2 and 4 own that separately. |
-| Repeating an accepted MCQ request cannot recover it | Temporary `RecallAnswerRecoveryPreparationTest.acceptedMcqCanBeRecoveredByRepeatingItsSubmission` accepted a controller answer, flushed/cleared persistence, reloaded the prompt and submitted again. `CURSOR_DEV=true nix develop -c pnpm backend:test_only` threw `QuestionAnswerException: The question is already answered` at the second controller call. | Real isolated MySQL persistence, but the test transaction did not simulate a lost wire response or concurrent committed requests. Slice 1 probes the latter; slice 2 establishes the replacement contract. |
-| Reloaded spelling projection omits accidental-match continuation data | In that same run, `acceptedAccidentalMatchCanBeProjectedAfterReload` submitted a real accidental match through the controller, confirmed one matched note, flushed/cleared and projected the reloaded prompt with `AnsweredQuestion.from`. The required matchedNotes assertion failed with null. | Confirms the projection gap, not that a new result path works. Slice 4 must construct and observe the complete recovered reply through the controller, including several matching notes. |
-| Existing backend regression baseline runs here | The same all-backend run completed 2,857 tests, with exactly the two expected scratch failures and two skipped; no other failures. Gradle test phase reported 1m13s, after initial isolated DB provisioning/migration. | Existing passing tests are baseline evidence, not claimed discriminating proof of recovery. No implementation was retained. |
-| Overlapping requests can share one acceptance boundary with fresh committed state | The existing lock is located, but its behavior with preloaded controller entities has not been observed. | Bounded by the early state-changing MySQL probe in slice 1; do not infer serialization from annotation presence. |
+See [the dated preparation observations](OBSERVATIONS.md) for the baseline
+setups, literal results and limits consumed by this plan.
 
 ## Outside-in proof ownership
 
@@ -107,7 +114,7 @@ submission/recovery journey: new page cases must use actual controls.
 
 ### 1. Establish fresh-state serialization for one recall attempt
 Type: Structure
-Status: planned
+Status: done
 Proof: An isolated real-MySQL probe with two independent transactions observes
 fresh answer state after lock acquisition, including the entity already being
 loaded before the lock and the first transaction rolling back.
@@ -234,3 +241,7 @@ input responsibilities remain distinct. No remaining slice-specific concern is
 identified outside the bounded fresh-state serialization probe in slice 1.
 The probe's result must precede dependent implementation; it is not claimed as
 observed during preparation. No person-owned product decision is pending.
+
+## Accepted execution evidence
+
+[Execution evidence](EXECUTION.md) retains slice proof, source acceptance and learnings.
