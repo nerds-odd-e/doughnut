@@ -8,6 +8,9 @@ reversal. Router and sidebar collaborators do not own store state.
 `resetNoteStore()` resets cache and undo state while preserving the singleton's
 identity for tests.
 
+[Notebook workspace](notebook-workspace.md) describes route-derived location,
+sidebar ownership and toolbar allocation around the note store.
+
 `noteRequests.ts` owns SDK requests. Failed requests throw, while
 `apiCallWithLoading` displays the error toast. Title and creation requests
 retain field errors for forms, following [failure handling](adrs/0006-failure-handling-accepted.md).
