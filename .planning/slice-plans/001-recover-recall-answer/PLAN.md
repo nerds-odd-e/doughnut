@@ -55,8 +55,10 @@ implementation or deployment is authorized by this preparation.
   answer response responsibility rather than teaching DTO projection to grade.
   `ConversationSubject`, memory-tracker history, and previous-answer listing
   also consume answer projections; preserve their current observable purposes.
-  Searches across CLI and MCP found no callers of the two prompt answer routes;
-  their distinct recall actions do not require new recovery UI.
+  CLI callers in `recallMcqStageSupport.tsx` and `spellingRecallStageSupport.tsx`
+  use these routes. Their stages prevent overlapping submissions and leave the
+  session on failure; this web recovery journey does not add CLI retry controls.
+  Preserve their existing response contract. MCP has no prompt-answer caller.
 - Relevant Accepted ADRs: [0003, scheduling policy](../../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)
   fixes Grade/Confusion/Overlap and timing semantics;
   [0006, failure handling](../../../docs/adrs/0006-failure-handling-accepted.md)
@@ -244,3 +246,7 @@ Disposition: proved by slice 3: frontend/tests/pages/RecallPage.answerRecovery.s
 Reported: slice 4 — "The spelling API now recovers accepted outcomes; coordinator inspection confirms the existing spelling form still needs the planned actionable failure and retained-input Retry journey."
 Story clause: "Explain that submission could not be confirmed and offer a deliberate recovery action."
 Disposition: proved by slice 5: frontend/tests/pages/RecallPage.spellingRecovery.spec.ts and RecallPage.spellingRecoveryOutcomes.spec.ts drive real form/Retry controls through repeated failures, immutable timing, ordinary history/progress, stale navigation, overlap's new prompt/refocus and current-authorized accidental-match resolution actions.
+
+## Execution complete
+
+Product advice: preserve the existing queue; story 2 remains the separate question-load recovery outcome. Aggregate implementation, architecture and test review found no correction. CLI consumer verification passed: 67 files, 440 tests; the Python stage discovered zero tests. Process occurrence recorded under ODF-074. CI remains pending until the execution's completion operation.
