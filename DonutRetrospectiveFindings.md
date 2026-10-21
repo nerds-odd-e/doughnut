@@ -27,12 +27,23 @@ principle 7 and `unit-testing` skill supply the stricter removal convention.
 | MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
 | Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
 
-The 2026-10-21 selection at Donut `55007dab3d` queues no new local
-stories. The single MinerU recovery remains below the current
-learning/refinement direction, which excludes bulk ingestion. The stale
-Development-class cause remains unestablished after the healthy probes below,
-so no specific remedy is selected for it. Existing Taken work and queue order
-are unchanged.
+The earlier 2026-10-21 local-log selection at Donut `55007dab3d` queued no
+new stories. The owner's subsequent product reassessment at
+`b46b36c9c1abdd6e31802b7ec2dac14330b583cb` also read the current backlog and
+canonical candidates, recent completed-story reviews, and relevant recall
+source/tests. It selects two new leading product stories: recover a failed or
+lost answer response, then retry a failed question load or explicitly choose
+existing self-review. Both preserve learning history and the current direction;
+the existing four queued stories retain their order and Taken remains empty.
+These source-backed assessments establish failure paths, not live occurrence
+counts, frequency or measured cost. The formal contest candidate
+[SEED-073#story-6](.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#story-6)
+remains unqueued with its policy decisions intact.
+
+The single MinerU recovery remains below the current learning/refinement
+direction. The stale Development-class cause remains unestablished after the
+healthy probes below, so no specific remedy is selected for either older
+finding. Their original evidence and uncertainty remain available.
 
 Shared findings retained in DearDough include changed-boundary proof acceptance
 (DD-218; public wrap-up step 2), decisive planning premises (DD-224; public
@@ -40,6 +51,82 @@ Shared findings retained in DearDough include changed-boundary proof acceptance
 observation/delivery. Their remaining claims concern the shared workflow, not
 an unrepaired Donut helper or voice-control defect. Successful local practice
 is separated below from open problems and has no backlog entry.
+
+## Queued product improvements: Recall request recovery
+
+### DD-317 — A failed or lost answer response has no complete recovery journey
+
+**Current source assessment:** At Donut
+`b46b36c9c1abdd6e31802b7ec2dac14330b583cb`,
+`frontend/src/components/recall/SpellingQuestionDisplay.vue` sets `submitted`
+before emitting the answer and disables Answer. Its parent
+`RecallPromptCard.vue:onSpellingAnswer` reacts only on success and provides no
+failure completion that restores submission. A rejected answer request therefore
+leaves that mounted spelling attempt unable to submit again.
+
+For multiple choice, `RecallPromptComponent.vue:submitAnswer` re-enables input
+on an API error; its existing `RecallPromptComponent.spec.ts` test "allows
+retrying on API error" proves the mocked fail-then-success path only.
+`AnswerService.createAnswerForQuestion` calls `Answer.buildAnswer`, which
+rejects an existing answer with "The question is already answered" before
+scheduling. Consequently, when an answer commits and its response is lost,
+retrying the current operation cannot recover the stored result. This prevents
+a duplicate answer, but leaves the learner without a complete in-place recovery.
+The spelling grading path likewise rejects an existing answer
+(`services/SpellingRecallGrading.java`).
+
+**Ownership / limits:** Donut owns these UI/API states and learning effects.
+This is separate from shared proof and delivery processes. These are current
+source/test observations, not reproduced live incidents; production occurrence
+count, transport conditions and frequency remain unknown. Existing overlap
+spelling retry concerns a returned learning outcome, not a failed request, and
+does not cover this seam. No active story covers it.
+
+**Queued response:** [Recover a recall answer after a failed or lost submission
+response](.planning/seeds/SEED-081-recover-recall-request-failures.md#story-1)
+(`SEED-081#story-1`). Preserve the original attempt and learning history, recover
+a recorded result after response loss, and allow deliberate retry when the
+attempt was not recorded. Not resolved; implementation and adoption are pending.
+**Evaluation:** Inject a failure before acceptance and a response loss after
+acceptance for both answer formats. Recover through the same card; inspect the
+persisted answer, recall logs and schedule to establish one set of effects and
+unchanged session position until a real result is recovered.
+
+### DD-318 — A failed question load falls through to an unintended recall surface
+
+**Current source assessment:** At Donut
+`b46b36c9c1abdd6e31802b7ec2dac14330b583cb`,
+`useRecallPromptFetching.ts:fetchNextRecallPrompts` writes an `undefined` cache
+entry on an API error. `RecallPromptCard.vue` treats key presence as fetched and
+renders `JustReview` for that falsy prompt. The existing
+`frontend/tests/recall/RecallPromptCard.spec.ts` test "should show ContentLoader,
+not JustReview, when navigating to a memory tracker that previously failed"
+expects self-review after the initial failure and recovers only after changing
+the current tracker away and back. No direct question retry is offered there.
+`MemoryTrackerController.getRecallPrompt` returns 503 when question generation
+produces no prompt; the server does not identify that as successful self-review.
+Global error handling can show a toast, but does not supply a question-recovery
+choice on the card.
+
+The spelling branch loads its question separately in
+`SpellingQuestionDisplay.vue:fetchSpellingQuestion`; after an error it clears
+loading without a prompt, leaving an empty stem and the answer form available.
+
+**Ownership / limits:** These are Donut-owned failure presentations and learner
+choices, distinct from question-context quality and shared execution process.
+The source-backed paths were not exercised live in this assessment; production
+frequency, latency and cost are unknown. There is no active covering story.
+
+**Queued response:** [Retry a failed recall-question load or choose self-review
+explicitly](.planning/seeds/SEED-081-recover-recall-request-failures.md#story-2)
+(`SEED-081#story-2`). Retain explicit existing MCQ self-review while making the
+failed current question recoverable; do not add a spelling self-grading policy.
+Not resolved; implementation and adoption are pending.
+**Evaluation:** Fail the current question request and a future prefetch, then
+retry on the same recall surface. The same tracker and progress remain; a
+loaded spelling question is required for answering, and no Grade or schedule
+change occurs until the learner submits an answer or deliberately grades an
+explicit self-review.
 
 ## Open, not queued: Rebuilding a stale MinerU virtual environment
 
