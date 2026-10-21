@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Recover a recall answer after a failed or lost submission response](seeds/SEED-081-recover-recall-request-failures.md#story-1) — SEED-081#story-1 ([plan](slice-plans/001-recover-recall-answer/PLAN.md))
-
 ## Backlog list
 
 - [Retry a failed recall-question load or choose self-review explicitly](seeds/SEED-081-recover-recall-request-failures.md#story-2) — SEED-081#story-2

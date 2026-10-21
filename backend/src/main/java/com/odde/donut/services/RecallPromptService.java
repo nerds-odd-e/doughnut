@@ -1,11 +1,14 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.AnswerDTO;
+import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.AiQuestionGenerator;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import java.sql.Timestamp;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ public class RecallPromptService {
   private final AnswerService answerService;
   private final MemoryTrackerService memoryTrackerService;
   private final RecallPromptPersister recallPromptPersister;
+  private final EntityManager entityManager;
 
   @Autowired
   public RecallPromptService(
@@ -29,7 +33,8 @@ public class RecallPromptService {
       MemoryTrackerService memoryTrackerService,
       McqService mcqService,
       AiQuestionGenerator aiQuestionGenerator,
-      RecallPromptPersister recallPromptPersister) {
+      RecallPromptPersister recallPromptPersister,
+      EntityManager entityManager) {
     this.recallPromptRepository = recallPromptRepository;
     this.entityPersister = entityPersister;
     this.answerService = answerService;
@@ -37,6 +42,7 @@ public class RecallPromptService {
     this.mcqService = mcqService;
     this.aiQuestionGenerator = aiQuestionGenerator;
     this.recallPromptPersister = recallPromptPersister;
+    this.entityManager = entityManager;
   }
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
@@ -95,10 +101,32 @@ public class RecallPromptService {
 
   public RecallPrompt answer(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, Timestamp currentUTCTimestamp) {
+    recallPrompt = lockForAcceptance(recallPrompt);
+    if (recallPrompt.getAnswer() != null) {
+      return recallPrompt;
+    }
     Answer answer =
         answerService.createAnswerForQuestion(recallPrompt, answerDTO, currentUTCTimestamp);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt;
+  }
+
+  public MemoryTrackerService.SpellingAnswerResult answerSpelling(
+      RecallPrompt recallPrompt,
+      AnswerSpellingDTO answerDTO,
+      User user,
+      Timestamp currentUTCTimestamp) {
+    return memoryTrackerService.answerSpelling(
+        lockForAcceptance(recallPrompt), answerDTO, user, currentUTCTimestamp);
+  }
+
+  private RecallPrompt lockForAcceptance(RecallPrompt recallPrompt) {
+    RecallPrompt locked =
+        recallPromptRepository.findByIdForUpdate(recallPrompt.getId()).orElseThrow();
+    // Request binding may have loaded this entity before the acceptance transaction acquired its
+    // lock.
+    entityManager.refresh(locked, LockModeType.PESSIMISTIC_WRITE);
+    return locked;
   }
 }

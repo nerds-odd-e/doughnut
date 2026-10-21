@@ -128,7 +128,6 @@ describe("repeat page", () => {
       expect(mockedAnswerSpelling).toHaveBeenCalledWith({
         path: { recallPrompt: spellingRecallPrompt.id },
         body: {
-          recallPromptId: spellingRecallPrompt.id,
           spellingAnswer: "cat",
           thinkingTimeMs: 0,
           awayMs: 0,

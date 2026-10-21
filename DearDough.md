@@ -35,6 +35,16 @@ Former local code: DD-118. Concurrent unpublished plan allocation produces two q
 
 Former local code: DD-126. Former local code: DD-130. Former local code: DD-134. Former local code: DD-139. Former local code: DD-147. Former local code: DD-162. Former local code: DD-167. Former local code: DD-209. Concrete only-caller and host-state premises enter a plan without inspection, forcing a changed decision or stopped implementation when checked. Open after verified later recurrence; not resolved. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-074.md).
 
+### Occurrences
+
+- Execution: SEED-081#story-1
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-10-21 retrospective; `a8b2d2d66cc196dff803fb6f4915dd5823bee1e2:.planning/slice-plans/001-recover-recall-answer/PLAN.md:58` claimed no CLI callers. `cli/src/commands/recall/recallMcqStageSupport.tsx:117` and `spellingRecallStageSupport.tsx:44` call the two answer routes.
+  - Observed effect: The coordinator corrected the premise and expanded consumer verification during retrospective after all five slices had been published. CLI stages guard concurrent input and leave recall on submission failure; their response shapes are unchanged.
+  - Inference: The original whole-product search was insufficient. This caused late verification rather than a changed implementation decision; no production impact or quantitative cost was established.
+
 <a id="odf-147"></a>
 
 ## ODF-147 — Reasoned red proof leaves ineffective tests

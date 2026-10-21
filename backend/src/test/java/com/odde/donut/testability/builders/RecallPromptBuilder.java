@@ -36,9 +36,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
       }
     }
     if (answerDTO != null && entity.getQuestionType() != QuestionType.SPELLING) {
-      Answer answer =
-          Answer.buildAnswer(
-              answerDTO, entity.getMcq(), entity.getAnswer(), resolvedAnswerTimestamp());
+      Answer answer = Answer.buildAnswer(answerDTO, entity.getMcq(), resolvedAnswerTimestamp());
       entity.setAnswer(answer);
     } else if (spellingAnswerText != null) {
       Answer answer = new Answer();

@@ -83,7 +83,7 @@ class RecallPromptController {
       throws UnexpectedNoAccessRightException {
     assertCanMutateRecallPrompt(recallPrompt);
     MemoryTrackerService.SpellingAnswerResult result =
-        memoryTrackerService.answerSpelling(
+        recallPromptService.answerSpelling(
             recallPrompt,
             answerDTO,
             authorizationService.getCurrentUser(),

@@ -17,9 +17,7 @@ public class AnswerService {
 
   public Answer createAnswerForQuestion(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, Timestamp currentUTCTimestamp) {
-    Answer answer =
-        Answer.buildAnswer(
-            answerDTO, recallPrompt.getMcq(), recallPrompt.getAnswer(), currentUTCTimestamp);
+    Answer answer = Answer.buildAnswer(answerDTO, recallPrompt.getMcq(), currentUTCTimestamp);
     entityPersister.save(answer);
     recallPrompt.setAnswer(answer);
     entityPersister.save(recallPrompt);

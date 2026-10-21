@@ -1,11 +1,7 @@
 import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
 import RecallPromptComponent from "@/components/recall/RecallPromptComponent.vue"
 import { flushPromises } from "@vue/test-utils"
-import helper, {
-  mockSdkService,
-  wrapSdkResponse,
-  wrapSdkError,
-} from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {
   expectSoftKeyboardPrimerIsFocused,
@@ -142,47 +138,8 @@ describe("RecallPromptComponent", () => {
       expect(
         wrapper.find(".daisy-loading.daisy-loading-spinner").exists()
       ).toBe(false)
-      // The gray overlay should remain visible after answering (isAnswered stays true)
+      // The gray overlay remains visible after the answer completes.
       expect(wrapper.find(".absolute.inset-0").exists()).toBe(true)
-    })
-
-    it("allows retrying on API error", async () => {
-      // Setup API to fail first time
-      const answerSpy = mockSdkService(
-        RecallPromptController,
-        "answer",
-        makeMe.anAnsweredQuestion.answerCorrect(true).please()
-      )
-      answerSpy
-        .mockResolvedValueOnce(wrapSdkError("API Error"))
-        .mockResolvedValueOnce(
-          wrapSdkResponse(
-            makeMe.anAnsweredQuestion.answerCorrect(true).please()
-          )
-        )
-
-      const wrapper = mountComponent()
-
-      // Submit first answer (will fail)
-      await wrapper
-        .findComponent({ name: "QuestionDisplay" })
-        .vm.$emit("answer", { choiceIndex: 0 })
-      await flushPromises()
-
-      // Verify error state
-      expect(wrapper.find(".daisy-alert.daisy-alert-error").exists()).toBe(true)
-
-      // Submit second answer (should succeed)
-      await wrapper
-        .findComponent({ name: "QuestionDisplay" })
-        .vm.$emit("answer", { choiceIndex: 1 })
-      await flushPromises()
-
-      // Verify success
-      expect(wrapper.emitted().answered).toBeTruthy()
-      expect(wrapper.find(".daisy-alert.daisy-alert-error").exists()).toBe(
-        false
-      )
     })
 
     it("emits answered event on successful submission", async () => {

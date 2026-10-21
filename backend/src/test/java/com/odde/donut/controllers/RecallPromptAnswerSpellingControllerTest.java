@@ -94,13 +94,6 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
   }
 
   @Test
-  void shouldNotAllowAnsweringTwice() throws UnexpectedNoAccessRightException {
-    controller.answerSpelling(recallPrompt, answerDTO);
-    assertThrows(
-        IllegalArgumentException.class, () -> controller.answerSpelling(recallPrompt, answerDTO));
-  }
-
-  @Test
   void shouldNotIncreaseStabilityIfRepeatImmediately() throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
     Float oldStability = memoryTracker.getStability();
