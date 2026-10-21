@@ -24,6 +24,7 @@ Feature: Browse answers and notes while recalling
     And I type my answer "riot"
     Then I should see that my spelling answer "riot" is incorrect
     When I resume recalling
+    And I choose self-review
     And I remember the current recall question
     And I review my last recall answer
     When I visit note "medical"

@@ -27,15 +27,15 @@ Given('I ask to do more recall', () => {
   start.recall().navigateToRecallPage().repeatMore()
 })
 
-When('I repeat more old {string}', (repeatNotes: string) => {
-  start.recall().assumeRecallPage().recallNotes(repeatNotes)
+When('I self-review more old {string}', (repeatNotes: string) => {
+  start.recall().assumeRecallPage().selfReviewNotes(repeatNotes)
 })
 
 When(
-  'On day {int} I recall {string} and assimilate new {string}',
+  'On day {int} I self-review {string} and assimilate new {string}',
   (day: number, repeatNotes: string, initialNotes: string) => {
     start.testability().timeTravelTo(day, 8)
-    start.recall().navigateToRecallPage().recallNotes(repeatNotes)
+    start.recall().navigateToRecallPage().selfReviewNotes(repeatNotes)
     commonSenseSplit(initialNotes, ', ').forEach((title) => {
       if (title !== 'end') {
         start.testability().assimilateNote(title)
@@ -164,6 +164,10 @@ Then('I should be able to resume recalling', () => {
 
 When('I resume recalling', () => {
   start.recall().resumeRecall()
+})
+
+When('I choose self-review', () => {
+  start.recall().assumeRecallPage().chooseSelfReview()
 })
 
 When('I remember the current recall question', () => {

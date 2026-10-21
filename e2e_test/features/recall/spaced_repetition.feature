@@ -17,30 +17,31 @@ Feature: Spaced-repetition
 
   @mockBrowserTime
   Scenario: Recall catches up by itself when the half-day ends
-    Given On day 1 I recall "end" and assimilate new "Note 1, end"
+    Given On day 1 I self-review "end" and assimilate new "Note 1, end"
     And It's day 2
     When it is 1440 minutes later in the browser
+    And I choose self-review
     Then I should be recalling "Note 1"
     And the menu should show 1 note to recall
 
   @mockBrowserTime
   Scenario: Strictly follow the schedule
-    When On day 1 I recall "                    " and assimilate new "Note 1, end "
-    And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
-    And On day 3 I recall "Note 2, end         " and assimilate new "Note 3, end "
-    And On day 4 I recall "Note 3, end         " and assimilate new "end         "
-    And On day 5 I recall "Note 1, end         " and assimilate new "end         "
-    And On day 6 I recall "Note 2, end         " and assimilate new "end         "
-    And On day 7 I recall "Note 3, end         " and assimilate new "end         "
-    And On day 8 I recall "end                 " and assimilate new "end         "
-    And On day 9 I recall "end                 " and assimilate new "end         "
+    When On day 1 I self-review "                    " and assimilate new "Note 1, end "
+    And On day 2 I self-review "Note 1, end         " and assimilate new "Note 2, end "
+    And On day 3 I self-review "Note 2, end         " and assimilate new "Note 3, end "
+    And On day 4 I self-review "Note 3, end         " and assimilate new "end         "
+    And On day 5 I self-review "Note 1, end         " and assimilate new "end         "
+    And On day 6 I self-review "Note 2, end         " and assimilate new "end         "
+    And On day 7 I self-review "Note 3, end         " and assimilate new "end         "
+    And On day 8 I self-review "end                 " and assimilate new "end         "
+    And On day 9 I self-review "end                 " and assimilate new "end         "
 
   @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more
-    When On day 1 I recall "                    " and assimilate new "Note 1, end "
-    And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
-    And On day 3 I recall "Note 2, end         " and assimilate new "Note 3, end "
-    And On day 4 I recall "Note 3, end         " and assimilate new "end         "
+    When On day 1 I self-review "                    " and assimilate new "Note 1, end "
+    And On day 2 I self-review "Note 1, end         " and assimilate new "Note 2, end "
+    And On day 3 I self-review "Note 2, end         " and assimilate new "Note 3, end "
+    And On day 4 I self-review "Note 3, end         " and assimilate new "end         "
     And I ask to do more recall
-    And I repeat more old "Note 1, Note 2, Note 3"
+    And I self-review more old "Note 1, Note 2, Note 3"
     Then I should have "0/0/3" note for assimilation and "6/6/3" for recall

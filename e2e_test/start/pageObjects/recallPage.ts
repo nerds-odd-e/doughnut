@@ -1,5 +1,4 @@
 import { RecallsController } from '@generated/donut-backend-api/sdk.gen'
-import { commonSenseSplit } from 'support/string_util'
 import {
   pageBar,
   waitUntilAppIsNotBusy,
@@ -9,6 +8,7 @@ import router from '../router'
 import { assumeQuestionPage } from './QuizQuestionPage'
 import { recallDailyProbeMethods } from './recallDailyProbeMethods'
 import { recallLearningSessionMethods } from './recallLearningSessionMethods'
+import { recallSelfReviewMethods } from './recallSelfReviewMethods'
 
 function recallProgressFromTriple(triple: string) {
   const [finished, dailyTotal, totalAssimilated] = triple.split('/').map(Number)
@@ -42,22 +42,7 @@ const recallPage = () => {
   return {
     ...recallLearningSessionMethods(),
     ...recallDailyProbeMethods(),
-    chooseGood() {
-      cy.on('uncaught:exception', (err) => {
-        if (
-          err.message.includes('Unauthorized') ||
-          err.message.includes('401')
-        ) {
-          return false
-        }
-        return true
-      })
-      cy.findByRole('button', { name: 'Good' })
-      cy.tick(11 * 1000).then(() => {
-        cy.findByRole('button', { name: 'Good' }).click({})
-      })
-      waitUntilAppIsNotBusy()
-    },
+    ...recallSelfReviewMethods(),
     typeSpellingAnswer(answer: string) {
       waitUntilAppIsNotBusy()
       cy.get('[data-test="question-section"]:visible', { timeout: 15000 })
@@ -142,23 +127,6 @@ const recallPage = () => {
     repeatMore() {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
     },
-    recallNotes(noteTitles: string) {
-      waitUntilAppIsNotBusy()
-      commonSenseSplit(noteTitles, ',').forEach((title) => {
-        if (title === 'end') {
-          cy.findByText(
-            'You have finished all recalls for this half a day!'
-          ).should('be.visible')
-        } else {
-          this.expectRecalling(title)
-          this.chooseGood()
-        }
-      })
-    },
-    expectRecalling(noteTitle: string) {
-      cy.findByText(noteTitle, { selector: 'h2 *' })
-      return this
-    },
     rememberCurrentQuestion() {
       waitUntilAppIsNotBusy()
       assumeQuestionPage()
@@ -229,7 +197,7 @@ export const recall = () => {
       waitUntilAppIsNotBusy()
       // Flush Vue remount timeouts under cy.clock() so the restored question is clickable.
       cy.tick(1)
-      assumeQuestionPage().getQuestionSection().should('be.visible')
+      cy.get('.progress-bar').first().should('be.visible')
       return recallPage()
     },
     visitRecallPage() {

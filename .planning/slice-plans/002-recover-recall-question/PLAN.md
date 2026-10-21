@@ -15,9 +15,8 @@ Preserve normal navigation, authorization, grading, timing and focus behavior.
 Answer-submission recovery, spelling self-grading, automatic retry/backoff,
 offline/cross-reload recovery, question-quality changes, generic transport
 infrastructure and CLI/MCP interfaces are deferred. Preparation authorizes no
-implementation. Story 1 is independently Taken; reconcile shared recall files
-with its actual delivered behavior when execution starts, without acquiring its
-submission-recovery work or making it a prerequisite.
+implementation. Story 1's delivered submission recovery is retained in shared recall files;
+this work does not acquire its answer-submission responsibility.
 
 ## Current decisions and reuse
 
@@ -231,3 +230,9 @@ Disposition: receiving slice 2
 Reported: slice 1 — "Spelling fetch consolidation, failed-load and OVERLAP recovery, input preservation, attempt ownership and persistence regressions remain for slice 3."
 Story clause: "For spelling, make the stem and answer form usable only with a loaded prompt."
 Disposition: receiving slice 3
+
+
+### G3. Existing E2E consumers expected automatic Self-review
+Reported: slice 1 — "CI run 39583877557 attempt 1 failed seven existing recall/probe/scheduling journeys because their AI-disabled paths expected immediate question/note rendering after a load failure."
+Story clause: "For MCQ failures, offer Self-review explicitly. Selecting it reveals the existing note context and Good/Again controls"
+Disposition: proved by slice 1: repaired browse_answer_and_notes_while_recalling.feature, daily_probe.feature and spaced_repetition.feature retain their assertions after deliberate Self-review; see EVIDENCE.md CI repair

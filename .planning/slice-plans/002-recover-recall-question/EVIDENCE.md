@@ -92,3 +92,33 @@ the grade click and the final full run passed. Active implementation about
 4 minutes (agent estimate); suite waits 73.00s and 77.54s plus focused checks.
 Independent refactor is accepted in the coordinator conversation before this
 status mutation. Scope understanding remains aligned; readiness basis is not renewed.
+
+
+## CI repair
+
+CI run 39583877557 attempt 1 at slice-1 SHA
+`07606012773257fbb71ba09491cc96907e127b6a` failed seven E2E cases in three
+features. Job 119167858550's failed assertions expected question-section or
+note titles after disabled-AI MCQ loads. Local daily_probe reproduction at
+unchanged HEAD failed all 3 scenarios; browser evidence showed GET recall-prompt
+503 and the new deliberate Self-review choice. This was an overlooked E2E
+consumer, not an infrastructure failure. Source-only reviewer 2's original
+explicit-choice commitments apply to this repair as well.
+
+The repaired journeys choose Self-review explicitly before expecting its note
+and grade surface. Existing probe statistics, schedule/progress and retained
+question/navigation assertions stay intact. Resume is a navigation action;
+subsequent explicit choices or remembered-question assertions observe its
+result. Self-review methods are cohesive in recallSelfReviewMethods.ts, composed
+into the existing recall page object. A first repair batch showed that route
+return preserves the choice; redundant repeated choices were removed, while
+remount journeys retain an explicit choice.
+
+Final `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature,e2e_test/features/recall/daily_probe.feature,e2e_test/features/recall/spaced_repetition.feature`
+passed all 9 scenarios (2 browse, 3 probe, 4 scheduling), exit 0. Local log:
+`/tmp/dough-story2-repair-green-final.log`. No product code or API changed; accepted
+slice-1 unit/type proof is compatible. Ad hoc E2E tsc diagnostics reflect existing
+unchanged imports/count/time-travel typing (HEAD and candidate each 229 diagnostics, zero new); the repository configures Biome and
+Cypress proof, and no broad type remediation was attempted. Slice 2 was paused
+and saved through ci-repair-stash before repair and is restored only after
+accepted repair publication. G3 is proved by the final repaired journeys.

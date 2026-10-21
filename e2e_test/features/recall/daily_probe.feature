@@ -23,16 +23,19 @@ Feature: Daily probe
     And I should see Daily probe variability "0.00"
     And I should see Daily probe saved
     When I continue from the Daily probe
+    And I choose self-review
     Then I should see ordinary recall
     When I visit recall
     Then I should not see the Daily probe instruction
-    And I should see ordinary recall
+    When I choose self-review
+    Then I should see ordinary recall
 
   Scenario: Opted-in learner skips the probe for the rest of the page's life
     Given Daily probe is on
     When I visit recall
     Then I should see the Daily probe instruction
     When I skip the Daily probe
+    And I choose self-review
     Then I should see ordinary recall
     When I jump to the note page of "Note 2"
     And I return to recall from the menu
@@ -45,6 +48,7 @@ Feature: Daily probe
     Given Daily probe is on
     When I visit recall
     And I skip the Daily probe
+    And I choose self-review
     Then I should see ordinary recall
     Given It's day 2
     When it is 1440 minutes later in the browser
