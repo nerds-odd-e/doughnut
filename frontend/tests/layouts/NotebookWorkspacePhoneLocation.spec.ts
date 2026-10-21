@@ -167,6 +167,9 @@ describe("Notebook workspace phone location", () => {
     for (const width of [767, 768, 767]) {
       await page.viewport(width, 700)
       await vi.waitFor(() => {
+        expect(
+          document.querySelector(".sidebar-drawer-backdrop") !== null
+        ).toBe(width < 768)
         expect(commandsSitInPageBar(width)).toBe(true)
         expect(
           document.querySelector<HTMLTextAreaElement>(
