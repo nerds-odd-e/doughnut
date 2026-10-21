@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
+  moveCurrentRecallToEnd,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
@@ -62,6 +63,10 @@ describe('RecallPage "just review" quiz', () => {
     getRecallPromptSpy.mockResolvedValueOnce(
       wrapSdkResponse(makeMe.aRecallPrompt.please())
     )
+    await wrapper.find('[data-testid="self-review"]').trigger("click")
+    await flushPromises()
+    expect(mockedMarkAsRepeatedCall).not.toHaveBeenCalled()
+    expect(wrapper.findComponent({ name: "GlobalBar" }).text()).toContain("0/3")
     vi.runOnlyPendingTimers()
     await flushPromises()
     await wrapper.find("button.daisy-btn-primary").trigger("click")
@@ -70,6 +75,7 @@ describe('RecallPage "just review" quiz', () => {
       query: { grade: "GOOD" },
     })
     await flushPromises()
+    expect(mockedMarkAsRepeatedCall).toHaveBeenCalledTimes(1)
     expect(wrapper.findComponent({ name: "GlobalBar" }).text()).toContain("1/3")
     expect(getRecallPromptSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -82,15 +88,7 @@ describe('RecallPage "just review" quiz', () => {
     const wrapper = await ctx.mountPage()
     const vm = exposed(wrapper)
     expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([123, 456, 3])
-    await wrapper.find(".progress-bar").trigger("click")
-    await wrapper.vm.$nextTick()
-    await flushPromises()
-    const moveToEndButton = document.body.querySelector(
-      'button[title="Move to end of list"]'
-    )
-    expect(moveToEndButton).toBeTruthy()
-    await moveToEndButton?.dispatchEvent(new Event("click"))
-    await wrapper.vm.$nextTick()
+    await moveCurrentRecallToEnd(wrapper)
     expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([456, 3, 123])
   })
 

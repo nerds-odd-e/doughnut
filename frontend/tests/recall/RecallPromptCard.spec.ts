@@ -144,21 +144,30 @@ describe("repeat page", () => {
     })
   })
 
-  describe("loading state when fetching recall prompt", () => {
-    it("should show ContentLoader, not JustReview, when navigating to a memory tracker that previously failed", async () => {
-      const recallPrompt = getRecallPrompt()
-      let tracker1Calls = 0
+  describe("failed recall prompt", () => {
+    it("shows loading until the current prompt arrives", async () => {
       const { gate, resolve } = createDeferredGate()
+      getRecallPromptSpy.mockImplementation(async () => {
+        await gate
+        return wrapSdkResponse(getRecallPrompt())
+      })
+
+      const recallPromptCardWrapper = mountRecallPromptCard([1], 1)
+      await flushPromises()
+      expect(contentLoaderVisible(recallPromptCardWrapper)).toBe(true)
+
+      resolve()
+      await flushPromises()
+      expect(contestableQuestionVisible(recallPromptCardWrapper)).toBe(true)
+    })
+
+    it("keeps the self-review choice with its tracker after navigation", async () => {
+      const recallPrompt = getRecallPrompt()
       getRecallPromptSpy.mockImplementation(async (options) => {
         const memoryTracker = (options as { path: { memoryTracker: number } })
           .path.memoryTracker
         if (memoryTracker === 1) {
-          tracker1Calls += 1
-          if (tracker1Calls === 1) {
-            return wrapSdkError("Failed to fetch")
-          }
-          await gate
-          return wrapSdkResponse(recallPrompt)
+          return wrapSdkError("Failed to fetch")
         }
         return wrapSdkResponse(recallPrompt)
       })
@@ -168,16 +177,21 @@ describe("repeat page", () => {
         1
       )
 
+      expect(recallPromptCardWrapper.text()).toContain(
+        "We couldn't load this question."
+      )
+      await recallPromptCardWrapper
+        .find('[data-testid="self-review"]')
+        .trigger("click")
+      await flushPromises()
       expect(justReviewVisible(recallPromptCardWrapper)).toBe(true)
 
       await recallPromptCardWrapper.setProps({ currentIndex: 1 })
       await flushPromises()
+      expect(contestableQuestionVisible(recallPromptCardWrapper)).toBe(true)
       await recallPromptCardWrapper.setProps({ currentIndex: 0 })
-
-      expect(contentLoaderVisible(recallPromptCardWrapper)).toBe(true)
-
-      resolve()
       await flushPromises()
+      expect(justReviewVisible(recallPromptCardWrapper)).toBe(true)
     })
   })
 })

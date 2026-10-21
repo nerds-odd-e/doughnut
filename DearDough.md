@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 318. Removed numbers are never reused.
+- Highest allocated local number: 319. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
@@ -193,6 +193,14 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
   - Observed effect: two oversized startup batches forced repeated retrieval before first-slice delegation.
   - Inference: the coordinator repeated the known broad-read deviation; savings are unmeasured.
 
+- Execution: SEED-081#story-2 (first implementation `07606012773257fbb71ba09491cc96907e127b6a`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: dashboard launch `566a5be7-c9a4-4da2-8d08-bee2dcf7a6f2`, startup on 2026-10-21; broad batched tool results reported truncation at 30,625, 16,469 and 16,497 original tokens before focused reads recovered required references.
+  - Observed effect: required startup passages were retrieved again before first-slice delegation.
+  - Inference: recurrence of the existing broad-read deviation; no measured savings or product impact established.
+
 <a id="odf-265"></a>
 
 ## ODF-265 — A comparison of empty captures was printed as a match
@@ -328,3 +336,18 @@ Former local code: DD-258. A rollover rule omitted the offered probe already run
 ## ODF-316 — Consumer discovery treats execution evidence as canonical work
 
 Former local code: DD-274. Consumer discovery treated execution-evidence Identity lines and non-story anchors as canonical work, producing duplicate-home and unreadable-story warnings. One SEED-080#story-1 execution, release unknown; source inspection found no current dependency agreements and preserved unrelated SEED-066 evidence. No dependency was silently satisfied. Relationship to other discovery/readiness findings remains uncertain. Open, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-316.md).
+
+
+## DD-319 — Explicit recovery changes missed E2E journey preconditions
+
+A question-load failure changed from immediate self-review to deliberate Self-review, but acceptance treated the unchanged backend API as sufficient to preserve existing E2E consumers. AI-disabled journeys still expected the note/question surface without choosing it. Seven failures escaped the first slice to CI. The test journeys were repaired within the execution; no shared prevention is established. This differs from ODF-272's accessible-name collision and ODF-310's direct moved-control lookup, though their consumer-tracing relationship may be relevant.
+
+### Occurrences
+
+- Execution: SEED-081#story-2 (first implementation `07606012773257fbb71ba09491cc96907e127b6a`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: [CI run 39583877557, attempt 1](https://github.com/nerds-odd-e/doughnut/actions/runs/39583877557), job 119167858550; first-slice plan's E2E consumer assumption at `07606012773257fbb71ba09491cc96907e127b6a:.planning/slice-plans/002-recover-recall-question/PLAN.md`; repair `e46d23deacb110a1cd861519810c311b5faeddbd`.
+  - Observed effect: browse/resume, Daily probe and scheduling produced seven missing-question/note failures. Local untouched-HEAD probe reproduction had 0/3 passing; after explicit choices and preservation of existing assertions, the three-feature batch passed 9/9. Slice 2 was safely paused, saved and restored around the published repair.
+  - Inference: source compatibility must include changed UI journey preconditions even when the transport API is unchanged; incidence and savings outside this execution are unmeasured.

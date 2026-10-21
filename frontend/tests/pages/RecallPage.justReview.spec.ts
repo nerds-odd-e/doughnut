@@ -49,6 +49,12 @@ describe("RecallPage Just review", () => {
 
     const wrapper = await ctx.mountPage({ attachTo: host })
 
+    expect(wrapper.text()).toContain("We couldn't load this question.")
+    expect(markAsRecalled).not.toHaveBeenCalled()
+    await wrapper.find('button[data-testid="self-review"]').trigger("click")
+    await flushPromises()
+    expect(markAsRecalled).not.toHaveBeenCalled()
+
     const context = document.querySelector('article[aria-label="Note context"]')
     expect(context?.textContent).toContain("Sedition")
     expect(context?.textContent).toContain("Inciting rebellion.")
@@ -86,6 +92,9 @@ describe("RecallPage Just review", () => {
     givenRecallQueue(createMemoryTrackerLite(123))
 
     const wrapper = await ctx.mountPage({ attachTo: document.body })
+
+    await wrapper.find('button[data-testid="self-review"]').trigger("click")
+    await flushPromises()
 
     const context = wrapper.find('article[aria-label="Note context"]')
     expect(context.text()).toContain("Inciting rebellion.")

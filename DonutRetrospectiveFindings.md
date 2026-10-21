@@ -73,7 +73,7 @@ The source-backed paths were not exercised live in this assessment; production
 frequency, latency and cost are unknown. There is no active covering story.
 
 **Queued response:** [Retry a failed recall-question load or choose self-review
-explicitly](.planning/seeds/SEED-081-recover-recall-request-failures.md#story-2)
+explicitly](https://github.com/nerds-odd-e/doughnut/blob/2c3d5574d8e2f54567f562649fcb87987ca23be5/.planning/seeds/SEED-081-recover-recall-request-failures.md#story-2)
 (`SEED-081#story-2`). Retain explicit existing MCQ self-review while making the
 failed current question recoverable; do not add a spelling self-grading policy.
 Not resolved; implementation and adoption are pending.

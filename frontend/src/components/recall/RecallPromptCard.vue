@@ -1,48 +1,57 @@
 <template>
-  <div class="content h-full">
-    <ContentLoader v-if="!currentRecallPromptFetched || isCurrentMemoryTrackerFetching" />
-    <template v-else>
-      <div class="pt-5 h-full">
-      <SpellingQuestionDisplay
-        v-if="currentMemoryTracker?.spelling"
-        v-bind="{
-          memoryTrackerId: currentMemoryTrackerId!,
-          nextIsSpelling,
-          overlapFeedback: spellingOverlapFeedback,
-        }"
-        @answered="onAnswered($event)"
-        :key="`spelling-${currentMemoryTrackerId}-${props.spellingRetryNonce ?? 0}`"
+  <div class="content h-full flex flex-col">
+    <div
+      v-if="currentMemoryTracker?.spelling && spellingOverlapFeedback"
+      class="daisy-alert daisy-alert-warning mb-2 shrink-0"
+      data-testid="spelling-overlap-feedback"
+    >{{ spellingOverlapFeedback }}</div>
+    <ContentLoader v-if="!currentRecallPromptLoad || currentRecallPromptLoad.status === 'loading'" />
+    <div v-else class="pt-5 flex-1 min-h-0">
+      <JustReview
+        v-if="selfReviewTrackerIds.has(currentMemoryTrackerId!)"
+        :memory-tracker-id="currentMemoryTrackerId"
+        @reviewed="() => emit('just-reviewed', undefined)"
       />
-      <template v-else>
-        <div v-if="!currentRecallPrompt">
-          <JustReview
-            v-bind="{
-              memoryTrackerId: currentMemoryTrackerId,
-            }"
-            @reviewed="() => emit('just-reviewed', undefined)"
-          />
-        </div>
+      <div v-else-if="currentRecallPromptLoad.status === 'failed'">
+        <p>We couldn't load this question.</p>
+        <button
+          class="daisy-btn daisy-btn-primary mt-4"
+          data-testid="retry-question"
+          @click="retryRecallPrompt(currentMemoryTrackerId!)"
+        >Retry</button>
+        <button
+          v-if="!currentMemoryTracker?.spelling"
+          class="daisy-btn daisy-btn-secondary mt-4"
+          data-testid="self-review"
+          @click="selfReviewTrackerIds.add(currentMemoryTrackerId!)"
+        >Self-review</button>
+      </div>
+      <template v-else-if="currentRecallPrompt">
+        <SpellingQuestionDisplay
+          v-if="currentMemoryTracker?.spelling"
+          :recall-prompt="currentRecallPrompt"
+          :next-is-spelling="nextIsSpelling"
+          @answered="onAnswered($event)"
+          :key="currentRecallPrompt.id"
+        />
         <template v-else>
-         <div class="notebook-source mb-4">
+          <div class="notebook-source mb-4">
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
           </div>
           <ContestableQuestion
-            v-bind="{
-              recallPrompt: currentRecallPrompt,
-              nextIsSpelling,
-            }"
+            :recall-prompt="currentRecallPrompt"
+            :next-is-spelling="nextIsSpelling"
             @answered="onAnswered($event)"
             :key="currentRecallPrompt.id"
           />
         </template>
       </template>
-      </div>
-    </template>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted } from "vue"
+import { computed, watch, onMounted, ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   MemoryTrackerLite,
@@ -72,32 +81,28 @@ const emit = defineEmits<{
   (e: "just-reviewed", result: undefined): void
 }>()
 
-const { recallPromptCache, fetchRecallPrompts, fetchingMemoryTrackerIds } =
-  useRecallPromptFetching(props)
+const {
+  recallPromptLoads,
+  fetchRecallPrompts,
+  retryRecallPrompt,
+  startRecallAttempt,
+} = useRecallPromptFetching(props)
+const selfReviewTrackerIds = ref(new Set<number>())
 
 // Computed properties with better naming
 const currentMemoryTracker = computed(() => memoryTrackerAt(props.currentIndex))
 const currentMemoryTrackerId = computed(
   () => currentMemoryTracker.value?.memoryTrackerId
 )
-const isCurrentMemoryTrackerFetching = computed(() => {
-  const memoryTrackerId = currentMemoryTrackerId.value
-  return (
-    memoryTrackerId !== undefined &&
-    fetchingMemoryTrackerIds.value.has(memoryTrackerId)
-  )
-})
-const currentRecallPromptFetched = computed(() => {
-  const memoryTrackerId = currentMemoryTrackerId.value
-  return (
-    memoryTrackerId !== undefined && memoryTrackerId in recallPromptCache.value
-  )
-})
-const currentRecallPrompt = computed(() => {
+const currentRecallPromptLoad = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
   return memoryTrackerId !== undefined
-    ? recallPromptCache.value[memoryTrackerId]
+    ? recallPromptLoads.value[memoryTrackerId]
     : undefined
+})
+const currentRecallPrompt = computed(() => {
+  const load = currentRecallPromptLoad.value
+  return load?.status === "loaded" ? load.recallPrompt : undefined
 })
 
 // Methods
@@ -110,6 +115,15 @@ const onAnswered = (answerResult: AnsweredQuestion) => {
 
 // Watchers
 watch(() => currentMemoryTrackerId.value, fetchRecallPrompts)
+
+watch(
+  () => props.spellingRetryNonce,
+  () => {
+    if (currentMemoryTracker.value?.spelling) {
+      startRecallAttempt(currentMemoryTrackerId.value!)
+    }
+  }
+)
 
 // Lifecycle hooks
 onMounted(() => {

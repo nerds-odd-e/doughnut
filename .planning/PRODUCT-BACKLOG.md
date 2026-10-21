@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Retry a failed recall-question load or choose self-review explicitly](seeds/SEED-081-recover-recall-request-failures.md#story-2) — SEED-081#story-2 ([plan](slice-plans/002-recover-recall-question/PLAN.md))
-
 ## Backlog list
 
 - [Restore visible note properties and bottom timestamps](seeds/SEED-082-visible-note-properties.md#story-1) — SEED-082#story-1

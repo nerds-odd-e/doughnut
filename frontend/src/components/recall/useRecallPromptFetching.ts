@@ -6,68 +6,68 @@ import type {
 import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
+type RecallPromptLoad =
+  | { status: "loading"; requestId: number }
+  | { status: "failed" }
+  | { status: "loaded"; recallPrompt: RecallPrompt }
+
 export function useRecallPromptFetching(props: {
   memoryTrackers: MemoryTrackerLite[]
   currentIndex: number
   eagerFetchCount: number
 }) {
-  const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
-  const fetching = ref(false)
-  const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
+  const recallPromptLoads = ref<Record<number, RecallPromptLoad>>({})
+
+  let nextRequestId = 0
+
+  const loadRecallPrompt = async (
+    memoryTrackerId: number,
+    foreground: boolean
+  ) => {
+    if (recallPromptLoads.value[memoryTrackerId]?.status === "loading") return
+    const requestId = ++nextRequestId
+    recallPromptLoads.value[memoryTrackerId] = { status: "loading", requestId }
+    const request = () =>
+      MemoryTrackerController.getRecallPrompt({
+        path: { memoryTracker: memoryTrackerId },
+      })
+    const { data: recallPrompt, error } = await (foreground
+      ? apiCallWithLoading(request)
+      : request())
+    const current = recallPromptLoads.value[memoryTrackerId]
+    if (current?.status !== "loading" || current.requestId !== requestId) return
+    recallPromptLoads.value[memoryTrackerId] = error
+      ? { status: "failed" }
+      : { status: "loaded", recallPrompt: recallPrompt! }
+  }
 
   const fetchNextRecallPrompts = async () => {
-    for (
-      let index = props.currentIndex;
-      index < props.currentIndex + props.eagerFetchCount;
-      index++
-    ) {
-      const memoryTracker = props.memoryTrackers?.[index]
-      if (memoryTracker === undefined) break
-
+    const trackers = props.memoryTrackers.slice(
+      props.currentIndex,
+      props.currentIndex + props.eagerFetchCount
+    )
+    for (const [offset, memoryTracker] of trackers.entries()) {
       const memoryTrackerId = memoryTracker.memoryTrackerId
 
-      const cachedValue = recallPromptCache.value[memoryTrackerId]
-      if (cachedValue !== undefined) continue
+      const previousLoad = recallPromptLoads.value[memoryTrackerId]
+      if (previousLoad) continue
 
-      fetchingMemoryTrackerIds.value.add(memoryTrackerId)
-      try {
-        const { data: recallPrompt, error } = await apiCallWithLoading(() =>
-          MemoryTrackerController.getRecallPrompt({
-            path: { memoryTracker: memoryTrackerId },
-          })
-        )
-        if (!error) {
-          recallPromptCache.value[memoryTrackerId] = recallPrompt!
-        } else {
-          recallPromptCache.value[memoryTrackerId] = undefined
-        }
-      } finally {
-        fetchingMemoryTrackerIds.value.delete(memoryTrackerId)
-      }
+      await loadRecallPrompt(memoryTrackerId, offset === 0)
     }
   }
 
-  let queuedFetch = false
-
-  const fetchRecallPrompts = async () => {
-    if (fetching.value) {
-      queuedFetch = true
-      return
-    }
-    fetching.value = true
-    try {
-      do {
-        queuedFetch = false
-        await fetchNextRecallPrompts()
-      } while (queuedFetch)
-    } finally {
-      fetching.value = false
-    }
+  const retryRecallPrompt = (memoryTrackerId: number) => {
+    if (recallPromptLoads.value[memoryTrackerId]?.status !== "failed") return
+    return loadRecallPrompt(memoryTrackerId, true)
   }
 
   return {
-    recallPromptCache,
-    fetchRecallPrompts,
-    fetchingMemoryTrackerIds,
+    recallPromptLoads,
+    fetchRecallPrompts: fetchNextRecallPrompts,
+    retryRecallPrompt,
+    startRecallAttempt: (memoryTrackerId: number) => {
+      delete recallPromptLoads.value[memoryTrackerId]
+      return loadRecallPrompt(memoryTrackerId, true)
+    },
   }
 }

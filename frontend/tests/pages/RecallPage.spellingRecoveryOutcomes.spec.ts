@@ -4,7 +4,6 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import type {
   AnswerSpellingData,
-  GetRecallPromptData,
   ShowNoteData,
 } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -28,9 +27,8 @@ import {
 } from "./spellingRecoveryTestSupport"
 
 const ctx = useRecallPageSpecContext({ fakeTimers: true })
-let fetchPrompt: ReturnType<typeof givenSpellingRecoveryQueue>
 beforeEach(() => {
-  fetchPrompt = givenSpellingRecoveryQueue()
+  givenSpellingRecoveryQueue()
 })
 
 describe("RecallPage recovered spelling outcomes", () => {
@@ -61,11 +59,6 @@ describe("RecallPage recovered spelling outcomes", () => {
       wrapper.find('[data-testid="spelling-overlap-feedback"]').text()
     ).toContain("Your answer matches an overlapped note")
     expect(progress(wrapper)).toContain("0/2")
-    expect(
-      fetchPrompt.mock.calls.map(
-        ([options]) => (options as GetRecallPromptData).path.memoryTracker
-      )
-    ).toEqual([1, 1, 1])
     expect((input(wrapper).element as HTMLInputElement).value).toBe("")
     expect(document.activeElement).toBe(input(wrapper).element)
     await submit(wrapper, "Specific title")

@@ -6,17 +6,51 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
-import type { MemoryTrackerLite } from "@generated/donut-backend-api"
+import type {
+  MemoryTrackerLite,
+  RecallPrompt,
+} from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
-import { enableAutoUnmount, flushPromises } from "@vue/test-utils"
-import { afterEach, beforeEach, vi } from "vitest"
+import helper, {
+  mockSdkService,
+  productionRouterAt,
+  wrapSdkError,
+  wrapSdkResponse,
+} from "@tests/helpers"
+import {
+  enableAutoUnmount,
+  flushPromises,
+  type VueWrapper,
+} from "@vue/test-utils"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 
 /** Puts the given trackers in the real recall queue. */
 export function givenRecallQueue(...trackers: MemoryTrackerLite[]) {
   useRecallData().setToRepeat(trackers)
+}
+
+export function deferredRecallPromptResponse() {
+  type Response =
+    | ReturnType<typeof wrapSdkResponse<RecallPrompt>>
+    | ReturnType<typeof wrapSdkError>
+  let resolve!: (value: Response) => void
+  const promise = new Promise<Response>((done) => {
+    resolve = done
+  })
+  return { promise, resolve }
+}
+
+export async function moveCurrentRecallToEnd(wrapper: VueWrapper) {
+  await wrapper.find(".progress-bar").trigger("click")
+  await flushPromises()
+  const button = document.body.querySelector<HTMLButtonElement>(
+    'button[title="Move to end of list"]'
+  )!
+  expect(button.disabled).toBe(false)
+  button.click()
+  await flushPromises()
 }
 
 export function createMemoryTrackerLite(
