@@ -18,15 +18,12 @@
       </div>
     </div>
 
-    <div v-if="phase === 'uncertain'" class="daisy-alert daisy-alert-error mt-4" data-testid="answer-recovery">
-      <span>We couldn't confirm your answer. Retry to recover this attempt.</span>
-      <button type="button" class="daisy-btn daisy-btn-sm" data-testid="retry-answer" @click="retryAnswer">Retry</button>
-    </div>
+    <RecallAnswerRecovery v-if="phase === 'uncertain'" class="mt-4" @retry="retryAnswer" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, ref, shallowRef, watch } from "vue"
+import { computed } from "vue"
 import type { PropType } from "vue"
 import type {
   AnsweredQuestion,
@@ -34,16 +31,10 @@ import type {
   RecallPrompt,
 } from "@generated/donut-backend-api"
 import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { useRecallSubmission } from "@/composables/useRecallSubmission"
 import QuestionDisplay from "./QuestionDisplay.vue"
+import RecallAnswerRecovery from "./RecallAnswerRecovery.vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
-
-const phase = ref<"ready" | "pending" | "uncertain" | "answered">("ready")
-const submission = shallowRef<AnswerDto>()
-let mounted = true
-onBeforeUnmount(() => {
-  mounted = false
-})
 
 const props = defineProps({
   recallPrompt: {
@@ -60,42 +51,25 @@ const emits = defineEmits<{
   (e: "answered", result: AnsweredQuestion): void
 }>()
 
-watch(
-  () => props.recallPrompt.id,
-  () => {
-    submission.value = undefined
-    phase.value = "ready"
-  }
-)
-
-const sendSubmission = async () => {
-  if (props.nextIsSpelling) primeSoftKeyboard()
-  const promptId = props.recallPrompt.id
-  const body = submission.value!
-  phase.value = "pending"
-  const { data: answerResult, error: apiError } = await apiCallWithLoading(() =>
-    RecallPromptController.answer({
+const {
+  phase,
+  submission,
+  submitAnswer: submit,
+  retryAnswer,
+} = useRecallSubmission<AnswerDto>(
+  computed(() => props.recallPrompt.id),
+  (promptId, body) => {
+    if (props.nextIsSpelling) primeSoftKeyboard()
+    return RecallPromptController.answer({
       path: { recallPrompt: promptId },
       body,
     })
-  )
-  if (!mounted || props.recallPrompt.id !== promptId) return
-  if (apiError) {
-    phase.value = "uncertain"
-  } else {
-    phase.value = "answered"
-    emits("answered", answerResult!)
-  }
-}
+  },
+  (answer) => emits("answered", answer)
+)
 
 const submitAnswer = async (answerData: AnswerDto) => {
-  if (phase.value !== "ready" || answerData.choiceIndex === undefined) return
-  submission.value = Object.freeze({ ...answerData })
-  await sendSubmission()
-}
-
-const retryAnswer = async () => {
-  if (phase.value !== "uncertain") return
-  await sendSubmission()
+  if (answerData.choiceIndex === undefined) return
+  await submit(answerData)
 }
 </script>

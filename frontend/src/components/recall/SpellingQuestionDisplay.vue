@@ -16,11 +16,13 @@
       >
         {{ overlapFeedback }}
       </div>
+      <RecallAnswerRecovery v-if="phase === 'uncertain'" @retry="retryAnswer" />
       <form @submit.prevent="submitAnswer" class="sticky bottom-0 bg-base-100 pt-4 pb-4">
         <TextInput
           scope-name="memory_tracker"
           field="answer"
           v-model="spellingAnswer"
+          :disabled="phase !== 'ready'"
           placeholder="put your answer here"
           v-focus
         >
@@ -29,7 +31,7 @@
               type="submit"
               value="Answer"
               class="daisy-btn daisy-btn-primary daisy-btn"
-              :disabled="submitted"
+              :disabled="phase !== 'ready'"
             />
           </template>
         </TextInput>
@@ -40,13 +42,22 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
-import type { RecallPrompt } from "@generated/donut-backend-api"
-import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
+import type {
+  RecallPrompt,
+  AnswerSpellingDto,
+  AnsweredQuestion,
+} from "@generated/donut-backend-api"
+import {
+  MemoryTrackerController,
+  RecallPromptController,
+} from "@generated/donut-backend-api/sdk.gen"
 import ContentLoader from "../commons/ContentLoader.vue"
 import TextInput from "../form/TextInput.vue"
 import InactiveRecallMask from "./InactiveRecallMask.vue"
 import QuestionStem from "./QuestionStem.vue"
+import RecallAnswerRecovery from "./RecallAnswerRecovery.vue"
 import { useQuestionThinkingTime } from "@/composables/useQuestionThinkingTime"
+import { useRecallSubmission } from "@/composables/useRecallSubmission"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const props = defineProps({
@@ -64,11 +75,25 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(["answer"])
+const emits = defineEmits<{ (e: "answered", result: AnsweredQuestion): void }>()
 const spellingAnswer = ref("")
 const recallPrompt = ref<RecallPrompt>()
 const loading = ref(true)
-const submitted = ref(false)
+const {
+  phase,
+  submitAnswer: submit,
+  retryAnswer,
+} = useRecallSubmission<AnswerSpellingDto>(
+  computed(() => recallPrompt.value?.id),
+  (promptId, body) => {
+    if (props.nextIsSpelling) primeSoftKeyboard()
+    return RecallPromptController.answerSpelling({
+      path: { recallPrompt: promptId },
+      body,
+    })
+  },
+  (answer) => emits("answered", answer)
+)
 
 const isActiveQuestion = computed(() => !loading.value)
 const { stop, isPaused, awayMs, awayCount, detourMs, detourCount, idleMs } =
@@ -89,14 +114,11 @@ const fetchSpellingQuestion = async () => {
 }
 
 const submitAnswer = () => {
-  if (submitted.value) return
-  if (props.nextIsSpelling) primeSoftKeyboard()
-  submitted.value = true
+  if (phase.value !== "ready") return
   const thinkingTimeMs = stop()
-  emits("answer", {
+  return submit({
     spellingAnswer: spellingAnswer.value,
     thinkingTimeMs,
-    recallPromptId: recallPrompt.value?.id,
     awayMs: Math.round(awayMs.value),
     awayCount: awayCount.value,
     detourMs: Math.round(detourMs.value),

@@ -1,3 +1,4 @@
+import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {
@@ -64,7 +65,7 @@ describe("SpellingQuestionDisplay", () => {
     )
   })
 
-  it("emits answer with thinking time on submit", async () => {
+  it("submits answer with thinking time on submit", async () => {
     const wrapper = await mountSpellingQuestionDisplay(
       { memoryTrackerId: 1 },
       { rafCallbacks }
@@ -74,17 +75,20 @@ describe("SpellingQuestionDisplay", () => {
     vi.advanceTimersByTime(5000)
     await submitSpellingAnswer(wrapper)
 
-    const answerData = wrapper.emitted("answer")?.[0]?.[0] as {
+    const answerData = vi.mocked(RecallPromptController.answerSpelling).mock
+      .calls[0]?.[0]?.body as {
       spellingAnswer?: string
       thinkingTimeMs?: number
-      recallPromptId?: number
     }
     expect(answerData?.spellingAnswer).toBe("cat")
     expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(5000)
-    expect(answerData?.recallPromptId).toBeDefined()
+    expect(
+      vi.mocked(RecallPromptController.answerSpelling).mock.calls[0]?.[0]?.path
+        .recallPrompt
+    ).toBeDefined()
   })
 
-  it("emits away, detour, and idle fields alongside thinking time on submit", async () => {
+  it("submits away, detour, and idle fields alongside thinking time on submit", async () => {
     const wrapper = await mountSpellingQuestionDisplay(
       { memoryTrackerId: 1 },
       { rafCallbacks }
@@ -94,7 +98,8 @@ describe("SpellingQuestionDisplay", () => {
     vi.advanceTimersByTime(5000)
     await submitSpellingAnswer(wrapper)
 
-    const answerData = wrapper.emitted("answer")?.[0]?.[0] as {
+    const answerData = vi.mocked(RecallPromptController.answerSpelling).mock
+      .calls[0]?.[0]?.body as {
       awayMs?: number
       awayCount?: number
       detourMs?: number
@@ -108,7 +113,7 @@ describe("SpellingQuestionDisplay", () => {
     expect(answerData?.idleMs).toBeDefined()
   })
 
-  it("emits answer only once when submit is triggered multiple times", async () => {
+  it("accepts answer only once when submit is triggered multiple times", async () => {
     const wrapper = await mountSpellingQuestionDisplay(
       { memoryTrackerId: 1 },
       { rafCallbacks }
@@ -121,7 +126,7 @@ describe("SpellingQuestionDisplay", () => {
     await form.trigger("submit")
     await form.trigger("submit")
 
-    expect(wrapper.emitted("answer")).toHaveLength(1)
+    expect(RecallPromptController.answerSpelling).toHaveBeenCalledTimes(1)
   })
 
   it.each([

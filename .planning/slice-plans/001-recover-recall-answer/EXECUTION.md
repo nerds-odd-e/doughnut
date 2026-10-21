@@ -204,3 +204,44 @@ all schedule/log snapshots. No production or wire change from that refactor.
 Separate acceptance reading swept the retired spelling refusal literal/test;
 no live references remain, with dated observations preserved. No absence test.
 Whitespace passed through the project script; no schema/API generation trigger.
+
+## Slice 5 accepted evidence
+
+Source-only reviewer `/root/source_review_5` returned 43 original commitments and
+qualified journeys; actual launch/return are retained in the conversation. Both
+answer kinds now use one prompt-scoped submission owner for the first immutable
+payload, phases, deliberate Retry, pending duplicate prevention and stale/unmounted
+completion guards. Spelling owns its input and SDK result; the card forwards the
+accepted event to the existing continuation. One recovery-feedback component owns
+the message and Retry controls. Source expectations at every included trigger are
+met by actual form/control observations, paired with accepted backend proof.
+
+`RecallPage.spellingRecovery.spec.ts` observes correct/wrong repeated failures,
+unchanged stem/text/original six-field timing payload/path and progress 0/2, no
+automatic call after waiting, pending form/Retry duplicate refusal, accepted reveal
+and history/progress 1/2 once. Navigation during initial or recovery pending leaves
+the new visible attempt at 0/2 after old completion.
+`RecallPage.spellingRecoveryOutcomes.spec.ts` observes recovered overlap feedback,
+same tracker/new prompt ID, cleared/refocused input, then a distinct specific
+submission; accidental-match recovery opens readable resolve rows and writable
+actions or active readonly refusal. Existing reveal specs retain multiple-match
+and detailed action proof. G2 is proved. The full source mapping is settled:
+MCQ frontend proof reruns through the shared owner; server identity, original
+mark/outcome/creation time/timing, Grade/Confusion/log/schedule uniqueness, ownership
+and current visibility remain proven in slices 2/4. Original deferrals remain.
+
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` passed 385 files/2,396 tests
+in 81.76s before refactor. After extracting presentation and splitting proof,
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall tests/pages/RecallPage tests/recall/RecallPromptCard.spec.ts`
+passed 52 files/248 tests; the final split's targeted command
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPage.spellingRecovery`
+passed 2 files/7 tests. Both `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` passed.
+Active implementation 9–10 minutes, refactor about eight, excluding waits.
+Fixture corrections preserved existing double-fetch setup, current authorization,
+generated SDK types and the new direct DTO body. Consumer/event tracing found no
+old spelling submission owner; conversation recallPromptId remains legitimate.
+Vite generated the expected two component declarations. Its initial integrated
+format/noVoid failure was repaired by returning the promise and the coordinator's
+single formatter followed by `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vite build --emptyOutDir`
+in guarded preparation; that build must succeed before this evidence is published.

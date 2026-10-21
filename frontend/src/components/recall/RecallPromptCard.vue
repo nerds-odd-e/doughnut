@@ -10,7 +10,7 @@
           nextIsSpelling,
           overlapFeedback: spellingOverlapFeedback,
         }"
-        @answer="onSpellingAnswer($event)"
+        @answered="onAnswered($event)"
         :key="`spelling-${currentMemoryTrackerId}-${props.spellingRetryNonce ?? 0}`"
       />
       <template v-else>
@@ -45,12 +45,9 @@
 import { computed, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
-  AnswerSpellingDto,
   MemoryTrackerLite,
   AnsweredQuestion,
 } from "@generated/donut-backend-api"
-import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
@@ -106,23 +103,6 @@ const currentRecallPrompt = computed(() => {
 // Methods
 const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined =>
   props.memoryTrackers?.[index]
-
-const onSpellingAnswer = async (
-  answerData: AnswerSpellingDto & { recallPromptId?: number }
-) => {
-  if (answerData.spellingAnswer === undefined || !answerData.recallPromptId)
-    return
-
-  const { data: answerResult, error } = await apiCallWithLoading(() =>
-    RecallPromptController.answerSpelling({
-      path: { recallPrompt: answerData.recallPromptId! },
-      body: answerData,
-    })
-  )
-  if (!error) {
-    emit("answered", answerResult!)
-  }
-}
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
   emit("answered", answerResult)

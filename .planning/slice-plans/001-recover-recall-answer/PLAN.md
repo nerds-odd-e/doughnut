@@ -177,7 +177,7 @@ Interim: spelling API is recoverable; its disabled web form is handled next.
 
 ### 5. Recover spelling submissions through the existing recall continuations
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted RecallPage spelling input-to-result cases in the proof table;
 frontend suite and both typechecks. Read the complete mapping at acceptance.
 
@@ -243,4 +243,4 @@ Disposition: proved by slice 3: frontend/tests/pages/RecallPage.answerRecovery.s
 ### G2. Spelling recovery needs its deliberate web action
 Reported: slice 4 — "The spelling API now recovers accepted outcomes; coordinator inspection confirms the existing spelling form still needs the planned actionable failure and retained-input Retry journey."
 Story clause: "Explain that submission could not be confirmed and offer a deliberate recovery action."
-Disposition: receiving slice 5
+Disposition: proved by slice 5: frontend/tests/pages/RecallPage.spellingRecovery.spec.ts and RecallPage.spellingRecoveryOutcomes.spec.ts drive real form/Retry controls through repeated failures, immutable timing, ordinary history/progress, stale navigation, overlap's new prompt/refocus and current-authorized accidental-match resolution actions.
