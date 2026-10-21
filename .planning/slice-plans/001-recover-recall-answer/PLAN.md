@@ -17,16 +17,7 @@ implementation or deployment is authorized by this preparation.
 
 ## Current decisions and reuse
 
-- Execution resumed 2026-10-21 in the established owned worktree
-  `/Users/terryyin/git/doughnut/.worktrees/recover-a-recall-answer-after-a-failed-or-lost-s`,
-  branch `codex/recover-a-recall-answer-after-a-failed-or-lost-s`, Story Branch
-  Mode, origin/main integration target. Publisher
-  `dashboard-territory.local-doughnut`, agent Airi-chan; starting revision
-  `a9b42ad6f55242ab4df205b1ae672b913381e3e2`, published claim
-  `9de0b75a02cf7b8d5b92c0d80bfd2a753f41f095`. Existing planning authority
-  permits in-scope refinement. Checkout setup completed with
-  `./scripts/run.sh bash scripts/worktree_setup.sh`; applicable command
-  `CURSOR_DEV=true nix develop -c pnpm --version` returned 12.14.0.
+- [Execution context](EXECUTION.md#execution-context) retains identity and checkout setup.
 - CI observer: GitHub `nerds-odd-e/doughnut`, verified selector `ci.yml`
   (`donut CI`), target `codex/recover-a-recall-answer-after-a-failed-or-lost-s`.
   Coordinator `airi-recall-cbbdfa3f`; directory `/tmp/dough-ci-501/watch-NInIyd`,
@@ -134,7 +125,7 @@ state-changing concurrent transactions. Its failure stops dependent slices.
 
 ### 2. Recover the first accepted multiple-choice answer
 Type: Behavior
-Status: planned
+Status: done
 Proof: Backend controller/HTTP cases in the proof table, including retained
 concurrent and rollback discrimination from slice 1; all backend tests.
 
@@ -245,3 +236,10 @@ observed during preparation. No person-owned product decision is pending.
 ## Accepted execution evidence
 
 [Execution evidence](EXECUTION.md) retains slice proof, source acceptance and learnings.
+
+## Story obligations
+
+### G1. MCQ recovery needs its deliberate web action
+Reported: slice 2 — "Coordinator inspected the existing RecallPromptComponent error path; the backend's new recovery result still needs the planned retained-input Retry journey on the current page."
+Story clause: "Explain that submission could not be confirmed and offer a deliberate recovery action."
+Disposition: receiving slice 3
