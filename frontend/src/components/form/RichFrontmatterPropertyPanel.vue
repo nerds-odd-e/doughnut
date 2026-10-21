@@ -59,7 +59,6 @@
 import { Minus } from "@lucide/vue"
 import { computed, toRef, useId } from "vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useNoteDetailsDisclosure } from "@/composables/noteDetailsDisclosure"
 import { useRouter } from "vue-router"
 import AssimilationModes from "@/components/recall/AssimilationModes.vue"
 import {
@@ -127,15 +126,9 @@ const showAssimilationModes = computed(
     !isNoteLevelPropertyKey(props.propertyKey) &&
     (hasSavedNote.value || authoredListValues.value !== undefined)
 )
-const detailsDisclosure = useNoteDetailsDisclosure()
 useAssimilationView().trackPresentation(
   () => props.noteId,
-  () =>
-    showAssimilationModes.value &&
-    hasSavedNote.value &&
-    (detailsDisclosure === undefined ||
-      (detailsDisclosure.revealed.value &&
-        detailsDisclosure.noteId.value === props.noteId))
+  () => showAssimilationModes.value && hasSavedNote.value
 )
 
 const allowedModes: MemoryTrackerType[] = ["UNDERSTANDING"]

@@ -3,7 +3,7 @@ import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
 import noteCreationForm from './forms/noteCreationForm'
-import { revealNoteDetails } from './notePageContentRegion'
+import { findNoteContentRegion } from './notePageContentRegion'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 
 /** Classifier for inbound/legacy note-show paths in `cy.url()`, not a compile of the named table. */
@@ -15,7 +15,7 @@ type AssumeNotePage = typeof import('./notePage').assumeNotePage
 type RichContentSwitcher = { switchToRichContent: () => unknown }
 
 function findWikiLinkInNoteContent(linkClass: string, wikiLinkText: string) {
-  return revealNoteDetails().find(`a.${linkClass}`).contains(wikiLinkText)
+  return findNoteContentRegion().find(`a.${linkClass}`).contains(wikiLinkText)
 }
 
 function pointUnresolvedWikiLinkAtDestinationInFolder(

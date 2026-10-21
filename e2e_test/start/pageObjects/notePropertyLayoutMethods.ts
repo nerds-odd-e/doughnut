@@ -1,4 +1,7 @@
-import { revealNoteDetails, richNotePropertyRow } from './notePageContentRegion'
+import {
+  findNoteContentRegion,
+  richNotePropertyRow,
+} from './notePageContentRegion'
 
 function expectPropertyControlHeights(
   $container: JQuery<HTMLElement>,
@@ -21,7 +24,7 @@ function expectPropertyControlHeights(
 export const notePropertyLayoutMethods = () => ({
   expectRichNotePropertyValueVisible(key: string) {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key))
         .find('dd')
         .should('be.visible')
@@ -35,7 +38,7 @@ export const notePropertyLayoutMethods = () => ({
   },
   expectEditablePropertyValueShowsAllText(key: string) {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key))
         .find('[data-testid="rich-note-property-row-value-input"]')
         .should(($value) => {
@@ -50,7 +53,7 @@ export const notePropertyLayoutMethods = () => ({
   },
   expectRichNotePropertyKeyEndsWithEllipsis(key: string) {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key))
         .find('[data-testid="rich-note-property-row-key-input"]')
         .should('have.css', 'text-overflow', 'ellipsis')
@@ -59,7 +62,7 @@ export const notePropertyLayoutMethods = () => ({
   },
   expectRichNotePropertyControlsApart(key: string) {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key)).should(($row) => {
         const boxes = [
           '[data-testid="rich-note-property-panel-toggle"]',
@@ -86,7 +89,7 @@ export const notePropertyLayoutMethods = () => ({
   },
   expectRichNotePropertyControlHeights(key: string, tall: boolean) {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key)).should(($row) => {
         expectPropertyControlHeights(
           $row,
@@ -106,7 +109,7 @@ export const notePropertyLayoutMethods = () => ({
     return this
   },
   expectNewRichNotePropertyControlHeights() {
-    revealNoteDetails().should(($region) => {
+    findNoteContentRegion().should(($region) => {
       expectPropertyControlHeights(
         $region,
         ['rich-note-property-row-add', 'rich-note-property-row-cancel'],

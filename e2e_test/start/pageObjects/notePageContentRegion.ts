@@ -54,21 +54,8 @@ export function findNoteContentRegion() {
   })
 }
 
-/** Reveal the note's mounted property rows; scoped readmes have no disclosure. */
-export function revealNoteDetails() {
-  findNoteContentRegion().then(($region) => {
-    const toggle = $region
-      .closest('.note-reading-surface')
-      .find('[data-testid="note-details-toggle"]')
-    if (toggle.length && toggle.attr('aria-expanded') === 'false') {
-      cy.wrap(toggle).click()
-    }
-  })
-  return findNoteContentRegion()
-}
-
 export function focusNoteBody() {
-  return revealNoteDetails().within(() => {
+  return findNoteContentRegion().within(() => {
     cy.get('.ql-editor[contenteditable="true"]').first().click()
   })
 }

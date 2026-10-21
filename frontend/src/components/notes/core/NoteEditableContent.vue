@@ -80,7 +80,6 @@ import {
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
-import { useNoteDetailsDisclosure } from "@/composables/noteDetailsDisclosure"
 import { useBodyEditorDictation } from "@/composables/useBodyEditorDictation"
 
 const emit = defineEmits<{
@@ -124,7 +123,6 @@ async function beforeSaveContent(
   return true
 }
 
-const detailsDisclosure = useNoteDetailsDisclosure()
 const rootRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)
@@ -218,7 +216,6 @@ onMounted(() => {
     insert: (text: string) => {
       const composed = appendWikiLinkPropertyRow(props.noteContent ?? "", text)
       if (composed === undefined) return
-      if (detailsDisclosure) detailsDisclosure.revealed.value = true
       if (props.asMarkdown) {
         const textarea = markdownTextarea()
         if (!textarea) return

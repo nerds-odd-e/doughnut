@@ -53,27 +53,18 @@ history, identity and publication guarantees.
 
 ## Rich property editing
 
-Notes arrive with their details compact beneath the title. The single line
-summarizes authored property keys in file order and shows the updated date;
-long key summaries truncate while the date remains readable. Activating it
-reveals the existing property rows and the created and updated dates. Dates
-spell out the month and include the year. The updated date is more prominent
-for newer edits within the current theme.
+Property rows appear directly between the title and the body. Authors of a note without properties see “Add property”
+there; read-only viewers of such a note go straight from the title to the body.
+Created and Last updated appear at the bottom of the full note, after the body
+and image and before references. Dates spell out the month and include the
+year. The updated date is more prominent for newer edits within the current
+theme.
 
-Opening or closing details saves nothing and keeps the current route and
-note content. Collapsing an unfinished property draft keeps its
-entered values and validation, with an “Unfinished edit” cue on the compact
-line. Reopening resumes that draft. After a successful property save, the
-summary reflects the saved keys. Details reset to compact on another note.
+An unfinished property draft keeps its entered values and validation until it
+is completed or cancelled. A property-targeted arrival focuses the requested
+existing row; a missing key shows its explicit notice beside the existing rows.
 
-A property-targeted arrival reveals and focuses the requested existing row;
-a missing key shows its explicit notice without expanding unrelated details.
-Property insertion opens details so the new row can be edited. Markdown mode
-retains the same disclosure and dates while editing the raw note content.
-Notes without properties show “No properties” for authors and only the
-updated date for read-only viewers.
-
-The title, details and body share a centered reading measure of at most 48rem,
+The title, properties and body share a centered reading measure of at most 48rem,
 with 1rem of padding on each side. Rich body text uses 17px at the default root
 size and 1.55 line spacing; long body text wraps within the available width.
 

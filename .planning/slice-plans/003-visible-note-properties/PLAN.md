@@ -146,7 +146,7 @@ emphasis.
 
 ### 2. Read and use properties directly throughout note workflows
 Type: Behavior
-Status: planned
+Status: done
 Proof: Remaining proof-table rows, exercised through mounted note/page/workspace
 boundaries and retained property-editing E2E consumers.
 
@@ -182,10 +182,10 @@ their drafts, validation feedback and saved values available.
 
 ## Story obligations
 
-### G1. Header disclosure hidden for read-only notes without properties
-Reported: slice 1 — "the header button now renders only when `propertyKeys.length || !readonly`, because its date was the only content left for a read-only note with no properties."
+### G1. Header disclosure hidden for read-only notes without properties (first reported in slice 1)
+Reported: slice 2 — "the header button now renders only when `propertyKeys.length || !readonly`, because its date was the only content left for a read-only note with no properties."
 Story clause: "a read-only empty note proceeds directly to its body"
-Disposition: interim until slices 2
+Disposition: proved by slice 2: the header is deleted; `frontend/tests/notes/NoteTextContent.properties.spec.ts` "proceeds from the title directly to the body of a read-only note without properties" and "offers Add property above the body of an editable note without properties"
 
 ### G2. Footer test image does not load
 Reported: slice 1 — "The image in the footer test does not load (no backend), so its box may have zero height."
@@ -208,6 +208,28 @@ then passed), full `pnpm frontend:test` (388 files, 2407 tests), `vue-tsc` and
 `tsc --noEmit`, and `note_recent_update.feature` 2/2. Searches for
 `after-properties` and `note-detail-dates` found no product consumers. The
 header `note-details-toggle` remains as interim behavior (G1) for slice 2.
+
+## Slice 2 acceptance
+
+Accepted on 2026-10-21 against source commitments C1, C3–C13, C29–C57, X1–X18
+and K1–K5, K7. The disclosure module, header control, summary, unfinished-edit
+cue, reveal wiring in properties, insertion, focus and panel tracking, and E2E
+`revealNoteDetails` are deleted; E2E page objects use `findNoteContentRegion`.
+`useFocusedNoteProperty` no longer watches the disclosure note identity; focus on
+the next note is proved by "focuses the property location on the next note".
+Proof: six focused mounted specs (25 tests), full `pnpm frontend:test` (387
+files, 2404 tests), `vue-tsc` and `tsc --noEmit`, and E2E `note_property`,
+`note_property_layout`, `property_wiki_link`, `property_memory_tracker`,
+`relationship_edit_and_remove` (41/41). Other helper consumers (`wiki_link`,
+body focus, `reify_property`, `note_frontmatter_image`) received the same
+region swap already exercised by those features.
+
+One-time acceptance reading, 2026-10-21, on the slice 2 working tree over
+`d5b50a822c`:
+`git grep -n -I -e noteDetailsDisclosure -e useNoteDetailsDisclosure -e note-details-toggle -e note-property-summary -e note-details-unfinished-edit -e revealNoteDetails -e after-properties -e note-detail-dates -e "Unfinished edit" -e note-reading-surface -e detailsRevealed -e "No properties" -- ":!.planning" ":!**/node_modules/**"`
+returned no product references. `git grep -w revealed` found only an unrelated
+git-secret sentence in `docs/secrets_management.md`. `note-updated-at` remains
+the footer recency observable.
 
 ## Verification and delivery
 

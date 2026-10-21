@@ -4,7 +4,6 @@
   />
   <section
     v-if="showSection"
-    v-show="detailsRevealed"
     class="mb-3 pointer-coarse:[&_.daisy-btn-sm]:min-h-11 pointer-coarse:[&_.daisy-input-sm]:min-h-11"
     :class="isInteractionLocked ? 'pointer-events-none opacity-60' : ''"
     :aria-labelledby="headingVisible ? headingId : undefined"
@@ -85,7 +84,6 @@ import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPr
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
-import { useNoteDetailsDisclosure } from "@/composables/noteDetailsDisclosure"
 import { useRichFrontmatterPropertyEditing } from "@/composables/useRichFrontmatterPropertyEditing"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import {
@@ -117,12 +115,6 @@ const emits = defineEmits<{
 }>()
 
 const isInteractionLocked = computed(() => props.interactionLocked ?? false)
-const detailsDisclosure = useNoteDetailsDisclosure(
-  () => insertOpen.value || !!validationMessage.value
-)
-const detailsRevealed = computed(
-  () => detailsDisclosure?.revealed.value ?? true
-)
 const headingId = useId()
 const insertKeyInputId = `${headingId}-insert-key`
 const insertKeyPresetListId = `${headingId}-insert-key-presets`

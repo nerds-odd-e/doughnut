@@ -45,14 +45,8 @@ async function showNote() {
   return save
 }
 
-async function toggleDetails() {
-  screen.getByTestId("note-details-toggle").click()
-  await flushPromises()
-}
-
-it("retains an unfinished draft and validation through collapse, then saves its summary", async () => {
+it("keeps an unfinished draft with its validation, then saves the corrected property", async () => {
   const save = await showNote()
-  await toggleDetails()
   screen.getByText("Add property").click()
   await flushPromises()
   const key = screen.getByLabelText("Property key") as HTMLInputElement
@@ -65,11 +59,6 @@ it("retains an unfinished draft and validation through collapse, then saves its 
     true
   )
 
-  await toggleDetails()
-  expect(
-    screen.getByTestId("note-details-unfinished-edit").checkVisibility()
-  ).toBe(true)
-  await toggleDetails()
   expect(
     (screen.getByLabelText("Property key") as HTMLInputElement).value
   ).toBe("topic")
@@ -92,14 +81,13 @@ it("retains an unfinished draft and validation through collapse, then saves its 
       body: { content: "---\ntopic: training\n---\nBody." },
     })
   )
-  await toggleDetails()
-  expect(screen.getByTestId("note-property-summary").textContent).toBe(
-    "Properties: topic"
-  )
+  const row = screen.getByTestId("rich-note-property-row")
+  expect(row.checkVisibility()).toBe(true)
+  expect(row.textContent).toContain("training")
 })
 
 it.each([false, true])(
-  "reveals property insertion from a compact note (Markdown: %s)",
+  "inserts a wiki link as a property (Markdown: %s)",
   async (asMarkdown) => {
     const save = await showNote()
     if (asMarkdown) {
@@ -108,9 +96,6 @@ it.each([false, true])(
     }
     useContentCursorInserter().insertWikiLinkAsProperty("[[Target]]")
     await flushPromises()
-    expect(
-      screen.getByTestId("note-details-toggle").getAttribute("aria-expanded")
-    ).toBe("true")
     expect(save).toHaveBeenCalledWith(
       expect.objectContaining({
         body: { content: '---\n"": "[[Target]]"\n---\nBody.' },

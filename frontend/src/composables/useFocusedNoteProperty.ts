@@ -18,7 +18,6 @@ import {
   type MaybeRefOrGetter,
 } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { useNoteDetailsDisclosure } from "@/composables/noteDetailsDisclosure"
 
 const focusedPropertyKeyKey: InjectionKey<
   MaybeRefOrGetter<string | undefined>
@@ -44,7 +43,6 @@ export function useFocusedNoteProperty(
   const router = useRouter()
   const providedPropertyKey = inject(focusedPropertyKeyKey, undefined)
   const propertyRowElements = new Map<string, HTMLElement>()
-  const detailsDisclosure = useNoteDetailsDisclosure()
   // Off note routes (notebook/folder readme) there is no property location.
   const offNoteRoutePropertyKey = ref<string>()
   const focusedPropertyKey = computed(() => {
@@ -104,17 +102,12 @@ export function useFocusedNoteProperty(
     [
       focusedPropertyKey,
       () => (propertyKeys === undefined ? undefined : toValue(propertyKeys)),
-      () => detailsDisclosure?.noteId.value,
     ],
     async ([key, keys]) => {
       if (!key || (keys !== undefined && !keys.includes(key))) return
       await nextTick()
       const element = propertyRowElements.get(key)
-      if (element) {
-        if (detailsDisclosure) detailsDisclosure.revealed.value = true
-        await nextTick()
-        scrollPropertyRowIntoView(element)
-      }
+      if (element) scrollPropertyRowIntoView(element)
     },
     { immediate: true, flush: "post" }
   )

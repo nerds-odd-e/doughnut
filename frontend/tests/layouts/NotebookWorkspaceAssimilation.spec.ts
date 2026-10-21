@@ -62,7 +62,7 @@ it("identifies an opened note panel, closes it, and restores Note when switching
   await expectActivity("Note")
 })
 
-it("follows direct property learning disclosure, close, note identity and route lifetime", async () => {
+it("follows direct property learning, close, note identity and route lifetime", async () => {
   const realm = propertyNote()
   const second = makeMe.aNoteRealm.title("Other").please()
   const mounted = await mountNotebookWorkspace(
@@ -70,10 +70,6 @@ it("follows direct property learning disclosure, close, note identity and route 
     notePropertyLocation(realm.id, "topic")
   )
   wrapper = mounted.wrapper
-  await expectActivity("Assimilate")
-  await click('[data-testid="note-details-toggle"]')
-  await expectActivity("Note")
-  await click('[data-testid="note-details-toggle"]')
   await expectActivity("Assimilate")
   await click(
     '[data-property-key="topic"] [data-testid="rich-note-property-panel-toggle"]'

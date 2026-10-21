@@ -1,4 +1,3 @@
-import { screen } from "@testing-library/vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { afterEach, expect, it, onTestFinished } from "vitest"
@@ -10,7 +9,6 @@ let wrapper: VueWrapper
 afterEach(() => {
   wrapper?.unmount()
   document.body.innerHTML = ""
-  document.documentElement.removeAttribute("data-theme")
 })
 
 async function viewport(width: number) {
@@ -20,7 +18,7 @@ async function viewport(width: number) {
 }
 
 it.each([375, 1440])(
-  "keeps a readable bounded body and shared title/details alignment at %spx",
+  "keeps a readable bounded body and shared title/property alignment at %spx",
   async (width) => {
     await viewport(width)
     wrapper = mountNoteTextContent(
@@ -50,7 +48,7 @@ it.each([375, 1440])(
     ).toBeCloseTo(bodyBounds.left, 0)
     expect(
       wrapper
-        .get('[data-testid="note-details-toggle"]')
+        .get('[data-testid="rich-note-property-row"]')
         .element.getBoundingClientRect().left
     ).toBeCloseTo(bodyBounds.left, 0)
 
@@ -68,66 +66,6 @@ it.each([375, 1440])(
     for (const line of text.getClientRects()) {
       expect(line.left).toBeGreaterThanOrEqual(bodyBounds.left - 1)
       expect(line.right).toBeLessThanOrEqual(bodyBounds.right + 1)
-    }
-  }
-)
-
-it("keeps the unfinished-edit cue on one phone-width line beside truncated keys", async () => {
-  await viewport(375)
-  wrapper = mountNoteTextContent(
-    makeMe.aNote
-      .content(`---\n${"long_authored_key_".repeat(10)}: value\n---\nBody.`)
-      .please()
-  )
-  await flushPromises()
-  await wrapper.get('[data-testid="note-details-toggle"]').trigger("click")
-  screen.getByText("Add property").click()
-  await flushPromises()
-  const key = screen.getByLabelText("Property key") as HTMLInputElement
-  key.value = "draft"
-  key.dispatchEvent(new Event("input", { bubbles: true }))
-  await flushPromises()
-  await wrapper.get('[data-testid="note-details-toggle"]').trigger("click")
-
-  const toggle = screen.getByTestId("note-details-toggle")
-  const summary = screen.getByTestId("note-property-summary")
-  const cue = screen.getByTestId("note-details-unfinished-edit")
-  const line = toggle.getBoundingClientRect()
-  expect(summary.scrollWidth).toBeGreaterThan(summary.clientWidth)
-  expect(summary.clientWidth).toBeGreaterThan(0)
-  expect(cue.checkVisibility()).toBe(true)
-  for (const element of [summary, cue]) {
-    const bounds = element.getBoundingClientRect()
-    expect(bounds.left).toBeGreaterThanOrEqual(line.left)
-    expect(bounds.right).toBeLessThanOrEqual(line.right)
-    expect(bounds.top).toBeCloseTo(cue.getBoundingClientRect().top, 0)
-  }
-  expect(toggle.scrollWidth).toBeLessThanOrEqual(toggle.clientWidth)
-})
-
-function renderedColor(element: Element) {
-  const canvas = document.createElement("canvas")
-  canvas.width = canvas.height = 1
-  const context = canvas.getContext("2d")!
-  context.fillStyle = getComputedStyle(element).color
-  context.fillRect(0, 0, 1, 1)
-  return [...context.getImageData(0, 0, 1, 1).data]
-}
-
-it.each(["light", "dark"])(
-  "keeps details quieter than body text in the %s theme",
-  async (theme) => {
-    document.documentElement.setAttribute("data-theme", theme)
-    wrapper = mountNoteTextContent(makeMe.aNote.content("Body.").please())
-    await flushPromises()
-    const body = renderedColor(wrapper.get(".ql-editor p").element)
-    const details = renderedColor(screen.getByTestId("note-details-toggle"))
-    expect(details[3]).toBeGreaterThan(100)
-    expect(details[3]).toBeLessThan(body[3]!)
-    for (const channel of [0, 1, 2]) {
-      expect(Math.abs(body[channel]! - details[channel]!)).toBeLessThanOrEqual(
-        2
-      )
     }
   }
 )

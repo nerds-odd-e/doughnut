@@ -2,7 +2,10 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import { commonSenseSplit } from '../../support/string_util'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
-import { revealNoteDetails, richNotePropertyRow } from './notePageContentRegion'
+import {
+  findNoteContentRegion,
+  richNotePropertyRow,
+} from './notePageContentRegion'
 import { toolbarButton } from './toolbarButton'
 
 const wikiLinkOrRelationshipToolbarLabel = 'Wiki link or relationship'
@@ -47,7 +50,7 @@ export const noteRelationshipMethods = () => ({
     })
   },
   changeRelationType: function (relationType: string) {
-    revealNoteDetails()
+    findNoteContentRegion()
       .find(richNotePropertyRow('relation'))
       .within(() => {
         cy.findByRole('button', { name: 'Relation Type' }).click()

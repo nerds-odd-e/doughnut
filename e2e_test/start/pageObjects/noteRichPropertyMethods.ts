@@ -2,7 +2,7 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
   focusNoteBody,
-  revealNoteDetails,
+  findNoteContentRegion,
   richNotePropertyPanelToggleTestId,
   richNotePropertyRow,
 } from './notePageContentRegion'
@@ -10,7 +10,7 @@ import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 
 export const noteRichPropertyMethods = () => ({
   addRichNoteProperty(key: string, value: string) {
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
       cy.get('[data-property-draft="true"]')
         .findByTestId('rich-note-property-row-key-input')
@@ -26,7 +26,7 @@ export const noteRichPropertyMethods = () => ({
     return this.flushPendingContentSave()
   },
   addRichNotePropertyFromPreset(key: string, value: string) {
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
       cy.get(
         `[data-testid="rich-note-property-key-preset-option"][data-preset-key="${key}"]`
@@ -41,7 +41,7 @@ export const noteRichPropertyMethods = () => ({
     return this.flushPendingContentSave()
   },
   expectRichNotePropertyList(key: string, values: string[]) {
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key))
         .find('[data-testid="rich-note-property-row-list-value"]')
         .should('have.attr', 'title', values.join('\n'))
@@ -49,7 +49,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   startAddingRichNoteProperty(key: string) {
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
       cy.get('[data-property-draft="true"]')
         .findByTestId('rich-note-property-row-key-input')
@@ -59,7 +59,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   typeInRichNotePropertyKey(key: string, text: string) {
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key))
         .find('[data-testid="rich-note-property-row-key-input"]')
         .clear()
@@ -68,7 +68,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   uploadRichNoteImagePropertyFromFixture(fixtureRelativePath: string) {
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
       cy.get('[data-property-draft="true"]')
         .findByTestId('rich-note-property-row-key-input')
@@ -87,7 +87,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   expectRichNotePropertyDisplayed(key: string, value: string) {
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.contains('h4', 'Properties')
       cy.get(richNotePropertyRow(key)).within(() => {
         cy.get('[data-testid="rich-note-property-row-key-input"]').should(
@@ -114,14 +114,14 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   expectRichNotePropertyAbsent(key: string) {
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key)).should('not.exist')
     })
     return this
   },
   reifyRichNoteProperty(key: string) {
     this.openRichNotePropertyPanel(key)
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key))
         .findByRole('button', { name: `Reify note property ${key}` })
         .click()
@@ -131,7 +131,7 @@ export const noteRichPropertyMethods = () => ({
   },
   removeRichNoteProperty(key: string) {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key)).within(() => {
         cy.findByTestId(richNotePropertyPanelToggleTestId).then(($toggle) => {
           if ($toggle.attr('aria-expanded') !== 'true') {
@@ -146,7 +146,7 @@ export const noteRichPropertyMethods = () => ({
   },
   renameFocusedRichNotePropertyKey(oldKey: string, newKey: string) {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
         cy.get('[data-testid="rich-note-property-row-key-input"]')
           .focus({ force: true })
@@ -161,7 +161,7 @@ export const noteRichPropertyMethods = () => ({
   },
   editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
     // Edit value before key so a row queried by oldKey remains stable.
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.contains('h4', 'Properties')
       cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
         cy.get('[data-testid="rich-note-property-row-value-input"]')
@@ -170,7 +170,7 @@ export const noteRichPropertyMethods = () => ({
           .blur()
       })
     })
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
         cy.get('[data-testid="rich-note-property-row-key-input"]')
           .clear()
@@ -184,7 +184,7 @@ export const noteRichPropertyMethods = () => ({
   },
   expectWikidataBrowseLinkOpensUrl(expectedUrl: string) {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.get('[data-testid="rich-note-property-row"]')
         .filter((_, row) => {
           const key = row.getAttribute('data-property-key')?.toLowerCase()
@@ -221,7 +221,7 @@ export const noteRichPropertyMethods = () => ({
   },
   associateWikidataDialog() {
     this.switchToRichContent()
-    revealNoteDetails().within(() => {
+    findNoteContentRegion().within(() => {
       cy.root().then(($region) => {
         const editBtn = $region.find(
           '[data-testid="rich-note-wikidata-property-edit"]'
