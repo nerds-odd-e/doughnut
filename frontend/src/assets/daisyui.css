@@ -28,6 +28,17 @@
   prefix: daisy-;
 }
 
+/* The centered reading measure shared by a note's text and the content around it */
+@utility note-reading-column {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 48rem;
+  min-width: 0;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  overflow-wrap: anywhere;
+}
+
 /* Same border as daisy-select / daisy-input field controls */
 .daisy-dropdown-content,
 .donut-menu-panel,

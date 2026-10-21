@@ -36,6 +36,7 @@
                   @dead-wiki-link-click="onDeadWikiLinkClick"
                 />
                 <ShowImage :note="noteRealm.note" />
+                <NoteTimestamps :note-topology="noteRealm.note.noteTopology" />
                 <NoteReferences
                   :note-topologies="noteRealm.references ?? []"
                 />
@@ -76,6 +77,7 @@ import type { NoteRealm, User } from "@generated/donut-backend-api"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import NoteReferences from "./NoteReferences.vue"
 import ShowImage from "./widgets/ShowImage.vue"
+import NoteTimestamps from "./NoteTimestamps.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"

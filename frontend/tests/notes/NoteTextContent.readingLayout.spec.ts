@@ -27,7 +27,7 @@ it.each([375, 1440])(
       makeMe.aNote
         .title("Reading a note")
         .content(
-          `A paragraph with room to read. ${"The next thought follows naturally. ".repeat(80)}\n\n${"unbroken".repeat(100)}`
+          `---\ntopic: reading\n---\n\nA paragraph with room to read. ${"The next thought follows naturally. ".repeat(80)}\n\n${"unbroken".repeat(100)}`
         )
         .please(),
       { readonly: true }
@@ -72,12 +72,11 @@ it.each([375, 1440])(
   }
 )
 
-it("keeps a full date and unfinished-edit cue on one phone-width line beside truncated keys", async () => {
+it("keeps the unfinished-edit cue on one phone-width line beside truncated keys", async () => {
   await viewport(375)
   wrapper = mountNoteTextContent(
     makeMe.aNote
       .content(`---\n${"long_authored_key_".repeat(10)}: value\n---\nBody.`)
-      .updatedAt("2026-09-30T12:00:00Z")
       .please()
   )
   await flushPromises()
@@ -92,21 +91,18 @@ it("keeps a full date and unfinished-edit cue on one phone-width line beside tru
 
   const toggle = screen.getByTestId("note-details-toggle")
   const summary = screen.getByTestId("note-property-summary")
-  const date = screen.getByTestId("note-updated-at")
   const cue = screen.getByTestId("note-details-unfinished-edit")
   const line = toggle.getBoundingClientRect()
   expect(summary.scrollWidth).toBeGreaterThan(summary.clientWidth)
   expect(summary.clientWidth).toBeGreaterThan(0)
-  expect(date.textContent).toContain("September 30, 2026")
   expect(cue.checkVisibility()).toBe(true)
-  for (const element of [summary, date, cue]) {
+  for (const element of [summary, cue]) {
     const bounds = element.getBoundingClientRect()
     expect(bounds.left).toBeGreaterThanOrEqual(line.left)
     expect(bounds.right).toBeLessThanOrEqual(line.right)
-    expect(bounds.top).toBeCloseTo(date.getBoundingClientRect().top, 0)
+    expect(bounds.top).toBeCloseTo(cue.getBoundingClientRect().top, 0)
   }
   expect(toggle.scrollWidth).toBeLessThanOrEqual(toggle.clientWidth)
-  expect(date.scrollWidth).toBeLessThanOrEqual(date.clientWidth)
 })
 
 function renderedColor(element: Element) {

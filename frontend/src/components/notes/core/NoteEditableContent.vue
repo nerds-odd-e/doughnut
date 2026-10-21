@@ -8,7 +8,6 @@
       :begin-dictation="beginDictation"
     >
       <template #default="{ value, update, blur }">
-        <slot v-if="asMarkdown" name="after-properties" />
         <TextArea
           v-if="asMarkdown"
           ref="textareaRef"
@@ -44,9 +43,7 @@
               handlePasteComplete(content, update, quillContext)
           "
           @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
-        >
-          <template #after-properties><slot name="after-properties" /></template>
-        </RichMarkdownEditor>
+        />
       </template>
     </TextContentWrapper>
     <PasteChoiceActionBar

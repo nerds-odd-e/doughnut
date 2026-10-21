@@ -124,7 +124,7 @@ permission refusal. Deletion sweep is a separate reading, never an absence test.
 
 ### 1. Read timestamps at the bottom of the full note
 Type: Behavior
-Status: planned
+Status: done
 Proof: Footer observations in the first two rows above, plus existing note/context
 reading and recent-update scenarios with their date consumer aligned.
 
@@ -179,6 +179,35 @@ their drafts, validation feedback and saved values available.
   the focused-test/external-wait exception, not permission for extra implementation.
   At >5 minutes reassess; at >10 minutes of substantive work stop and refine the
   remaining boundary with the actual evidence under AGENTS.md's sizing rule.
+
+## Story obligations
+
+### G1. Header disclosure hidden for read-only notes without properties
+Reported: slice 1 — "the header button now renders only when `propertyKeys.length || !readonly`, because its date was the only content left for a read-only note with no properties."
+Story clause: "a read-only empty note proceeds directly to its body"
+Disposition: interim until slices 2
+
+### G2. Footer test image does not load
+Reported: slice 1 — "The image in the footer test does not load (no backend), so its box may have zero height."
+Story clause: "after the body and displayed images"
+Disposition: proved by slice 1: `frontend/tests/notes/NoteShow.timestamps.spec.ts` asserts `#note-image` precedes the footer in document order within block flow, plus geometry, in rich, raw and read-only modes
+
+### G3. Recent-update E2E not run by implementation
+Reported: slice 1 — "`note_recent_update.feature` was not run."
+Story clause: "Preserve the existing recency emphasis"
+Disposition: proved by slice 1: coordinator ran `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_view/note_recent_update.feature`, 2/2 passing against the footer `note-updated-at`
+
+## Slice 1 acceptance
+
+Source-only review (fresh reviewer, story text only) returned commitments C1–C57,
+X1–X20, E1–E3, K1–K7; slice 1 owns C2, C14–C28, X16, X19–X20, K6 and K7's footer
+part. Accepted on 2026-10-21: `NoteTimestamps.vue` owns formatting/emphasis and
+renders between `ShowImage` and `NoteReferences` in `NoteShow`; context readers
+unchanged. Proof: `NoteShow.timestamps.spec.ts` (failed 6/6 on unchanged code,
+then passed), full `pnpm frontend:test` (388 files, 2407 tests), `vue-tsc` and
+`tsc --noEmit`, and `note_recent_update.feature` 2/2. Searches for
+`after-properties` and `note-detail-dates` found no product consumers. The
+header `note-details-toggle` remains as interim behavior (G1) for slice 2.
 
 ## Verification and delivery
 
