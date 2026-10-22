@@ -18,6 +18,7 @@ import com.openai.models.files.FileCreateParams;
 import com.openai.models.files.FileObject;
 import com.openai.models.files.FilePurpose;
 import com.openai.models.responses.ResponseCreateParams;
+import com.openai.models.responses.ResponseStatus;
 import com.openai.models.responses.StructuredResponse;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.reactivex.BackpressureStrategy;
@@ -144,7 +145,10 @@ public class OpenAiApiHandler {
       StructuredResponseCreateParams<T> responseRequest) {
     assertOpenAiAvailable();
     StructuredResponse<T> response = officialClient.responses().create(responseRequest);
-    if (response == null || response.output() == null || response.output().isEmpty()) {
+    if (response == null
+        || response.status().filter(ResponseStatus.INCOMPLETE::equals).isPresent()
+        || response.output() == null
+        || response.output().isEmpty()) {
       return Optional.empty();
     }
 

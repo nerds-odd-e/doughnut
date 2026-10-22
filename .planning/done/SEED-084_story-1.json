@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-084#story-1",
+  "title": "Handle incomplete AI output during recall-prompt generation",
+  "completedAt": "2026-10-22T22:44:28.389Z",
+  "developer": "Terry Yin",
+  "agent": "Nana-chan",
+  "host": "codex"
+}

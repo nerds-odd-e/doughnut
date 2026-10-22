@@ -8,23 +8,32 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
+import com.openai.models.responses.Response;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerRecallPromptRecoveryControllerTest extends MemoryTrackerControllerTestBase {
   @Autowired EntityManager entityManager;
 
-  @Test
-  void failedThenSuccessfulMcqLoadingPreservesLearningState()
+  @ParameterizedTest
+  @ValueSource(strings = {"max_output_tokens", "content_filter"})
+  void incompleteThenSuccessfulMcqLoadingPreservesLearningState(String reason)
       throws UnexpectedNoAccessRightException {
     var openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     MemoryTracker tracker = ownedTracker();
     var nextRecallAt = tracker.getNextRecallAt();
     var recallLogs = recallLogsOf(tracker);
-    openAiStructuredResponseMock.stubStructuredResponse(null);
-    assertThrows(ResponseStatusException.class, () -> controller.getRecallPrompt(tracker));
+    openAiStructuredResponseMock.stubStructuredResponseIncomplete(
+        "{\"correctAnswer\":\"客が銀行にお金を預ける。\",\"distractors\":[\"客が銀行のお金を預かる。\",\"銀行が客にお",
+        Response.IncompleteDetails.Reason.of(reason));
+    ResponseStatusException exception =
+        assertThrows(ResponseStatusException.class, () -> controller.getRecallPrompt(tracker));
+    assertThat(exception.getStatusCode(), equalTo(HttpStatus.SERVICE_UNAVAILABLE));
 
     openAiStructuredResponseMock.stubStructuredResponse(makeMe.aGeneratedMcq().please());
     var prompt = controller.getRecallPrompt(tracker);
