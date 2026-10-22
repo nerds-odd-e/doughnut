@@ -115,3 +115,14 @@ Accepted proof (slice 3): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -
 Slice-plan refinement: not needed — three independent outcomes with separate
 proof loops, each a small change in one component and its helper. No remaining
 slice-specific concern identified in this review.
+
+## Execution complete
+
+Product advice: no change. The story's outcome is delivered as refined; the
+deferred editor improvements (keeping task checkboxes, collapsible sections,
+strikethrough, hard breaks and code-block languages without conversion) stay
+deferred. Observed limitation, consistent with the story's block-level rule:
+supported inline formatting that shares a block with unsupported formatting is
+dropped with it (`a_b *c* ~~d~~` → `a\_b c d`); wiki links survive conversion
+as written. Worth considering only if owners report losing emphasis after
+converting.

@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 320. Removed numbers are never reused.
+- Highest allocated local number: 324. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
@@ -331,3 +331,19 @@ Former local code: DD-319. Acceptance traced the unchanged transport API but not
 ## ODF-323 — A caller-written plan-status mutation survives a later delivery refusal
 
 Former local code: DD-320. Guarded delivery applied the coordinator's plan update before its staged-whitespace check refused; the retry needed an idempotent update. One SEED-082#story-1 execution, 0.3.67; no delivered defect. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-323.md).
+
+<a id="dd-324"></a>
+
+## DD-324 — Implementer takes a red baseline by overwriting a shared-checkout file
+
+A slice implementer obtained a pre-change failing observation by temporarily copying HEAD's version of an owned component over the working file, running the new spec, then restoring its edit — although delegation said to use a separate temporary checkout or report the need. No loss occurred and the red check was useful.
+
+### Occurrences
+- Execution: SEED-083#story-1, first implementation commit 0c160d37a0adc6791a167e2aa960c2911dd507c5
+  - Timestamp: unknown (slice 3 implementation, 2026-10-23 Asia/Tokyo, delivered as 3c228434b326f31b2fc4d043ce66d7f2961c5ac1)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.68
+  - Evidence: slice 3 implementation return ("copied HEAD's component in temporarily, ran the spec, saw it fail ... then put my version back") for `frontend/src/components/form/RichEditingUnavailableWarning.vue`.
+  - Observed effect: in-place swap of an uncommitted owned file in the shared execution checkout; restored before return.
+  - Inference: the delegation forbids stash/checkout but names no cheap baseline route, so a careful agent improvises one; an interruption mid-swap could have lost the uncommitted edit.
