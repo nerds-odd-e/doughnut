@@ -72,7 +72,7 @@ Accepted proof (slice 2): same four-spec command as slice 1 → 60 passed. Obser
 
 ### 3. The warning and button fit the existing UI on narrow screens
 Type: Behavior
-Status: planned
+Status: done
 Proof: a narrow-viewport case in the bodyItCannotKeep spec (or a sibling
 `...Narrow.spec.ts` following `propertyValueDialogNarrow`): at 320px the
 message, consequence line, and button lie within the window, the button is not
@@ -81,6 +81,8 @@ clipped and has a comfortable tap height.
 Behavior: the warning shows message, then consequence line, then the action,
 with spacing consistent with existing alerts; at phone width the button wraps
 below the text instead of overlapping or clipping.
+
+Accepted proof (slice 3): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/components/form/RichMarkdownEditor.bodyItCannotKeep.spec.ts tests/components/form/RichMarkdownEditor.bodyItCannotKeepNarrow.touch.spec.ts tests/notes/NoteEditableContent.debouncedSave.spec.ts tests/components/form/RichMarkdownEditor.frontmatter.spec.ts tests/components/form/RichMarkdownEditor.listProperties.spec.ts` → 61 passed; vue-tsc clean. Observation: "stacks message, consequence and a touch-sized button within the window" (chromium-touch, 320px): parts within the window, in vertical order, button not clipped, height ≥ 44. DaisyUI's alert lays children out in columns, so the warning wraps its parts in a vertical flex stack; the button uses the repo's `pointer-coarse:min-h-11` touch size. The frontmatter-error variant shares the stack with unchanged text.
 
 ## Current decisions
 
