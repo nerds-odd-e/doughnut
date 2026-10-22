@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-085#story-1",
+  "title": "Accept either observed correct live audio transcription",
+  "completedAt": "2026-10-22T23:50:25.007Z",
+  "developer": "Terry Yin",
+  "agent": "Anri-chan",
+  "host": "codex"
+}
