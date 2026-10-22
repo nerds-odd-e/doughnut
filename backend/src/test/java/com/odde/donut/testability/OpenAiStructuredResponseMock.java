@@ -44,12 +44,16 @@ public class OpenAiStructuredResponseMock {
               if (result == null) {
                 return null;
               }
+              if (result instanceof Response response) {
+                return new StructuredResponse(params.responseType(), response);
+              }
               String content =
                   result instanceof MalformedStructuredContent malformed
                       ? malformed.content()
                       : objectMapperConfig.objectMapper().valueToTree(result).toString();
               return new StructuredResponse(
-                  params.responseType(), buildStructuredResponse(content));
+                  params.responseType(),
+                  buildStructuredResponse(content, ResponseStatus.COMPLETED));
             });
   }
 
@@ -89,6 +93,14 @@ public class OpenAiStructuredResponseMock {
     fallbackStructuredResults.add(new MalformedStructuredContent(malformedJson));
   }
 
+  public void stubStructuredResponseIncomplete(
+      String content, Response.IncompleteDetails.Reason reason) {
+    fallbackStructuredResults.add(
+        buildStructuredResponse(content, ResponseStatus.INCOMPLETE).toBuilder()
+            .incompleteDetails(Response.IncompleteDetails.builder().reason(reason).build())
+            .build());
+  }
+
   private Object pollStructuredResult(Class<?> responseType) {
     Queue<Object> exactQueue = structuredResults.get(responseType);
     if (exactQueue != null && !exactQueue.isEmpty()) {
@@ -115,14 +127,17 @@ public class OpenAiStructuredResponseMock {
     return fallbackStructuredResults.poll();
   }
 
-  private Response buildStructuredResponse(String content) {
+  private Response buildStructuredResponse(String content, ResponseStatus status) {
     ResponseOutputText outputText =
         ResponseOutputText.builder().annotations(List.of()).text(content).build();
     ResponseOutputMessage message =
         ResponseOutputMessage.builder()
             .id("msg-mock")
             .addContent(outputText)
-            .status(ResponseOutputMessage.Status.COMPLETED)
+            .status(
+                status.equals(ResponseStatus.INCOMPLETE)
+                    ? ResponseOutputMessage.Status.INCOMPLETE
+                    : ResponseOutputMessage.Status.COMPLETED)
             .build();
     return Response.builder()
         .id("resp-mock")
@@ -138,7 +153,7 @@ public class OpenAiStructuredResponseMock {
         .toolChoice(ToolChoiceOptions.NONE)
         .tools(List.of())
         .topP(Optional.empty())
-        .status(ResponseStatus.COMPLETED)
+        .status(status)
         .build();
   }
 }

@@ -17,7 +17,7 @@ scope: small
 
 **Identity:** SEED-084#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"c7da7cbf20c3e1e179c3747b99afb8da55526ee0f55c721fdc42e6627da0c614"}}
 ```
 
 **Goal:** Resolve the reported recall-prompt failure with an evidenced diagnosis
@@ -41,5 +41,16 @@ the cause of truncation and the current failure handling require investigation.
 **Evaluation:** Reproduce the confirmed discrepancy through the existing stable
 API boundary before repair; verify the intended observable result and related
 backend behavior.
+
+**Bounded repair instruction:** Through the controller boundary, reproduce a
+truncated structured response marked incomplete by OpenAI, then return the
+existing generation-failure outcome before attempting to parse that output.
+Preserve completed-response generation. The report lacks provider metadata, so
+do not claim which incomplete reason caused the historical incident. Use the
+bug-fixing workflow's ten-minute planless attempt with no replanning.
+
+**Key examples:** Incomplete AI output with truncated Japanese distractors
+produces the existing HTTP 503 generation-failure response. A later successful
+request generates a usable recall prompt without changing the learning state.
 
 **Source:** Owner-supplied failure report 285 / GitHub issue 862, pasted 2026-10-23.
