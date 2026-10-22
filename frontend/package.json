@@ -59,7 +59,7 @@
     "optionator": "^0.9.4",
     "pdfjs-dist": "6.4.299",
     "playwright": "1.64.1",
-    "sass": "1.105.2",
+    "sass": "1.106.0",
     "storybook": "10.6.3",
     "tailwindcss": "4.3.3",
     "terser": "^5.51.2",
