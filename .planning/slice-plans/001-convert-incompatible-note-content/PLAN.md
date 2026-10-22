@@ -58,7 +58,7 @@ Accepted proof (slice 1): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -
 
 ### 2. Converted blocks that merge in the editor stay editable
 Type: Behavior
-Status: planned
+Status: done
 Proof: same spec, adjacent fenced code blocks (one tagged `ts`) example.
 
 Behavior: a body of two adjacent fenced code blocks → convert → the result is
@@ -67,6 +67,8 @@ alone is kept, but the editor merges adjacent code blocks, so the joined
 per-block result is not kept). Rule extension: when the joined result is not
 kept, use the editor's held Markdown of the joined result if it keeps the
 readable text, else its readable lines.
+
+Accepted proof (slice 2): same four-spec command as slice 1 → 60 passed. Observation: "converting %j keeps its text and makes it editable" row for two adjacent fenced code blocks (one `ts`) → "```\nconst a = 1\nplain\n```" (one untagged code block), blur once, warning gone, editor editable. `bodyTheRichEditorKeeps` applies the same rule (`asTheEditorKeeps`) per block and then to the joined result.
 
 ### 3. The warning and button fit the existing UI on narrow screens
 Type: Behavior

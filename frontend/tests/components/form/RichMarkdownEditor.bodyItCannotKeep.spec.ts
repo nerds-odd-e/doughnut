@@ -51,6 +51,10 @@ describe("RichMarkdownEditor with a body it cannot keep", () => {
       "# Kept heading\n\ntext ~~strike~~ and more\n\n- kept item",
       "# Kept heading\n\ntext strike and more\n\n- kept item",
     ],
+    [
+      "```ts\nconst a = 1\n```\n\n```\nplain\n```",
+      "```\nconst a = 1\nplain\n```",
+    ],
   ])(
     "converting %j keeps its text and makes it editable",
     async (body, converted) => {

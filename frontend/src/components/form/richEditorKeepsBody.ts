@@ -84,7 +84,8 @@ const plainParagraphs = (lines: string[]) => {
  * A body the rich editor keeps, with the readable text of `body`: each
  * top-level block stays when the editor keeps it, becomes the editor's
  * Markdown for it when that keeps its readable text, and otherwise becomes
- * its readable lines as plain paragraphs.
+ * its readable lines as plain paragraphs. The joined blocks are then treated
+ * the same way as a whole, since the editor may merge adjacent blocks.
  */
 export const bodyTheRichEditorKeeps = (body: string) => {
   registerDonutQuillBlots()
@@ -97,16 +98,18 @@ export const bodyTheRichEditorKeeps = (body: string) => {
     quill.update(Quill.sources.SILENT)
     return quill.root.innerHTML
   }
-  return marked
-    .lexer(body)
-    .filter((token) => token.type !== "space")
-    .map(({ raw }) => {
-      const block = raw.replace(/\n+$/, "")
-      const held = heldHtml(block)
-      if (richEditorKeepsBody(block, held)) return block
-      const heldMarkdown = markdownizer.htmlToMarkdown(held)
-      if (sameReadableText(block, heldMarkdown)) return heldMarkdown
-      return plainParagraphs(readableLines(block))
-    })
-    .join("\n\n")
+  const asTheEditorKeeps = (markdown: string) => {
+    const held = heldHtml(markdown)
+    if (richEditorKeepsBody(markdown, held)) return markdown
+    const heldMarkdown = markdownizer.htmlToMarkdown(held)
+    if (sameReadableText(markdown, heldMarkdown)) return heldMarkdown
+    return plainParagraphs(readableLines(markdown))
+  }
+  return asTheEditorKeeps(
+    marked
+      .lexer(body)
+      .filter((token) => token.type !== "space")
+      .map(({ raw }) => asTheEditorKeeps(raw.replace(/\n+$/, "")))
+      .join("\n\n")
+  )
 }
