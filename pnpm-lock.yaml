@@ -419,8 +419,8 @@ importers:
         specifier: 2.5.15
         version: 2.5.15
       '@lucide/vue':
-        specifier: 1.59.0
-        version: 1.59.0(vue@3.5.44(typescript@6.0.3))
+        specifier: 1.60.0
+        version: 1.60.0(vue@3.5.44(typescript@6.0.3))
       '@storybook/addon-docs':
         specifier: 10.6.2
         version: 10.6.2(@types/react@19.3.0)(storybook@10.6.2(@types/react@19.3.0)(react@19.3.1))
@@ -1247,8 +1247,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@lucide/vue@1.59.0':
-    resolution: {integrity: sha512-X7O3FCwECqmVV9h6l2dPxksuiJx9/gszRTj15aOKsxsfU4jr+p7vUVFILn7K38fG8wfSmsy8jPVS9muDdTt0MA==}
+  '@lucide/vue@1.60.0':
+    resolution: {integrity: sha512-rARqkhMbeBa+YWgDNInZavBAt+FUxdEyOx/gfrMZ466im0EnBTWgSKBra08bHhnRytyv4AGucf1+9AhrEDQqMA==}
     peerDependencies:
       vue: '>=3.0.1'
 
@@ -6756,7 +6756,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@lucide/vue@1.59.0(vue@3.5.44(typescript@6.0.3))':
+  '@lucide/vue@1.60.0(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       vue: 3.5.44(typescript@6.0.3)
 
