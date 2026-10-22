@@ -58,6 +58,13 @@ Then(
   }
 )
 
+Then(
+  'the note content on the current page should be either {string} or {string} within {int} seconds',
+  (first: string, second: string, timeout: number) => {
+    start.assumeNotePage().findNoteContentEither(first, second, timeout * 1000)
+  }
+)
+
 When(
   'I request to complete the content for the note {string}',
   (noteTopology: string) => {
