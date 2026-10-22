@@ -6,6 +6,8 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Accept either observed correct live audio transcription](seeds/SEED-075-live-audio-transcription-assertion.md#story-1) — SEED-075#story-1
+
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
