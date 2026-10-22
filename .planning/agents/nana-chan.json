@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nana-chan",
+  "email": "nana-chan@example.org",
+  "identity": "SEED-084#story-1",
+  "mode": "story-branch",
+  "branch": "codex/recall-incomplete-ai-response",
+  "host": "codex"
+}
