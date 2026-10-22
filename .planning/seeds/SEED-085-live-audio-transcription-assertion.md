@@ -4,7 +4,7 @@
 
 ### Accept either observed correct live audio transcription
 
-**Identity:** SEED-075#story-1
+**Identity:** SEED-085#story-1
 ```json dough-story-state
 {"schemaVersion":1,"refinement":"refined","approach":"planless"}
 ```

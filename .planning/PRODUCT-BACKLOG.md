@@ -6,7 +6,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Accept either observed correct live audio transcription](seeds/SEED-075-live-audio-transcription-assertion.md#story-1) — SEED-075#story-1
+- [Accept either observed correct live audio transcription](seeds/SEED-085-live-audio-transcription-assertion.md#story-1) — SEED-085#story-1
 
 ## Backlog list
 

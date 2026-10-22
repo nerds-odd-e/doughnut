@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "agent": "Anri-chan",
   "email": "anri-chan@example.org",
-  "identity": "SEED-075#story-1",
+  "identity": "SEED-085#story-1",
   "mode": "story-branch",
   "branch": "codex/audio-transcription-alternatives",
   "host": "codex"
