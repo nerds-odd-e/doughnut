@@ -17,18 +17,11 @@
     <p v-if="hasNestedMetadata" class="mb-3 text-sm">
       Edit metadata in Markdown.
     </p>
-    <div
-      v-if="richEditingUnavailableReason"
-      role="alert"
-      aria-live="polite"
-      data-testid="rich-note-unavailable-warning"
-      class="daisy-alert daisy-alert-warning mb-3 text-sm"
-    >
-      <span>{{ richEditingUnavailableReason.message }}</span>
-      <span class="block mt-1 text-xs opacity-90">
-        {{ richEditingUnavailableReason.hint }}
-      </span>
-    </div>
+    <RichEditingUnavailableWarning
+      v-if="richEditingUnavailable"
+      :frontmatter-problem="frontmatterProblem"
+      @convert="convertBody"
+    />
     <QuillEditor
       ref="quillRef"
       v-bind="{ multipleLine, scopeName, field, title, errors }"
@@ -51,8 +44,12 @@ import { computed, nextTick, ref, type PropType } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import type { QuillPasteContext } from "./quillPasteContext"
 import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
+import RichEditingUnavailableWarning from "./RichEditingUnavailableWarning.vue"
 import markdownizer from "./markdownizer"
-import { richEditorKeepsBody } from "./richEditorKeepsBody"
+import {
+  bodyTheRichEditorKeeps,
+  richEditorKeepsBody,
+} from "./richEditorKeepsBody"
 import type { WikiLink } from "@generated/donut-backend-api"
 import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
 import {
@@ -107,20 +104,14 @@ const parsedContent = computed(() =>
 
 const bodyItCannotKeep = ref(false)
 
-const richEditingUnavailableReason = computed(() => {
+const frontmatterProblem = computed(() => {
   const p = parsedContent.value
-  if (!p.ok && p.reason !== "nested_metadata")
-    return {
-      message: p.message,
-      hint: "Switch to Markdown mode to fix the frontmatter.",
-    }
-  if (bodyItCannotKeep.value)
-    return {
-      message: "This note has content the rich editor cannot keep.",
-      hint: "Switch to Markdown mode to edit it.",
-    }
-  return null
+  return !p.ok && p.reason !== "nested_metadata" ? p.message : undefined
 })
+
+const richEditingUnavailable = computed(
+  () => frontmatterProblem.value !== undefined || bodyItCannotKeep.value
+)
 
 const hasNestedMetadata = computed(() => {
   const p = parsedContent.value
@@ -130,7 +121,7 @@ const hasNestedMetadata = computed(() => {
 const effectiveReadonly = computed(
   () =>
     Boolean(props.readonly) ||
-    richEditingUnavailableReason.value !== null ||
+    richEditingUnavailable.value ||
     imageUploadInProgress.value
 )
 
@@ -180,6 +171,18 @@ const htmlValueUpdated = (newHtmlValue: string) => {
   emits("update:modelValue", composed)
 }
 
+const emitAndSave = (composed: string) => {
+  emits("update:modelValue", composed)
+  nextTick(() => emits("blur"))
+}
+
+const convertBody = () => {
+  bodyItCannotKeep.value = false
+  emitAndSave(
+    composeBodyMarkdown(bodyTheRichEditorKeeps(markdownForRichDisplay.value))
+  )
+}
+
 const onPropertiesChanged = (rows: PropertyRow[]) => {
   const p = parsedContent.value
   if (!p.ok) return
@@ -187,10 +190,7 @@ const onPropertiesChanged = (rows: PropertyRow[]) => {
   const bodyMarkdown = currentIntervalBodyMarkdown ?? p.body
   const composed = composeNoteContentInPlace(prevFull, rows, bodyMarkdown)
   if (composed === prevFull) return
-  emits("update:modelValue", composed)
-  nextTick(() => {
-    emits("blur")
-  })
+  emitAndSave(composed)
 }
 
 const onPasteComplete = (

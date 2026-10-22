@@ -32,7 +32,7 @@ stay as they are. Frontend only; no API change.
 
 ### 1. Converting a body the editor cannot keep keeps its text and makes it editable
 Type: Behavior
-Status: planned
+Status: done
 Proof: `RichMarkdownEditor.bodyItCannotKeep.spec.ts` (replace the "Switch to
 Markdown mode" assertion with the button and conversion examples) and one
 `NoteEditableContent` save case; run with
@@ -53,6 +53,8 @@ keep it when the editor keeps it; otherwise use the editor's held Markdown for
 that block when its readable text (words, with block and line breaks as
 separators) is unchanged; otherwise use the block's readable lines as plain
 paragraphs.
+
+Accepted proof (slice 1): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/components/form/RichMarkdownEditor.bodyItCannotKeep.spec.ts tests/notes/NoteEditableContent.debouncedSave.spec.ts tests/components/form/RichMarkdownEditor.frontmatter.spec.ts tests/components/form/RichMarkdownEditor.listProperties.spec.ts` → 59 passed; `vue-tsc --noEmit` clean. Observations: "converting %j keeps its text and makes it editable", "converting keeps the frontmatter as written", "saves a converted body at once and reopens it editable". Converted outputs matched the expectations above exactly. Conversion lives in `bodyTheRichEditorKeeps` (`richEditorKeepsBody.ts`); the warning is `RichEditingUnavailableWarning.vue`. Sweep reading: "Switch to Markdown mode to edit it" matches only planning files.
 
 ### 2. Converted blocks that merge in the editor stay editable
 Type: Behavior

@@ -131,6 +131,29 @@ topic: Japanese
     wrapper.unmount()
   })
 
+  it("saves a converted body at once and reopens it editable", async () => {
+    const richNote = (noteContent: string) =>
+      mountNoteEditableContent({ noteId, noteContent, asMarkdown: false })
+    const warning = '[data-testid="rich-note-unavailable-warning"]'
+    const wrapper = await richNote("---\ntopic: tea\n---\n\n**a** *b*")
+
+    await wrapper
+      .find(warning)
+      .findAll("button")
+      .find((b) => b.text() === "Convert for the rich editor")!
+      .trigger("click")
+    await flushPromises()
+
+    expectSaved("---\ntopic: tea\n---\n\na b")
+    wrapper.unmount()
+    const reopened = await richNote("---\ntopic: tea\n---\n\na b")
+    expect(reopened.find(warning).exists()).toBe(false)
+    expect(
+      reopened.findComponent({ name: "QuillEditor" }).props("readonly")
+    ).toBe(false)
+    reopened.unmount()
+  })
+
   describe("guarding a property's memory tracker", () => {
     const tracker = makeMe.aMemoryTracker
       .id(99)

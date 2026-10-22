@@ -1,3 +1,4 @@
+import { flushPromises } from "@vue/test-utils"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor with a body it cannot keep", () => {
@@ -11,6 +12,18 @@ describe("RichMarkdownEditor with a body it cannot keep", () => {
     h.getWrapper().find('[data-testid="rich-note-unavailable-warning"]')
   const warningText = () => warning().text()
 
+  const convertButton = () =>
+    warning()
+      .findAll("button")
+      .find((b) => b.text() === "Convert for the rich editor")!
+
+  async function convert() {
+    await convertButton().trigger("click")
+    await flushPromises()
+    await h.getWrapper().setProps({ modelValue: h.lastEmittedMarkdown() })
+    await flushPromises()
+  }
+
   it.each([
     "<details><summary>S</summary>Inner</details>",
     "- [ ] todo\n- [x] done",
@@ -22,7 +35,44 @@ describe("RichMarkdownEditor with a body it cannot keep", () => {
 
     expect(h.quillReadonly()).toBe(true)
     expect(warningText()).toContain("rich editor cannot keep")
-    expect(warningText()).toContain("Switch to Markdown mode")
+    expect(warningText()).toContain(
+      "Converting keeps the text and removes formatting the rich editor cannot keep."
+    )
+    expect(convertButton().exists()).toBe(true)
+  })
+
+  it.each([
+    ["<details><summary>S</summary>Inner</details>", "S\n\nInner"],
+    ["text ~~strike~~ and more", "text strike and more"],
+    ["line one  \nline two", "line one\n\nline two"],
+    ["**a** *b*", "a b"],
+    ["- [ ] todo\n- [x] done", "- todo\n- done"],
+    [
+      "# Kept heading\n\ntext ~~strike~~ and more\n\n- kept item",
+      "# Kept heading\n\ntext strike and more\n\n- kept item",
+    ],
+  ])(
+    "converting %j keeps its text and makes it editable",
+    async (body, converted) => {
+      await h.mountEditor(body)
+
+      await convert()
+
+      expect(h.lastEmittedMarkdown()).toBe(converted)
+      expect(h.getWrapper().emitted("blur")).toHaveLength(1)
+      expect(warning().exists()).toBe(false)
+      expect(h.quillReadonly()).toBe(false)
+    }
+  )
+
+  it("converting keeps the frontmatter as written", async () => {
+    await h.mountEditor("---\ntopic:   tea  # note\n---\n\n**a** *b*")
+
+    await convert()
+
+    expect(h.lastEmittedMarkdown()).toBe(
+      "---\ntopic:   tea  # note\n---\n\na b"
+    )
   })
 
   it.each(["&nbsp;", "<p></p>", "<br/>\n"])(
