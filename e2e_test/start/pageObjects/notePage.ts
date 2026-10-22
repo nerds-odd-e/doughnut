@@ -122,6 +122,19 @@ export const assumeNotePage = (
         }
       })
     },
+    findNoteContentEither(first: string, second: string, timeout: number) {
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+        timeout,
+      }).should(($el) => {
+        const actual = $el.text()
+        expect(
+          actual.includes(first) || actual.includes(second),
+          `expected note content to include either ${JSON.stringify(first)} or ${JSON.stringify(second)}, but found ${JSON.stringify(actual)}`
+        ).to.be.true
+      })
+      return this
+    },
     expectSoftLineBreakBetween(before: string, after: string) {
       const escapedBefore = before.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       const escapedAfter = after.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
