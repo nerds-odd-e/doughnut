@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Handle incomplete AI output during recall-prompt generation](seeds/SEED-084-recall-prompt-incomplete-ai-response.md#story-1) — SEED-084#story-1
-
 ## Backlog list
 
 - [Make incompatible note content editable with one conversion button](seeds/SEED-083-rich-editor-content-compatibility.md#story-1) — SEED-083#story-1
