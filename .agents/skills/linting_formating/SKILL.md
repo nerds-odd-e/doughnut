@@ -1,6 +1,6 @@
 ---
 name: linting_formating
-description: Linting, formatting, code quality, Biome (2.4.x), Redocly, OpenAPI validation, code style, fix formatting errors, biome.json config, Vue SFC project-domain rule limitation, multi-file analysis (MFA). Use when linting, formatting, Biome, or OpenAPI validation.
+description: Linting, formatting, code quality, Biome (2.6.x), Redocly, OpenAPI validation, code style, fix formatting errors, biome.json config, Vue SFC project-domain rule limitation, multi-file analysis (MFA). Use when linting, formatting, Biome, or OpenAPI validation.
 ---
 # Linting and Formatting in Donut Project
 
@@ -114,9 +114,9 @@ After API changes, also run frontend unit tests and fix call sites — see the `
 - **Redocly**: Configured in `redocly.yaml`
 - **Backend**: Configured in `backend/build.gradle` (Spotless for formatting, custom linting rules)
 
-## Biome Configuration (2.4.x)
+## Biome Configuration (2.6.x)
 
-This project uses `@biomejs/biome@2.4.x` across the workspace (`package.json`, `frontend/package.json`, `packages/donut-test-fixtures/package.json`). Keep those versions pinned and in sync — `syncpack fix` runs on `postinstall` to help.
+This project uses `@biomejs/biome@2.6.x` across the workspace (`package.json`, `frontend/package.json`, `packages/donut-test-fixtures/package.json`). Keep those versions pinned and in sync — `syncpack fix` runs on `postinstall` to help.
 
 ### Monorepo config layout
 
@@ -130,7 +130,7 @@ When running `pnpm biome check` from the workspace root, Biome walks up from eac
 Both configs must pin `$schema` to the exact CLI version. A mismatch emits a `deserialize` warning on every run:
 
 ```
-i The configuration schema version does not match the CLI version 2.4.x
+i The configuration schema version does not match the CLI version 2.6.x
 ```
 
 When upgrading `@biomejs/biome`, run `pnpx @biomejs/biome migrate --write` from both the repo root and `frontend/` to bump the schema URLs (and auto-apply any rule renames / config restructuring).
@@ -142,6 +142,7 @@ Running `biome migrate` from inside `frontend/` sometimes suggests adding `"root
 ### Path scoping: use `files.includes`, not separate `linter.includes`
 
 - `files.includes` is the canonical include/exclude list; it scopes **both** formatter and linter.
+- Root `files.includes` excludes `*.yaml`/`*.yml`: Biome 2.6+ formats YAML, which would rewrite tool-owned files (`pnpm-lock.yaml`, `pnpm-workspace.yaml`, generated `open_api_docs.yaml`).
 - `linter.includes` and `formatter.includes` exist but further narrow each tool's scope and are easy to get wrong (and desynced from `files.includes`). Prefer `files.includes` plus scoped overrides when a specific tool needs different treatment.
 - To express "format but don't lint this file", use an override with `linter: { enabled: false }` scoped via `includes`, e.g. for `vitest.config.ts` and `src/assets/daisyui.css` in `frontend/biome.json`. **Do not** rely on a hidden-in-`linter.includes` exclusion — that pattern is opaque.
 

@@ -32,7 +32,7 @@
     "yaml": "2.9.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
+    "@biomejs/biome": "2.6.2",
     "@lucide/vue": "1.61.0",
     "@storybook/addon-docs": "10.6.3",
     "@storybook/vue3": "10.6.3",
@@ -59,7 +59,7 @@
     "optionator": "^0.9.4",
     "pdfjs-dist": "6.4.299",
     "playwright": "1.64.1",
-    "sass": "1.106.0",
+    "sass": "1.106.1",
     "storybook": "10.6.3",
     "tailwindcss": "4.3.3",
     "terser": "^5.51.2",

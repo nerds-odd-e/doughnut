@@ -110,7 +110,7 @@ pnpm generateTypeScript
 To do the code generation. There are two steps in this command:
 
 1. Generate openAPI docs from the backend service into `./open_api_docs.yaml`.
-2. Generate TypeScript interfaces from the openAPI docs, into `frontend/src/generated`.
+2. Generate TypeScript interfaces from the openAPI docs, into `packages/generated/donut-backend-api`.
 
 If the step 1 is not done, a unit test will fail. If the step 2 is not done, CI will fail (`./assert_generated_type_script_up_to_date.sh`).
 
