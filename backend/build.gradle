@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '4.1.1'
+  id 'org.springframework.boot' version '4.1.2'
   // Spotless for the code style
   id "com.diffplug.spotless" version "8.10.4"
   id "io.github.ben-manes.versions" version "0.66.0"
@@ -81,7 +81,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-flyway'
   implementation 'org.flywaydb:flyway-mysql:12.11.0'
   implementation 'org.springframework.boot:spring-boot-starter-session-jdbc'
-  implementation 'io.micrometer:micrometer-core'
+  implementation 'io.micrometer:micrometer-core:1.17.2'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
