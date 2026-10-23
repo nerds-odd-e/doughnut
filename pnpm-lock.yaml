@@ -261,8 +261,8 @@ importers:
         specifier: 1.32.1
         version: 1.32.1(supports-color@8.1.1)(zod@4.6.7)
       '@redocly/cli':
-        specifier: 2.67.1
-        version: 2.67.1
+        specifier: 2.69.0
+        version: 2.69.0
       '@testing-library/cypress':
         specifier: 10.1.3
         version: 10.1.3(cypress@16.2.0)
@@ -1745,8 +1745,8 @@ packages:
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
-  '@redocly/cli@2.67.1':
-    resolution: {integrity: sha512-syZ7eZ0DGY/R+5nTQX1IRnKegUN76nqhfdLezUY9S538o/aVNXA9eLorKupRpXRNWd6G49lr4D5IWK2z8jkN0g==}
+  '@redocly/cli@2.69.0':
+    resolution: {integrity: sha512-un2CnJ+2OO82wArjuH132mD9lHs2oNJL8DtX50aCt6YrFTWIMWywCBRgxjznHdJ1lJAgck1giQgMc6yUL4kD0A==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -7149,7 +7149,7 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
-  '@redocly/cli@2.67.1': {}
+  '@redocly/cli@2.69.0': {}
 
   '@rolldown/binding-android-arm-eabi@1.2.14':
     optional: true

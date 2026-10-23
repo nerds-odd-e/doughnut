@@ -108,7 +108,7 @@ minimumReleaseAgeExclude:
   - '@biomejs/cli-win32-arm64@2.5.4'
   - '@biomejs/cli-win32-x64@2.5.4'
   - '@lucide/vue@1.25.0'
-  - '@redocly/cli@2.40.0'
+  - '@redocly/cli@2.40.0 || 2.69.0'
   - '@redocly/openapi-core@2.40.0'
   - '@redocly/respect-core@2.40.0'
   - '@vue/compiler-core@3.5.40'
