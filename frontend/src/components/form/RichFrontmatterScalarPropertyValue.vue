@@ -2,7 +2,7 @@
   <div class="min-w-0" :class="rowLayoutClass">
     <div
       v-if="isListValue && !expanded"
-      class="min-w-0 flex-1"
+      class="min-w-0 flex-[1_1_6rem]"
       data-testid="rich-note-property-row-value-input"
     >
       <RichFrontmatterListPropertyValue
@@ -33,21 +33,23 @@
         @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
       />
     </div>
-    <button
-      v-if="textCapable && !draft"
-      type="button"
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
-      :aria-label="`Edit property value for ${propertyKey} in the property value dialog`"
-      data-testid="rich-note-property-value-dialog-open"
-      @click="valueDialogOpen = true"
-    >
-      <SquarePen class="h-4 w-4" aria-hidden="true" />
-    </button>
-    <RichFrontmatterPropertyExternalLink
-      v-if="isUrlProperty && scalarValue.trim()"
-      kind="url"
-      :value="scalarValue"
-    />
+    <div v-if="(textCapable && !draft) || (isUrlProperty && scalarValue.trim())" class="ml-auto flex shrink-0 items-center gap-1">
+      <button
+        v-if="textCapable && !draft"
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square shrink-0"
+        :aria-label="`Edit property value for ${propertyKey} in the property value dialog`"
+        data-testid="rich-note-property-value-dialog-open"
+        @click="valueDialogOpen = true"
+      >
+        <SquarePen class="h-4 w-4" aria-hidden="true" />
+      </button>
+      <RichFrontmatterPropertyExternalLink
+        v-if="isUrlProperty && scalarValue.trim()"
+        kind="url"
+        :value="scalarValue"
+      />
+    </div>
     <RichFrontmatterPropertyValueDialog
       v-if="valueDialogOpen"
       :property-key="propertyKey"
@@ -116,10 +118,10 @@ const listModeAllowed = computed(
 const isUrlProperty = computed(() => isUrlPropertyKey(propertyKey.value))
 const usesFlexRow = computed(() => textCapable.value || isUrlProperty.value)
 const rowLayoutClass = computed(() =>
-  usesFlexRow.value ? "flex items-center gap-2" : ""
+  usesFlexRow.value ? "flex flex-wrap items-start gap-1" : ""
 )
 const valueFieldWrapperClass = computed(() =>
-  usesFlexRow.value ? "min-w-0 flex-1" : ""
+  usesFlexRow.value ? "min-w-0 flex-[1_1_6rem]" : ""
 )
 const valueAriaLabel = computed(() =>
   props.draft

@@ -27,12 +27,12 @@
     </template>
     <div
       v-else
-      class="flex flex-wrap items-start gap-x-4 gap-y-1"
+      :class="draft ? 'flex flex-wrap items-start gap-x-4 gap-y-1' : 'property-row-fields'"
     >
       <button
         v-if="!draft"
         type="button"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square shrink-0"
         :aria-label="`Toggle property panel for note property ${modelValue.key}`"
         :aria-expanded="isFocused"
         data-testid="rich-note-property-panel-toggle"
@@ -42,7 +42,7 @@
         <ChevronDown v-else class="h-4 w-4" aria-hidden="true" />
       </button>
       <RichFrontmatterPropertyKeyField
-        class="min-w-[8rem] max-w-80 flex-[1_1_8rem]"
+        :class="draft ? 'min-w-[8rem] max-w-80 flex-[1_1_8rem]' : 'property-key-field min-w-0'"
         :model-value="modelValue.key"
         :input-id="keyInputId"
         :list-id="presetListId"
@@ -56,7 +56,7 @@
         @enter="draft && focusValue()"
         @select="focusValue"
       />
-      <div ref="valueAreaRef" class="min-w-0 flex-[999_1_12rem]">
+      <div ref="valueAreaRef" :class="draft ? 'min-w-0 flex-[999_1_12rem]' : 'property-value-area min-w-0'">
         <RichFrontmatterScalarPropertyValue
           v-if="isTextCapablePropertyRow(modelValue) || (draft && !isImagePropertyKey(modelValue.key) && !isWikidataIdPropertyKey(modelValue.key))"
           :model-value="scalarValue"
@@ -214,3 +214,24 @@ function focusValue() {
   scheduleFocusTargetWithin(valueAreaRef.value)
 }
 </script>
+
+<style scoped lang="scss">
+.property-row-fields {
+  display: grid;
+  grid-template-columns: auto minmax(0, min(28%, 8rem)) minmax(0, 1fr);
+  align-items: start;
+  column-gap: 0.25rem;
+}
+
+.property-key-field :deep(input) {
+  padding-inline: 0.25rem;
+}
+
+.property-key-field:focus-within {
+  grid-column: 2 / -1;
+}
+
+.property-key-field:focus-within + .property-value-area {
+  grid-column: 2 / -1;
+}
+</style>

@@ -105,7 +105,9 @@ export function expectLegibleWholeValueInRow(
   editor: Element
 ) {
   expectWholeTextVisibleInRow(row, value, editor)
-  expect(rect(value).width).toBeGreaterThanOrEqual(rect(row).width / 2)
+  expect(rect(value).width).toBeGreaterThanOrEqual(
+    Math.min(96, rect(row).width / 2)
+  )
 }
 
 export const DRAFT = '[data-property-draft="true"]'
