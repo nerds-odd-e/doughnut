@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Koharu-chan",
+  "email": "koharu-chan@example.org",
+  "identity": "SEED-086#story-1",
+  "mode": "story-branch",
+  "branch": "codex/ios-keyboard-investigation",
+  "host": "codex"
+}
