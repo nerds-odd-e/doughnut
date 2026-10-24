@@ -6,7 +6,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Diagnose automatic mobile keyboard presentation](seeds/SEED-086-mobile-keyboard-autofocus.md#story-1) — SEED-086#story-1
+- [Restore automatic mobile keyboard presentation](seeds/SEED-086-mobile-keyboard-autofocus.md#story-1) — SEED-086#story-1
 
 ## Backlog list
 
