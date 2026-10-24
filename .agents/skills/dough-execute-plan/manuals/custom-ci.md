@@ -1,9 +1,8 @@
 # Custom CI command adapter
 
-Use a command adapter when this project pushes to a CI service other than the
-GitHub Actions check supported by default. The adapter translates that service's
-own API into the small CI model used by `dough-execute-plan`; it does not trigger,
-retry, or repair CI.
+Use a command adapter to translate a CI service other than the default GitHub
+Actions check into `dough-execute-plan`'s model. The adapter observes CI; it does
+not trigger, retry, or repair it.
 
 ## Configure the command
 
@@ -19,6 +18,9 @@ Create or update `.planning/open-dough.json` in this project's root:
 without a shell. The first item is the executable and the rest are its arguments.
 Use project-relative arguments when appropriate. An absent setting, an absent
 configuration file, or `"ciAdapter": []` selects the GitHub Actions default.
+For another GitHub Actions workflow, use a nonempty `ciWorkflow` string such as
+`{"ciWorkflow":"checks.yaml"}` in the same project file. `DOUGH_CI_WORKFLOW`
+overrides it; without either selector the workflow is `ci.yml`.
 The observer reads the file once at startup, so restart it after changing the
 setting. Keep endpoint URLs and credentials in this project's normal environment
 or credential store, not in this file.
@@ -45,8 +47,7 @@ Discovery requests have this shape:
 }
 ```
 
-Return every relevant attempt visible within the service query's bounded result,
-newest first:
+Return the service query's bounded relevant attempts newest first:
 
 ```json
 {
@@ -78,6 +79,8 @@ exact SHA. Without `branch`, an attempt keeps counting for its exact SHA but
 never attests the target. When the service checks a SHA once for every branch
 that carries it, omit `branch` on an attempt it admitted for another branch so
 that the attempt still covers its exact SHA on the requested target.
+
+Discovery may also return [authoritative queue facts](custom-ci-queue.md).
 
 The first discovery after the observer starts is its startup snapshot. From it
 the observer keeps unfinished attempts and only the newest completed attempt by
