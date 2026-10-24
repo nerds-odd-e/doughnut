@@ -72,9 +72,7 @@ export function useRichFrontmatterPropertyEditing(options: {
     primeSoftKeyboard()
     options.insertOpen.value = true
     await nextTick()
-    requestAnimationFrame(() => {
-      document.getElementById(options.insertKeyInputId)?.focus()
-    })
+    document.getElementById(options.insertKeyInputId)?.focus()
   }
 
   function tryCommitInsert() {

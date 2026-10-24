@@ -86,16 +86,19 @@ function collapseCaretToEnd(element: HTMLElement) {
   sel?.addRange(range)
 }
 
+function resolveFocusTargetWithin(element: Element | null): HTMLElement | null {
+  if (!element) return null
+  return (
+    focusableWithin(element, preferredFocusableSelector) ??
+    focusableWithin(element, fallbackFocusableSelector)
+  )
+}
+
 export function focusTargetWithin(
   element: Element | null,
   options: FocusTargetOptions = {}
 ): boolean {
-  if (!element) return false
-
-  const focusable =
-    focusableWithin(element, preferredFocusableSelector) ??
-    focusableWithin(element, fallbackFocusableSelector)
-
+  const focusable = resolveFocusTargetWithin(element)
   if (!focusable) return false
   focusable.focus()
   if (options.selectAll) {
@@ -107,9 +110,7 @@ export function focusTargetWithin(
 }
 
 function scheduleFocus(run: () => void) {
-  nextTick(() => {
-    requestAnimationFrame(run)
-  })
+  nextTick(run)
 }
 
 export function scheduleFocusTargetWithin(
@@ -129,6 +130,11 @@ export function focusAutofocusTargetWithin(element: Element | null): boolean {
       autofocusTarget instanceof HTMLElement &&
       autofocusTarget.dataset.autofocusSelectAll === "true",
   })
+}
+
+export function prepareAutofocusTargetWithin(element: Element | null) {
+  const markedTarget = element?.querySelector(autofocusSelector) ?? null
+  resolveFocusTargetWithin(markedTarget)?.setAttribute("autofocus", "")
 }
 
 export function scheduleFocusAutofocusTargetWithin(element: Element | null) {

@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
+import { nextTick } from "vue"
 
 /** Advance one animation frame under fake or real timers. */
 export async function advanceAnimationFrame() {
@@ -10,8 +11,8 @@ export async function advanceAnimationFrame() {
   await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
 }
 
-/** Wait for `scheduleFocusTargetWithin` (nextTick + requestAnimationFrame). */
+/** Settle Vue's DOM update and scheduled autofocus. */
 export async function settleScheduledAutofocus() {
   await flushPromises()
-  await advanceAnimationFrame()
+  await nextTick()
 }

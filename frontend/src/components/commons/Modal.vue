@@ -43,7 +43,10 @@ import { ref, computed, watch, onMounted, onUnmounted } from "vue"
 import { X } from "@lucide/vue"
 import { useRoute } from "vue-router"
 import { registerModal } from "./modalStack"
-import { focusAutofocusTargetWithin } from "@/utils/focusTarget"
+import {
+  focusAutofocusTargetWithin,
+  prepareAutofocusTargetWithin,
+} from "@/utils/focusTarget"
 import { provideModalTopAnchor } from "@/composables/modalTopAnchor"
 
 // Props
@@ -92,15 +95,19 @@ watch(
 
 // Open as modal and register ESC handler for non-popup modals
 let unregister: (() => void) | undefined
-onMounted(() => {
+const openDialog = () => {
+  prepareAutofocusTargetWithin(dialogRef.value)
   try {
     dialogRef.value?.showModal()
-    requestAnimationFrame(() => {
-      focusAutofocusTargetWithin(dialogRef.value)
-    })
   } catch {
     // Dialog not connected to document (e.g. Teleport stubbed in tests)
+    return
   }
+  focusAutofocusTargetWithin(dialogRef.value)
+}
+
+onMounted(() => {
+  openDialog()
   if (!props.isPopup) {
     unregister = registerModal(() => emit("close_request"))
   }
