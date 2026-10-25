@@ -336,8 +336,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/donut-api
       markdansi:
-        specifier: 0.3.6
-        version: 0.3.6
+        specifier: 0.3.7
+        version: 0.3.7
       react:
         specifier: 19.3.1
         version: 19.3.1
@@ -4201,8 +4201,8 @@ packages:
   mailparser@3.9.12:
     resolution: {integrity: sha512-kbT4xtkKEddonhDTjjWWVFJlI5axm0S9QuIAHs1ue3IEw+fNd9o4ytPKaG7p1LOE2aKifrWLjx/omOGLHz/9RQ==}
 
-  markdansi@0.3.6:
-    resolution: {integrity: sha512-MuccvbziHg8eVnsU+aMQ1g9ZDiB//LMzpC3PNrMcQn0qRLWdfzUE9bfg41FBSZRmRn9uLjb9d2qCM6LoQqqNeA==}
+  markdansi@0.3.7:
+    resolution: {integrity: sha512-A7J3BpPtORzQR8YrWy4awpBTyHIiKf7XiOPj3+IMlJz4I/T6t84O00SDSNkYmTysryO/Uh/THNNe3a9nKuCIyQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -9832,7 +9832,7 @@ snapshots:
       punycode.js: 2.3.1
       tlds: 1.261.0
 
-  markdansi@0.3.6:
+  markdansi@0.3.7:
     dependencies:
       ansi-regex: 6.4.0
       chalk: 6.0.1
