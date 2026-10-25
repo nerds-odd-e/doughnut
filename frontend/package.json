@@ -52,7 +52,7 @@
     "@vue/test-utils": "2.5.1",
     "daisyui": "5.7.50",
     "donut-test-fixtures": "workspace:*",
-    "es-toolkit": "^1.52.0",
+    "es-toolkit": "1.53.0",
     "esbuild": "0.28.2",
     "gsap": "^3.15.0",
     "marked": "18.1.1",
