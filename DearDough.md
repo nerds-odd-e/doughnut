@@ -1,6 +1,9 @@
 # DearDough Process Findings
 
-Reviewed 2026-10-21 (Asia/Tokyo). Active shared-process findings only; released
+Source maintenance on 2026-10-25 retained all newly collected evidence before shortening at Open Dough `ccf309a69459284de3f1d45f2de813e9180c2971:docs/maintainer/findings/`. The complete pre-edit source is `d5cb4a923b16973028820eb9cb1f4d811b4ef4f6:DearDough.md`; distinct executions, former codes and qualified provenance remain recoverable.
+
+
+Reviewed 2026-10-25 (Asia/Tokyo). Active shared-process findings only; released
 responses under observation live in the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md).
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
@@ -334,16 +337,10 @@ Former local code: DD-320. Guarded delivery applied the coordinator's plan updat
 
 <a id="dd-324"></a>
 
-## DD-324 — Implementer takes a red baseline by overwriting a shared-checkout file
+## ODF-331 — Implementer takes a red baseline by overwriting a shared-checkout file
 
-A slice implementer obtained a pre-change failing observation by temporarily copying HEAD's version of an owned component over the working file, running the new spec, then restoring its edit — although delegation said to use a separate temporary checkout or report the need. No loss occurred and the red check was useful.
+Former local code: DD-324.
 
-### Occurrences
-- Execution: SEED-083#story-1, first implementation commit 0c160d37a0adc6791a167e2aa960c2911dd507c5
-  - Timestamp: unknown (slice 3 implementation, 2026-10-23 Asia/Tokyo, delivered as 3c228434b326f31b2fc4d043ce66d7f2961c5ac1)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.68
-  - Evidence: slice 3 implementation return ("copied HEAD's component in temporarily, ran the spec, saw it fail ... then put my version back") for `frontend/src/components/form/RichEditingUnavailableWarning.vue`.
-  - Observed effect: in-place swap of an uncommitted owned file in the shared execution checkout; restored before return.
-  - Inference: the delegation forbids stash/checkout but names no cheap baseline route, so a careful agent improvises one; an interruption mid-swap could have lost the uncommitted edit.
+An implementer obtains a red baseline by swapping committed bytes into the live shared checkout, creating interruption and concurrent-proof exposure.
+
+[Retained evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-331.md). Original occurrence provenance and distinct effects are recoverable in Open Dough `ccf309a69459284de3f1d45f2de813e9180c2971:docs/maintainer/findings/ODF-331.md` and this project's source snapshot `d5cb4a923b16973028820eb9cb1f4d811b4ef4f6:DearDough.md`. Name adoption is not resolution.
