@@ -28,3 +28,7 @@ sh_profile            text eol=lf
 *.xml                 text eol=lf
 *.{yml,yaml}          text eol=lf
 *.md                  text eol=lf
+
+# Generated API artifacts follow the generator's whitespace policy.
+open_api_docs.yaml                                      -whitespace
+packages/generated/donut-backend-api/**                 -whitespace

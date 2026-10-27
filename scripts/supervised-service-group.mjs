@@ -17,6 +17,7 @@ export function runSupervisedServiceGroup({
   env,
   logWriter,
   onBeforeExit,
+  isExpectedClose,
   exitMessage,
   startFailureMessage,
   cleanupFailurePrefix = 'supervisor cleanup failed',
@@ -40,6 +41,10 @@ export function runSupervisedServiceGroup({
   process.once('SIGTERM', forwardSignal)
 
   let finished = false
+  const removeSignalHandlers = () => {
+    process.removeListener('SIGINT', forwardSignal)
+    process.removeListener('SIGTERM', forwardSignal)
+  }
   const finish = async (code, signal, message) => {
     if (finished) return
     finished = true
@@ -62,6 +67,10 @@ export function runSupervisedServiceGroup({
   })
 
   child.on('close', (code, signal) => {
+    if (isExpectedClose?.(child)) {
+      removeSignalHandlers()
+      return
+    }
     finish(code, signal, exitMessage(code, signal)).catch(reportFinishFailure)
   })
 

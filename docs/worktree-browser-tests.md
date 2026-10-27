@@ -80,6 +80,11 @@ waits for that 200 through the local load balancer before it resets test data.
 
 ## Focused Cypress run
 
+Selecting `mcp/assistant_account_linking.feature` starts an owned HTTPS fixture
+and uses its canonical HTTPS origin for Cypress so the GitHub login session
+continues into consent. This fixture defaults to Chrome, including when a
+primary checkout selects it through a glob; an explicit `--browser` is preserved.
+
 Pass comma-separated feature paths to `pnpm cy:run --spec` to run several
 supported features sequentially with one stack. The invocation starts a private
 OpenAI or Wikidata mock if any selected feature needs it, then cleans up once

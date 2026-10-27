@@ -18,7 +18,10 @@ skills.
 ## How to use this MCP server
 
 Connect any MCP client that speaks Streamable HTTP with a personal bearer token.
-No OAuth setup is required.
+Registered confidential hosted assistants can instead use
+[GitHub-backed OAuth account linking](../../../docs/assistant-oauth.md), including
+consent, automatic renewal and Settings withdrawal. Personal-token connections
+need no OAuth setup.
 
 1. Open Donut in the browser and sign in.
 2. Go to **Settings → Access Tokens**, generate a token, and copy it once.
@@ -73,9 +76,8 @@ await client.listTools()
 
 - Delete the token under **Settings → Access Tokens**. Withdrawal takes effect
   on the next MCP request (HTTP 401). Update or remove the client header.
-- If the client fails authentication, generate a new token, replace the bearer
-  value in the client config, and reconnect. Do not add OAuth or browser login
-  as a substitute for the personal token.
+- If a personal-token client fails authentication, generate a new token, replace
+  the bearer value in its config, and reconnect.
 
 ## Available Tools
 

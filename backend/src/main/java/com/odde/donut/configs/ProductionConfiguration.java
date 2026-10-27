@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,7 +24,8 @@ public class ProductionConfiguration {
     http.authorizeHttpRequests(
         auth -> auth.requestMatchers("/api/healthcheck", "/api/games", "/install").permitAll());
 
-    commonConfiguration.commonConfig(http.oauth2Login(Customizer.withDefaults()));
+    commonConfiguration.oauth2Login(http);
+    commonConfiguration.commonConfig(http);
     return http.build();
   }
 }

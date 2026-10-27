@@ -38,6 +38,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/AssistantConsentPage': RouteRecordInfo<
+      '/AssistantConsentPage',
+      '/AssistantConsentPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/AttachmentPage': RouteRecordInfo<
       '/AttachmentPage',
       '/AttachmentPage',
@@ -199,6 +206,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/settings/ConnectedAssistantsSettingsTab': RouteRecordInfo<
+      '/settings/ConnectedAssistantsSettingsTab',
+      '/settings/ConnectedAssistantsSettingsTab',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/settings/GeneralSettingsTab': RouteRecordInfo<
       '/settings/GeneralSettingsTab',
       '/settings/GeneralSettingsTab',
@@ -250,6 +264,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/AdminDashboardPage.vue': {
       routes:
         | '/AdminDashboardPage'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/AssistantConsentPage.vue': {
+      routes:
+        | '/AssistantConsentPage'
       views:
         | never
       pathParamNames:
@@ -434,6 +456,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/settings/AccessTokensSettingsTab.vue': {
       routes:
         | '/settings/AccessTokensSettingsTab'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/settings/ConnectedAssistantsSettingsTab.vue': {
+      routes:
+        | '/settings/ConnectedAssistantsSettingsTab'
       views:
         | never
       pathParamNames:

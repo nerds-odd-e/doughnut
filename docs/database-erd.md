@@ -44,6 +44,8 @@ erDiagram
     notebook_git_binding ||--o{ notebook_git_accepted_object : "notebook_git_binding_id ON DELETE CASCADE"
     notebook_group ||--o{ notebook : "notebook_group_id ON DELETE SET NULL"
     notebook_group ||--o{ subscription : "notebook_group_id ON DELETE SET NULL"
+    oauth2_registered_client ||--o{ oauth2_authorization : "registered_client_id ON DELETE CASCADE"
+    oauth2_registered_client ||--o{ oauth2_authorization_consent : "registered_client_id ON DELETE CASCADE"
     ownership ||--o{ conversation : "subject_ownership_id ON DELETE NO ACTION"
     ownership ||--o{ notebook : "ownership_id ON DELETE CASCADE"
     ownership ||--o{ notebook_group : "ownership_id ON DELETE CASCADE"
@@ -60,6 +62,8 @@ erDiagram
     "user" ||--o{ memory_tracker : "user_id ON DELETE CASCADE"
     "user" ||--o{ note_creator : "user_id ON DELETE CASCADE"
     "user" ||--o{ notebook : "creator_id ON DELETE CASCADE"
+    "user" ||--o{ oauth2_authorization : "principal_name ON DELETE CASCADE"
+    "user" ||--o{ oauth2_authorization_consent : "principal_name ON DELETE CASCADE"
     "user" ||--o{ ownership : "user_id ON DELETE CASCADE"
     "user" ||--o{ question_generation_batch : "user_id ON DELETE CASCADE"
     "user" ||--o{ subscription : "user_id ON DELETE CASCADE"
@@ -205,6 +209,19 @@ erDiagram
     notebook_group {
         int id PK
         int ownership_id FK
+    }
+    oauth2_authorization {
+        string id PK
+        string registered_client_id FK
+        string principal_name FK
+    }
+    oauth2_authorization_consent {
+        string registered_client_id PK FK
+        string principal_name PK FK
+    }
+    oauth2_registered_client {
+        string id PK
+        string client_id UK
     }
     ownership {
         int id PK

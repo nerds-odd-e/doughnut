@@ -215,6 +215,7 @@ describe("routes", () => {
       { name: "settingsGeneral" },
       { name: "settingsRecent" },
       { name: "settingsAccessTokens" },
+      { name: "settingsConnectedAssistants" },
       { name: "settingsRecallStats" },
     ] as const)("compile the same $name path as production", (location) => {
       expect(dummyRouter().resolve(location).path).toBe(

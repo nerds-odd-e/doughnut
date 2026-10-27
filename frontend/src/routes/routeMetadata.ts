@@ -28,6 +28,14 @@ function noteIdFromRoute(route: RouteLocation): Record<string, unknown> {
 export const routeMetadata: RouteMetadata[] = [
   { path: "/", name: "root" },
   {
+    path: "/assistant-consent",
+    name: "assistantConsent",
+    props: (route: RouteLocation) => ({
+      clientId: String(route.query.client_id ?? ""),
+      state: String(route.query.state ?? ""),
+    }),
+  },
+  {
     path: "/notebooks",
     name: "notebooks",
   },
@@ -155,5 +163,9 @@ export const routeMetadata: RouteMetadata[] = [
   { path: "/settings", name: "settingsGeneral" },
   { path: "/settings/recent", name: "settingsRecent" },
   { path: "/settings/access-tokens", name: "settingsAccessTokens" },
+  {
+    path: "/settings/connected-assistants",
+    name: "settingsConnectedAssistants",
+  },
   { path: "/settings/recall-stats", name: "settingsRecallStats" },
 ]

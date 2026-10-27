@@ -39,6 +39,7 @@ export async function runOwnedE2eInvocation({
   log,
   errLog,
   env,
+  sutEnv,
   stdio,
   cancel,
   startPrivateOpenAiMockFn,
@@ -87,6 +88,7 @@ export async function runOwnedE2eInvocation({
       errLog,
       signal: cancel.signal,
       runtimeTarget,
+      env: sutEnv,
       ...(isPortOccupiedFn ? { isPortOccupiedFn } : {}),
       ...lifetimeOpts,
     })
@@ -202,6 +204,11 @@ export async function runOwnedE2eInvocation({
         childExit,
         mockExit,
         target: lifetime.target,
+        tlsProxy: lifetime.tlsProxy,
+        restartApplication: async () => {
+          leaseToken ??= await acquireSutRunnerLease(checkoutRoot)
+          return lifetime.restartApplication(leaseToken)
+        },
         errLog,
         cancelEscalationMs,
         browser,

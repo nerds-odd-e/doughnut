@@ -4,6 +4,9 @@ info:
   version: v0
 servers:
 - url: ""
+tags:
+- name: assistant-oauth
+  description: OAuth protocol endpoints; use an OAuth/MCP SDK.
 paths:
   /api/mcp:
     post:
@@ -2775,6 +2778,41 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AnsweredQuestion"
+  /api/oauth/consent-context:
+    get:
+      tags:
+      - assistant-consent-controller
+      operationId: getAssistantConsentContext
+      parameters:
+      - name: client_id
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ConsentContext"
+  /api/oauth/assistants:
+    get:
+      tags:
+      - assistant-management-controller
+      operationId: getConnectedAssistants
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AssistantManagement"
   /api/notes/{note}:
     get:
       tags:
@@ -3691,6 +3729,20 @@ paths:
       responses:
         "200":
           description: OK
+  /api/oauth/assistants/{clientId}:
+    delete:
+      tags:
+      - assistant-management-controller
+      operationId: withdrawAssistant
+      parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/book/blocks/{bookBlock}:
     delete:
       tags:
@@ -3750,6 +3802,70 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FailureReportDeletionResultDTO"
+  /.well-known/oauth-authorization-server:
+    get:
+      tags:
+      - assistant-oauth
+      summary: OAuth authorization-server metadata
+      description: Public OAuth discovery metadata for the configured canonical Donut
+        MCP resource.
+      operationId: assistantIssuerMetadata
+      responses:
+        "200":
+          description: OAuth metadata
+          content:
+            application/json:
+              schema: {}
+  /.well-known/oauth-protected-resource/api/mcp:
+    get:
+      tags:
+      - assistant-oauth
+      summary: MCP protected-resource metadata
+      description: Public OAuth discovery metadata for the configured canonical Donut
+        MCP resource.
+      operationId: assistantResourceMetadata
+      responses:
+        "200":
+          description: OAuth metadata
+          content:
+            application/json:
+              schema: {}
+  /api/oauth/authorize:
+    get:
+      tags:
+      - assistant-oauth
+      summary: Authorize an assistant
+      description: "Browser authorization-code request with an exact registered redirect,\
+        \ PKCE and read scope; Donut sign-in and consent are required."
+      operationId: assistantAuthorization
+      responses:
+        default:
+          description: "OAuth protocol response, including redirects and standard\
+            \ OAuth errors."
+  /api/oauth/token:
+    post:
+      tags:
+      - assistant-oauth
+      summary: Exchange or renew an assistant credential
+      description: OAuth form-encoded code or refresh exchange. The confidential client
+        authenticates with HTTP Basic; use an OAuth SDK.
+      operationId: assistantToken
+      responses:
+        default:
+          description: "OAuth protocol response, including redirects and standard\
+            \ OAuth errors."
+  /api/oauth/revoke:
+    post:
+      tags:
+      - assistant-oauth
+      summary: Revoke an assistant credential
+      description: OAuth form-encoded revocation with confidential-client HTTP Basic
+        authentication.
+      operationId: assistantRevocation
+      responses:
+        default:
+          description: "OAuth protocol response, including redirects and standard\
+            \ OAuth errors."
 components:
   schemas:
     BookBlockReadingRecordPutRequest:
@@ -5936,6 +6052,55 @@ components:
           $ref: "#/components/schemas/User"
         externalIdentifier:
           type: string
+    ConsentContext:
+      type: object
+      properties:
+        accountName:
+          type: string
+        clientId:
+          type: string
+        clientName:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        resource:
+          type: string
+        redirectUri:
+          type: string
+        state:
+          type: string
+        formAction:
+          type: string
+        csrfParameterName:
+          type: string
+        csrfToken:
+          type: string
+    AssistantManagement:
+      type: object
+      properties:
+        assistants:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConnectedAssistant"
+        csrfHeaderName:
+          type: string
+        csrfToken:
+          type: string
+    ConnectedAssistant:
+      type: object
+      properties:
+        clientId:
+          type: string
+        clientName:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
     NoteRecallInfo:
       type: object
       properties:

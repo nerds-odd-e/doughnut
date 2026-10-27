@@ -1,4 +1,7 @@
 import assert from 'node:assert'
+import './sut-https-origin.cases.mjs'
+import './local-lb-origin.cases.mjs'
+import './sut-owned-restart.cases.mjs'
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'

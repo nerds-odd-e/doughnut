@@ -20,7 +20,7 @@ import {
   resolveSpecs,
   resolveInvocationCheckout,
 } from './e2e-invocation-selection.mjs'
-import { runOwnedE2eInvocation } from './e2e-owned-invocation.mjs'
+import { runWithHostedAssistant } from './e2e-hosted-assistant.mjs'
 import { runE2eHold } from './e2e-hold.mjs'
 
 export { defaultSpawnCypress, defaultSpawnCypressOpen, wireBatchCancellation }
@@ -88,7 +88,7 @@ export async function runE2eBatch({
     errLog(error.message)
     return 1
   }
-  return runOwnedE2eInvocation({
+  return runWithHostedAssistant({
     specs,
     approved,
     spawnCypress,
@@ -174,7 +174,7 @@ export async function runE2eInteractive({
     runtimeTarget: lifetimeOpts.runtimeTarget,
     isIsolatedCheckoutFn,
   })
-  return runOwnedE2eInvocation({
+  return runWithHostedAssistant({
     specs: preselectedSpecs,
     approved,
     spawnCypress,

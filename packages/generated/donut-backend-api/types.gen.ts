@@ -1136,6 +1136,31 @@ export type CurrentUserInfo = {
     externalIdentifier?: string;
 };
 
+export type ConsentContext = {
+    accountName?: string;
+    clientId?: string;
+    clientName?: string;
+    scopes?: Array<string>;
+    resource?: string;
+    redirectUri?: string;
+    state?: string;
+    formAction?: string;
+    csrfParameterName?: string;
+    csrfToken?: string;
+};
+
+export type AssistantManagement = {
+    assistants?: Array<ConnectedAssistant>;
+    csrfHeaderName?: string;
+    csrfToken?: string;
+};
+
+export type ConnectedAssistant = {
+    clientId?: string;
+    clientName?: string;
+    scopes?: Array<string>;
+};
+
 export type NoteRecallInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     skippedPropertyKeys?: Array<string>;
@@ -3754,6 +3779,41 @@ export type PreviouslyAnsweredResponses = {
 
 export type PreviouslyAnsweredResponse = PreviouslyAnsweredResponses[keyof PreviouslyAnsweredResponses];
 
+export type GetAssistantConsentContextData = {
+    body?: never;
+    path?: never;
+    query: {
+        client_id: string;
+        state: string;
+    };
+    url: '/api/oauth/consent-context';
+};
+
+export type GetAssistantConsentContextResponses = {
+    /**
+     * OK
+     */
+    200: ConsentContext;
+};
+
+export type GetAssistantConsentContextResponse = GetAssistantConsentContextResponses[keyof GetAssistantConsentContextResponses];
+
+export type GetConnectedAssistantsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/oauth/assistants';
+};
+
+export type GetConnectedAssistantsResponses = {
+    /**
+     * OK
+     */
+    200: AssistantManagement;
+};
+
+export type GetConnectedAssistantsResponse = GetConnectedAssistantsResponses[keyof GetConnectedAssistantsResponses];
+
 export type ShowNoteData = {
     body?: never;
     path: {
@@ -4601,6 +4661,22 @@ export type DeleteTokenResponses = {
     200: unknown;
 };
 
+export type WithdrawAssistantData = {
+    body?: never;
+    path: {
+        clientId: string;
+    };
+    query?: never;
+    url: '/api/oauth/assistants/{clientId}';
+};
+
+export type WithdrawAssistantResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type CancelBookBlockData = {
     body?: never;
     path: {
@@ -4651,3 +4727,94 @@ export type DeleteFailureReportsResponses = {
 };
 
 export type DeleteFailureReportsResponse = DeleteFailureReportsResponses[keyof DeleteFailureReportsResponses];
+
+export type AssistantIssuerMetadataData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/.well-known/oauth-authorization-server';
+};
+
+export type AssistantIssuerMetadataResponses = {
+    /**
+     * OAuth metadata
+     */
+    200: unknown;
+};
+
+export type AssistantResourceMetadataData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/.well-known/oauth-protected-resource/api/mcp';
+};
+
+export type AssistantResourceMetadataResponses = {
+    /**
+     * OAuth metadata
+     */
+    200: unknown;
+};
+
+export type AssistantAuthorizationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/oauth/authorize';
+};
+
+export type AssistantAuthorizationErrors = {
+    /**
+     * OAuth protocol response, including redirects and standard OAuth errors.
+     */
+    default: unknown;
+};
+
+export type AssistantAuthorizationResponses = {
+    /**
+     * OAuth protocol response, including redirects and standard OAuth errors.
+     */
+    default: unknown;
+};
+
+export type AssistantTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/oauth/token';
+};
+
+export type AssistantTokenErrors = {
+    /**
+     * OAuth protocol response, including redirects and standard OAuth errors.
+     */
+    default: unknown;
+};
+
+export type AssistantTokenResponses = {
+    /**
+     * OAuth protocol response, including redirects and standard OAuth errors.
+     */
+    default: unknown;
+};
+
+export type AssistantRevocationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/oauth/revoke';
+};
+
+export type AssistantRevocationErrors = {
+    /**
+     * OAuth protocol response, including redirects and standard OAuth errors.
+     */
+    default: unknown;
+};
+
+export type AssistantRevocationResponses = {
+    /**
+     * OAuth protocol response, including redirects and standard OAuth errors.
+     */
+    default: unknown;
+};

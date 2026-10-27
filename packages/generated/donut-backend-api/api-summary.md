@@ -280,6 +280,15 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `recalling`: GET `/api/recalls/recalling` -> `RecallingResponse` (request: `RecallingData`; query: timezone, dueindays; response body: DueMemoryTrackers)
 - `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<AnsweredQuestion>)
 
+## Assistant Consent Controller
+
+- `getAssistantConsentContext`: GET `/api/oauth/consent-context` -> `GetAssistantConsentContextResponse` (request: `GetAssistantConsentContextData`; query: client_id, state; response body: ConsentContext)
+
+## Assistant Management Controller
+
+- `getConnectedAssistants`: GET `/api/oauth/assistants` -> `GetConnectedAssistantsResponse` (request: none; response body: AssistantManagement)
+- `withdrawAssistant`: DELETE `/api/oauth/assistants/{clientId}` -> `WithdrawAssistantResponse` (request: `WithdrawAssistantData`; path: clientId; response body: void)
+
 ## Note Image Controller
 
 - `showNoteImage`: GET `/api/notes/{note}/image` -> `ShowNoteImageResponse` (request: `ShowNoteImageData`; path: note; query: path; response body: string)
@@ -306,3 +315,11 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Admin User Controller
 
 - `listUsers`: GET `/api/admin/users` -> `ListUsersResponse` (request: `ListUsersData`; query: pageIndex, pageSize; response body: UserListingPage)
+
+## Assistant Oauth
+
+- `assistantIssuerMetadata`: GET `/.well-known/oauth-authorization-server` -> `AssistantIssuerMetadataResponse` (request: none; response body: unknown)
+- `assistantResourceMetadata`: GET `/.well-known/oauth-protected-resource/api/mcp` -> `AssistantResourceMetadataResponse` (request: none; response body: unknown)
+- `assistantAuthorization`: GET `/api/oauth/authorize` -> `AssistantAuthorizationResponse` (request: none; response body: void)
+- `assistantToken`: POST `/api/oauth/token` -> `AssistantTokenResponse` (request: none; response body: void)
+- `assistantRevocation`: POST `/api/oauth/revoke` -> `AssistantRevocationResponse` (request: none; response body: void)

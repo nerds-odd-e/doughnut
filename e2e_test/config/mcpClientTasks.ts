@@ -1,6 +1,6 @@
 import mcpClient from '../support/mcp_client'
 
-export function mcpClientTasks() {
+export function mcpClientTasks(forwardOrigin?: string) {
   return {
     mcpClientConnectionInfo() {
       return mcpClient.connectionInfo()
@@ -13,7 +13,7 @@ export function mcpClientTasks() {
       accessToken: string
     }) {
       return await mcpClient.connectMcpHttps({
-        baseUrl,
+        baseUrl: forwardOrigin ?? baseUrl,
         accessToken,
       })
     },

@@ -11,7 +11,12 @@ import org.hibernate.metamodel.model.domain.JpaMetamodel;
 public class DBCleanerWorker {
 
   /** Application data tables written only through JDBC, so the JPA metamodel cannot list them. */
-  private static final List<String> JDBC_ONLY_TABLES = List.of("notebook_git_accepted_object");
+  private static final List<String> JDBC_ONLY_TABLES =
+      List.of(
+          "notebook_git_accepted_object",
+          "oauth2_authorization",
+          "oauth2_authorization_consent",
+          "oauth2_registered_client");
 
   /**
    * Truncate all application data tables; use the caller’s {@link EntityManager} (same DB session

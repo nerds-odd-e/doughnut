@@ -51,6 +51,7 @@ export function runSutServices({
   checkoutRoot = env.SUT_CHECKOUT_ROOT ?? repoRoot,
   serviceArgs,
   retainOwnershipOnExit,
+  isExpectedClose,
   stopOwnedTree = stopOwnedSutProcessTree,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget, env })
@@ -61,6 +62,7 @@ export function runSutServices({
     cwd: checkoutRoot,
     env: withSutRuntimeTargetEnv(env, target),
     logWriter,
+    isExpectedClose,
     onBeforeExit: async (child) => {
       await stopOwnedTree(child)
       if (env.SUT_OWNER_TOKEN && !retainOwnershipOnExit?.()) {
@@ -77,7 +79,24 @@ export function runSutServices({
 
 export async function startOwnedSutSupervisor(opts = {}) {
   const env = opts.env ?? process.env
-  const state = { child: undefined, retain: false, shutdown: undefined }
+  const logWriter =
+    opts.logWriter ??
+    createRotatingLogWriter(opts.logFile ?? env.SUT_LOG_FILE ?? LOG_TARGETS.sut)
+  const state = {
+    child: undefined,
+    retain: false,
+    shutdown: undefined,
+    restarting: undefined,
+  }
+  const launch = () =>
+    runSutServices({
+      ...opts,
+      env,
+      logWriter,
+      retainOwnershipOnExit: () => state.retain,
+      stopOwnedTree: sharedStop,
+      isExpectedClose: (child) => state.restarting === child,
+    })
   const sharedStop = (child) => {
     if (!state.shutdown) {
       state.shutdown = stopOwnedSutProcessTree(child ?? state.child)
@@ -85,6 +104,15 @@ export async function startOwnedSutSupervisor(opts = {}) {
     return state.shutdown
   }
   await startSutOwnerControlFromEnv(env, {
+    onRestart: async () => {
+      const previous = state.child
+      const closed = new Promise((resolve) => previous.once('close', resolve))
+      state.restarting = previous
+      await stopOwnedSutProcessTree(previous)
+      await closed
+      state.child = launch()
+      state.restarting = undefined
+    },
     onShutdown: async () => {
       state.retain = true
       await sharedStop(state.child)
@@ -94,12 +122,7 @@ export async function startOwnedSutSupervisor(opts = {}) {
       return Number.isInteger(pid) && pid > 0 ? pid : undefined
     },
   })
-  state.child = runSutServices({
-    ...opts,
-    env,
-    retainOwnershipOnExit: () => state.retain,
-    stopOwnedTree: sharedStop,
-  })
+  state.child = launch()
   return state.child
 }
 

@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Link an assistant to Donut through GitHub sign-in](seeds/SEED-002-host-mcp-over-https.md#story-2) — SEED-002#story-2 ([plan](slice-plans/073-assistant-account-linking/PLAN.md))
-
 ## Backlog list
 
 - [Complete the retirement of the local MCP server](seeds/SEED-002-host-mcp-over-https.md#story-4) — SEED-002#story-4

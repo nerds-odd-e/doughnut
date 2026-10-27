@@ -7,13 +7,46 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body))
 }
 
-function handleOwnerControlRequest(req, res, state) {
+async function handleOwnerControlRequest(req, res, state) {
   if (req.headers.authorization !== `Bearer ${state.token}`) {
     res.writeHead(403)
     res.end()
     return
   }
   const urlPath = (req.url ?? '').split('?')[0]
+  if (req.method === 'POST' && urlPath === '/restart-application') {
+    if (
+      !state.runnerLeaseToken ||
+      req.headers['x-sut-runner-lease'] !== state.runnerLeaseToken
+    ) {
+      sendJson(res, 409, {
+        error:
+          'Application restart requires the matching active runner lease; owned processes were not signalled.',
+      })
+      return
+    }
+    if (state.shuttingDown || state.restarting || !state.onRestart) {
+      sendJson(res, 409, {
+        error: 'SUT owner cannot restart its application now.',
+      })
+      return
+    }
+    state.restarting = true
+    try {
+      await state.onRestart()
+      sendJson(res, 200, {
+        ok: true,
+        applicationGroupId: state.getApplicationGroupId(),
+      })
+    } catch (error) {
+      sendJson(res, 500, {
+        error: `Owned application restart failed: ${error.message}`,
+      })
+    } finally {
+      state.restarting = false
+    }
+    return
+  }
   if (req.method === 'GET' && urlPath === '/owner') {
     const body = {
       ok: true,
@@ -46,6 +79,12 @@ function handleOwnerControlRequest(req, res, state) {
     return
   }
   if (req.method === 'DELETE' && urlPath === '/runner-lease') {
+    if (state.restarting) {
+      sendJson(res, 409, {
+        error: 'Application restart is still using the runner lease.',
+      })
+      return
+    }
     const presented = req.headers['x-sut-runner-lease']
     if (!state.runnerLeaseToken) {
       sendJson(res, 200, { ok: true })
@@ -99,6 +138,7 @@ export function startSutOwnerControl({
   token,
   controlPath,
   onShutdown,
+  onRestart,
   getApplicationGroupId,
 } = {}) {
   try {
@@ -111,6 +151,7 @@ export function startSutOwnerControl({
     runnerLeaseToken: null,
     shuttingDown: false,
     onShutdown,
+    onRestart,
     getApplicationGroupId,
   }
   const server = http.createServer((req, res) => {
@@ -124,7 +165,7 @@ export function startSutOwnerControl({
 
 export function startSutOwnerControlFromEnv(
   env = process.env,
-  { onShutdown, getApplicationGroupId } = {}
+  { onShutdown, onRestart, getApplicationGroupId } = {}
 ) {
   const token = env.SUT_OWNER_TOKEN
   const controlPath = env.SUT_OWNER_CONTROL_PATH
@@ -133,6 +174,7 @@ export function startSutOwnerControlFromEnv(
     token,
     controlPath,
     onShutdown,
+    onRestart,
     getApplicationGroupId,
   })
 }

@@ -1,5 +1,6 @@
 import type { RouteComponent, RouteRecordRaw } from "vue-router"
 import HomePage from "@/pages/HomePage.vue"
+import AssistantConsentPage from "@/pages/AssistantConsentPage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
@@ -21,6 +22,7 @@ import SettingsPage from "@/pages/SettingsPage.vue"
 import GeneralSettingsTab from "@/pages/settings/GeneralSettingsTab.vue"
 import RecentSettingsTab from "@/pages/settings/RecentSettingsTab.vue"
 import AccessTokensSettingsTab from "@/pages/settings/AccessTokensSettingsTab.vue"
+import ConnectedAssistantsSettingsTab from "@/pages/settings/ConnectedAssistantsSettingsTab.vue"
 import RecallStatsSettingsTab from "@/pages/settings/RecallStatsSettingsTab.vue"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { routeMetadata } from "./routeMetadata"
@@ -32,6 +34,7 @@ import {
 
 const componentMap: Record<string, RouteComponent> = {
   root: HomePage,
+  assistantConsent: AssistantConsentPage,
   notebooks: NotebooksPage,
   notebookGroup: NotebookGroupPage,
   noteShow: NoteShowPage,
@@ -56,6 +59,7 @@ const settingsTabComponents = {
   settingsGeneral: GeneralSettingsTab,
   settingsRecent: RecentSettingsTab,
   settingsAccessTokens: AccessTokensSettingsTab,
+  settingsConnectedAssistants: ConnectedAssistantsSettingsTab,
   settingsRecallStats: RecallStatsSettingsTab,
 }
 
