@@ -55,10 +55,15 @@ public record FailureReportFactory(
         currentUTCTimestamp);
   }
 
+  /** Deliberate validation/access outcomes that must not create failure reports. */
+  public static boolean isDeliberate(Throwable failure) {
+    return failure instanceof ResponseStatusException
+        || failure instanceof ApiException
+        || failure instanceof UnexpectedNoAccessRightException;
+  }
+
   public void createUnlessAllowed() {
-    if (exception instanceof ResponseStatusException) return;
-    if (exception instanceof ApiException) return;
-    if (exception instanceof UnexpectedNoAccessRightException) return;
+    if (isDeliberate(exception)) return;
 
     if (incrementIfConsecutiveSimilar()) return;
 

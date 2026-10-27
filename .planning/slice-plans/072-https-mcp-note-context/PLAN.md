@@ -99,7 +99,7 @@ partial test selection satisfies the backend skill's full-suite requirement.
 
 ### 1. Discover the service with a personal token
 Type: Behavior
-Status: planned
+Status: done
 Proof: Real SDK initialization and `tools/list` through the application's servlet;
 HTTP-level token, Origin, and request-context assertions; all backend tests.
 
@@ -116,6 +116,34 @@ stop dependent slices and refine this same plan rather than widening auth.
 Sizing: 6–10 minutes of implementation, plus the required backend suite. The
 SDK scheduling choice is already observed; servlet/filter integration is new
 behavior owned here. No note data can be served before the gate is proved.
+
+Accepted proof (reuse):
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — BUILD SUCCESSFUL
+  (2885 tests) after implementation; after refactor, focused replacement
+  `backend/gradlew -p backend test -Dspring.profiles.active=test --tests
+  com.odde.donut.mcp.McpEndpointTest --tests
+  com.odde.donut.mcp.McpFailureReporterTest --tests
+  com.odde.donut.factoryServices.FailureReportFactoryTest` — BUILD SUCCESSFUL.
+- Observations: `McpEndpointTest$Authentication` (missing/invalid/withdrawn
+  token → 401 without Location; browser principal cannot substitute);
+  `McpEndpointTest$OriginValidation` (invalid Origin → 403; no Origin + token
+  → 200); `McpEndpointTest$ProtocolNegotiation` (initialize + empty
+  `tools/list` through MVC→SDK transport); `McpFailureReporterTest` /
+  `FailureReportFactory.isDeliberate` (deliberate vs unexpected reporting).
+- Setup: `makeMe.aUserToken()`; JSON-RPC initialize/`tools/list` with Accept
+  `application/json, text/event-stream` and protocol `2025-11-25`.
+
+Learnings:
+- MockMvc only reaches DispatcherServlet; a thin `McpHttpEndpoint` that calls
+  `HttpServletStatelessServerTransport.service` keeps one `/api/mcp` path for
+  tests and production while preserving the SDK servlet transport.
+- Extractor requires Spring request attributes (fail loudly); successful
+  initialize through the MVC adapter proves binding — no test-only context hook.
+- Default Origin allowlist is empty: any supplied Origin is refused; clients
+  without Origin authenticate with bearer normally. Browser Origin allowlisting
+  remains outside this story's deferred ChatGPT/OAuth work.
+- Deliberate-failure classification for MCP and `createUnlessAllowed` share
+  `FailureReportFactory.isDeliberate`.
 
 ### 2. Find accessible note candidates
 Type: Behavior

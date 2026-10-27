@@ -5,6 +5,40 @@ info:
 servers:
 - url: ""
 paths:
+  /api/mcp:
+    post:
+      summary: MCP Streamable HTTP transport
+      description: "Model Context Protocol (MCP) Streamable HTTP endpoint served by\
+        \ the Donut backend. Clients negotiate MCP over JSON-RPC with a Donut personal\
+        \ bearer token. Tool schemas are defined by the MCP protocol, not this OpenAPI\
+        \ document. Requests without a current valid token receive 401 without a sign-in\
+        \ redirect. When an Origin header is supplied, invalid origins are refused\
+        \ with 403."
+      operationId: mcpStreamableHttp
+      parameters:
+      - name: Accept
+        in: header
+        description: Must include both application/json and text/event-stream
+        required: true
+        schema: {}
+      - name: Origin
+        in: header
+        description: "Optional. When present, validated per MCP HTTP transport rules;\
+          \ invalid values yield 403."
+        required: false
+        schema: {}
+      responses:
+        "200":
+          description: JSON-RPC response
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: "Missing, invalid, or withdrawn personal token"
+        "403":
+          description: Invalid Origin header
+      security:
+      - donutPersonalToken: []
   /api/notebooks/{notebook}/lfs/objects/{oid}:
     get:
       tags:
@@ -6494,3 +6528,10 @@ components:
           type: array
           items:
             type: string
+  securitySchemes:
+    donutPersonalToken:
+      type: http
+      description: Donut personal access token. Required on every MCP request; browser
+        session cookies cannot authorize this endpoint.
+      scheme: bearer
+      bearerFormat: Donut personal token
