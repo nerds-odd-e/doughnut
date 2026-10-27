@@ -69,7 +69,7 @@
       notebooksLayout === 'grid' ? 'max-w-7xl' : 'max-w-3xl'
     "
   >
-    <section class="mb-12">
+    <section ref="catalogSectionRef" class="mb-12" @keydown="handleCatalogKeydown">
       <div
         v-if="catalogItems.length > 0"
         class="mb-4"
@@ -159,6 +159,7 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import PeerSortDropdownMenu from "@/components/commons/PeerSortDropdownMenu.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import { handleInputListKeydown } from "@/utils/searchDialogKeyboard"
 
 const props = defineProps({
   // Undefined while the catalog loads.
@@ -198,6 +199,18 @@ function selectCatalogPeerSort(spec: PeerSortSpec, closeDropdown: () => void) {
 }
 const filterText = ref("")
 const filterInputRef = ref<HTMLInputElement | null>(null)
+const catalogSectionRef = ref<HTMLElement | null>(null)
+
+function handleCatalogKeydown(event: KeyboardEvent) {
+  handleInputListKeydown(event, {
+    input: filterInputRef.value,
+    targets: Array.from(
+      catalogSectionRef.value?.querySelectorAll<HTMLElement>(
+        "[data-notebook-catalog-target]"
+      ) ?? []
+    ),
+  })
+}
 
 const filteredCatalogItems = computed(() =>
   sortNotebookCatalogByPeerSpec(

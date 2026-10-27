@@ -55,7 +55,7 @@ and its markup are deleted (`frontend/src/pages/NotebooksPageView.vue`).
 
 ### 2. Up and Down move between the filter and the displayed entries
 Type: Behavior
-Status: planned
+Status: done
 Proof: new `NotebookCatalogKeyboard.spec.ts` for examples 1–5 and 9 in both
 layouts (set `donut.notebooksPage.layout` in localStorage before mounting;
 dispatch keys with `dispatchArrowKey` from
@@ -187,3 +187,46 @@ slice-specific concern identified in this review.
   story fixtures typechecked. Circle independent label, route declarations,
   incidental backend fixture and planning/guidance matches do not consume changed
   filter markup. No affected consumer lacks proof.
+- Independent refactor `refactor_filter`: none, already clean; no edits or
+  invalidated proof. Slice delivered as `8c5915bcbef51aa3cb6610542c15f00a8623a11f`
+  to the story branch, suffix base `1e8fa25b2948788b7daedacfc8d31786e887aaae`,
+  attached to the retained observer.
+
+### Slice 2
+
+Fresh isolated `source_review_two` received only original source commitments,
+qualifications, examples and exclusions. Its individual commitment inventory
+agrees with the source; coordinator inspected product, router-link test stub,
+fixtures and observing assertions before accepting the following mapping:
+
+| Original trigger/setup | Expected result | Actual observation / remaining owner |
+| --- | --- | --- |
+| Input focused; list or grid with owned, group, member, subscribed entries | Down reaches each displayed link in reading order; no wrap | `walks the displayed links…` visits owned → group → three displayed members of five → subscribed, exact named-route ids, initial Up and final Down stay |
+| C focused, matching query retained | Up visits B, A, then filter with text intact | `walks back…` observes each focus and input value |
+| Query or sort changes | Down reaches first currently displayed result | `uses the current filter and sort order` observes Beta's exact route after query and title-desc sort |
+| No matches | Down stays in editable filter | `keeps focus…` observes active input |
+| Filter or secondary/clear/layout/sort control focused | Left/Right/caret and Tab access retained; secondary arrows keep ordinary behavior | `leaves the filter cursor and secondary controls…` observes unprevented input keys and unchanged control focus; markup has no tabindex changes, handler recognizes only exact filter/link focus |
+| Link receives focus | Visible whole-link ring, browser scroll and native Enter destination | Reading: row/header ring, block card link with inset ring; default `focus()` scrolls; existing RouterLinks retain notebookPage/notebookGroup names, ADR 0005; exact route assertions above |
+| Group header/member horizontal journeys, including empty group | Right enters, Left returns, unrelated entry stays | Legitimate remaining owner: slice 3 |
+| Filter UI and ordinary catalog operations | Name/placeholder/autofocus/filter/sort/layout/previews retained | Slice 1 proof retained; current catalog/page/Circle/Bazaar suites pass; no new control or layout; Circle title and excluded Home/End/type-ahead/return-on-typing/Escape unchanged |
+
+- `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookCatalogKeyboard.spec.ts tests/pages/NotebookCatalogFilter.spec.ts tests/pages/NotebookCatalogList.spec.ts tests/pages/NotebookCatalogSubscriptions.spec.ts tests/pages/NotebooksPage.spec.ts tests/pages/CircleShowPage.spec.ts tests/pages/BazaarPage.spec.ts`:
+  34 passed across 7 files. New keyboard cases attach real page to document,
+  select list/grid in localStorage, build real `makeMe` catalogs, dispatch arrows
+  on active elements, and assert focused entry links and RouterLink `to` props.
+- `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookCatalogKeyboard.spec.ts tests/wiki-link-or-relationship/SearchDialog.spec.ts tests/notes/FolderSelector.spec.ts tests/toolbars/DonutMenu.search.spec.ts tests/pages/NotebookCatalogFilter.spec.ts tests/pages/NotebookCatalogList.spec.ts tests/pages/NotebookCatalogSubscriptions.spec.ts tests/pages/NotebooksPage.spec.ts tests/pages/CircleShowPage.spec.ts tests/pages/BazaarPage.spec.ts`:
+  shared consumers passed 7/4/12 tests. Batch initially failed only new catalog
+  test setup (static RouterLink lookup and dropdown flush), corrected and green
+  in the 34-test run; shared code unchanged, so those 23 passes are retained.
+  Search/Folder mounted tests observe focus traversing results and returning to
+  input; DonutMenu also exercises Enter with the production router.
+- Both final typechecks passed: `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+  and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit`.
+- Consumer trace command: `node .agents/skills/dough-execute-plan/scripts/consumer-trace.mjs --checkout /Users/terryyin/git/doughnut/.worktrees/open-notebooks-from-the-filter-with-the-keyboard --base 8c5915bcbef51aa3cb6610542c15f00a8623a11f --term handleSearchDialogListKeydown --term handleInputListKeydown --term searchDialogKeyboard --term NotebookCard --term NotebookListRow --term NotebookCatalogGroupHeader --term data-notebook-catalog-target`.
+  Catalog section/group/card wrappers, page/Circle/Bazaar, search forms/results
+  and their tests covered above; component declarations and story fixtures
+  typechecked. E2E card/title/click selectors inspected unchanged, no affected
+  selector contract; route declarations and incidental backend/CLI/property-list
+  or planning matches excluded. No affected consumer lacks proof.
+- Independent `refactor_vertical` review: none, already clean; no edits or
+  invalidated proof. Active implementation about 5 minutes; no overrun.

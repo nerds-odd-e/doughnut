@@ -11,6 +11,7 @@
       v-bind="
         headerNavigatesToGroup
           ? {
+              'data-notebook-catalog-target': '',
               to: { name: 'notebookGroup', params: { groupId: group.id } },
               class: headerLinkClass,
             }
@@ -61,5 +62,5 @@ defineProps({
 })
 
 const headerLinkClass =
-  "block rounded-md no-underline text-inherit outline-offset-2 hover:bg-primary/10"
+  "block rounded-md no-underline text-inherit outline-offset-2 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
 </script>
