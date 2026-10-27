@@ -3,8 +3,8 @@
 **Source:** [Complete the retirement of the local MCP server](../../seeds/SEED-002-host-mcp-over-https.md#story-4)
 **Identity:** SEED-002#story-4
 
-Preparation is complete. Taking this story waits for the owner-managed private
-client migration below and a fresh readiness assessment.
+The owner-managed private client migration was verified on 2026-10-28 as
+recorded below. Execution still requires a separate instruction.
 
 ## Goal and scope
 
@@ -26,7 +26,7 @@ OAuth linking and ChatGPT onboarding belong to sibling stories 2 and 3.
 No retrieval redesign, new public API, deployment, client certification matrix,
 global test optimization, or arbitrary cleanup of other checkouts is included.
 
-## Owner-managed prerequisite
+## Owner-managed client migration
 
 On 2026-10-28 Terry Yin selected a separate Cursor-agent handoff to migrate
 his private clients and requested landing this preparation. That migration
@@ -38,11 +38,13 @@ clients have reconnected with their bundle processes released. An unavailable
 endpoint or still-active consumer remains explicitly unresolved with that
 owner. No deployment or forced termination of unrelated work is authorized.
 
-The Cursor handoff leaves the generated directory for this story's deletion.
-Migration is not yet observed, so the recorded assessment remains not-ready
-for that concrete prerequisite. On receiving the result, freshly verify the
-client/consumer state, review this plan, and reassess; do not renew readiness
-from the owner's intention alone. No scope question remains for landing.
+After Terry reported the Cursor update, the fresh default-checkout observation
+in item 6 below verified the configured HTTPS endpoint, authenticated tool
+discovery, and release of the bundle processes. This settles the migration
+prerequisite. The generated directory remains for this story's deletion;
+recheck its ownership and active consumers at execution because clients and
+filesystem contents can change. No private configuration change, deployment,
+or process termination is part of this preparation.
 
 ## Existing owners and decisions
 
@@ -114,20 +116,18 @@ graph limits; the maintained examples and guidance describe that same service.
   its contents and ownership first: `build/`, `dist/`, and package-local
   `node_modules` links/cache were observed. Remove links without following
   their shared targets. Do not modify the integration checkout's index or
-  other work. Live foreign owners were observed during preparation (see
-  observation 5); their selected migration must be confirmed under the
-  prerequisite above before this step is executable. Preserve new authored content or unresolved
-  active consumers and stop that deletion for their owner.
+  other work. Live foreign owners were observed in observation 5 and their
+  release was verified in observation 6. Recheck at deletion; preserve new
+  authored content or unresolved active consumers and stop that deletion for
+  their owner.
   This local filesystem effect is not delivered by a Git commit alone.
 - Sweep source, generated artifacts, root/package configuration, scripts,
   CI, docs, comments, and agent guidance transitively. Delete discovered
   exclusive dependents; shared owners stay. Inspect the actual execution
   checkout and the named integration checkout separately.
-- Refresh obsolete current transport guidance in plan 073 if it still exists
-  when execution begins: its consumer-trace paragraph describes the earlier
-  stdio client and tells readers to wait for story 1. Replace that obsolete
-  guidance with a dated observation of the delivered HTTPS client, preserving
-  the OAuth story's promises and its actual dated probe evidence. Remove
+- Refresh any obsolete current transport guidance found in surviving planning
+  consumers, using a dated observation of the delivered HTTPS client and
+  preserving their promises and actual dated probe evidence. Remove
   obsolete dependent local-package observations only when their consumers
   have been repaired. Retain still-needed dated observations verbatim in
   substance; never rename an observed action. If a retention decision cannot
@@ -231,7 +231,7 @@ at `d65e2550331fea6682c0405813085516a4164c98`, with only the scratch edits below
    treating the generated directory as unused. The later owner decision is
    recorded separately above; this observation establishes no migration.
 
-Limits: ordinary selection excludes `@mcpIsolationProof`; no concurrent
+Limits of observations 1–5: ordinary selection excludes `@mcpIsolationProof`; no concurrent
 worktree run, production observation, OAuth observation, or new full backend
 suite result is claimed. All probes were unpaid and used the owned disposable
 E2E allocation. They do not complete the planned slice.
@@ -241,6 +241,45 @@ load around 8.8; a VM and unrelated Nix work were active. Chose one focused
 E2E owner at a time, no parallel heavy suite and no paid service. Both owned
 runner invocations exited and shut down their stacks. Recheck host conditions
 before execution; do not stop unrelated workloads.
+
+6. **Client migration and readiness review, 2026-10-28.** Checkout:
+   `/Users/terryyin/git/doughnut`, revision
+   `3d4da7a333d562d2b8ed3c60db2b32c8d2d2d918`, before preparation edits.
+   Terry reported that Cursor MCP was updated. A private JSON read of
+   `/Users/terryyin/.cursor/mcp.json` found `doughnut` configured with URL
+   `https://doughnut.odd-e.com/api/mcp`, an Authorization header, and no command
+   or bundle arguments. It reported only transport/endpoint and header names;
+   credentials were neither printed nor copied into the repository. Filtering
+   `ps -axo pid=,ppid=,comm=,args=` privately for Node processes using the exact
+   bundle found zero consumers. `rg --files --hidden --no-ignore mcp-server`
+   and a filesystem read found compiled `build/` files, package-local
+   installation links/cache, and an empty `dist/`; no artifacts were deleted.
+   These results supersede the current prerequisite concern, while preserving
+   observations 4–5 as dated evidence.
+
+   Consuming operation:
+   `CURSOR_DEV=true nix develop -c node /tmp/story4-verify-cursor-mcp.mjs`.
+   This temporary script loaded the installed SDK from this checkout and the
+   configured URL/header privately, then awaited `Client.connect` through
+   `StreamableHTTPClientTransport` and `Client.listTools` with normal TLS
+   certificate verification. Result: passed, exit 0; tools were exactly
+   `get_note_graph`, `list_note_candidates`, and `read_note`. Initialize and
+   tools/list returned HTTP 200; the observed status sequence was
+   `[200, 202, 405, 200]`, including the SDK's auxiliary request. The script
+   closed its client. No note tool was invoked and no private note was read.
+   This verifies the real deployed discovery path using the migrated entry;
+   it is not a new Cursor UI, OAuth, E2E, or paired-worktree verdict.
+
+   Re-read the story, proof mapping, slice, and ADRs 0002, 0005, and 0007.
+   `git diff d65e2550331fea6682c0405813085516a4164c98 HEAD --
+   e2e_test/features/mcp/mcp_services.feature e2e_test/support/mcp_client.ts`
+   was empty. The TLS proxy changes since that probe add browser certificate
+   pin metadata and URLSearchParams forwarding; the ordinary MCP JSON path
+   used by the retained proof is unchanged. Reuse observations 2–3 within
+   their original boundary, with final focused proof still owned by execution.
+   Only plan 074 remains under `.planning/slice-plans/`; the conditional plan
+   073 consumer repair is no longer pending. No new architecture choice,
+   probe slice, scope decision, or unmapped proof remains.
 
 ## Removal acceptance reading
 
@@ -267,8 +306,10 @@ Slice-plan refinement was not needed: the cleanup remains one bounded outcome
 and proof loop, with the proposed search simplification exercised and its
 retained candidate proof shown to discriminate. The owner settled scope by
 selecting private client migration through a separate Cursor-agent handoff.
-Slice 1 still waits for that actual migration result: deleting the artifacts
-before the active consumers are released could break later client launches.
-Record not-ready for this pending prerequisite, and land the completed
-preparation under the owner's instruction. No remaining scope question,
+Observation 6 settles that actual migration result in the named default
+checkout with authenticated discovery and a fresh consumer reading. The
+existing bounded slice and mapped proof remain suitable. Record ready against
+the reviewed story and plan, and auto-land this one-shot preparation under the
+owner's instruction. Execution rechecks mutable artifact ownership before
+deletion and runs its final focused proof. No remaining scope question,
 runtime responsibility move, or speculative structure is proposed.

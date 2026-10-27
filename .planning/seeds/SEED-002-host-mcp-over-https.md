@@ -106,7 +106,7 @@ HTTPS connection.
 
 **Identity:** SEED-002#story-4
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/074-https-mcp-maintenance/PLAN.md","assessment":"not-ready","reasons":["The owner selected a separate Cursor-agent migration of private clients to HTTPS. Its endpoint/tool-discovery and consumer-release result is not yet observed; obtain that result and freshly reassess before taking Story 4 or deleting the generated directory."],"basis":{"document":"3e9f3f0353811de5843fbfcce70ae0e6233c66de44701631558aae426623b309","plan":"a53a0cb188fd223410020ff789992f695fd6e7be0b184a085222e80b79483a2b"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/074-https-mcp-maintenance/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"146cd5fba2efcc436c6cfc9adb870eabb53c861733bd5582d1d2eb824a81f0fb","plan":"b77abcf730cb0a0c463b1654624c4459ee1ddf830654a483d328215d2fefe20d"}}
 ```
 
 **Goal:** Donut users connect their MCP clients directly to the backend's HTTPS
@@ -228,8 +228,8 @@ exact bundle. Only command/path and environment-key names were inspected for
 reporting; token values were not exposed. The directory therefore has active
 consumers and cannot be treated as unused generated output.
 
-**Local client disposition, selected by Terry Yin on 2026-10-28:** Terry will
-ask a Cursor agent to migrate his private clients to HTTPS separately, using
+**Local client disposition, selected by Terry Yin on 2026-10-28:** Terry selected
+a separate Cursor-agent migration of his private clients to HTTPS, using
 the handoff supplied in chat. Private configuration migration is outside
 this story's implementation; its verified completion is a prerequisite to
 taking this cleanup story. The handoff must verify the remote endpoint and
@@ -238,11 +238,25 @@ tool discovery using the existing personal token privately, update the
 unrelated work. It reports any still-active bundle consumer or unavailable
 HTTPS endpoint rather than deleting files or claiming success.
 
-No client configuration or running session was changed by this preparation,
-and migration completion has not been observed. Preparation may land as
-requested; execution waits for the Cursor result and a fresh readiness
-assessment. Artifact deletion remains part of this story and rechecks
-ownership, preserving any new authored or foreign-owned work.
+**Client migration verification, 2026-10-28:** After Terry reported that Cursor
+MCP was updated, a fresh read in the default checkout at
+`3d4da7a333d562d2b8ed3c60db2b32c8d2d2d918` found the private `doughnut` entry
+pointing directly to `https://doughnut.odd-e.com/api/mcp` with an Authorization
+header and no launch command. No live Node process used the former bundle.
+Using that entry's credentials privately, the maintained MCP SDK initialized
+the connection and discovered `list_note_candidates`, `read_note`, and
+`get_note_graph` with normal TLS certificate verification. This confirms the
+endpoint/discovery and consumer-release prerequisite, rather than inferring
+completion from the configuration alone. The associated plan retains the
+literal command, results, and limits.
+
+The generated directory still contains compiled `build/` files and
+package-local installation links/cache; `dist/` is now empty. These fresh
+observations do not alter the earlier dated bundle and consumer observations.
+This preparation changed no private configuration, running session, or
+generated artifact. Artifact deletion remains part of execution and rechecks
+ownership, preserving any new authored or foreign-owned work. The existing
+plan remains the selected approach; no new plan or execution starts here.
 
 ## Ordering and Scope Reduction
 
