@@ -74,14 +74,6 @@
         v-if="catalogItems.length > 0"
         class="mb-4"
       >
-        <label
-          class="daisy-label px-0 pb-1"
-          for="notebook-filter-input"
-        >
-          <span class="daisy-label-text text-sm text-base-content/70">
-            Filter notebooks
-          </span>
-        </label>
         <div class="flex items-center gap-2">
           <div class="daisy-input daisy-input-sm flex items-center gap-2 flex-1">
             <Search class="h-4 w-4 text-base-content/50" />
@@ -91,6 +83,7 @@
               v-model="filterText"
               type="text"
               class="grow"
+              aria-label="Search notebooks and groups"
               placeholder="Search by notebook or group name"
             />
           </div>

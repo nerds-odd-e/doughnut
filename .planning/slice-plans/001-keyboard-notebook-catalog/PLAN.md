@@ -41,7 +41,7 @@ equivalent `lint`/`build` evidence.
 
 ### 1. The filter needs no visible title
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NotebookCatalogFilter.spec.ts` (add the accessible-name assertion to
 the autofocus or filtering case) run with
 `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookCatalogFilter.spec.ts`;
@@ -137,3 +137,53 @@ Slice-plan refinement: not needed — three independent outcomes with separate
 proof loops; the only structural change (sharing the vertical rule) sits inside
 the Behavior that needs it, with its consumers' specs named. No remaining
 slice-specific concern identified in this review.
+
+## Execution context
+
+- Execution authority: owner invoked dough-execute-plan for SEED-087#story-1;
+  planned Story Branch Mode; existing planning authority permits in-scope replanning.
+- Owned workspace (created for this story, creation ref verified):
+  `/Users/terryyin/git/doughnut/.worktrees/open-notebooks-from-the-filter-with-the-keyboard`;
+  branch `codex/open-notebooks-from-the-filter-with-the-keyboard`.
+- Integration checkout: `/Users/terryyin/git/doughnut`; authorized publication target
+  `origin/main`; slice delivery target is the story branch on `origin`.
+- Starting revision: `faced863b730f077dcde757eb7d41db5e76631a8`;
+  accepted claim and initial published base: `1e8fa25b2948788b7daedacfc8d31786e887aaae`.
+  Publisher `dashboard-territory.local-doughnut`; agent Yui-chan.
+- Checkout setup: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded
+  with the checkout's current dependency fingerprint; the 7 filter component
+  tests then passed using the plan's literal focused command.
+- Delivery formatter: `./scripts/run.sh pnpm format:changed` once per delivery;
+  installed pre-commit hook independently runs check-only `pnpm lint:changed`.
+- CI: GitHub Actions, `nerds-odd-e/doughnut`, push workflow `ci.yml` (`donut CI`).
+  Story-branch observer coordinator `yui-keyboard`, directory
+  `/tmp/dough-ci-501/watch-6uAevK`, PID 27237, stream session 28824, yielded cell 11.
+  The trunk claim predates this story-branch observer and is unobserved.
+
+## Accepted proof
+
+### Slice 1
+
+- Source-only review: fresh isolated agent `source_review_one` received the
+  story's goal, scope, examples and exclusions, no product/plan/return, and
+  returned individual commitments. A corrected exact example 8 confirms the
+  accessible-name wording is unspecified. Source comparison: non-empty catalog
+  renders → title deleted, placeholder/name/icon/clear retained → markup reading
+  and existing component assertions agree; keyboard journeys remain owned by
+  slices 2 and 3. Circle label remains explicitly excluded.
+- `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookCatalogFilter.spec.ts`:
+  7 passed. Real mounted `NotebooksPageView` with `makeMe` catalog; existing
+  autofocus case observes focused input id, accessible name and placeholder;
+  existing filtering/group-preview/clear/no-match cases observe the retained behavior.
+- `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookCatalogList.spec.ts tests/pages/NotebookCatalogSubscriptions.spec.ts`:
+  6 passed; existing catalog fixtures observe sort, group route/preview, dropdown
+  dismissal and subscribed member actions through the mounted view.
+- `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and
+  `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit`: passed.
+- One-time removal reading, 2026-10-27: `rg -n 'Filter notebooks' frontend`
+  finds only `CircleShowPage.vue:63`, the retained Circle label.
+- Consumer trace: `node .agents/skills/dough-execute-plan/scripts/consumer-trace.mjs --checkout /Users/terryyin/git/doughnut/.worktrees/open-notebooks-from-the-filter-with-the-keyboard --base 1e8fa25b2948788b7daedacfc8d31786e887aaae --term 'Filter notebooks' --term notebook-filter-input --term NotebooksPageView`.
+  View/page/list/subscription callers covered by the component checks; declarative
+  story fixtures typechecked. Circle independent label, route declarations,
+  incidental backend fixture and planning/guidance matches do not consume changed
+  filter markup. No affected consumer lacks proof.
