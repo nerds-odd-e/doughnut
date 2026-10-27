@@ -38,6 +38,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/AssistantConsentPage': RouteRecordInfo<
+      '/AssistantConsentPage',
+      '/AssistantConsentPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/AttachmentPage': RouteRecordInfo<
       '/AttachmentPage',
       '/AttachmentPage',
@@ -250,6 +257,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/AdminDashboardPage.vue': {
       routes:
         | '/AdminDashboardPage'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/AssistantConsentPage.vue': {
+      routes:
+        | '/AssistantConsentPage'
       views:
         | never
       pathParamNames:

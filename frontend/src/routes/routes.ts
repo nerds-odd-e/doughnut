@@ -1,5 +1,6 @@
 import type { RouteComponent, RouteRecordRaw } from "vue-router"
 import HomePage from "@/pages/HomePage.vue"
+import AssistantConsentPage from "@/pages/AssistantConsentPage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
@@ -32,6 +33,7 @@ import {
 
 const componentMap: Record<string, RouteComponent> = {
   root: HomePage,
+  assistantConsent: AssistantConsentPage,
   notebooks: NotebooksPage,
   notebookGroup: NotebookGroupPage,
   noteShow: NoteShowPage,

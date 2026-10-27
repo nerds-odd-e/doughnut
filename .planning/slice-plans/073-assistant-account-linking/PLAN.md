@@ -17,6 +17,7 @@ Starting revision: `83615a792fe3aa3107badb07d883a70398d75127`.
 Startup claim `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` was confirmed on remote main/execution branch.
 Published on the execution branch: slice 1 `f0390693df002168b2ce6a81f038bcb5f90931b8`, slice 2 `d488c64dbc69a00c51f2cc9237f71ae9fda016a1`, slice 3 `9562d7c1ae2e965e95aa70afaa0d01f97c98406f`.
 Slice 4 published `84e2b4eda9562369af774636edb490d2d1bdeb12`; slice 5 published `20d28229aabc6a4747cb8e1a39f433f170a71dad` on that branch.
+Slice 6 published `4df752991fbb75653481bbf9a24471e1953c3146`; slice 7 published `0fb9548eb93b320b71f3e02eb9be06e86b4c444d`.
 Slice 2's SHA is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's
@@ -119,7 +120,7 @@ Accepted implementation/proof and independent refactor: [execution evidence](EXE
 
 ### 8. Show informed assistant consent in the browser
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted consent tests, both frontend typechecks and actual fixture-backed browser Allow/Deny/retry observe the same Donut identity, informed decision and callback.
 
 Add named consent route in routeMetadata/routes; use namedLocationHref navigation. Show client/account, current
@@ -128,6 +129,7 @@ Allow/Deny protocol forms carry returned CSRF/state; this is protocol navigation
 Backend consent-page URI is standard redirect configuration; invent no JVM/Vue route compiler. Reuse fixture 6,
 with no live GitHub probe or Basic/injected-principal callback claim. Generate normal component declarations.
 Sizing: 5–10 minutes plus mounted/types/browser proof and E2E cold waits.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#8-show-informed-assistant-consent-in-the-browser).
 
 ### 9. Exchange a code for a constrained credential
 Type: Behavior
