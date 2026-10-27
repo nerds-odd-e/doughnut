@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-002#story-2",
+  "title": "Link an assistant to Donut through GitHub sign-in",
+  "completedAt": "2026-10-27T23:14:52.066Z",
+  "developer": "Terry Yin",
+  "agent": "Yua-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

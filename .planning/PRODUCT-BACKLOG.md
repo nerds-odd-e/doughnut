@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Link an assistant to Donut through GitHub sign-in](seeds/SEED-002-host-mcp-over-https.md#story-2) — SEED-002#story-2 ([plan](slice-plans/073-assistant-account-linking/PLAN.md))
-
 ## Backlog list
 
 - [Use Donut knowledge directly in ChatGPT](seeds/SEED-002-host-mcp-over-https.md#story-3) — SEED-002#story-3

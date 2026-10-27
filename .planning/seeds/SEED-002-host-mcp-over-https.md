@@ -26,7 +26,7 @@ non-executable decomposition/backlog input, not implementation authority.
 - Selected order: token-authenticated HTTPS MCP → GitHub/Donut account linking → direct ChatGPT plugin.
 
 Real MCP interoperability must retain user access and attribution.
-[Dated baseline and candidate investigation](../slice-plans/073-assistant-account-linking/PREPARATION-EVIDENCE.md) retain revisions, actions, results and limits.
+The [hosted assistant account-linking guide](../../docs/assistant-oauth.md) describes the delivered authorization contract and operator configuration.
 
 ## Shared Constraints
 
@@ -43,151 +43,6 @@ Real MCP interoperability must retain user access and attribution.
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours including verification and delivery,
 following [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition).
 Refinement challenges an L story likely to exceed those comparative bands.
-
-<a id="story-2"></a>
-
-### Link an assistant to Donut through GitHub sign-in
-
-**Identity:** SEED-002#story-2
-```json dough-story-dependencies
-{"schemaVersion":1,"identity":"SEED-002#story-2","dependencies":[{"supplier":{"identity":"SEED-002#story-1","href":"seeds/SEED-002-host-mcp-over-https.md#story-1"},"implementation":"Build account linking against the existing direct HTTPS MCP knowledge service and reuse its user-scoped note operations.","rationale":"The selected OAuth journey must be exercised by a real client against Donut's actual protected MCP resource. Shared design or mocked tools cannot establish that resource's protocol, attribution, and current-user access boundary.","condition":"Donut's direct HTTPS MCP service has delivered candidate search, attributed full reads, and bounded graph context for a real authenticated client using existing Donut tokens.","state":"satisfied","resolution":{"revision":"2c06ba2245f8972af0e8e9e64a218e82561717ba","path":".planning/seeds/SEED-002-host-mcp-over-https.md#story-1","summary":"SEED-002#story-1 delivered HTTPS MCP at /api/mcp with list_note_candidates, read_note, and get_note_graph for token-authenticated clients. Proof: backend MCP boundary tests through tip b8c5d9ae and e2e_test/features/mcp/mcp_services.feature (9 scenarios) over verified TLS Streamable HTTP. Condition met without changing story-2 assumptions.\nCondition satisfied: Donut's direct HTTPS MCP service has delivered candidate search, attributed full reads, and bounded graph context for a real authenticated client using existing Donut tokens.\nAccepted integration: 1faeb6d81afc86fd45582cd99589e7a115286c9c on origin/refs/heads/main."}}]}
-```
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/073-assistant-account-linking/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f9ddafc467232ee4132690edbabe1fbed73f1d4b8cd3cbf13967e31c0c964f6b","plan":"528d86f659d5f26dfde52675929e1f899c9e16d3d166f911a93a48c3649ed736"}}
-```
-
-**Goal:** A Donut user can grant, maintain, and withdraw a compatible assistant's
-read access by signing into Donut through GitHub, without manually copying a
-Donut personal access token into that client.
-
-**Scope:**
-
-- Deliver discovery, GitHub-backed Donut sign-in, informed read-access consent,
-  authorization-code exchange with PKCE, authenticated MCP use, token expiry
-  and renewal, and user withdrawal of the assistant's access. Reuse the user's
-  existing Donut identity and current notebook permissions. GitHub authenticates
-  the person; Donut grants access and issues credentials for its MCP service.
-  Reuse the existing GitHub OAuth login implementation and identity mapping;
-  no new GitHub scopes, APIs or provider capabilities are selected. The new
-  return-to-consent integration is proved with an external GitHub HTTP fixture
-  through the real security chain. A new GitHub test app or credentialed
-  provider probe is unnecessary for this unchanged login behavior, as clarified
-  by Terry Yin on 2026-10-27.
-- Consent names the client and Donut account, explains that the assistant can
-  search, read, and explore notebooks the account can currently read, and offers
-  Allow and Deny. It explains continued access through renewal and where to
-  withdraw permission. A GitHub session by itself is not consent.
-- Bind credentials to the authorizing user, registered client, read scope, and
-  canonical MCP resource. Check the current grant and notebook permissions on
-  every tool request. These credentials do not grant general Donut API access,
-  personal-token creation, or content mutation. This enforces the seed's
-  read-only, user-scoped delegation requirement.
-- Keep grants and consent durable across ordinary backend restarts. In Donut
-  settings, the user can identify a connected assistant and withdraw its access.
-  Withdrawal invalidates that user's outstanding credentials and remembered
-  consent for that client; subsequent access needs a fresh authorization.
-  Finishing an already authorized in-flight read cannot recall information
-  the assistant has received.
-- One predefined OAuth client is sufficient, as selected in decomposition.
-  The first journey uses a confidential hosted client with an exact
-  registered callback and server-held secret, approved by Terry Yin on
-  2026-10-27. Public-client renewal, client registration self-service, DCR, client-metadata-document
-  registration, a client certification matrix, and ChatGPT-specific onboarding
-  are deferred promises. No arbitrary one-client runtime limit follows from
-  the example.
-- Existing personal-token workflows remain available. Body search, editing,
-  new retrieval rules, notebook-specific consent selection, and changing the
-  GitHub login provider are outside this delivery. Existing Donut users are
-  the beneficiary; account creation remains the existing registration workflow,
-  with first-time signup during assistant linking a deferred promise.
-
-**Key examples:**
-
-1. An existing Donut user starts connecting a registered assistant with only
-   the service URL and its registered client configuration. The client discovers
-   the authorization server, sends the user through GitHub sign-in, and shows
-   Donut's read-access consent. Allow completes the callback and code exchange;
-   the assistant searches, reads an attributed note, and obtains bounded graph
-   context using the same identity and permissions as the user. No personal
-   Donut token is copied into the assistant.
-2. A signed-in user sees the client and account before deciding. Deny returns
-   an authorization refusal to the client; retry can ask again. A mismatched
-   callback, invalid PKCE proof, or reused code cannot issue a usable credential.
-   These are OAuth authorization constraints, not limits inferred from examples.
-3. A valid grant permits subsequent calls without another browser login. When
-   its short-lived access token expires, the client renews it and can read again
-   under the same resource and scope. An expired or invalid refresh credential
-   requires reconnection; renewal cannot enlarge the authorization.
-4. Two users authorize the same assistant. Each sees only their readable notes.
-   Losing notebook permission affects the next read or graph expansion. A
-   credential for a different resource or without the read scope is refused;
-   the assistant credential cannot be used to create a personal token or edit
-   a note, including when a browser session accompanies the request.
-5. The user withdraws the assistant in Donut settings. Its next tool call and
-   renewal fail, including from an existing connection; the other user's grant
-   still works. Connecting again requires consent. A backend restart between
-   authorization and renewal preserves the valid grant and its user binding.
-
-**Architecture:**
-
-Use Spring Security's maintained authorization server in the existing backend:
-authorization-code/PKCE, durable authorization/consent, and opaque reference
-tokens checked locally. Withdrawal affects the next request; JWTs would still
-need revocation checks. Do not issue personal tokens as assistant credentials
-or call Donut introspection over loopback merely to read local grant state.
-
-Reuse `CurrentUserFetcherFromRequest`, `UserService` and `AuthorizationService`
-for user identity, notebook permissions and attributed reads. OAuth grants own
-client/consent/resource/scope/expiry/renewal, separately from `UserToken`.
-CLI Gmail OAuth is an outbound client; personal-token settings are a navigation
-precedent, not a grant store. No existing owner supplies OAuth grant issuance.
-
-Validate resource at authorization, exchange and renewal, then stored resource
-and read scope at MCP use; the [probe](../slice-plans/073-assistant-account-linking/PREPARATION-EVIDENCE.md)
-found the library default insufficient. Resolve the GitHub user's identity,
-not the client principal. Keep browser login/consent separate from bearer-only
-MCP. Protect consent/withdrawal against CSRF; preserve deliberate protocol
-errors and report unexpected failures under [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md).
-
-Operational endpoints remain under `/api`; Vue screens use `routeMetadata`.
-On 2026-10-27 Terry Yin approved only `/.well-known/oauth-authorization-server`
-and `/.well-known/oauth-protected-resource/api/mcp` as exceptions to
-[ADR 0005](../../docs/adrs/0005-web-routes-accepted.md). Route both to the backend;
-advertise the latter in the MCP `401` challenge. Authorization, token,
-revocation, grant management and MCP remain under `/api`. Preserve this narrow
-exception in maintained OAuth docs at wrap-up; no ADR status or wider rule changes.
-
-[ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
-preserves accepted-revision attribution; [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
-requires isolated disposable proof. ADRs 0000–0007 have agreeing Accepted index/in-file
-statuses and no relevant supersession; ADR 0001 lacks the accepted filename suffix.
-
-**Owner decisions, 2026-10-27:** Terry Yin answered "as recommended" to the
-two presented choices: the discovery-only ADR 0005 exception and the first
-journey through one pre-registered confidential hosted client. These settle
-the open refinement decisions. The recommended Spring/opaque-token design
-above retains the full lifecycle promise.
-
-During execution on the same date, Terry Yin clarified that GitHub OAuth login
-is an existing feature to reuse cohesively. No new GitHub test-app approval is
-needed unless implementation proposes a new GitHub OAuth capability; any such
-proposal returns to the owner. This changes the proof prerequisite for the
-unchanged provider behavior, while preserving callback/identity continuation
-into Donut consent as required new integration proof.
-
-**Effort hypothesis:** L (2–4 hours), medium confidence after the library and
-persistence probe and the owner's decisions.
-Maintained protocol and JDBC support reduce the unknown work. Explicit resource
-binding, browser consent and return-to-flow integration, whole-client withdrawal,
-and real-client proof still need bounded leaves. Required backend-suite time
-and operator-owned release waits are accounted for separately in
-the plan. Reassess the band if reducible implementation exceeds it; do not
-silently split or shrink the lifecycle promise.
-
-**Safe stopping point:** The delivered compatible client can connect, renew,
-and lose access through the user's decision, independently of ChatGPT-specific
-packaging. During execution, preserve existing login and personal-token use;
-offer the new connection only when its promised lifecycle works.
 
 <a id="story-3"></a>
 
@@ -238,8 +93,7 @@ these expansions are not queued here.
 
 ## Refinement Handoff
 
-Refinement settles library integration, client registration, token lifetimes/renewal,
-and minimum consent/revocation UI. This decomposition provides no executable plan or readiness.
+Refinement checks current ChatGPT connection requirements, onboarding and attribution against the delivered HTTPS MCP and OAuth service. This decomposition provides no executable plan or readiness.
 Public-directory publication remains an owner decision after a useful direct custom plugin.
 
 ## When to Surface
