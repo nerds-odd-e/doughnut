@@ -3,7 +3,7 @@ id: SEED-002
 status: dormant
 planted: 2026-08-06
 planted_during: idle (after deploy/static consistency audit)
-updated: 2026-10-27
+updated: 2026-10-28
 trigger_when: extending Donut through a direct ChatGPT plugin or migrating local MCP clients to the Donut HTTPS service
 scope: large
 ---
@@ -360,7 +360,7 @@ HTTPS connection.
 
 **Identity:** SEED-002#story-4
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/074-https-mcp-maintenance/PLAN.md","assessment":"not-ready","reasons":["The owner selected a separate Cursor-agent migration of private clients to HTTPS. Its endpoint/tool-discovery and consumer-release result is not yet observed; obtain that result and freshly reassess before taking Story 4 or deleting the generated directory."],"basis":{"document":"3e9f3f0353811de5843fbfcce70ae0e6233c66de44701631558aae426623b309","plan":"a53a0cb188fd223410020ff789992f695fd6e7be0b184a085222e80b79483a2b"}}
 ```
 
 **Goal:** Donut users connect their MCP clients directly to the backend's HTTPS
@@ -412,6 +412,28 @@ tests after completely deleting the standalone local server and its dependents.
 - **Safe stopping point:** The existing HTTPS service and its distinct behavior
   coverage remain useful independently of later OAuth or ChatGPT work.
 
+**Key examples:**
+
+1. A user has a personal token and follows the supported HTTPS setup. Their
+   client discovers the three note tools, finds matching candidates, reads a
+   candidate with its accepted notebook revision, and obtains graph context
+   within the requested budget. An unmatched query gives the existing empty
+   result. The setup and feature description describe these read operations.
+2. Two users have different private notebooks. Each client's personal token
+   permits searching its user's readable notes; the other user's private notes
+   stay inaccessible. Existing token withdrawal and notebook-access refusals
+   remain supported behavior, not removal assertions.
+3. A maintainer runs the focused MCP feature in an isolated checkout. It uses
+   that checkout's disposable application through verified HTTPS and retains
+   distinct candidate, attribution, access, and graph-budget observations.
+   Equivalent positive-search examples share the richer candidate proof.
+   The separate paired-worktree isolation scenario and its support remain.
+4. A maintainer uses the supported setup and build guidance after cleanup.
+   It describes the backend service directly. The integration checkout's
+   generated package outputs and exclusive installation links are included in
+   the deletion; shared dependency targets and authored work remain intact.
+   The deletion itself is accepted by the separate one-time removal reading.
+
 **Current evidence, 2026-10-27:** Repository reading at
 `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` found that
 `b8c5d9ae302d4be49c63edeaea06e5b7ffe7b158` had already deleted the tracked
@@ -424,6 +446,57 @@ still contains the untracked generated bundle
 observations, not a new test run or a finding that existing HTTPS scenarios
 are redundant. Start from the delivered behavior and classify remaining work
 rather than repeating the completed migration.
+
+**Investigation, 2026-10-28:** In the established preparation checkout at
+`d65e2550331fea6682c0405813085516a4164c98`, tracked-file and explicit ignored-file
+readings confirmed the delivered HTTPS transport and package deletion. The
+generated directory is absent in this fresh worktree but remains at
+`/Users/terryyin/git/doughnut/mcp-server`: compiled `build/` files,
+`dist/mcp-server.bundle.mjs`, and package-local `node_modules` links/cache.
+These observations distinguish the two checkouts; they do not revise the
+dated observation above. The root MCP SDK is still consumed by the HTTPS E2E
+client, and the TLS proxy forwards requests to the real backend.
+
+The generic positive-search outline rows overlap richer candidate scenarios.
+A disposable edit replaced that outline with its unmatched-query case. Running
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature`
+passed all seven remaining ordinary cases, including token-user isolation,
+revision-changing reads, and both graph budgets. A second disposable run
+focused the all-candidates scenario and replaced the real search response's
+content with `[]` at the client boundary: it failed at the candidate assertion.
+Both source files were restored byte for byte before this refinement write.
+The paired-worktree case was excluded by ordinary runner selection; this is
+not a fresh concurrent-worktree observation. Full commands, setup, results,
+and proof limits belong in the associated plan.
+
+Remaining work is cleanup within the existing scope: the observed generated
+directory, redundant search rows, the feature's unsupported write-operation
+description, removal wording in current MCP guidance, and obsolete current
+transport assumptions in planning consumers. Preserve needed dated evidence
+with its actual date, revision, action, result, and limits; replace obsolete
+current guidance without changing what a historical observation says.
+A final process-ownership observation found seven live bundle processes owned
+by Cursor extension hosts, Cursor's MCP process, and cursor-agent sessions.
+The `doughnut` entry in `/Users/terryyin/.cursor/mcp.json` still launches that
+exact bundle. Only command/path and environment-key names were inspected for
+reporting; token values were not exposed. The directory therefore has active
+consumers and cannot be treated as unused generated output.
+
+**Local client disposition, selected by Terry Yin on 2026-10-28:** Terry will
+ask a Cursor agent to migrate his private clients to HTTPS separately, using
+the handoff supplied in chat. Private configuration migration is outside
+this story's implementation; its verified completion is a prerequisite to
+taking this cleanup story. The handoff must verify the remote endpoint and
+tool discovery using the existing personal token privately, update the
+`doughnut` client entry, and reconnect affected clients while preserving
+unrelated work. It reports any still-active bundle consumer or unavailable
+HTTPS endpoint rather than deleting files or claiming success.
+
+No client configuration or running session was changed by this preparation,
+and migration completion has not been observed. Preparation may land as
+requested; execution waits for the Cursor result and a fresh readiness
+assessment. Artifact deletion remains part of this story and rechecks
+ownership, preserving any new authored or foreign-owned work.
 
 ## Ordering and Scope Reduction
 
