@@ -2,7 +2,6 @@
   <template v-for="(popupInfo, _index) in popupInfos" :key="_index">
     <Modal
       v-if="popupInfo.type === 'alert'"
-      class="popups"
       :isPopup="true"
       @close_request="resolve(true)"
     >
@@ -19,7 +18,6 @@
 
     <Modal
       v-if="popupInfo.type === 'confirm'"
-      class="popups z-[9998]"
       :isPopup="true"
       @close_request="resolve(false)"
     >
@@ -30,7 +28,7 @@
         <div>
           <span>{{ popupInfo.message }}</span>
         </div>
-        <button class="daisy-btn daisy-btn-success" @click="resolve(true)">OK</button>
+        <button class="daisy-btn daisy-btn-success" autofocus @click="resolve(true)">OK</button>
         <button class="daisy-btn daisy-btn-secondary" @click="resolve(false)">
           Cancel
         </button>
@@ -39,7 +37,6 @@
 
     <Modal
       v-if="popupInfo.type === 'options'"
-      class="popups z-[9998]"
       :isPopup="true"
       @close_request="resolve(null)"
     >
