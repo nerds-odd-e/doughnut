@@ -9,6 +9,7 @@ import { createReadStream, existsSync, statSync } from 'node:fs'
 import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { proxyHttp, proxyUpgrade, targetPort } from './local-lb-proxy.mjs'
 import { loadDoughnutRouting } from '../infra/gcp/path-routing/doughnutRouting.mjs'
 import { pathGoesToBackend } from '../infra/gcp/path-routing/pathGoesToBackend.mjs'
 
@@ -22,6 +23,9 @@ const VITE_UPSTREAM = process.env.LOCAL_LB_VITE_UPSTREAM
   ? new URL(process.env.LOCAL_LB_VITE_UPSTREAM)
   : null
 const PORT = Number(process.env.LOCAL_LB_LISTEN_PORT ?? 5173)
+const PUBLIC_ORIGIN = process.env.LOCAL_LB_PUBLIC_ORIGIN
+  ? new URL(process.env.LOCAL_LB_PUBLIC_ORIGIN)
+  : null
 const DOUGHNUT_ROUTING_PATH = process.env.LOCAL_LB_ROUTING_JSON
   ? path.resolve(process.env.LOCAL_LB_ROUTING_JSON)
   : path.join(repoRoot, 'infra/gcp/path-routing/doughnut-routing.json')
@@ -135,11 +139,6 @@ function tryServeCliInstallPath(urlPath, method, res) {
   return sendStatic(bundlePath, method, res)
 }
 
-function targetPort(target) {
-  if (target.port) return target.port
-  return target.protocol === 'https:' ? '443' : '80'
-}
-
 function backendPortNumber() {
   return Number(targetPort(BACKEND))
 }
@@ -187,87 +186,6 @@ function handleLbReady(req, res) {
   })
 }
 
-function proxyHttp(clientReq, clientRes, target, logLabel) {
-  const headers = { ...clientReq.headers }
-  const incomingHost = clientReq.headers.host ?? `127.0.0.1:${PORT}`
-  const tp = targetPort(target)
-  headers.host = `${target.hostname}:${tp}`
-  headers['x-forwarded-host'] = incomingHost
-  headers['x-forwarded-proto'] = 'http'
-  delete headers.connection
-
-  const opts = {
-    protocol: target.protocol,
-    hostname: target.hostname,
-    port: tp,
-    path: clientReq.url,
-    method: clientReq.method,
-    headers,
-  }
-
-  const pReq = http.request(opts, (pRes) => {
-    clientRes.writeHead(pRes.statusCode ?? 502, pRes.headers)
-    pRes.pipe(clientRes)
-  })
-  pReq.on('error', (err) => {
-    console.error(`[local-lb] ${logLabel} error:`, err.message)
-    if (!clientRes.headersSent) {
-      clientRes.statusCode = 502
-      clientRes.end('Bad Gateway')
-    }
-  })
-  clientReq.pipe(pReq)
-}
-
-function rawUpgradeHead(res) {
-  const code = res.statusCode ?? 101
-  const msg = res.statusMessage || 'Switching Protocols'
-  let raw = `HTTP/1.1 ${code} ${msg}\r\n`
-  for (const [key, value] of Object.entries(res.headers)) {
-    if (value === undefined) continue
-    if (Array.isArray(value)) {
-      for (const v of value) raw += `${key}: ${v}\r\n`
-    } else {
-      raw += `${key}: ${value}\r\n`
-    }
-  }
-  raw += '\r\n'
-  return raw
-}
-
-function proxyUpgrade(clientReq, clientSocket, head, target, logLabel) {
-  const tp = targetPort(target)
-  const headers = { ...clientReq.headers }
-  headers.host = `${target.hostname}:${tp}`
-
-  const opts = {
-    hostname: target.hostname,
-    port: tp,
-    path: clientReq.url,
-    method: clientReq.method,
-    headers,
-  }
-
-  const pReq = http.request(opts)
-  pReq.on('upgrade', (pRes, pSocket, pHead) => {
-    clientSocket.write(rawUpgradeHead(pRes))
-    const endSocket = () => {
-      clientSocket.destroy()
-      pSocket.destroy()
-    }
-    pSocket.on('error', endSocket)
-    clientSocket.on('error', endSocket)
-    if (pHead?.length) pSocket.unshift(pHead)
-    pSocket.pipe(clientSocket)
-    clientSocket.pipe(pSocket)
-  })
-  pReq.on('error', (err) => {
-    console.error(`[local-lb] ${logLabel} upgrade error:`, err.message)
-    clientSocket.destroy()
-  })
-  pReq.end(head)
-}
-
 if (!(VITE_UPSTREAM || existsSync(STATIC_ROOT))) {
   console.error(`[local-lb] static root missing: ${STATIC_ROOT}`)
   process.exit(1)
@@ -283,7 +201,14 @@ const server = http.createServer((req, res) => {
   if (tryServeCliInstallPath(urlPath, method, res)) return
   const up = upstreamForPath(urlPath)
   if (up) {
-    proxyHttp(req, res, up, proxyLogLabel(up))
+    proxyHttp(
+      req,
+      res,
+      up,
+      proxyLogLabel(up),
+      PUBLIC_ORIGIN,
+      `127.0.0.1:${PORT}`
+    )
     return
   }
   if (method !== 'GET' && method !== 'HEAD') {

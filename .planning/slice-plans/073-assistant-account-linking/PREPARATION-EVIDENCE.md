@@ -13,6 +13,11 @@ Further refinement after `9562d7c1ae2e965e95aa70afaa0d01f97c98406f` inserts
 store/client bootstrap at current 4. The earlier mapping is historical: original
 slices 3–10 now correspond to current 5–12; dated observation text is unchanged.
 
+After `20d28229aabc6a4747cb8e1a39f433f170a71dad` (the twelve-leaf plan), consent
+slice 6 splits into current 6–8, and former 7–12 become 9–14. In the original
+ten-leaf observations, 3 remains current 5, 4 maps to 6–8, and 5–10 map to 9–14.
+Only this historical mapping is added; observed actions and evidence are unchanged.
+
 ## Decomposition baseline
 
 Repository reading on 2026-10-27 at

@@ -189,7 +189,11 @@ export async function startOwnedSutLifetime({
       owner: ownerRef.owner,
       checkoutRoot,
       env: tlsProxy
-        ? { ...env, DONUT_CANONICAL_ORIGIN: tlsProxy.httpsOrigin }
+        ? {
+            ...env,
+            DONUT_CANONICAL_ORIGIN: tlsProxy.httpsOrigin,
+            LOCAL_LB_PUBLIC_ORIGIN: tlsProxy.httpsOrigin,
+          }
         : env,
     })
     child = spawned.child

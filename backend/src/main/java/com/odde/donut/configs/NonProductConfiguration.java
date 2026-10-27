@@ -2,6 +2,7 @@ package com.odde.donut.configs;
 
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -30,11 +32,14 @@ public class NonProductConfiguration {
   @Autowired private CommonConfiguration commonConfiguration;
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(
+      HttpSecurity http, ObjectProvider<ClientRegistrationRepository> registrations)
+      throws Exception {
     http.csrf(AbstractHttpConfigurer::disable);
     http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
     http.authorizeHttpRequests(auth -> auth.requestMatchers("/api/games").permitAll());
 
+    if (registrations.getIfAvailable() != null) commonConfiguration.oauth2Login(http);
     commonConfiguration.commonConfig(
         http.httpBasic(
             basic -> basic.securityContextRepository(new HttpSessionSecurityContextRepository())));
