@@ -32,7 +32,7 @@ onMounted(async () => {
         <p>Donut account: <strong>{{ consent.accountName }}</strong></p>
         <p>This assistant can search, read, and explore notebooks that this account can currently read.</p>
         <p>Access can continue through automatic renewal until you withdraw permission.</p>
-        <p>You can withdraw this assistant’s access at any time in <a :href="namedLocationHref({ name: 'settingsGeneral' })" class="daisy-link">Settings</a>.</p>
+        <p>You can withdraw this assistant’s access at any time in <a :href="namedLocationHref({ name: 'settingsConnectedAssistants' })" class="daisy-link">Settings</a>.</p>
         <form :action="consent.formAction" method="post" class="flex flex-wrap gap-3">
           <input type="hidden" name="client_id" :value="consent.clientId" />
           <input type="hidden" name="state" :value="consent.state" />

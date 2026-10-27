@@ -34,7 +34,7 @@ describe("AssistantConsentPage", () => {
       view.getByText(/automatic renewal until you withdraw permission/)
     ).toBeVisible()
     expect(view.getByText("Settings").getAttribute("href")).toBe(
-      namedLocationHref({ name: "settingsGeneral" })
+      namedLocationHref({ name: "settingsConnectedAssistants" })
     )
     const form = view.container.querySelector("form")!
     const allow = view.getByText("Allow") as HTMLButtonElement

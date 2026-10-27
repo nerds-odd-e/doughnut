@@ -163,5 +163,9 @@ export const routeMetadata: RouteMetadata[] = [
   { path: "/settings", name: "settingsGeneral" },
   { path: "/settings/recent", name: "settingsRecent" },
   { path: "/settings/access-tokens", name: "settingsAccessTokens" },
+  {
+    path: "/settings/connected-assistants",
+    name: "settingsConnectedAssistants",
+  },
   { path: "/settings/recall-stats", name: "settingsRecallStats" },
 ]

@@ -1,5 +1,6 @@
 import ApiErrorBuilder from './ApiErrorBuilder'
 import ConsentContextBuilder from './ConsentContextBuilder'
+import AssistantManagementBuilder from './AssistantManagementBuilder'
 import BookBlockFullBuilder from './BookBlockFullBuilder'
 import BookFullBuilder from './BookFullBuilder'
 import {
@@ -46,6 +47,10 @@ import WikidataEntityBuilder from './WikidataEntityBuilder'
 import WikidataSearchEntityBuilder from './WikidataSearchEntityBuilder'
 
 class MakeMe {
+  static get anAssistantManagement(): AssistantManagementBuilder {
+    return new AssistantManagementBuilder()
+  }
+
   static get aConsentContext(): ConsentContextBuilder {
     return new ConsentContextBuilder()
   }

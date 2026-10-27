@@ -22,6 +22,7 @@ Slice 8 published `890d5be26955d8d2ab456d6ad0de7f0015622709`.
 Slice 9 published `47add57de8a497e44734cf4a462735079cf65d66`.
 Slice 10 published `5057876408a583ee2ee27f1f2282969ec0b976b5`.
 Slice 11 published `81d5879fca427614836ceac60f96d79bad92639e`.
+Slice 12 published `210c70a033bed3d6dae8b1f72632c76ddefbc707`.
 Slice 2's SHA is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's
@@ -132,10 +133,11 @@ Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#12-withdraw-a-users-w
 
 ### 13. Manage connected assistants in Settings
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted component/types and actual fixture-backed browser settings withdrawal observe client identification, token/renewal refusal and reconnect requiring consent.
 
 Use generated management API/loading wrappers and framework CSRF context in existing named Settings navigation; retain personal-token controls. Show no credential/secret values. Reuse accepted backend isolation/race proof and actual GitHub callback fixture; no new provider feature. Sizing: 5–10 minutes source plus frontend/browser cold proof.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#13-manage-connected-assistants-in-settings).
 
 ### 14. Establish an owned process-restart proof seam
 Type: Structure

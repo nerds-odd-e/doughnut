@@ -22,6 +22,7 @@ import SettingsPage from "@/pages/SettingsPage.vue"
 import GeneralSettingsTab from "@/pages/settings/GeneralSettingsTab.vue"
 import RecentSettingsTab from "@/pages/settings/RecentSettingsTab.vue"
 import AccessTokensSettingsTab from "@/pages/settings/AccessTokensSettingsTab.vue"
+import ConnectedAssistantsSettingsTab from "@/pages/settings/ConnectedAssistantsSettingsTab.vue"
 import RecallStatsSettingsTab from "@/pages/settings/RecallStatsSettingsTab.vue"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { routeMetadata } from "./routeMetadata"
@@ -58,6 +59,7 @@ const settingsTabComponents = {
   settingsGeneral: GeneralSettingsTab,
   settingsRecent: RecentSettingsTab,
   settingsAccessTokens: AccessTokensSettingsTab,
+  settingsConnectedAssistants: ConnectedAssistantsSettingsTab,
   settingsRecallStats: RecallStatsSettingsTab,
 }
 

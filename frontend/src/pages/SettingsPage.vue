@@ -1,7 +1,7 @@
 <template>
   <ContainerPage v-bind="{ contentLoaded: true, title: 'Settings' }">
     <div
-      class="daisy-tabs daisy-tabs-box bg-base-200 p-2 flex justify-center mb-4"
+      class="daisy-tabs daisy-tabs-box bg-base-200 p-2 flex flex-wrap justify-center mb-4"
     >
       <router-link
         v-for="tab in tabs"
@@ -26,6 +26,7 @@ const tabs = [
   { name: "settingsGeneral", label: "General" },
   { name: "settingsRecent", label: "Recent" },
   { name: "settingsAccessTokens", label: "Access Tokens" },
+  { name: "settingsConnectedAssistants", label: "Connected Assistants" },
   { name: "settingsRecallStats", label: "Recall Stats" },
 ] as const
 
