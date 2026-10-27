@@ -8,9 +8,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Link an assistant to Donut through GitHub sign-in](seeds/SEED-002-host-mcp-over-https.md#story-2) — SEED-002#story-2 ([plan](slice-plans/073-assistant-account-linking/PLAN.md))
+
 ## Backlog list
 
-- [Link an assistant to Donut through GitHub sign-in](seeds/SEED-002-host-mcp-over-https.md#story-2) — SEED-002#story-2
 - [Use Donut knowledge directly in ChatGPT](seeds/SEED-002-host-mcp-over-https.md#story-3) — SEED-002#story-3
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
