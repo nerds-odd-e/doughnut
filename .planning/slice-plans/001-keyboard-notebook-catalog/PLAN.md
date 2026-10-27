@@ -84,8 +84,9 @@ links so the focused entry is visible; `focus()` scrolls it into view.
 
 ### 3. Right and Left step into and out of a group
 Type: Behavior
-Status: planned
-Proof: same spec, examples 6 and 7, both layouts.
+Status: done
+Proof: `NotebookCatalogGroupKeyboard.spec.ts`, examples 6 and 7, both layouts;
+shared `notebookCatalogKeyboardTestSupport.ts` retains the mounted-page boundary.
 
 Behavior: a group header link is focused → Right → its first displayed member
 link is focused; a member link is focused → Left → its group header link is
@@ -230,3 +231,17 @@ fixtures and observing assertions before accepting the following mapping:
   or planning matches excluded. No affected consumer lacks proof.
 - Independent `refactor_vertical` review: none, already clean; no edits or
   invalidated proof. Active implementation about 5 minutes; no overrun.
+
+### Slice 3
+
+- Slice 2 delivered as `9e8a01a6e1184003b922a529b753c1c6c3748d95`, suffix base `8c5915bcbef51aa3cb6610542c15f00a8623a11f`, retained story-branch observer reused.
+- Fresh isolated `source_review_three` received only original source and returned individual commitments, qualifications, journeys and exclusions; source comparison agrees with the earlier mapping, with horizontal promises now applicable.
+- Trigger → expected → observation: header Right → first rendered member → `steps into a group…` observes Alpha; Beta Left → header → same journey observes header, then Down visits Alpha/Beta/outside; header Left/member Right/outside Left/Right stay. Filtered group Right reaches Beta in `enters the first currently displayed member after filtering`.
+- Empty/preview-limited header → existing group page and Right boundary → `keeps empty and preview-limited groups available…` observes exact group ids, empty header stays, preview enters first displayed member. Slice 2's retained vertical case visits only three of five displayed members and exact owned/member/subscribed notebook routes. No expand/collapse or custom Enter path exists.
+- Filter caret, clear/secondary/layout/sort controls → browser handling → boundary case keeps input keys unprevented and control focus unchanged for vertical/horizontal arrows. Default link focus supplies scrolling; retained whole-link rings and native route activation remain. Existing Tab order and scope exclusions remain unchanged by inspection.
+- `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookCatalogKeyboard.spec.ts tests/pages/NotebookCatalogFilter.spec.ts tests/pages/NotebookCatalogList.spec.ts tests/pages/NotebookCatalogSubscriptions.spec.ts tests/pages/NotebooksPage.spec.ts`: 36 passed across 5 files, document-attached real components with makeMe catalogs and list/grid localStorage setup.
+- `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit`: final implementation passed.
+- Consumer trace: `node .agents/skills/dough-execute-plan/scripts/consumer-trace.mjs --checkout /Users/terryyin/git/doughnut/.worktrees/open-notebooks-from-the-filter-with-the-keyboard --base 9e8a01a6e1184003b922a529b753c1c6c3748d95 --term handleCatalogKeydown --term catalogTargetSelector --term notebook-catalog-group --term data-notebook-catalog-target`. Group/header/row/card/page and catalog/view tests run; story fixture typechecked; route declarations, local targets collection, planning matches excluded. No affected consumer lacks proof. Active implementation about 3 minutes.
+- Independent `refactor_groups`: extracted complete handler into `components/notebook/notebookCatalogKeyboard.ts`, shared modifier/composition guard, split group spec with one browser harness to keep files below 250 lines. Coordinator inspected moved product/setup/assertions; behavior and named routes preserved.
+- Refactor proof: `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookCatalogKeyboard.spec.ts tests/pages/NotebookCatalogGroupKeyboard.spec.ts tests/pages/NotebookCatalogFilter.spec.ts tests/pages/NotebookCatalogList.spec.ts tests/pages/NotebookCatalogSubscriptions.spec.ts tests/pages/NotebooksPage.spec.ts tests/wiki-link-or-relationship/SearchDialog.spec.ts tests/notes/FolderSelector.spec.ts tests/toolbars/DonutMenu.search.spec.ts`: 59 passed in 9 files; both typechecks above passed, whitespace check passed. Moved group/vertical observations retain their setups; fresh shared-search proof covers the guard extraction; prior Circle/Bazaar markup proof remains valid.
+- Refactor consumer trace: same script/checkout/base with `--term handleInputListKeydown --term isVerticalListNavigationKey --term isUnmodifiedKeydown --term handleCatalogKeydown --term handleNotebookCatalogKeydown --term mountCatalog --term expectFocusedEntry --term setupCatalogKeyboardTest`. Catalog/page/search and moved tests run; story fixtures typechecked; layout storage reused; unchanged type/import/storage/route/planning and backend matches excluded. Active refactor about 4 minutes; no gaps or deferred proof.

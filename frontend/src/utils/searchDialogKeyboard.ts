@@ -14,14 +14,20 @@ export interface SearchDialogListKeydownOptions {
   when?: boolean
 }
 
-function isVerticalListNavigationKey(event: KeyboardEvent): boolean {
+export function isUnmodifiedKeydown(event: KeyboardEvent): boolean {
   return (
-    (event.key === "ArrowDown" || event.key === "ArrowUp") &&
     !event.isComposing &&
     !event.altKey &&
     !event.ctrlKey &&
     !event.metaKey &&
     !event.shiftKey
+  )
+}
+
+function isVerticalListNavigationKey(event: KeyboardEvent): boolean {
+  return (
+    (event.key === "ArrowDown" || event.key === "ArrowUp") &&
+    isUnmodifiedKeydown(event)
   )
 }
 

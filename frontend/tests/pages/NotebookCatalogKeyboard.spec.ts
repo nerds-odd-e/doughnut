@@ -1,48 +1,13 @@
-import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
-import NotebooksPageView from "@/pages/NotebooksPageView.vue"
-import helper from "@tests/helpers"
 import { dispatchArrowKey } from "@tests/helpers/searchDialogKeyboardTestSupport"
 import { fireEvent } from "@testing-library/vue"
-import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import { afterEach, beforeEach, describe, expect, it } from "vitest"
-import type { RouterLink } from "vue-router"
-import { clearNotebooksPageStorage } from "./notebooksPageTestSupport"
-
-let wrapper: VueWrapper
-
-async function mountCatalog(catalogItems: NotebookCatalogEntry[]) {
-  wrapper = helper
-    .component(NotebooksPageView)
-    .withProps({
-      catalogItems,
-      subscriptions: [],
-      user: makeMe.aUser.please(),
-    })
-    .withCurrentUser(makeMe.aUser.please())
-    .withRouter()
-    .mount({ attachTo: document.body })
-  await flushPromises()
-  return wrapper.get<HTMLInputElement>("#notebook-filter-input")
-}
-
-function expectFocusedEntry(title: string) {
-  const heading = wrapper
-    .findAll("h3, h5")
-    .find((heading) => heading.text() === title)!
-  const link = heading.element.closest("a")!
-  expect(document.activeElement).toBe(link)
-  return wrapper.findComponent<typeof RouterLink>(
-    `a[to='${link.getAttribute("to")}']`
-  )
-}
+import { describe, expect, it } from "vitest"
+import { setupCatalogKeyboardTest } from "./notebookCatalogKeyboardTestSupport"
 
 describe.each(["list", "grid"])("catalog keyboard in %s layout", (layout) => {
-  beforeEach(() => {
-    clearNotebooksPageStorage()
-    localStorage.setItem("donut.notebooksPage.layout", layout)
-  })
-  afterEach(() => wrapper?.unmount())
+  const catalog = setupCatalogKeyboardTest(layout)
+  const { mountCatalog, expectFocusedEntry } = catalog
 
   it("walks the displayed links, including group previews and subscriptions, without wrapping", async () => {
     const ownedNotebook = makeMe.aNotebook.title("A Owned").please()
@@ -129,7 +94,8 @@ describe.each(["list", "grid"])("catalog keyboard in %s layout", (layout) => {
     input.element.focus()
     await input.setValue("")
     await fireEvent.click(
-      wrapper.get('[data-testid="notebook-catalog-sort"] summary').element
+      catalog.wrapper.get('[data-testid="notebook-catalog-sort"] summary')
+        .element
     )
     await flushPromises()
     await fireEvent.click(
@@ -165,14 +131,17 @@ describe.each(["list", "grid"])("catalog keyboard in %s layout", (layout) => {
     }
     await input.setValue("a")
     const controls = [
-      wrapper.get<HTMLElement>('[aria-label="Clear filter"]').element,
-      wrapper.get<HTMLElement>('[aria-label="Notebook actions"]').element,
-      wrapper.get<HTMLElement>('[aria-label="Grid view"]').element,
-      wrapper.get<HTMLElement>('[aria-label="Sort notebooks"]').element,
+      catalog.wrapper.get<HTMLElement>('[aria-label="Clear filter"]').element,
+      catalog.wrapper.get<HTMLElement>('[aria-label="Notebook actions"]')
+        .element,
+      catalog.wrapper.get<HTMLElement>('[aria-label="Grid view"]').element,
+      catalog.wrapper.get<HTMLElement>('[aria-label="Sort notebooks"]').element,
     ]
     for (const control of controls) {
       control.focus()
       dispatchArrowKey("ArrowDown")
+      await fireEvent.keyDown(control, { key: "ArrowLeft" })
+      await fireEvent.keyDown(control, { key: "ArrowRight" })
       expect(document.activeElement).toBe(control)
     }
   })

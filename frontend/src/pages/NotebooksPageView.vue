@@ -159,7 +159,7 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import PeerSortDropdownMenu from "@/components/commons/PeerSortDropdownMenu.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { handleInputListKeydown } from "@/utils/searchDialogKeyboard"
+import { handleNotebookCatalogKeydown } from "@/components/notebook/notebookCatalogKeyboard"
 
 const props = defineProps({
   // Undefined while the catalog loads.
@@ -200,17 +200,12 @@ function selectCatalogPeerSort(spec: PeerSortSpec, closeDropdown: () => void) {
 const filterText = ref("")
 const filterInputRef = ref<HTMLInputElement | null>(null)
 const catalogSectionRef = ref<HTMLElement | null>(null)
-
-function handleCatalogKeydown(event: KeyboardEvent) {
-  handleInputListKeydown(event, {
-    input: filterInputRef.value,
-    targets: Array.from(
-      catalogSectionRef.value?.querySelectorAll<HTMLElement>(
-        "[data-notebook-catalog-target]"
-      ) ?? []
-    ),
-  })
-}
+const handleCatalogKeydown = (event: KeyboardEvent) =>
+  handleNotebookCatalogKeydown(
+    event,
+    catalogSectionRef.value,
+    filterInputRef.value
+  )
 
 const filteredCatalogItems = computed(() =>
   sortNotebookCatalogByPeerSpec(
