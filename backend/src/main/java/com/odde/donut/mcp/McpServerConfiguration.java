@@ -1,8 +1,7 @@
 package com.odde.donut.mcp;
 
+import com.odde.donut.configs.ApiBearerAuthenticationFilter;
 import com.odde.donut.entities.User;
-import com.odde.donut.oauth.AssistantOAuthEndpoints;
-import com.odde.donut.services.UserService;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpStatelessServerHandler;
@@ -13,10 +12,8 @@ import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpStatelessServerTransport;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.web.context.request.RequestContextHolder;
 import reactor.core.publisher.Mono;
 
@@ -70,23 +67,12 @@ public class McpServerConfiguration {
         .build();
   }
 
-  @Bean
-  FilterRegistrationBean<McpTokenAuthenticationFilter> mcpTokenAuthenticationFilterRegistration(
-      UserService userService, AssistantOAuthEndpoints endpoints) {
-    FilterRegistrationBean<McpTokenAuthenticationFilter> registration =
-        new FilterRegistrationBean<>(new McpTokenAuthenticationFilter(userService, endpoints));
-    registration.addUrlPatterns(MCP_ENDPOINT);
-    registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 20);
-    registration.setName("donutMcpTokenAuthenticationFilter");
-    return registration;
-  }
-
   private McpTransportContext extractTransportContext(HttpServletRequest request) {
     if (RequestContextHolder.getRequestAttributes() == null) {
       throw new IllegalStateException("Spring request context must be bound for MCP");
     }
     User user =
-        (User) request.getAttribute(McpTokenAuthenticationFilter.AUTHENTICATED_USER_ATTRIBUTE);
+        (User) request.getAttribute(ApiBearerAuthenticationFilter.AUTHENTICATED_USER_ATTRIBUTE);
     return McpTransportContext.create(Map.of(TRANSPORT_USER_KEY, user));
   }
 

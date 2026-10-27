@@ -4,27 +4,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
-import org.springframework.test.web.servlet.ResultActions;
 
-class AssistantCodeExchangeTest extends AssistantConsentTestSupport {
-  private static final String VERIFIER = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG";
-  private static final String CHALLENGE = "fR4ifSAEy-7Mu6g7FHZulPKrtjqdAnUCwRFAJt2JFsA";
+class AssistantCodeExchangeTest extends AssistantAuthorizationTestSupport {
 
   @Test
   void exchangedCredentialsRetainTheConsentingAccountClientScopeAndResource() throws Exception {
@@ -111,42 +104,5 @@ class AssistantCodeExchangeTest extends AssistantConsentTestSupport {
         .andExpect(jsonPath("$.error").value("invalid_grant"))
         .andExpect(jsonPath("$.access_token").doesNotExist())
         .andExpect(jsonPath("$.refresh_token").doesNotExist());
-  }
-
-  private String approvedCode() throws Exception {
-    String state = begin(Map.of("code_challenge", CHALLENGE));
-    var context = context(state, "test-assistant").andReturn();
-    var body = objectMapper.readTree(context.getResponse().getContentAsString());
-    return query(decide(state, context, body, true).getResponse().getRedirectedUrl(), "code");
-  }
-
-  private ResultActions exchange(String code, Map<String, String> overrides, String secret)
-      throws Exception {
-    return exchange(code, overrides, "test-assistant", secret);
-  }
-
-  private ResultActions exchange(
-      String code, Map<String, String> overrides, String clientId, String secret) throws Exception {
-    var fields =
-        new HashMap<>(
-            Map.of(
-                "grant_type",
-                "authorization_code",
-                "code",
-                code,
-                "redirect_uri",
-                "https://assistant.example/callback",
-                "code_verifier",
-                VERIFIER,
-                "resource",
-                endpoints.resource()));
-    fields.putAll(overrides);
-    var request =
-        post(AssistantOAuthEndpoints.TOKEN)
-            .header(
-                HttpHeaders.AUTHORIZATION,
-                "Basic " + HttpHeaders.encodeBasicAuth(clientId, secret, StandardCharsets.UTF_8));
-    fields.forEach(request::param);
-    return mockMvc.perform(request);
   }
 }

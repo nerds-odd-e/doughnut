@@ -19,6 +19,7 @@ Published on the execution branch: slice 1 `f0390693df002168b2ce6a81f038bcb5f909
 Slice 4 published `84e2b4eda9562369af774636edb490d2d1bdeb12`; slice 5 published `20d28229aabc6a4747cb8e1a39f433f170a71dad` on that branch.
 Slice 6 published `4df752991fbb75653481bbf9a24471e1953c3146`; slice 7 published `0fb9548eb93b320b71f3e02eb9be06e86b4c444d`.
 Slice 8 published `890d5be26955d8d2ab456d6ad0de7f0015622709`.
+Slice 9 published `47add57de8a497e44734cf4a462735079cf65d66`.
 Slice 2's SHA is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's
@@ -143,12 +144,13 @@ Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#9-exchange-a-code-for
 
 ### 10. Read MCP knowledge under the delegated permission
 Type: Behavior
-Status: planned
+Status: done
 Proof: Interleaved two-user OAuth SDK calls to all tools; current/foreign-note permissions and general mutation/token-creation refusals.
 
 Accept active OAuth reference tokens for the correct resource/read scope, resolving existing user/knowledge operations.
 Search/read/graph retain current notebook permissions and accepted attribution. Expired/revoked/wrong-resource tokens cannot fall through to sessions; OAuth cannot authorize non-MCP mutation/personal tokens even with cookies.
 Retain ordinary sessions/personal tokens. Sizing: 6–10 minutes plus full backend/MCP proof.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#10-read-mcp-knowledge-under-the-delegated-permission).
 
 ### 11. Renew access without enlarging permission
 Type: Behavior
@@ -219,3 +221,13 @@ Disposition: proved by slice 4: TestabilityDbResetTest.resetRestoresConfiguredCl
 Reported: slice 3 — "E2E typecheck remains at 236 diagnostics. Comparing the changed fixture import/compiler option against baseline found zero new diagnostics; this does not constitute a whole-checkout baseline."
 Story clause: "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client."
 Disposition: no user cost "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client.": The optional whole-E2E static check is not claimed green. Changed TS import/options add no diagnostics in the bounded comparison; the changed JS setup/environment/cleanup paths pass their public runtime suites. Actual SDK discovery and the complete linking journey retain slices 5 and 14 as proof owners.
+
+### G3. Observe credential scope independently of grant scope
+Reported: slice 10 — "Acceptance found the scope refusal changes the stored grant scope while the access credential itself still has notes:read; token-scope refusal needs a distinct observation."
+Story clause: "A credential for a different resource or without the read scope is refused;"
+Disposition: proved by slice 10: AssistantMcpAccessTest.invalidDelegationCannotUseAnAccompanyingBrowserSession(token-scope) persists an otherwise-valid grant/token binding with access scope notes:write and observes MCP401 despite its live cookie; the distinct current-grant-scope refusal remains. Full backend63211 passed2943/0failures/0errors.
+
+### G4. Bearer scheme casing must preserve credential authority
+Reported: slice 10 — "Final reading found lowercase/mixed-case OAuth bearer could fall through to cookies on general APIs; valid MCP bearer schemes must also authenticate case-insensitively under RFC 9110 section 11.1."
+Story clause: "the assistant credential cannot be used to create a personal token or edit a note, including when a browser session accompanies the request."
+Disposition: proved by slice 10: ApiBearerAuthenticationFilter detects bearer schemes case-insensitively before session/direct-Principal controllers; AssistantMcpAccessTest observes lowercase/mixed-case MCP read success as the consenting account and corresponding OAuth+cookie general-API personal-token-creation401. Actual SDK content PATCH401 and unchanged owner read cover the mutation continuation. Full backend63211 passed2943/0failures/0errors; standard-Bearer SDK5642 boundary is unchanged.

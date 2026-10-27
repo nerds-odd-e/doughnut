@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.JsonNode;
 
-class AssistantConsentTest extends AssistantConsentTestSupport {
+class AssistantConsentTest extends AssistantAuthorizationTestSupport {
   @Test
   void contextComesFromThePendingGrantAndAllowPersistsTheSamePermission() throws Exception {
     String state = begin(Map.of());

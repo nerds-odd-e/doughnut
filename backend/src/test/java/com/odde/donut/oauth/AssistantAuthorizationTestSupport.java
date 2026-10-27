@@ -28,7 +28,9 @@ import org.springframework.web.util.UriUtils;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-abstract class AssistantConsentTestSupport extends SpringTestBase {
+abstract class AssistantAuthorizationTestSupport extends SpringTestBase {
+  private static final String VERIFIER = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG";
+  private static final String CHALLENGE = "fR4ifSAEy-7Mu6g7FHZulPKrtjqdAnUCwRFAJt2JFsA";
   @Autowired MockMvc mockMvc;
   @Autowired AssistantOAuthEndpoints endpoints;
   @Autowired ObjectMapper objectMapper;
@@ -127,5 +129,42 @@ abstract class AssistantConsentTestSupport extends SpringTestBase {
             .param(body.get("csrfParameterName").asString(), body.get("csrfToken").asString());
     if (allow) form.param("scope", "notes:read");
     return mockMvc.perform(form).andExpect(status().isFound()).andReturn();
+  }
+
+  protected String approvedCode() throws Exception {
+    String state = begin(Map.of("code_challenge", CHALLENGE));
+    var context = context(state, "test-assistant").andReturn();
+    var body = objectMapper.readTree(context.getResponse().getContentAsString());
+    return query(decide(state, context, body, true).getResponse().getRedirectedUrl(), "code");
+  }
+
+  protected ResultActions exchange(String code, Map<String, String> overrides, String secret)
+      throws Exception {
+    return exchange(code, overrides, "test-assistant", secret);
+  }
+
+  protected ResultActions exchange(
+      String code, Map<String, String> overrides, String clientId, String secret) throws Exception {
+    var fields =
+        new HashMap<>(
+            Map.of(
+                "grant_type",
+                "authorization_code",
+                "code",
+                code,
+                "redirect_uri",
+                "https://assistant.example/callback",
+                "code_verifier",
+                VERIFIER,
+                "resource",
+                endpoints.resource()));
+    fields.putAll(overrides);
+    var request =
+        post(AssistantOAuthEndpoints.TOKEN)
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Basic " + HttpHeaders.encodeBasicAuth(clientId, secret, StandardCharsets.UTF_8));
+    fields.forEach(request::param);
+    return mockMvc.perform(request);
   }
 }
