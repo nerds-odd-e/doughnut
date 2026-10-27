@@ -83,8 +83,9 @@ every cited journey. Verify the selected story's decisive premises when refining
 - Retrieved content is evidence, distinct from application instructions.
   Search, expansion, citations, and later reads respect the viewer's access.
 - Bulk ingestion, embeddings, a universal review inbox, automatic knowledge
-  rewrites, skill factories, and remote MCP hosting are deferred promises.
-  These deferrals do not prescribe runtime rejection of naturally supported behavior.
+  rewrites and skill factories are deferred promises. These deferrals do not
+  prescribe runtime rejection of naturally supported behavior. Direct MCP and
+  ChatGPT access follows [SEED-002](SEED-002-host-mcp-over-https.md).
 
 ## Story Decomposition
 
