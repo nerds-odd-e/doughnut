@@ -245,7 +245,7 @@ Learnings:
 
 ### 5. Use the complete knowledge journey over HTTPS
 Type: Behavior
-Status: planned
+Status: done
 Proof: Migrated `e2e_test/features/mcp/mcp_services.feature` using a real
 TypeScript SDK Streamable HTTP client over verified TLS, the owning E2E origin,
 and real issued tokens; new discovery and user-isolation observations.
@@ -265,6 +265,24 @@ of TLS/protocol interoperability stops retirement. Do not count an HTTP-only
 pass, mocked tool response, or health check as this slice's acceptance.
 Interim: the local package remains supported until slice 6; the duplicated
 transport is temporary and is removed there.
+
+Accepted proof (reuse):
+- `CURSOR_DEV=true nix develop -c env SUT_TIMEOUT_MS=240000 pnpm cy:run --spec
+  e2e_test/features/mcp/mcp_services.feature` — 9 passing (discovery, search×3,
+  multi-candidate, equal-title disambiguation, graph budgets×2, read/revision,
+  two-token isolation). After harness refactor: TLS unit
+  `tsx --test e2e_test/support/mcp_tls_proxy.test.ts` — 1 pass (reuse full
+  feature; journey not invalidated).
+- `@mcpIsolationProof` migrated in feature/steps; ordinary selection still
+  excludes the paired run (same as preparation).
+
+Learnings:
+- Test TLS proxy (`mcp_tls_proxy` + material) forwards to isolated HTTP origin;
+  client uses CA-trusted fetch with `rejectUnauthorized: true`.
+- Process-exit stdio fixture/tests deleted; isolation asserts HTTPS MCP URL +
+  forward origin. `bundleMcpServer` remains until slice 6.
+- Shared `NOTE_CONTEXT_MCP_TOOLS` / `MCP_HTTP_PATH`; task renamed
+  `disconnectMcp`.
 
 ### 6. Configure the supported HTTPS connection
 Type: Behavior

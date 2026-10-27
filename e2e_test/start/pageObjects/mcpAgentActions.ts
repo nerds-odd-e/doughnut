@@ -1,4 +1,5 @@
 import { e2eAppBaseUrl } from '../../support/e2eAppUrl'
+import { NOTE_CONTEXT_MCP_TOOLS } from '../../support/mcp_note_context_tools'
 
 interface ApiResponse {
   content: Array<{
@@ -41,12 +42,47 @@ const getReadRevision = () =>
 export const mcpAgentActions = () => {
   return {
     connect() {
-      cy.task('disconnectMcpServer')
+      cy.task('disconnectMcp')
       cy.get('@savedAccessToken').then((accessToken) => {
-        cy.task('spawnAndConnectMcpServer', {
+        cy.task('connectMcpHttps', {
           baseUrl: e2eAppBaseUrl(),
           accessToken,
         })
+      })
+      return this
+    },
+
+    expectDiscoveredNoteContextTools() {
+      cy.task<{ tools: string[] | null }>('mcpClientConnectionInfo').then(
+        (info) => {
+          expect(
+            info.tools,
+            'MCP tools discovered over verified HTTPS'
+          ).to.include.members([...NOTE_CONTEXT_MCP_TOOLS])
+        }
+      )
+      return this
+    },
+
+    expectEqualTitleCandidatesDisambiguated() {
+      getResponseText('@MCPApiResponse').then((responseText) => {
+        const candidates = JSON.parse(responseText) as Array<{
+          title: string
+          notebookName: string
+          folderName?: string
+        }>
+        expect(candidates, 'equal-title candidate count').to.have.length(2)
+        expect(candidates.map((c) => c.title)).to.deep.equal([
+          'Functional',
+          'Functional',
+        ])
+        const byNotebook = Object.fromEntries(
+          candidates.map((c) => [c.notebookName, c])
+        )
+        expect(byNotebook['CS concepts']?.folderName).to.equal(
+          'Programming Concepts'
+        )
+        expect(byNotebook.Maths?.folderName).to.equal(undefined)
       })
       return this
     },

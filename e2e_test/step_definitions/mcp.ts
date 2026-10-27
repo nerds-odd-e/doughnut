@@ -3,6 +3,7 @@ import {
   WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY,
   WORKTREE_RESET_ISOLATION_TASK_TIMEOUT_MS,
 } from '../../scripts/worktree-isolation-constants.mjs'
+import { MCP_HTTP_PATH } from '../support/mcp_note_context_tools'
 import start from '../start'
 
 type McpIsolationProof = {
@@ -12,13 +13,9 @@ type McpIsolationProof = {
 }
 
 type McpConnectionInfo = {
-  pid: number | null
-  baseUrl: string | null
-}
-
-type McpDisconnectResult = {
-  pid: number | null
-  exited: boolean
+  mcpUrl: string | null
+  forwardOrigin: string | null
+  tools: string[] | null
 }
 
 function requireMcpIsolationProof() {
@@ -63,14 +60,18 @@ Given(
   }
 )
 
-Then("the MCP client used this checkout's isolated origin", () => {
+Then("the MCP client used this checkout's isolated HTTPS MCP endpoint", () => {
   expect(
     Boolean(Cypress.expose(WORKTREE_BROWSER_ISOLATION_EXPOSE_KEY)),
     'worktree browser isolation must be active'
   ).to.equal(true)
   cy.task<McpConnectionInfo>('mcpClientConnectionInfo').then((info) => {
     const origin = Cypress.config('baseUrl')
-    expect(info.baseUrl, 'MCP client baseUrl').to.equal(origin)
+    expect(info.forwardOrigin, 'MCP TLS forward origin').to.equal(origin)
+    expect(info.mcpUrl, 'MCP HTTPS URL').to.match(/^https:\/\/127\.0\.0\.1:\d+/)
+    expect(new URL(info.mcpUrl!).pathname, 'MCP HTTPS path').to.equal(
+      MCP_HTTP_PATH
+    )
     expect(origin, 'isolated Cypress origin').to.match(
       /^http:\/\/127\.0\.0\.1:\d+$/
     )
@@ -117,18 +118,19 @@ When("AI agent searches for the other worktree's MCP isolation marker", () => {
 })
 
 When('the MCP client disconnects', () => {
-  cy.task<McpDisconnectResult>('disconnectMcpServer').as('mcpDisconnectResult')
+  cy.task('disconnectMcp')
 })
 
-Then('the spawned MCP server process has exited', () => {
-  cy.get<McpDisconnectResult>('@mcpDisconnectResult').then((result) => {
-    expect(result.pid, 'spawned MCP server pid').to.be.a('number')
-    expect(
-      result.exited,
-      `MCP server pid ${result.pid} should have exited`
-    ).to.equal(true)
-  })
+Then('the MCP client has discovered the note context tools', () => {
+  start.mcpAgentActions().expectDiscoveredNoteContextTools()
 })
+
+Then(
+  'equal-title note candidates are disambiguated by notebook and folder',
+  () => {
+    start.mcpAgentActions().expectEqualTitleCandidatesDisambiguated()
+  }
+)
 
 When('AI agent calls the {string} MCP tool', (apiName: string) => {
   start.mcpAgentActions().callTool(apiName)

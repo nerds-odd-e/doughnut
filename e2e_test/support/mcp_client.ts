@@ -1,38 +1,34 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
-import path from 'path'
-import fs from 'fs'
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+import { startMcpTlsProxy, type McpTlsProxy } from './mcp_tls_proxy'
+import { MCP_HTTP_PATH, NOTE_CONTEXT_MCP_TOOLS } from './mcp_note_context_tools'
 import { E2E_APP_BASE_URL } from '../config/constants'
 
-function processExists(pid: number) {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch {
-    return false
-  }
-}
-
 class McpClient {
-  client: Client | null = null
-  transport: StdioClientTransport | null = null
-  lastPid: number | null = null
-  lastBaseUrl: string | null = null
+  private client: Client | null = null
+  private transport: StreamableHTTPClientTransport | null = null
+  private tlsProxy: McpTlsProxy | null = null
+  private lastMcpUrl: string | null = null
+  private lastForwardOrigin: string | null = null
+  private lastDiscoveredTools: string[] | null = null
 
-  async spawnAndConnectMcpServer({
+  async connectMcpHttps({
     baseUrl,
     accessToken,
-    args,
   }: {
     baseUrl: string
     accessToken: string
-    args?: string[]
   }) {
     if (this.client !== null) {
       throw new Error(
         'MCP client is already connected. Please disconnect the previous client before connecting a new one.'
       )
     }
+    const forwardOrigin =
+      baseUrl && baseUrl !== 'undefined' ? baseUrl : E2E_APP_BASE_URL
+    this.tlsProxy = await startMcpTlsProxy(forwardOrigin)
+    const mcpUrl = `${this.tlsProxy.httpsOrigin}${MCP_HTTP_PATH}`
+
     this.client = new Client(
       {
         name: 'donut-mcp-client',
@@ -42,47 +38,32 @@ class McpClient {
         capabilities: {},
       }
     )
-
-    // Resolve local MCP server bundle built under mcp-server/dist relative to repo root
-    const repoRoot = path.resolve(__dirname, '..', '..')
-    const bundlePath = path.join(
-      repoRoot,
-      'mcp-server',
-      'dist',
-      'mcp-server.bundle.mjs'
-    )
-    const mcpServerNodeModules = path.join(
-      repoRoot,
-      'mcp-server',
-      'node_modules'
-    )
-    const serverArgs = args ?? [bundlePath]
-    if (args === undefined && !fs.existsSync(bundlePath)) {
-      throw new Error(
-        `MCP server bundle not found at ${bundlePath}. Please build it first: \n  CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle`
-      )
-    }
-    // Set NODE_PATH so external packages (like @modelcontextprotocol/sdk and express) can be resolved
-    const nodePath = process.env.NODE_PATH
-      ? `${process.env.NODE_PATH}:${mcpServerNodeModules}`
-      : mcpServerNodeModules
-    const apiBaseUrl =
-      baseUrl && baseUrl !== 'undefined' ? baseUrl : E2E_APP_BASE_URL
-    this.transport = new StdioClientTransport({
-      command: process.execPath,
-      args: serverArgs,
-      env: {
-        ...process.env,
-        NODE_PATH: nodePath,
-        DONUT_API_BASE_URL: apiBaseUrl,
-        DONUT_API_AUTH_TOKEN: accessToken,
+    this.transport = new StreamableHTTPClientTransport(new URL(mcpUrl), {
+      requestInit: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       },
+      fetch: this.tlsProxy.trustedFetch,
     })
     await this.client.connect(this.transport)
-    ;(this.client as { _connected?: boolean })._connected = true
-    this.lastPid = this.transport.pid ?? null
-    this.lastBaseUrl = apiBaseUrl
-    return { pid: this.lastPid, baseUrl: this.lastBaseUrl }
+    const listed = await this.client.listTools()
+    const toolNames = listed.tools.map((tool) => tool.name)
+    for (const required of NOTE_CONTEXT_MCP_TOOLS) {
+      if (!toolNames.includes(required)) {
+        throw new Error(
+          `MCP tools/list missing ${required}; discovered: ${toolNames.join(', ') || '(none)'}`
+        )
+      }
+    }
+    this.lastMcpUrl = mcpUrl
+    this.lastForwardOrigin = forwardOrigin
+    this.lastDiscoveredTools = toolNames
+    return {
+      mcpUrl: this.lastMcpUrl,
+      forwardOrigin: this.lastForwardOrigin,
+      tools: this.lastDiscoveredTools,
+    }
   }
 
   async callMcpToolWithParams({
@@ -90,28 +71,35 @@ class McpClient {
     params,
   }: {
     apiName: string
-    params: Record<string, any>
+    params: Record<string, unknown>
   }) {
     if (!this.client) throw new Error('MCP client is not connected')
-    const result = await this.client.callTool({
+    return await this.client.callTool({
       name: apiName,
       arguments: params,
     })
-    return result
   }
 
   connectionInfo() {
-    return { pid: this.lastPid, baseUrl: this.lastBaseUrl }
+    return {
+      mcpUrl: this.lastMcpUrl,
+      forwardOrigin: this.lastForwardOrigin,
+      tools: this.lastDiscoveredTools,
+    }
   }
 
-  async disconnectMcpServer() {
-    const pid = this.transport?.pid ?? this.lastPid
-    await this.client?.close()
-    this.client = null
-    this.transport = null
-    const exited =
-      pid === null || pid === undefined ? true : !processExists(pid)
-    return { pid: pid ?? null, exited }
+  async disconnectMcp() {
+    try {
+      await this.client?.close()
+    } finally {
+      this.client = null
+      this.transport = null
+      const proxy = this.tlsProxy
+      this.tlsProxy = null
+      if (proxy) {
+        await proxy.close()
+      }
+    }
   }
 }
 

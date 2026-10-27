@@ -126,13 +126,12 @@ After({ tags: '@disableOpenAiService' }, () => {
 // as expected.
 // When a test fail, the After hook is not called.
 // So we need to call the task in the Before hook as well.
-Before({ tags: '@BundleFirstAndTerminateMCPServerWhenTeardown' }, () => {
-  cy.task('bundleMcpServer')
-  cy.task('disconnectMcpServer')
+Before({ tags: '@ConnectAndDisconnectHttpsMcpWhenTeardown' }, () => {
+  cy.task('disconnectMcp')
 })
 
-After({ tags: '@BundleFirstAndTerminateMCPServerWhenTeardown' }, () => {
-  cy.task('disconnectMcpServer')
+After({ tags: '@ConnectAndDisconnectHttpsMcpWhenTeardown' }, () => {
+  cy.task('disconnectMcp')
 })
 
 Before({ tags: '@bundleCliE2eInstall' }, () =>
