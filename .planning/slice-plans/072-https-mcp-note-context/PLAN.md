@@ -147,7 +147,7 @@ Learnings:
 
 ### 2. Find accessible note candidates
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP search calls using real search/permission fixtures, including alias,
 subscription, equal-title disambiguation, empty search, and two-token isolation;
 all backend tests.
@@ -161,6 +161,23 @@ current local client journey green during this additive step.
 Sizing: ~5 minutes of adapter work plus required backend verification. Reuse
 existing data builders; do not create a parallel search algorithm or suite for
 internal mapping helpers.
+
+Accepted proof (reuse):
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — 2890 tests, 0
+  failures, 2 skipped. After refactor split, focused
+  `McpEndpointTest` + `ListNoteCandidatesMcpEndpointTest` — 15 tests, 0 failures.
+- Observations: tools/list exposes `list_note_candidates`; alias match;
+  subscribed notebook; equal-title notebook/folder disambiguation; empty
+  signal `ListNoteCandidatesTool.EMPTY_SEARCH_SIGNAL`; interleaved two-token
+  isolation with poisoned `CurrentUser` (no foreign private candidate).
+- Local stdio: `pnpm mcp-server:test` — 18 passed (additive; package not retired).
+
+Learnings:
+- Cross-thread MockMvc cannot see `@Transactional` test token rows (401);
+  interleaved same-thread HTTP calls satisfy the plan's parallel-or-interleaved
+  isolation requirement.
+- SwaggerConfig inserts `/api/mcp` path-first so OpenAPI path order stays
+  deterministic versus committed YAML.
 
 ### 3. Read a selected note with its accepted revision
 Type: Behavior

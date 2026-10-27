@@ -40,7 +40,9 @@ public class McpServerConfiguration {
   }
 
   @Bean
-  McpStatelessSyncServer mcpStatelessSyncServer(HttpServletStatelessServerTransport transport) {
+  McpStatelessSyncServer mcpStatelessSyncServer(
+      HttpServletStatelessServerTransport transport,
+      ListNoteCandidatesTool listNoteCandidatesTool) {
     McpStatelessServerTransport handlerIntercept =
         new McpStatelessServerTransport() {
           @Override
@@ -57,6 +59,7 @@ public class McpServerConfiguration {
     return McpServer.sync(handlerIntercept)
         .serverInfo("donut", "1.0.0")
         .capabilities(McpSchema.ServerCapabilities.builder().tools(true).build())
+        .tools(listNoteCandidatesTool.specification())
         .immediateExecution(true)
         .build();
   }

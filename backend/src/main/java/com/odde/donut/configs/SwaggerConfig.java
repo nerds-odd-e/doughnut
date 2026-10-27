@@ -3,6 +3,7 @@ package com.odde.donut.configs;
 import com.odde.donut.mcp.McpServerConfiguration;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Discriminator;
 import io.swagger.v3.oas.models.media.MediaType;
@@ -108,7 +109,17 @@ public class SwaggerConfig {
                             .description("Missing, invalid, or withdrawn personal token"))
                     .addApiResponse("403", new ApiResponse().description("Invalid Origin header")));
 
-    openApi.path(McpServerConfiguration.MCP_ENDPOINT, new PathItem().post(post));
+    // Keep /api/mcp first so OpenAPI path order stays stable across regenerations.
+    Paths existing = openApi.getPaths() != null ? openApi.getPaths() : new Paths();
+    Paths ordered = new Paths();
+    ordered.addPathItem(McpServerConfiguration.MCP_ENDPOINT, new PathItem().post(post));
+    existing.forEach(
+        (path, item) -> {
+          if (!McpServerConfiguration.MCP_ENDPOINT.equals(path)) {
+            ordered.addPathItem(path, item);
+          }
+        });
+    openApi.setPaths(ordered);
   }
 
   /**
