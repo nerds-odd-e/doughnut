@@ -23,16 +23,16 @@ const namedLocation = (name: string, params: RouteParams = {}) => ({
 })
 
 const router = () => {
+  const visitHref = (href: string) => {
+    cy.wrap('yes').as('firstVisited')
+    return cy.visit(href)
+  }
+
   const visitNamed = (
     name: string,
     params: RouteParams = {},
     query?: RouteQuery
-  ) => {
-    cy.wrap('yes').as('firstVisited')
-    return cy.visit(
-      namedLocationHref({ ...namedLocation(name, params), query })
-    )
-  }
+  ) => visitHref(namedLocationHref({ ...namedLocation(name, params), query }))
 
   const whenAppIsOpen = (whenOpen: () => unknown, whenNotOpen: () => unknown) =>
     cy
@@ -81,6 +81,7 @@ const router = () => {
     openApp,
     push,
     reloadOpenApp,
+    visitAuthorization: visitHref,
     visitNamed,
   }
 }

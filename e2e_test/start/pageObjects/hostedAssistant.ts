@@ -16,7 +16,7 @@ export const hostedAssistant = () => ({
         expect(authorize.searchParams.get('code_challenge_method')).to.equal(
           'S256'
         )
-        cy.visit(authorizationUrl)
+        router().visitAuthorization(authorizationUrl)
         cy.get('a[href="/oauth2/authorization/github"]').click()
         cy.location('pathname').should('equal', '/assistant-consent')
         waitUntilAppIsNotBusy()
@@ -143,7 +143,7 @@ export const hostedAssistant = () => ({
   reconnect() {
     cy.task<{ authorizationUrl: string }>('assistantBegin').then(
       ({ authorizationUrl }) => {
-        cy.visit(authorizationUrl)
+        router().visitAuthorization(authorizationUrl)
       }
     )
     waitUntilAppIsNotBusy()
@@ -161,8 +161,8 @@ export const hostedAssistant = () => ({
     cy.contains('automatic renewal until you withdraw permission').should(
       'be.visible'
     )
-    cy.findByRole('button', { name: 'Allow', exact: true }).should('be.visible')
-    cy.findByRole('button', { name: 'Deny', exact: true }).should('be.visible')
+    cy.findByRole('button', { name: 'Allow' }).should('be.visible')
+    cy.findByRole('button', { name: 'Deny' }).should('be.visible')
     return this
   },
 })

@@ -10,7 +10,7 @@
 Agent: Yua-chan; publisher: `dashboard-territory.local-doughnut`.
 The preparation checkout is the owned execution checkout, branch `codex/link-an-assistant-to-donut-through-github-sign-i`, Story Branch Mode. Integration/default checkout: `/Users/terryyin/git/doughnut`; remote: `origin`; eventual target: `main`. Ordinary increments publish the execution branch.
 Starting revision: `83615a792fe3aa3107badb07d883a70398d75127`; startup claim `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` was confirmed on remote main/execution branch.
-Most recent validated increment: 18 `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3`; [publication history](PUBLICATION-EVIDENCE.md).
+Implementation 18 `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3`; completion `33454cf0d682c918f1f8f6761b2c2784feb516d0`; [publication history](PUBLICATION-EVIDENCE.md) and [CI recovery](HOSTED-SDK-EVIDENCE.md#ci-navigation-gate-repair).
 Slice 2 `d488c64dbc69a00c51f2cc9237f71ae9fda016a1` is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's current dependency fingerprint. `CURSOR_DEV=true nix develop -c pnpm validate:path-routing` passed 11 backend probes/five static paths; this establishes command readiness only. No live GitHub observation, production deployment, real-account authorization or paid call occurred.
@@ -137,14 +137,11 @@ Proof: [execution evidence](EXECUTION-EVIDENCE.md#17-complete-hosted-sdk-authori
 ### 18. Connect through the documented OAuth journey
 Type: Behavior
 Status: done
-Proof: Permanent isolated assistant_account_linking.feature uses the real hosted SDK client through discovery → GitHub/informed consent → exchange → attributed search/read/bounded graph → expiry/automatic renewal → Settings withdrawal/reconnection.
-
-Extend fixture17's initial feature using accepted state/callback, isolation, constraint/race/restart proof; require actual SDK credential replacement before retry and no ordinary-call browser login. Run the complete feature and existing mcp_services.feature over verified TLS. Document client registration/encoded server secrets, canonical issuer/resource/exact callback, default finite lifetimes/rotation, existing GitHub reuse, consent/withdrawal/reconnect, schema-first release and narrow discovery ADR exception; retain personal-token instructions. ChatGPT remains story3. No real-client activation/deployment authority. Sizing: 5–10 minutes source plus mandatory E2E cold proof; stop/refine incompatible client or source overrun.
-Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#18-connect-through-the-documented-oauth-journey).
+Proof: [execution evidence](EXECUTION-EVIDENCE.md#18-connect-through-the-documented-oauth-journey); full original brief and subsequent CI navigation repair in [hosted SDK evidence](HOSTED-SDK-EVIDENCE.md#ci-navigation-gate-repair).
 
 ## Execution complete
 
-Product advice: no change. The amended existing-user assistant lifecycle is delivered; keep ChatGPT onboarding in the existing SEED-002#story-3. No correction plan or new product priority is recommended. Aggregate review covers the attributable publication set, current whole-product identity/permission/content boundaries and retained tests; CI remains unobserved pending the completion operation.
+Product advice: no change. The amended existing-user assistant lifecycle is delivered; keep ChatGPT onboarding in the existing SEED-002#story-3. No correction plan or new product priority is recommended. Aggregate review covers the attributable publication set, current whole-product identity/permission/content boundaries and retained tests. The developer authorized one fresh CI observer after the original missing-registration handoff; its owned navigation-gate failure is repaired locally and CI completion remains required.
 
 ## Consumer trace and verification
 
@@ -245,3 +242,8 @@ Disposition: proved by slice 18: preserve guard-selected HTTP Node MCP forwardOr
 Reported: slice 18 — "wrapper's pre-existing mcpIsolationProof filter deliberately excludes its paired-worktree-only scenario when no peer barrier is configured"
 Story clause: "Existing personal-token workflows remain available."
 Disposition: no user cost "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client.": Inspected applyMcpIsolationCypressExpose and all-or-none own/foreign/barrier inputs: the default focused batch deliberately selects nine ordinary MCP scenarios; the paired-only rendezvous needs its own peer harness. No new filter was added. The changed Node binding preserves the guard-selected HTTP origin before the hosted browser override; ordinary and paired-only selections without hosted fixture use the same origin as before. Public runtime/owner isolation proof remains unchanged. Final composed proof must truthfully report one hosted plus nine ordinary MCP scenarios; it claims no live paired-worktree observation. The coordinator withdrew its overbroad all-scenarios instruction without changing the source's two-user/current-permission promise, already proved through actual SDK and backend boundaries.
+
+### G16. Existing E2E compiler diagnostics
+Reported: slice 18 — "Whole E2E typecheck remains red236 existing diagnostics outside this repair; not a green whole-project typecheck claim."
+Story clause: "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client."
+Disposition: no user cost "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client.": Same actual E2E compiler configuration observes baseline238/current236, zero new diagnostics and both edited files clear after correcting two owned unsupported query options. Remaining diagnostics are outside the repair; no whole-typecheck success is claimed. Actual compiled hosted lifecycle plus nine ordinary MCP scenarios pass10/10; unchanged backend/frontend/runtime proof remains accepted. Corrected harness observations and failed reduced-root probes are retained in hosted SDK evidence.
