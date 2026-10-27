@@ -12,86 +12,37 @@ scope: large
 
 ## Parent Problem
 
-For Donut users who want an assistant to use their deliberately captured
-knowledge, manually moving note contents or running a local MCP process should
-change to an authenticated connection to Donut that can find, read, and explore
-the user's accessible notes. ChatGPT should be able to use that connection
-while the user's computer is off.
-
-The owner selected this direction on 2026-10-27: serve MCP directly from the
-existing Donut backend over HTTPS, let Donut authorize assistant access through
-OAuth, retain GitHub as the user's Donut login, and connect the service to
-ChatGPT as a plugin. This is non-executable decomposition and backlog input,
-not permission to implement these stories.
-
-## Why This Matters
-
-The near-future direction prioritizes extending Donut's abilities through
-ChatGPT. A direct connection makes the knowledge useful during ordinary
-questions and tasks without asking the user to operate another service.
-
-Repository reading on 2026-10-27 at
-`8598fe004c6aff8adc2ca9d83cccf6e566c23ae2` establishes the starting point:
-
-- The local MCP server offers title/alias candidate search, a full attributed
-  note read, and bounded graph context through Donut's existing backend API.
-- Donut already accepts personal bearer tokens and enforces notebook access.
-- Donut's production Spring Security configuration consumes GitHub login;
-  it does not issue OAuth grants to assistant clients.
-- The existing backend already owns note search, content attribution, and
-  focus-context retrieval. Keep those responsibilities there.
+Donut users should connect an assistant to their deliberately captured knowledge
+for authenticated search, reading and exploration while their computer is off.
+On 2026-10-27 the owner selected direct HTTPS MCP from Donut's backend, Donut
+OAuth authorization, existing GitHub login, and a ChatGPT plugin. This is
+non-executable decomposition/backlog input, not implementation authority.
 
 ## Alternatives and Decision
 
-- **Defer:** preserves the current manual and local-client workflows but does
-  not advance the owner's selected ChatGPT direction.
-- **Copy selected notes into a chat:** the strongest smaller alternative for
-  an occasional task, but the user must choose and transfer every passage and
-  later retrieve fresh content themselves.
-- **Operate a client-side bridge or separately hosted connector:** rejected
-  by the owner because the connection should be served by Donut itself.
-- **Selected direction:** deliver the three usable outcomes below. First make
-  the existing knowledge capabilities available to an HTTPS MCP client using
-  a Donut token. Then enable account linking through GitHub login and Donut
-  authorization. Finally prove and document the direct ChatGPT plugin journey.
+- Defer: retains manual/local workflows but does not advance the selected goal.
+- Copy notes: the strongest smaller option; users must select, transfer and refresh passages.
+- Client bridge or separate connector: owner rejected; Donut should serve the connection.
+- Selected order: token-authenticated HTTPS MCP → GitHub/Donut account linking → direct ChatGPT plugin.
 
-The first story tests the highest current learning question: can a real MCP
-client use the existing knowledge capabilities directly from Donut's HTTPS
-service with correct attribution and user access?
+Real MCP interoperability must retain user access and attribution.
+[Dated baseline and candidate investigation](../slice-plans/073-assistant-account-linking/PREPARATION-EVIDENCE.md) retain revisions, actions, results and limits.
 
 ## Shared Constraints
 
-- The MCP service and OAuth authorization capability belong in the existing
-  Donut backend and use its ordinary HTTPS deployment. The connection should
-  work while the user's computer is off.
-- GitHub remains the user's login provider. Donut grants access to Donut
-  knowledge and issues the assistant's credentials; each request resolves
-  the authorizing Donut user and follows existing notebook permissions.
-- The first release is read-only: candidate search, attributed full reads,
-  and bounded graph context. Preserve current title/alias search semantics;
-  body search and knowledge editing remain separate outcomes.
-- Browser sign-in and consent belong to account linking. Ordinary MCP calls
-  carry access tokens. Token expiry, renewal, and withdrawal of permission
-  must preserve the author's control of access.
-- Use the existing backend search, note attribution, and focus-context
-  responsibilities. Retrieved note contents are evidence, distinct from
-  application instructions; citations identify the note and its accepted
-  notebook revision.
-- Follow [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
-  for accepted content and revision attribution,
-  [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md) for the API boundary,
-  and [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
-  for observation and test environments.
-- Complete migration includes deleting the standalone local MCP package and
-  everything used only by it, with the whole-product reading described in
-  story 1. Shared client or test dependencies stay where other callers need them.
+- MCP and OAuth belong in the existing backend and ordinary HTTPS deployment.
+- GitHub authenticates the person; Donut issues credentials and resolves the authorizing user and current notebook permissions on each request.
+- First delivery is read-only title/alias candidate search, attributed full reads and bounded graph context; body search and editing are separate outcomes.
+- Browser sign-in/consent establish linking; ordinary MCP uses access tokens with expiry, renewal and withdrawal under the author's control.
+- Reuse backend search, attribution and focus context. Note contents are evidence, distinct from instructions; citations identify the note and accepted notebook revision.
+- Follow [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md), [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md), and [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md).
+- Migration deletes the standalone local MCP package and everything only it used, with story 1's whole-product reading; retain dependencies shared by other callers.
 
 ## Story Decomposition
 
-S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including verification and
-delivery, following [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition).
-These are comparative hypotheses. Refinement must challenge either L story
-if concrete learning makes it likely to exceed that band.
+S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours including verification and delivery,
+following [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition).
+Refinement challenges an L story likely to exceed those comparative bands.
 
 <a id="story-2"></a>
 
@@ -102,7 +53,7 @@ if concrete learning makes it likely to exceed that band.
 {"schemaVersion":1,"identity":"SEED-002#story-2","dependencies":[{"supplier":{"identity":"SEED-002#story-1","href":"seeds/SEED-002-host-mcp-over-https.md#story-1"},"implementation":"Build account linking against the existing direct HTTPS MCP knowledge service and reuse its user-scoped note operations.","rationale":"The selected OAuth journey must be exercised by a real client against Donut's actual protected MCP resource. Shared design or mocked tools cannot establish that resource's protocol, attribution, and current-user access boundary.","condition":"Donut's direct HTTPS MCP service has delivered candidate search, attributed full reads, and bounded graph context for a real authenticated client using existing Donut tokens.","state":"satisfied","resolution":{"revision":"2c06ba2245f8972af0e8e9e64a218e82561717ba","path":".planning/seeds/SEED-002-host-mcp-over-https.md#story-1","summary":"SEED-002#story-1 delivered HTTPS MCP at /api/mcp with list_note_candidates, read_note, and get_note_graph for token-authenticated clients. Proof: backend MCP boundary tests through tip b8c5d9ae and e2e_test/features/mcp/mcp_services.feature (9 scenarios) over verified TLS Streamable HTTP. Condition met without changing story-2 assumptions.\nCondition satisfied: Donut's direct HTTPS MCP service has delivered candidate search, attributed full reads, and bounded graph context for a real authenticated client using existing Donut tokens.\nAccepted integration: 1faeb6d81afc86fd45582cd99589e7a115286c9c on origin/refs/heads/main."}}]}
 ```
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/073-assistant-account-linking/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3aaeda0024031bd2c478d9999b7c99a14bcee3900a6d603ed89c4fee74afc228","plan":"f4ecc758d631a846c58e2178abe9d97cfc311db44c962a0b2d22509cc64195b3"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/073-assistant-account-linking/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f9ddafc467232ee4132690edbabe1fbed73f1d4b8cd3cbf13967e31c0c964f6b","plan":"bac80c00242a55c21d3ec8ac7a6aabfb775ba710c8816c8628fc5c35effb3479"}}
 ```
 
 **Goal:** A Donut user can grant, maintain, and withdraw a compatible assistant's
@@ -116,6 +67,12 @@ Donut personal access token into that client.
   and renewal, and user withdrawal of the assistant's access. Reuse the user's
   existing Donut identity and current notebook permissions. GitHub authenticates
   the person; Donut grants access and issues credentials for its MCP service.
+  Reuse the existing GitHub OAuth login implementation and identity mapping;
+  no new GitHub scopes, APIs or provider capabilities are selected. The new
+  return-to-consent integration is proved with an external GitHub HTTP fixture
+  through the real security chain. A new GitHub test app or credentialed
+  provider probe is unnecessary for this unchanged login behavior, as clarified
+  by Terry Yin on 2026-10-27.
 - Consent names the client and Donut account, explains that the assistant can
   search, read, and explore notebooks the account can currently read, and offers
   Allow and Deny. It explains continued access through renewal and where to
@@ -173,127 +130,37 @@ Donut personal access token into that client.
 
 **Architecture:**
 
-Use Spring Security's maintained authorization-server support in the existing
-backend, with authorization-code/PKCE and durable authorization and consent
-storage. Prefer opaque reference tokens checked against the local grant store:
-the same backend owns issuance and consumption, and withdrawal must affect the
-next request. JWTs would still need a revocation check or accept a withdrawal
-delay; the latter does not satisfy this story. Do not issue existing personal
-tokens as assistant credentials or call Donut's own introspection endpoint over
-loopback HTTP merely to read local authorization state.
+Use Spring Security's maintained authorization server in the existing backend:
+authorization-code/PKCE, durable authorization/consent, and opaque reference
+tokens checked locally. Withdrawal affects the next request; JWTs would still
+need revocation checks. Do not issue personal tokens as assistant credentials
+or call Donut introspection over loopback merely to read local grant state.
 
-The existing `CurrentUserFetcherFromRequest`, `UserService`, and
-`AuthorizationService` own identity resolution and notebook authorization.
-Reuse that domain meaning through an explicit MCP authentication boundary.
-An OAuth grant is a different lifecycle from `UserToken`: it includes a client,
-consent, resource, scope, expiring credentials, and renewal. The CLI's Gmail
-OAuth code is an outbound Google client, not an authorization server. The
-existing personal-token settings UI is a navigation precedent, not a grant
-store. This whole-product comparison found no existing owner for OAuth grant
-issuance; add it without duplicating notebook access or attributed reads.
+Reuse `CurrentUserFetcherFromRequest`, `UserService` and `AuthorizationService`
+for user identity, notebook permissions and attributed reads. OAuth grants own
+client/consent/resource/scope/expiry/renewal, separately from `UserToken`.
+CLI Gmail OAuth is an outbound client; personal-token settings are a navigation
+precedent, not a grant store. No existing owner supplies OAuth grant issuance.
 
-Use explicit resource validation during authorization, exchange, and renewal,
-and validate the stored resource/scope on MCP use. The probe below establishes
-that adding the Spring starter alone does not supply MCP audience binding.
-Map the GitHub principal to the existing Donut user; do not confuse a client ID
-or a Spring token principal with the authorizing user's identity. Keep browser
-session login and consent separate from bearer-only MCP authentication. Protect
-new consent and withdrawal mutations against CSRF; preserve OAuth protocol
-errors deliberately and do not convert unexpected failures into success.
+Validate resource at authorization, exchange and renewal, then stored resource
+and read scope at MCP use; the [probe](../slice-plans/073-assistant-account-linking/PREPARATION-EVIDENCE.md)
+found the library default insufficient. Resolve the GitHub user's identity,
+not the client principal. Keep browser login/consent separate from bearer-only
+MCP. Protect consent/withdrawal against CSRF; preserve deliberate protocol
+errors and report unexpected failures under [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md).
 
-Keep operational endpoints under `/api` and Vue screens in `routeMetadata`.
-The approved discovery-only paths are
-`/.well-known/oauth-authorization-server` and
-`/.well-known/oauth-protected-resource/api/mcp`, with the latter advertised by
-the MCP `401` challenge. Both need backend routing in the shared routing
-manifest. On 2026-10-27, Terry Yin approved this narrow exception to
-[ADR 0005 — Web routes](../../docs/adrs/0005-web-routes-accepted.md), whose
-HTTP API namespace includes authentication. The approval covers these two
-metadata routes; authorization, token, revocation, grant management, and MCP
-operations stay under `/api`. Record this exception with the maintained OAuth
-documentation at implementation wrap-up. No ADR status or wider namespace rule
-is changed by this story.
+Operational endpoints remain under `/api`; Vue screens use `routeMetadata`.
+On 2026-10-27 Terry Yin approved only `/.well-known/oauth-authorization-server`
+and `/.well-known/oauth-protected-resource/api/mcp` as exceptions to
+[ADR 0005](../../docs/adrs/0005-web-routes-accepted.md). Route both to the backend;
+advertise the latter in the MCP `401` challenge. Authorization, token,
+revocation, grant management and MCP remain under `/api`. Preserve this narrow
+exception in maintained OAuth docs at wrap-up; no ADR status or wider rule changes.
 
-[ADR 0002 — Git-native Portable notebook tree synchronization](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
-preserves accepted-revision attribution through the supplied MCP operations.
-[ADR 0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md)
-constrains intentional OAuth refusals and unexpected-failure reporting.
-[ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md)
-requires isolated disposable proof. The ADR index and in-file statuses identify
-0000–0007 as Accepted, with no supersession affecting this work. ADR 0001's
-filename lacks the accepted suffix although both authority signals agree.
-
-**Explored approaches and borrowed mechanism:**
-
-| Candidate | Fit to the goal and constraints | Consequence |
-| --- | --- | --- |
-| Continue using personal tokens or copy notes | Smallest existing solution | Fails the selected account-linking goal and preserves manual credential handling |
-| Wrap personal-token issuance in a custom OAuth flow | Could provide a similar user journey | Donut would own protocol machinery and would still need a separate constrained, expiring delegation model |
-| Spring authorization server with JWT access tokens | Fits the backend and interoperable client flow | Next-request withdrawal still needs shared grant/revocation state; stateless validation alone is insufficient |
-| Spring authorization server with opaque reference tokens | Fits the same backend and next-request withdrawal | Recommended; a local durable grant lookup joins token lifecycle to current permissions |
-
-Borrow a revocable visitor badge from physical access control. The Donut user
-is the host authorizing a visitor; the assistant is the visitor; the
-authorization server issues the badge; the opaque token identifies an entry in
-the access roster; notebook permission checks are the door checks. Renewal
-extends a permitted visit, and removing permission from the roster stops later
-entry. This is the opaque-token candidate, not independent evidence for it.
-The consequential limit is that an assistant can retain information it has
-already read: revocation prevents future access, not prior disclosure. A badge
-also does not establish the OAuth callback, PKCE, or resource-binding rules;
-those need protocol proof. A separately hosted identity broker remains outside
-the owner's selected in-backend boundary.
-
-**Investigation, 2026-10-27:**
-
-Repository inspection at `9c830fadb68b3299766a644dfa92ed48a39f3c73` found
-Spring Boot 4.1.2, GitHub `oauth2Login` only in the production security chain,
-browser identity mapped by `externalIdentifier`, and personal tokens carrying
-only user, token, and label. Existing Cypress login supplies a nonproduction
-Basic-auth session; it cannot prove a GitHub callback. Story 1 is still Taken
-in this checkout and its required HTTPS MCP outcome remains a recorded supplier
-dependency, not an observation made by this preparation.
-
-A disposable probe in this owned worktree used the Boot 4.1.2 dependency BOM,
-which resolved Spring Security authorization server 7.1.2. Command:
-`CURSOR_DEV=true nix develop -c ./backend/gradlew -p .tmp-oauth-probe run`.
-It drove the library's real security filters through MockMvc with synthetic
-GitHub-shaped principals, exact HTTPS callback URIs, S256 PKCE, `notes:read`,
-opaque tokens, and refresh rotation. It observed:
-
-- Root authorization-server metadata returned 200 and advertised the configured
-  `/api` token endpoint.
-- A public client received an access token but no refresh token. A confidential
-  client received both and preserved the synthetic GitHub principal name.
-- Default access-token claims named the client as audience, and a request for
-  a different resource still exchanged successfully. Explicit MCP resource
-  binding remains required work.
-- Renewal returned a new access token and rotated refresh token. Revoking the
-  refresh token made both current tokens inactive; another renewal returned 400.
-- On local MySQL 8.4.11, the released JDBC authorization schema and service
-  saved that grant; a newly constructed service loaded it by access token with
-  its principal preserved and refresh token active. A uniquely named disposable
-  database was created for this operation and dropped in `finally`.
-
-The final probe passed. Initial probe setup errors (duplicate synthetic client
-secret, then GET parameters not encoded as a query) were corrected before these
-observations. Consent was disabled in the probe, authentication was supplied,
-and it did not call Donut's MCP service. Thus it establishes library mechanism
-and JDBC serialization, not browser consent, real GitHub login, full-process
-restart recovery, whole-client withdrawal, or end-to-end MCP interoperability.
-Those remain execution proof obligations. No production or Development data
-was touched. All disposable source/build files were removed before this write.
-The final probe source SHA-256 was
-`0e73908ac52f7c23994e49b47198084226306e7f4c29b011b3e8500cca196608`.
-
-Primary references checked on that date:
-[MCP authorization and discovery](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization),
-[Spring Security authorization-server setup](https://docs.spring.io/spring-security/reference/servlet/oauth2/authorization-server/getting-started.html),
-[Spring authorization components](https://docs.spring.io/spring-security/reference/servlet/oauth2/authorization-server/core-model-components.html),
-and the released
-[7.1.2 refresh-token generator](https://raw.githubusercontent.com/spring-projects/spring-security/7.1.2/oauth2/oauth2-authorization-server/src/main/java/org/springframework/security/oauth2/server/authorization/token/OAuth2RefreshTokenGenerator.java).
-This uses the supplier's 2025-11-25 interoperability baseline; it does not promise
-certification against every newer protocol version.
+[ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
+preserves accepted-revision attribution; [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
+requires isolated disposable proof. ADRs 0000–0007 have agreeing Accepted index/in-file
+statuses and no relevant supersession; ADR 0001 lacks the accepted filename suffix.
 
 **Owner decisions, 2026-10-27:** Terry Yin answered "as recommended" to the
 two presented choices: the discovery-only ADR 0005 exception and the first
@@ -301,12 +168,19 @@ journey through one pre-registered confidential hosted client. These settle
 the open refinement decisions. The recommended Spring/opaque-token design
 above retains the full lifecycle promise.
 
+During execution on the same date, Terry Yin clarified that GitHub OAuth login
+is an existing feature to reuse cohesively. No new GitHub test-app approval is
+needed unless implementation proposes a new GitHub OAuth capability; any such
+proposal returns to the owner. This changes the proof prerequisite for the
+unchanged provider behavior, while preserving callback/identity continuation
+into Donut consent as required new integration proof.
+
 **Effort hypothesis:** L (2–4 hours), medium confidence after the library and
 persistence probe and the owner's decisions.
 Maintained protocol and JDBC support reduce the unknown work. Explicit resource
 binding, browser consent and return-to-flow integration, whole-client withdrawal,
 and real-client proof still need bounded leaves. Required backend-suite time
-and operator-owned credential/release waits are accounted for separately in
+and operator-owned release waits are accounted for separately in
 the plan. Reassess the band if reducible implementation exceeds it; do not
 silently split or shrink the lifecycle promise.
 
@@ -356,39 +230,21 @@ HTTPS connection.
 
 ## Ordering and Scope Reduction
 
-The order delivers an immediately usable remote knowledge service, then
-user-controlled account linking, then the specific ChatGPT experience. Keep
-each supplier's working outcome available to compatible clients even if a
-later story is cancelled. Necessary blocking supplier agreements belong in
-the consumers' canonical sections and must be recorded with the backlog tool.
-
-If scope must shrink, defer public-directory distribution, editing tools,
-custom ChatGPT UI, and broader search before changing the three read
-capabilities or the user's access controls. Those expansions are not queued
-by this decomposition.
+Each supplier remains useful if a later story is cancelled. Record necessary
+blocking supplier agreements in consumer story sections with the backlog tool.
+Defer public-directory distribution, editing, custom ChatGPT UI and broader
+search before reducing the three read capabilities or user access controls;
+these expansions are not queued here.
 
 ## Refinement Handoff
 
-Refinement must settle the supported backend MCP and OAuth library integration,
-client-registration policy, token lifetime/renewal policy, and the smallest
-useful consent and revocation interface. These details affect sizing; no
-executable plan or readiness assessment is supplied here.
-
-## Open Decisions
-
-Whether a public-directory release is worth its publication and review work
-remains an owner decision after the direct custom-plugin journey is useful.
-The three selected outcomes do not require that expansion.
+Refinement settles library integration, client registration, token lifetimes/renewal,
+and minimum consent/revocation UI. This decomposition provides no executable plan or readiness.
+Public-directory publication remains an owner decision after a useful direct custom plugin.
 
 ## When to Surface
 
-Use this seed when selecting direct HTTPS MCP access, assistant account
-linking, or the ChatGPT extension of Donut.
-
-## Breadcrumbs
-
-- [Product backlog](../PRODUCT-BACKLOG.md)
-- [Learning, refinement, and retrieval](SEED-073-learning-refinement-and-retrieval.md)
-- [Knowledge-to-capability experiment](SEED-074-knowledge-to-capability.md)
-- [OpenAI MCP server guidance](https://developers.openai.com/plugins/build/mcp-server)
-- [OpenAI account-linking guidance](https://developers.openai.com/plugins/build/auth)
+For direct HTTPS MCP, assistant linking or ChatGPT, see [backlog](../PRODUCT-BACKLOG.md), [learning/refinement/retrieval](SEED-073-learning-refinement-and-retrieval.md),
+[knowledge-to-capability](SEED-074-knowledge-to-capability.md),
+[OpenAI MCP](https://developers.openai.com/plugins/build/mcp-server) and
+[account linking](https://developers.openai.com/plugins/build/auth).
