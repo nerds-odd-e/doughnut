@@ -2,11 +2,15 @@ import http from 'node:http'
 import https from 'node:https'
 import { Readable } from 'node:stream'
 import type { IncomingMessage } from 'node:http'
-import { generateMcpTestTlsMaterial } from './mcp_tls_material.ts'
+import {
+  generateMcpTestTlsMaterial,
+  certificateSpkiPin,
+} from './mcp_tls_material.ts'
 
 export type McpTlsProxy = {
   httpsOrigin: string
   caCertPem: string
+  browserCertificatePin: string
   forwardOrigin: string
   trustedFetch: typeof fetch
   close: () => Promise<void>
@@ -72,6 +76,7 @@ export async function startMcpTlsProxy(
   return {
     httpsOrigin,
     caCertPem: material.caCertPem,
+    browserCertificatePin: certificateSpkiPin(material.serverCertPem),
     forwardOrigin,
     trustedFetch: createCaTrustedFetch(material.caCertPem),
     close: () =>
@@ -128,6 +133,7 @@ async function readRequestBody(
 ): Promise<Buffer | undefined> {
   if (body === undefined || body === null) return undefined
   if (typeof body === 'string') return Buffer.from(body)
+  if (body instanceof URLSearchParams) return Buffer.from(body.toString())
   if (body instanceof Uint8Array) return Buffer.from(body)
   if (body instanceof ArrayBuffer) return Buffer.from(body)
   if (typeof Blob !== 'undefined' && body instanceof Blob) {

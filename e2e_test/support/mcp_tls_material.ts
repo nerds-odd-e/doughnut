@@ -2,6 +2,14 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { createHash, X509Certificate } from 'node:crypto'
+
+export function certificateSpkiPin(certificatePem: string): string {
+  const certificate = new X509Certificate(certificatePem)
+  return createHash('sha256')
+    .update(certificate.publicKey.export({ type: 'spki', format: 'der' }))
+    .digest('base64')
+}
 
 export type McpTlsMaterial = {
   caCertPem: string

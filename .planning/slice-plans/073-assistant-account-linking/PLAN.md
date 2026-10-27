@@ -9,33 +9,21 @@
 ## Execution resume
 
 Agent: Yua-chan; publisher: `dashboard-territory.local-doughnut`.
-The preparation checkout is the owned execution checkout, branch
-`codex/link-an-assistant-to-donut-through-github-sign-i`, Story Branch Mode.
-Integration/default checkout: `/Users/terryyin/git/doughnut`; remote: `origin`;
-eventual target: `main`. Ordinary increments publish the execution branch.
+The preparation checkout is the owned execution checkout, branch `codex/link-an-assistant-to-donut-through-github-sign-i`, Story Branch Mode. Integration/default checkout: `/Users/terryyin/git/doughnut`; remote: `origin`; eventual target: `main`. Ordinary increments publish the execution branch.
 Starting revision: `83615a792fe3aa3107badb07d883a70398d75127`.
 Startup claim `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` was confirmed on remote main/execution branch.
 Published on the execution branch: slice 1 `f0390693df002168b2ce6a81f038bcb5f90931b8`, slice 2 `d488c64dbc69a00c51f2cc9237f71ae9fda016a1`, slice 3 `9562d7c1ae2e965e95aa70afaa0d01f97c98406f`.
 Slice 4 published `84e2b4eda9562369af774636edb490d2d1bdeb12`; slice 5 published `20d28229aabc6a4747cb8e1a39f433f170a71dad` on that branch.
 Slice 6 published `4df752991fbb75653481bbf9a24471e1953c3146`; slice 7 published `0fb9548eb93b320b71f3e02eb9be06e86b4c444d`.
-Slice 8 published `890d5be26955d8d2ab456d6ad0de7f0015622709`.
-Slice 9 published `47add57de8a497e44734cf4a462735079cf65d66`.
-Slice 10 published `5057876408a583ee2ee27f1f2282969ec0b976b5`.
-Slice 11 published `81d5879fca427614836ceac60f96d79bad92639e`.
-Slice 12 published `210c70a033bed3d6dae8b1f72632c76ddefbc707`.
-Slice 13 published `2327b254faff5367b4ef78ae3f62a9e0bd413ef9`.
+Slice 8 published `890d5be26955d8d2ab456d6ad0de7f0015622709`; 9 `47add57de8a497e44734cf4a462735079cf65d66`; 10 `5057876408a583ee2ee27f1f2282969ec0b976b5`; 11 `81d5879fca427614836ceac60f96d79bad92639e`; 12 `210c70a033bed3d6dae8b1f72632c76ddefbc707`; 13 `2327b254faff5367b4ef78ae3f62a9e0bd413ef9`.
 Slice 2's SHA is the immutable schema-only release candidate; no deployment is authorized.
 
-`./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's
-current dependency fingerprint. `CURSOR_DEV=true nix develop -c pnpm validate:path-routing`
-passed 11 backend probes/five static paths; this establishes command readiness only.
+`./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's current dependency fingerprint. `CURSOR_DEV=true nix develop -c pnpm validate:path-routing` passed 11 backend probes/five static paths; this establishes command readiness only.
 No live GitHub observation, production deployment, real-account authorization or paid call occurred.
 
 ## Scope, decisions and safety
 
-Deliver the canonical source's full contract/approved architecture against story 1's
-real HTTPS MCP. [Preparation evidence](PREPARATION-EVIDENCE.md) retains dated inputs,
-revisions, commands, results, comparisons, digest and limits.
+Deliver the canonical source's full contract/approved architecture against story 1's real HTTPS MCP. [Preparation evidence](PREPARATION-EVIDENCE.md) retains dated inputs, revisions, commands, results, comparisons, digest and limits.
 
 - Terry's 2026-10-27 clarification selects cohesive reuse of existing GitHub login/identity mapping. No new GitHub scope/API/provider feature is selected; a proposed expansion returns to the owner. Slices 6–8 prove new callback-to-consent integration with external HTTP fixtures; no live test-app gate applies to unchanged login.
 - Reuse Spring Security authorization-server handlers and JDBC stores, S256 PKCE, exact redirects, confidential-client authentication and opaque tokens; initially observed Boot 4.1.2/Security 7.1.2. Never wrap personal tokens as OAuth.
@@ -59,10 +47,9 @@ revisions, commands, results, comparisons, digest and limits.
 | Expiry/renewal without widening | 11 | Expired access refused; real refresh restores SDK read; invalid/widened requests refused |
 | Withdrawal/race/reconnection | 12, 13 | Browser withdrawal, SDK/refresh refusal, fresh consent, unaffected other user, controlled race |
 | Durable consent/grants | 2, 4, 14, 15 | MySQL storage then owned backend process restart with retained credentials/database |
-| Documented confidential-client journey | 16, 17 | Real SDK over HTTPS from discovery through renewal/withdrawal |
+| Documented confidential-client journey | 16–18 | Real SDK over HTTPS from discovery through renewal/withdrawal |
 
-Mock only external GitHub HTTP, never internal issuance/permission/renewal/revocation.
-Injected principals prove filters, not callback/continuation. Use controlled clocks/short test lifetimes, not production sleeps. Story 1 retains retrieval semantics; this adds delegated authorization.
+Mock only external GitHub HTTP, never internal issuance/permission/renewal/revocation. Injected principals prove filters, not callback/continuation. Use controlled clocks/short test lifetimes, not production sleeps. Story 1 retains retrieval semantics; this adds delegated authorization.
 
 ## Ordered slices
 
@@ -156,19 +143,27 @@ Proof: Real credentials survive an actual owned JVM replacement with the same My
 Use seam14. Withdraw and restart again: old MCP/refresh fail and reconnection requires consent; no reset between process instances. Observe ordinary grant and consent behavior, not same-JVM repositories. Sizing: ~5 minutes source/probe plus two owned startup waits.
 Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#15-keep-authorization-valid-across-a-backend-restart).
 
-### 16. Establish the hosted SDK client fixture
+### 16. Support OAuth clients over the owned TLS fixture
+Type: Structure
+Status: done
+Proof: Public TLS fixture forwards SDK URLSearchParams form bytes while retaining JSON/bearer forwarding and strict CA verification; exposed browser pin identifies the owned leaf.
+
+Keep the existing TLS proxy/fetch boundary. Accept the maintained SDK's form body and expose only public leaf pin data for the immediate hosted-browser consumer. Reuse accepted actual SDK exchange and focused TLS observation; no browser manager or blanket trust bypass. Sizing: the extracted implementation is complete; bounded public-leaf observation/refactor/delivery remain. All other original fixture-attempt code is parked externally with hashes until 17.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#16-support-oauth-clients-over-the-owned-tls-fixture).
+
+### 17. Complete hosted SDK authorization through the browser
 Type: Structure
 Status: planned
-Proof: Maintained SDK authProvider/finishAuth follows actual HTTPS discovery and browser GitHub/consent through an exact hosted callback, validating state/S256 and saving issued credentials outside the browser.
+Proof: Actual permanent initial Cypress scenario completes HTTPS discovery, existing GitHub sign-in, informed consent, exact callback state/S256, maintained SDK exchange and private attributed read with owned cleanup.
 
-Own callback listener/client secret/state/verifier/tokens before backend startup and configured client bootstrap; reuse GitHub/TLS/runner ownership. Expose only the minimum private Node-task controls needed by Cypress, preserving server-held confidential credentials. Resolve the concrete SDK callback/control seam here, with cleanup and one real initial authorization as result-bearing proof; no handwritten OAuth engine or internal issuance mocks. Sizing: 5–10 minutes source plus fixture/runtime suites/cold proof; stop/refine a harness overrun.
+Restore parked compatible client/provider/runner/tasks/feature work. First bounded probe (maximum five source minutes plus one cold replay) traces actual Cypress request/session/saved-request continuation: Chrome reaches authenticated home instead of consent while direct pinned Playwright/SDK passes. Compare the HTTP Cypress top origin with canonical HTTPS cookie context; do not supply authorization/consent in setup or blame the driver without observation. Use the smallest supported existing runner/browser seam; stop/refine if the cause or solution remains unsettled. Keep secret/verifier/tokens server-held before bootstrap, strict CA/public owned pins, primary CI glob selection and ordinary runner defaults. No new GitHub provider feature. Proof uses Chrome as CI does; disclose Electron fixture limitations. Sizing: five-minute decisive probe, then at most five source minutes if supported; cold waits are exceptions.
 
-### 17. Connect through the documented OAuth journey
+### 18. Connect through the documented OAuth journey
 Type: Behavior
 Status: planned
 Proof: Permanent isolated assistant_account_linking.feature uses the real hosted SDK client through discovery → GitHub/informed consent → exchange → attributed search/read/bounded graph → expiry/automatic renewal → Settings withdrawal/reconnection.
 
-Use fixture16 and accepted state/callback, isolation, constraint/race/restart proof; require actual SDK credential replacement before retry and no ordinary-call browser login. Run the new feature and existing mcp_services.feature over verified TLS. Document client registration/encoded server secrets, canonical issuer/resource/exact callback, default finite lifetimes/rotation, existing GitHub reuse, consent/withdrawal/reconnect, schema-first release and narrow discovery ADR exception; retain personal-token instructions. ChatGPT remains story3. No real-client activation/deployment authority. Sizing: 5–10 minutes source plus mandatory E2E cold proof; stop/refine incompatible client or source overrun.
+Extend fixture17's initial feature using accepted state/callback, isolation, constraint/race/restart proof; require actual SDK credential replacement before retry and no ordinary-call browser login. Run the complete feature and existing mcp_services.feature over verified TLS. Document client registration/encoded server secrets, canonical issuer/resource/exact callback, default finite lifetimes/rotation, existing GitHub reuse, consent/withdrawal/reconnect, schema-first release and narrow discovery ADR exception; retain personal-token instructions. ChatGPT remains story3. No real-client activation/deployment authority. Sizing: 5–10 minutes source plus mandatory E2E cold proof; stop/refine incompatible client or source overrun.
 
 ## Consumer trace and verification
 
@@ -181,7 +176,7 @@ Per diff run installed `consumer-trace.mjs --checkout <execution-checkout> --bas
 - Run focused OAuth and existing MCP E2E; extend runner/client lifecycle tests for changed TLS/provider/restart ownership. No real GitHub credentials in CI.
 - CLI extra behavior excluded while personal tokens unchanged; revise/run affected boundaries if shared auth reaches CLI. Full E2E suite is not a local gate.
 
-- `CURSOR_DEV=true nix develop -c env SUT_TIMEOUT_MS=240000 pnpm cy:run --spec e2e_test/features/mcp/assistant_account_linking.feature,e2e_test/features/mcp/mcp_services.feature` after isolated registration; wrapper owns data/ports/fixtures.
+- `CURSOR_DEV=true nix develop -c env SUT_TIMEOUT_MS=240000 pnpm cy:run --spec e2e_test/features/mcp/assistant_account_linking.feature,e2e_test/features/mcp/mcp_services.feature --browser chrome` after isolated registration; wrapper owns data/ports/fixtures.
 
 Delivery: Jidoka → fresh refactor → API generation when needed → coordinator `./scripts/run.sh pnpm format:changed` once → plan update → agent commit/check-only hook → push.
 Execute Plan owns CI/Story Wrap Up. Inspect host load/memory/competitors and sequence heavy proof/build output. Reuse unchanged proof; narrow passes cannot replace failed required suites. No removal is planned.
@@ -189,7 +184,7 @@ Execute Plan owns CI/Story Wrap Up. Inspect host load/memory/competitors and seq
 ## Sizing assessment
 
 2026-10-27 refinement at `81d5879fca427614836ceac60f96d79bad92639e`: preserve completed1–11 and their accepted evidence. Split former12 into atomic backend withdrawal12 and Settings13. Make the observed missing owned-restart seam14 explicit before durability15; make hosted SDK callback/fixture16 explicit before permanent journey17. Maintained7.1.2 token endpoint exposes authenticationProviders; existing JPA row-lock patterns and JDBC stores support a shared durable grant transaction without a new model. SDK1.32.2 exposes authProvider/finishAuth, state/verifier/token persistence; no new provider feature is selected. Readiness follows the shared recorder after current-basis review.
-Seventeen leaves; source target5minutes, scrutinize6–10/hardfinerdecompose>10 except declared fullsuite/cold-start waits. Story outcome/authority are unchanged. Story resplit recommended:17slices; use [dough-resplit-story](../../../.agents/skills/dough-resplit-story/SKILL.md). This recommendation is not an execution-readiness gate; resplitting waits for Terry's instruction, while the established Execute Plan authority continues the selected full outcome.
+Eighteen leaves after the bounded fixture attempt exposed a separate Cypress authorization continuation; source target5minutes, scrutinize6–10/hardfinerdecompose>10 except declared fullsuite/cold-start waits. Story outcome/authority are unchanged. Story resplit recommended:18slices; use [dough-resplit-story](../../../.agents/skills/dough-resplit-story/SKILL.md). This recommendation is not an execution-readiness gate; resplitting waits for Terry's instruction, while the established Execute Plan authority continues the selected full outcome.
 
 ## Story obligations
 
@@ -201,7 +196,7 @@ Disposition: proved by slice 4: TestabilityDbResetTest.resetRestoresConfiguredCl
 ### G2. E2E compiler observation is limited
 Reported: slice 3 — "E2E typecheck remains at 236 diagnostics. Comparing the changed fixture import/compiler option against baseline found zero new diagnostics; this does not constitute a whole-checkout baseline."
 Story clause: "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client."
-Disposition: no user cost "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client.": The optional whole-E2E static check is not claimed green. Changed TS import/options add no diagnostics in the bounded comparison; the changed JS setup/environment/cleanup paths pass their public runtime suites. Actual SDK discovery and the complete linking journey retain slices 5 and 17 as proof owners.
+Disposition: no user cost "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client.": The optional whole-E2E static check is not claimed green. Changed TS import/options add no diagnostics in the bounded comparison; the changed JS setup/environment/cleanup paths pass their public runtime suites. Actual SDK discovery and the complete linking journey retain slices 5 and 18 as proof owners.
 
 ### G3. Observe credential scope independently of grant scope
 Reported: slice 10 — "Acceptance found the scope refusal changes the stored grant scope while the access credential itself still has notes:read; token-scope refusal needs a distinct observation."
@@ -232,3 +227,23 @@ Disposition: no user cost "A Donut user can grant, maintain, and withdraw a comp
 Reported: slice 14 — "Acceptance found new signal-listener removal also ran before ordinary asynchronous cleanup, changing the shared supervisor's default failure path."
 Story clause: "A backend restart between authorization and renewal preserves the valid grant and its user binding."
 Disposition: proved by slice 14: removed only the new normal-finish listener removal, restoring baseline signal forwarding through onBeforeExit while retaining removal for the planned expected-close branch. Development19 and SUT80 passed after this one-line restoration, including default forced-exit/bounded-cleanup and authorized restart cases. Actual new-JVM/HTTPS/database/foreign-sentinel proof remains valid because its planned branch is unchanged.
+
+### G9. Support the maintained SDK's form body through verified TLS
+Reported: slice 16 — "installed SDK sends URLSearchParams for token exchange; shared CA fetch rejects that body type."
+Story clause: "Allow completes the callback and code exchange;"
+Disposition: receiving slice 17
+
+### G11. Complete browser authorization continuation
+Reported: slice 16 — "Permanent Cypress initial scenario reached login but after GitHub redirects landed chrome-error://chromewebdata (screenshot inspected), while pinned Playwright path passes."
+Story clause: "Allow completes the callback and code exchange;"
+Disposition: receiving slice 17
+
+### G12. Start the hosted fixture for CI's selected glob
+Reported: slice 16 — "CI primary uses the mcp/** glob. The fixture selector must recognize glob inclusion, not just exact feature strings, or CI's new feature lacks its pre-bootstrap client."
+Story clause: "The client discovers the authorization server, sends the user through GitHub sign-in, and shows Donut's read-access consent."
+Disposition: receiving slice 17
+
+### G10. Keep admitted initial journey executable
+Reported: slice 16 — "Runtime114 showed113pass/1inventory fail because admitting leaf17's feature before its file exists violates existing registry inventory."
+Story clause: "The client discovers the authorization server, sends the user through GitHub sign-in, and shows Donut's read-access consent."
+Disposition: receiving slice 17
