@@ -6,6 +6,7 @@ import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.entities.repositories.UserRepository;
 import com.odde.donut.factoryServices.EntityPersister;
+import com.odde.donut.oauth.AssistantClientBootstrap;
 import com.odde.donut.services.BazaarService;
 import com.odde.donut.services.CircleService;
 import com.odde.donut.services.GithubService;
@@ -47,6 +48,7 @@ class TestabilityRestController {
   @Autowired BazaarService bazaarService;
   @Autowired UserService userService;
   @Autowired InjectNotesWorker injectNotesWorker;
+  @Autowired AssistantClientBootstrap assistantClientBootstrap;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -59,6 +61,7 @@ class TestabilityRestController {
       createUser("non_admin", "Non Admin");
       createUser("a_trainer", "A Trainer");
       testabilitySettings.init();
+      assistantClientBootstrap.configureClients();
     }
     return "OK";
   }

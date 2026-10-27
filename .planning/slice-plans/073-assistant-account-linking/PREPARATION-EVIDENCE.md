@@ -9,6 +9,10 @@ Slice numbers in the dated observations below refer to the ten-leaf plan retaine
 at `d488c64dbc69a00c51f2cc9237f71ae9fda016a1`. Refinement inserts current slice 3;
 original slices 3–10 correspond to current 4–11. Observed actions are unchanged.
 
+Further refinement after `9562d7c1ae2e965e95aa70afaa0d01f97c98406f` inserts
+store/client bootstrap at current 4. The earlier mapping is historical: original
+slices 3–10 now correspond to current 5–12; dated observation text is unchanged.
+
 ## Decomposition baseline
 
 Repository reading on 2026-10-27 at
