@@ -19,7 +19,9 @@ export function createHostedAssistantClient({
   let saved = false
   let tokenGeneration = 0
   let callbackError
+  let expiresAt
   const requests = []
+  const replacements = []
   const provider = {
     redirectUrl,
     clientMetadata: {
@@ -38,9 +40,22 @@ export function createHostedAssistantClient({
     tokens: () =>
       saved ? JSON.parse(readFileSync(tokenFile, 'utf8')) : undefined,
     saveTokens: (tokens) => {
+      const previous = provider.tokens()
       writeFileSync(tokenFile, JSON.stringify(tokens), { mode: 0o600 })
       saved = true
       tokenGeneration++
+      expiresAt = Date.now() + tokens.expires_in * 1000
+      replacements.push({
+        generation: tokenGeneration,
+        accessChanged: previous?.access_token !== tokens.access_token,
+        refreshChanged: previous?.refresh_token !== tokens.refresh_token,
+        issuer: tokens.issuer,
+        scope: tokens.scope,
+        resource: requests.findLast((request) => request.grantType)?.resource,
+        tokenEndpointOrigin: requests.findLast((request) => request.grantType)
+          ?.origin,
+        lifetimeSeconds: tokens.expires_in,
+      })
     },
     redirectToAuthorization: (url) => {
       authorizationUrl = url
@@ -69,11 +84,21 @@ export function createHostedAssistantClient({
         fetch: async (input, init) => {
           if (new Headers(init?.headers).has('cookie'))
             throw new Error('Hosted SDK must use cookie-free requests')
-          requests.push({
+          const form =
+            init?.body instanceof URLSearchParams ? init.body : undefined
+          const request = {
             path: new URL(String(input)).pathname,
+            origin: new URL(String(input)).origin,
             method: init?.method ?? 'GET',
-          })
-          return tlsProxy.trustedFetch(input, init)
+            generation: tokenGeneration,
+            grantType: form?.get('grant_type'),
+            resource: form?.get('resource'),
+          }
+          requests.push(request)
+          const response = await tlsProxy.trustedFetch(input, init)
+          request.status = response.status
+          request.serverDate = response.headers.get('date')
+          return response
         },
       }
     )
@@ -128,7 +153,33 @@ export function createHostedAssistantClient({
     },
     status() {
       if (callbackError) throw new Error(callbackError)
-      return { connected: saved, tokenGeneration, requests, redirectUrl }
+      return {
+        connected: saved,
+        tokenGeneration,
+        requests,
+        replacements,
+        redirectUrl,
+        expiresAt,
+      }
+    },
+    async waitForAccessExpiry() {
+      if (!(saved && Number.isFinite(expiresAt)))
+        throw new Error('No finite SDK access lifetime')
+      // The endpoint rounds its advertised lifetime down to whole seconds.
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.max(0, expiresAt - Date.now() + 1100))
+      )
+      return { expired: Date.now() > expiresAt, tokenGeneration }
+    },
+    async expectWithdrawnTool(params) {
+      try {
+        await client.callTool(params)
+      } catch (error) {
+        if (error instanceof UnauthorizedError && authorizationUrl)
+          return { authorizationRequired: true }
+        throw error
+      }
+      throw new Error('Withdrawn assistant unexpectedly retained tool access')
     },
     callTool: ({ name, arguments: args }) =>
       client.callTool({ name, arguments: args }),

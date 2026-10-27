@@ -78,6 +78,7 @@ const commonConfig = {
           return result
         },
       })
+      const mcpForwardOrigin = config.baseUrl
       const hostedOrigin = process.env[HOSTED_ASSISTANT_BROWSER_ORIGIN]
       if (hostedOrigin) config.baseUrl = hostedOrigin
       if (!config.expose || typeof config.expose !== 'object') {
@@ -133,7 +134,7 @@ const commonConfig = {
         ...worktreeResetIsolationCypressTasks(),
         ...notebookPublicationProfileTasks(repoRoot, on),
         ...mcpIsolationCypressTasks(),
-        ...mcpClientTasks(),
+        ...mcpClientTasks(hostedOrigin ? mcpForwardOrigin : undefined),
         ...hostedAssistantTasks(),
         ...createCliE2ePluginTasks(repoRoot, {
           saveBufferToCurrentSpecFolder:

@@ -47,6 +47,10 @@ export async function startHostedAssistantFixture() {
           result = { ...assistant.status(), githubVisits: github.visits }
         else if (url.pathname === '/control/tool')
           result = await assistant.callTool(params)
+        else if (url.pathname === '/control/expiry')
+          result = await assistant.waitForAccessExpiry()
+        else if (url.pathname === '/control/withdrawn-tool')
+          result = await assistant.expectWithdrawnTool(params)
         else {
           res.writeHead(404).end()
           return
@@ -84,6 +88,7 @@ export async function startHostedAssistantFixture() {
         spring: { security: { oauth2: { client: github.springClient } } },
         donut: {
           oauth: {
+            accessTokenTimeToLive: 'PT10S',
             clients: [
               {
                 clientId,
@@ -137,5 +142,7 @@ export function hostedAssistantTasks(env = process.env) {
     assistantBegin: () => invoke('begin'),
     assistantStatus: () => invoke('status'),
     assistantCallTool: (params) => invoke('tool', params),
+    assistantWaitForAccessExpiry: () => invoke('expiry'),
+    assistantWithdrawnTool: (params) => invoke('withdrawn-tool', params),
   }
 }

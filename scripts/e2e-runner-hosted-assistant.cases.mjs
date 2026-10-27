@@ -88,6 +88,7 @@ for (const { ready, spec, browser } of [
           connected: false,
           tokenGeneration: 0,
           requests: [],
+          replacements: [],
           redirectUrl: callback,
           githubVisits: ['/unknown'],
         })

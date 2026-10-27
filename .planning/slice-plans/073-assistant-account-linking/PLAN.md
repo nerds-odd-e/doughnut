@@ -3,23 +3,17 @@
 **Identity:** SEED-002#story-2
 **Source:** [Refined story](../../seeds/SEED-002-host-mcp-over-https.md#story-2)
 **Preparation checkout:** `/Users/terryyin/git/doughnut/.worktrees/link-an-assistant-to-donut-through-github-sign-i`
-**Observed revision:** `9c830fadb68b3299766a644dfa92ed48a39f3c73`
 **Prepared:** 2026-10-27; execution separately authorized by the established start.
 
 ## Execution resume
 
 Agent: Yua-chan; publisher: `dashboard-territory.local-doughnut`.
 The preparation checkout is the owned execution checkout, branch `codex/link-an-assistant-to-donut-through-github-sign-i`, Story Branch Mode. Integration/default checkout: `/Users/terryyin/git/doughnut`; remote: `origin`; eventual target: `main`. Ordinary increments publish the execution branch.
-Starting revision: `83615a792fe3aa3107badb07d883a70398d75127`.
-Startup claim `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` was confirmed on remote main/execution branch.
-Published on the execution branch: slice 1 `f0390693df002168b2ce6a81f038bcb5f90931b8`, slice 2 `d488c64dbc69a00c51f2cc9237f71ae9fda016a1`, slice 3 `9562d7c1ae2e965e95aa70afaa0d01f97c98406f`.
-Slice 4 published `84e2b4eda9562369af774636edb490d2d1bdeb12`; slice 5 published `20d28229aabc6a4747cb8e1a39f433f170a71dad` on that branch.
-Slice 6 published `4df752991fbb75653481bbf9a24471e1953c3146`; slice 7 published `0fb9548eb93b320b71f3e02eb9be06e86b4c444d`.
-Slice 8 published `890d5be26955d8d2ab456d6ad0de7f0015622709`; 9 `47add57de8a497e44734cf4a462735079cf65d66`; 10 `5057876408a583ee2ee27f1f2282969ec0b976b5`; 11 `81d5879fca427614836ceac60f96d79bad92639e`; 12 `210c70a033bed3d6dae8b1f72632c76ddefbc707`; 13 `2327b254faff5367b4ef78ae3f62a9e0bd413ef9`.
-Slice 2's SHA is the immutable schema-only release candidate; no deployment is authorized.
+Starting revision: `83615a792fe3aa3107badb07d883a70398d75127`; startup claim `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` was confirmed on remote main/execution branch.
+Most recent validated increment: 17 `a26a2a4094f5c0f61a3e1c56c00746e9414cf13b`; [publication history](PUBLICATION-EVIDENCE.md).
+Slice 2 `d488c64dbc69a00c51f2cc9237f71ae9fda016a1` is the immutable schema-only release candidate; no deployment is authorized.
 
-`./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's current dependency fingerprint. `CURSOR_DEV=true nix develop -c pnpm validate:path-routing` passed 11 backend probes/five static paths; this establishes command readiness only.
-No live GitHub observation, production deployment, real-account authorization or paid call occurred.
+`./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's current dependency fingerprint. `CURSOR_DEV=true nix develop -c pnpm validate:path-routing` passed 11 backend probes/five static paths; this establishes command readiness only. No live GitHub observation, production deployment, real-account authorization or paid call occurred.
 
 ## Scope, decisions and safety
 
@@ -53,8 +47,7 @@ Mock only external GitHub HTTP, never internal issuance/permission/renewal/revoc
 
 ## Ordered slices
 
-Target ~5 minutes including proof/cleanup; scrutinize 6–10, finer-decompose >10.
-Full backend suites, E2E cold starts and operator release waits are exceptions.
+Target ~5 minutes including proof/cleanup; scrutinize 6–10, finer-decompose >10. Full backend suites, E2E cold starts and operator release waits are exceptions.
 
 ### 1. Reuse the GitHub login and identity boundary
 Type: Behavior
@@ -114,57 +107,40 @@ Proof: [Accepted execution evidence](EXECUTION-EVIDENCE.md#11-renew-access-witho
 ### 12. Withdraw a user's whole client grant atomically
 Type: Behavior
 Status: done
-Proof: Real management HTTP lists only the current user's clients, requires CSRF/ownership, and atomically removes every matching grant and remembered consent; existing SDK/refresh fail while the other user works.
-
-Use existing identity, JDBC authorization/consent and registered clients. Return public client identity/name/read scope only, never credentials. Framework CSRF context protects the management mutation. Share a durable per-user grant transaction/lock with maintained token-grant handlers (code/refresh), rechecking after lock so an in-flight issuance cannot recreate withdrawn state. Prove a controlled overlapping refresh/withdrawal through real HTTP/database boundaries, not mocked collaborators. Existing provider-list hook is observed; use current tables/transactions, no process cache or parallel grant model. Sizing: 5–10 minutes source plus required backend/generated-client/HTTP proof; stop/refine a model or budget overrun.
-Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#12-withdraw-a-users-whole-client-grant-atomically).
+Proof: [execution evidence](EXECUTION-EVIDENCE.md#12-withdraw-a-users-whole-client-grant-atomically).
 
 ### 13. Manage connected assistants in Settings
 Type: Behavior
 Status: done
-Proof: Mounted component/types and actual fixture-backed browser settings withdrawal observe client identification, token/renewal refusal and reconnect requiring consent.
-
-Use generated management API/loading wrappers and framework CSRF context in existing named Settings navigation; retain personal-token controls. Show no credential/secret values. Reuse accepted backend isolation/race proof and actual GitHub callback fixture; no new provider feature. Sizing: 5–10 minutes source plus frontend/browser cold proof.
-Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#13-manage-connected-assistants-in-settings).
+Proof: [execution evidence](EXECUTION-EVIDENCE.md#13-manage-connected-assistants-in-settings).
 
 ### 14. Establish an owned process-restart proof seam
 Type: Structure
 Status: done
-Proof: Public owner/lifetime tests and one actual owned restart show a new backend JVM while retaining canonical HTTPS origin, database and cleanup ownership; foreign/Development services remain untouched.
-
-Current supervised group exits on child close and has no restart operation. Add the smallest supported owned application restart seam, authenticating the active proof owner/lease. Restarting the owned application group is allowed when it is the existing indivisible ownership unit; retain outer TLS proxy and MySQL. No classloader-only surrogate, detached orphan or shared-development restart. Sizing: 5–10 minutes source plus lifecycle suites/cold waits; stop/refine an ownership model overrun.
-Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#14-establish-an-owned-process-restart-proof-seam).
+Proof: [execution evidence](EXECUTION-EVIDENCE.md#14-establish-an-owned-process-restart-proof-seam).
 
 ### 15. Keep authorization valid across a backend restart
 Type: Behavior
 Status: done
-Proof: Real credentials survive an actual owned JVM replacement with the same MySQL/origin; renewal and cookie-free SDK read preserve user/resource/scope, and remembered consent remains effective.
-
-Use seam14. Withdraw and restart again: old MCP/refresh fail and reconnection requires consent; no reset between process instances. Observe ordinary grant and consent behavior, not same-JVM repositories. Sizing: ~5 minutes source/probe plus two owned startup waits.
-Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#15-keep-authorization-valid-across-a-backend-restart).
+Proof: [execution evidence](EXECUTION-EVIDENCE.md#15-keep-authorization-valid-across-a-backend-restart).
 
 ### 16. Support OAuth clients over the owned TLS fixture
 Type: Structure
 Status: done
-Proof: Public TLS fixture forwards SDK URLSearchParams form bytes while retaining JSON/bearer forwarding and strict CA verification; exposed browser pin identifies the owned leaf.
-
-Keep the existing TLS proxy/fetch boundary. Accept the maintained SDK's form body and expose only public leaf pin data for the immediate hosted-browser consumer. Reuse accepted actual SDK exchange and focused TLS observation; no browser manager or blanket trust bypass. Sizing: the extracted implementation is complete; bounded public-leaf observation/refactor/delivery remain. All other original fixture-attempt code is parked externally with hashes until 17.
-Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#16-support-oauth-clients-over-the-owned-tls-fixture).
+Proof: [execution evidence](EXECUTION-EVIDENCE.md#16-support-oauth-clients-over-the-owned-tls-fixture).
 
 ### 17. Complete hosted SDK authorization through the browser
 Type: Structure
 Status: done
-Proof: Actual permanent initial Cypress scenario completes HTTPS discovery, existing GitHub sign-in, informed consent, exact callback state/S256, maintained SDK exchange and private attributed read with owned cleanup.
-
-Restore parked compatible client/provider/runner/tasks/feature work. First bounded probe (maximum five source minutes plus one cold replay) traces actual Cypress request/session/saved-request continuation: Chrome reaches authenticated home instead of consent while direct pinned Playwright/SDK passes. Compare the HTTP Cypress top origin with canonical HTTPS cookie context; do not supply authorization/consent in setup or blame the driver without observation. Use the smallest supported existing runner/browser seam; stop/refine if the cause or solution remains unsettled. Keep secret/verifier/tokens server-held before bootstrap, strict CA/public owned pins, primary CI glob selection and ordinary runner defaults. No new GitHub provider feature. Proof uses Chrome as CI does; disclose Electron fixture limitations. Sizing: five-minute decisive probe, then at most five source minutes if supported; cold waits are exceptions.
-Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#17-complete-hosted-sdk-authorization-through-the-browser).
+Proof: [execution evidence](EXECUTION-EVIDENCE.md#17-complete-hosted-sdk-authorization-through-the-browser).
 
 ### 18. Connect through the documented OAuth journey
 Type: Behavior
-Status: planned
+Status: done
 Proof: Permanent isolated assistant_account_linking.feature uses the real hosted SDK client through discovery → GitHub/informed consent → exchange → attributed search/read/bounded graph → expiry/automatic renewal → Settings withdrawal/reconnection.
 
 Extend fixture17's initial feature using accepted state/callback, isolation, constraint/race/restart proof; require actual SDK credential replacement before retry and no ordinary-call browser login. Run the complete feature and existing mcp_services.feature over verified TLS. Document client registration/encoded server secrets, canonical issuer/resource/exact callback, default finite lifetimes/rotation, existing GitHub reuse, consent/withdrawal/reconnect, schema-first release and narrow discovery ADR exception; retain personal-token instructions. ChatGPT remains story3. No real-client activation/deployment authority. Sizing: 5–10 minutes source plus mandatory E2E cold proof; stop/refine incompatible client or source overrun.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#18-connect-through-the-documented-oauth-journey).
 
 ## Consumer trace and verification
 
@@ -248,3 +224,18 @@ Disposition: proved by slice 17: public exact and primary mcp/** runner cases ob
 Reported: slice 16 — "Runtime114 showed113pass/1inventory fail because admitting leaf17's feature before its file exists violates existing registry inventory."
 Story clause: "The client discovers the authorization server, sends the user through GitHub sign-in, and shows Donut's read-access consent."
 Disposition: proved by slice 17: actual initial assistant_account_linking.feature exists and passes; public runtime116 includes registry inventory reconciliation and all ordinary selections. See hosted SDK evidence17 and /tmp/dough-story2-slice17-runtime.log.
+
+### G13. Observe actual SDK renewal after finite expiry
+Reported: slice 18 — "hosted scenario reached automatic-renewal assertion but generation remained1 after expiry wait"
+Story clause: "When its short-lived access token expires, the client renews it and can read again under the same resource and scope."
+Disposition: proved by slice 18: final permanent pair observes actual MCP401, maintained SDK refresh200, private saved replacement generation1→2 before MCP200 and equal attributed read; positive canonical issuer/token endpoint/resource/read scope and unchanged GitHub visits. Safe failed timing observations and final /tmp/dough-story2-slice18-cypress-final.log are retained in hosted SDK evidence18.
+
+### G14. Preserve personal-token MCP in the composed fixture
+Reported: slice 18 — "existing nine MCP scenarios all attempted and failed because their TLS proxy only accepts HTTP upstream, while hosted selection changes Cypress baseUrl to canonical HTTPS."
+Story clause: "Existing personal-token workflows remain available."
+Disposition: proved by slice 18: preserve guard-selected HTTP Node MCP forwardOrigin before hosted canonical HTTPS browser override. Final exact pair passes all nine ordinary MCP scenarios together with hosted lifecycle, /tmp/dough-story2-slice18-cypress-final.log; runtime116 and actual config→mcpClientTasks→PAT client consumers are inspected/classified. Earlier inherited17 host-origin coupling is retained as the first failed composition, not relabeled unaffected.
+
+### G15. Paired-worktree scenario has a separate harness
+Reported: slice 18 — "wrapper's pre-existing mcpIsolationProof filter deliberately excludes its paired-worktree-only scenario when no peer barrier is configured"
+Story clause: "Existing personal-token workflows remain available."
+Disposition: no user cost "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client.": Inspected applyMcpIsolationCypressExpose and all-or-none own/foreign/barrier inputs: the default focused batch deliberately selects nine ordinary MCP scenarios; the paired-only rendezvous needs its own peer harness. No new filter was added. The changed Node binding preserves the guard-selected HTTP origin before the hosted browser override; ordinary and paired-only selections without hosted fixture use the same origin as before. Public runtime/owner isolation proof remains unchanged. Final composed proof must truthfully report one hosted plus nine ordinary MCP scenarios; it claims no live paired-worktree observation. The coordinator withdrew its overbroad all-scenarios instruction without changing the source's two-user/current-permission promise, already proved through actual SDK and backend boundaries.
