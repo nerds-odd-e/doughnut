@@ -27,6 +27,7 @@ import {
   releaseSutOwnership,
 } from './sut-owner.mjs'
 import { stopOwnedSutProcessTree } from './sut-owned-process-tree.mjs'
+import { ownedApplicationRestart } from './sut-owned-restart.mjs'
 import { waitForSutHealthy } from './sut-start-health-wait.mjs'
 import {
   LOG_FILE,
@@ -90,7 +91,7 @@ async function releaseOwnedLifetime({ child, checkoutRoot, ownerRef }) {
  *   https?: boolean,
  *   env?: NodeJS.ProcessEnv,
  * }} [opts]
- * @returns {Promise<{ child: import('node:child_process').ChildProcess, target: object, tlsProxy?: import('../e2e_test/support/mcp_tls_proxy.ts').McpTlsProxy, ready: Promise<{ ok: boolean, exitCode: number }>, shutdown: () => Promise<void> }>}
+ * @returns {Promise<{ child: import('node:child_process').ChildProcess, target: object, tlsProxy?: import('../e2e_test/support/mcp_tls_proxy.ts').McpTlsProxy, ready: Promise<{ ok: boolean, exitCode: number }>, restartApplication: Function, shutdown: () => Promise<void> }>}
  */
 export async function startOwnedSutLifetime({
   spawnFn = spawn,
@@ -199,7 +200,7 @@ export async function startOwnedSutLifetime({
     child = spawned.child
     await writePidFile(child.pid, { pidFile })
 
-    const ready = waitForSutHealthy({
+    const readiness = {
       child,
       timeoutMs,
       pollMs,
@@ -210,7 +211,8 @@ export async function startOwnedSutLifetime({
       runtimeTarget: target,
       checkoutRoot,
       signal,
-    }).then(
+    }
+    const ready = waitForSutHealthy(readiness).then(
       async (result) => {
         if (!result.ok) await closeTls()
         return result
@@ -229,7 +231,11 @@ export async function startOwnedSutLifetime({
       }
     }
 
-    return { child, target, tlsProxy, ready, shutdown }
+    const restartApplication = ownedApplicationRestart({
+      ownerRef,
+      ...readiness,
+    })
+    return { child, target, tlsProxy, ready, restartApplication, shutdown }
   } catch (error) {
     if (!admissionReleased) releaseAdmissionIfHeld()
     try {

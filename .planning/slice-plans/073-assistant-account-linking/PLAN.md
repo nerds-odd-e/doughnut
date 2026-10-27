@@ -23,6 +23,7 @@ Slice 9 published `47add57de8a497e44734cf4a462735079cf65d66`.
 Slice 10 published `5057876408a583ee2ee27f1f2282969ec0b976b5`.
 Slice 11 published `81d5879fca427614836ceac60f96d79bad92639e`.
 Slice 12 published `210c70a033bed3d6dae8b1f72632c76ddefbc707`.
+Slice 13 published `2327b254faff5367b4ef78ae3f62a9e0bd413ef9`.
 Slice 2's SHA is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's
@@ -141,10 +142,11 @@ Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#13-manage-connected-a
 
 ### 14. Establish an owned process-restart proof seam
 Type: Structure
-Status: planned
+Status: done
 Proof: Public owner/lifetime tests and one actual owned restart show a new backend JVM while retaining canonical HTTPS origin, database and cleanup ownership; foreign/Development services remain untouched.
 
 Current supervised group exits on child close and has no restart operation. Add the smallest supported owned application restart seam, authenticating the active proof owner/lease. Restarting the owned application group is allowed when it is the existing indivisible ownership unit; retain outer TLS proxy and MySQL. No classloader-only surrogate, detached orphan or shared-development restart. Sizing: 5–10 minutes source plus lifecycle suites/cold waits; stop/refine an ownership model overrun.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#14-establish-an-owned-process-restart-proof-seam).
 
 ### 15. Keep authorization valid across a backend restart
 Type: Behavior
@@ -219,3 +221,13 @@ Disposition: proved by slice 12: AssistantAuthorizationServerConfiguration post-
 Reported: slice 12 — "Acceptance traced anonymous management/context GET302 through generated fetch to login HTML200; the existing frontend login interceptor requires HTTP401, so a logged-out settings/context request could appear successful."
 Story clause: "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client."
 Disposition: proved by slice 12: AssistantConsentTest observes missing-session context401, real logout followed by ended-session401 for both JSON routes, and valid anonymous AUTHORIZE302 to /login; AssistantManagementTest observes anonymous list401. Final backend9926 passed2961/0failures/0errors/2skips. The existing frontend clientSetup GET401 sign-in test passed in unchanged frontend73910; its interceptor/helper/return-location continuation was inspected, with all reached consumers classified in /tmp/dough-story2-json-context-consumers.md. Authenticated grant/DTO/race paths remain unchanged.
+
+### G7. Live Development preservation was not directly observed
+Reported: slice 14 — "The actual restart probe had no live Development listener; its preservation was not directly observed."
+Story clause: "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client."
+Disposition: no user cost "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client.": The new control operation is confined to the authenticated SUT owner/application tree and matching active lease. Inspected paths never address Development ownership; shared supervisor's default unexpected-exit/log behavior passes19 Development tests. Actual foreign process and HTTP sentinels survive, and owner/lifetime tests preserve foreign peers. Port5175 was empty before/after; no stronger live-Development claim is made or required for the OAuth outcome. Actual OAuth grant/consent restart remains15.
+
+### G8. Keep baseline signal forwarding during cleanup
+Reported: slice 14 — "Acceptance found new signal-listener removal also ran before ordinary asynchronous cleanup, changing the shared supervisor's default failure path."
+Story clause: "A backend restart between authorization and renewal preserves the valid grant and its user binding."
+Disposition: proved by slice 14: removed only the new normal-finish listener removal, restoring baseline signal forwarding through onBeforeExit while retaining removal for the planned expected-close branch. Development19 and SUT80 passed after this one-line restoration, including default forced-exit/bounded-cleanup and authorized restart cases. Actual new-JVM/HTTPS/database/foreign-sentinel proof remains valid because its planned branch is unchanged.

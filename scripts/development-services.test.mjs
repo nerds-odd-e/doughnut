@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
@@ -13,6 +14,34 @@ const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 )
+
+test('Development supervisor closes its log and exits with an unexpected child failure', async () => {
+  const supervisor = spawn(
+    process.execPath,
+    [
+      '--input-type=module',
+      '-e',
+      `
+    import { spawn } from 'node:child_process'
+    import { runDevelopmentServices } from ${JSON.stringify(new URL('./development-services.mjs', import.meta.url).href)}
+    runDevelopmentServices({
+      spawnFn: (_command, args, options) => spawn(process.execPath, args, options),
+      serviceArgs: ['-e', 'process.exit(7)'],
+      logWriter: { write: chunk => process.stdout.write(chunk), close: () => process.stdout.write('LOG CLOSED\\n') },
+    })
+  `,
+    ],
+    { stdio: ['ignore', 'pipe', 'pipe'] }
+  )
+  let output = ''
+  supervisor.stdout.on('data', (chunk) => {
+    output += chunk
+  })
+  const code = await new Promise((resolve) => supervisor.once('close', resolve))
+  assert.equal(code, 7)
+  assert.match(output, /Forced Development service child exit \(code 7\)/)
+  assert.equal(output.split('LOG CLOSED').length - 1, 1)
+})
 
 test('DEVELOPMENT_SERVICE_ARGS are reload-capable and never include Mountebank', () => {
   assert.deepEqual(DEVELOPMENT_SERVICE_ARGS, [

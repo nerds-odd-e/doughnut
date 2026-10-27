@@ -168,3 +168,21 @@ export async function beginSutOwnerShutdown(checkoutRoot) {
   }
   return result
 }
+
+export async function restartSutApplication(
+  checkoutRoot,
+  leaseToken,
+  ownedRecord
+) {
+  const owner = ownedRecord ?? (await readOwnerRecord(checkoutRoot))
+  if (!(owner?.token && owner?.controlPath)) throw noLiveOwnerError()
+  const result = await requestOwnerControl(owner.controlPath, owner.token, {
+    method: 'POST',
+    urlPath: '/restart-application',
+    headers: leaseToken ? { 'X-Sut-Runner-Lease': leaseToken } : {},
+    timeoutMs: 15_000,
+  })
+  if (!result.ok)
+    throw new Error(result.error ?? 'Owned application restart failed.')
+  return result
+}

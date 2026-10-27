@@ -205,6 +205,10 @@ export async function runOwnedE2eInvocation({
         mockExit,
         target: lifetime.target,
         tlsProxy: lifetime.tlsProxy,
+        restartApplication: async () => {
+          leaseToken ??= await acquireSutRunnerLease(checkoutRoot)
+          return lifetime.restartApplication(leaseToken)
+        },
         errLog,
         cancelEscalationMs,
         browser,
