@@ -150,10 +150,11 @@ Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#14-establish-an-owned
 
 ### 15. Keep authorization valid across a backend restart
 Type: Behavior
-Status: planned
+Status: done
 Proof: Real credentials survive an actual owned JVM replacement with the same MySQL/origin; renewal and cookie-free SDK read preserve user/resource/scope, and remembered consent remains effective.
 
 Use seam14. Withdraw and restart again: old MCP/refresh fail and reconnection requires consent; no reset between process instances. Observe ordinary grant and consent behavior, not same-JVM repositories. Sizing: ~5 minutes source/probe plus two owned startup waits.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#15-keep-authorization-valid-across-a-backend-restart).
 
 ### 16. Establish the hosted SDK client fixture
 Type: Structure
