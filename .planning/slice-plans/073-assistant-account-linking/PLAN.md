@@ -82,7 +82,7 @@ No product behavior changed; no product test rerun. Sizing: ~5 minutes.
 
 ### 2. Persist assistant authorization state
 Type: Structure
-Status: planned
+Status: done
 Proof: MySQL migration/JDBC grant-consent round-trip, all backend tests, regenerated ERD; login/personal-token behavior retained.
 
 Add minimum compatible registered-client/authorization/consent schema at a version
@@ -91,6 +91,12 @@ deletion rules. This commit has no runtime consumers or personal-token data migr
 it enables slice 3 and is the immutable schema-first release point described above.
 Record schema commit and separately authorized release/table verification before
 shipping dependent runtime code. Sizing: 6–10 minutes plus migration/ERD proof.
+Accepted: source-only `/root/source_promises_2` separates durable grant/consent
+from process restart. `AssistantAuthorizationPersistenceTest` fresh JDBC stores
+reload bound state. Full command: `CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2 -Dorg.gradle.internal.http.socketTimeout=20000 -Dorg.gradle.internal.http.connectionTimeout=20000' pnpm backend:verify`.
+Passed 2,901 tests (0 failures/errors, 2 existing skips); the first attempt hit a dependency-fetch timeout before compilation.
+ERD command: `CURSOR_DEV=true nix develop -c env DONUT_ERD_SCHEMA=doughnut_wt_c5528f397af6467b8cdbe326355f44f1_test pnpm export:database-erd`.
+no production consumer was added. Restart remains slice 9; enforcement remains 4–8.
 
 ### 3. Discover the configured authorization service
 Type: Behavior
@@ -233,3 +239,10 @@ No extra refinement was needed; estimate 2–4 hours excluding operator waits.
 Reassess disproved sizing assumptions; preserve renewal, withdrawal, persistence
 and real-client proof. The owner's reuse clarification settles the GitHub gate;
 slice 4 owns new continuation proof and schema deployment retains its release gate.
+
+## Story obligations
+
+### G1. Clear E2E OAuth state when runtime storage begins
+Reported: slice 2 — "E2E JDBC-only cleanup must include OAuth tables when runtime use begins."
+Story clause: "Reuse the user's existing Donut identity and current notebook permissions."
+Disposition: receiving slice 3
