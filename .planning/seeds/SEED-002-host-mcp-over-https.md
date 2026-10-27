@@ -84,7 +84,7 @@ service with correct attribution and user access?
   for observation and test environments.
 - Complete migration includes deleting the standalone local MCP package and
   everything used only by it, with the whole-product reading described in
-  story 1. Shared client or test dependencies stay where other callers need them.
+  story 4. Shared client or test dependencies stay where other callers need them.
 
 ## Story Decomposition
 
@@ -354,6 +354,77 @@ HTTPS connection.
   personal/custom plugin. A public-directory listing is a separate product
   decision and is not required for this outcome.
 
+<a id="story-4"></a>
+
+### Complete the retirement of the local MCP server
+
+**Identity:** SEED-002#story-4
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal:** Donut users connect their MCP clients directly to the backend's HTTPS
+service, and maintainers support that service with one coherent set of behavior
+tests after completely deleting the standalone local server and its dependents.
+
+- **For / why:** Users and maintainers need the supported connection, setup
+  instructions, build tooling, and E2E coverage to agree on the backend-owned
+  HTTPS service.
+- **Scope:** Delete every remaining part of the standalone local MCP server,
+  recursively including its exclusive tests, fixtures, helpers, dependencies,
+  package and lockfile entries, build/distribution outputs, scripts, CI wiring,
+  configuration, documentation, comments, agent guidance, and generated
+  artifacts. Sweep backend, frontend, CLI, MCP, tooling, and documentation;
+  keep shared code and dependencies that surviving callers need. Document the
+  supported connection directly to the existing backend `/api/mcp` endpoint.
+- **E2E disposition:** Redirect any tests still using the local process or stdio
+  transport to the backend's HTTPS service. Where coverage already exercises
+  HTTPS, compare the promised behaviors and delete redundant tests and their
+  exclusive support. Retain meaningful proof of each distinct surviving
+  behavior, including token-scoped access, candidate search, attributed reads,
+  bounded graph context, and isolated E2E operation. The E2E TLS proxy is test
+  transport infrastructure forwarding to the backend, not the standalone MCP
+  implementation targeted for deletion.
+- **Evaluation:** A client configured with the Donut HTTPS URL and a personal
+  token discovers and uses the backend tools. The retained E2E journeys exercise
+  those behaviors through verified HTTPS against their own disposable stack.
+  Local-only coverage moves to that boundary; duplicate HTTPS coverage is
+  deleted without discarding distinct behavior proof.
+- **Removal reading:** At acceptance, perform a one-time whole-product search
+  for the retired package, process, bundle, commands, and setup names, and
+  inspect exclusive dependents transitively. Record the search and classified
+  result as a reading in the execution plan, separately from surviving-behavior
+  tests. Add no absence assertion, permanent checker, compatibility guard, or
+  historical removal note. Preserve the provenance of retained dated evidence;
+  resolve obsolete dependent observations with their consumers rather than
+  relabeling an observed action to clear a search.
+- **Boundary:** Reuse the delivered HTTPS service and existing tool semantics.
+  OAuth account linking and ChatGPT onboarding remain with stories 2 and 3.
+  Follow [ADR 0005 — Web routes](../../docs/adrs/0005-web-routes-accepted.md)
+  for the API boundary and
+  [ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md)
+  for disposable E2E ownership.
+- **Value / learning:** Finish the retirement and remove maintenance duplication
+  while preserving confidence in the connection users actually use.
+- **Effort hypothesis:** S (30–60 minutes), medium confidence because tracked
+  package deletion and HTTPS E2E migration have already landed; refinement
+  should size any newly discovered dependents before execution.
+- **Safe stopping point:** The existing HTTPS service and its distinct behavior
+  coverage remain useful independently of later OAuth or ChatGPT work.
+
+**Current evidence, 2026-10-27:** Repository reading at
+`3d32688d4a040ab4e57e8a5a03d48963e4dc157f` found that
+`b8c5d9ae302d4be49c63edeaea06e5b7ffe7b158` had already deleted the tracked
+`mcp-server` package and updated workspace/build/CI/setup references.
+`e2e_test/support/mcp_client.ts` already uses `StreamableHTTPClientTransport`
+through a trusted TLS proxy to the backend `/api/mcp` endpoint;
+`e2e_test/features/mcp/mcp_services.feature` uses that client. This checkout
+still contains the untracked generated bundle
+`mcp-server/dist/mcp-server.bundle.mjs`. These are source and filesystem
+observations, not a new test run or a finding that existing HTTPS scenarios
+are redundant. Start from the delivered behavior and classify remaining work
+rather than repeating the completed migration.
+
 ## Ordering and Scope Reduction
 
 The order delivers an immediately usable remote knowledge service, then
@@ -361,6 +432,10 @@ user-controlled account linking, then the specific ChatGPT experience. Keep
 each supplier's working outcome available to compatible clients even if a
 later story is cancelled. Necessary blocking supplier agreements belong in
 the consumers' canonical sections and must be recorded with the backlog tool.
+
+Story 4 closes the local-server retirement against the delivered HTTPS
+service. It is queued next and can proceed independently of account linking;
+it adds no prerequisite to stories 2 or 3.
 
 If scope must shrink, defer public-directory distribution, editing tools,
 custom ChatGPT UI, and broader search before changing the three read
