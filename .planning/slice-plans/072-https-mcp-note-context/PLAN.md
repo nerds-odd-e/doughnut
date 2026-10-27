@@ -181,7 +181,7 @@ Learnings:
 
 ### 3. Read a selected note with its accepted revision
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP full read and REST regression through the shared operation, using
 Git-backed note fixtures; refused foreign private note; all backend tests.
 
@@ -194,6 +194,23 @@ and use the current note-ID/revision citation contract.
 
 Sizing: 6–10 minutes plus backend verification. Shared extraction belongs in
 this behavior slice because its immediate consumer and proof are here.
+
+Accepted proof (reuse):
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — 2894 tests, 0
+  failures. Focused: `ReadNoteMcpEndpointTest`,
+  `AttributedNoteContentControllerTests`, `McpEndpointTest$ProtocolNegotiation`.
+- Observations: full attribution once; accepted edit changes later revision;
+  unbound notebook omits/nulls `acceptedRevision`; foreign private → JSON-RPC
+  error; REST regression green; tools/list includes `read_note`.
+- Local stdio: `pnpm mcp-server:test` — 18 passed.
+- Post-change refactor: no edits (already cohesive).
+
+Learnings:
+- Shared `AttributedNoteContentService` owns auth + projection + revision in
+  one `@Transactional(readOnly=true)` for REST and MCP.
+- MCP Git-backed tests live in `controllers` package to reuse package-private
+  Git fixtures; deliberate `UnexpectedNoAccessRightException` is rethrown so
+  `FailureReportFactory.isDeliberate` still applies.
 
 ### 4. Retrieve bounded context for a readable note
 Type: Behavior

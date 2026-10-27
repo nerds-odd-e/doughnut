@@ -92,7 +92,9 @@ class McpEndpointTest extends McpEndpointTestBase {
           .perform(authorized(mcpPost(TOOLS_LIST_BODY)))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.result.tools[0].name", equalTo(ListNoteCandidatesTool.NAME)))
-          .andExpect(jsonPath("$.result.tools[0].inputSchema.properties.query").exists());
+          .andExpect(jsonPath("$.result.tools[0].inputSchema.properties.query").exists())
+          .andExpect(jsonPath("$.result.tools[1].name", equalTo(ReadNoteTool.NAME)))
+          .andExpect(jsonPath("$.result.tools[1].inputSchema.properties.noteId").exists());
     }
   }
 }
