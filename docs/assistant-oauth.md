@@ -73,6 +73,22 @@ again. Other users' grants are independent. An already authorized in-flight read
 may finish, and information already disclosed cannot be recalled. Grants and
 consent persist across backend restarts.
 
+## Authorization implementation
+
+Spring Security Authorization Server owns the protocol handlers. Registered
+clients, authorizations and remembered consent use its maintained JDBC stores;
+assistant grants are separate from personal `UserToken` credentials. The
+authorization-service interface proxy preserves the singleton JDBC target while
+honoring lazy startup for database-free API metadata generation.
+
+MCP resolves opaque credentials against local grant state and the existing Donut
+user and notebook permission services. It uses the authorizing GitHub user's
+identity, rather than the OAuth client principal. Authorization, renewal and
+withdrawal share a per-user database lock so completed withdrawal invalidates
+all of that user's credentials and pending consent for the client atomically.
+Consent and grant management enforce CSRF protection. Configured clients are
+bootstrapped on application readiness after the Flyway readiness listener.
+
 ## Routing and release order
 
 Terry Yin approved two exact discovery exceptions to
