@@ -3,6 +3,8 @@ package com.odde.donut.oauth;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
@@ -22,6 +24,8 @@ public class AssistantAuthorizationConfiguration {
   }
 
   @Bean
+  // Honor lazy startup for tasks that only inspect API metadata.
+  @Scope(proxyMode = ScopedProxyMode.INTERFACES)
   OAuth2AuthorizationService oauth2AuthorizationService(
       JdbcTemplate jdbcTemplate, RegisteredClientRepository clients) {
     return new JdbcOAuth2AuthorizationService(jdbcTemplate, clients);

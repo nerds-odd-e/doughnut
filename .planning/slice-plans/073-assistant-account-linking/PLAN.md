@@ -10,7 +10,7 @@
 Agent: Yua-chan; publisher: `dashboard-territory.local-doughnut`.
 The preparation checkout is the owned execution checkout, branch `codex/link-an-assistant-to-donut-through-github-sign-i`, Story Branch Mode. Integration/default checkout: `/Users/terryyin/git/doughnut`; remote: `origin`; eventual target: `main`. Ordinary increments publish the execution branch.
 Starting revision: `83615a792fe3aa3107badb07d883a70398d75127`; startup claim `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` was confirmed on remote main/execution branch.
-Implementation 18 `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3`; completion `33454cf0d682c918f1f8f6761b2c2784feb516d0`; [publication history](PUBLICATION-EVIDENCE.md) and [CI recovery](HOSTED-SDK-EVIDENCE.md#ci-navigation-gate-repair).
+Implementation 18 `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3`; completion `33454cf0d682c918f1f8f6761b2c2784feb516d0`; navigation repair `4fa3ad93d52c23d9a0dc587917d2d85c063d426b`; [publication history](PUBLICATION-EVIDENCE.md) and [CI recovery](HOSTED-SDK-EVIDENCE.md#ci-api-generation-repair).
 Slice 2 `d488c64dbc69a00c51f2cc9237f71ae9fda016a1` is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's current dependency fingerprint. `CURSOR_DEV=true nix develop -c pnpm validate:path-routing` passed 11 backend probes/five static paths; this establishes command readiness only. No live GitHub observation, production deployment, real-account authorization or paid call occurred.
@@ -141,25 +141,13 @@ Proof: [execution evidence](EXECUTION-EVIDENCE.md#18-connect-through-the-documen
 
 ## Execution complete
 
-Product advice: no change. The amended existing-user assistant lifecycle is delivered; keep ChatGPT onboarding in the existing SEED-002#story-3. No correction plan or new product priority is recommended. Aggregate review covers the attributable publication set, current whole-product identity/permission/content boundaries and retained tests. The developer authorized one fresh CI observer after the original missing-registration handoff; its owned navigation-gate failure is repaired locally and CI completion remains required.
+Product advice: no change. The amended existing-user assistant lifecycle is delivered; keep ChatGPT onboarding in the existing SEED-002#story-3. No correction plan or new product priority is recommended. Aggregate review covers the attributable publication set, current whole-product identity/permission/content boundaries and retained tests. The developer authorized one fresh CI observer after the original missing-registration handoff; navigation repair is published, its subsequent database-free generation failure is repaired locally, and CI completion remains required.
 
 ## Consumer trace and verification
 
-One-time aggregate acceptance reading at `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3`: searching backend/frontend/CLI/E2E/packages/scripts/docs/agent guidance found no product reference to the retired `McpTokenAuthenticationFilter` class name. This is a reading, not a test; retained ApiBearerAuthenticationFilter/MCP/general-API tests and actual SDK/PAT journeys prove the replacement behavior.
+Accepted 1–18 observations and literal commands are in the linked execution/hosted SDK evidence, including the one-time aggregate removal reading and original verification instructions. Each repair traces actual consumers, reuses unchanged proof, runs sufficient affected boundaries, and retains failures and limitations.
 
-Trace security/principal/user/permission, login continuation/token settings and supplier HTTP ingress/client.
-Per diff run installed `consumer-trace.mjs --checkout <execution-checkout> --base HEAD` with `CurrentUserFetcherFromRequest`, `login/continue`, `Authorization`, `generateToken` and MCP connection phrases; follow callers/journeys and classify run/reused/excluded.
-
-- Run all backend tests, including retained login/profile/personal tokens and new real-filter/MySQL authorization; use SpringTestBase MockMvc/session cleanup, without redundant contexts. Reuse literal commands in the linked execution evidence.
-- Run mounted consent/settings tests and both frontend typechecks on same generated API; use generated SDK/loading wrappers, existing navigation and Vite component declarations.
-- Run routing classifier/rendered production map/validation; generate/lint OpenAPI from source for API contracts, never hand-edit generated artifacts.
-- Run focused OAuth and existing MCP E2E; extend runner/client lifecycle tests for changed TLS/provider/restart ownership. No real GitHub credentials in CI.
-- CLI extra behavior excluded while personal tokens unchanged; revise/run affected boundaries if shared auth reaches CLI. Full E2E suite is not a local gate.
-
-- `CURSOR_DEV=true nix develop -c env SUT_TIMEOUT_MS=240000 pnpm cy:run --spec e2e_test/features/mcp/assistant_account_linking.feature,e2e_test/features/mcp/mcp_services.feature --browser chrome` after isolated registration; wrapper owns data/ports/fixtures.
-
-Delivery: Jidoka → fresh refactor → API generation when needed → coordinator `./scripts/run.sh pnpm format:changed` once → plan update → agent commit/check-only hook → push.
-Execute Plan owns CI/Story Wrap Up. Inspect host load/memory/competitors and sequence heavy proof/build output. Reuse unchanged proof; narrow passes cannot replace failed required suites. No removal is planned.
+Delivery remains Jidoka → fresh refactor → needed API generation → coordinator format:changed once → plan evidence/agent commit with check-only hook → managed publication. Execute Plan owns CI and Story Wrap Up; sequence heavy work using actual host/ownership evidence. No production deployment or real-client activation is authorized.
 
 ## Sizing assessment
 
@@ -247,3 +235,8 @@ Disposition: no user cost "A Donut user can grant, maintain, and withdraw a comp
 Reported: slice 18 — "Whole E2E typecheck remains red236 existing diagnostics outside this repair; not a green whole-project typecheck claim."
 Story clause: "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client."
 Disposition: no user cost "A Donut user can grant, maintain, and withdraw a compatible assistant's read access by signing into Donut through GitHub, without manually copying a Donut personal access token into that client.": Same actual E2E compiler configuration observes baseline238/current236, zero new diagnostics and both edited files clear after correcting two owned unsupported query options. Remaining diagnostics are outside the repair; no whole-typecheck success is claimed. Actual compiled hosted lifecycle plus nine ordinary MCP scenarios pass10/10; unchanged backend/frontend/runtime proof remains accepted. Corrected harness observations and failed reduced-root probes are retained in hosted SDK evidence.
+
+### G17. Preserve database-free API generation
+Reported: slice 18 — "Failure is owned eager construction, not infrastructure."
+Story clause: "Reuse the user's existing Donut identity and current notebook permissions."
+Disposition: proved by slice 18: one canonical singleton authorization-service interface proxy preserves the maintained JDBC target while honoring the existing lazy metadata-generation context. The actual closed-database generator now saves byte-identical OpenAPI output; all backend2961 tests and actual hosted/PAT10 scenarios pass. Initial wrong-environment probes, the rejected filter-only change/HTTP500 despite process0, original incorrect constructor-SQL claim and final positive-output evidence remain in CI repair evidence. No alternate identity, store, handler, permission path or generated contract is introduced; normal startup and all current-grant/consent/renewal/withdrawal boundaries are observed.
