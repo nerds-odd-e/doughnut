@@ -14,9 +14,8 @@ export interface SearchDialogListKeydownOptions {
   when?: boolean
 }
 
-function isVerticalListNavigationKey(event: KeyboardEvent): boolean {
+export function isUnmodifiedKeydown(event: KeyboardEvent): boolean {
   return (
-    (event.key === "ArrowDown" || event.key === "ArrowUp") &&
     !event.isComposing &&
     !event.altKey &&
     !event.ctrlKey &&
@@ -25,29 +24,47 @@ function isVerticalListNavigationKey(event: KeyboardEvent): boolean {
   )
 }
 
-function listRows(container: Element | null, rowSelector: string): Element[] {
-  if (!container) return []
-  return Array.from(container.querySelectorAll(rowSelector))
+function isVerticalListNavigationKey(event: KeyboardEvent): boolean {
+  return (
+    (event.key === "ArrowDown" || event.key === "ArrowUp") &&
+    isUnmodifiedKeydown(event)
+  )
 }
 
-function isFocusInSearchField(searchInput: HTMLElement | null): boolean {
-  return searchInput != null && document.activeElement === searchInput
+interface InputListKeydownOptions {
+  input: HTMLElement | null
+  targets: HTMLElement[]
+  focusWithinTarget?: boolean
 }
 
-function isFocusInRows(rows: Element[]): boolean {
+export function handleInputListKeydown(
+  event: KeyboardEvent,
+  { input, targets, focusWithinTarget = false }: InputListKeydownOptions
+): boolean {
+  if (!isVerticalListNavigationKey(event) || targets.length === 0) return false
+
   const active = document.activeElement
-  if (!active) return false
-  return rows.some((row) => row.contains(active))
-}
+  const inInput = input != null && active === input
+  const currentIndex = targets.findIndex((target) =>
+    focusWithinTarget ? target.contains(active) : target === active
+  )
+  if (!inInput && currentIndex === -1) return false
 
-function focusedRowIndex(rows: Element[]): number {
-  const active = document.activeElement
-  if (!active) return -1
-  return rows.findIndex((row) => row.contains(active))
-}
-
-function focusRow(row: Element): boolean {
-  return focusTargetWithin(row)
+  const nextIndex =
+    event.key === "ArrowDown" ? currentIndex + 1 : currentIndex - 1
+  if (event.key === "ArrowUp" && currentIndex === 0) {
+    input?.focus()
+  } else {
+    const target = targets[nextIndex]
+    if (!target || (inInput && event.key === "ArrowUp")) return false
+    if (focusWithinTarget) {
+      if (!focusTargetWithin(target)) return false
+    } else {
+      target.focus()
+    }
+  }
+  event.preventDefault()
+  return true
 }
 
 export function handleSearchDialogListKeydown(
@@ -55,48 +72,14 @@ export function handleSearchDialogListKeydown(
   options: SearchDialogListKeydownOptions
 ): boolean {
   if (options.when === false) return false
-  if (!isVerticalListNavigationKey(event)) return false
-
-  const { container, rowSelector, searchInput } = options
-  const rows = listRows(container, rowSelector)
-  if (rows.length === 0) return false
-
-  const inSearch = isFocusInSearchField(searchInput)
-  const inList = isFocusInRows(rows)
-  if (!inSearch && !inList) return false
-
-  const currentIndex = focusedRowIndex(rows)
-
-  if (event.key === "ArrowDown") {
-    if (inSearch) {
-      const firstRow = rows[0]
-      if (!firstRow || !focusRow(firstRow)) return false
-      event.preventDefault()
-      return true
-    }
-    if (inList && currentIndex >= 0 && currentIndex < rows.length - 1) {
-      const nextRow = rows[currentIndex + 1]
-      if (!nextRow || !focusRow(nextRow)) return false
-      event.preventDefault()
-      return true
-    }
-    return false
-  }
-
-  if (event.key === "ArrowUp") {
-    if (!inList || currentIndex === -1) return false
-    if (currentIndex === 0) {
-      searchInput?.focus()
-      event.preventDefault()
-      return true
-    }
-    const previousRow = rows[currentIndex - 1]
-    if (!previousRow || !focusRow(previousRow)) return false
-    event.preventDefault()
-    return true
-  }
-
-  return false
+  return handleInputListKeydown(event, {
+    input: options.searchInput,
+    targets: Array.from(
+      options.container?.querySelectorAll<HTMLElement>(options.rowSelector) ??
+        []
+    ),
+    focusWithinTarget: true,
+  })
 }
 
 export function bindSearchDialogListKeydown(

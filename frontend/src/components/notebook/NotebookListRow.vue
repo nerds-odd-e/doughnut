@@ -14,7 +14,8 @@
     >
       <router-link
         :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
-        class="notebook-list-row__main flex min-w-0 flex-1 flex-col justify-center gap-0.5 no-underline"
+        data-notebook-catalog-target
+        class="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary notebook-list-row__main flex min-w-0 flex-1 flex-col justify-center gap-0.5 no-underline"
       >
         <h5
           class="font-semibold leading-snug text-base-content truncate"

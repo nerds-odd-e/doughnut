@@ -34,3 +34,28 @@ their existing sidebar owners.
 Navigation uses named locations and the shared note/property route family under
 [ADR 0005](adrs/0005-web-routes-accepted.md). Folder location follows the
 [notebook domain vocabulary](adrs/0001-ubiquitous-language.md#notebook--note-structure).
+
+## Notebook catalog
+
+The notebooks page autofocuses its filter when a non-empty catalog loads. The
+input has an accessible name and the placeholder "Search by notebook or group
+name". Filtering and sorting determine the entries available to keyboard
+navigation in both list and grid layouts.
+
+Down from the filter focuses the first displayed entry link. Up and Down visit
+the displayed notebooks, subscriptions, group headers and visible group members
+in reading order. Up from the first entry returns to the filter with its text
+intact. Up at the filter, Down at the last entry, and Down with no matches keep
+focus in place.
+
+Right from a group header focuses its first visible member; Left from a member
+returns to its header. An empty header and unrelated entries keep focus on
+horizontal arrows. Group previews retain their displayed size. Enter activates
+the focused notebook or group link, including empty and preview-limited groups.
+Entry links show a focus ring and use the browser's focus scrolling.
+
+Catalog arrows apply only to the filter and entry links. Left and Right in the
+filter retain text-cursor behavior; Tab and Shift+Tab retain access to clear,
+layout, sort and secondary controls. The catalog and search dialogs share the
+input-to-list traversal rule, while catalog group navigation reads membership
+and order from the rendered group panels.

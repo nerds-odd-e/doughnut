@@ -4,7 +4,8 @@
     <slot name="cardHeader" />
     <router-link
       :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
-      class="no-underline"
+      data-notebook-catalog-target
+      class="block no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
     >
       <div :class="compact ? 'p-2' : 'p-4'">
         <h5

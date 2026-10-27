@@ -28,7 +28,7 @@ describe("filter", () => {
         .notebook("Alpha notebook")
         .please()
 
-      helper
+      const wrapper = helper
         .component(NotebooksPageView)
         .withProps({
           catalogItems,
@@ -42,6 +42,11 @@ describe("filter", () => {
       await flushPromises()
 
       expect(focusedIds).toContain("notebook-filter-input")
+      const input = wrapper.get("#notebook-filter-input")
+      expect(input.attributes("aria-label")).toBe("Search notebooks and groups")
+      expect(input.attributes("placeholder")).toBe(
+        "Search by notebook or group name"
+      )
     } finally {
       focusSpy.mockRestore()
     }
