@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 326. Removed numbers are never reused.
+- Highest allocated local number: 332. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
@@ -26,6 +26,16 @@ Former local code: DD-109. Former local code: DD-163. Former local code: DD-168.
 ## ODF-121 — Transient transport failure ends observation
 
 Former local code: DD-115. A reported GitHub transport failure ends observation and leaves later revisions without notification coverage. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-121.md).
+
+### Occurrences
+
+- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: `/tmp/dough-ci-501/watch-QaZbTF/events/000000000001.json` reports workflow-runs acquisition `failed: gh failed`; `result.json` is `finished`, only f039069 was registered/undiscovered. Native coordinator history `01a17cf4-7699-7b80-87e5-7d4e8bc71f0b`, audit return 2026-10-27T13:46:02.975Z; retained publication receipts through b5afee6 report unobserved. Event timestamp itself was not recorded.
+  - Observed effect: A reported GitHub request failure ended the worker without a CI verdict; subsequent accepted revisions had no notification coverage. Installed Codex policy forbids restarting terminal finished observers, so recovery needs a human override even though local implementation continued.
+  - Inference: Repeats the request-failure/ended-observation mechanism; the underlying gh/server cause and whether it was transient were not established. No CI success or shared recovery fix is claimed.
 
 <a id="odf-106"></a>
 
@@ -90,6 +100,14 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
   - Evidence: six post-change-refactor Task launches (one per delivered slice); slice-3 agent return reported no edits and `skipped — no refactor edits` after ~12 minutes active; plan learnings record post-change refactor no-edits for slice 3 and a task-seam-only edit for slice 6.
   - Observed effect: repeated full refactor agents on already-accepted small diffs, including at least one no-edit pass, before delivery continued.
   - Inference: repeats the fixed per-slice refactor cost; no measured token total claimed.
+
+- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-10-28 leaf15 no-edit review `/tmp/dough-story2-durability-refactor.md` reports about six active minutes; post-extraction no-edit review `/tmp/dough-story2-durability-modules-refactor.md` reports about four. Their accepted implementation/repair are f2bfa481 and 87033c6a; b5afee6:.planning/slice-plans/073-assistant-account-linking/EXECUTION-EVIDENCE.md retains both. Exact review event times unavailable.
+  - Observed effect: Fresh full refactor passes recurred within one execution even for a proof-only return needing no edits; each repeated context/consumer reading before delivery.
+  - Inference: The durations are agent estimates, not measured token or stopwatch totals. This supports the existing fixed-cost finding; useful later refactors are not claimed unnecessary.
 
 <a id="odf-208"></a>
 
@@ -196,6 +214,14 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
   - Evidence: dashboard launch `44097ed9-4344-48fc-950b-8c5b02b793fb`, startup on 2026-10-21; batched tool results reported truncation at 15,551 and 31,805 original tokens before focused reference reads recovered the required passages.
   - Observed effect: two oversized startup batches forced repeated retrieval before first-slice delegation.
   - Inference: the coordinator repeated the known broad-read deviation; savings are unmeasured.
+
+- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: This execution retrospective combined native Git manifest, direction and earliest PLAN reads into one functions.exec result: returned original total11148 tokens exceeded its default10000 result budget and truncated part of the original plan. The coordinator then retrieved only the missing45–102 passage. Native coordinator history01a17cf4 records both calls; exact event time unavailable.
+  - Observed effect: Avoidable review output truncation required an extra targeted retrieval even though each nested command had its own larger max_output_tokens.
+  - Inference: Nested tool budgets do not increase the orchestration result budget. No measured monetary or total-token saving is claimed.
 
 <a id="odf-265"></a>
 
@@ -339,6 +365,16 @@ Former local code: DD-274. Consumer discovery treated execution-evidence Identit
 
 Former local code: DD-319. Acceptance traced the unchanged transport API but not the existing E2E journeys whose preconditions the explicit question-load recovery changed; seven failures reached CI in SEED-081#story-2 and were repaired in the execution. Distinct from ODF-272 and ODF-310. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-150.md).
 
+### Occurrences
+
+- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: `a26a2a4094f5c0f61a3e1c56c00746e9414cf13b:e2e_test/config/common.ts` changes Cypress browser origin; leaf17 classified old MCP consumers as unchanged. First leaf18 composed run failed all nine ordinary MCP scenarios because its Node TLS client received HTTPS instead of HTTP. `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3:.planning/slice-plans/073-assistant-account-linking/HOSTED-SDK-EVIDENCE.md#18-connect-through-the-documented-oauth-journey` retains failed/final10-of10 receipts and G14.
+  - Observed effect: A changed configuration value reached an unchanged task/page-object/client chain that slice acceptance had excluded; the later composed journey found it and the same execution repaired the HTTP Node ingress binding.
+  - Inference: Matches indirect-consumer discovery, not a new OAuth server defect. Actual CI was unobserved; no CI failure is inferred from the local failure.
+
 <a id="odf-323"></a>
 
 ## ODF-323 — A caller-written plan-status mutation survives a later delivery refusal
@@ -386,3 +422,19 @@ An E2E Cypress `cy.task` handler that resolves to `undefined` can be reported gr
   - Evidence: slice 5 (`195d5f30f1`) `disconnectMcp` task returned `await mcpClient.disconnectMcp()` with no value; implementer reported local `pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature` — 9 passing; CI run 40481816429 failed every MCP scenario with `The task 'disconnectMcp' returned undefined`; slice 6 (`b8c5d9ae30`) fixed the task seam to `return null` after await (plan learning). Tip SHA later green on run 40483343387.
   - Observed effect: intermediate HTTPS E2E SHA red in CI; repair landed on the next slice; applicable tip recovered.
   - Inference: local focused proof did not surface the Cypress task return contract that CI enforced; cause of the local green is not established beyond the reported command result.
+
+<a id="dd-332"></a>
+
+## DD-332 — Formatting expands a file after the last size check
+
+A pre-format refactor can approve a file below the maintained250-line limit, then coordinator formatting expands it beyond that limit before the guarded operation commits/pushes. The final size invariant needs checking after the mutating formatter as well as during refactor.
+
+### Occurrences
+
+- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: `f2bfa481da5c653aa9de3c7796f1e59a4cf746dc:.planning/slice-plans/073-assistant-account-linking/verify-authorization-durability.mjs` has423 lines after the accepted229-line input/refactor; coordinator noticed after publication. Repair87033c6a extracted client/process responsibilities and reran the actual two-JVM proof47.8s. Exact commands/input hashes and both receipts are preserved at b5afee6:.planning/slice-plans/073-assistant-account-linking/EXECUTION-EVIDENCE.md#15-keep-authorization-valid-across-a-backend-restart; event date2026-10-28, exact formatter event time unavailable.
+  - Observed effect: The published proof artifact violated the size rule and required another extraction/refactor/delivery plus an otherwise avoidable invalidated-proof rerun. Formatter itself succeeded; this was not a masked formatter failure.
+  - Inference: Distinct from pre-existing oversize/small-addition extraction findings: the entire new proof fit before formatting. Leaf18 added a coordinator-local post-format size guard before staging; no shared prevention change is claimed.

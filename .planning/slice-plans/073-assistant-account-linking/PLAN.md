@@ -10,7 +10,7 @@
 Agent: Yua-chan; publisher: `dashboard-territory.local-doughnut`.
 The preparation checkout is the owned execution checkout, branch `codex/link-an-assistant-to-donut-through-github-sign-i`, Story Branch Mode. Integration/default checkout: `/Users/terryyin/git/doughnut`; remote: `origin`; eventual target: `main`. Ordinary increments publish the execution branch.
 Starting revision: `83615a792fe3aa3107badb07d883a70398d75127`; startup claim `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` was confirmed on remote main/execution branch.
-Most recent validated increment: 17 `a26a2a4094f5c0f61a3e1c56c00746e9414cf13b`; [publication history](PUBLICATION-EVIDENCE.md).
+Most recent validated increment: 18 `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3`; [publication history](PUBLICATION-EVIDENCE.md).
 Slice 2 `d488c64dbc69a00c51f2cc9237f71ae9fda016a1` is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's current dependency fingerprint. `CURSOR_DEV=true nix develop -c pnpm validate:path-routing` passed 11 backend probes/five static paths; this establishes command readiness only. No live GitHub observation, production deployment, real-account authorization or paid call occurred.
@@ -142,7 +142,13 @@ Proof: Permanent isolated assistant_account_linking.feature uses the real hosted
 Extend fixture17's initial feature using accepted state/callback, isolation, constraint/race/restart proof; require actual SDK credential replacement before retry and no ordinary-call browser login. Run the complete feature and existing mcp_services.feature over verified TLS. Document client registration/encoded server secrets, canonical issuer/resource/exact callback, default finite lifetimes/rotation, existing GitHub reuse, consent/withdrawal/reconnect, schema-first release and narrow discovery ADR exception; retain personal-token instructions. ChatGPT remains story3. No real-client activation/deployment authority. Sizing: 5–10 minutes source plus mandatory E2E cold proof; stop/refine incompatible client or source overrun.
 Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#18-connect-through-the-documented-oauth-journey).
 
+## Execution complete
+
+Product advice: no change. The amended existing-user assistant lifecycle is delivered; keep ChatGPT onboarding in the existing SEED-002#story-3. No correction plan or new product priority is recommended. Aggregate review covers the attributable publication set, current whole-product identity/permission/content boundaries and retained tests; CI remains unobserved pending the completion operation.
+
 ## Consumer trace and verification
+
+One-time aggregate acceptance reading at `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3`: searching backend/frontend/CLI/E2E/packages/scripts/docs/agent guidance found no product reference to the retired `McpTokenAuthenticationFilter` class name. This is a reading, not a test; retained ApiBearerAuthenticationFilter/MCP/general-API tests and actual SDK/PAT journeys prove the replacement behavior.
 
 Trace security/principal/user/permission, login continuation/token settings and supplier HTTP ingress/client.
 Per diff run installed `consumer-trace.mjs --checkout <execution-checkout> --base HEAD` with `CurrentUserFetcherFromRequest`, `login/continue`, `Authorization`, `generateToken` and MCP connection phrases; follow callers/journeys and classify run/reused/excluded.

@@ -14,4 +14,6 @@ Slice 15 published `f2bfa481da5c653aa9de3c7796f1e59a4cf746dc`; its proof-module 
 Refined slice 16/TLS support and the 18-leaf reassessment published `676593f081ce18eb42bdc6c5b7b3cf88f516d8e9`.
 Slice 17/initial hosted browser authorization published `a26a2a4094f5c0f61a3e1c56c00746e9414cf13b`.
 
+Slice 18/full hosted lifecycle and permanent setup guidance published `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3`.
+
 All accepted increment receipts and candidate/suffix-base pairs are retained in this execution conversation and temporary delivery inputs `/tmp/dough-story2-delivery/`. Original observer `/tmp/dough-ci-501/watch-QaZbTF` ended without a CI verdict; later publications truthfully report unobserved. No trunk landing, retirement or production release is implied by this record.
