@@ -139,7 +139,7 @@ pnpm backend:sut
 
 Expect the Vue production build under `frontend/dist`. The CLI install URL is served from GCS in prod; locally, `pnpm cli:bundle` produces `cli/dist/donut-cli.bundle.mjs`, and the local LB (`scripts/local-lb.mjs` via `pnpm cy:run` / `pnpm test`) serves `/doughnut-cli-latest/doughnut` from that file — not Spring on 9081.
 
-### 7. [Integrating MCP server for IDE](./.agents/skills/mcp-server/SKILL.md#how-to-use-this-mcp-server)
+### 7. [Connect an MCP client over HTTPS](./.agents/skills/mcp-server/SKILL.md#how-to-use-this-mcp-server)
 
 ### 8. Manual testing locally — see `.agents/skills/dough-manual-testing/SKILL.md`
 

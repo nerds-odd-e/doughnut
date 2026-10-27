@@ -1421,6 +1421,41 @@ export type SubscriptionWritable = {
     fromDTO?: SubscriptionDto;
 };
 
+export type McpStreamableHttpData = {
+    body?: never;
+    headers: {
+        /**
+         * Must include both application/json and text/event-stream
+         */
+        Accept: unknown;
+        /**
+         * Optional. When present, validated per MCP HTTP transport rules; invalid values yield 403.
+         */
+        Origin?: unknown;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/mcp';
+};
+
+export type McpStreamableHttpErrors = {
+    /**
+     * Missing, invalid, or withdrawn personal token
+     */
+    401: unknown;
+    /**
+     * Invalid Origin header
+     */
+    403: unknown;
+};
+
+export type McpStreamableHttpResponses = {
+    /**
+     * JSON-RPC response
+     */
+    200: unknown;
+};
+
 export type DownloadData = {
     body?: never;
     path: {

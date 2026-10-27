@@ -3,6 +3,10 @@
 Generated from `open_api_docs.yaml` by `scripts/generate-api-summary.mjs`.
 Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact generated signatures.
 
+## Untagged
+
+- `mcpStreamableHttp`: POST `/api/mcp` -> `McpStreamableHttpResponse` (request: none; response body: unknown)
+
 ## Notebook Lfs Transfer Controller
 
 - `download`: GET `/api/notebooks/{notebook}/lfs/objects/{oid}` -> `DownloadResponse` (request: `DownloadData`; path: notebook, oid; response body: object)

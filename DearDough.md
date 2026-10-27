@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 324. Removed numbers are never reused.
+- Highest allocated local number: 326. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
@@ -80,6 +80,16 @@ Former local code: DD-160. Two refactor passes within one story treat barely tou
 ## ODF-141 — Fixed refactor cost on small accepted slices
 
 Former local code: DD-176. Every small slice launches a fresh full refactor agent even when the accepted diff needs no further changes, creating substantial repeated cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-141.md).
+
+### Occurrences
+
+- Execution: SEED-002#story-1 (first implementation `543008d1e88024ab9e4a3f99d1a6515d1f87bb82`)
+  - Timestamp: 2026-10-27T16:39:31+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.71
+  - Evidence: six post-change-refactor Task launches (one per delivered slice); slice-3 agent return reported no edits and `skipped — no refactor edits` after ~12 minutes active; plan learnings record post-change refactor no-edits for slice 3 and a task-seam-only edit for slice 6.
+  - Observed effect: repeated full refactor agents on already-accepted small diffs, including at least one no-edit pass, before delivery continued.
+  - Inference: repeats the fixed per-slice refactor cost; no measured token total claimed.
 
 <a id="odf-208"></a>
 
@@ -344,3 +354,35 @@ Former local code: DD-324.
 An implementer obtains a red baseline by swapping committed bytes into the live shared checkout, creating interruption and concurrent-proof exposure.
 
 [Retained evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-331.md). Original occurrence provenance and distinct effects are recoverable in Open Dough `ccf309a69459284de3f1d45f2de813e9180c2971:docs/maintainer/findings/ODF-331.md` and this project's source snapshot `d5cb4a923b16973028820eb9cb1f4d811b4ef4f6:DearDough.md`. Name adoption is not resolution.
+
+<a id="dd-325"></a>
+
+## DD-325 — OpenAPI path insertion order disagrees with committed docs
+
+Documenting a new API path by appending through the OpenAPI customizer can leave committed `open_api_docs.yaml` and CI regeneration with different path orders, failing `RobotsTests.openApiDocsMatchCommittedYaml` even when generated artifacts were committed with the feature.
+
+### Occurrences
+
+- Execution: SEED-002#story-1 (first implementation `543008d1e88024ab9e4a3f99d1a6515d1f87bb82`)
+  - Timestamp: 2026-10-27T16:39:31+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.71
+  - Evidence: slice 1 committed `/api/mcp` first in `open_api_docs.yaml` via `SwaggerConfig`; CI run 40475079509 regenerated with `/api/mcp` after other paths (e.g. after `/api/healthcheck`) and failed Backend Unit tests plus Linting & Types Gen; coordinator noted the mismatch before slice 2; slice 2 (`b99ece7099`) rebuilt paths with `/api/mcp` first. Plan learning records the path-first fix.
+  - Observed effect: published intermediate SHA red on OpenAPI sync; later slice repaired path order and CI on subsequent SHAs succeeded.
+  - Inference: generation determinism for path order was not proved with the first committed docs; not claimed as a missing `generateTypeScript` step alone.
+
+<a id="dd-326"></a>
+
+## DD-326 — Cypress task returning undefined greened locally then failed CI
+
+An E2E Cypress `cy.task` handler that resolves to `undefined` can be reported green in a focused local feature run and still fail CI Before/After teardown that requires `null` or a value.
+
+### Occurrences
+
+- Execution: SEED-002#story-1 (first implementation `543008d1e88024ab9e4a3f99d1a6515d1f87bb82`)
+  - Timestamp: 2026-10-27T17:34:13+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.71
+  - Evidence: slice 5 (`195d5f30f1`) `disconnectMcp` task returned `await mcpClient.disconnectMcp()` with no value; implementer reported local `pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature` — 9 passing; CI run 40481816429 failed every MCP scenario with `The task 'disconnectMcp' returned undefined`; slice 6 (`b8c5d9ae30`) fixed the task seam to `return null` after await (plan learning). Tip SHA later green on run 40483343387.
+  - Observed effect: intermediate HTTPS E2E SHA red in CI; repair landed on the next slice; applicable tip recovered.
+  - Inference: local focused proof did not surface the Cypress task return contract that CI enforced; cause of the local green is not established beyond the reported command result.

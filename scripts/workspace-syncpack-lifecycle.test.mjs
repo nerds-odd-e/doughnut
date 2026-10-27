@@ -101,7 +101,7 @@ function syncpackLifecycleInvocations(packages) {
 test('lifecycle scripts invoke PATH syncpack only where the package declares it', async () => {
   const { dirs, packages } = await workspaceState()
   assert.deepEqual(
-    ['cli', 'frontend', 'mcp-server'].filter((dir) => !dirs.includes(dir)),
+    ['cli', 'frontend'].filter((dir) => !dirs.includes(dir)),
     []
   )
 

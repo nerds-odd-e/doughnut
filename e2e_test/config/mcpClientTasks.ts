@@ -1,24 +1,19 @@
-import { join } from 'node:path'
 import mcpClient from '../support/mcp_client'
-import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
-import { E2E_APP_BASE_URL } from './constants'
 
-export function mcpClientTasks(repoRoot: string) {
+export function mcpClientTasks() {
   return {
     mcpClientConnectionInfo() {
       return mcpClient.connectionInfo()
     },
-    async spawnAndConnectMcpServer({
+    async connectMcpHttps({
       baseUrl,
       accessToken,
     }: {
       baseUrl: string
       accessToken: string
     }) {
-      const apiBaseUrl =
-        baseUrl && baseUrl !== 'undefined' ? baseUrl : E2E_APP_BASE_URL
-      return await mcpClient.spawnAndConnectMcpServer({
-        baseUrl: apiBaseUrl,
+      return await mcpClient.connectMcpHttps({
+        baseUrl,
         accessToken,
       })
     },
@@ -27,28 +22,13 @@ export function mcpClientTasks(repoRoot: string) {
       params,
     }: {
       apiName: string
-      params: Record<string, any>
+      params: Record<string, unknown>
     }) {
       return await mcpClient.callMcpToolWithParams({ apiName, params })
     },
-    async disconnectMcpServer() {
-      return await mcpClient.disconnectMcpServer()
-    },
-    async bundleMcpServer() {
-      const mcpServerDir = join(repoRoot, 'mcp-server')
-      try {
-        runShellCommandSync('pnpm bundle', {
-          cwd: mcpServerDir,
-          env: {
-            ...process.env,
-            ...CLI_E2E_PNPM_SPAWN_ENV,
-          },
-        })
-        return true
-      } catch (error) {
-        console.error('Failed to bundle MCP server:', error)
-        throw error
-      }
+    async disconnectMcp() {
+      await mcpClient.disconnectMcp()
+      return null
     },
   }
 }

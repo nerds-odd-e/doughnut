@@ -1,6 +1,5 @@
 packages:
   - frontend
-  - mcp-server
   - cli
   - packages/donut-api
   - packages/donut-test-fixtures

@@ -115,7 +115,7 @@ const commonConfig = {
         ...worktreeResetIsolationCypressTasks(),
         ...notebookPublicationProfileTasks(repoRoot, on),
         ...mcpIsolationCypressTasks(),
-        ...mcpClientTasks(repoRoot),
+        ...mcpClientTasks(),
         ...createCliE2ePluginTasks(repoRoot, {
           saveBufferToCurrentSpecFolder:
             specScreenshotSink.saveBufferToCurrentSpecFolder.bind(

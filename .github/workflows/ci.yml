@@ -107,7 +107,6 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-      - run: pnpm mcp-server:test
       - run: pnpm cli:test
       - name: Run script unit tests
         run: bash scripts/test/run_all_script_tests.sh
@@ -208,8 +207,7 @@ jobs:
           path: |
             frontend/dist
             cli/dist
-            mcp-server/dist
-          key: ${{ runner.os }}-e2e-dist-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'frontend/package.json', 'frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/index.html', 'frontend/src/**', 'frontend/public/**', 'cli/package.json', 'cli/src/**', 'cli/tsconfig.json', 'mcp-server/package.json', 'mcp-server/src/**', 'packages/generated/donut-backend-api/**', 'packages/donut-api/**') }}
+          key: ${{ runner.os }}-e2e-dist-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'frontend/package.json', 'frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/index.html', 'frontend/src/**', 'frontend/public/**', 'cli/package.json', 'cli/src/**', 'cli/tsconfig.json', 'packages/generated/donut-backend-api/**', 'packages/donut-api/**') }}
       - name: Build E2E bundles if needed
         run: bash scripts/ci/e2e-bundle-if-needed.sh
         env:

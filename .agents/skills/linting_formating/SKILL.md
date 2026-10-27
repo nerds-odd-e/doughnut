@@ -17,7 +17,7 @@ description: Linting, formatting, code quality, Biome (2.6.x), Redocly, OpenAPI 
 ## Overview
 
 This project uses multiple linting tools to ensure code quality:
-- **Biome**: Frontend, CLI, MCP server, `packages/donut-test-fixtures`, Cypress, and other root-level TypeScript/JavaScript code
+- **Biome**: Frontend, CLI, `packages/donut-test-fixtures`, Cypress, and other root-level TypeScript/JavaScript code
 - **Redocly CLI**: OpenAPI specification validation
 - **Backend linting**: Java code quality checks (via Gradle)
 
@@ -120,7 +120,7 @@ This project uses `@biomejs/biome@2.6.x` across the workspace (`package.json`, `
 
 ### Monorepo config layout
 
-- **`biome.json`** (workspace root) — governs `e2e_test/`, `cli/`, `mcp-server/`, `scripts/`, `infra/`, `packages/donut-test-fixtures/`, etc. Implicit `root: true`.
+- **`biome.json`** (workspace root) — governs `e2e_test/`, `cli/`, `scripts/`, `infra/`, `packages/donut-test-fixtures/`, etc. Implicit `root: true`.
 - **`frontend/biome.json`** — sets `"root": false`; governs `frontend/` only. Uses Vue-specific rules (`noVueReservedProps`, `noVueDuplicateKeys`, `noVueSetupPropsReactivityLoss`, etc.).
 
 When running `pnpm biome check` from the workspace root, Biome walks up from each file to find the nearest config. The frontend subtree uses the frontend config; everything else uses the root config.
