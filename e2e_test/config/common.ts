@@ -24,6 +24,11 @@ import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { E2E_APP_BASE_URL } from './constants'
 import { notebookPublicationProfileTasks } from './notebookPublicationProfile'
 import { mcpClientTasks } from './mcpClientTasks'
+import { hostedAssistantTasks } from '../support/hosted_assistant_fixture.mjs'
+import {
+  HOSTED_ASSISTANT_BROWSER_PINS,
+  HOSTED_ASSISTANT_BROWSER_ORIGIN,
+} from '../support/hosted_assistant_constants.mjs'
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -45,6 +50,17 @@ const commonConfig = {
       config: Cypress.PluginConfigOptions
     ): Promise<Cypress.PluginConfigOptions> {
       on = composeCypressPluginEvents(on) as Cypress.PluginEvents
+      const browserPins = process.env[HOSTED_ASSISTANT_BROWSER_PINS]
+      if (browserPins) {
+        on('before:browser:launch', (browser, launchOptions) => {
+          if (browser.name !== 'electron') {
+            launchOptions.args.push(
+              `--ignore-certificate-errors-spki-list=${browserPins}`
+            )
+          }
+          return launchOptions
+        })
+      }
       // Cypress 10+ changes process.cwd() to the config file's directory when using --config-file,
       // so resolve from __dirname to get the repo root regardless of cwd.
       const repoRoot = resolve(__dirname, '..', '..')
@@ -62,6 +78,8 @@ const commonConfig = {
           return result
         },
       })
+      const hostedOrigin = process.env[HOSTED_ASSISTANT_BROWSER_ORIGIN]
+      if (hostedOrigin) config.baseUrl = hostedOrigin
       if (!config.expose || typeof config.expose !== 'object') {
         config.expose = {}
       }
@@ -116,6 +134,7 @@ const commonConfig = {
         ...notebookPublicationProfileTasks(repoRoot, on),
         ...mcpIsolationCypressTasks(),
         ...mcpClientTasks(),
+        ...hostedAssistantTasks(),
         ...createCliE2ePluginTasks(repoRoot, {
           saveBufferToCurrentSpecFolder:
             specScreenshotSink.saveBufferToCurrentSpecFolder.bind(

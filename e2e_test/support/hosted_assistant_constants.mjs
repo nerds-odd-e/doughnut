@@ -1,0 +1,7 @@
+export const HOSTED_ASSISTANT_CLIENT_NAME = 'Hosted SDK assistant'
+export const HOSTED_ASSISTANT_CONTROL = 'DONUT_E2E_ASSISTANT_CONTROL'
+export const HOSTED_ASSISTANT_BROWSER_PINS = 'DONUT_E2E_ASSISTANT_BROWSER_PINS'
+export const HOSTED_ASSISTANT_BROWSER_ORIGIN =
+  'DONUT_E2E_ASSISTANT_BROWSER_ORIGIN'
+export const ASSISTANT_LINKING_SPEC =
+  'e2e_test/features/mcp/assistant_account_linking.feature'

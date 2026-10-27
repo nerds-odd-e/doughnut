@@ -1,0 +1,9 @@
+Feature: Assistant account linking
+  A hosted assistant can read my Donut knowledge after I grant access through GitHub.
+
+  Scenario: A hosted SDK assistant obtains its first authorization
+    Given there are some notes for existing user "old_learner" in notebook "SDK Notebook"
+      | Title             | Content                                         |
+      | Hosted SDK Marker | Initial SDK authorization reads this private note |
+    When I connect the hosted assistant through GitHub and allow read access
+    Then the hosted assistant reads "Hosted SDK Marker" containing "Initial SDK authorization reads this private note"

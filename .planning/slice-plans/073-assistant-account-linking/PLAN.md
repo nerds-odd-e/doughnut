@@ -153,10 +153,11 @@ Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#16-support-oauth-clie
 
 ### 17. Complete hosted SDK authorization through the browser
 Type: Structure
-Status: planned
+Status: done
 Proof: Actual permanent initial Cypress scenario completes HTTPS discovery, existing GitHub sign-in, informed consent, exact callback state/S256, maintained SDK exchange and private attributed read with owned cleanup.
 
 Restore parked compatible client/provider/runner/tasks/feature work. First bounded probe (maximum five source minutes plus one cold replay) traces actual Cypress request/session/saved-request continuation: Chrome reaches authenticated home instead of consent while direct pinned Playwright/SDK passes. Compare the HTTP Cypress top origin with canonical HTTPS cookie context; do not supply authorization/consent in setup or blame the driver without observation. Use the smallest supported existing runner/browser seam; stop/refine if the cause or solution remains unsettled. Keep secret/verifier/tokens server-held before bootstrap, strict CA/public owned pins, primary CI glob selection and ordinary runner defaults. No new GitHub provider feature. Proof uses Chrome as CI does; disclose Electron fixture limitations. Sizing: five-minute decisive probe, then at most five source minutes if supported; cold waits are exceptions.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#17-complete-hosted-sdk-authorization-through-the-browser).
 
 ### 18. Connect through the documented OAuth journey
 Type: Behavior
@@ -231,19 +232,19 @@ Disposition: proved by slice 14: removed only the new normal-finish listener rem
 ### G9. Support the maintained SDK's form body through verified TLS
 Reported: slice 16 — "installed SDK sends URLSearchParams for token exchange; shared CA fetch rejects that body type."
 Story clause: "Allow completes the callback and code exchange;"
-Disposition: receiving slice 17
+Disposition: proved by slice 17: actual maintained SDK callback/URLSearchParams token exchange completes in permanent assistant_account_linking.feature; unchanged TLS3 directly proves form bytes. Final explicit Chrome helper-state feature1/1 and hosted default1/1, linked hosted SDK evidence.
 
 ### G11. Complete browser authorization continuation
 Reported: slice 16 — "Permanent Cypress initial scenario reached login but after GitHub redirects landed chrome-error://chromewebdata (screenshot inspected), while pinned Playwright path passes."
 Story clause: "Allow completes the callback and code exchange;"
-Disposition: receiving slice 17
+Disposition: proved by slice 17: external failed trace observes request-session loss in HTTP-top Cypress iframe; owned canonical HTTPS browser origin after worktree guard and unchanged SDK URL preserve the GitHub session and continue into actual consent/callback/exchange/private read. Final permanent Chrome1/1 and hosted default1/1 pass, /tmp/dough-story2-slice17-cypress-helper-final.log. Original Electron/Chrome failures remain retained; explicit Electron journey is not claimed. Source selects no Cypress browser; Chrome matches documented default and actual CI entry.
 
 ### G12. Start the hosted fixture for CI's selected glob
 Reported: slice 16 — "CI primary uses the mcp/** glob. The fixture selector must recognize glob inclusion, not just exact feature strings, or CI's new feature lacks its pre-bootstrap client."
 Story clause: "The client discovers the authorization server, sends the user through GitHub sign-in, and shows Donut's read-access consent."
-Disposition: receiving slice 17
+Disposition: proved by slice 17: public exact and primary mcp/** runner cases observe configured confidential callback/client before startup and owned cleanup in runtime116. CI matrix and explicit Chrome entry were inspected; final permanent Chrome feature1/1 proves the selected consumer, without a claim of actual CI execution.
 
 ### G10. Keep admitted initial journey executable
 Reported: slice 16 — "Runtime114 showed113pass/1inventory fail because admitting leaf17's feature before its file exists violates existing registry inventory."
 Story clause: "The client discovers the authorization server, sends the user through GitHub sign-in, and shows Donut's read-access consent."
-Disposition: receiving slice 17
+Disposition: proved by slice 17: actual initial assistant_account_linking.feature exists and passes; public runtime116 includes registry inventory reconciliation and all ordinary selections. See hosted SDK evidence17 and /tmp/dough-story2-slice17-runtime.log.

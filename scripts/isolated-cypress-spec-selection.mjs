@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process'
 import path from 'node:path'
+import { ASSISTANT_LINKING_SPEC } from '../e2e_test/support/hosted_assistant_constants.mjs'
 import {
   ACTIVE_CLI_SPECS,
   APPLICATION_ONLY_ACTIVE_SPECS,
@@ -85,6 +86,7 @@ const APPROVED_ISOLATED_CYPRESS_SPECS = [
   { spec: SUPPORTED_ISOLATED_CLI_SPEC },
   ...ACTIVE_CLI_SPECS.map((spec) => ({ spec })),
   { spec: SUPPORTED_ISOLATED_MCP_SPEC },
+  { spec: ASSISTANT_LINKING_SPEC },
   {
     spec: SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC,
     requiresPrivateOpenAiMock: true,
