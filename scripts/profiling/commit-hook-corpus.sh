@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # The fixed commit-hook profiling corpus, sourced by profile-commit-hook.sh:
-# 8 classes x 5 distinct staged changes, each to an input checked by the
+# 7 classes x 5 distinct staged changes, each to an input checked by the
 # component scripts/quality_changed.sh selects for it.
 #
 # Compatible with macOS /bin/bash 3.2.
@@ -25,11 +25,6 @@ cli-2 cli cli/src/commands/notebook/notebookPublishAncestry.ts
 cli-3 cli cli/src/commands/recall/recallMcqStageKeys.ts
 cli-4 cli cli/src/inkAbsoluteContentPosition.ts
 cli-5 cli cli/src/terminalColumns.ts
-mcp-server-1 mcp-server mcp-server/src/context.ts
-mcp-server-2 mcp-server mcp-server/src/helpers.ts
-mcp-server-3 mcp-server mcp-server/src/server.ts
-mcp-server-4 mcp-server mcp-server/src/tools/get-note-graph.ts
-mcp-server-5 mcp-server mcp-server/src/types.ts
 test-fixtures-1 test-fixtures packages/donut-test-fixtures/src/AnsweredQuestionBuilder.ts
 test-fixtures-2 test-fixtures packages/donut-test-fixtures/src/ApiErrorBuilder.ts
 test-fixtures-3 test-fixtures packages/donut-test-fixtures/src/BookFullBuilder.ts

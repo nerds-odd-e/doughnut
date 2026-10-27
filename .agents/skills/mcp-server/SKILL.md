@@ -1,159 +1,81 @@
 ---
 name: mcp-server
-description: donut-mcp-server — structure, build, tests, Cursor/IDE configuration. Use when changing the Donut MCP server.
+description: Donut HTTPS MCP at /api/mcp — tools, auth, IDE URL+token setup. Use when changing or connecting to Donut MCP.
 paths:
-  - "mcp-server/**"
+  - "backend/src/main/java/com/odde/donut/mcp/**"
+  - "backend/src/test/java/com/odde/donut/mcp/**"
 ---
-# donut-mcp-server MCP Server
+# Donut HTTPS MCP
 
-A Model Context Protocol server for Donut.
+Donut exposes MCP on the backend over Streamable HTTP at `/api/mcp`. One backend
+service owns the tools; there is no separate MCP process.
 
-Is in the `mcp-server` folder.
+Implementation lives under `backend/src/main/java/com/odde/donut/mcp/`. Proof is
+the MCP boundary tests and `e2e_test/features/mcp/mcp_services.feature`. Style
+for backend unit tests: the `unit-testing` skill and `backend` / `backend-testing`
+skills.
 
-This is a TypeScript-based MCP server that demonstrates core MCP concepts by providing:
+## How to use this MCP server
 
-- Tools that read note context from the Donut backend API (search and graph).
+Connect any MCP client that speaks Streamable HTTP with a personal bearer token.
+No OAuth setup is required.
 
-## Structure (minimal)
+1. Open Donut in the browser and sign in.
+2. Go to **Settings → Access Tokens**, generate a token, and copy it once.
+3. Point the client at your deployment HTTPS URL ending in `/api/mcp` (for
+   production, `https://doughnut.odd-e.com/api/mcp`).
+4. Send `Authorization: Bearer <token>` on every request.
 
-```
-mcp-server/
-  src/                    # Production source code
-    index.ts              # boot: create context, start stdio
-    server.ts             # assemble server, list tools, route calls
-    context.ts            # read env, create DonutApi
-    api.ts                # DonutApi factory
-    schemas.ts            # tool input schemas (shared)
-    tools/index.ts        # tool registry + handlers
-    types.ts              # shared types
-    utils.ts              # error + validation helpers
-  tests/                  # Unit tests (separate from production code)
-    server.test.ts        # Server and tools tests
-    utils.test.ts         # Utility functions tests
-  vitest.config.ts        # Test configuration
-  tsconfig.json           # TypeScript configuration
-  package.json            # Dependencies and scripts
-```
+### Cursor
 
-**Important**: Tests are kept in a separate `tests/` folder, not mixed with production code in the `src/` folder. This maintains clean separation between production and test code, making the codebase more organized and maintainable.
+Add to `~/.cursor/mcp.json` (or project `.cursor/mcp.json`):
 
-## Development
-
-### Building the MCP Server
-
-Run this command to build the mcp server:
-
-```sh
-CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle
-```
-
-Note: The E2E `mcp_services.feature` preparation task (`bundleMcpServer`) rebuilds the bundle from current source automatically before the client connects; the standalone build command above is for IDE/client use.
-
-### Running Unit Tests
-
-The MCP server has Vitest unit tests under `tests/` (not mixed with `src/`). **Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** the `unit-testing` skill.
-
-```sh
-CURSOR_DEV=true nix develop -c pnpm mcp-server:test
-```
-
-For `dough-test-optimization`, measure that command as the ordinary feedback
-path. Obtain per-test Vitest durations with
-`CURSOR_DEV=true nix develop -c pnpm -C mcp-server exec vitest run --reporter=json`;
-the JSON run is profiling evidence and does not replace normal verification.
-
-### Test Organization
-
-- **Production code**: `src/`
-- **Test files**: `tests/**/*.test.ts` (see `vitest.config.ts`)
-- Drive high-level tool/server entry points; cover lower layers with realistic `makeMe` data. Mock only backend HTTP responses (external dependency), with `makeMe` for API-shaped payloads.
-
-### Formatting Code
-
-Format the MCP server code with:
-
-```sh
-CURSOR_DEV=true nix develop -c pnpm mcp-server:format
-```
-
-### Test Coverage
-
-The unit tests cover:
-- Utility functions (error handling, parameter validation, environment configuration)
-- Server configuration and tool definitions
-- Tool schema validation
-- Response format validation
-- Behavior-focused assertions that are insensitive to internal structure
-
-## CI/CD Integration
-
-- Unit tests run as part of the "Other Unit Tests" job in GitHub Actions
-- Formatting is included in the workspace format command; see `.agents/skills/linting_formating/SKILL.md`
-- Tests are automatically executed on every push to main branch
-
-## How to use this MCP Server
-
-Add the below command to your AI MCP Server configuration.
-
-For Cursor:
 ```json
 {
   "mcpServers": {
     "donut": {
-      "disabled": false,
-      "timeout": 60,
-      "transportType": "stdio",
-      "command": "node",
-      "args": [
-        "<doughnut root folder>/mcp-server/dist/mcp-server.bundle.mjs"
-      ],
-      "env": {
-        "DONUT_API_BASE_URL": "http://localhost:9081",
-        "DONUT_API_AUTH_TOKEN": "your-token-here"
+      "url": "https://doughnut.odd-e.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:DONUT_API_AUTH_TOKEN}"
       }
     }
   }
 }
 ```
 
-For VS Code (you need to put the following content into `./.vscode/mcp.json`):
-```json
-{
-  "servers": {
-    "donut": {
-      "command": "node",
-      "args": [
-        "<doughnut root folder>/mcp-server/dist/mcp-server.bundle.mjs"
-      ],
-      "env": {
-        "DONUT_API_BASE_URL": "http://localhost:9081",
-        "DONUT_API_AUTH_TOKEN": "your-token-here"
-      }
-    }
-  }
-}
+Set `DONUT_API_AUTH_TOKEN` in the environment Cursor inherits, or paste the
+token directly in a private config you do not commit. Save and restart Cursor
+(or reload MCP) so the client reconnects.
 
-For IntelliJ IDE you need to go to the general settings/tools/GitHub Copilot/MCP and press configure:
-```json
-{
-  "servers": {
-    "donut": {
-      "disabled": false,
-      "timeout": 60,
-      "transportType": "stdio",
-      "command": "node",
-      "args": [
-        "<doughnut root folder>/mcp-server/dist/mcp-server.bundle.mjs"
-      ],
-      "env": {
-        "DONUT_API_BASE_URL": "http://localhost:9081",
-        "DONUT_API_AUTH_TOKEN": "your-token-here"
-      }
-    }
-  }
-}
+### Compatible SDK / HTTP clients
 
+Use the MCP TypeScript client with Streamable HTTP against the same URL and
+bearer header:
+
+```ts
+import { Client } from '@modelcontextprotocol/sdk/client/index.js'
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+
+const client = new Client({ name: 'example', version: '1.0.0' }, { capabilities: {} })
+const transport = new StreamableHTTPClientTransport(
+  new URL('https://doughnut.odd-e.com/api/mcp'),
+  {
+    requestInit: {
+      headers: { Authorization: `Bearer ${process.env.DONUT_API_AUTH_TOKEN}` },
+    },
+  }
+)
+await client.connect(transport)
+await client.listTools()
 ```
+
+### Token withdrawal and auth failure recovery
+
+- Delete the token under **Settings → Access Tokens**. Withdrawal takes effect
+  on the next MCP request (HTTP 401). Update or remove the client header.
+- If the client fails authentication, generate a new token, replace the bearer
+  value in the client config, and reconnect. Do not add OAuth or browser login
+  as a substitute for the personal token.
 
 ## Available Tools
 

@@ -53,7 +53,7 @@ case "$staged" in *cli/src/commands/recall/recallMcqStageKeys.ts:*)
   echo "WARN failing check" >&2
   exit 3
 esac
-case "$staged" in *mcp-server/src/helpers.ts:*)
+case "$staged" in *packages/donut-test-fixtures/src/ApiErrorBuilder.ts:*)
   echo stray >stray-untracked.txt
 esac
 PNPM
@@ -77,7 +77,7 @@ paste <(awk -F'\t' 'NR > 1 { gsub(",", " ", $8); print $8 " " }' "$results") <(c
   awk -F'\t' '$1 != $2 { bad++ } END { print "recorded inputs differing from hook-checked input: " bad + 0 }'
 echo "rows by section: $(awk -F'\t' 'NR > 1 { print $1 }' "$results" | uniq -c | awk '{ printf "%s%s=%s", sep, $2, $1; sep = " " }')"
 echo "failed run: $(awk -F'\t' '$2 == "cli-3" && $1 == "corpus" { print $5, $6, $7 }' "$results") $(grep -c "WARN failing check" "$evidence/corpus/cli-3/hook.stderr")"
-echo "changed-state run: $(awk -F'\t' '$2 == "mcp-server-2" && $1 == "corpus" { print $5, $7 }' "$results") $(grep -c 'stray-untracked.txt' "$evidence/corpus/mcp-server-2/preservation.diff")"
+echo "changed-state run: $(awk -F'\t' '$2 == "test-fixtures-2" && $1 == "corpus" { print $5, $7 }' "$results") $(grep -c 'stray-untracked.txt' "$evidence/corpus/test-fixtures-2/preservation.diff")"
 echo "summary timings: $(grep '^timings:' "$evidence/summary.txt" | grep -o '=' | wc -l | tr -d ' ') classes: $(grep -c '^class .*: mean .* range ' "$evidence/summary.txt") mean: $(grep -c '^overall mean: ' "$evidence/summary.txt")"
 echo "worktrees left: $(git -C "$work/src" worktree list --porcelain | grep -c '^worktree ') fixture exists: $([ -e "$fixture" ] && echo yes || echo no) source unchanged: $([ "$(git -C "$work/src" status --porcelain)" = "$source_status" ] && echo yes || echo no)"
 EOF
@@ -89,15 +89,15 @@ test-profiles-every-corpus-case-through-the-installed-hook-and-cleans-up() {
 
   @assert-equals "$(@cat <<'EXPECTED'
 driver exit: 1
-corpus per class: frontend=5 backend=5 cli=5 mcp-server=5 test-fixtures=5 root=5 openapi=5 mixed=5
-distinct corpus inputs: 40
+corpus per class: frontend=5 backend=5 cli=5 test-fixtures=5 root=5 openapi=5 mixed=5
+distinct corpus inputs: 35
 frontend kinds: .ts:.vue:
-hook calls: 57 in fixture: 57
+hook calls: 50 in fixture: 50
 recorded inputs differing from hook-checked input: 0
-rows by section: fresh-cache=8 corpus=40 inside-nix=8 no-component=1
+rows by section: fresh-cache=7 corpus=35 inside-nix=7 no-component=1
 failed run: 3 1 yes 1
 changed-state run: 0 no 2
-summary timings: 40 classes: 8 mean: 1
+summary timings: 35 classes: 7 mean: 1
 worktrees left: 1 fixture exists: no source unchanged: yes
 EXPECTED
 )" "$output"

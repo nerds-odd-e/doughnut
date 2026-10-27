@@ -25,7 +25,6 @@ select_component() {
 
 select_biome_components() {
   select_component frontend
-  select_component mcp-server
   select_component cli
   select_component test-fixtures
   select_component root
@@ -38,9 +37,6 @@ select_components_for_file() {
       ;;
     frontend/*)
       select_component frontend
-      ;;
-    mcp-server/*)
-      select_component mcp-server
       ;;
     cli/*)
       select_component cli
@@ -101,7 +97,7 @@ run_quality_for_component() {
     lint:frontend)
       lint_frontend_index
       ;;
-    lint:mcp-server|lint:cli)
+    lint:cli)
       pnpm -C "$1" lint
       ;;
     lint:test-fixtures)
@@ -119,13 +115,13 @@ run_quality_for_component() {
   esac
 }
 
-if [[ "$MODE" == lint ]] && [[ "$selected_components" =~ frontend|mcp-server|cli|test-fixtures|root|openapi ]]; then
+if [[ "$MODE" == lint ]] && [[ "$selected_components" =~ frontend|cli|test-fixtures|root|openapi ]]; then
   source "$SCRIPT_DIR/dev_setup.sh"
   log() { :; }
   setup_pnpm_deps
 fi
 
-for component in backend frontend mcp-server cli test-fixtures root openapi; do
+for component in backend frontend cli test-fixtures root openapi; do
   if [[ " $selected_components " == *" $component "* ]]; then
     run_quality_for_component "$component"
   fi

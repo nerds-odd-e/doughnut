@@ -64,20 +64,20 @@ case "$DONUT_TEST_SCENARIO" in
     printf 'const ignoredChanged = true\n' >"$work/cli/ignored.ts"
     ;;
   staged)
-    mkdir -p "$work/frontend" "$work/mcp-server" \
+    mkdir -p "$work/frontend" "$work/cli" \
       "$work/packages/donut-test-fixtures"
     printf 'const original = true\n' >"$work/frontend/example.ts"
-    printf 'const original = true\n' >"$work/mcp-server/example.ts"
+    printf 'const original = true\n' >"$work/cli/example.ts"
     printf 'const original = true\n' \
       >"$work/packages/donut-test-fixtures/example.ts"
     git -C "$work" add .
     git -C "$work" commit -qm initial
 
     printf 'const unstaged = true\n' >"$work/frontend/example.ts"
-    printf 'const staged = true\n' >"$work/mcp-server/example.ts"
+    printf 'const staged = true\n' >"$work/cli/example.ts"
     printf 'const fixture = true\n' \
       >"$work/packages/donut-test-fixtures/example.ts"
-    git -C "$work" add mcp-server/example.ts \
+    git -C "$work" add cli/example.ts \
       packages/donut-test-fixtures/example.ts
     ;;
   staged-frontend)
@@ -144,7 +144,7 @@ test-lint-selects-only-staged-components() {
   output="$(run-in-temporary-repository lint staged)"
 
   @assert-equals \
-    $'pnpm --frozen-lockfile recursive install\npnpm -C mcp-server lint\npnpm -C packages/donut-test-fixtures lint' \
+    $'pnpm --frozen-lockfile recursive install\npnpm -C cli lint\npnpm -C packages/donut-test-fixtures lint' \
     "$output"
 }
 
@@ -162,7 +162,7 @@ test-shared-biome-config-selects-every-affected-component() {
   output="$(run-in-temporary-repository lint shared-biome-config)"
 
   @assert-equals \
-    $'pnpm --frozen-lockfile recursive install\npnpm lint in copy with example.ts: const original = true (verify deps: false)\npnpm -C mcp-server lint\npnpm -C cli lint\npnpm -C packages/donut-test-fixtures lint\npnpm biome check .' \
+    $'pnpm --frozen-lockfile recursive install\npnpm lint in copy with example.ts: const original = true (verify deps: false)\npnpm -C cli lint\npnpm -C packages/donut-test-fixtures lint\npnpm biome check .' \
     "$output"
 }
 

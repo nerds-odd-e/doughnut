@@ -106,7 +106,6 @@ infra/ssl/
 frontend/node_modules
 frontend/dist/
 frontend/tsconfig.tsbuildinfo
-mcp-server/dist/
 cli/dist/
 
 # Symbolication related

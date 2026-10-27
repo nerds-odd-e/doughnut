@@ -10,7 +10,7 @@ and are intentionally not cataloged here.
 - Frontend pages and components: start in `frontend/src/pages/`, `frontend/src/components/`, `frontend/src/composables/`, and `frontend/src/store/`; frontend tests live in `frontend/tests/`.
 - E2E behavior: start with `e2e_test/features/`, then matching step definitions in `e2e_test/step_definitions/` and page objects in `e2e_test/start/`.
 - CLI behavior: start in `cli/src/`.
-- MCP server behavior: start in `mcp-server/`.
+- MCP HTTPS behavior: start in `backend/src/main/java/com/odde/donut/mcp/`; client setup in `.agents/skills/mcp-server/SKILL.md`.
 - Database schema changes: add a new migration in `backend/src/main/resources/db/migration/`; never edit committed migrations.
 
 ## Generated API

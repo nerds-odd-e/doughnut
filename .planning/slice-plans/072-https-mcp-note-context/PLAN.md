@@ -286,7 +286,7 @@ Learnings:
 
 ### 6. Configure the supported HTTPS connection
 Type: Behavior
-Status: planned
+Status: done
 Proof: Execute the documented SDK/compatible-client URL and token setup against
 the owned TLS endpoint; migrated MCP feature and affected build/script checks.
 Separate acceptance reading: transitive product-wide cleanup below.
@@ -304,6 +304,22 @@ callers need them. End the supported setup with one backend service.
 Sizing: 6–10 minutes of mechanical retirement/docs, plus affected verification.
 If the consumer trace exposes a new functional owner or longer implementation,
 stop and refine before continuing. Do not deliver dangling package references.
+
+Accepted proof (reuse):
+- Documented URL+token setup in `.agents/skills/mcp-server/SKILL.md` (HTTPS
+  `/api/mcp` + bearer; withdrawal/auth recovery; no OAuth); README points there.
+- `CURSOR_DEV=true nix develop -c env SUT_TIMEOUT_MS=240000 pnpm cy:run --spec
+  e2e_test/features/mcp/mcp_services.feature` — 9 passing (documents the
+  supported connection against owned TLS).
+- `pnpm test:browser-worktree-isolation` — 112 pass; `quality_changed.test` —
+  6; `test:workspace-syncpack-lifecycle` — 2; `e2e-bundle-if-needed.sh.test` —
+  OK; `profile-commit-hook.test` — 1.
+- Post-change refactor: Cypress `disconnectMcp` null contract on task seam only.
+
+Learnings:
+- After removing `bundleMcpServer`, Cypress Before teardown required
+  `disconnectMcp` to return `null` (undefined fails the task).
+- Skill name `mcp-server` retained for HTTPS guidance; package directory gone.
 
 ## Consumer trace and local verification
 
@@ -412,16 +428,27 @@ Recheck load and competing work before execution's backend/E2E proof.
 
 ## Removal acceptance reading
 
-After HTTPS behavior passes, read the whole product for the retired package
-name/path, stdio connection and bundle symbols, process fixture/tag/step, and
-exclusive uses found transitively. Cover backend/frontend/CLI/MCP, E2E and
-runner scripts, manifests/lockfile, CI/deployment, README/docs/comments, agent
-skills, both AGENTS.md and CLAUDE.md, and generated artifacts. Delete obsolete
-dependent material and repair consumers. Retained observation provenance stays
-literal: classify planning/history matches separately from live product
-references. No renamed historical action, permanent absence test, runtime guard,
-or "used to" product note is acceptable. Record the search and classified
-result here once as a reading at acceptance.
+Recorded at slice 6 acceptance (2026-10-27), execution checkout at the
+pre-delivery working tree after package retirement.
+
+**Search terms:** `mcp-server/`, `donut-mcp-server`, `bundleMcpServer`,
+`spawnAndConnectMcpServer`, `StdioClientTransport`,
+`mcp-server:bundle|test|format|lint`, `mcp-server.bundle`,
+`the spawned MCP server process has exited`.
+
+**Live product:** no package path, stdio/bundle symbols, CI/scripts, lockfile
+workspace membership, or exclusive fixtures. Workspace has no `mcp-server`
+package; directory absent. Sweep over product (excluding `.planning/`) for
+those symbols returned no matches.
+
+**Retained skill-name only (not the package):** `AGENTS.md` / `CLAUDE.md`
+(`MCP → mcp-server`), `.agents/skills/mcp-server/SKILL.md` (HTTPS URL+token
+guidance), agent-map + unit-testing skill pointers, README link to that skill.
+Root retains `@modelcontextprotocol/sdk` and `donut-api` for CLI/E2E.
+
+**Planning/history (separate):** this plan and
+`.planning/seeds/SEED-002-host-mcp-over-https.md` still name retired symbols as
+historical intent/provenance — leave; do not rename.
 
 ## Concern and sizing assessment
 
