@@ -99,40 +99,149 @@ if concrete learning makes it likely to exceed that band.
 
 **Identity:** SEED-002#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/072-https-mcp-note-context/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e9a74d3dea623b78eea266aa242ef3fec8a9e987bd81cb0d59a5d7e76a6f33d3","plan":"014d90b55df3b9dfc55a0e17ac74458c03029693bc87a869cc95bd73a74c8a7d"}}
 ```
 
-**Goal:** A Donut user can connect a compatible remote MCP client directly to
-Donut, authenticate with an existing Donut token, and use the same note
-discovery and context capabilities that local MCP clients have today.
+**Goal:** A Donut user can configure a compatible remote MCP client with
+Donut's HTTPS URL and an existing personal token, then discover, read, and
+explore their accessible notes without running a local Donut process.
 
-- **For / why:** A Donut user configuring an IDE or assistant can supply a
-  Donut HTTPS URL and token and immediately use their accessible knowledge.
-- **Scope:** Deliver candidate search, full attributed note reads, and bounded
-  graph context through Donut's HTTPS MCP service, using the existing backend
-  domain behavior. Give users the client connection instructions. Migrate
-  the current local-MCP journeys and their externally observable proof to
-  that service. Once those capabilities work through HTTPS, delete the local
-  MCP package, its exclusive tests and helpers, and its exclusive build,
-  dependency, client-configuration, documentation, and agent-guidance material.
-- **Evaluation:** Given two accessible notes with a matching title in different
-  notebooks, the user connects a real compatible MCP client with their token,
-  distinguishes the candidates, reads the chosen note with its accepted
-  revision, and retrieves its context within the requested budget. Another
-  user's private note remains protected by the existing read rule.
-- **Removal reading:** At acceptance, perform one product-wide reading for
-  orphaned local-server references across production code, tests, CLI/MCP
-  integration, package and deployment configuration, docs, agent guidance,
-  and generated artifacts. Record it as a reading, separate from executable
-  proof. The retained proof exercises HTTPS note discovery, reading, context,
-  and active access refusals.
-- **Value / learning:** Existing MCP users gain a direct, usable connection;
-  validate the backend protocol and identity boundary before adding account linking.
-- **Effort hypothesis:** L, low confidence until refinement checks the supported
-  Java MCP integration and the extent of exclusive local-client scaffolding.
-- **Safe stopping point:** HTTPS MCP clients can use their existing Donut tokens
-  without waiting for OAuth or ChatGPT integration. Normal notebook access and
-  content attribution hold on every call.
+**Scope:**
+
+- Serve `list_note_candidates`, `read_note`, and `get_note_graph` from the
+  existing backend at `/api/mcp` using Streamable HTTP. Preserve title/alias
+  candidate matching, ranking and notebook/folder disambiguation; full note
+  content with notebook accepted-revision attribution; and the existing
+  approximate combined body budget and related-note selection.
+- Authenticate each MCP request with its supplied Donut bearer token and apply
+  the existing notebook read rules throughout search, reads, and graph expansion.
+  Missing, invalid, or withdrawn tokens get an authentication refusal rather
+  than browser sign-in. A token belongs to one Donut user, not a shared client
+  session. Browser login alone does not authorize MCP calls.
+- Publish usable URL-and-token client instructions. Migrate the existing MCP
+  journeys and their surviving observable proof. Once they work over HTTPS,
+  delete the standalone package and its exclusive tests, process helpers,
+  builds, dependencies, configuration, documentation, and agent guidance.
+  Preserve dependencies and isolation helpers still used by supported clients.
+- Read-only tools, existing permissions, and protocol-required Origin validation
+  are genuine constraints. OAuth discovery/consent/renewal, ChatGPT onboarding,
+  body search, editing, new retrieval rules, and broad client certification are
+  deferred promises. They do not create extra rejection rules.
+
+**Key examples:**
+
+1. Given a personal token and two accessible notes with the same title in
+   different notebooks, a compatible client connects to `/api/mcp`, discovers
+   the tools, searches that title, and distinguishes candidates by notebook and
+   folder. Alias matches and subscribed-notebook access retain their existing
+   behavior; an unmatched query yields the current empty-result signal.
+2. Given a selected candidate (or a numeric ID supplied by the user), a read
+   returns its full content, note identity, title, notebook, folder path, update
+   time, and accepted notebook revision. An accepted edit anywhere in that
+   notebook changes a later read's revision. A notebook without an accepted
+   revision returns null, without inventing one. Tool descriptions tell the
+   assistant to treat content as evidence and cite note ID plus revision.
+3. Given a readable focus note and a requested budget, graph retrieval returns
+   the focus plus permitted related context under the existing approximate
+   combined body budget. Small and large budgets exercise the same retrieval
+   rule; ordinary argument errors are actionable tool failures.
+4. Given two users with private notes, interleaved client calls each see the
+   permissions of their request's token. A direct read or graph request for
+   the other user's private note is refused; graph expansion cannot expose it.
+   After token withdrawal, the next request is refused even on an existing
+   client connection. Supplying a valid token permits reconnection.
+5. Given the documented HTTPS URL and token configuration, a real SDK client
+   completes discovery → candidate search → full read → bounded graph using
+   the backend deployment. The supported setup has no locally launched Donut
+   server. Invalid supplied Origins receive the protocol's refusal; clients
+   without an Origin header can use bearer authentication normally.
+
+**Architecture:** The backend owns the protocol adapter as well as its existing
+knowledge domain. Prefer the maintained Java SDK's stateless servlet transport,
+with synchronous immediate execution, over a separate service or handwritten
+JSON-RPC. Read tools need no server-to-client requests or durable MCP session
+state. Keep authentication request-scoped and ensure servlet request context,
+read transactions, and deliberate error translation encompass each tool call.
+Do not store a current user in a singleton or use a loopback HTTP client to call
+Donut's own API. Reuse `NoteSearchService`, `AuthorizationService`, and
+`FocusContextRetrievalService`; expose the attributed-read operation once for
+both HTTP and MCP rather than duplicating its revision lookup.
+
+Keep `/api/mcp` within the API namespace and describe its transport boundary in
+the OpenAPI source/generation path under
+[ADR 0005 — Web routes](../../docs/adrs/0005-web-routes-accepted.md).
+Preserve accepted-revision meaning under
+[ADR 0002 — Git-native Portable notebook tree synchronization](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md).
+Authorization/argument refusals are deliberate outcomes; unexpected failures
+must retain the existing reporting responsibility under
+[ADR 0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md),
+even where the SDK converts an exception into a protocol response.
+Use isolated disposable test data under
+[ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md).
+No conflict with these Accepted decisions was identified. ADR 0001's filename
+omits `-accepted`, but its index and in-file status agree; that is a naming
+mismatch, not a different authority.
+
+**Explored approaches and borrowed mechanism:**
+
+| Candidate | Fit to this outcome | Consequence |
+| --- | --- | --- |
+| Existing REST calls or copied passages | Useful simpler workflow, but does not provide a direct MCP connection | Keep existing APIs; it cannot satisfy this story alone |
+| A protocol adapter inside the backend using the Java SDK | Meets the deployment constraint and reuses the domain owners | Recommended; explicitly preserve request context and transaction/error boundaries |
+| Spring AI's WebMVC MCP starter | Also fits the backend and offers stateless transport | Credible alternative, but adds auto-configuration and tool-conversion machinery that these three explicit handlers do not need |
+| Handwritten JSON-RPC in a controller | Fits the location but makes Donut own protocol negotiation and transport details | Higher maintenance than the maintained SDK |
+
+The borrowed mechanism is an interpreter at a public-service counter. A
+visitor states a request in one language; the interpreter translates it for
+the existing service officer, who still owns the records and eligibility
+rules. Here the visitor is the MCP client, the interpreter is the in-backend
+protocol adapter, and the service officer is the existing knowledge operation.
+Adaptation preserves one place for domain judgment while opening a different
+interaction language; this is the SDK-adapter candidate in the comparison.
+The analogy's limit is consequential: a human interpreter can keep track of the
+visitor throughout a conversation, whereas a server handles concurrent callers
+and changes threads. Wire translation cannot establish identity, transaction
+lifetime, or failure reporting. The request-context probe demonstrates why
+those must be explicit backend responsibilities.
+A separately hosted connector remains outside the owner's selected boundary.
+
+**Investigation, 2026-10-27:** At `0719278a187bdead917a44d79b4bddc714d7d599`,
+the isolated existing MCP feature passed all seven ordinary scenarios. A scratch
+mutation returning null attribution made its revision scenario fail, so that
+assertion discriminates. A disposable Java SDK 2.1.0 probe under Spring Boot
+4.1.2 dependency management observed missing Spring request context in default
+sync execution and distinct synthetic request identities with immediate execution.
+The deployed HTTPS health endpoint returned 200 with successful certificate
+verification. These establish the current baseline and a viable adapter
+mechanism; they do not establish the future application's MCP integration,
+concurrent-user isolation, or HTTPS tool journey. Those are explicit execution
+proof obligations in the plan. All scratch source changes were reverted.
+
+Primary integration references checked on that date:
+[Java SDK server](https://java.sdk.modelcontextprotocol.io/latest/server/),
+[Spring AI stateless server](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-stateless-server-boot-starter-docs.html),
+and [MCP transport contract](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports).
+The released SDK sources, rather than unversioned examples, settled the builder
+and scheduling behavior. Newer negotiated protocol versions are not promised
+without client evidence.
+
+**Removal reading:** At acceptance, read the whole product for references to
+`donut-mcp-server`, `mcp-server/`, `StdioClientTransport`,
+`spawnAndConnectMcpServer`, `bundleMcpServer`, the process-exit fixture, and their
+exclusive consumers. Delete transitively, preserving shared consumers. Record
+this once as a reading, separate from executable proof. Proof asserts the
+surviving HTTPS behavior and active authorization refusals, never the absence
+of removed code. Preserve the dates, revision, inputs and limits of any retained
+historical observations; do not rename an old observed action to clear a search.
+
+**Effort hypothesis:** L (2–4 hours), medium confidence after the baseline and
+SDK probe. Most domain behavior exists; servlet integration, TLS client proof,
+and transitive retirement dominate the uncertainty. Execution must revisit
+sizing if one of those exceeds its bounded leaf.
+
+**Safe stopping point:** The complete HTTPS knowledge connection works with
+personal tokens, independently of stories 2 and 3. During execution, keep the
+existing supported journey working until the remote replacement is proved.
 
 <a id="story-2"></a>
 
