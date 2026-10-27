@@ -11,6 +11,7 @@
     "noUnusedParameters": false,
     "rootDir": "..",
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "paths": {
       "@generated/*": ["../packages/generated/donut-backend-api/*"],
       "@/routes/*": ["../frontend/src/routes/*"],

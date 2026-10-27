@@ -5,6 +5,10 @@ same date. These are dated evidence, not completed implementation proof.
 The canonical [story](../../seeds/SEED-002-host-mcp-over-https.md#story-2) and
 [execution plan](PLAN.md) retain scope, decisions and current proof ownership.
 
+Slice numbers in the dated observations below refer to the ten-leaf plan retained
+at `d488c64dbc69a00c51f2cc9237f71ae9fda016a1`. Refinement inserts current slice 3;
+original slices 3–10 correspond to current 4–11. Observed actions are unchanged.
+
 ## Decomposition baseline
 
 Repository reading on 2026-10-27 at

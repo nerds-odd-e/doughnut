@@ -2,7 +2,7 @@ import http from 'node:http'
 import https from 'node:https'
 import { Readable } from 'node:stream'
 import type { IncomingMessage } from 'node:http'
-import { generateMcpTestTlsMaterial } from './mcp_tls_material'
+import { generateMcpTestTlsMaterial } from './mcp_tls_material.ts'
 
 export type McpTlsProxy = {
   httpsOrigin: string

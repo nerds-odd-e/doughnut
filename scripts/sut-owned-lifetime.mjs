@@ -36,6 +36,7 @@ import {
 } from './sut-start-spawn.mjs'
 import { initializeWorktreeIdentity } from './worktree-identity.mjs'
 import { holdRetirementAdmission } from './worktree-retirement-admission.mjs'
+import { startMcpTlsProxy } from '../e2e_test/support/mcp_tls_proxy.ts'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -56,13 +57,15 @@ async function releaseOwnedLifetime({ child, checkoutRoot, ownerRef }) {
  * Returns a handle with:
  *   - child:    the running supervisor ChildProcess (detached group leader)
  *   - target:   the resolved runtime target
+ *   - tlsProxy: the optional HTTPS fixture owned by this lifetime
  *   - ready:    Promise<{ ok, exitCode }> from the readiness wait
- *   - shutdown: async () => stop the owned tree and release ownership; no-op for
- *               the primary (non-isolated) target where no ownership was claimed
+ *   - shutdown: async () => stop the owned tree, release ownership and close HTTPS;
+ *               the primary target has no owned SUT tree to stop
  *
  * The caller owns shutdown: on a successful ready it may keep the supervisor
  * running (legacy adapter) or shut it down (batch wrapper). On a failed ready,
  * the caller must call shutdown to settle the owned tree when an owner exists.
+ * Optional HTTPS is allocated before spawn and closed on failed readiness or shutdown.
  *
  * @param {{
  *   spawnFn?: typeof spawn,
@@ -84,8 +87,10 @@ async function releaseOwnedLifetime({ child, checkoutRoot, ownerRef }) {
  *   paidOpenAi?: boolean,
  *   retainOwnership?: boolean,
  *   signal?: AbortSignal,
+ *   https?: boolean,
+ *   env?: NodeJS.ProcessEnv,
  * }} [opts]
- * @returns {Promise<{ child: import('node:child_process').ChildProcess, target: object, ready: Promise<{ ok: boolean, exitCode: number }>, shutdown: () => Promise<void> }>}
+ * @returns {Promise<{ child: import('node:child_process').ChildProcess, target: object, tlsProxy?: import('../e2e_test/support/mcp_tls_proxy.ts').McpTlsProxy, ready: Promise<{ ok: boolean, exitCode: number }>, shutdown: () => Promise<void> }>}
  */
 export async function startOwnedSutLifetime({
   spawnFn = spawn,
@@ -107,6 +112,8 @@ export async function startOwnedSutLifetime({
   paidOpenAi,
   retainOwnership = false,
   signal,
+  https = false,
+  env = process.env,
 } = {}) {
   // A retained-owner start already holds SUT ownership; do not take the gate again.
   const releaseAdmissionIfHeld =
@@ -117,6 +124,9 @@ export async function startOwnedSutLifetime({
   let child
   let target
   let admissionReleased = false
+  let tlsProxy
+  let tlsClose
+  const closeTls = () => (tlsClose ??= tlsProxy?.close())
   try {
     if (
       worktreeIsolationApplies(checkoutRoot) &&
@@ -142,7 +152,7 @@ export async function startOwnedSutLifetime({
     })
     target = resolvedTarget
     if (isolated) {
-      refuseConflictingSutOverrides(process.env, target)
+      refuseConflictingSutOverrides(env, target)
       assertE2eDatabaseExists(target.database, { existsFn: databaseExistsFn })
       if (retainOwnership) {
         ownerRef.owner = await readHeldSutOwner(checkoutRoot)
@@ -168,6 +178,7 @@ export async function startOwnedSutLifetime({
         isPortOccupiedFn ?? isTcpPortOccupied
       )
     }
+    if (https) tlsProxy = await startMcpTlsProxy(isolatedBrowserOrigin(target))
     log(`Starting SUT services... (log: ${logFile})`)
     const spawned = spawnSutServices({
       spawnFn,
@@ -177,6 +188,9 @@ export async function startOwnedSutLifetime({
       paidOpenAi,
       owner: ownerRef.owner,
       checkoutRoot,
+      env: tlsProxy
+        ? { ...env, DONUT_CANONICAL_ORIGIN: tlsProxy.httpsOrigin }
+        : env,
     })
     child = spawned.child
     await writePidFile(child.pid, { pidFile })
@@ -192,16 +206,33 @@ export async function startOwnedSutLifetime({
       runtimeTarget: target,
       checkoutRoot,
       signal,
-    })
+    }).then(
+      async (result) => {
+        if (!result.ok) await closeTls()
+        return result
+      },
+      async (error) => {
+        await closeTls()
+        throw error
+      }
+    )
 
     const shutdown = async () => {
-      await releaseOwnedLifetime({ child, checkoutRoot, ownerRef })
+      try {
+        await releaseOwnedLifetime({ child, checkoutRoot, ownerRef })
+      } finally {
+        await closeTls()
+      }
     }
 
-    return { child, target, ready, shutdown }
+    return { child, target, tlsProxy, ready, shutdown }
   } catch (error) {
     if (!admissionReleased) releaseAdmissionIfHeld()
-    await releaseOwnedLifetime({ child, checkoutRoot, ownerRef })
+    try {
+      await releaseOwnedLifetime({ child, checkoutRoot, ownerRef })
+    } finally {
+      await closeTls()
+    }
     throw error
   }
 }
