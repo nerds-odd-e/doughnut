@@ -20,6 +20,7 @@ Slice 4 published `84e2b4eda9562369af774636edb490d2d1bdeb12`; slice 5 published 
 Slice 6 published `4df752991fbb75653481bbf9a24471e1953c3146`; slice 7 published `0fb9548eb93b320b71f3e02eb9be06e86b4c444d`.
 Slice 8 published `890d5be26955d8d2ab456d6ad0de7f0015622709`.
 Slice 9 published `47add57de8a497e44734cf4a462735079cf65d66`.
+Slice 10 published `5057876408a583ee2ee27f1f2282969ec0b976b5`.
 Slice 2's SHA is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's
@@ -154,11 +155,13 @@ Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#10-read-mcp-knowledge
 
 ### 11. Renew access without enlarging permission
 Type: Behavior
-Status: planned
+Status: done
 Proof: Actual token endpoint refreshes expired access and SDK reads again; expired/reused/invalid refresh and resource/scope widening are refused.
 
 Authenticate confidential client against the active grant; rotate refresh while preserving user/client/resource/read scope/current state.
 Save replacement before retry without login; unusable refresh offers reconnect. Use controlled clock/test lifetime, never production sleeps or fixture-token replacement as renewal proof. Sizing: ~5 minutes plus backend/client verification.
+
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#11-renew-access-without-enlarging-permission).
 
 ### 12. Withdraw a connected assistant
 Type: Behavior
