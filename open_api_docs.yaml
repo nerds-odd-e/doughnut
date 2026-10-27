@@ -2778,6 +2778,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AnsweredQuestion"
+  /api/oauth/consent-context:
+    get:
+      tags:
+      - assistant-consent-controller
+      operationId: getAssistantConsentContext
+      parameters:
+      - name: client_id
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ConsentContext"
   /api/notes/{note}:
     get:
       tags:
@@ -6002,6 +6025,32 @@ components:
         user:
           $ref: "#/components/schemas/User"
         externalIdentifier:
+          type: string
+    ConsentContext:
+      type: object
+      properties:
+        accountName:
+          type: string
+        clientId:
+          type: string
+        clientName:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        resource:
+          type: string
+        redirectUri:
+          type: string
+        state:
+          type: string
+        formAction:
+          type: string
+        csrfParameterName:
+          type: string
+        csrfToken:
           type: string
     NoteRecallInfo:
       type: object

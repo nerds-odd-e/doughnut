@@ -1136,6 +1136,19 @@ export type CurrentUserInfo = {
     externalIdentifier?: string;
 };
 
+export type ConsentContext = {
+    accountName?: string;
+    clientId?: string;
+    clientName?: string;
+    scopes?: Array<string>;
+    resource?: string;
+    redirectUri?: string;
+    state?: string;
+    formAction?: string;
+    csrfParameterName?: string;
+    csrfToken?: string;
+};
+
 export type NoteRecallInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     skippedPropertyKeys?: Array<string>;
@@ -3753,6 +3766,25 @@ export type PreviouslyAnsweredResponses = {
 };
 
 export type PreviouslyAnsweredResponse = PreviouslyAnsweredResponses[keyof PreviouslyAnsweredResponses];
+
+export type GetAssistantConsentContextData = {
+    body?: never;
+    path?: never;
+    query: {
+        client_id: string;
+        state: string;
+    };
+    url: '/api/oauth/consent-context';
+};
+
+export type GetAssistantConsentContextResponses = {
+    /**
+     * OK
+     */
+    200: ConsentContext;
+};
+
+export type GetAssistantConsentContextResponse = GetAssistantConsentContextResponses[keyof GetAssistantConsentContextResponses];
 
 export type ShowNoteData = {
     body?: never;

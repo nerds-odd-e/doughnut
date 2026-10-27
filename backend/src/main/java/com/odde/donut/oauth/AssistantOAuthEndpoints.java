@@ -12,6 +12,7 @@ public record AssistantOAuthEndpoints(CanonicalDonutOrigin origin) {
   public static final String TOKEN = "/api/oauth/token";
   public static final String REVOKE = "/api/oauth/revoke";
   public static final String INTROSPECT = "/api/oauth/introspect";
+  public static final String CONSENT_CONTEXT = "/api/oauth/consent-context";
 
   public String issuer() {
     return origin.value();

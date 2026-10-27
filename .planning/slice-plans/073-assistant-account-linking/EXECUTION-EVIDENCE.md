@@ -1,0 +1,87 @@
+# Accepted execution evidence
+
+Detailed completed-slice observations, retained verbatim from the active plan on 2026-10-27.
+
+### 1. Reuse the GitHub login and identity boundary
+Type: Behavior
+Status: done
+Proof: Inspect existing provider/continuation/identity mapping; slices 6–8 own new consent integration.
+
+Reading at `3d32688d4a040ab4e57e8a5a03d48963e4dc157f`: preserve production `oauth2Login(Customizer.withDefaults())`/`application-prod.yml` registration.
+`signInRedirectHref` → authenticated `/login/continue?from=…` → `ApplicationController.loginContinue`; `CurrentUserFetcherFromRequest` maps principal to existing `externalIdentifier`.
+Source-only `/root/source_promises_1` received original Goal/Scope/examples/exclusions plus owner's amendment; C06/C12/C14 select these boundaries.
+Reading is not live-provider/consent proof. No product change/test rerun. Sizing: ~5 minutes.
+
+### 2. Persist assistant authorization state
+Type: Structure
+Status: done
+Proof: MySQL migration/JDBC grant-consent round-trip, all backend tests, regenerated ERD; login/personal-token behavior retained.
+
+V300000355 stores the released models with withdrawal indexes and user/client
+cascade FKs, without runtime consumers or personal-token migration. Slice 4 uses
+migrated disposable data; shipping runtime code retains the schema-first gate.
+Sizing: 6–10 minutes plus migration/ERD proof. Source-only `/root/source_promises_2`
+separates durable storage from restart; `AssistantAuthorizationPersistenceTest` fresh JDBC stores
+reload bound state. Full command: `CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2 -Dorg.gradle.internal.http.socketTimeout=20000 -Dorg.gradle.internal.http.connectionTimeout=20000' pnpm backend:verify`.
+Passed 2,901 tests (0 failures/errors, 2 existing skips); the first attempt hit a dependency-fetch timeout before compilation.
+ERD command: `CURSOR_DEV=true nix develop -c env DONUT_ERD_SCHEMA=doughnut_wt_c5528f397af6467b8cdbe326355f44f1_test pnpm export:database-erd`.
+No production consumer was added. Restart remains slice 13; enforcement remains 7–12.
+
+### 3. Establish the owned HTTPS test origin
+Type: Structure
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm test:sut-start` and `CURSOR_DEV=true nix develop -c pnpm -C cli exec tsx --test ../e2e_test/support/mcp_tls_proxy.test.ts` observe pre-spawn configuration, CA/forwarding and success/failure cleanup.
+
+Implemented `startOwnedSutLifetime({ https: true, env })` and invocation `sutEnv`: bind the shared proxy before spawn, explicitly pass `DONUT_CANONICAL_ORIGIN`, retain `tlsProxy`, and close it on shutdown/startup failure; caller environment stays intact.
+`sut-https-origin.cases.mjs` observes public batch forwarding, configured origin, cancellation/failure cleanup and readable foreign upstream; source-only `/root/source_promises_3` leaves actual SDK discovery with slice 5.
+`CURSOR_DEV=true nix develop -c pnpm test:sut-start`: 77 passed.
+`CURSOR_DEV=true nix develop -c pnpm test:browser-worktree-isolation`: 112 passed.
+`CURSOR_DEV=true nix develop -c pnpm -C cli exec tsx --test ../e2e_test/support/mcp_tls_proxy.test.ts`: 1 passed.
+Approximately 10 minutes implementation plus a bounded 4-minute focused-verification exception for compiler-baseline diagnosis and invalidated-suite reruns; no further scope was added. Compiler limit is G2.
+
+### 4. Bootstrap configured assistant clients and stores
+Type: Structure
+Status: done
+Proof: Real MySQL store/configured-client bootstrap and reset HTTP tests observe client restoration with cleared grants/consent; full `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+`AssistantAuthorizationConfiguration` supplies real JDBC stores without constructor SQL; `AssistantClientBootstrap` runs after migration's highest-priority Ready listener and after reset.
+Configured client lists preserve IDs, encoded secrets, exact redirects, confidential Basic authentication, PKCE/consent/read scope/reference-token/rotation settings; no one-client cap or protocol handler was added.
+Accepted: source-only `/root/source_promises_4` retains physical restart with slice 13. `TestabilityDbResetTest.resetRestoresConfiguredClientsWithFreshAuthorizationState` drives real MockMvc reset, reloads both configured clients/settings and observes old grant/consent cleared (G1).
+Full `CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' pnpm backend:test_only`: 2,902 tests, 0 failures/errors, 2 existing skips; reset boundary 2/2. Connector/J 26.10.0 bytecode confirms `preserveInstants=true`; existing UTC URLs remain.
+Approximately four minutes implementation plus full-suite verification; slice 5 owns protocol discovery. HTTP signatures and generated contracts are unchanged.
+
+### 5. Discover the configured authorization service
+Type: Behavior
+Status: done
+Proof: SDK follows unauthenticated MCP 401 → protected-resource → issuer metadata through verified TLS/shared routing.
+
+Accepted: source-only `/root/source_promises_5`; `AssistantDiscoveryTest` observes canonical Host-resistant challenge/resource/issuer metadata, read scope, Basic/code/refresh/S256 and certificate-bound=false. Existing personal-token/Origin tests pass.
+`CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' pnpm generateTypeScript` and `CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' pnpm backend:test_only` passed: 2,905 tests, 0 failures/errors, 2 existing skips; discovery 3/3.
+`CURSOR_DEV=true nix develop -c pnpm test:path-routing`, `CURSOR_DEV=true nix develop -c pnpm validate:path-routing` (13 backend/5 static) and `CURSOR_DEV=true nix develop -c pnpm openapi:lint` passed.
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` passed 394 files/2,439 tests; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` passed on the generated content. All 707 existing types/42 SDK declarations remain unchanged.
+`CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' SUT_TIMEOUT_MS=240000 node /tmp/dough-story2-discovery-probe.mjs` passed actual SDK 1.32.2 challenge→resource→issuer over verified CA HTTPS49324 after normal owned reset, then shutdown0. Probe SHA256 `2298a11ebc1db645cdb4d20d42dc349b6d45fc95b3a9cebe929a0938f27a7f45`; source/proof `/tmp/dough-story2-discovery-proof.md`.
+No Cypress scenarios are claimed by the admission-only feature selection. Four minutes source work plus required verification/cold-start waits; consent, binding, consumption and later lifecycle remain 6–14.
+
+### 6. Establish the owned GitHub callback and HTTPS continuation
+Type: Structure
+Status: done
+Proof: LB/lifetime tests and real security-chain fixture callback observe the existing Donut identity and saved request remaining on the owned HTTPS origin.
+
+Shared `CommonConfiguration.oauth2Login` retains production defaults and enables configured E2E registrations. Owned `github_oauth_fixture.mjs` overrides only private provider URIs/fake credentials; existing `read:user` scope is observed unchanged.
+`LOCAL_LB_PUBLIC_ORIGIN` comes from the owned TLS fixture; extracted `local-lb-proxy.mjs` enforces its forwarded host/protocol/port while ordinary HTTP defaults pass. No app-owned session state or prod testability was added.
+Accepted source-only `/root/source_promises_6`: actual callback → existing Old Learner → original HTTPS saved authorization URL, preserving all query parameters; consent remains 7/8. No Basic/injected principal. Probe SHA256 `02b2fe29a1b0854d216b502a1d774a8f4882a9f2cc8a78b369bb2c3ff7b092a9`.
+`CURSOR_DEV=true nix develop -c pnpm test:sut-start` passed 79; `CURSOR_DEV=true nix develop -c pnpm test:browser-worktree-isolation` passed 112.
+`CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' pnpm backend:test_only` passed 2,905 tests (0 failures/errors, 2 existing skips).
+`CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' SUT_TIMEOUT_MS=240000 node /tmp/dough-story2-github-probe.mjs` passed on HTTPS56859; owned stack/fixture shutdown0. Source/proof `/tmp/dough-story2-github-proof.md`; admission-only feature selection claims no Cypress scenarios.
+Three minutes source work, ten total. Probe launch preceded consumption of the backend terminal receipt; both reached0 on unchanged source/isolated databases, without a strict sequencing claim. Relocated transport definitions were read once in their new owner; retained transport tests are the proof.
+
+### 7. Decide validated assistant consent through the protocol
+
+Accepted source-only review: `/root/source_promises_7` received only `/tmp/dough-story2-original-source.txt` and returned 126 individual clauses. Comparing that source with the product: existing GitHub identity/current account and unchanged provider scope are observed through the actual external fixture callback; stored client/account/resource/read-scope context and native Allow/Deny/retry are current slice 7. Visible client/account/search/read/explore/renewal/withdrawal explanations and browser controls remain slice 8; usable credential/secret/PKCE/code-reuse bindings remain 9; every-tool grant/current notebook checks, two-user isolation and API restrictions remain 10; expiry/renewal/no widening remain 11; settings/withdrawal/race/reconnection/other-user survival remain 12; physical restart/user binding remain 13; the complete URL/config-only SDK journey/attribution/graph context remains 14. Durable store and configured confidential multi-client foundations are accepted 2/4; existing personal-token regression remains green. No new GitHub scopes/APIs/provider capabilities, test app, live credentials, signup, public-client renewal, self-service/DCR/metadata registration, certification matrix, ChatGPT onboarding, body search/editing/retrieval-rule changes or notebook-specific selection is selected. The owner amendment and all deferred/excluded source qualifications remain effective; no expected/actual mismatch at current output was found.
+
+`AssistantConsentController` reads persisted pending authorization, current principal/account and registered client; display/bindings ignore untrusted query values. Shared resource policy requires canonical MCP/read scope; authorization validates exact callback including loopback port and S256. Native maintained handlers persist consent/code or return access_denied at the validated callback; framework cookie/token protects POST.
+`CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' pnpm generateTypeScript` and the same wrapper with `pnpm backend:test_only` passed: 2,919 tests, 0 failures/errors, 2 existing skips; 14 consent observations. Full frontend passed 394 files/2,439 tests; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`, the same with `tsc --noEmit`, and `CURSOR_DEV=true nix develop -c pnpm openapi:lint` passed on generated content.
+`CURSOR_DEV=true nix develop -c node /tmp/dough-story2-consent-probe.mjs` passed through verified HTTPS52810: actual GitHub callback/Old Learner → safe context/HttpOnly CSRF cookie → missing-CSRF403 → native Deny/access_denied/original state → consumed-state400 → retry Allow/code/exact callback; owned stack/fixture shutdown0. SHA256 `ae00d90f2e4133034b9f79e99fea2fdc5f20f5e93863040b97f0e573bc82c43a`.
+Exact commands/results/setup/assertions and corrected harness failures: `/tmp/dough-story2-slice7-proof.md`; complete consumer dispositions: `/tmp/dough-story2-slice7-consumer-dispositions.md`. Initial MockMvc query/decoding/error expectations and temporary probe body serialization were corrected before green; earlier refusal passes were discarded. About 20 minutes including serial proof/cold starts and harness corrections; no additional product scope. No Cypress scenarios or green whole-E2E typecheck claimed.
+
+Independent fresh `/root/refactor_assistant_consent` completed: renamed only `AssistantDiscoveryConfiguration` to `AssistantAuthorizationServerConfiguration`; no external consumers, `compileJava`/repository whitespace check passed. All accepted proof remains valid; no rerun. Exact report `/tmp/dough-story2-consent-refactor.md`, marker `## REFACTOR COMPLETE`.

@@ -280,6 +280,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `recalling`: GET `/api/recalls/recalling` -> `RecallingResponse` (request: `RecallingData`; query: timezone, dueindays; response body: DueMemoryTrackers)
 - `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<AnsweredQuestion>)
 
+## Assistant Consent Controller
+
+- `getAssistantConsentContext`: GET `/api/oauth/consent-context` -> `GetAssistantConsentContextResponse` (request: `GetAssistantConsentContextData`; query: client_id, state; response body: ConsentContext)
+
 ## Note Image Controller
 
 - `showNoteImage`: GET `/api/notes/{note}/image` -> `ShowNoteImageResponse` (request: `ShowNoteImageData`; path: note; query: path; response body: string)
