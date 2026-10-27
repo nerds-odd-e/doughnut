@@ -306,3 +306,11 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Admin User Controller
 
 - `listUsers`: GET `/api/admin/users` -> `ListUsersResponse` (request: `ListUsersData`; query: pageIndex, pageSize; response body: UserListingPage)
+
+## Assistant Oauth
+
+- `assistantIssuerMetadata`: GET `/.well-known/oauth-authorization-server` -> `AssistantIssuerMetadataResponse` (request: none; response body: unknown)
+- `assistantResourceMetadata`: GET `/.well-known/oauth-protected-resource/api/mcp` -> `AssistantResourceMetadataResponse` (request: none; response body: unknown)
+- `assistantAuthorization`: GET `/api/oauth/authorize` -> `AssistantAuthorizationResponse` (request: none; response body: void)
+- `assistantToken`: POST `/api/oauth/token` -> `AssistantTokenResponse` (request: none; response body: void)
+- `assistantRevocation`: POST `/api/oauth/revoke` -> `AssistantRevocationResponse` (request: none; response body: void)

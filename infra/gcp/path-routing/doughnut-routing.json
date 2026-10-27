@@ -1,6 +1,6 @@
 {
   "backendPathHints": {
-    "exactPaths": ["/api", "/install", "/login", "/login/continue", "/robots.txt"],
+    "exactPaths": ["/api", "/install", "/login", "/login/continue", "/robots.txt", "/.well-known/oauth-authorization-server", "/.well-known/oauth-protected-resource/api/mcp"],
     "pathPrefixes": [
       "/api/",
       "/oauth2/",

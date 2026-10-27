@@ -1,6 +1,7 @@
 package com.odde.donut.mcp;
 
 import com.odde.donut.entities.User;
+import com.odde.donut.oauth.AssistantOAuthEndpoints;
 import com.odde.donut.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,9 +20,11 @@ public class McpTokenAuthenticationFilter extends OncePerRequestFilter {
       McpTokenAuthenticationFilter.class.getName() + ".user";
 
   private final UserService userService;
+  private final AssistantOAuthEndpoints endpoints;
 
-  public McpTokenAuthenticationFilter(UserService userService) {
+  public McpTokenAuthenticationFilter(UserService userService, AssistantOAuthEndpoints endpoints) {
     this.userService = userService;
+    this.endpoints = endpoints;
   }
 
   @Override
@@ -36,6 +39,8 @@ public class McpTokenAuthenticationFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     Optional<User> user = resolveTokenUser(request);
     if (user.isEmpty()) {
+      response.setHeader(
+          "WWW-Authenticate", "Bearer resource_metadata=\"" + endpoints.resourceMetadata() + "\"");
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Valid personal token required");
       return;
     }

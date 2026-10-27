@@ -1,6 +1,7 @@
 package com.odde.donut.mcp;
 
 import com.odde.donut.entities.User;
+import com.odde.donut.oauth.AssistantOAuthEndpoints;
 import com.odde.donut.services.UserService;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServer;
@@ -71,9 +72,9 @@ public class McpServerConfiguration {
 
   @Bean
   FilterRegistrationBean<McpTokenAuthenticationFilter> mcpTokenAuthenticationFilterRegistration(
-      UserService userService) {
+      UserService userService, AssistantOAuthEndpoints endpoints) {
     FilterRegistrationBean<McpTokenAuthenticationFilter> registration =
-        new FilterRegistrationBean<>(new McpTokenAuthenticationFilter(userService));
+        new FilterRegistrationBean<>(new McpTokenAuthenticationFilter(userService, endpoints));
     registration.addUrlPatterns(MCP_ENDPOINT);
     registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 20);
     registration.setName("donutMcpTokenAuthenticationFilter");

@@ -108,19 +108,20 @@ Proof: Real MySQL store/configured-client bootstrap and reset HTTP tests observe
 `AssistantAuthorizationConfiguration` supplies real JDBC stores without constructor SQL; `AssistantClientBootstrap` runs after migration's highest-priority Ready listener and after reset.
 Configured client lists preserve IDs, encoded secrets, exact redirects, confidential Basic authentication, PKCE/consent/read scope/reference-token/rotation settings; no one-client cap or protocol handler was added.
 Accepted: source-only `/root/source_promises_4` retains physical restart with slice 11. `TestabilityDbResetTest.resetRestoresConfiguredClientsWithFreshAuthorizationState` drives real MockMvc reset, reloads both configured clients/settings and observes old grant/consent cleared (G1).
-Full `CURSOR_DEV=true nix develop -c pnpm backend:test_only`: 2,902 tests, 0 failures/errors, 2 existing skips; reset boundary 2/2. Connector/J 26.10.0 bytecode confirms `preserveInstants=true`; existing UTC URLs remain.
+Full `CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' pnpm backend:test_only`: 2,902 tests, 0 failures/errors, 2 existing skips; reset boundary 2/2. Connector/J 26.10.0 bytecode confirms `preserveInstants=true`; existing UTC URLs remain.
 Approximately four minutes implementation plus full-suite verification; slice 5 owns protocol discovery. HTTP signatures and generated contracts are unchanged.
 
 ### 5. Discover the configured authorization service
 Type: Behavior
-Status: planned
+Status: done
 Proof: SDK follows unauthenticated MCP 401 → protected-resource → issuer metadata through verified TLS/shared routing.
 
-Use configured client/stores (4) and HTTPS origin (3) for issuer/protected-resource
-metadata, approved exact routes and MCP challenge. Describe `/api` operational
-endpoints through OpenAPI generation; advertise supported scopes only, no DCR.
-Preserve personal-token auth/invalid-Origin handling and MCP auth challenges without
-login pages. Curl/route checks alone are insufficient. Sizing: 6–10 minutes plus backend/routing/SDK proof.
+Accepted: source-only `/root/source_promises_5`; `AssistantDiscoveryTest` observes canonical Host-resistant challenge/resource/issuer metadata, read scope, Basic/code/refresh/S256 and certificate-bound=false. Existing personal-token/Origin tests pass.
+`CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' pnpm generateTypeScript` and the same prefix with `pnpm backend:test_only` passed: 2,905 tests, 0 failures/errors, 2 existing skips; discovery 3/3.
+`CURSOR_DEV=true nix develop -c pnpm test:path-routing`, `CURSOR_DEV=true nix develop -c pnpm validate:path-routing` (13 backend/5 static) and `CURSOR_DEV=true nix develop -c pnpm openapi:lint` passed.
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` passed 394 files/2,439 tests; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` passed on the generated content. All 707 existing types/42 SDK declarations remain unchanged.
+`CURSOR_DEV=true nix develop -c env GRADLE_OPTS='-Dorg.gradle.workers.max=2' SUT_TIMEOUT_MS=240000 node /tmp/dough-story2-discovery-probe.mjs` passed actual SDK 1.32.2 challenge→resource→issuer over verified CA HTTPS49324 after normal owned reset, then shutdown0. Probe SHA256 `2298a11ebc1db645cdb4d20d42dc349b6d45fc95b3a9cebe929a0938f27a7f45`; source/proof `/tmp/dough-story2-discovery-proof.md`.
+No Cypress scenarios are claimed by the admission-only feature selection. Four minutes source work plus required verification/cold-start waits; consent, binding, consumption and later lifecycle remain 6–12.
 
 ### 6. Decide an assistant's read access after GitHub sign-in
 Type: Behavior

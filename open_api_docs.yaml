@@ -4,6 +4,9 @@ info:
   version: v0
 servers:
 - url: ""
+tags:
+- name: assistant-oauth
+  description: OAuth protocol endpoints; use an OAuth/MCP SDK.
 paths:
   /api/mcp:
     post:
@@ -3750,6 +3753,70 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FailureReportDeletionResultDTO"
+  /.well-known/oauth-authorization-server:
+    get:
+      tags:
+      - assistant-oauth
+      summary: OAuth authorization-server metadata
+      description: Public OAuth discovery metadata for the configured canonical Donut
+        MCP resource.
+      operationId: assistantIssuerMetadata
+      responses:
+        "200":
+          description: OAuth metadata
+          content:
+            application/json:
+              schema: {}
+  /.well-known/oauth-protected-resource/api/mcp:
+    get:
+      tags:
+      - assistant-oauth
+      summary: MCP protected-resource metadata
+      description: Public OAuth discovery metadata for the configured canonical Donut
+        MCP resource.
+      operationId: assistantResourceMetadata
+      responses:
+        "200":
+          description: OAuth metadata
+          content:
+            application/json:
+              schema: {}
+  /api/oauth/authorize:
+    get:
+      tags:
+      - assistant-oauth
+      summary: Authorize an assistant
+      description: "Browser authorization-code request with an exact registered redirect,\
+        \ PKCE and read scope; Donut sign-in and consent are required."
+      operationId: assistantAuthorization
+      responses:
+        default:
+          description: "OAuth protocol response, including redirects and standard\
+            \ OAuth errors."
+  /api/oauth/token:
+    post:
+      tags:
+      - assistant-oauth
+      summary: Exchange or renew an assistant credential
+      description: OAuth form-encoded code or refresh exchange. The confidential client
+        authenticates with HTTP Basic; use an OAuth SDK.
+      operationId: assistantToken
+      responses:
+        default:
+          description: "OAuth protocol response, including redirects and standard\
+            \ OAuth errors."
+  /api/oauth/revoke:
+    post:
+      tags:
+      - assistant-oauth
+      summary: Revoke an assistant credential
+      description: OAuth form-encoded revocation with confidential-client HTTP Basic
+        authentication.
+      operationId: assistantRevocation
+      responses:
+        default:
+          description: "OAuth protocol response, including redirects and standard\
+            \ OAuth errors."
 components:
   schemas:
     BookBlockReadingRecordPutRequest:
