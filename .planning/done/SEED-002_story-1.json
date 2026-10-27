@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-002#story-1",
+  "title": "Use Donut note context from an HTTPS MCP client",
+  "completedAt": "2026-10-27T10:03:34.859Z",
+  "developer": "Terry Yin",
+  "agent": "Yuma-chan",
+  "host": "cursor",
+  "model": "auto"
+}

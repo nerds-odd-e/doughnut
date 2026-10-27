@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Use Donut note context from an HTTPS MCP client](seeds/SEED-002-host-mcp-over-https.md#story-1) — SEED-002#story-1 ([plan](slice-plans/072-https-mcp-note-context/PLAN.md))
-
 ## Backlog list
 
 - [Link an assistant to Donut through GitHub sign-in](seeds/SEED-002-host-mcp-over-https.md#story-2) — SEED-002#story-2
