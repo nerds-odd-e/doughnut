@@ -114,6 +114,26 @@ async function viewport(width: number) {
   await page.viewport(width, 900)
 }
 
+it.each([375, 1440])(
+  "aligns references with the note reading column at %spx",
+  async (width) => {
+    await viewport(width)
+    await mountNoteShow(
+      realmWith("2026-02-10T12:00:00Z", "2026-05-15T12:00:00Z"),
+      false
+    )
+    const content = wrapper
+      .get('[aria-label="Note content"]')
+      .element.getBoundingClientRect()
+    const heading = wrapper
+      .findAll("h3")
+      .find((candidate) => candidate.text() === "References")!
+      .element.getBoundingClientRect()
+    expect(heading.left).toBeCloseTo(content.left)
+    expect(heading.right).toBeCloseTo(content.right)
+  }
+)
+
 it.each([
   [375, "light"],
   [375, "dark"],

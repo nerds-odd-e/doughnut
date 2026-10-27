@@ -38,6 +38,7 @@
                 <ShowImage :note="noteRealm.note" />
                 <NoteTimestamps :note-topology="noteRealm.note.noteTopology" />
                 <NoteReferences
+                  class="note-reading-column"
                   :note-topologies="noteRealm.references ?? []"
                 />
               </div>
