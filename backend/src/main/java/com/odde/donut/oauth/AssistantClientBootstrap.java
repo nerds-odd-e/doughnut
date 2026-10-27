@@ -56,6 +56,8 @@ public class AssistantClientBootstrap {
             .tokenSettings(
                 TokenSettings.builder()
                     .accessTokenFormat(OAuth2TokenFormat.REFERENCE)
+                    .accessTokenTimeToLive(properties.getAccessTokenTimeToLive())
+                    .refreshTokenTimeToLive(properties.getRefreshTokenTimeToLive())
                     .reuseRefreshTokens(false)
                     .build());
     if (existing != null) client.clientIdIssuedAt(existing.getClientIdIssuedAt());

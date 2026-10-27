@@ -11,6 +11,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.oauth2.server.authorization.authentication.ClientSecretAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.resource.web.OAuth2ProtectedResourceMetadataFilter;
@@ -53,6 +55,20 @@ public class AssistantAuthorizationServerConfiguration {
             server,
             config ->
                 config
+                    .clientAuthentication(
+                        endpoint ->
+                            endpoint.authenticationProviders(
+                                providers ->
+                                    providers.forEach(
+                                        provider -> {
+                                          if (provider
+                                              instanceof
+                                              ClientSecretAuthenticationProvider secret) {
+                                            secret.setPasswordEncoder(
+                                                PasswordEncoderFactories
+                                                    .createDelegatingPasswordEncoder());
+                                          }
+                                        })))
                     .authorizationEndpoint(
                         endpoint ->
                             endpoint

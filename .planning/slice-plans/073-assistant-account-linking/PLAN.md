@@ -18,6 +18,7 @@ Startup claim `3d32688d4a040ab4e57e8a5a03d48963e4dc157f` was confirmed on remote
 Published on the execution branch: slice 1 `f0390693df002168b2ce6a81f038bcb5f90931b8`, slice 2 `d488c64dbc69a00c51f2cc9237f71ae9fda016a1`, slice 3 `9562d7c1ae2e965e95aa70afaa0d01f97c98406f`.
 Slice 4 published `84e2b4eda9562369af774636edb490d2d1bdeb12`; slice 5 published `20d28229aabc6a4747cb8e1a39f433f170a71dad` on that branch.
 Slice 6 published `4df752991fbb75653481bbf9a24471e1953c3146`; slice 7 published `0fb9548eb93b320b71f3e02eb9be06e86b4c444d`.
+Slice 8 published `890d5be26955d8d2ab456d6ad0de7f0015622709`.
 Slice 2's SHA is the immutable schema-only release candidate; no deployment is authorized.
 
 `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with the checkout's
@@ -133,11 +134,12 @@ Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#8-show-informed-assis
 
 ### 9. Exchange a code for a constrained credential
 Type: Behavior
-Status: planned
+Status: done
 Proof: Real HTTP exchange issues opaque user/client/read/resource-bound credentials; invalid secret/PKCE, wrong resource and code reuse fail.
 
 Use maintained exchange/common resource validation, persisting GitHub-backed Donut subject rather than client audience.
 Set finite access/refresh lifetimes and rotation with deterministic short tests; retain credential/error rules. Sizing: ~5 minutes plus full backend verification.
+Accepted proof: [execution evidence](EXECUTION-EVIDENCE.md#9-exchange-a-code-for-a-constrained-credential).
 
 ### 10. Read MCP knowledge under the delegated permission
 Type: Behavior

@@ -1,5 +1,6 @@
 package com.odde.donut.oauth;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -11,6 +12,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "donut.oauth")
 public class AssistantClientProperties {
   private List<Client> clients = new ArrayList<>();
+  private Duration accessTokenTimeToLive = Duration.ofMinutes(5);
+  private Duration refreshTokenTimeToLive = Duration.ofDays(30);
 
   @Getter
   @Setter
