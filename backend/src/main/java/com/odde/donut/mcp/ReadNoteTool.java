@@ -12,9 +12,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * MCP {@code read_note}: returns canonical attributed content via {@link
@@ -77,35 +75,14 @@ public class ReadNoteTool {
     User user = (User) transportContext.get(McpServerConfiguration.TRANSPORT_USER_KEY);
     try {
       AttributedNoteContent content =
-          attributedNoteContentService.read(user, noteIdArgument(request));
+          attributedNoteContentService.read(user, McpToolArguments.noteId(request));
       return McpSchema.CallToolResult.builder()
           .addContent(new McpSchema.TextContent(objectMapper.writeValueAsString(content)))
           .build();
     } catch (UnexpectedNoAccessRightException e) {
-      throw rethrow(e);
+      throw McpToolArguments.rethrow(e);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
-  }
-
-  /**
-   * Preserve deliberate checked failures for {@link
-   * com.odde.donut.factoryServices.FailureReportFactory#isDeliberate}.
-   */
-  @SuppressWarnings("unchecked")
-  private static <T extends Throwable> RuntimeException rethrow(Throwable failure) throws T {
-    throw (T) failure;
-  }
-
-  private static Integer noteIdArgument(McpSchema.CallToolRequest request) {
-    Map<String, Object> arguments = request.arguments();
-    if (arguments == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "noteId is required");
-    }
-    Object noteId = arguments.get("noteId");
-    if (noteId instanceof Number number) {
-      return number.intValue();
-    }
-    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "noteId is required");
   }
 }

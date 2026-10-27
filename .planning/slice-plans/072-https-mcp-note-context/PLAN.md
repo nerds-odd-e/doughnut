@@ -214,7 +214,7 @@ Learnings:
 
 ### 4. Retrieve bounded context for a readable note
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP graph calls at small/large body budgets and active argument/access
 refusals; reuse the existing domain fixtures; all backend tests.
 
@@ -226,6 +226,22 @@ related content is filtered under the same existing rule. Keep the established
 argument-error outcomes useful without inventing new content restrictions.
 
 Sizing: ~5 minutes of adapter work plus backend verification.
+
+Accepted proof (reuse):
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only` — 2900 tests, 0
+  failures, 2 skipped. After helper extract: focused
+  `GetNoteGraphMcpEndpointTest` + `ReadNoteMcpEndpointTest` — BUILD SUCCESSFUL.
+- Observations: large budget returns focus + folder peer; small budget omits
+  peer; useless tokenLimits refuse with established messages; foreign private
+  focus refused; foreign private related filtered; tools/list includes
+  `get_note_graph`.
+- Local stdio: `pnpm mcp-server:test` — 18 passed.
+
+Learnings:
+- `NoteGraphService` wraps auth + `FocusContextRetrievalService.retrieve` +
+  `RetrievalConfig.forGraphApi` in `@Transactional(readOnly=true)` for MCP;
+  REST graph still calls retrieval directly (domain already shared).
+- Shared MCP `noteId` / deliberate `rethrow` live in `McpToolArguments`.
 
 ### 5. Use the complete knowledge journey over HTTPS
 Type: Behavior

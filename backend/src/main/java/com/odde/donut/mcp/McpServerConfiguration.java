@@ -43,7 +43,8 @@ public class McpServerConfiguration {
   McpStatelessSyncServer mcpStatelessSyncServer(
       HttpServletStatelessServerTransport transport,
       ListNoteCandidatesTool listNoteCandidatesTool,
-      ReadNoteTool readNoteTool) {
+      ReadNoteTool readNoteTool,
+      GetNoteGraphTool getNoteGraphTool) {
     McpStatelessServerTransport handlerIntercept =
         new McpStatelessServerTransport() {
           @Override
@@ -60,7 +61,10 @@ public class McpServerConfiguration {
     return McpServer.sync(handlerIntercept)
         .serverInfo("donut", "1.0.0")
         .capabilities(McpSchema.ServerCapabilities.builder().tools(true).build())
-        .tools(listNoteCandidatesTool.specification(), readNoteTool.specification())
+        .tools(
+            listNoteCandidatesTool.specification(),
+            readNoteTool.specification(),
+            getNoteGraphTool.specification())
         .immediateExecution(true)
         .build();
   }
