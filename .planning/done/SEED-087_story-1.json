@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-087#story-1",
+  "title": "Open notebooks from the filter with the keyboard",
+  "completedAt": "2026-10-27T03:42:55.015Z",
+  "developer": "Terry Yin",
+  "agent": "Yui-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

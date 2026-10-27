@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Open notebooks from the filter with the keyboard](seeds/SEED-087-notebook-keyboard-navigation.md#story-1) — SEED-087#story-1 ([plan](slice-plans/001-keyboard-notebook-catalog/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
