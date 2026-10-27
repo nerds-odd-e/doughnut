@@ -8,20 +8,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.oauth2.server.authorization.authentication.ClientSecretAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationConsentAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.resource.web.OAuth2ProtectedResourceMetadataFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcherEntry;
 
 @Configuration
 public class AssistantAuthorizationServerConfiguration {
@@ -44,13 +50,37 @@ public class AssistantAuthorizationServerConfiguration {
   @Bean
   @Order(1)
   SecurityFilterChain assistantAuthorizationChain(
-      HttpSecurity http, AssistantAuthorizationRequestValidator validator) throws Exception {
+      HttpSecurity http,
+      AssistantAuthorizationRequestValidator validator,
+      AssistantGrantService grants)
+      throws Exception {
     OAuth2AuthorizationServerConfigurer server = new OAuth2AuthorizationServerConfigurer();
-    http.securityMatcher(
-            new OrRequestMatcher(
-                server.getEndpointsMatcher(),
-                PathPatternRequestMatcher.withDefaults()
-                    .matcher(AssistantOAuthEndpoints.CONSENT_CONTEXT)))
+    server.withObjectPostProcessor(
+        new ObjectPostProcessor<AuthenticationProvider>() {
+          @Override
+          @SuppressWarnings("unchecked")
+          public <O extends AuthenticationProvider> O postProcess(O provider) {
+            // Keep the original list entries visible to SAS's shared request validator.
+            if (provider instanceof OAuth2AuthorizationCodeRequestAuthenticationProvider
+                || provider instanceof OAuth2AuthorizationConsentAuthenticationProvider) {
+              return (O) new AssistantGrantAuthenticationProvider(provider, grants);
+            }
+            return provider;
+          }
+        });
+    var jsonContexts =
+        new OrRequestMatcher(
+            PathPatternRequestMatcher.withDefaults()
+                .matcher(AssistantOAuthEndpoints.CONSENT_CONTEXT),
+            PathPatternRequestMatcher.withDefaults()
+                .matcher(AssistantOAuthEndpoints.ASSISTANTS + "/**"));
+    var entryPoint =
+        new DelegatingAuthenticationEntryPoint(
+            new LoginUrlAuthenticationEntryPoint("/login"),
+            List.of(
+                new RequestMatcherEntry<>(
+                    jsonContexts, new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))));
+    http.securityMatcher(new OrRequestMatcher(server.getEndpointsMatcher(), jsonContexts))
         .with(
             server,
             config ->
@@ -84,6 +114,18 @@ public class AssistantAuthorizationServerConfiguration {
                                                 codeRequest.setAuthenticationValidator(validator);
                                               }
                                             })))
+                    .tokenEndpoint(
+                        endpoint ->
+                            endpoint.authenticationProviders(
+                                providers ->
+                                    AssistantGrantAuthenticationProvider.serialize(
+                                        providers, grants)))
+                    .tokenRevocationEndpoint(
+                        endpoint ->
+                            endpoint.authenticationProviders(
+                                providers ->
+                                    AssistantGrantAuthenticationProvider.serialize(
+                                        providers, grants)))
                     .authorizationServerMetadataEndpoint(
                         metadata ->
                             metadata.authorizationServerMetadataCustomizer(
@@ -136,15 +178,17 @@ public class AssistantAuthorizationServerConfiguration {
                             // SAS adds an endpoint-wide exemption during init. Consent is a
                             // browser form, so install its precise policy on the final filter.
                             filter.setRequireCsrfProtectionMatcher(
-                                PathPatternRequestMatcher.withDefaults()
-                                    .matcher(HttpMethod.POST, AssistantOAuthEndpoints.AUTHORIZE));
+                                new OrRequestMatcher(
+                                    PathPatternRequestMatcher.withDefaults()
+                                        .matcher(
+                                            HttpMethod.POST, AssistantOAuthEndpoints.AUTHORIZE),
+                                    PathPatternRequestMatcher.withDefaults()
+                                        .matcher(
+                                            HttpMethod.DELETE, AssistantOAuthEndpoints.ASSISTANT)));
                             return filter;
                           }
                         }))
-        .exceptionHandling(
-            exceptions ->
-                exceptions.authenticationEntryPoint(
-                    new LoginUrlAuthenticationEntryPoint("/login")));
+        .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(entryPoint));
     return http.build();
   }
 

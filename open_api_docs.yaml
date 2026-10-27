@@ -2801,6 +2801,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ConsentContext"
+  /api/oauth/assistants:
+    get:
+      tags:
+      - assistant-management-controller
+      operationId: getConnectedAssistants
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AssistantManagement"
   /api/notes/{note}:
     get:
       tags:
@@ -3714,6 +3726,20 @@ paths:
         required: true
         schema:
           type: integer
+      responses:
+        "200":
+          description: OK
+  /api/oauth/assistants/{clientId}:
+    delete:
+      tags:
+      - assistant-management-controller
+      operationId: withdrawAssistant
+      parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -6052,6 +6078,29 @@ components:
           type: string
         csrfToken:
           type: string
+    AssistantManagement:
+      type: object
+      properties:
+        assistants:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConnectedAssistant"
+        csrfHeaderName:
+          type: string
+        csrfToken:
+          type: string
+    ConnectedAssistant:
+      type: object
+      properties:
+        clientId:
+          type: string
+        clientName:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
     NoteRecallInfo:
       type: object
       properties:

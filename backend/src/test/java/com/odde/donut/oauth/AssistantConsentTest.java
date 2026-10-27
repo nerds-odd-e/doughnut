@@ -4,7 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,12 +16,49 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.JsonNode;
 
 class AssistantConsentTest extends AssistantAuthorizationTestSupport {
+  @Test
+  void consentContextRequiresSignInWithoutRedirectingTheJsonClient() throws Exception {
+    mockMvc
+        .perform(
+            get(AssistantOAuthEndpoints.CONSENT_CONTEXT)
+                .param("client_id", "test-assistant")
+                .param("state", begin(Map.of())))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void endedSessionRequiresSignInForBothJsonContexts() throws Exception {
+    String state = begin(Map.of());
+    mockMvc.perform(post("/logout").cookie(session));
+    context(state, "test-assistant").andExpect(status().isUnauthorized());
+    mockMvc
+        .perform(get(AssistantOAuthEndpoints.ASSISTANTS).cookie(session))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void authorizationNavigationRedirectsToSignIn() throws Exception {
+    mockMvc
+        .perform(
+            get(AssistantOAuthEndpoints.AUTHORIZE)
+                .queryParam("response_type", "code")
+                .queryParam("client_id", "test-assistant")
+                .queryParam("redirect_uri", "https://assistant.example/callback")
+                .queryParam("scope", "notes:read")
+                .queryParam("resource", endpoints.resource())
+                .queryParam("code_challenge", "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG")
+                .queryParam("code_challenge_method", "S256"))
+        .andExpect(status().isFound())
+        .andExpect(header().string(HttpHeaders.LOCATION, containsString("/login")));
+  }
+
   @Test
   void contextComesFromThePendingGrantAndAllowPersistsTheSamePermission() throws Exception {
     String state = begin(Map.of());

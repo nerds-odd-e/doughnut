@@ -1149,6 +1149,18 @@ export type ConsentContext = {
     csrfToken?: string;
 };
 
+export type AssistantManagement = {
+    assistants?: Array<ConnectedAssistant>;
+    csrfHeaderName?: string;
+    csrfToken?: string;
+};
+
+export type ConnectedAssistant = {
+    clientId?: string;
+    clientName?: string;
+    scopes?: Array<string>;
+};
+
 export type NoteRecallInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     skippedPropertyKeys?: Array<string>;
@@ -3786,6 +3798,22 @@ export type GetAssistantConsentContextResponses = {
 
 export type GetAssistantConsentContextResponse = GetAssistantConsentContextResponses[keyof GetAssistantConsentContextResponses];
 
+export type GetConnectedAssistantsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/oauth/assistants';
+};
+
+export type GetConnectedAssistantsResponses = {
+    /**
+     * OK
+     */
+    200: AssistantManagement;
+};
+
+export type GetConnectedAssistantsResponse = GetConnectedAssistantsResponses[keyof GetConnectedAssistantsResponses];
+
 export type ShowNoteData = {
     body?: never;
     path: {
@@ -4627,6 +4655,22 @@ export type DeleteTokenData = {
 };
 
 export type DeleteTokenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type WithdrawAssistantData = {
+    body?: never;
+    path: {
+        clientId: string;
+    };
+    query?: never;
+    url: '/api/oauth/assistants/{clientId}';
+};
+
+export type WithdrawAssistantResponses = {
     /**
      * OK
      */
