@@ -6,7 +6,7 @@ Feature: Assistant account linking
       | Title             | Content                                         |
       | Hosted SDK Marker | Initial SDK authorization reads this private note |
       | Hosted SDK Sibling | Nearby private knowledge                         |
-    When I connect the hosted assistant through GitHub and allow read access
+    When I connect the hosted assistant through GitHub and allow notebook reading and learning session recording
     Then the hosted assistant reads "Hosted SDK Marker" containing "Initial SDK authorization reads this private note"
     And the hosted assistant explores bounded graph context for "Hosted SDK Marker"
     When the hosted assistant's access expires

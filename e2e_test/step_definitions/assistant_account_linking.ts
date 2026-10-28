@@ -2,7 +2,7 @@ import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { hostedAssistant } from '../start/pageObjects/hostedAssistant'
 
 When(
-  'I connect the hosted assistant through GitHub and allow read access',
+  'I connect the hosted assistant through GitHub and allow notebook reading and learning session recording',
   () => {
     hostedAssistant().connectThroughGithub()
   }

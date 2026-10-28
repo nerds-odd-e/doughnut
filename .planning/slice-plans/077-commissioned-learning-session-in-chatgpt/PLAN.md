@@ -206,6 +206,12 @@ Story clause: "Expand hosted-assistant OAuth and consent with a narrow grant for
 Disposition: proved by slice 1: AssistantConsentTest.contextComesFromThePendingGrantAndAllowPersistsTheSamePermission (repeated scope fields, persisted exact scopes) and AssistantConsentPage.spec.ts (native FormData.getAll on Allow and no scopes on Deny); full backend and browser tests pass.
 Commitment: C20
 
+### G2. SDK dual-scope journey observation
+Reported: slice 1 — "CI expected the read-only consent heading, but discovery makes the real SDK request both supported scopes."
+Story clause: "Expand hosted-assistant OAuth and consent with a narrow grant for recording Learning Session Reports"
+Disposition: proved by slice 1: focused assistant_account_linking.feature reproduces the old expectation failure, then observes dual-scope consent, renewal, withdrawal and reconnect after repairing expectations; product behavior unchanged.
+
+
 ## Accepted slice 1 evidence — 2026-10-28
 
 - Narrow grant registration/discovery and exact read/read+record resource policy
@@ -237,3 +243,29 @@ Commitment: C20
   command; one required full backend suite at a time. Reconsider on pressure
   or changed workload. Cohesive OAuth lifecycle and mandatory suite justified
   exceeding the five-minute target; about eight minutes active implementation.
+
+## Slice 1 CI repair — 2026-10-28
+
+CI run `40660492127`, attempt `1`, accepted revision
+`6a12f6bbc287099c6e1c00916df4b48249cb0d8e`: hosted SDK E2E expected the
+read-only consent heading. SDK 1.32.2 prefers discovered `scopes_supported`
+over `clientMetadata.scope`, so it requests both advertised permissions.
+A local failure screenshot and authorization URL confirmed dual scopes.
+
+- Updated the real SDK journey's feature/step wording, dual-scope consent
+  assertions and scope-order-independent renewal assertion. Product and SDK
+  fixture unchanged. Explicit read-only backend/browser observations retained.
+- `./scripts/run.sh pnpm cy:run --spec e2e_test/features/mcp/assistant_account_linking.feature`:
+  before repair FAIL 1/1 (old heading); after repair PASS 1/1, 16 seconds.
+  Logs `/tmp/seed090-assistant-e2e-before.log` and
+  `/tmp/seed090-assistant-e2e-after.log`. The runner-owned HTTPS/GitHub/SDK
+  fixture and seeded learner exercise native consent, note/graph access,
+  renewal with both scopes, withdrawal and reconnect.
+- Consumer trace `/tmp/seed090-ci-repair-consumer-trace.md`: all consumers
+  dispositioned; unchanged product proof reused. Independent
+  `/root/refactor_ci_e2e` completes the required refactor boundary.
+- Local 48 GiB host, load about 5.4, one focused E2E invocation at a time;
+  both runner-owned stacks stopped. No competing owned heavy workload.
+- Slice 2 paused/quiescent; preserved by the managed CI stash record
+  `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/dough-ci-repair-stash-gjgujC/record.json`,
+  OID `9adcdefc08f5713fb5aff1c7c17492abcd616044`; restore after repair publication.

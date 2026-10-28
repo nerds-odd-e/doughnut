@@ -35,8 +35,11 @@ export function expectRenewedAssistant(
   expect(replacement).to.include({
     accessChanged: true,
     refreshChanged: true,
-    scope: 'notes:read',
   })
+  expect(replacement.scope.split(' ')).to.have.members([
+    'notes:read',
+    'learning_session:record',
+  ])
   expect(origin).to.match(/^https:\/\//)
   expect(replacement).to.include({
     issuer: origin,

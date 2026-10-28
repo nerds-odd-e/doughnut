@@ -152,12 +152,15 @@ export const hostedAssistant = () => ({
   expectInformedConsent() {
     cy.contains(
       'h1',
-      'Allow Hosted SDK assistant to read your notebooks?'
+      'Allow Hosted SDK assistant to read your notebooks and record learning sessions?'
     ).should('be.visible')
     cy.contains('Donut account: Old Learner').should('be.visible')
     cy.contains('notebooks that this account can currently read').should(
       'be.visible'
     )
+    cy.contains(
+      'record Learning Session Reports, saving Feedback and updating learning schedules for completed items'
+    ).should('be.visible')
     cy.contains('automatic renewal until you withdraw permission').should(
       'be.visible'
     )
