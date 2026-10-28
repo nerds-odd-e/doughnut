@@ -4,6 +4,7 @@ import static com.odde.donut.entities.Fsrs.NEW_STABILITY_HOURS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.utils.TimestampOperations;
@@ -106,5 +107,38 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
     assertThat(tracker.getDifficulty(), nullValue());
     assertThat(tracker.getLastRecalledAt(), nullValue());
     assertThat(tracker.getNextRecallAt(), equalTo(assimilatedAt));
+  }
+
+  @Test
+  void rebuildingFuzzedDueFromTheSameValidHistoryReproducesStabilityDifficultyAndDue() {
+    incremental.id = 42;
+    recordIncrementally(5, Grade.GOOD);
+    recordIncrementally(60, Grade.GOOD);
+    recordIncrementally(350, Grade.GOOD);
+    assertThat(
+        incremental.getStability(),
+        greaterThanOrEqualTo(MemoryTrackerRecallIntervalFuzz.THRESHOLD_HOURS));
+    MemoryTracker rebuilt = aNewTracker();
+    rebuilt.id = 42;
+    List<RecallLog> replayedLogs =
+        incrementalLogs.stream()
+            .map(
+                log ->
+                    makeMe
+                        .aRecallLogFor(rebuilt)
+                        .recordedAt(log.getRecordedAt())
+                        .grade(log.getGrade())
+                        .inMemoryPlease())
+            .toList();
+    RecallLog excluded = anExcludedAttemptWithoutCachedState(rebuilt, 20);
+    List<RecallLog> history = new ArrayList<>(replayedLogs);
+    history.add(1, excluded);
+
+    rebuilt.rebuildWithout(excluded, history);
+
+    assertThat(rebuilt.getStability(), equalTo(incremental.getStability()));
+    assertThat(rebuilt.getDifficulty(), equalTo(incremental.getDifficulty()));
+    assertThat(rebuilt.getLastRecalledAt(), equalTo(incremental.getLastRecalledAt()));
+    assertThat(rebuilt.getNextRecallAt(), equalTo(incremental.getNextRecallAt()));
   }
 }

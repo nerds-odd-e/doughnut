@@ -64,7 +64,7 @@ cleanup.
 
 ### 1. Schedule the next recall with deterministic hour fuzz
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `MemoryTrackerCorrectRecallSchedulingTest` (and sibling scheduling
 tests that assert due = Stability hours) plus `MemoryTrackerRebuildFromRecallHistoryTest`
 so Grade scheduling and rebuild observe fuzzed hour dues, unfuzzed short
@@ -106,6 +106,24 @@ Eligibility and commissioned separation stay as today.
 - Slice-plan refinement: not needed — two cohesive Behavior slices, one proof
   loop each, no unresolved boundary or sizing concern within the understood
   outcome.
+- Slice 1 learning: below-threshold Stability must bypass review-fuzz equal-bounds
+  expansion (`upper = lower + 1` when delta is 0); gate short intervals before
+  `withReviewFuzz`.
+
+## Accepted proof (slice 1)
+
+```bash
+CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test \
+  --tests 'com.odde.donut.entities.MemoryTrackerCorrectRecallSchedulingTest' \
+  --tests 'com.odde.donut.entities.MemoryTrackerCorrectRecallDueFuzzTest' \
+  --tests 'com.odde.donut.entities.MemoryTrackerRebuildFromRecallHistoryTest' \
+  -Dspring.profiles.active=test
+```
+
+PASS. Due-fuzz assertions live in `MemoryTrackerCorrectRecallDueFuzzTest`
+(below/at threshold, identity variance, Easy first, over-cap ≤ max); rebuild
+`rebuildingFuzzedDueFromTheSameValidHistoryReproducesStabilityDifficultyAndDue`.
+Queue-order promises remain slice 2.
 
 ## Remaining concerns
 
