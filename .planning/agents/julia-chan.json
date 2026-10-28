@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Julia-chan",
+  "email": "julia-chan@example.org",
+  "identity": "SEED-088#story-1",
+  "mode": "story-branch",
+  "branch": "cursor/vary-recall-spacing-and-the-order-of-similarly-d",
+  "host": "cursor",
+  "model": "auto"
+}
