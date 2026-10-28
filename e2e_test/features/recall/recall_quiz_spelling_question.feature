@@ -25,3 +25,16 @@ Feature: Spelling recall quiz
     And I type my answer "sedation"
     Then I should see that my spelling answer "sedation" is incorrect
     And I should see the reviewed note context containing "Sedition means incite violence"
+
+  @mockBrowserTime
+  Scenario: Resume a spelling question ready for typing
+    Given I have a notebook "More words" with notes:
+      | Title     | Content                               |
+      | democracy | Democracy means government by people |
+    And the note "sedition" was assimilated as spelling on day 1
+    And the note "democracy" was assimilated as spelling on day 1
+    When I visit recall for a due recall prompt on day 2
+    And I type my answer "sedition"
+    And I visit note "English"
+    And I resume recalling from the main menu
+    Then the spelling answer input should have focus
