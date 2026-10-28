@@ -11,25 +11,15 @@ scope: large
 
 ## Epic Outcome
 
-For people learning from deliberately authored Donut notes, a confusing recall
-answer or conversation should lead to better understanding or a reviewed note
-correction, and later questions should find and use the relevant evidence.
-Preserve the learner's history and the author's control over knowledge changes.
+For people learning from deliberately authored Donut notes, a confusing recall answer or conversation should lead to better understanding or a reviewed note correction, and later questions should find and use the relevant evidence. Preserve the learner's history and the author's control over knowledge changes.
 
-This is the parent epic for the combined learning/refinement and chat work,
-question-context quality, evidence discovery, and cited answers. It is not one
-executable story and is not queued in addition to its children. The independent
-[knowledge-to-capability experiment](SEED-074-knowledge-to-capability.md#story-1)
-is outside this epic. Its outcome is useful even if this epic stops.
+This is the parent epic for the combined learning/refinement and chat work, question-context quality, evidence discovery, and cited answers. It is not one executable story and is not queued in addition to its children. The independent [knowledge-to-capability experiment](SEED-074-knowledge-to-capability.md#story-1) is outside this epic. Its outcome is useful even if this epic stops.
 
 ## Why This Matters
 
-The owner wants to borrow OpenKB ideas for improving and using accumulated
-knowledge. Donut's starting point remains a person noticing and capturing
-something worth learning; bulk document compilation is not the priority.
+The owner wants to borrow OpenKB ideas for improving and using accumulated knowledge. Donut's starting point remains a person noticing and capturing something worth learning; bulk document compilation is not the priority.
 
-The 2026-10-12 assessment read local main at `e851a7682d`, including code,
-tests, and Accepted ADRs. It did not run the app or measure model quality:
+The 2026-10-12 assessment read local main at `e851a7682d`, including code, tests, and Accepted ADRs. It did not run the app or measure model quality:
 
 - Answered MCQs already open refinement with the question and tested focus,
   but that refinement input omits the learner's selected answer.
@@ -48,8 +38,7 @@ tests, and Accepted ADRs. It did not run the app or measure model quality:
   events. Neither alone records the diagnosis, proposal decision, and learning
   follow-up as one resolved difficulty.
 
-These are starting observations, not promises that the current UI works in
-every cited journey. Verify the selected story's decisive premises when refining it.
+These are starting observations, not promises that the current UI works in every cited journey. Verify the selected story's decisive premises when refining it.
 
 ## Alternatives and Decision
 
@@ -85,20 +74,15 @@ every cited journey. Verify the selected story's decisive premises when refining
 - Bulk ingestion, embeddings, a universal review inbox, automatic knowledge
   rewrites and skill factories are deferred promises. These deferrals do not
   prescribe runtime rejection of naturally supported behavior. Direct MCP and
-  ChatGPT access follows [SEED-002](SEED-002-host-mcp-over-https.md).
+  ChatGPT access follows the [hosted assistant setup guide](../../docs/assistant-oauth.md).
 
 ## Story Decomposition
 
-S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery, following
-[SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition). Estimates are
-hypotheses. Refine or resplit work likely to exceed L before execution.
-Each story records its preparation state below.
+S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery, following [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition). Estimates are hypotheses. Refine or resplit work likely to exceed L before execution. Each story records its preparation state below.
 
 ### Generate focus-note questions with relevant supporting passages
 
-The canonical story is [SEED-007#story-1](SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1).
-It is the next epic increment after the two learning-loop stories. Keep its
-scope, examples, preparation state, and identity in that existing seed only.
+The canonical story is [SEED-007#story-1](SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1). It is the next epic increment after the two learning-loop stories. Keep its scope, examples, preparation state, and identity in that existing seed only.
 
 <a id="story-3"></a>
 
@@ -200,8 +184,7 @@ scope, examples, preparation state, and identity in that existing seed only.
   Refine before execution planning; this candidate is not queued.
 
 **Preparation observation:** On 2026-10-12 at `e1bbd1d2727fced534f473bcba709407a46d91c9`
-in story 1's owned workspace, a disposable controller probe answered an MCQ
-incorrectly, reloaded persisted state, then contested with a mocked infeasibility
+in story 1's owned workspace, a disposable controller probe answered an MCQ incorrectly, reloaded persisted state, then contested with a mocked infeasibility
 result. Reload showed a contested MCQ, the original incorrect Answer and AGAIN
 event, and unchanged Stability, Difficulty, last recall and due time.
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed with 2738 tests,
@@ -262,6 +245,6 @@ concrete evaluation cases.
 - [Focus-context design](../../docs/focus-context/focus_context_retrieval_design.md)
   and [domain vocabulary](../../docs/adrs/0001-ubiquitous-language.md).
 - [Existing question-context hypothesis](SEED-007-per-concept-prompt-splitting-single-note-qg.md)
-  and [remote MCP hosting seed](SEED-002-host-mcp-over-https.md).
+  and the [hosted assistant setup guide](../../docs/assistant-oauth.md).
 - SEED-055 concerns file-serving API cleanup and SEED-001 concerns a different
   fuzzy spelling-match behavior; neither is duplicated or reprioritized here.

@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Use Donut knowledge directly in ChatGPT](seeds/SEED-002-host-mcp-over-https.md#story-3) — SEED-002#story-3 ([plan](slice-plans/075-direct-chatgpt-knowledge/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
