@@ -127,3 +127,9 @@ minimumReleaseAgeExclude:
   - github_action_sound@1.1.0
   - vite@8.2.0
   - unplugin-auto-import@21.1.0
+  - '@storybook/addon-docs@10.6.5'
+  - '@storybook/builder-vite@10.6.5'
+  - '@storybook/react-dom-shim@10.6.5'
+  - '@storybook/vue3-vite@10.6.5'
+  - '@storybook/vue3@10.6.5'
+  - storybook@10.6.5
