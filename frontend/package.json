@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.3",
-    "@lucide/vue": "1.61.0",
+    "@lucide/vue": "1.63.0",
     "@storybook/addon-docs": "10.6.5",
     "@storybook/vue3": "10.6.5",
     "@storybook/vue3-vite": "10.6.5",
@@ -55,7 +55,7 @@
     "es-toolkit": "1.53.0",
     "esbuild": "0.28.2",
     "gsap": "^3.15.0",
-    "marked": "18.1.1",
+    "marked": "18.1.2",
     "optionator": "^0.9.4",
     "pdfjs-dist": "6.4.299",
     "playwright": "1.64.1",
