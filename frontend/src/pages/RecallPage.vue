@@ -1,5 +1,5 @@
 <template>
-  <div ref="recallPageRoot" class="recall-page h-full flex flex-col">
+  <div ref="recallPageRoot" class="recall-page w-full max-w-6xl mx-auto h-full flex flex-col">
     <DailyProbeGate>
     <template #bar="{ ordinaryRecall }">
       <GlobalBar
