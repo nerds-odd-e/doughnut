@@ -83,7 +83,7 @@ fuzz column or mass-reschedule existing dues.
 
 ### 2. Order similarly due questions randomly in the shared queue
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `RecallsControllerTests` (stable HTTP/controller boundary) so two
 eligible trackers in the same 12-hour `next_recall_at` band can appear in
 different orders across controlled random seeds, a tracker in an earlier band
@@ -129,6 +129,21 @@ CI repair (run 40626834805): residual fixtures/assertions assumed unfuzzed
 dues; builders now reschedule Grade-path fuzz after persist; residual tests
 assert relative to actual fuzzed `nextRecallAt` / Stability. Slice 1 remains
 `done`.
+
+## Accepted proof (slice 2)
+
+```bash
+CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test \
+  --tests 'com.odde.donut.controllers.RecallsControllerTests' \
+  --tests 'com.odde.donut.controllers.RecallsControllerSharedDueOrderTests' \
+  -Dspring.profiles.active=test
+```
+
+PASS — band precedence, within-band seed variance, SPELLING preference,
+future-due exclusion in `RecallsControllerSharedDueOrderTests`. CLI
+`recallJustReviewInteractive.loadMoreSharedOrder.test.tsx` PASS (server
+order). Frontend `RecallPage.dueQueue.spec.ts` reused (client shuffle
+removed).
 
 ## Remaining concerns
 

@@ -5,13 +5,11 @@ import type {
   MemoryTrackerLite,
 } from "@generated/donut-backend-api"
 import { RecallsController } from "@generated/donut-backend-api/sdk.gen"
-import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import {
   fetchDueRecalls,
   useRecallCatchUp,
 } from "@/composables/useRecallCatchUp"
-import { shuffle } from "es-toolkit"
 import {
   onActivated,
   onDeactivated,
@@ -50,19 +48,11 @@ export function useRecallPageLoading(options: {
 
   const applyDueList = (response: DueMemoryTrackers, dueInDays?: number) => {
     setDueCommissioned(response.dueCommissioned ?? [])
-    let trackers = response.toRepeat
     currentIndex.value = 0
     setTotalAssimilatedCount(response.totalAssimilatedCount)
     const loadingFutureDays = (dueInDays ?? 0) > 0
     setDiligentMode(loadingFutureDays)
-    if (
-      getEnvironment() !== "testing" &&
-      loadingFutureDays &&
-      trackers?.length
-    ) {
-      trackers = shuffle(trackers)
-    }
-    setToRepeat(trackers)
+    setToRepeat(response.toRepeat)
   }
 
   const loadMore = async (dueInDays?: number) => {
