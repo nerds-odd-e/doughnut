@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsukasa-chan",
+  "email": "tsukasa-chan@example.org",
+  "identity": "SEED-089#story-1",
+  "mode": "story-branch",
+  "branch": "codex/recall-quiz-container",
+  "host": "codex"
+}
