@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Aino-chan",
+  "email": "aino-chan@example.org",
+  "identity": "SEED-090#story-2",
+  "mode": "story-branch",
+  "branch": "codex/verify-commissioned-learning-chatgpt",
+  "host": "codex"
+}
