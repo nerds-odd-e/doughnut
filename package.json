@@ -7,7 +7,7 @@
   "license": "MIT",
   "engines": {
     "node": ">=26.10",
-    "pnpm": ">=12.16.0"
+    "pnpm": ">=12.16.1"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -122,5 +122,5 @@
   "dependencies": {
     "vue-toastification": "2.0.0-rc.5"
   },
-  "packageManager": "pnpm@12.16.0"
+  "packageManager": "pnpm@12.16.1"
 }
