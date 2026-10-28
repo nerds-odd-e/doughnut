@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsubomi-chan",
+  "email": "tsubomi-chan@example.org",
+  "identity": "SEED-002#story-3",
+  "mode": "story-branch",
+  "branch": "codex/direct-chatgpt-knowledge",
+  "host": "codex"
+}
