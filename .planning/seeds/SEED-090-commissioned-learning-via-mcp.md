@@ -21,30 +21,57 @@ and retain only operator steps that have actually been observed.
 
 **Identity:** SEED-090#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/078-verify-commissioned-learning-in-chatgpt/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0e9aa4ff18fb7ae912965c1fc6e4327208b57810e57bd720b4455b3864c6fb65","plan":"c513e5006a305c7c57150691a7baa514a11f2665a032c273216b84d817e63e8f"}}
 ```
 
-- **Goal:** A learner using Donut in ChatGPT can complete a commissioned
-  Learning Session and see Feedback saved in Donut, including when ending early.
-- **Scope:** The owner operates a real ChatGPT connection to an HTTPS deployment
-  containing the MCP Request/Report tools. Request `notes:read` and
-  `learning_session:record`, observe consent describing recording, retrieve the
-  first Request, tutor from its instructions, and submit a Report for completed
-  items only. Verify Feedback in learning history and incomplete items unchanged.
-  Observe the no-session response and an empty Report when ending immediately.
-  Record origin/revision, actual scope string, consent wording, tool calls,
-  history observations and limitations. Update the hosted-assistant guide only
-  with steps actually observed. If ChatGPT cannot request or retain both scopes,
-  retain the evidence and refine the remaining interoperability work.
-- **Key examples:** Japanese is the sole available notebook and its completed
-  items receive Feedback; with A/B/C, ending after A records A only; ending
-  immediately records nothing; with no due session, ChatGPT explains none exists.
-- **Exclusions:** Personal-token-only or SDK-fixture proof cannot establish this
-  ChatGPT journey. Program choice, automatic further sessions, a replacement
-  protocol and general note editing remain outside scope.
-- **Owner / operation:** Terry will conduct the credentialed probe directly in
-  ChatGPT. Environment and permitted UI access are setup prerequisites; no
-  credentials belong in prompts or source control.
+- **Goal:** Terry, as a learner using Donut in ChatGPT, can verify that a real
+  commissioned Learning Session saves Feedback in Donut for the items actually
+  completed, including when ending early. The observed journey supplies reliable
+  setup instructions for other learners.
+- **Scope:** Verify the existing implementation through a real ChatGPT OAuth
+  connection to an operator-authorized HTTPS deployment containing the MCP
+  Request/Report tools. Request `notes:read` and `learning_session:record`,
+  observe Donut consent describing report recording, and demonstrate that the
+  resulting connection can both request and record a session. An existing
+  read-only connection needs fresh authorization for both scopes.
+  ChatGPT retrieves the first available Request with the learner's IANA timezone,
+  follows its tutoring instructions, and submits the existing Report markdown
+  for completed Session Items when the session finishes or ends early. Compare
+  the returned recording result with actual Feedback in Donut recall history;
+  incomplete items retain their prior Feedback and learning schedule. Verify an
+  empty Report on immediate end and the explicit no-session outcome.
+- **Key examples:**
+  1. Japanese is the sole notebook with a Potential learning session. Asking
+     ChatGPT to start learning returns Japanese's Request. After the learner
+     starts and completes its items, ChatGPT records their Grades and descriptive
+     Feedback; the same Feedback is visible in Donut recall history.
+  2. A Request contains A/B/C. The learner completes A and ends before B/C.
+     ChatGPT submits Feedback for A only. Donut history contains A's new
+     Feedback; B/C's prior history and schedule match their recorded baseline.
+  3. A Request is available, but the learner ends before completing any item.
+     ChatGPT submits an empty Report; the result records zero items and the
+     session's items retain their prior history and schedule.
+  4. The learner has no due commissioned items. Asking to start returns the
+     explicit no-session result, which ChatGPT explains to the learner.
+- **Evidence and documentation:** For each round retain the observation date,
+  deployment origin and revision, account/data preconditions, learner timezone,
+  actual requested scope string, consent wording, ChatGPT tool arguments/results,
+  and Donut history/schedule comparisons. Record failures and unreached steps
+  precisely. Update the existing hosted-assistant guide with the setup and
+  session steps actually observed; keep credentials out of evidence. Automated
+  MCP/OAuth and SDK proof supports its own boundary and cannot establish the
+  ChatGPT journey. A failed or unavailable probe leaves the relevant example
+  unverified; retain the evidence and refine the remaining interoperability work.
+- **Deferred promises:** Notebook/program choice, automatic further sessions,
+  a replacement Request/Report protocol, general note editing, additional client
+  compatibility, and implementation of interoperability repairs. Verification
+  does not authorize deploying an application or activating a new real client.
+- **Owner / operation:** Terry conducts the credentialed steps and tutoring
+  directly in ChatGPT and inspects Donut. The first probe establishes the actual
+  HTTPS origin/revision, permitted ChatGPT surface, existing client registration
+  and suitable session data. These are execution setup prerequisites, not claims
+  that a candidate is already deployed. Use ordinary product operations on
+  owner-approved data; credentials stay in the connection UI.
 - **Provenance:** Moved from former slice 4 of the commissioned-learning MCP
   execution by owner instruction on 2026-10-28. Existing MCP/OAuth automated
   proof is reusable; the real ChatGPT journey remains unobserved.
