@@ -54,58 +54,46 @@ report format; MCP should carry that same interaction.
 {"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/077-commissioned-learning-session-in-chatgpt/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7d55eadd1f4ef90a34afbd41e53b8caf709875e223f9a3b3a0b77c946df2136f","plan":"bff3455145cc970df4a8a4ce7f85c753ccbb6f87d6e184afd9407eda00265911"}}
 ```
 
-- **Goal:** A Donut learner connected through the ChatGPT plugin can ask
-  ChatGPT to conduct one commissioned Learning Session and have Feedback for
-  the Session Items they completed saved in Donut, including when they end
-  early.
-- **Scope:** On the learner's request in the connected ChatGPT conversation,
-  obtain the first available Potential learning session for that learner in
-  Donut's returned order. Load its Learning Session Request (notebook-specific
-  instructions and Session Items) through MCP and tutor interactively from
-  that Request. When the session finishes or the learner asks to end it,
-  submit a Learning Session Report through MCP for completed Session Items
-  only, using the existing commissioned learning protocol (Grade 1–4 and
-  descriptive Feedback, title matching within the notebook, existing
-  Feedback recording and scheduling). Incomplete items receive no Feedback
-  and keep their current learning state. If no Potential learning session is
-  available, tell the learner there is none. Reuse the existing
-  request/record domain behavior; do not invent a second protocol or a
-  program-picker. Expand hosted-assistant OAuth and consent with a narrow
-  grant for recording Learning Session Reports (distinct from general note
-  editing and from `notes:write`), so the ChatGPT plugin path can save
-  Feedback; do not allow report recording under `notes:read` alone.
+- **Goal:** A Donut learner can obtain the first available commissioned Learning
+  Session Request and record Feedback for completed Session Items through MCP,
+  including a partial or empty Report.
+- **Scope:** Expose the existing Request/Report markdown protocol through MCP.
+  Select the first available Potential learning session in Donut's due order,
+  return its notebook-specific instructions and Session Items, and record only
+  the Report's completed items through existing Feedback recording and scheduling.
+  Preserve incomplete items' learning state. Return an explicit no-session
+  outcome when none is available. Expand hosted-assistant OAuth and consent with a narrow grant for recording Learning Session Reports
+  (`learning_session:record`) alongside `notes:read`; refuse recording under
+  `notes:read` alone and grant no general note editing. Tutoring instructions
+  direct the connected assistant to submit completed items on normal or early
+  finish without automatically starting another session.
 - **Key examples:**
-  1. **Japanese session:** Japanese is the only available Potential learning
-     session. The learner asks ChatGPT to start learning from Donut. ChatGPT
-     retrieves that session's Request through MCP, follows its tutoring
-     instructions, teaches interactively, and submits Feedback for the
-     completed items. The learner can see that Feedback in Donut's learning
-     history.
-  2. **Several actions:** Donut supplies multiple Potential learning
-     sessions. ChatGPT uses the first in Donut's returned order and tutors
-     from that session's Request.
-  3. **End early:** A Request contains Session Items A, B, and C. After
-     completing A, the learner ends before completing B or starting C.
-     ChatGPT submits Feedback only for A; B and C remain unscored with their
-     existing schedules. Ending before completing any item records no
-     Feedback.
-  4. **Nothing available:** Donut supplies no Potential learning session.
-     ChatGPT explains that there is no available session.
-- **Deferred promises:** Choosing among programs or notebooks when several
-  are available; automatically starting a further session; replacing the
-  markdown Request/Report protocol with MCP-only structured schemas;
-  general note editing or a broad `notes:write` grant for assistants.
-- **Rejection constraints:** None beyond existing notebook authorization and
-  Report matching/recording rules (unmatched or invalid grades are rejected
-  and reported; unmatched Session Items stay unchanged).
-- **Value / learning:** Make commissioned practice usable inside the
-  connected conversation, with progress retained when time is limited.
-- **Effort hypothesis:** M–L (2–5 hours) including the MCP surface and the
-  narrow hosted-assistant report-recording grant. Confidence medium after
-  investigation below.
-- **Safe stopping point:** One requested session can be taught and its
-  completed items recorded, including an early finish. Further selection and
-  multi-session workflows remain deferred.
+  1. **Japanese Request:** With one due Japanese notebook, MCP returns that
+     notebook's identity, instructions, Session Items and Report format.
+  2. **Several actions:** With several due notebooks, MCP selects the first in
+     Donut's returned due order.
+  3. **End early:** A Request contains A/B/C. A Report for A records its Grade
+     and descriptive Feedback; B/C retain their histories and schedules. An
+     empty Report records nothing.
+  4. **Nothing available:** MCP returns an explicit no-session outcome.
+  5. **Narrow recording grant:** Real OAuth consent/code exchange grants both
+     scopes; an assistant can record only with `learning_session:record`.
+- **Deferred promises:** Real ChatGPT interoperability, interactive tutoring,
+  and visible history verification are owned by SEED-090#story-2. Choosing among
+  programs/notebooks, automatically starting another session, replacing markdown
+  with MCP-only schemas, general note editing and `notes:write` remain deferred.
+- **Rejection constraints:** Preserve existing notebook authorization and Report
+  matching/recording rules, including reported unmatched entries/invalid grades.
+- **Value / learning:** Make the existing learning protocol available to a
+  connected assistant with narrowly authorized progress recording.
+- **Safe stopping point:** The MCP Request/Report and OAuth boundaries are
+  implemented and verified; live ChatGPT verification is a separate story.
+
+**Owner amendment (2026-10-28):** Split former execution slice 4 into a new
+first-priority backlog story. The owner will perform that probe directly from
+ChatGPT; finish execution and wrap up this MCP capability story now. The
+amendment changes the current story's proof boundary; it does not claim the
+live ChatGPT journey has been observed.
 
 #### Refinement — 2026-10-28
 
@@ -178,6 +166,40 @@ ChatGPT OAuth path can meet the goal without granting general note editing.
 **Decision (owner, 2026-10-28):** Expand hosted-assistant OAuth/consent with a
 narrow Learning Session Report recording grant, as recommended. General note
 editing and `notes:write` stay out of scope. Slice planning may continue.
+
+<a id="story-2"></a>
+
+### Verify a commissioned learning session directly in ChatGPT
+
+**Identity:** SEED-090#story-2
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+- **Goal:** A learner using Donut in ChatGPT can complete a commissioned
+  Learning Session and see Feedback saved in Donut, including when ending early.
+- **Scope:** The owner operates a real ChatGPT connection to an HTTPS deployment
+  containing the MCP Request/Report tools. Request `notes:read` and
+  `learning_session:record`, observe consent describing recording, retrieve the
+  first Request, tutor from its instructions, and submit a Report for completed
+  items only. Verify Feedback in learning history and incomplete items unchanged.
+  Observe the no-session response and an empty Report when ending immediately.
+  Record origin/revision, actual scope string, consent wording, tool calls,
+  history observations and limitations. Update the hosted-assistant guide only
+  with steps actually observed. If ChatGPT cannot request or retain both scopes,
+  retain the evidence and refine the remaining interoperability work.
+- **Key examples:** Japanese is the sole available notebook and its completed
+  items receive Feedback; with A/B/C, ending after A records A only; ending
+  immediately records nothing; with no due session, ChatGPT explains none exists.
+- **Exclusions:** Personal-token-only or SDK-fixture proof cannot establish this
+  ChatGPT journey. Program choice, automatic further sessions, a replacement
+  protocol and general note editing remain outside scope.
+- **Owner / operation:** Terry will conduct the credentialed probe directly in
+  ChatGPT. Environment and permitted UI access are setup prerequisites; no
+  credentials belong in prompts or source control.
+- **Provenance:** Moved from former slice 4 of the commissioned-learning MCP
+  execution by owner instruction on 2026-10-28. Existing MCP/OAuth automated
+  proof is reusable; the real ChatGPT journey remains unobserved.
 
 ## Breadcrumbs
 

@@ -95,6 +95,15 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
 
 Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-141](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-141.md); rereading adds no occurrence.
 
+- Execution: SEED-090#story-1 / first implementation `6a12f6bbc287099c6e1c00916df4b48249cb0d8e`
+  - Timestamp: unknown (execution date 2026-10-28)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: Codex session `01a181b0-57f4-7e02-9474-3ba08c605ec8`, returns from `refactor_oauth_grant`, `refactor_ci_e2e`, `refactor_session_request`, `refactor_session_record`, `refactor_probe_checkpoint`, and `refactor_authorized_probe_record`; retained execution evidence at `75fece3:.planning/slice-plans/077-commissioned-learning-session-in-chatgpt/execution-evidence.md`.
+  - Observed effect: Six fresh passes returned no refactor edits and reported approximately 2–5 active minutes each (about 17 minutes summed). Two were records-only stop checkpoints, reporting about four minutes together. One pass usefully caught an oversized PLAN and the coordinator moved its evidence to a linked file; accepted product proof stayed unchanged throughout.
+  - Inference: The records-only passes exhibit recurring fixed review cost without product change. Times are agent reports, not independently measured wall time or token cost; the useful size finding prevents treating every pass as wasted.
+
+
 
 <a id="odf-208"></a>
 
@@ -337,6 +346,15 @@ Former local code: DD-319. Acceptance traced the unchanged transport API but not
 ### Occurrences
 
 Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-150](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-150.md); rereading adds no occurrence.
+
+- Execution: SEED-090#story-1 / first implementation `6a12f6bbc287099c6e1c00916df4b48249cb0d8e`
+  - Timestamp: 2026-10-28T09:01:43Z
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: slice-1 consumer trace excluded `hostedAssistant.ts` as an unchanged read-only journey; CI run `40660492127`, attempt 1, job `122722010192`, failed its old consent heading. Repair `4f226b3c992ff723868e5e4086ed2748a25cee28` and its retained plan/evidence record show the cause and focused reproduction.
+  - Observed effect: Advertising `learning_session:record` changed SDK 1.32.2's selected scopes because it prefers discovered `scopes_supported` over provider `clientMetadata.scope`. The existing SDK journey requested both scopes and failed in CI despite passing selected backend/browser proof. Four E2E-only expectation edits then passed the unchanged real SDK consent/read/renewal/withdrawal journey (1/1, 16 seconds).
+  - Inference: Consumer acceptance stopped at an unchanged transport/default-scope assumption instead of tracing discovery into actual client selection. The product/test repair is complete; shared prevention remains unproved. Inspect indirect discovery/default consumers before excluding an existing journey.
+
 
 
 <a id="odf-323"></a>

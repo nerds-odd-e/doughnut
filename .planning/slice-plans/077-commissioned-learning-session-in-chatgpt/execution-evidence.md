@@ -167,3 +167,25 @@ A local failure screenshot and authorization URL confirmed dual scopes.
 - Prior observer `/tmp/dough-ci-501/watch-XohUdl` was recovered as stopped, no
   unread evidence. Resumed observer `/tmp/dough-ci-501/watch-y4Vcqe`, PID 55287,
   session 75033, cell 5, same coordinator `maria-chan-090`, same branch target.
+
+## Owner split and completion — 2026-10-28
+
+- Owner moved live ChatGPT probe to first queued `SEED-090#story-2`, to operate
+  directly, and requested completion/wrap-up of the MCP capability story.
+- Fresh source-only `/root/amended_source_review` returned 56 individual
+  statements, retained and mapped in source-review.md. Original review retained
+  in source-review-before-owner-amendment.md. All current obligations checked.
+- Independent `/root/refactor_scope_handoff` completed after two stale plan
+  references were corrected; no product changes or invalidated proof.
+- `/root/execution_retrospective`: no product correction or additional backlog
+  advice. Recorded supported recurrences under existing ODF-141/ODF-150 in
+  DearDough.md, preserving the specific bounded process-log contract.
+- Fetched main ff368082 merged through the backlog adapter as 8b36de5f; sibling
+  SEED-091 cleanup/done record preserved, no product-code change. Identity
+  evidence is gap-free and confirms SEED-090#story-2 unused before allocation.
+- Worktree creation ref refs/worktree/dough/created-for/SEED-090#story-1 names
+  this work. Shared Git management context /Users/terryyin/git/doughnut/.git;
+  default checkout and surviving reporting directory /Users/terryyin/git/doughnut.
+- Resumed story-branch observer watch-Dkc2Dn, PID83808/session9928/cell16,
+  coordinator maria-chan-090. Prior watch-y4Vcqe was stopped with no unread
+  evidence. CI completion is owned by coordinator, no success inferred here.

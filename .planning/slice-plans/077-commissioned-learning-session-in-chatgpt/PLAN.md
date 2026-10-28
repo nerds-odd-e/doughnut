@@ -7,13 +7,11 @@
 
 ## Goal and scope
 
-A Donut learner connected through the ChatGPT plugin can ask ChatGPT to
-conduct one commissioned Learning Session and have Feedback for completed
-Session Items saved in Donut, including an early end. The source story owns
-the complete scope, exclusions, key examples, and the owner decision
-(2026-10-28) to expand hosted-assistant OAuth with a narrow
-`learning_session:record` grant alongside `notes:read` — not `notes:write`,
-and not write under `notes:read` alone.
+A Donut learner can obtain the first available commissioned Learning Session
+Request and record completed items through MCP with a narrow hosted-assistant
+grant. The owner moved real ChatGPT interoperability and visible-history
+verification to SEED-090#story-2 on 2026-10-28. The selected source story owns
+the amended completion boundary; the three delivered slices remain unchanged.
 
 ## Exclusions
 
@@ -76,7 +74,7 @@ Preparation checkout:
 | `AssistantResourcePolicy` requires exact `{notes:read}` | Slice 1 must permit `{notes:read}` and `{notes:read, learning_session:record}` | Read `AssistantResourcePolicy.permits` + tests rejecting `notes:write` / multi-scope with write | Confirmed — multi-scope needs an explicit permitted-set change |
 | Consent Allow's joined scope value can grant both permissions | Slice 1 consent form / scopes list | Full backend slice 1 run: SAS rejects joined dual scopes with `invalid_scope` | Invalidated — use repeated native form scope fields on Allow; Deny submits no scopes |
 | Tools do not see OAuth scopes today | Slice 3 write gate | Read `ApiBearerAuthenticationFilter` + MCP transport context (user only) | Confirmed — scopes must be added to transport (or equivalent) before the record tool can refuse `notes:read`-only assistants |
-| ChatGPT Advanced OAuth accepts requesting `notes:read` and `learning_session:record` together | Slice 4 early probe | Not observed (credentialed ChatGPT) | Open — bounded by slice 4 |
+| ChatGPT Advanced OAuth accepts both scopes | SEED-090#story-2 | Not observed (credentialed ChatGPT) | Owner moved the live probe to the new story |
 
 ## Outside-in proof ownership
 
@@ -85,13 +83,12 @@ Preparation checkout:
 | Hosted assistant can be granted `notes:read` + `learning_session:record`; `notes:read` alone still authenticates; write scopes other than the new grant stay refused | 1: discovery, consent, token exchange / MCP auth boundary tests |
 | First Potential learning session Request (or none) through MCP | 2: MCP endpoint tests — sole notebook, several (first wins), empty |
 | Record Feedback for completed items only; early end / empty report; assistant without record scope refused | 3: MCP endpoint tests with personal token and assistant tokens with/without `learning_session:record` |
-| ChatGPT plugin path can authorize both scopes and complete one request→record journey | 4: early owner-operated probe on a real or staging ChatGPT connection after 1–3 |
+| Real ChatGPT interoperability probe | Owner moved to SEED-090#story-2; outside current completion proof |
 
 ## Ordered slices
 
 Each leaf targets about five minutes of active change, focused checking, and
-cleanup. Slice 4 may wait on owner ChatGPT steps; that wait does not enlarge
-code in slices 1–3.
+cleanup. The owner moved the credentialed ChatGPT probe to SEED-090#story-2.
 
 ### 1. Grant learning_session:record beside notes:read for hosted assistants
 Type: Structure
@@ -111,7 +108,7 @@ scope; change `AssistantResourcePolicy` to permit the read-only set and the
 read+record set; bootstrap clients and `scopes_supported` / resource metadata;
 carry authorized scopes on the MCP transport context; describe report recording
 in consent when that scope is requested. Do not grant general note editing.
-Enables slice 3's write gate and slice 4's ChatGPT dual-scope link.
+Enables slice 3's write gate and SEED-090#story-2's ChatGPT dual-scope link.
 
 ### 2. Obtain the first Potential learning session Request through MCP
 Type: Behavior
@@ -142,32 +139,13 @@ Report for a notebook → Donut records Feedback via existing
 Incomplete Session Items stay unscored. Refuse recording for hosted assistants
 that lack `learning_session:record` without widening `notes:read`.
 
-### 4. Prove ChatGPT can authorize both scopes and complete one session
-Type: Behavior
-Status: planned
-Proof: Early credentialed probe after slices 1–3: in ChatGPT's custom MCP /
-Advanced OAuth settings, request `notes:read` and `learning_session:record`,
-complete Donut consent that names report recording, then in one conversation
-obtain the first Request and submit a Report for at least one completed item
-(or for none if ending immediately). Record deployed/revision or local origin,
-scope string used, consent wording observed, tool calls, and Feedback visible
-in Donut learning history. If ChatGPT cannot request or retain the second
-scope, stop and replan; do not fall back to personal-token-only as meeting
-this story's ChatGPT promise.
-
-Behavior: A learner with the ChatGPT plugin linked under both scopes asks to
-start learning from Donut → ChatGPT retrieves the first available Request,
-tutors, and saves Feedback for completed items through MCP. Update
-`docs/assistant-oauth.md` only with steps actually observed.
-
 ## Current decisions
 
 - Scope name: `learning_session:record` (colon style, capability-named).
 - Recommended direction from refinement: protocol-preserving MCP tools +
   narrow hosted-assistant report grant.
-- Slice-plan refinement: not needed — four cohesive slices, one proof loop
-  each; ChatGPT interoperability is an authorized early probe (slice 4), not
-  an unresolved boundary inside 1–3.
+- Slice-plan refinement: not needed — three delivered slices, one proof loop
+  each; ChatGPT interoperability now belongs to SEED-090#story-2.
 
 ## Execution context
 
@@ -188,16 +166,14 @@ tutors, and saves Feedback for completed items through MCP. Update
 - Replanning: existing planned-work authority retained; no `--no-replan`.
 - CI: GitHub Actions `ci.yml`, verified active display name `donut CI`;
   target execution branch, coordinator `maria-chan-090`, observer
-  `/tmp/dough-ci-501/watch-y4Vcqe`, PID `55287`, stream session `75033`,
-  yielded cell `5`. Runtime is the same checkout's
+  `/tmp/dough-ci-501/watch-Dkc2Dn`, PID `83808`, stream session `9928`,
+  yielded cell `16`. Runtime is the same checkout's
   `.agents/skills/dough-execute-plan`. Reuse this observer for increments.
 
 ## Remaining concerns
 
-None identified for readiness beyond slice 4's early probe, which the plan
-already bounds. Existing assistant grants remain read-only until reconnect
-with the new scope set; that reconnection is part of slice 4 / operator docs,
-not a separate readiness block.
+Current MCP implementation and proof are complete. Reconnection and live
+ChatGPT observations belong to SEED-090#story-2 under the owner amendment.
 
 ## Story obligations
 
@@ -205,7 +181,6 @@ not a separate readiness block.
 Reported: slice 1 — "SAS consent expects repeated scope form fields, whereas the existing Allow button submits notes:read learning_session:record as one value and dual consent fails invalid_scope."
 Story clause: "Expand hosted-assistant OAuth and consent with a narrow grant for recording Learning Session Reports"
 Disposition: proved by slice 1: AssistantConsentTest.contextComesFromThePendingGrantAndAllowPersistsTheSamePermission (repeated scope fields, persisted exact scopes) and AssistantConsentPage.spec.ts (native FormData.getAll on Allow and no scopes on Deny); full backend and browser tests pass.
-Commitment: C20
 
 ### G2. SDK dual-scope journey observation
 Reported: slice 1 — "CI expected the read-only consent heading, but discovery makes the real SDK request both supported scopes."
@@ -218,23 +193,22 @@ Reported: slice 2 — "The full backend suite failed shouldWeakenUniqueMatchedSp
 Story clause: "existing Feedback recording and scheduling"
 Disposition: proved by slice 2: shouldWeakenUniqueMatchedSpellingTrackerWithoutRecallCredit now fixes elapsed time at lastRecalledAt + 200h, preserving exact stability 115 and every scheduling/no-credit assertion; full 2,975-test backend pass, no production scheduling change.
 
-### G4. Credentialed ChatGPT journey remains unobserved
-Reported: slice 4 — "No candidate staging/test HTTPS endpoint and owner-operated ChatGPT connection were supplied; the SDK fixture pass does not observe the real ChatGPT path."
-Story clause: "A Donut learner connected through the ChatGPT plugin can ask ChatGPT to conduct one commissioned Learning Session and have Feedback for the Session Items they completed saved in Donut, including when they end early."
-Disposition: return
-Commitment: C01, C06, C07, C23, C25, E01, E02, E03, E04, E05, E06, E07, E09, E22
+### G4. Credentialed ChatGPT journey remains unobserved (first reported in slice 4)
+Reported: slice 3 — "No candidate staging/test HTTPS endpoint and owner-operated ChatGPT connection were supplied; the SDK fixture pass does not observe the real ChatGPT path."
+Story clause: "Real ChatGPT interoperability, interactive tutoring, and visible history verification are owned by SEED-090#story-2."
+Disposition: owner changed "Real ChatGPT interoperability, interactive tutoring, and visible history verification are owned by SEED-090#story-2."
+Commitment: 39, 40, 41, 50, 55, 56
 
-## Manual probe waiting
+## Owner scope amendment — 2026-10-28
 
-Slices 1–3 are delivered; slice 4 remains planned. Code candidate:
-`b261a1eceb8912b9d04eb32c5c4d3ab23c289bdd` on the execution branch.
-Resume at the credentialed probe; do not repeat accepted implementation/proof.
-The owner authorized the agent to run the probes on 2026-10-28. A resumed
-read found production discovery advertises only `notes:read`; this candidate
-is not available there. Computer Use refused access to `com.openai.codex`
-for safety reasons; browser inventory reports its host unavailable.
-Resume with a candidate HTTPS endpoint and a permitted ChatGPT surface, or
-owner-observed evidence of both scopes, tutoring/Report and Feedback history
-(including early-end/no-session cases). No deployment or real client activation
-performed. Keep Taken, plan, source and worktree; no execution completion,
-retrospective, wrap-up or trunk integration is claimed.
+The owner moved former slice 4 into SEED-090#story-2 at the top of the product
+backlog and will run it directly in ChatGPT. Current execution consists of the
+three delivered slices. Live ChatGPT observations remain open in that new
+story; no live interoperability success is claimed. Accepted implementation
+proof and original observations retain their recorded provenance in
+execution-evidence.md. A fresh source-only review replaces the pre-amendment
+review before completion acceptance.
+
+## Execution complete
+
+Product advice: no additional change; preserve SEED-090#story-2 as the first queued owner-operated ChatGPT probe.
