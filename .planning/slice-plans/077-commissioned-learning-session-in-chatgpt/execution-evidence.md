@@ -86,3 +86,35 @@ A local failure screenshot and authorization URL confirmed dual scopes.
   branch, suffix base `6a12f6bbc287099c6e1c00916df4b48249cb0d8e`; same observer.
 - Reconsidered local host: 48 GiB, load about 10, no competing owned heavy
   process; ran one full backend suite at a time. CI pause excluded from slice work.
+
+## Accepted slice 3 evidence — 2026-10-28
+
+- `record_learning_session(notebookId, reportMarkdown)` delegates the existing
+  record service and notebook authorization. Validated assistant scopes require
+  `learning_session:record`; personal tokens keep full-user authority. Request
+  guidance names the Report continuation on normal or early finish.
+- `./scripts/run.sh pnpm backend:test_only`: PASS 2,981 tests, zero failures
+  or errors, two skipped, BUILD SUCCESSFUL in 1m 10s. Final log
+  `/tmp/seed090-slice3-backend-final.log`, XML backend/build/test-results/test.
+- `LearningSessionRecordMcpEndpointTest` obtains actual A/B/C Request, records A
+  with grade/text/schedule, observes B/C no Feedback and unchanged full learning
+  state; also empty report, invalid/unmatched entries and foreign notebook refusal.
+  Real notebooks/trackers and personal-token MCP HTTP are the starting setup.
+- `AssistantLearningSessionTest` obtains actual consent/code-exchange credentials
+  to observe dual-scope recording and read-only refusal even with browser cookie.
+- Existing `LearningSessionRecordTutorFeedbackRecallLogTests.matchedGradeLeavesMappedRecallLog`
+  selected all grades: 1 AGAIN, 2 HARD, 3 GOOD, 4 EASY. Existing HTTP behavior
+  retained. `McpEndpointTest` observes tool registration/schema/write annotations.
+- Initial full run passed; final full run followed a test-only Request→partial
+  Report assertion so A/B/C are observed in output, not inferred from fixtures.
+- Consumer trace `/tmp/seed090-slice3-consumer-trace-final.md`, base
+  `ea6c425f1490a42121fb7d3ccfcc3fd6b878ef33`, terms `record_learning_session`,
+  `TRANSPORT_ASSISTANT_SCOPES_KEY`, `recordedItems`, `listTools`. All consumers
+  dispositioned. E2E MCP list validator includes existing names, no fixed count;
+  SDK consent/renewal consumer unchanged and prior E2E proof reused.
+- Independent `/root/refactor_session_record` owns refactor acceptance;
+  coordinator inspects any changed proof before publication. No generation trigger.
+- Slice 2 accepted `ea6c425f1490a42121fb7d3ccfcc3fd6b878ef33` on execution branch,
+  suffix base `4f226b3c992ff723868e5e4086ed2748a25cee28`; same observer reused.
+- Local 48 GiB host, load 5.17, no competing owned heavy process; backend runs
+  sequential, all terminal. No remaining slice 3 gap; real ChatGPT probe in slice 4.

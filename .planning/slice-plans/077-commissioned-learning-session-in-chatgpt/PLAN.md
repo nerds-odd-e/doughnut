@@ -129,7 +129,7 @@ Do not add a program picker. Tutoring stays in the chat client.
 
 ### 3. Record a Learning Session Report through MCP under the report grant
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP endpoint tests: personal token records Feedback for completed
 items only (early end leaves others unchanged; empty report records nothing);
 assistant token with `{notes:read, learning_session:record}` can record;

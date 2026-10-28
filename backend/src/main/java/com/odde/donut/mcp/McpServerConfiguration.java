@@ -51,7 +51,8 @@ public class McpServerConfiguration {
       ListNoteCandidatesTool listNoteCandidatesTool,
       ReadNoteTool readNoteTool,
       GetNoteGraphTool getNoteGraphTool,
-      RequestLearningSessionTool requestLearningSessionTool) {
+      RequestLearningSessionTool requestLearningSessionTool,
+      RecordLearningSessionTool recordLearningSessionTool) {
     McpStatelessServerTransport handlerIntercept =
         new McpStatelessServerTransport() {
           @Override
@@ -72,7 +73,8 @@ public class McpServerConfiguration {
             listNoteCandidatesTool.specification(),
             readNoteTool.specification(),
             getNoteGraphTool.specification(),
-            requestLearningSessionTool.specification())
+            requestLearningSessionTool.specification(),
+            recordLearningSessionTool.specification())
         .immediateExecution(true)
         .build();
   }

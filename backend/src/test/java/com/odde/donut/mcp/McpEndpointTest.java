@@ -101,17 +101,20 @@ class McpEndpointTest extends McpEndpointTestBase {
           .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.tokenLimit").exists())
           .andExpect(jsonPath("$.result.tools[3].name", equalTo(RequestLearningSessionTool.NAME)))
           .andExpect(jsonPath("$.result.tools[3].inputSchema.properties.timezone").exists())
+          .andExpect(jsonPath("$.result.tools[4].name", equalTo(RecordLearningSessionTool.NAME)))
+          .andExpect(jsonPath("$.result.tools[4].inputSchema.properties.reportMarkdown").exists())
           .andExpect(
               jsonPath(
-                  "$.result.tools[*].annotations.readOnlyHint", contains(true, true, true, true)))
+                  "$.result.tools[*].annotations.readOnlyHint",
+                  contains(true, true, true, true, false)))
           .andExpect(
               jsonPath(
                   "$.result.tools[*].annotations.destructiveHint",
-                  contains(false, false, false, false)))
+                  contains(false, false, false, false, false)))
           .andExpect(
               jsonPath(
                   "$.result.tools[*].annotations.openWorldHint",
-                  contains(false, false, false, false)));
+                  contains(false, false, false, false, false)));
     }
   }
 }

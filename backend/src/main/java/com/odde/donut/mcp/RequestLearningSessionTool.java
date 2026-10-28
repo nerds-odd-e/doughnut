@@ -38,7 +38,9 @@ public record RequestLearningSessionTool(
                     Potential learning session in Donut's due order. Returns notebookId,
                     notebookName and requestMarkdown, containing the existing Learning Session
                     Request with its tutoring instructions, Session Items and Report format.
-                    Tutor interactively from that Request. Do not automatically start another
+                    Tutor interactively from that Request. When finished or the learner asks to end,
+                    use record_learning_session with Feedback for completed items only.
+                    Do not automatically start another
                     session. If no session is available, tell the learner that there is none.
                     """)
                 .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
