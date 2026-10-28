@@ -1,6 +1,6 @@
 # DearDough Process Findings
 
-Source maintenance on 2026-10-25 retained all newly collected evidence before shortening at Open Dough `ccf309a69459284de3f1d45f2de813e9180c2971:docs/maintainer/findings/`. The complete pre-edit source is `d5cb4a923b16973028820eb9cb1f4d811b4ef4f6:DearDough.md`; distinct executions, former codes and qualified provenance remain recoverable.
+Source maintenance on 2026-10-28 retained collected evidence before shortening at Open Dough `32b5ae0b4414d755bcde4ef6cd822774d7450771:docs/maintainer/findings/`. The complete post-local source is `cc8b0fe361c07a8a6532d1a74aa0b41ba18146f0:DearDough.md`; linked source records share that revision. Unknown execution releases and local facets remain qualified.
 
 
 Reviewed 2026-10-25 (Asia/Tokyo). Active shared-process findings only; released
@@ -29,13 +29,8 @@ Former local code: DD-115. A reported GitHub transport failure ends observation 
 
 ### Occurrences
 
-- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: `/tmp/dough-ci-501/watch-QaZbTF/events/000000000001.json` reports workflow-runs acquisition `failed: gh failed`; `result.json` is `finished`, only f039069 was registered/undiscovered. Native coordinator history `01a17cf4-7699-7b80-87e5-7d4e8bc71f0b`, audit return 2026-10-27T13:46:02.975Z; retained publication receipts through b5afee6 report unobserved. Event timestamp itself was not recorded.
-  - Observed effect: A reported GitHub request failure ended the worker without a CI verdict; subsequent accepted revisions had no notification coverage. Installed Codex policy forbids restarting terminal finished observers, so recovery needs a human override even though local implementation continued.
-  - Inference: Repeats the request-failure/ended-observation mechanism; the underlying gh/server cause and whether it was transient were not established. No CI success or shared recovery fix is claimed.
+Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-121](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-121.md); rereading adds no occurrence.
+
 
 <a id="odf-106"></a>
 
@@ -75,13 +70,8 @@ Former local code: DD-144. A small addition crosses the numeric file-size ceilin
 
 ### Occurrences
 
-- Execution: SEED-088#story-1 (first implementation `1bbc9e88fb8d06d13a7e67ac85588cddee42b6e9`)
-  - Timestamp: 2026-10-28T11:55:10+08:00
-  - Tool: Cursor
-  - Open Dough release: unknown
-  - Evidence: slice 2 `f9363a8d8242f104ea67fb2021cfe7219b8dd0da` stopped CLI client shuffle (`nextRecallCardLoad.ts` removed `fetchShuffledDueMemoryTrackerIds`); pre-change `RecallSessionStage.tsx` was already 327 lines and ended at exactly 250 after extracting `RecallSessionActiveCard.tsx` (72), `RecallSessionChrome.tsx` (25), and `RecallSessionLoadMoreView.tsx` (50). Behavioral product change for Stage was the due-list fetch call.
-  - Observed effect: A one-call shuffle removal on an already oversized CLI stage forced relocating substantial presentation into three new modules and re-proof via `recallJustReviewInteractive.loadMoreSharedOrder.test.tsx`.
-  - Inference: Matches the small-change-plus-size-gate extraction pattern; relationship to ODF-152/ODF-195 is qualified. No claim that the extraction harmed product behavior.
+Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-189](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-189.md); rereading adds no occurrence.
+
 
 <a id="odf-190"></a>
 
@@ -103,29 +93,8 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
 
 ### Occurrences
 
-- Execution: SEED-002#story-1 (first implementation `543008d1e88024ab9e4a3f99d1a6515d1f87bb82`)
-  - Timestamp: 2026-10-27T16:39:31+08:00
-  - Tool: Cursor
-  - Open Dough release: 0.3.71
-  - Evidence: six post-change-refactor Task launches (one per delivered slice); slice-3 agent return reported no edits and `skipped — no refactor edits` after ~12 minutes active; plan learnings record post-change refactor no-edits for slice 3 and a task-seam-only edit for slice 6.
-  - Observed effect: repeated full refactor agents on already-accepted small diffs, including at least one no-edit pass, before delivery continued.
-  - Inference: repeats the fixed per-slice refactor cost; no measured token total claimed.
+Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-141](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-141.md); rereading adds no occurrence.
 
-- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: 2026-10-28 leaf15 no-edit review `/tmp/dough-story2-durability-refactor.md` reports about six active minutes; post-extraction no-edit review `/tmp/dough-story2-durability-modules-refactor.md` reports about four. Their accepted implementation/repair are f2bfa481 and 87033c6a; b5afee6:.planning/slice-plans/073-assistant-account-linking/EXECUTION-EVIDENCE.md retains both. Exact review event times unavailable.
-  - Observed effect: Fresh full refactor passes recurred within one execution even for a proof-only return needing no edits; each repeated context/consumer reading before delivery.
-  - Inference: The durations are agent estimates, not measured token or stopwatch totals. This supports the existing fixed-cost finding; useful later refactors are not claimed unnecessary.
-
-- Execution: SEED-002#story-4 (first implementation `61192809a4e1d227fdeaf74b4bf67197d58da5d2`)
-  - Timestamp: 2026-10-28T08:02:00+08:00
-  - Tool: Cursor
-  - Open Dough release: 0.3.71
-  - Evidence: Coordinator Task `Post-change refactor pass` after accepted focused MCP E2E; subagent `7a1f0570-0b06-4168-ae3b-42e5c48b3d12` returned `none — already clean. No refactor edits` (transcript mtime 2026-10-28T08:05:28+08:00). Accepted product/guidance diff was four paths (feature claim + unmatched scenario, skill absence-sentence removal, seed dated connection note, plan removal reading). Parent conversation `6e0fe73a-6ccc-4ef2-b3ec-2d4a5f6679ce`.
-  - Observed effect: A fresh full refactor agent ran on an already-accepted small slice and made no edits before delivery continued.
-  - Inference: Repeats the fixed per-slice refactor cost; wall clock from launch timestamp to return mtime is about three minutes, not a measured token total. Useful later refactors are not claimed unnecessary.
 
 <a id="odf-208"></a>
 
@@ -225,21 +194,8 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
 
 ### Occurrences
 
-- Execution: SEED-080#story-2 (first implementation `9ee121fdfad67f4aeab513c8bc09e960c17939c0`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: dashboard launch `44097ed9-4344-48fc-950b-8c5b02b793fb`, startup on 2026-10-21; batched tool results reported truncation at 15,551 and 31,805 original tokens before focused reference reads recovered the required passages.
-  - Observed effect: two oversized startup batches forced repeated retrieval before first-slice delegation.
-  - Inference: the coordinator repeated the known broad-read deviation; savings are unmeasured.
+Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-264](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-264.md); rereading adds no occurrence.
 
-- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: This execution retrospective combined native Git manifest, direction and earliest PLAN reads into one functions.exec result: returned original total11148 tokens exceeded its default10000 result budget and truncated part of the original plan. The coordinator then retrieved only the missing45–102 passage. Native coordinator history01a17cf4 records both calls; exact event time unavailable.
-  - Observed effect: Avoidable review output truncation required an extra targeted retrieval even though each nested command had its own larger max_output_tokens.
-  - Inference: Nested tool budgets do not increase the orchestration result budget. No measured monetary or total-token saving is claimed.
 
 <a id="odf-265"></a>
 
@@ -313,13 +269,8 @@ Former local code: DD-252. Required build/generation proof checks formatting bef
 
 ### Occurrences
 
-- Execution: SEED-080#story-2 (first implementation `9ee121fdfad67f4aeab513c8bc09e960c17939c0`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: slice 1's required `pnpm -C frontend exec vite build --emptyOutDir` generated declarations but exited 1 on pending Biome formatting; after the coordinator's `format:changed`, the same build passed. Retained observations: `821fbd9ac795f37c0ab06aebe602425cdaa2696d:.planning/slice-plans/002-sidebar-location/EVIDENCE.md#slice-1`.
-  - Observed effect: the prescribed build/formatter ordering required a second build before delivery; no failing build was represented as passing.
-  - Inference: this repeats the generation-versus-formatting scheduling friction; no measured cost is claimed.
+Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-309](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-309.md); rereading adds no occurrence.
+
 
 <a id="odf-310"></a>
 
@@ -385,21 +336,8 @@ Former local code: DD-319. Acceptance traced the unchanged transport API but not
 
 ### Occurrences
 
-- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: `a26a2a4094f5c0f61a3e1c56c00746e9414cf13b:e2e_test/config/common.ts` changes Cypress browser origin; leaf17 classified old MCP consumers as unchanged. First leaf18 composed run failed all nine ordinary MCP scenarios because its Node TLS client received HTTPS instead of HTTP. `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3:.planning/slice-plans/073-assistant-account-linking/HOSTED-SDK-EVIDENCE.md#18-connect-through-the-documented-oauth-journey` retains failed/final10-of10 receipts and G14.
-  - Observed effect: A changed configuration value reached an unchanged task/page-object/client chain that slice acceptance had excluded; the later composed journey found it and the same execution repaired the HTTP Node ingress binding.
-  - Inference: Matches indirect-consumer discovery, not a new OAuth server defect. Actual CI was unobserved; no CI failure is inferred from the local failure.
+Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-150](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-150.md); rereading adds no occurrence.
 
-- Execution: SEED-088#story-1 (first implementation `1bbc9e88fb8d06d13a7e67ac85588cddee42b6e9`)
-  - Timestamp: 2026-10-28T11:48:59+08:00
-  - Tool: Cursor
-  - Open Dough release: unknown
-  - Evidence: Slice 1 accepted focused entity suites (`MemoryTrackerCorrectRecallDueFuzzTest` / Scheduling / Rebuild). Backend Unit CI failed on residual fixtures that still assumed Stability-hour dues (`MemoryTrackerBuilder.stabilityAndNextRecallAt` via unfuzzed `calculateNextRecallAt`; `RecallServiceDueWorkTest` absolute day offsets). Repair `8de87c62be8ab20d6337dd27948e65cb86ff8e26` reschedules Grade-path fuzz after persist and asserts relative to actual fuzzed dues; plan Accepted proof notes CI repair run 40626834805.
-  - Observed effect: Indirect builder/service/controller consumers of the scheduling write escaped slice acceptance and failed in CI; same execution repaired them before later slices.
-  - Inference: Matches missed-indirect-consumer proof, here fixture and due-work tests rather than E2E journeys. Distinct mechanism from ODF-272/ODF-310; tip CI for later SHAs remains pending and is not claimed green.
 
 <a id="odf-323"></a>
 
@@ -417,16 +355,14 @@ An implementer obtains a red baseline by swapping committed bytes into the live 
 
 [Retained evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-331.md). Original occurrence provenance and distinct effects are recoverable in Open Dough `ccf309a69459284de3f1d45f2de813e9180c2971:docs/maintainer/findings/ODF-331.md` and this project's source snapshot `d5cb4a923b16973028820eb9cb1f4d811b4ef4f6:DearDough.md`. Name adoption is not resolution.
 
-## DD-332 — Formatting expands a file after the last size check
+<a id="dd-332--formatting-expands-a-file-after-the-last-size-check"></a>
+
+## ODF-218 — Formatting expands a file after the last size check
+
+Former local code: DD-332.
 
 A pre-format refactor can approve a file below the maintained250-line limit, then coordinator formatting expands it beyond that limit before the guarded operation commits/pushes. The final size invariant needs checking after the mutating formatter as well as during refactor.
 
 ### Occurrences
 
-- Execution: SEED-002#story-2 (first implementation `f0390693df002168b2ce6a81f038bcb5f90931b8`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: `f2bfa481da5c653aa9de3c7796f1e59a4cf746dc:.planning/slice-plans/073-assistant-account-linking/verify-authorization-durability.mjs` has423 lines after the accepted229-line input/refactor; coordinator noticed after publication. Repair87033c6a extracted client/process responsibilities and reran the actual two-JVM proof47.8s. Exact commands/input hashes and both receipts are preserved at b5afee6:.planning/slice-plans/073-assistant-account-linking/EXECUTION-EVIDENCE.md#15-keep-authorization-valid-across-a-backend-restart; event date2026-10-28, exact formatter event time unavailable.
-  - Observed effect: The published proof artifact violated the size rule and required another extraction/refactor/delivery plus an otherwise avoidable invalidated-proof rerun. Formatter itself succeeded; this was not a masked formatter failure.
-  - Inference: Distinct from pre-existing oversize/small-addition extraction findings: the entire new proof fit before formatting. Leaf18 added a coordinator-local post-format size guard before staging; no shared prevention change is claimed.
+Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-218](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-218.md); rereading adds no occurrence.
