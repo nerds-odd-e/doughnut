@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
@@ -52,8 +53,11 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
     String head = snapshotCurrentPortableTree(notebook).getAcceptedGitObjectId();
     UserToken token = tokenForOwner();
 
-    JsonNode read = callReadNote(token, note.getId());
+    JsonNode result = callReadNoteResult(token, note.getId());
+    JsonNode text = objectMapper.readTree(result.at("/content/0/text").asText());
+    JsonNode read = result.get("structuredContent");
 
+    assertThat(read, equalTo(text));
     assertThat(read.get("noteId").asInt(), equalTo(note.getId()));
     assertThat(read.get("title").asText(), equalTo("Kinetic"));
     assertThat(read.get("notebookName").asText(), equalTo("Physics"));
@@ -62,6 +66,23 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
     assertThat(read.get("updatedAt").asText(), equalTo("2026-09-06T04:05:06.000+00:00"));
     assertThat(read.get("acceptedRevision").asText(), equalTo(head));
     assertThat(head, matchesPattern("[0-9a-f]{40}"));
+
+    mockMvc
+        .perform(
+            authorized(
+                mcpPost("{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/list\",\"params\":{}}"),
+                token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.result.tools[1].outputSchema.type").value("object"))
+        .andExpect(
+            jsonPath("$.result.tools[1].outputSchema.properties.noteId.type").value("integer"))
+        .andExpect(
+            jsonPath("$.result.tools[1].outputSchema.properties.acceptedRevision.type")
+                .value("string"))
+        .andExpect(
+            jsonPath(
+                "$.result.tools[1].outputSchema.required",
+                contains("noteId", "title", "notebookName", "folderPath", "updatedAt")));
   }
 
   @Test
@@ -108,6 +129,10 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
   }
 
   private JsonNode callReadNote(UserToken token, Integer noteId) throws Exception {
+    return objectMapper.readTree(callReadNoteResult(token, noteId).at("/content/0/text").asText());
+  }
+
+  private JsonNode callReadNoteResult(UserToken token, Integer noteId) throws Exception {
     MvcResult result =
         mockMvc
             .perform(authorized(mcpPost(toolsCallBody(noteId)), token))
@@ -115,7 +140,7 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
             .andExpect(jsonPath("$.result.content[0].text").exists())
             .andReturn();
     JsonNode root = objectMapper.readTree(result.getResponse().getContentAsString());
-    return objectMapper.readTree(root.at("/result/content/0/text").asText());
+    return root.get("result");
   }
 
   private static MockHttpServletRequestBuilder mcpPost(String body) {

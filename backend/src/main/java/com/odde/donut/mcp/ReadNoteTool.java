@@ -66,6 +66,21 @@ public class ReadNoteTool {
                                 "Numeric ID of the note to read. Obtain this from a 'list_note_candidates' candidate or user-provided ID.")),
                         "required",
                         List.of("noteId")))
+                .outputSchema(
+                    Map.of(
+                        "type",
+                        "object",
+                        "properties",
+                        Map.of(
+                            "noteId", Map.of("type", "integer"),
+                            "title", Map.of("type", "string"),
+                            "notebookName", Map.of("type", "string"),
+                            "folderPath", Map.of("type", "string"),
+                            "content", Map.of("type", "string"),
+                            "updatedAt", Map.of("type", "string"),
+                            "acceptedRevision", Map.of("type", "string")),
+                        "required",
+                        List.of("noteId", "title", "notebookName", "folderPath", "updatedAt")))
                 .build())
         .callHandler(this::call)
         .build();
@@ -77,8 +92,10 @@ public class ReadNoteTool {
     try {
       AttributedNoteContent content =
           attributedNoteContentService.read(user, McpToolArguments.noteId(request));
+      String serializedContent = objectMapper.writeValueAsString(content);
       return McpSchema.CallToolResult.builder()
-          .addContent(new McpSchema.TextContent(objectMapper.writeValueAsString(content)))
+          .addContent(new McpSchema.TextContent(serializedContent))
+          .structuredContent(objectMapper.readValue(serializedContent, Object.class))
           .build();
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolArguments.rethrow(e);

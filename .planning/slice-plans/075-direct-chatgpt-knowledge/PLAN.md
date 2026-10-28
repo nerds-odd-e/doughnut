@@ -19,7 +19,7 @@ body search, editing and signup during linking remain deferred.
 
 Preparation granted no release authority. The story-2 supplier agreement is
 satisfied by its compatible-SDK result, not by a ChatGPT result. Execution
-progress and acceptance evidence are linked below; live results remain unproved.
+progress and accepted live observations are linked below; remaining proof stays open.
 
 ## Current decisions and existing owners
 
@@ -30,8 +30,8 @@ Execution identity, readiness, observation handles and proof decisions are in
   `AttributedNoteContentService` (shared with `AttributedNoteContentController`),
   and `NoteGraphService` behind the three current MCP tools. Their domain
   meaning already matches the requested search, full read and graph traversal.
-  Keep the existing tool names and result contracts. The observed gap is client
-  metadata, not a second retrieval implementation.
+  Keep the existing tool names and retrieval owners. Add structured attribution
+  to the full-read result for the observed ChatGPT adapter mismatch.
 - Keep protocol handling and rotating credentials in the existing Spring
   Authorization Server integration. ChatGPT is the confidential hosted client;
   the Donut user remains the knowledge principal. Use predefined credentials,
@@ -52,18 +52,12 @@ Execution identity, readiness, observation handles and proof decisions are in
   architecture topic, ADR decision or exception is needed.
 - Guide the librarian sequence through current descriptors and written prompts:
   candidates → full reads → relevant graph exploration → cited evidence.
-  Adjust those existing surfaces only for an observed failure. A model's answer,
-  successful SDK call or displayed setup form alone is insufficient proof of
-  the actual ChatGPT request/result journey.
-
-## Preparation evidence
-
-See the dated [premises and observations](EXECUTION-EVIDENCE.md#premises-and-observations).
+  Adjust those existing surfaces only for an observed failure. Record the actual ChatGPT request/result journey alongside its answer.
 
 ## Live observation gate
 
 Follow [production proof and human participation](EXECUTION-EVIDENCE.md#production-proof-and-human-participation)
-before slice 2. The release and real-client activation need separate operator authority.
+before slice 3. The release and real-client activation need separate operator authority.
 Terry authorized landing, release and continued setup on 2026-10-28; the release
 and client registration are recorded in [live observations](LIVE-OBSERVATIONS.md).
 
@@ -91,12 +85,26 @@ Donut knowledge. Set `readOnlyHint: true`, `destructiveHint: false` and
 arguments, results and authorization. No new endpoint, result DTO or script.
 This remains useful to existing clients independently of the ChatGPT probe.
 
-### 2. Link a personal ChatGPT plugin to the real Donut account
+### 2. Expose full-read attribution as structured MCP data
+Type: Behavior
+Status: done
+Proof: Extend the existing authenticated HTTP read test to observe structured
+note content and revision equal to the retained text result. Run the full backend
+suite red then green. This proves the wire contract, not the browser repair;
+slice 3 owns the actual failing-client recheck after release.
+
+Behavior: A successful full read returns the existing attributed note as both
+structured data and text, with a matching output schema. Reuse the existing DTO,
+mapper and service; retain optional-value semantics and authorization. No new
+retrieval, endpoint or client. See [compatibility evidence](READ-COMPATIBILITY.md).
+
+### 3. Link a personal ChatGPT plugin to the real Donut account
 Type: Behavior
 Status: planned
 Proof: Early credentialed probe: current production discovery, actual custom
-plugin creation/installation, one cancelled consent and one retry/allow, followed
-by a full read of the owner's private acceptance note. Capture the discovered
+plugin creation/installation, an authorized connection and a full read of the
+owner-selected note. Terry waived live cancellation on 2026-10-28; retain the
+existing denial/retry product tests. Recheck the browser client after release. Capture the discovered
 three tools, returned account-scoped evidence and the exact usable setup steps.
 
 Behavior: After the authorized production release and client configuration,
@@ -105,12 +113,12 @@ callback, predefined client and `notes:read` → the user can cancel or approve
 through GitHub/Donut and complete a read. Add the observed setup to a ChatGPT
 section in `docs/assistant-oauth.md`, linked from the MCP guide. If discovery,
 exchange or installation fails, record the failing operation and stop slices
-3–8; no speculative auth replacement or extra script is authorized.
+4–9; no speculative auth replacement or extra script is authorized.
 
-### 3. Continue reading after normal access expiry
+### 4. Continue reading after normal access expiry
 Type: Behavior
 Status: planned
-Proof: Early lifecycle probe on slice 2's connection. Record issued-token expiry
+Proof: Early lifecycle probe on slice 3's connection. Record issued-token expiry
 from available operator evidence, wait for actual expiry (default five minutes),
 then issue a fresh read. Require renewal evidence and returned source, not just
 a model answer reusing history. No browser reauthorization during successful renewal.
@@ -121,7 +129,7 @@ the guide's continuation behavior from the observed result. Do not shorten
 production lifetimes or simulate time. A failure stops dependent rounds and
 triggers diagnosis at the existing OAuth boundary. Explicit external-wait exception.
 
-### 4. Withdraw permission and reconnect deliberately
+### 5. Withdraw permission and reconnect deliberately
 Type: Behavior
 Status: planned
 Proof: Early recovery probe: owner withdraws the Donut client grant in Settings,
@@ -136,7 +144,7 @@ Document the actual ChatGPT recovery action and that prior conversation content
 remains disclosed. Do not promise that uninstalling a plugin substitutes for
 Donut withdrawal. Stop subsequent rounds on a failed control boundary.
 
-### 5. Keep two users' connections independent
+### 6. Keep two users' connections independent
 Type: Behavior
 Status: planned
 Proof: Early account probe: a second owner-operated ChatGPT connection follows
@@ -151,7 +159,7 @@ actual account-switching steps, without adding profile tools or another client
 implementation. The retained backend current-permission tests prove request-time
 reevaluation; this round proves that ChatGPT uses the independently linked identities.
 
-### 6. Answer from identifiable full-note evidence
+### 7. Answer from identifiable full-note evidence
 Type: Behavior
 Status: planned
 Proof: In ChatGPT, use a direct and an ordinary-language topic request against
@@ -170,7 +178,7 @@ if the observation warrants it; preserve the natural search rule. Re-run affecte
 prompts after any descriptor change and perform the required backend check if
 Java changes. Record successful plain instructions in the guide.
 
-### 7. Explain relevant connections with bounded graph evidence
+### 8. Explain relevant connections with bounded graph evidence
 Type: Behavior
 Status: planned
 Proof: A follow-up asks how a known note relates to another idea. Observe
@@ -184,7 +192,7 @@ Truncated graph text is not presented as a complete note or invented revision.
 Retain a successful follow-up example in the same guide. Any metadata correction
 stays in existing tools and rechecks the affected earlier prompt observations.
 
-### 8. Retrieve an accepted update with the original computer off
+### 9. Retrieve an accepted update with the original computer off
 Type: Behavior
 Status: planned
 Proof: Terry edits a designated acceptance note through the normal Donut UI and
@@ -205,40 +213,34 @@ the off-device observation is unavailable. Explicit owner/device-wait exception.
 ### G1. Production release and real connection are not yet observed
 Reported: slice 1 — "Acceptance confirms no separately authorized schema-first release receipt, deployed revision or registered ChatGPT configuration has been supplied; real creation/installation, consent and authenticated read remain unobserved."
 Story clause: "The plugin creator/operator configures the connection"
-Disposition: receiving slice 2
+Disposition: receiving slice 3
 
 ### G2. Real ChatGPT renewal is not yet observed
 Reported: slice 1 — "Only the inherited compatible-SDK result exists; ChatGPT expiry, renewal and a fresh read require the connection from slice 2."
 Story clause: "After actual access-token expiry, another request succeeds through ordinary renewal without repeating browser consent."
-Disposition: receiving slice 3
+Disposition: receiving slice 4
 
 ### G3. Real ChatGPT withdrawal and reconnect are not yet observed
 Reported: slice 1 — "Withdrawal, failed new reads/renewal and fresh-consent recovery have not been observed in ChatGPT."
 Story clause: "ChatGPT offers an actionable route to connect again; a new grant requires informed consent."
-Disposition: receiving slice 4
+Disposition: receiving slice 5
 
 ### G4. Real ChatGPT account isolation is not yet observed
 Reported: slice 1 — "No independent second-account connection has exercised private-note search, direct-ID read and graph access alongside the first account."
 Story clause: "Its new requests follow its own permissions, including direct note-ID reads and graph access."
-Disposition: receiving slice 5
+Disposition: receiving slice 6
 
 ### G5. ChatGPT source selection and attribution are not yet observed
 Reported: slice 1 — "Same-title disambiguation, full-read citations including null revision, bounded search retry and instruction-like source handling have no live ChatGPT result."
 Story clause: "Use full reads for cited evidence; graph excerpts can be truncated."
-Disposition: receiving slice 6
+Disposition: receiving slice 7
 
 ### G6. ChatGPT graph evidence is not yet observed
 Reported: slice 1 — "A relevant bounded graph call followed by full reads of cited related notes and evidence/inference distinction has not been observed."
 Story clause: "ChatGPT requests graph context with a token budget and reads any related note it relies on for a citation."
-Disposition: receiving slice 7
+Disposition: receiving slice 8
 
 ### G7. Computer-off freshness is not yet observed
 Reported: slice 1 — "No owner-observed second-device fresh search/read has returned an accepted new marker/revision with the original computer off."
 Story clause: "From another device, with the original computer switched off, a fresh conversation still completes a real search and read."
-Disposition: receiving slice 8
-
-
-## Delivery evidence
-
-[Execution evidence](EXECUTION-EVIDENCE.md) retains the source-only review, original
-proof ownership, verification contract, plan review and accepted observations.
+Disposition: receiving slice 9

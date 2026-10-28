@@ -12,11 +12,7 @@ scope: large
 
 ## Parent Problem
 
-Donut users should connect an assistant to their deliberately captured knowledge
-for authenticated search, reading and exploration while their computer is off.
-On 2026-10-27 the owner selected direct HTTPS MCP from Donut's backend, Donut
-OAuth authorization, existing GitHub login, and a ChatGPT plugin. This is
-non-executable decomposition/backlog input, not implementation authority.
+Donut users should connect an assistant to their deliberately captured knowledge for authenticated search, reading and exploration while their computer is off. On 2026-10-27 the owner selected direct HTTPS MCP from Donut's backend, Donut OAuth authorization, existing GitHub login, and a ChatGPT plugin. This is non-executable decomposition/backlog input, not implementation authority.
 
 ## Alternatives and Decision
 
@@ -69,37 +65,16 @@ Refinement challenges an L story likely to exceed those comparative bands.
 {"schemaVersion":1,"identity":"SEED-002#story-3","dependencies":[{"supplier":{"identity":"SEED-002#story-2","href":"seeds/SEED-002-host-mcp-over-https.md#story-2"},"implementation":"Connect ChatGPT to the delivered Donut OAuth and HTTPS MCP service, including its existing credential lifecycle.","rationale":"ChatGPT's authenticated connection requires a reachable resource and a working authorization contract before its onboarding and tool-use journey can be evaluated. Metadata sketches, a local bridge, or a stub authorization server would evaluate a different connection.","condition":"Donut has delivered and verified GitHub-backed OAuth account linking, user-scoped read access to its HTTPS MCP tools, token renewal, and revocation with a compatible client.","state":"satisfied","resolution":{"revision":"5a83d8d3589f81de67ee2ac3e40177ee633caa80","path":".planning/seeds/SEED-002-host-mcp-over-https.md#story-2","summary":"SEED-002#story-2 delivered the existing GitHub login/identity mapping into informed Donut consent and S256 authorization-code exchange for a registered confidential hosted client. Actual maintained SDK over verified HTTPS discovers metadata, reads attributed private notes and bounded graph context, renews after real access expiry with replacement credentials, loses MCP and refresh access after Settings withdrawal, and reconnects through fresh consent. Final composed hosted1 plus ordinary personal-token9 scenarios pass10/10; all2961 backend tests pass with no failures/errors and2 existing skips, including two-user/current-permission/read-only/resource/scope/CSRF/atomic withdrawal and persistent JDBC reload boundaries. The last implementation repair c46126a57cecf9cd3b56ce40ff9b6a56953252dc passed CI40599762327/attempt1. Before-cleanup PLAN.md and EXECUTION-EVIDENCE.md/HOSTED-SDK-EVIDENCE.md at this revision retain all18 completed leaves, original source qualifications, physical restart proof and literal observations. The whole supplier condition is fulfilled with a compatible hosted SDK client; actual ChatGPT-specific onboarding/compatibility and separately authorized deployment remain consumer/operator work. No new GitHub provider capability or test app was selected. The original consumer agreement and scope are unchanged.\nCondition satisfied: Donut has delivered and verified GitHub-backed OAuth account linking, user-scoped read access to its HTTPS MCP tools, token renewal, and revocation with a compatible client.\nAccepted integration: 61f0d210d1b53200cf6ac040c56fc83fed70385f on origin/refs/heads/main."}}]}
 ```
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/075-direct-chatgpt-knowledge/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0aa98d4b850569811168d6f197afc51849d413e17996ae98f02f91eed0230bbe","plan":"a37e3dbf1906631fe2cfb9e357a22755c7326f8a3a6bd65c212f05513fa744ba"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/075-direct-chatgpt-knowledge/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f4586f1e3faf78b1e045fcef45da3da3f518b536fe6ff49b884f8292c1971cad","plan":"3da35f39e364fd6f8c1977af392a82cb872f9586a5084a5d45d0a2ebb60ba138"}}
 ```
 
-**Goal:** An existing Donut user can create or install a personal/custom ChatGPT
-plugin, link their own Donut account through GitHub, and use current, attributable
-Donut knowledge in an ordinary ChatGPT conversation while their computer is off.
+**Goal:** An existing Donut user can create or install a personal/custom ChatGPT plugin, link their own Donut account through GitHub, and use current, attributable Donut knowledge in an ordinary ChatGPT conversation while their computer is off.
 
-**Scope:** Complete and document the real ChatGPT onboarding, consent, retrieval,
-renewal and reconnection journey against Donut's direct HTTPS service. Preserve
-the three delivered read capabilities: title/alias candidate search, attributed
-full-note reads, and bounded graph context. The plugin creator/operator configures
-the connection; each user grants access as their own Donut identity. Distinguish
-connection configuration from a user's consent, and give usable feedback when
-setup or reconnection cannot finish.
+**Scope:** Complete and document the real ChatGPT onboarding, consent, retrieval, renewal and reconnection journey against Donut's direct HTTPS service. Preserve the three delivered read capabilities: title/alias candidate search, attributed full-note reads, and bounded graph context. The plugin creator/operator configures the connection; each user grants access as their own Donut identity. Distinguish connection configuration from a user's consent, and give usable feedback when setup or reconnection cannot finish.
 
-Required attribution identifies the note by title, notebook/folder and note ID,
-with the accepted notebook revision returned by the full read. Explain that this
-is the whole notebook's revision, and preserve a null revision when none exists.
-Use full reads for cited evidence; graph excerpts can be truncated. Demonstrate
-current access permissions, account isolation, automatic access-token renewal,
-withdrawal and fresh informed consent when reconnecting. A later fresh read must
-use current accepted content, rather than presenting an old conversation's text
-as a new retrieval.
+Required attribution identifies the note by title, notebook/folder and note ID, with the accepted notebook revision returned by the full read. Explain that this is the whole notebook's revision, and preserve a null revision when none exists. Use full reads for cited evidence; graph excerpts can be truncated. Demonstrate current access permissions, account isolation, automatic access-token renewal, withdrawal and fresh informed consent when reconnecting. A later fresh read must use current accepted content, rather than presenting an old conversation's text as a new retrieval.
 
-**Genuine constraints:** Use the backend and its existing GitHub identity,
-authorization and notebook permission owners. The first release is read-only;
-the assistant's grant is for `notes:read`. Retrieved content remains evidence,
-not application instructions. Permission checks apply to every new request.
-Withdrawal cannot erase information already returned to a conversation. These
-constraints come from the shared owner-selected scope and the delivered
-[authorization contract](../../docs/assistant-oauth.md).
+**Genuine constraints:** Use the backend and its existing GitHub identity, authorization and notebook permission owners. The first release is read-only; the assistant's grant is for `notes:read`. Retrieved content remains evidence, not application instructions. Permission checks apply to every new request. Withdrawal cannot erase information already returned to a conversation. These constraints come from the shared owner-selected scope and the delivered [authorization contract](../../docs/assistant-oauth.md).
 
 **Deferred promises:** Public-directory publication, a custom ChatGPT UI,
 body/semantic search, content editing, first-time Donut signup during linking,
@@ -241,11 +216,7 @@ test change remains from the observation.
 
 **Execution plan:** [Direct ChatGPT knowledge](../slice-plans/075-direct-chatgpt-knowledge/PLAN.md).
 
-**Effort hypothesis:** M (1–2 hours) of implementation and focused verification
-if the existing OAuth client model interoperates; low confidence until the real
-linking probe. Operator release work and account/device observation waits are
-unmeasured prerequisites, not hidden inside this estimate. A compatibility failure
-must be understood before expanding implementation or revising the story boundary.
+**Effort hypothesis:** M (1–2 hours) of implementation and focused verification if the existing OAuth client model interoperates; low confidence until the real linking probe. Operator release work and account/device observation waits are unmeasured prerequisites, not hidden inside this estimate. A compatibility failure must be understood before expanding implementation or revising the story boundary.
 
 **Safe stopping point:** A documented, personally installable direct connection
 with the examples above demonstrated. Public-directory distribution remains a
