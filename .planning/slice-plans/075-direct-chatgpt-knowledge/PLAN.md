@@ -19,7 +19,8 @@ body search, editing and signup during linking remain deferred.
 
 Preparation granted no release authority. The story-2 supplier agreement is
 satisfied by its compatible-SDK result, not by a ChatGPT result. Execution
-progress and accepted live observations are linked below; remaining proof stays open.
+progress and accepted observations are linked below. The completion agreement
+waives further live acceptance observations without asserting that they passed.
 
 ## Current decisions and existing owners
 
@@ -57,7 +58,7 @@ Execution identity, readiness, observation handles and proof decisions are in
 ## Live observation gate
 
 Follow [production proof and human participation](EXECUTION-EVIDENCE.md#production-proof-and-human-participation)
-before slice 3. The release and real-client activation need separate operator authority.
+for slice 3. The release and real-client activation need separate operator authority.
 Terry authorized landing, release and continued setup on 2026-10-28; the release
 and client registration are recorded in [live observations](LIVE-OBSERVATIONS.md).
 
@@ -98,149 +99,62 @@ structured data and text, with a matching output schema. Reuse the existing DTO,
 mapper and service; retain optional-value semantics and authorization. No new
 retrieval, endpoint or client. See [compatibility evidence](READ-COMPATIBILITY.md).
 
-### 3. Link a personal ChatGPT plugin to the real Donut account
+### 3. Release the landed implementation and record the accepted boundary
 Type: Behavior
-Status: planned
-Proof: Early credentialed probe: current production discovery, actual custom
-plugin creation/installation, an authorized connection and a full read of the
-owner-selected note. Terry waived live cancellation on 2026-10-28; retain the
-existing denial/retry product tests. Recheck the browser client after release. Capture the discovered
-three tools, returned account-scoped evidence and the exact usable setup steps.
+Status: done
+Proof: Exact main CI 40625799063 attempt 1 succeeds for 982d32c; all three
+unexpired artifacts are available. Release that immutable commit as v1.3.57,
+observe the actual publication job and its deployment health evidence.
+Reuse the recorded direct-plugin full reads, graph and real-expiry renewal.
+Run no additional live acceptance tests, as Terry instructed on 2026-10-28.
 
-Behavior: After the authorized production release and client configuration,
-the creator follows ChatGPT's built-in form with the service URL, exact current
-callback, predefined client and `notes:read` → the user can cancel or approve
-through GitHub/Donut and complete a read. Add the observed setup to a ChatGPT
-section in `docs/assistant-oauth.md`, linked from the MCP guide. If discovery,
-exchange or installation fails, record the failing operation and stop slices
-4–9; no speculative auth replacement or extra script is authorized.
-
-### 4. Continue reading after normal access expiry
-Type: Behavior
-Status: planned
-Proof: Early lifecycle probe on slice 3's connection. Record issued-token expiry
-from available operator evidence, wait for actual expiry (default five minutes),
-then issue a fresh read. Require renewal evidence and returned source, not just
-a model answer reusing history. No browser reauthorization during successful renewal.
-
-Behavior: The linked user's access token expires while the grant remains valid →
-the next request renews and reads successfully through the normal client. Update
-the guide's continuation behavior from the observed result. Do not shorten
-production lifetimes or simulate time. A failure stops dependent rounds and
-triggers diagnosis at the existing OAuth boundary. Explicit external-wait exception.
-
-### 5. Withdraw permission and reconnect deliberately
-Type: Behavior
-Status: planned
-Proof: Early recovery probe: owner withdraws the Donut client grant in Settings,
-requests a fresh read in ChatGPT, observes authentication refusal and failed
-renewal, then follows the recovery action to fresh informed consent and a new read.
-Use operator-visible auth outcomes when the ChatGPT surface hides renewal attempts;
-missing visibility stays an unproved result, not an inferred pass.
-
-Behavior: Withdrawal ends this user's client grant → new reads cannot succeed
-through its outstanding credentials, and reconnecting requires new consent.
-Document the actual ChatGPT recovery action and that prior conversation content
-remains disclosed. Do not promise that uninstalling a plugin substitutes for
-Donut withdrawal. Stop subsequent rounds on a failed control boundary.
-
-### 6. Keep two users' connections independent
-Type: Behavior
-Status: planned
-Proof: Early account probe: a second owner-operated ChatGPT connection follows
-the written guide and links Donut account B. Observe B reading its own note,
-then its search, direct full-read and graph requests against A's private marker
-under B's grant. Inspect backend/tool refusals, not only the model's answer.
-Confirm A can still read A's note. Use separate chat/connection contexts.
-
-Behavior: The same plugin is linked by another Donut identity → its new calls
-use that identity's current notebook permissions. The operator records the
-actual account-switching steps, without adding profile tools or another client
-implementation. The retained backend current-permission tests prove request-time
-reevaluation; this round proves that ChatGPT uses the independently linked identities.
-
-### 7. Answer from identifiable full-note evidence
-Type: Behavior
-Status: planned
-Proof: In ChatGPT, use a direct and an ordinary-language topic request against
-two same-title acceptance notes in distinguishable notebooks/folders, including
-a repository-bound note and one with a null revision, then an unmatched query
-with a corrected title/alias. Record candidates, selected IDs,
-full reads and final citations. Include one harmless instruction-like sentence
-inside a test note and observe it treated as source text, not a new instruction.
-
-Behavior: The user's topic request → ChatGPT chooses the relevant candidate or
-asks for the missing distinction, reads full contents, and identifies each cited
-note and its returned notebook revision. Empty search explains the title/alias
-limit and offers a useful retry. A null revision remains explicit when the
-selected note has none. Improve only existing descriptions or written prompts
-if the observation warrants it; preserve the natural search rule. Re-run affected
-prompts after any descriptor change and perform the required backend check if
-Java changes. Record successful plain instructions in the guide.
-
-### 8. Explain relevant connections with bounded graph evidence
-Type: Behavior
-Status: planned
-Proof: A follow-up asks how a known note relates to another idea. Observe
-`get_note_graph` with an explicit token budget and full reads for related notes
-actually cited, then compare the answer with those sources. The prompt should
-require a relation present in the chosen acceptance notes.
-
-Behavior: The follow-up needs connections beyond one note → bounded graph context
-guides further reading and the answer separates source evidence from inference.
-Truncated graph text is not presented as a complete note or invented revision.
-Retain a successful follow-up example in the same guide. Any metadata correction
-stays in existing tools and rechecks the affected earlier prompt observations.
-
-### 9. Retrieve an accepted update with the original computer off
-Type: Behavior
-Status: planned
-Proof: Terry edits a designated acceptance note through the normal Donut UI and
-records the accepted content/revision. Power off the original computer. From a
-second device, use the installed plugin in a fresh ChatGPT conversation to search
-and read the new marker; retain the actual tool result and returned revision.
-Terry records the power state because this agent cannot observe its own powered-off
-host. Compare with the earlier read rather than inferring freshness from prose.
-
-Behavior: Donut accepts new content and the user's original computer becomes
-unavailable → a new request still reads that current content directly from the
-hosted service. Finalize the guide from the demonstrated journey, including its
-prerequisites and actual source attribution. Stop short of story completion if
-the off-device observation is unavailable. Explicit owner/device-wait exception.
+Behavior: Publish the reviewed implementation and setup guidance, then close
+under the source's human completion agreement. Retain the distinction between
+observed direct-plugin success and the unverified normal-browser repair.
+Original live rounds 3–9 are retired by that agreement; their original intent,
+observations and limitations remain recoverable in Git and linked evidence.
+The release workflow's elapsed wait is an explicit external-wait exception.
 
 ## Story obligations
 
 ### G1. Production release and real connection are not yet observed
 Reported: slice 1 — "Acceptance confirms no separately authorized schema-first release receipt, deployed revision or registered ChatGPT configuration has been supplied; real creation/installation, consent and authenticated read remain unobserved."
 Story clause: "The plugin creator/operator configures the connection"
-Disposition: receiving slice 3
+Disposition: owner changed "close this execution without further live acceptance tests"
 
 ### G2. Real ChatGPT renewal is not yet observed
 Reported: slice 1 — "Only the inherited compatible-SDK result exists; ChatGPT expiry, renewal and a fresh read require the connection from slice 2."
 Story clause: "After actual access-token expiry, another request succeeds through ordinary renewal without repeating browser consent."
-Disposition: receiving slice 4
+Disposition: owner changed "close this execution without further live acceptance tests"
 
 ### G3. Real ChatGPT withdrawal and reconnect are not yet observed
 Reported: slice 1 — "Withdrawal, failed new reads/renewal and fresh-consent recovery have not been observed in ChatGPT."
 Story clause: "ChatGPT offers an actionable route to connect again; a new grant requires informed consent."
-Disposition: receiving slice 5
+Disposition: owner changed "close this execution without further live acceptance tests"
 
 ### G4. Real ChatGPT account isolation is not yet observed
 Reported: slice 1 — "No independent second-account connection has exercised private-note search, direct-ID read and graph access alongside the first account."
 Story clause: "Its new requests follow its own permissions, including direct note-ID reads and graph access."
-Disposition: receiving slice 6
+Disposition: owner changed "close this execution without further live acceptance tests"
 
 ### G5. ChatGPT source selection and attribution are not yet observed
 Reported: slice 1 — "Same-title disambiguation, full-read citations including null revision, bounded search retry and instruction-like source handling have no live ChatGPT result."
 Story clause: "Use full reads for cited evidence; graph excerpts can be truncated."
-Disposition: receiving slice 7
+Disposition: owner changed "close this execution without further live acceptance tests"
 
 ### G6. ChatGPT graph evidence is not yet observed
 Reported: slice 1 — "A relevant bounded graph call followed by full reads of cited related notes and evidence/inference distinction has not been observed."
 Story clause: "ChatGPT requests graph context with a token budget and reads any related note it relies on for a citation."
-Disposition: receiving slice 8
+Disposition: owner changed "close this execution without further live acceptance tests"
 
 ### G7. Computer-off freshness is not yet observed
 Reported: slice 1 — "No owner-observed second-device fresh search/read has returned an accepted new marker/revision with the original computer off."
 Story clause: "From another device, with the original computer switched off, a fresh conversation still completes a real search and read."
-Disposition: receiving slice 9
+Disposition: owner changed "close this execution without further live acceptance tests"
+
+## Execution complete
+
+Product advice: no further product change is recommended within the owner's
+completed delivery scope. [Release and review evidence](RELEASE-CLOSURE.md)
+records the successful deployment and waived observations. No result from the
+retired live rounds is claimed as passed.
