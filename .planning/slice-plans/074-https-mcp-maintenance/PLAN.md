@@ -349,3 +349,7 @@ the reviewed story and plan, and auto-land this one-shot preparation under the
 owner's instruction. Execution rechecks mutable artifact ownership before
 deletion and runs its final focused proof. No remaining scope question,
 runtime responsibility move, or speculative structure is proposed.
+
+## Execution complete
+
+Product advice: No backlog change. Story 4 finishes local MCP retirement against the delivered HTTPS service; near-future direction and queue already put SEED-002#story-3 (ChatGPT) next. Wrap-up should close story 4 / spend plan 074; do not invent follow-ups from this cleanup.
