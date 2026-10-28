@@ -9,10 +9,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Focus the spelling answer after Resume](seeds/SEED-091-resume-spelling-focus.md#story-1) — SEED-091#story-1
+- [Conduct a commissioned learning session in ChatGPT through MCP](seeds/SEED-090-commissioned-learning-via-mcp.md#story-1) — SEED-090#story-1 ([plan](slice-plans/077-commissioned-learning-session-in-chatgpt/PLAN.md))
 
 ## Backlog list
 
-- [Conduct a commissioned learning session in ChatGPT through MCP](seeds/SEED-090-commissioned-learning-via-mcp.md#story-1) — SEED-090#story-1
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3

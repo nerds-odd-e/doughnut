@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Maria-chan",
+  "email": "maria-chan@example.org",
+  "identity": "SEED-090#story-1",
+  "mode": "story-branch",
+  "branch": "codex/conduct-a-commissioned-learning-session-in-chatg",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
