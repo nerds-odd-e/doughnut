@@ -16,6 +16,7 @@ import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +59,8 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     @Test
     void shouldWeakenUniqueMatchedSpellingTrackerWithoutRecallCredit()
         throws UnexpectedNoAccessRightException {
-      testabilitySettings.timeTravelTo(matchedSpellingTracker.getNextRecallAt());
+      testabilitySettings.timeTravelTo(
+          TimestampOperations.addHoursToTimestamp(matchedSpellingTracker.getLastRecalledAt(), 200));
       Timestamp dueBefore = matchedSpellingTracker.getNextRecallAt();
       Timestamp lastRecalledBefore = matchedSpellingTracker.getLastRecalledAt();
       Integer recallCountBefore = matchedSpellingTracker.getRecallCount();

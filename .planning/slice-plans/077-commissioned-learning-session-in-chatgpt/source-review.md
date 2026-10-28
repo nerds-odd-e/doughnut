@@ -24,10 +24,10 @@ not accept an earlier output that already owes the promise.
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
 | C01 | A Donut learner connected through the ChatGPT plugin can ask ChatGPT to conduct one commissioned Learning Session. Triggered by the learner’s request in the connected conversation. | slice 4 | |
-| C02 | Obtain a Potential learning session available to that learner. Select the first in Donut’s returned order. | slice 2 | |
-| C03 | Load that session’s Learning Session Request through MCP. Use the existing Request. | slice 2 | |
-| C04 | Obtain the Request’s notebook-specific instructions. Part of the Request. | slice 2 | |
-| C05 | Obtain the Request’s Session Items. Part of the Request. | slice 2 | |
+| C02 | Obtain a Potential learning session available to that learner. Select the first in Donut’s returned order. | slice 2 | observed: LearningSessionRequestMcpEndpointTest.selectsTheFirstNotebookInDueOrder; first tracker uses existing due order |
+| C03 | Load that session’s Learning Session Request through MCP. Use the existing Request. | slice 2 | observed: LearningSessionRequestMcpEndpointTest.returnsTheNotebookInstructionsAndSessionItemsInTheExistingMarkdownProtocol; real tools/call returns Request markdown |
+| C04 | Obtain the Request’s notebook-specific instructions. Part of the Request. | slice 2 | observed: LearningSessionRequestMcpEndpointTest.returnsTheNotebookInstructionsAndSessionItemsInTheExistingMarkdownProtocol; README instruction appears in returned markdown |
+| C05 | Obtain the Request’s Session Items. Part of the Request. | slice 2 | observed: LearningSessionRequestMcpEndpointTest.returnsTheNotebookInstructionsAndSessionItemsInTheExistingMarkdownProtocol; title/content and Report format returned |
 | C06 | Tutor interactively from that Request. Its instructions govern the tutoring. | slice 4 | |
 | C07 | Submit a Learning Session Report through MCP. Triggered when the session finishes or the learner asks to end it. These are alternative triggers. | slice 4 | |
 | C08 | Save Feedback for completed Session Items. Applies to an ordinary finish and an early finish. | slice 3 | |
@@ -39,8 +39,8 @@ not accept an earlier output that already owes the promise.
 | C14 | Use existing scheduling behavior. Reuse the existing record domain behavior. | slice 3 | |
 | C15 | Give incomplete items no Feedback. Applies when the learner ends early as well. | slice 3 | |
 | C16 | Preserve incomplete items’ current learning state. The early-end example explicitly includes their existing schedules. | slice 3 | |
-| C17 | Tell the learner that no session is available. Triggered when Donut supplies no Potential learning session. | slice 2 | |
-| C18 | Reuse existing Request domain behavior. No replacement protocol is commissioned. | slice 2 | |
+| C17 | Tell the learner that no session is available. Triggered when Donut supplies no Potential learning session. | slice 2 | observed: LearningSessionRequestMcpEndpointTest.explainsWhenTheLearnerHasNoPotentialSession; explicit no-session signal and tool instruction to explain none |
+| C18 | Reuse existing Request domain behavior. No replacement protocol is commissioned. | slice 2 | observed: RequestLearningSessionTool delegates existing LearningSessionService.request and markdown builder |
 | C19 | Expand hosted-assistant OAuth with a narrow grant for recording Learning Session Reports. Confirmed by the owner decision dated 2026-10-28. | slice 1 | observed: dual-scope discovery in AssistantDiscoveryTest; AssistantMcpAccessTest.reportCapableAssistantCanReadWithItsConsentedScopes exchanges and uses both grants; full backend pass |
 | C20 | Expand hosted-assistant consent with that narrow recording grant. Confirmed by the same owner decision. | slice 1 | G1 |
 | C21 | Keep the recording grant distinct from general note editing. Its purpose is Learning Session Report recording. | slice 1 | observed: AssistantResourcePolicy admits exact read or read+record sets; existing general API refusal observations remain green in AssistantMcpAccessTest |
@@ -64,7 +64,7 @@ not accept an earlier output that already owes the promise.
 | E05 | ChatGPT teaches interactively. | slice 4 | |
 | E06 | ChatGPT submits Feedback for completed items. | slice 4 | |
 | E07 | The learner sees that Feedback in Donut’s learning history. | slice 4 | |
-| E08 | When Donut supplies multiple Potential learning sessions, ChatGPT uses the first in the returned order. | slice 2 | |
+| E08 | When Donut supplies multiple Potential learning sessions, ChatGPT uses the first in the returned order. | slice 2 | observed: LearningSessionRequestMcpEndpointTest.selectsTheFirstNotebookInDueOrder; reversed creation order selects earliest due notebook |
 | E09 | ChatGPT tutors from that selected session’s Request. | slice 4 | |
 | E10 | In the early-end example, the Request contains item A. | slice 3 | |
 | E11 | It also contains item B. | slice 3 | |
@@ -80,13 +80,13 @@ not accept an earlier output that already owes the promise.
 | E21 | Ending with zero completed items records no Feedback. | slice 3 | |
 | E22 | When Donut supplies no Potential learning session, ChatGPT explains that none is available. | slice 4 | |
 | X01 | Inventing a second commissioned learning protocol. | slice 3 | |
-| X02 | Introducing a program-picker. | slice 2 | |
-| X03 | Choosing among programs when several are available. | slice 2 | |
-| X04 | Choosing among notebooks when several are available. | slice 2 | |
+| X02 | Introducing a program-picker. | slice 2 | observed: RequestLearningSessionTool accepts timezone and selects first notebook through existing service; no picker introduced |
+| X03 | Choosing among programs when several are available. | slice 2 | observed: same first-notebook selection; program choice remains deferred by source |
+| X04 | Choosing among notebooks when several are available. | slice 2 | observed: same first-notebook selection; notebook choice remains deferred by source |
 | X05 | Automatically starting a further session. | slice 3 | |
-| X06 | Replacing the markdown Request protocol with MCP-only structured schemas. | slice 2 | |
+| X06 | Replacing the markdown Request protocol with MCP-only structured schemas. | slice 2 | observed: existing Request markdown returned intact as requestMarkdown, observed by MCP endpoint test |
 | X07 | Replacing the markdown Report protocol with MCP-only structured schemas. | slice 3 | |
 | X08 | General note editing for assistants. | slice 1 | observed: scope expansion is confined to learning_session:record; general API refusal in AssistantMcpAccessTest and read-only MCP tool implementations unchanged |
 | X09 | A broad `notes:write` grant for assistants. | slice 1 | observed: unsupported notes:write authorization rejection remains in AssistantConsentTest and AssistantMcpAccessTest |
-| X10 | Further selection workflows. | slice 2 | |
+| X10 | Further selection workflows. | slice 2 | observed: tool returns a single selected notebook Request; further selection deferred by source |
 | X11 | Multi-session workflows. | slice 3 | |

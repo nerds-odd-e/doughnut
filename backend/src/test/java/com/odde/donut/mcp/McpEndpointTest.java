@@ -99,14 +99,19 @@ class McpEndpointTest extends McpEndpointTestBase {
           .andExpect(jsonPath("$.result.tools[2].name", equalTo(GetNoteGraphTool.NAME)))
           .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.noteId").exists())
           .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.tokenLimit").exists())
-          .andExpect(
-              jsonPath("$.result.tools[*].annotations.readOnlyHint", contains(true, true, true)))
-          .andExpect(
-              jsonPath(
-                  "$.result.tools[*].annotations.destructiveHint", contains(false, false, false)))
+          .andExpect(jsonPath("$.result.tools[3].name", equalTo(RequestLearningSessionTool.NAME)))
+          .andExpect(jsonPath("$.result.tools[3].inputSchema.properties.timezone").exists())
           .andExpect(
               jsonPath(
-                  "$.result.tools[*].annotations.openWorldHint", contains(false, false, false)));
+                  "$.result.tools[*].annotations.readOnlyHint", contains(true, true, true, true)))
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[*].annotations.destructiveHint",
+                  contains(false, false, false, false)))
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[*].annotations.openWorldHint",
+                  contains(false, false, false, false)));
     }
   }
 }

@@ -50,7 +50,8 @@ public class McpServerConfiguration {
       HttpServletStatelessServerTransport transport,
       ListNoteCandidatesTool listNoteCandidatesTool,
       ReadNoteTool readNoteTool,
-      GetNoteGraphTool getNoteGraphTool) {
+      GetNoteGraphTool getNoteGraphTool,
+      RequestLearningSessionTool requestLearningSessionTool) {
     McpStatelessServerTransport handlerIntercept =
         new McpStatelessServerTransport() {
           @Override
@@ -70,7 +71,8 @@ public class McpServerConfiguration {
         .tools(
             listNoteCandidatesTool.specification(),
             readNoteTool.specification(),
-            getNoteGraphTool.specification())
+            getNoteGraphTool.specification(),
+            requestLearningSessionTool.specification())
         .immediateExecution(true)
         .build();
   }

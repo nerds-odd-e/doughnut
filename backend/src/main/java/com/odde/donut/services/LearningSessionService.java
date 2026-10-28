@@ -43,6 +43,13 @@ public class LearningSessionService {
   }
 
   @Transactional(readOnly = true)
+  public Optional<Notebook> firstPotentialNotebook(User user, Timestamp now, ZoneId zoneId) {
+    try (var trackers = userService.getCommissionedMemoryTrackersNeedToRepeat(user, now, zoneId)) {
+      return trackers.map(tracker -> tracker.getNote().getNotebook()).findFirst();
+    }
+  }
+
+  @Transactional(readOnly = true)
   public LearningSessionRequestResponse request(
       User user, Notebook notebook, Timestamp now, ZoneId zoneId) {
     List<MemoryTracker> dueTrackers =
