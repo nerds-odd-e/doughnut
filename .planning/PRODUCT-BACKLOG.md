@@ -8,6 +8,8 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Focus the spelling answer after Resume](seeds/SEED-091-resume-spelling-focus.md#story-1) — SEED-091#story-1
+
 ## Backlog list
 
 - [Conduct a commissioned learning session in ChatGPT through MCP](seeds/SEED-090-commissioned-learning-via-mcp.md#story-1) — SEED-090#story-1
