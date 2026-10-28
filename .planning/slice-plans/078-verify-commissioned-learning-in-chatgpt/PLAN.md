@@ -1,6 +1,7 @@
 # Verify a commissioned learning session directly in ChatGPT
 
 **Source:** [Verify a commissioned learning session directly in ChatGPT](../../seeds/SEED-090-commissioned-learning-via-mcp.md#story-2)
+**Source review:** [Independent source review](source-review.md)
 **Identity:** SEED-090#story-2
 
 ## Goal and scope
@@ -10,11 +11,11 @@ Learning Session and recording Feedback in Donut, including a partial session,
 immediate end, and no available session. Retain reproducible operator steps in
 [the existing guide](../../../docs/assistant-oauth.md) only after observing them.
 The source owns the complete examples, boundaries and evidence requirements.
-This plan verifies existing behavior; an interoperability failure stops the
-dependent path for refinement rather than authorizing implementation repairs.
+The original verification-only boundary was expanded by Terry on 2026-10-29 to
+repair Donut's OAuth integration and release the tested correction.
 
-Deployment, new real-client activation, notebook selection, automatic further
-sessions, another protocol, general editing and additional clients are deferred.
+New real-client activation, notebook selection, automatic further sessions,
+another protocol, general editing and additional clients remain deferred.
 SDK or personal-token results cannot replace any ChatGPT observation below.
 
 ## Existing solution and constraints
@@ -27,8 +28,8 @@ recall-history page. The report tool requires `learning_session:record` for
 hosted assistants and reports `recordedItems` and `rejectedEntries`.
 
 The PFE decision is direct reuse of the existing tools, OAuth consent, markdown
-protocol and history UI. No harness, new domain representation or product-code
-change is planned. Follow [ADR 0001 — Ubiquitous language](../../../docs/adrs/0001-ubiquitous-language.md#commissioned-learning-session)
+protocol and history UI. No harness or new domain representation is needed. Slice 6
+corrects the existing tool metadata and recording-permission challenge. Follow [ADR 0001 — Ubiquitous language](../../../docs/adrs/0001-ubiquitous-language.md#commissioned-learning-session)
 and [ADR 0003 — Spaced-repetition scheduling policy](../../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md#commissioned-learning-session):
 Feedback contains Grade and descriptive text; another Report is another Grade.
 Do not replay a successful Report to collect evidence. Follow
@@ -39,59 +40,11 @@ verification; no architectural change or ADR exception is proposed.
 
 ## Decisive premises and prior evidence
 
-Preparation checkout:
-`/Users/terryyin/git/doughnut/.worktrees/refine-commissioned-learning-chatgpt`,
-branch `codex/refine-commissioned-learning-chatgpt`, prepared from
-`0a1b38a49584d7135413c0d3dfc3dd2bb7f8cb4c` on 2026-10-28.
-This checkout identifies preparation evidence, not the deployment to be tested.
-
-- The original implementation's accepted MCP/OAuth/SDK observations are retained
-  at `75fece3754879b7d3f840b002d58adfa7beafc91:.planning/slice-plans/077-commissioned-learning-session-in-chatgpt/execution-evidence.md`.
-  On 2026-10-28 the final backend run passed 2,981 tests; the record names
-  `LearningSessionRecordMcpEndpointTest` for A/B/C and empty Reports and
-  `AssistantLearningSessionTest` for consent-issued dual-scope recording.
-  These are historical implementation observations, not a new test run or
-  ChatGPT acceptance evidence.
-- That record's credentialed attempt on 2026-10-28 observed production at
-  `ff368082aedaf3c1ca8cf2449298e8ef15eb28f8`, advertising only `notes:read`.
-  Its CUA browser host was unavailable and access to `com.openai.codex` was
-  refused. No UI or credential action occurred. This is dated evidence, not a
-  claim about the current deployment or current tool access.
-- The actual HTTPS deployment/revision, registered client, permitted ChatGPT
-  surface and acceptance of both scopes remain unobserved. Slice 1 is the
-  permitted early, owner-operated probe: establish these before slices 2–5.
-  No deploy, grant, connection or runtime success is inferred from repository
-  files. Terry supplies the existing environment and uses the connection UI;
-  no agent workaround for a refused UI surface is required.
+[Preparation provenance and prior observations](execution-evidence.md#decisive-premises-and-prior-evidence).
 
 ## Proof ownership and observation contract
 
-| Source promise | Owner | Required observation |
-| --- | --- | --- |
-| Real ChatGPT connection requests both scopes and informed consent permits recording | 1, confirmed by 2 | Actual scope string and consent, then successful request and recording through that connection |
-| Japanese's Request, timezone and tutoring instructions lead to saved Feedback | 2 | Request/tool transcript, interactive tutoring, Report response and matching Donut history |
-| Ending after A saves A while B/C retain history and schedule | 3 | A/B/C Request, completed-only Report, recorded result and before/after learning state |
-| Immediate end submits an empty Report and records nothing | 4 | Empty Report call/result and unchanged baseline for all session items |
-| No due session is explained in ChatGPT | 5 | No-session tool result and ChatGPT's response |
-| Evidence is attributable and guide steps were observed | Each slice | Dated origin/revision, preconditions, tool/UI observations, limitations and corresponding guide edit |
-
-Terry operates every credentialed round. At execution's first request, provide
-the whole bundle of rounds below once; reuse answered setup and earlier
-observations rather than asking again between rounds. Request the HTTPS origin,
-deployed revision, environment/owner and usable registered connection then.
-Record the account reference without credentials and arrange each round's due
-items through supported operations on owner-approved data. Save the baseline
-before each write; baseline data is setup, while the actual ChatGPT call and
-Donut result are the observation. A notebook used in an example imposes no
-product limit on how many notebooks may exist.
-
-For each round append retained proof to this plan: promise, covered boundary,
-date/revision and inspected setup, actual owner-performed steps, observation
-locations, result and limitations. Include literal tool inputs/outputs and
-before/after Feedback and schedule values where promised. Redact secrets, codes
-and credentials. A prose success claim without the tool/history observations
-leaves that proof open. Persist lasting setup/usage facts in the guide before
-eventual story-history cleanup.
+[Source mappings and the retained observation protocol](execution-evidence.md#proof-ownership-and-observation-contract).
 
 ## Ordered slices
 
@@ -102,20 +55,59 @@ ten minutes, stop and finer-decompose unless the recorded external-wait
 exception explains it. Run one round per example; a failure retains its
 evidence and stops affected follow-ups rather than starting a repair loop.
 
+### 6. Advertise recording scopes and challenge a read-only connection
+Type: Behavior
+Status: done
+Proof: Reproduce missing recording auth metadata/challenge through the real MCP
+endpoint, then pass the complete backend suite. The wire descriptor declares
+`notes:read` and `learning_session:record` for recording; a read-only OAuth call
+returns a structured insufficient-scope challenge with the canonical resource
+metadata URL and both required scopes while preserving learning state. Existing
+dual-scope recording, personal-token access and notebook authorization retain
+their accepted behavior. Update setup instructions to request both scopes and
+identify the actual Donut consent screen, distinguishing unobserved ChatGPT steps.
+
+Behavior: Use the existing MCP tool, OAuth scope enforcement and canonical-origin
+configuration. This is the bounded correction authorized by Terry's 2026-10-29
+instruction. No new authorization protocol, general editing or silent scope
+upgrade. Follow ADR 0005's existing API/discovery routes and ADR 0006's business
+outcome rule: insufficient permission becomes an actionable OAuth challenge.
+Agent active implementation targets five minutes; complete backend-suite and
+required release CI waits are external proof time, recorded separately. If SDK
+support or scope selection requires broader work, refine this leaf before expanding.
+
+### 7. Release the tested OAuth correction
+Type: Behavior
+Status: planned
+Proof: Corrected source integrated on main, successful applicable CI and required
+artifacts, next increasing immutable stable tag, Application Release publication
+job success, and production smoke identifying the selected build and corrected
+MCP wire metadata. Release success does not accept slices 1–5.
+
+Behavior: Apply the existing release runbook under Terry's explicit release
+authority. Choose the next unused increasing patch version and the exact tested
+main commit. Preserve the execution checkout, branch, assignment and unfinished
+verification while publishing this necessary increment. No database change or
+new client activation is planned. Then resume the already-authorized empty-Report
+check through the connected plugin; any required consent stays informed.
+
 ### 1. Authorize the real ChatGPT connection for report recording
 Type: Behavior
 Status: planned
-Proof: Terry's actual setup and consent observations, requested scope string,
+Proof: Actual connection setup and consent observations, requested scope string,
 connection result, and visibility of the Request/Report tools. Slice 2 owns
 functional confirmation that this same connection retains recording authority.
 
 Behavior: Given an existing authorized HTTPS deployment and registered client,
-Terry links the intended Donut account in ChatGPT with `notes:read` and
-`learning_session:record` and sees consent describing report recording.
+the Donut plugin in this chat is connected to the intended account with
+`notes:read` and `learning_session:record`, with observed consent describing
+report recording. Reuse that connection when its grant is established; Terry
+handles fresh authorization when it is needed.
 
 Probe: First record origin/revision and inspect public authorization/resource
-discovery for both scopes. Use the current permitted ChatGPT interface and its
-actual callback; an existing read-only grant needs fresh authorization. Record
+discovery for both scopes. Use the plugin tools exposed in this chat; opening a
+separate ChatGPT app is unnecessary. If fresh authorization is needed, use the
+connection's actual callback; an existing read-only grant needs both scopes. Record
 the observed setup, consent wording and tool availability, updating only those
 guide steps established by the observation. Missing candidate deployment,
 registration, suitable data or permitted access stops here with the exact
@@ -183,14 +175,67 @@ response to the guide and review the final guide against retained observations.
 - One coherent Request/Report protocol and one Feedback model serve every
   example. Slices separate independently observable operator rounds, with
   authorization first to bound the external interoperability risk.
-- No additional automated tests or API generation are planned for evidence and
-  guide edits. Reuse accepted implementation proof only for its stated boundary.
-  Product changes discovered as necessary require refinement before execution;
-  they bring their own stack proof and delivery requirements.
+- Evidence and guide edits reuse accepted implementation proof only for its
+  stated boundary. Slice 6 adds MCP/OAuth regression tests; no API generation is
+  needed. Further product changes require refinement before execution and bring
+  their own stack proof and delivery requirements.
 - Execute Plan owns the required fresh refactor review, formatting once,
   commit and push after authorized changes. Preparation does not perform the
   manual rounds or mark any slice done.
-- Slice-plan refinement was not needed: five bounded rounds have distinct
-  proof loops and the uncertain external prerequisites are in the first probe.
-  No remaining slice-specific concern was identified beyond that permitted
-  credentialed probe; its failure leaves the dependent observations open.
+- Original preparation used five bounded observation rounds, with the first
+  credentialed probe bounding external prerequisites. Terry's 2026-10-29 amendment
+  added the authorized correction and release in slices 6–7. The unchanged
+  ChatGPT observations remain open after the bounded automated proof.
+
+## Retained observations
+
+- [Discovery and the first empty-Report probe](execution-evidence.md).
+- [Reauthorization, retries and observed read-access consent](connection-evidence.md).
+- [Accepted MCP/OAuth correction proof](oauth-correction-evidence.md).
+
+## Execution context
+
+- 2026-10-29 continuation: fast-forwarded the owned execution branch to
+  `c51f7b619a` from fetched origin/main, preserving local evidence. Locked
+  worktree setup passed. The fresh source-only review now includes Terry's
+  repair/release amendment. All unchanged manual-round obligations remain open.
+- Rearmed Codex CI observation after the earlier stopped observer had exited:
+  selector `ci.yml`, workflow 5208694 **donut CI**, repository
+  `nerds-odd-e/doughnut`, target `codex/verify-commissioned-learning-chatgpt`,
+  coordinator `aino-seed090`, directory `/tmp/dough-ci-501/watch-f9raBS`,
+  PID 35943, PTY 67819, yielded cell 31. Runtime and checkout identities match.
+
+- Story Branch Mode; identity `SEED-090#story-2`, publisher
+  `codex-seed090-chatgpt-verification`, assigned agent Aino-chan.
+- Created execution checkout
+  `/Users/terryyin/git/doughnut/.worktrees/verify-commissioned-learning-chatgpt`,
+  branch `codex/verify-commissioned-learning-chatgpt`, from
+  `7001846a8d141d6bbc48b48b0669c0db542bbe51`.
+  Originating/integration checkout: `/Users/terryyin/git/doughnut`.
+- Take accepted on `origin/main` and the execution branch at
+  `4ef50afd67cdb5f3fe91242e30f41016d8d240d6`; increments target
+  `origin` / `refs/heads/codex/verify-commissioned-learning-chatgpt`.
+- `./scripts/run.sh bash scripts/worktree_setup.sh` passed with the locked
+  workspace installation current. The same checkout's
+  `./scripts/run.sh node .agents/skills/dough-product-backlog/scripts/product-backlog.mjs read-state --link 'seeds/SEED-090-commissioned-learning-via-mcp.md#story-2'`
+  passed and read the published preparation. Existing planned-work replanning
+  authority remains; no overrun replan was selected.
+The [historical connection status](execution-evidence.md#historical-connection-status-before-the-oauth-repair)
+is retained with the observations.
+
+## Story obligations
+
+### G1. Recording authority after tool discovery (first reported in slice 1)
+Reported: slice 1 — "The available Donut tool inventory in this chat contains only list_note_candidates, read_note and get_note_graph; request_learning_session and record_learning_session are unavailable."
+Story clause: "resulting connection can both request and record a session."
+Disposition: return
+
+### G3. The reauthorized plugin must remain callable
+Reported: slice 1 — "After Terry reported reauthorization done, record_learning_session, request_learning_session and list_note_candidates all returned Unknown tool from the plugin runtime, while direct production tools/list still returned all five tools."
+Story clause: "resulting connection can both request and record a session."
+Disposition: return
+
+### G2. Recording consent must be observed
+Reported: slice 1 — "Terry answered I did not check the wording when asked whether Donut consent explicitly mentioned permission to record Learning Session Reports."
+Story clause: "observe Donut consent describing report recording"
+Disposition: return

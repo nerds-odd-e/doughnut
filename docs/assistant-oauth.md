@@ -52,9 +52,13 @@ operator to register. Each created connection may have a different callback;
 use its actual value rather than copying another installation's callback.
 
 After registration, select **User-Defined OAuth Client**, enter the client ID
-and its raw secret directly in ChatGPT, select `client_secret_basic`, and keep
-`notes:read` checked as the default scope. Create/install the plugin, connect
-the intended Donut account, and review Donut's read-access consent. Keep the
+and its raw secret directly in ChatGPT, select `client_secret_basic`, and select
+both `notes:read` and `learning_session:record` for commissioned learning.
+A connection requesting only `notes:read` supports notebook reading without
+recording Learning Session Reports. Create/install the plugin, connect
+the intended Donut account, and review the requested permissions on **Donut's**
+consent screen. A recording request adds **and record learning sessions** to
+the heading and explains that Reports save Feedback and update schedules. Keep the
 secret out of prompts and source control. Existing GitHub/Donut sign-in and an
 operator-registered confidential client are prerequisites.
 
@@ -92,6 +96,20 @@ record Learning Session Reports, saving Feedback and updating schedules for
 completed items. Existing read-only connections need fresh authorization requesting
 both scopes to gain recording permission. It gains no general API access, personal-token
 creation or content editing. Losing notebook permission affects subsequent reads.
+
+The MCP tool descriptors declare their OAuth scopes in `_meta.securitySchemes`:
+the reading and Request tools require `notes:read`, and the Report tool requires
+both scopes. A Report attempted through a read-only connection returns a tool
+error with an `mcp/www_authenticate` insufficient-scope challenge identifying
+both scopes and the canonical resource metadata. A compatible client can use
+that response to begin fresh authorization; an existing token keeps its original
+permissions. This follows the [ChatGPT authentication contract](https://developers.openai.com/plugins/build/auth#triggering-authentication-ui)
+and its [tool metadata compatibility field](https://developers.openai.com/apps-sdk/reference#_meta-fields-on-tool-descriptor).
+In ChatGPT, refresh the plugin's tools after deploying changed
+metadata before testing that permission upgrade. This describes the supported
+wire contract; the actual ChatGPT permission-upgrade and recording journey must
+be observed separately from backend tests. A connection completing after Donut
+showed only notebook-reading consent has not established recording permission.
 
 In **Settings → Connected Assistants**, the user identifies the assistant and
 withdraws access. Withdrawal removes that user's whole client grant and remembered

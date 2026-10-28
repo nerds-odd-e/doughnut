@@ -32,6 +32,7 @@ public record RequestLearningSessionTool(
         .tool(
             McpSchema.Tool.builder()
                 .name(NAME)
+                .meta(McpToolAuthorization.readOnlyMetadata())
                 .description(
                     """
                     When the learner asks to start commissioned learning, obtain the first available

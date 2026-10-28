@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.entities.repositories.UserRepository;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +20,8 @@ class AssistantLearningSessionTest extends AssistantAuthorizationTestSupport {
   @Autowired RecallLogRepository recallLogs;
 
   @Test
-  void consentedRecordScopeSavesFeedbackThroughMcp() throws Exception {
+  void recordingChallengeLeadsToFreshConsentAndSavedFeedbackWithoutWideningTheOldToken()
+      throws Exception {
     var note =
         makeMe
             .aNote("こんにちは")
@@ -27,7 +29,20 @@ class AssistantLearningSessionTest extends AssistantAuthorizationTestSupport {
             .please();
     var tracker = makeMe.aMemoryTrackerFor(note).commissioned().please();
 
-    var result = record("notes:read learning_session:record", note.getNotebook().getId());
+    String readOnlyToken = token("notes:read");
+    String challenge =
+        recordWithToken(readOnlyToken, note.getNotebook().getId())
+            .at("/result/_meta/mcp~1www_authenticate/0")
+            .asString();
+    String requestedScopes =
+        Pattern.compile("(?:^|, )scope=\"([^\"]+)\"")
+            .matcher(challenge)
+            .results()
+            .findFirst()
+            .orElseThrow()
+            .group(1);
+
+    var result = record(requestedScopes, note.getNotebook().getId());
 
     assertThat(
         result.at("/result/structuredContent/recordedItems/0/noteTitle").asString(), is("こんにちは"));
@@ -37,10 +52,19 @@ class AssistantLearningSessionTest extends AssistantAuthorizationTestSupport {
             .getFirst()
             .getTutorFeedback(),
         is("Clear pronunciation."));
+    assertThat(
+        recordWithToken(readOnlyToken, note.getNotebook().getId())
+            .at("/result/isError")
+            .asBoolean(),
+        is(true));
+    assertThat(
+        recallLogs.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(tracker.getId()),
+        hasSize(1));
   }
 
   @Test
-  void readOnlyAssistantCannotRecordEvenWithItsBrowserSession() throws Exception {
+  void readOnlyAssistantIsChallengedForRecordingPermissionWithoutChangingLearningState()
+      throws Exception {
     var note =
         makeMe
             .aNote("こんにちは")
@@ -51,21 +75,34 @@ class AssistantLearningSessionTest extends AssistantAuthorizationTestSupport {
 
     var result = record("notes:read", note.getNotebook().getId());
 
-    assertThat(result.at("/error/message").asString(), containsString("learning_session:record"));
+    assertThat(result.at("/result/isError").asBoolean(), is(true));
+    assertThat(
+        result.at("/result/_meta/mcp~1www_authenticate/0").asString(),
+        is(
+            "Bearer resource_metadata=\"https://donut.test/.well-known/oauth-protected-resource/api/mcp\", "
+                + "error=\"insufficient_scope\", "
+                + "error_description=\"Authorize learning session recording to continue\", "
+                + "scope=\"notes:read learning_session:record\""));
     assertThat(recallLogs.count(), is(0L));
     assertThat(tracker.getNextRecallAt(), equalTo(dueBefore));
   }
 
   private JsonNode record(String scopes, Integer notebookId) throws Exception {
+    return recordWithToken(token(scopes), notebookId);
+  }
+
+  private String token(String scopes) throws Exception {
     var reply =
         exchange(approvedCode(scopes), Map.of(), "test-assistant-secret")
             .andExpect(status().isOk())
             .andReturn();
-    String token =
-        objectMapper
-            .readTree(reply.getResponse().getContentAsString())
-            .get("access_token")
-            .asString();
+    return objectMapper
+        .readTree(reply.getResponse().getContentAsString())
+        .get("access_token")
+        .asString();
+  }
+
+  private JsonNode recordWithToken(String token, Integer notebookId) throws Exception {
     var result =
         mockMvc
             .perform(

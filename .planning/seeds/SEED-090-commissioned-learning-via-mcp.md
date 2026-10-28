@@ -64,11 +64,22 @@ and retain only operator steps that have actually been observed.
   unverified; retain the evidence and refine the remaining interoperability work.
 - **Deferred promises:** Notebook/program choice, automatic further sessions,
   a replacement Request/Report protocol, general note editing, additional client
-  compatibility, and implementation of interoperability repairs. Verification
-  does not authorize deploying an application or activating a new real client.
-- **Owner / operation:** Terry conducts the credentialed steps and tutoring
-  directly in ChatGPT and inspects Donut. The first probe establishes the actual
-  HTTPS origin/revision, permitted ChatGPT surface, existing client registration
+  compatibility, and activation of a new real client remain deferred.
+- **Owner amendment — 2026-10-29:** Terry authorized: "Fix Donut’s OAuth
+  integration so ChatGPT requests recording permission, then release it."
+  Correct the existing integration's declaration of required recording scopes
+  and its permission-upgrade response, prove those contracts at the MCP/OAuth
+  boundary, and release the tested correction through the application release
+  workflow. Preserve read-only access until informed authorization grants both
+  scopes; do not widen an existing token or bypass consent. Continue verification
+  through the existing connected plugin after release. Real ChatGPT success
+  remains a separate observation from automated proof and deployment success.
+- **Owner / operation:** On 2026-10-28 Terry clarified that the assistant should
+  use the connected Donut plugin directly in this chat as the ChatGPT surface;
+  opening a separate ChatGPT app is unnecessary. The assistant runs available
+  plugin tools; Terry supplies learning responses and any connection UI or
+  consent observations the tools cannot expose. The first probe establishes the
+  actual HTTPS origin/revision, connection scopes, existing client registration
   and suitable session data. These are execution setup prerequisites, not claims
   that a candidate is already deployed. Use ordinary product operations on
   owner-approved data; credentials stay in the connection UI.

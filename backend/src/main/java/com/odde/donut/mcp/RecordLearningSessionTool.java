@@ -5,6 +5,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.oauth.AssistantAuthorizationConfiguration;
+import com.odde.donut.oauth.AssistantOAuthEndpoints;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.LearningSessionService;
 import com.odde.donut.testability.TestabilitySettings;
@@ -26,7 +27,8 @@ public record RecordLearningSessionTool(
     NotebookRepository notebooks,
     AuthorizationService authorization,
     TestabilitySettings testabilitySettings,
-    JsonMapper objectMapper) {
+    JsonMapper objectMapper,
+    AssistantOAuthEndpoints oauthEndpoints) {
   public static final String NAME = "record_learning_session";
 
   public SyncToolSpecification specification() {
@@ -34,6 +36,7 @@ public record RecordLearningSessionTool(
         .tool(
             McpSchema.Tool.builder()
                 .name(NAME)
+                .meta(McpToolAuthorization.recordingMetadata())
                 .description(
                     """
                     Save a Learning Session Report for the notebook returned by request_learning_session.
@@ -80,8 +83,7 @@ public record RecordLearningSessionTool(
         (Set<?>) context.get(McpServerConfiguration.TRANSPORT_ASSISTANT_SCOPES_KEY);
     if (assistantScopes != null
         && !assistantScopes.contains(AssistantAuthorizationConfiguration.RECORD_SCOPE)) {
-      throw new ResponseStatusException(
-          HttpStatus.FORBIDDEN, "learning_session:record permission is required");
+      return McpToolAuthorization.recordingPermissionRequired(oauthEndpoints);
     }
     if (request.arguments() == null
         || !(request.arguments().get("notebookId") instanceof Number notebookId)

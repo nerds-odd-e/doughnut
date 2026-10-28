@@ -60,6 +60,7 @@ public class GetNoteGraphTool {
         .tool(
             McpSchema.Tool.builder()
                 .name(NAME)
+                .meta(McpToolAuthorization.readOnlyMetadata())
                 .description(DESCRIPTION)
                 .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
                 .inputSchema(

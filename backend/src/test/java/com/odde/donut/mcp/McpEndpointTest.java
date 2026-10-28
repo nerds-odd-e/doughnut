@@ -105,6 +105,22 @@ class McpEndpointTest extends McpEndpointTestBase {
           .andExpect(jsonPath("$.result.tools[4].inputSchema.properties.reportMarkdown").exists())
           .andExpect(
               jsonPath(
+                  "$.result.tools[*]._meta.securitySchemes[0].type",
+                  contains("oauth2", "oauth2", "oauth2", "oauth2", "oauth2")))
+          .andExpect(
+              jsonPath("$.result.tools[0]._meta.securitySchemes[0].scopes", contains("notes:read")))
+          .andExpect(
+              jsonPath("$.result.tools[1]._meta.securitySchemes[0].scopes", contains("notes:read")))
+          .andExpect(
+              jsonPath("$.result.tools[2]._meta.securitySchemes[0].scopes", contains("notes:read")))
+          .andExpect(
+              jsonPath("$.result.tools[3]._meta.securitySchemes[0].scopes", contains("notes:read")))
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[4]._meta.securitySchemes[0].scopes",
+                  contains("notes:read", "learning_session:record")))
+          .andExpect(
+              jsonPath(
                   "$.result.tools[*].annotations.readOnlyHint",
                   contains(true, true, true, true, false)))
           .andExpect(
