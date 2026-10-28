@@ -148,3 +148,8 @@ removed).
 ## Remaining concerns
 
 None identified for readiness.
+
+## Execution complete
+
+Product advice: no change — story complete for wrap-up (fuzz + band order as
+selected; mass reschedule and Anki load-balancer stay out).

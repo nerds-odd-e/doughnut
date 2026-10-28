@@ -73,6 +73,16 @@ Former local code: DD-138. An absolute changed-file size check conflicts with an
 
 Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-189.md).
 
+### Occurrences
+
+- Execution: SEED-088#story-1 (first implementation `1bbc9e88fb8d06d13a7e67ac85588cddee42b6e9`)
+  - Timestamp: 2026-10-28T11:55:10+08:00
+  - Tool: Cursor
+  - Open Dough release: unknown
+  - Evidence: slice 2 `f9363a8d8242f104ea67fb2021cfe7219b8dd0da` stopped CLI client shuffle (`nextRecallCardLoad.ts` removed `fetchShuffledDueMemoryTrackerIds`); pre-change `RecallSessionStage.tsx` was already 327 lines and ended at exactly 250 after extracting `RecallSessionActiveCard.tsx` (72), `RecallSessionChrome.tsx` (25), and `RecallSessionLoadMoreView.tsx` (50). Behavioral product change for Stage was the due-list fetch call.
+  - Observed effect: A one-call shuffle removal on an already oversized CLI stage forced relocating substantial presentation into three new modules and re-proof via `recallJustReviewInteractive.loadMoreSharedOrder.test.tsx`.
+  - Inference: Matches the small-change-plus-size-gate extraction pattern; relationship to ODF-152/ODF-195 is qualified. No claim that the extraction harmed product behavior.
+
 <a id="odf-190"></a>
 
 ## ODF-190 — Planned observation route is unavailable
@@ -382,6 +392,14 @@ Former local code: DD-319. Acceptance traced the unchanged transport API but not
   - Evidence: `a26a2a4094f5c0f61a3e1c56c00746e9414cf13b:e2e_test/config/common.ts` changes Cypress browser origin; leaf17 classified old MCP consumers as unchanged. First leaf18 composed run failed all nine ordinary MCP scenarios because its Node TLS client received HTTPS instead of HTTP. `b5afee6a6b5d6f27fc787ed88ebc0326b90697a3:.planning/slice-plans/073-assistant-account-linking/HOSTED-SDK-EVIDENCE.md#18-connect-through-the-documented-oauth-journey` retains failed/final10-of10 receipts and G14.
   - Observed effect: A changed configuration value reached an unchanged task/page-object/client chain that slice acceptance had excluded; the later composed journey found it and the same execution repaired the HTTP Node ingress binding.
   - Inference: Matches indirect-consumer discovery, not a new OAuth server defect. Actual CI was unobserved; no CI failure is inferred from the local failure.
+
+- Execution: SEED-088#story-1 (first implementation `1bbc9e88fb8d06d13a7e67ac85588cddee42b6e9`)
+  - Timestamp: 2026-10-28T11:48:59+08:00
+  - Tool: Cursor
+  - Open Dough release: unknown
+  - Evidence: Slice 1 accepted focused entity suites (`MemoryTrackerCorrectRecallDueFuzzTest` / Scheduling / Rebuild). Backend Unit CI failed on residual fixtures that still assumed Stability-hour dues (`MemoryTrackerBuilder.stabilityAndNextRecallAt` via unfuzzed `calculateNextRecallAt`; `RecallServiceDueWorkTest` absolute day offsets). Repair `8de87c62be8ab20d6337dd27948e65cb86ff8e26` reschedules Grade-path fuzz after persist and asserts relative to actual fuzzed dues; plan Accepted proof notes CI repair run 40626834805.
+  - Observed effect: Indirect builder/service/controller consumers of the scheduling write escaped slice acceptance and failed in CI; same execution repaired them before later slices.
+  - Inference: Matches missed-indirect-consumer proof, here fixture and due-work tests rather than E2E journeys. Distinct mechanism from ODF-272/ODF-310; tip CI for later SHAs remains pending and is not claimed green.
 
 <a id="odf-323"></a>
 
