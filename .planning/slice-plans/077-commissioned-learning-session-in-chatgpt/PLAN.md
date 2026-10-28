@@ -217,3 +217,22 @@ Disposition: proved by slice 1: focused assistant_account_linking.feature reprod
 Reported: slice 2 — "The full backend suite failed shouldWeakenUniqueMatchedSpellingTrackerWithoutRecallCredit: expected stability 115 but got 116; its clock used an ID-fuzzed due time."
 Story clause: "existing Feedback recording and scheduling"
 Disposition: proved by slice 2: shouldWeakenUniqueMatchedSpellingTrackerWithoutRecallCredit now fixes elapsed time at lastRecalledAt + 200h, preserving exact stability 115 and every scheduling/no-credit assertion; full 2,975-test backend pass, no production scheduling change.
+
+### G4. Credentialed ChatGPT journey remains unobserved
+Reported: slice 4 — "No candidate staging/test HTTPS endpoint and owner-operated ChatGPT connection were supplied; the SDK fixture pass does not observe the real ChatGPT path."
+Story clause: "A Donut learner connected through the ChatGPT plugin can ask ChatGPT to conduct one commissioned Learning Session and have Feedback for the Session Items they completed saved in Donut, including when they end early."
+Disposition: return
+Commitment: C01, C06, C07, C23, C25, E01, E02, E03, E04, E05, E06, E07, E09, E22
+
+## Manual probe waiting
+
+Slices 1–3 are delivered; slice 4 remains planned. Code candidate:
+`b261a1eceb8912b9d04eb32c5c4d3ab23c289bdd` on the execution branch.
+Resume at the credentialed probe; do not repeat accepted implementation/proof.
+The owner must identify a candidate HTTPS environment and ChatGPT connection;
+then request both scopes, observe informed consent, Request/tutoring/Report,
+and Feedback in learning history (including early-end/no-session observations
+owned by the source review). Record candidate origin/revision, actual scopes,
+tool calls, result and limitations. No deployment or real client activation
+performed. Keep the Taken entry, plan, source and owned worktree. No execution
+completion, retrospective, wrap-up or trunk integration is claimed.

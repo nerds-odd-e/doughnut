@@ -118,3 +118,23 @@ A local failure screenshot and authorization URL confirmed dual scopes.
   suffix base `4f226b3c992ff723868e5e4086ed2748a25cee28`; same observer reused.
 - Local 48 GiB host, load 5.17, no competing owned heavy process; backend runs
   sequential, all terminal. No remaining slice 3 gap; real ChatGPT probe in slice 4.
+
+## Slice 4 environment stop — 2026-10-28
+
+- Candidate `b261a1eceb8912b9d04eb32c5c4d3ab23c289bdd` accepted on execution branch,
+  suffix base `ea6c425f1490a42121fb7d3ccfcc3fd6b878ef33`, same observer reused.
+- Manual scope: real ChatGPT OAuth with both scopes, commissioned tutoring and
+  completed-only Report, Feedback in Donut history. Source review also retains
+  early-end and no-session ChatGPT observations. Active leaf budget applies;
+  credential wait is not implementation work. No manual journey was performed.
+- Missing prerequisite: candidate staging/test HTTPS endpoint and owner-operated
+  ChatGPT connection. Asked for these via async input during implementation;
+  no answer received at this checkpoint. Existing guide identifies production
+  and operator prerequisites only. No deployment/client activation was inferred.
+- CUA browser inventory reported browser host unavailable; no browser tab was
+  changed. Native apps exist, but provide no evidence of a deployed candidate.
+- `dough-manual-testing/SKILL.md`: "If oracle, budget, or needed environment or
+  access is missing, name it and stop; do not invent them." Reuse accepted MCP,
+  OAuth and SDK proof without substituting it for ChatGPT interoperability.
+- Source freshness check at this boundary: unchanged; trunk
+  `ff368082aedaf3c1ca8cf2449298e8ef15eb28f8`. Retain G4 and slice 4 for recovery.
