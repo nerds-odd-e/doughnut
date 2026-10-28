@@ -92,11 +92,22 @@ cases at a different boundary and are not deletion candidates.
 
 ### 1. Support the direct HTTPS connection with coherent guidance and proof
 Type: Behavior
-Status: planned
-Proof: The focused MCP feature passes its seven distinct ordinary cases over
-verified HTTPS using a personal token and the owned disposable stack. Retained
-backend and paired-isolation coverage keeps its existing meaning. Read the
-supported setup for agreement with that exercised connection.
+Status: done
+Proof: Accepted 2026-10-28. Focused command
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature`
+passed: seven ordinary scenarios, zero failed (~12s scenarios); Cypress 16.2.0 /
+Electron 146 / Node 26.12.1; DB
+`doughnut_e2e_wt_dc2511cf5a214a79a2e84e834232b217`; origin
+`http://127.0.0.1:64570`; exit 0. Boundary: feature → `mcpAgentActions` →
+`mcpClientTasks` → `McpClient` → TLS proxy → `/api/mcp`. Ordinary selection
+excludes `@mcpIsolationProof` (ownership reused). Consumer-trace after edits
+classified feature/helpers as run; isolated-runner admission docs and unchanged
+backend MCP/TLS/isolation ownership as reused; skill-name and planning-identity
+links excluded. Supported setup in `.agents/skills/mcp-server/SKILL.md` agrees
+with the exercised HTTPS personal-token connection. Removal acceptance reading
+recorded below. Integration filesystem deletion of
+`/Users/terryyin/git/doughnut/mcp-server` completed with zero live consumers;
+not a Git-delivered artifact.
 
 Behavior: Given a user with a personal token and a maintainer using the
 supported setup, configuring and exercising the HTTPS connection discovers
@@ -283,22 +294,47 @@ before execution; do not stop unrelated workloads.
 
 ## Removal acceptance reading
 
-Pending execution. This is a one-time reading, not an automated test.
-Search the whole product, including ignored generated output and explicit
-docs/guidance, for `mcp-server/`, `donut-mcp-server`, `bundleMcpServer`,
-`spawnAndConnectMcpServer`, `StdioClientTransport`, `StdioServerTransport`,
-`mcp-server.bundle`, `mcp-server:(bundle|test|format|lint)`, and
-`the spawned MCP server process has exited`; inspect exclusive dependents
-transitively. Classify exact matches instead of treating `stdio` for ordinary
-process I/O or the retained `mcp-server` skill name as removed implementation.
-Read the named integration checkout's generated paths separately; a tracked
-search alone cannot establish their disposition.
+Recorded 2026-10-28 during slice 1 execution in
+`/Users/terryyin/git/doughnut/.worktrees/complete-the-retirement-of-the-local-mcp-server`
+at revision `9a28f258985ac7e594499ef07c6177251a7757c1` with uncommitted slice edits
+to `e2e_test/features/mcp/mcp_services.feature` and
+`.agents/skills/mcp-server/SKILL.md`, after deleting the integration checkout
+filesystem directory `/Users/terryyin/git/doughnut/mcp-server` (ignored/untracked
+generated tree; integration Git index not modified). This is a one-time reading,
+not an automated test.
 
-At acceptance, record date, revision/working-tree boundary, commands, searched
-locations, classified matches, and limits here. Active preparation provenance
-is separate from live product text and is retired by normal story wrap-up;
-still-needed observations retain their original facts. Add no permanent
-absence checker, negative removal assertion, runtime guard, or tombstone.
+Commands (execution checkout unless noted):
+
+```bash
+rg --hidden -n \
+  -e 'mcp-server/' -e 'donut-mcp-server' -e 'bundleMcpServer' \
+  -e 'spawnAndConnectMcpServer' -e 'StdioClientTransport' -e 'StdioServerTransport' \
+  -e 'mcp-server\.bundle' -e 'mcp-server:(bundle|test|format|lint)' \
+  -e 'the spawned MCP server process has exited' \
+  --glob '!node_modules/**' --glob '!.git/**' --glob '!**/pnpm-lock.yaml' .
+rg --hidden --no-ignore -n \
+  -e 'mcp-server/' -e 'donut-mcp-server' -e 'bundleMcpServer' \
+  -e 'spawnAndConnectMcpServer' -e 'StdioClientTransport' -e 'StdioServerTransport' \
+  -e 'mcp-server\.bundle' -e 'the spawned MCP server process has exited' \
+  --glob '!node_modules/**' --glob '!.git/**' --glob '!**/pnpm-lock.yaml' .
+# Per-term exact scans outside .planning for each retired name above
+# Integration path: ls /Users/terryyin/git/doughnut/mcp-server (absent after deletion)
+```
+
+Classified matches:
+
+| Match | Classification |
+| --- | --- |
+| This plan's prep observations and this reading naming the search terms | Active preparation / acceptance provenance; retained until story wrap-up |
+| `SEED-002` dated evidence mentioning `mcp-server/dist/mcp-server.bundle.mjs` and the integration generated directory | Dated probe evidence; retained verbatim in substance |
+| `README.md`, `docs/assistant-oauth.md`, `.agents/agent-map.md` paths to `.agents/skills/mcp-server/SKILL.md` | Retained skill name / HTTPS setup links, not removed implementation |
+| Skill name `mcp-server` in `AGENTS.md` / `CLAUDE.md` / unit-testing skill package list | Retained skill name |
+| `StdioClientTransport` / `StdioServerTransport` under root `node_modules/@modelcontextprotocol/sdk` and unrelated packages | Third-party SDK / dependency symbols; not Donut local-server wiring |
+| Ordinary `stdio` options in scripts/process helpers | Ordinary process I/O; not removed MCP transport |
+| `donut-mcp-server`, `bundleMcpServer`, `spawnAndConnectMcpServer`, `mcp-server.bundle`, `mcp-server:(bundle\|test\|format\|lint)`, `the spawned MCP server process has exited` outside `.planning` | No product matches |
+| Integration `/Users/terryyin/git/doughnut/mcp-server` | Deleted: `build/` compiled JS, empty `dist/`, package-local `node_modules` links/cache (8 symlinks unlinked without following shared targets). Zero live bundle consumers at deletion. Shared `donut-api` / `donut-test-fixtures` / pnpm store targets intact. No authored `package.json`/`src` present. |
+
+Limits: did not treat ignored dependency trees as product text beyond classifying SDK symbols; did not search other worktrees; ordinary E2E selection still excludes `@mcpIsolationProof`; no production redeploy observation. No permanent absence checker, negative removal assertion, runtime guard, or tombstone was added.
 
 ## Concern and sizing assessment
 

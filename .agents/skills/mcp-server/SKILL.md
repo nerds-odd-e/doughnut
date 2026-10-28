@@ -8,7 +8,7 @@ paths:
 # Donut HTTPS MCP
 
 Donut exposes MCP on the backend over Streamable HTTP at `/api/mcp`. One backend
-service owns the tools; there is no separate MCP process.
+service owns the tools.
 
 Implementation lives under `backend/src/main/java/com/odde/donut/mcp/`. Proof is
 the MCP boundary tests and `e2e_test/features/mcp/mcp_services.feature`. Style

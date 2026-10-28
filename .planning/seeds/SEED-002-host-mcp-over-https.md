@@ -258,6 +258,21 @@ generated artifact. Artifact deletion remains part of execution and rechecks
 ownership, preserving any new authored or foreign-owned work. The existing
 plan remains the selected approach; no new plan or execution starts here.
 
+**Supported connection after slice 1 execution, 2026-10-28:** In the story
+execution checkout at `9a28f258985ac7e594499ef07c6177251a7757c1` (plus the
+slice's uncommitted feature and skill edits), maintainers and users are guided
+to the backend HTTPS `/api/mcp` service with a personal bearer token as in the
+`mcp-server` skill and README. The MCP feature describes the read-only
+candidate/search, attributed read, and bounded graph journey; its unmatched
+query, all-candidates, and disambiguation scenarios own search proof. After
+rechecking ownership and finding no live bundle consumers and no authored
+package sources, execution deleted `/Users/terryyin/git/doughnut/mcp-server`
+(`build/`, empty `dist/`, package-local links/cache) without following shared
+targets or touching the integration checkout's Git index. Earlier dated
+bundle, consumer, and filesystem observations above keep their original
+actions and results. The one-time removal reading lives in
+[plan 074](../slice-plans/074-https-mcp-maintenance/PLAN.md#removal-acceptance-reading).
+
 ## Ordering and Scope Reduction
 
 The order delivers an immediately usable remote knowledge service, then

@@ -1,8 +1,8 @@
 @ConnectAndDisconnectHttpsMcpWhenTeardown
 Feature: MCP (Model Context Protocol) Services
   As a note taker, I want my AI clients like Cursor to use the MCP services from
-  Donut, so that AI can automatically update my notes and fetch information from my
-  notes.
+  Donut, so that AI can search, read, and explore my notes as evidence for the
+  knowledge journey.
 
   Background:
     Given I am logged in as "old_learner"
@@ -28,15 +28,9 @@ Feature: MCP (Model Context Protocol) Services
     Then the response should contain "No matching notes."
     When the MCP client disconnects
 
-  Scenario Outline: AI agent finds relevant notes via MCP
-    When AI agent searches for relevant notes using MCP tool with the term "<search_term>"
-    Then the response should contain "<note_title>"
-
-    Examples:
-      | search_term     | note_title         |
-      | Object Oriented | Object Oriented    |
-      | Functional      | Functional         |
-      | Fiona           | No matching notes. |
+  Scenario: AI agent reports no match for an unmatched MCP search
+    When AI agent searches for relevant notes using MCP tool with the term "Fiona"
+    Then the response should contain "No matching notes."
 
   Scenario: AI agent lists every matching note as a candidate
     Given I have a notebook "Maths" with notes:
