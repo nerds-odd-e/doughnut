@@ -3,7 +3,7 @@
 **Status:** Accepted  
 **Date:** 2026-08-05  
 **Decision makers:** Terry Yin
-**Amended:** 2026-10-14 (recall history: excluded attempts)
+**Amended:** 2026-10-28 (interval fuzzing)
 **Consulted:** None
 
 ## Context
@@ -90,8 +90,8 @@ Donut owns its open-FSRS-6 implementation. It uses one product-wide
 requested retention and one product-wide maximum interval; neither is a learner
 setting.
 
-The scheduler uses elapsed time at whole-hour precision, without calendar-day
-boundaries, interval fuzz, or FSRS card-state step lists. Short-term and
+The scheduler uses elapsed time at whole-hour precision with interval fuzzing,
+without calendar-day boundaries or FSRS card-state step lists. Short-term and
 long-term recall follow open-FSRS-6.
 
 ### Grade transitions
