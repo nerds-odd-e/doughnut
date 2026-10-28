@@ -188,8 +188,8 @@ tutors, and saves Feedback for completed items through MCP. Update
 - Replanning: existing planned-work authority retained; no `--no-replan`.
 - CI: GitHub Actions `ci.yml`, verified active display name `donut CI`;
   target execution branch, coordinator `maria-chan-090`, observer
-  `/tmp/dough-ci-501/watch-XohUdl`, PID `54859`, stream session `8558`,
-  yielded cell `8`. Runtime is the same checkout's
+  `/tmp/dough-ci-501/watch-y4Vcqe`, PID `55287`, stream session `75033`,
+  yielded cell `5`. Runtime is the same checkout's
   `.agents/skills/dough-execute-plan`. Reuse this observer for increments.
 
 ## Remaining concerns
@@ -229,10 +229,12 @@ Commitment: C01, C06, C07, C23, C25, E01, E02, E03, E04, E05, E06, E07, E09, E22
 Slices 1–3 are delivered; slice 4 remains planned. Code candidate:
 `b261a1eceb8912b9d04eb32c5c4d3ab23c289bdd` on the execution branch.
 Resume at the credentialed probe; do not repeat accepted implementation/proof.
-The owner must identify a candidate HTTPS environment and ChatGPT connection;
-then request both scopes, observe informed consent, Request/tutoring/Report,
-and Feedback in learning history (including early-end/no-session observations
-owned by the source review). Record candidate origin/revision, actual scopes,
-tool calls, result and limitations. No deployment or real client activation
-performed. Keep the Taken entry, plan, source and owned worktree. No execution
-completion, retrospective, wrap-up or trunk integration is claimed.
+The owner authorized the agent to run the probes on 2026-10-28. A resumed
+read found production discovery advertises only `notes:read`; this candidate
+is not available there. Computer Use refused access to `com.openai.codex`
+for safety reasons; browser inventory reports its host unavailable.
+Resume with a candidate HTTPS endpoint and a permitted ChatGPT surface, or
+owner-observed evidence of both scopes, tutoring/Report and Feedback history
+(including early-end/no-session cases). No deployment or real client activation
+performed. Keep Taken, plan, source and worktree; no execution completion,
+retrospective, wrap-up or trunk integration is claimed.

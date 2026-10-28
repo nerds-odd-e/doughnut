@@ -138,3 +138,32 @@ A local failure screenshot and authorization URL confirmed dual scopes.
   OAuth and SDK proof without substituting it for ChatGPT interoperability.
 - Source freshness check at this boundary: unchanged; trunk
   `ff368082aedaf3c1ca8cf2449298e8ef15eb28f8`. Retain G4 and slice 4 for recovery.
+
+## Authorized probe attempt — 2026-10-28
+
+- Owner follow-up: "you are authorize to run these". This authorizes agent-run
+  OAuth and learning-session probes; no repeated permission request is needed.
+- Checkout remains clean at accepted checkpoint
+  `a8b1fd61ebc9b517631d258f3bba1d392b970d19`, branch unchanged. Source/accepted
+  implementation proof unchanged; G4 remains open on actual access prerequisites.
+- `curl --silent --show-error --max-time 20 https://doughnut.odd-e.com/.well-known/oauth-protected-resource/api/mcp`
+  returned `scopes_supported:["notes:read"]`; authorization-server metadata
+  returned the same single scope. Production therefore does not expose this
+  candidate's dual-scope capability. No write request or grant was attempted.
+- Production healthcheck returned profile `prod`, commit
+  `ff368082aedaf3c1ca8cf2449298e8ef15eb28f8`, confirming a different candidate.
+- Available Donut connector tools remain list_note_candidates, read_note and
+  get_note_graph; no request/record tool is callable through that connection.
+- `cua.getState()` returned no browsers and "The browser access host is
+  unavailable". `cua.getApp('com.openai.codex')` was rejected: "Computer Use is
+  not allowed to use the app 'com.openai.codex' for safety reasons." No UI action
+  or credential entry occurred; no attempt was made to bypass that restriction.
+- Existing repository guidance supplies isolated local E2E and production OAuth
+  setup, but no deployed candidate test URL. Local fixture/SDK proof remains
+  accepted and does not establish the real ChatGPT journey.
+- Actual next prerequisite is a candidate HTTPS environment plus a permitted
+  ChatGPT surface (or owner-operated observations), not further authorization.
+
+- Prior observer `/tmp/dough-ci-501/watch-XohUdl` was recovered as stopped, no
+  unread evidence. Resumed observer `/tmp/dough-ci-501/watch-y4Vcqe`, PID 55287,
+  session 75033, cell 5, same coordinator `maria-chan-090`, same branch target.
