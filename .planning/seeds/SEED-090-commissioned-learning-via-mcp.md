@@ -51,7 +51,7 @@ report format; MCP should carry that same interaction.
 
 **Identity:** SEED-090#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/077-commissioned-learning-session-in-chatgpt/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7d55eadd1f4ef90a34afbd41e53b8caf709875e223f9a3b3a0b77c946df2136f","plan":"bff3455145cc970df4a8a4ce7f85c753ccbb6f87d6e184afd9407eda00265911"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/077-commissioned-learning-session-in-chatgpt/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ef60098724cec238c4677c940ecc980a66b255636418bae3060304ba3e7d7242","plan":"d08b9a7b1af206b7f6601ddf8f39ab2d5d373ec860ce59acaab95191c3e081ef"}}
 ```
 
 - **Goal:** A Donut learner can obtain the first available commissioned Learning
@@ -200,6 +200,7 @@ editing and `notes:write` stay out of scope. Slice planning may continue.
 - **Provenance:** Moved from former slice 4 of the commissioned-learning MCP
   execution by owner instruction on 2026-10-28. Existing MCP/OAuth automated
   proof is reusable; the real ChatGPT journey remains unobserved.
+  Original probe contract: `75fece3754879b7d3f840b002d58adfa7beafc91:.planning/slice-plans/077-commissioned-learning-session-in-chatgpt/PLAN.md` (former slice 4).
 
 ## Breadcrumbs
 
