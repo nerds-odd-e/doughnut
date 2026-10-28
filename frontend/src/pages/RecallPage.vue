@@ -99,7 +99,7 @@ import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionCompo
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
-import { computed, ref, watch } from "vue"
+import { computed, onActivated, ref, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useRecallTrackerNavigation } from "@/composables/useRecallTrackerNavigation"
 import { useRecallAnswerHandling } from "@/composables/useRecallAnswerHandling"
@@ -215,6 +215,8 @@ watch(
     }
   }
 )
+
+onActivated(() => scheduleFocusAutofocusTargetWithin(recallPageRoot.value))
 
 const { isGlobalBarVisible, isLoadingMore, loadMore } = useRecallPageLoading({
   currentIndex,

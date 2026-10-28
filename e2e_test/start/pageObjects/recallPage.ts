@@ -43,6 +43,12 @@ const recallPage = () => {
     ...recallLearningSessionMethods(),
     ...recallDailyProbeMethods(),
     ...recallSelfReviewMethods(),
+    expectSpellingAnswerFocused() {
+      cy.get('[data-test="question-section"]:visible')
+        .find('input[placeholder="put your answer here"]')
+        .should('be.focused')
+      return this
+    },
     typeSpellingAnswer(answer: string) {
       waitUntilAppIsNotBusy()
       cy.get('[data-test="question-section"]:visible', { timeout: 15000 })
@@ -195,6 +201,13 @@ export const recall = () => {
       pageBar().findByRole('button', { name: 'Resume' }).click()
       waitUntilAppIsNotBusy()
       // Flush Vue remount timeouts under cy.clock() so the restored question is clickable.
+      cy.tick(1)
+      cy.get('.progress-bar').first().should('be.visible')
+      return recallPage()
+    },
+    resumeRecallFromMenu() {
+      withinDonutMenuItem('Resume', ($el) => $el.click())
+      waitUntilAppIsNotBusy()
       cy.tick(1)
       cy.get('.progress-bar').first().should('be.visible')
       return recallPage()

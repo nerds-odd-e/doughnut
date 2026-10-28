@@ -119,6 +119,10 @@ When('I type my answer {string}', (answer: string) => {
   start.recall().assumeRecallPage().typeSpellingAnswer(answer)
 })
 
+Then('the spelling answer input should have focus', () => {
+  start.recall().assumeRecallPage().expectSpellingAnswerFocused()
+})
+
 When('I choose answer {string}', (answer: string) => {
   start.assumeQuestionPage().answer(answer)
 })
@@ -164,6 +168,10 @@ Then('I should be able to resume recalling', () => {
 
 When('I resume recalling', () => {
   start.recall().resumeRecall()
+})
+
+When('I resume recalling from the main menu', () => {
+  start.recall().resumeRecallFromMenu()
 })
 
 When('I choose self-review', () => {
