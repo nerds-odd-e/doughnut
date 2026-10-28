@@ -21,11 +21,11 @@ for (const { ready, spec, browser } of [
 ]) {
   test(`hosted SDK fixture ${spec} (${browser ?? 'default browser'}) owns configuration and closes on ${ready ? 'completion' : 'readiness failure'}`, async (t) => {
     const checkout = makePrimaryCheckout(t)
-    let control,
-      callback,
-      githubOrigin,
-      configuration,
-      shutdown = false
+    let control
+    let callback
+    let githubOrigin
+    let configuration
+    let shutdown = false
     const code = await runE2eBatch({
       argv: ['--spec', spec, ...(browser ? ['--browser', browser] : [])],
       checkoutRoot: checkout.root,

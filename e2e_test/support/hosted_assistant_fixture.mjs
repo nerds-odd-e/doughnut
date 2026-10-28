@@ -18,7 +18,8 @@ export async function startHostedAssistantFixture() {
   const capability = randomUUID()
   const clientId = 'hosted-sdk-assistant'
   const clientSecret = randomUUID()
-  let assistant, github
+  let assistant
+  let github
   const server = https.createServer(
     { key: material.serverKeyPem, cert: material.serverCertPem },
     async (req, res) => {

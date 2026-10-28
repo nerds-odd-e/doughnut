@@ -15,7 +15,12 @@ export function createHostedAssistantClient({
 }) {
   const directory = mkdtempSync(join(tmpdir(), 'donut-assistant-'))
   const tokenFile = join(directory, 'tokens.json')
-  let tlsProxy, transport, client, authorizationUrl, state, verifier
+  let tlsProxy
+  let transport
+  let client
+  let authorizationUrl
+  let state
+  let verifier
   let saved = false
   let tokenGeneration = 0
   let callbackError
