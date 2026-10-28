@@ -417,40 +417,6 @@ An implementer obtains a red baseline by swapping committed bytes into the live 
 
 [Retained evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-331.md). Original occurrence provenance and distinct effects are recoverable in Open Dough `ccf309a69459284de3f1d45f2de813e9180c2971:docs/maintainer/findings/ODF-331.md` and this project's source snapshot `d5cb4a923b16973028820eb9cb1f4d811b4ef4f6:DearDough.md`. Name adoption is not resolution.
 
-<a id="dd-325"></a>
-
-## DD-325 — OpenAPI path insertion order disagrees with committed docs
-
-Documenting a new API path by appending through the OpenAPI customizer can leave committed `open_api_docs.yaml` and CI regeneration with different path orders, failing `RobotsTests.openApiDocsMatchCommittedYaml` even when generated artifacts were committed with the feature.
-
-### Occurrences
-
-- Execution: SEED-002#story-1 (first implementation `543008d1e88024ab9e4a3f99d1a6515d1f87bb82`)
-  - Timestamp: 2026-10-27T16:39:31+08:00
-  - Tool: Cursor
-  - Open Dough release: 0.3.71
-  - Evidence: slice 1 committed `/api/mcp` first in `open_api_docs.yaml` via `SwaggerConfig`; CI run 40475079509 regenerated with `/api/mcp` after other paths (e.g. after `/api/healthcheck`) and failed Backend Unit tests plus Linting & Types Gen; coordinator noted the mismatch before slice 2; slice 2 (`b99ece7099`) rebuilt paths with `/api/mcp` first. Plan learning records the path-first fix.
-  - Observed effect: published intermediate SHA red on OpenAPI sync; later slice repaired path order and CI on subsequent SHAs succeeded.
-  - Inference: generation determinism for path order was not proved with the first committed docs; not claimed as a missing `generateTypeScript` step alone.
-
-<a id="dd-326"></a>
-
-## DD-326 — Cypress task returning undefined greened locally then failed CI
-
-An E2E Cypress `cy.task` handler that resolves to `undefined` can be reported green in a focused local feature run and still fail CI Before/After teardown that requires `null` or a value.
-
-### Occurrences
-
-- Execution: SEED-002#story-1 (first implementation `543008d1e88024ab9e4a3f99d1a6515d1f87bb82`)
-  - Timestamp: 2026-10-27T17:34:13+08:00
-  - Tool: Cursor
-  - Open Dough release: 0.3.71
-  - Evidence: slice 5 (`195d5f30f1`) `disconnectMcp` task returned `await mcpClient.disconnectMcp()` with no value; implementer reported local `pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature` — 9 passing; CI run 40481816429 failed every MCP scenario with `The task 'disconnectMcp' returned undefined`; slice 6 (`b8c5d9ae30`) fixed the task seam to `return null` after await (plan learning). Tip SHA later green on run 40483343387.
-  - Observed effect: intermediate HTTPS E2E SHA red in CI; repair landed on the next slice; applicable tip recovered.
-  - Inference: local focused proof did not surface the Cypress task return contract that CI enforced; cause of the local green is not established beyond the reported command result.
-
-<a id="dd-332"></a>
-
 ## DD-332 — Formatting expands a file after the last size check
 
 A pre-format refactor can approve a file below the maintained250-line limit, then coordinator formatting expands it beyond that limit before the guarded operation commits/pushes. The final size invariant needs checking after the mutating formatter as well as during refactor.
