@@ -9,7 +9,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Use Donut knowledge directly in ChatGPT](seeds/SEED-002-host-mcp-over-https.md#story-3) — SEED-002#story-3 ([plan](slice-plans/075-direct-chatgpt-knowledge/PLAN.md))
-- [Vary recall spacing and the order of similarly due questions](seeds/SEED-088-varied-recall-spacing-and-order.md#story-1) — SEED-088#story-1 ([plan](slice-plans/076-vary-recall-spacing-and-order/PLAN.md))
 
 ## Backlog list
 
