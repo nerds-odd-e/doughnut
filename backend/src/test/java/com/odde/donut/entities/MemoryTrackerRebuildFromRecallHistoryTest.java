@@ -111,7 +111,7 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
 
   @Test
   void rebuildingFuzzedDueFromTheSameValidHistoryReproducesStabilityDifficultyAndDue() {
-    incremental.id = 42;
+    MemoryTrackerTestIds.assign(incremental, 42);
     recordIncrementally(5, Grade.GOOD);
     recordIncrementally(60, Grade.GOOD);
     recordIncrementally(350, Grade.GOOD);
@@ -119,7 +119,7 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
         incremental.getStability(),
         greaterThanOrEqualTo(MemoryTrackerRecallIntervalFuzz.THRESHOLD_HOURS));
     MemoryTracker rebuilt = aNewTracker();
-    rebuilt.id = 42;
+    MemoryTrackerTestIds.assign(rebuilt, 42);
     List<RecallLog> replayedLogs =
         incrementalLogs.stream()
             .map(

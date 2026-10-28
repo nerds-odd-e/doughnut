@@ -125,6 +125,11 @@ PASS. Due-fuzz assertions live in `MemoryTrackerCorrectRecallDueFuzzTest`
 `rebuildingFuzzedDueFromTheSameValidHistoryReproducesStabilityDifficultyAndDue`.
 Queue-order promises remain slice 2.
 
+CI repair (run 40626834805): residual fixtures/assertions assumed unfuzzed
+dues; builders now reschedule Grade-path fuzz after persist; residual tests
+assert relative to actual fuzzed `nextRecallAt` / Stability. Slice 1 remains
+`done`.
+
 ## Remaining concerns
 
 None identified for readiness.

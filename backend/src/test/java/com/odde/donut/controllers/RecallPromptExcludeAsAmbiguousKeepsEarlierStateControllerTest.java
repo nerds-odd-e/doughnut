@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.MemoryTrackerTestIds;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
@@ -217,6 +218,7 @@ class RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest
 
   /** {@code start} is an in-memory tracker in the state the replay is expected to start from. */
   private void assertPersistedStateIsGoodRecallOn(MemoryTracker start) {
+    MemoryTrackerTestIds.assign(start, tracker.getId());
     RecallLog onlyLog =
         makeMe.aRecallLogFor(start).recordedAt(recalledAt).grade(Grade.GOOD).inMemoryPlease();
     onlyLog.recordStateBefore(start);

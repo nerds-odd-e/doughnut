@@ -184,6 +184,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return MemoryTrackerRecallDue.calculateNextRecallAt(this);
   }
 
+  public void scheduleNextRecallAt(Timestamp gradeAt) {
+    MemoryTrackerRecallDue.scheduleNextRecallFromStability(this, gradeAt);
+  }
+
   public long elapsedHoursUntil(Timestamp currentUTCTimestamp) {
     return MemoryTrackerRecallDue.elapsedHoursUntil(this, currentUTCTimestamp);
   }
@@ -197,19 +201,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   public void applyGrade(Timestamp now, Grade grade) {
-    long elapsed = elapsedHoursUntil(now);
-    Float stability = getStability();
-    Float difficulty = getDifficulty();
-    Fsrs.NextMemory next =
-        switch (grade) {
-          case GOOD -> Fsrs.afterGoodRecall(stability, difficulty, elapsed);
-          case EASY -> Fsrs.afterEasyRecall(stability, difficulty, elapsed);
-          case HARD -> Fsrs.afterHardRecall(stability, difficulty, elapsed);
-          case AGAIN -> Fsrs.afterAgainRecall(stability, difficulty, elapsed);
-        };
-    setDifficulty(next.difficulty());
-    MemoryTrackerNextStability.write(this, next.stability());
-    MemoryTrackerRecallDue.scheduleNextRecallFromStability(this, now);
+    MemoryTrackerGrade.apply(this, now, grade);
   }
 
   public void adjustForConfusion(Timestamp currentUTCTimestamp) {

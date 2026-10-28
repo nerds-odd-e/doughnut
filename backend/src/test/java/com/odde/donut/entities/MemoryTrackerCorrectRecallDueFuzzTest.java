@@ -46,7 +46,7 @@ class MemoryTrackerCorrectRecallDueFuzzTest extends MemoryTrackerRecallSchedulin
   @Test
   void nextRecallAtAtOrAboveFuzzThresholdUsesBoundedHourFuzzWithoutChangingStability() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
-    memoryTracker.id = 17;
+    MemoryTrackerTestIds.assign(memoryTracker, 17);
     Timestamp gradeTime = onTimeGradeTime(memoryTracker);
 
     memoryTracker.applyGrade(gradeTime, Grade.GOOD);
@@ -78,8 +78,8 @@ class MemoryTrackerCorrectRecallDueFuzzTest extends MemoryTrackerRecallSchedulin
     }
     MemoryTracker first = aGradedTrackerAtThreeDayStability();
     MemoryTracker second = aGradedTrackerAtThreeDayStability();
-    first.id = leftId;
-    second.id = rightId;
+    MemoryTrackerTestIds.assign(first, leftId);
+    MemoryTrackerTestIds.assign(second, rightId);
 
     first.applyGrade(gradeTime, Grade.GOOD);
     second.applyGrade(gradeTime, Grade.GOOD);
@@ -96,7 +96,7 @@ class MemoryTrackerCorrectRecallDueFuzzTest extends MemoryTrackerRecallSchedulin
   @Test
   void firstEasyRecallUsesFuzzedIntervalWithinBounds() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
-    memoryTracker.id = 9;
+    MemoryTrackerTestIds.assign(memoryTracker, 9);
     Timestamp gradeTime = memoryTracker.getNextRecallAt();
 
     memoryTracker.applyGrade(gradeTime, Grade.EASY);
@@ -113,7 +113,7 @@ class MemoryTrackerCorrectRecallDueFuzzTest extends MemoryTrackerRecallSchedulin
   @Test
   void correctRecallFromOverCapStabilityLandsAtTheCap() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(LEGACY_LADDER_MAX_STABILITY_HOURS);
-    memoryTracker.id = 3;
+    MemoryTrackerTestIds.assign(memoryTracker, 3);
     Timestamp gradeTime = onTimeGradeTime(memoryTracker);
 
     memoryTracker.applyGrade(gradeTime, Grade.GOOD);

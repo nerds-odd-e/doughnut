@@ -46,27 +46,24 @@ public class RecallServiceDueWorkTest extends SpringTestBase {
 
     @ParameterizedTest
     @CsvSource({
-      "1,   0, false",
-      "1,   1, false",
-      "1,   2, false",
-      "1,   3, true",
-      "1,  10, true",
-      "2,   0, false",
-      "2,   1, false",
-      "2,  11, false",
-      "2,  12, true",
-      "2,  20, true",
-      "3,   0, false",
-      "3,   1, false",
-      "3,  49, false",
-      "3,  50, true",
+      "1, -24, false",
+      "1,   0, true",
+      "1,  24, true",
+      "2, -24, false",
+      "2,   0, true",
+      "2,  48, true",
+      "3, -24, false",
+      "3,   0, true",
+      "3,  48, true",
     })
     void whenThereIsOneRecalledNotesForUser(
-        Integer recallDone, Integer recallDay, Boolean expectedToRepeat) {
+        Integer recallDone, Integer hoursFromDue, Boolean expectedToRepeat) {
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).afterNthStrictRecall(recallDone).please();
       MemoryTracker mostUrgentMemoryTracker =
-          getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, recallDay));
+          getOneMemoryTrackerNeedToRepeat(
+              TimestampOperations.addHoursToTimestamp(
+                  memoryTracker.getNextRecallAt(), hoursFromDue));
       assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
     }
 
