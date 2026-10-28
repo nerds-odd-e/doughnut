@@ -109,6 +109,14 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
   - Observed effect: Fresh full refactor passes recurred within one execution even for a proof-only return needing no edits; each repeated context/consumer reading before delivery.
   - Inference: The durations are agent estimates, not measured token or stopwatch totals. This supports the existing fixed-cost finding; useful later refactors are not claimed unnecessary.
 
+- Execution: SEED-002#story-4 (first implementation `61192809a4e1d227fdeaf74b4bf67197d58da5d2`)
+  - Timestamp: 2026-10-28T08:02:00+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.71
+  - Evidence: Coordinator Task `Post-change refactor pass` after accepted focused MCP E2E; subagent `7a1f0570-0b06-4168-ae3b-42e5c48b3d12` returned `none — already clean. No refactor edits` (transcript mtime 2026-10-28T08:05:28+08:00). Accepted product/guidance diff was four paths (feature claim + unmatched scenario, skill absence-sentence removal, seed dated connection note, plan removal reading). Parent conversation `6e0fe73a-6ccc-4ef2-b3ec-2d4a5f6679ce`.
+  - Observed effect: A fresh full refactor agent ran on an already-accepted small slice and made no edits before delivery continued.
+  - Inference: Repeats the fixed per-slice refactor cost; wall clock from launch timestamp to return mtime is about three minutes, not a measured token total. Useful later refactors are not claimed unnecessary.
+
 <a id="odf-208"></a>
 
 ## ODF-208 — Observer worker exits without a recorded cause

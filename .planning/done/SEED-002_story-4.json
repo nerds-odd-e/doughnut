@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-002#story-4",
+  "title": "Complete the retirement of the local MCP server",
+  "completedAt": "2026-10-28T00:17:02.251Z",
+  "developer": "Terry Yin",
+  "agent": "Mana-chan",
+  "host": "cursor",
+  "model": "auto"
+}

@@ -4,7 +4,7 @@ status: dormant
 planted: 2026-08-06
 planted_during: idle (after deploy/static consistency audit)
 updated: 2026-10-28
-trigger_when: extending Donut through a direct ChatGPT plugin or migrating local MCP clients to the Donut HTTPS service
+trigger_when: extending Donut through a direct ChatGPT plugin
 scope: large
 ---
 
@@ -51,9 +51,8 @@ The [hosted assistant account-linking guide](../../docs/assistant-oauth.md) desc
   [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md) for the API boundary,
   and [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
   for observation and test environments.
-- Complete migration includes deleting the standalone local MCP package and
-  everything used only by it, with the whole-product reading described in
-  story 4. Shared client or test dependencies stay where other callers need them.
+- The supported MCP surface is the backend HTTPS `/api/mcp` service. Shared
+  client or test dependencies stay where other callers need them.
 
 ## Story Decomposition
 
@@ -252,164 +251,6 @@ must be understood before expanding implementation or revising the story boundar
 with the examples above demonstrated. Public-directory distribution remains a
 separate owner decision. Preparation alone does not reach this stopping point.
 
-<a id="story-4"></a>
-
-### Complete the retirement of the local MCP server
-
-**Identity:** SEED-002#story-4
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/074-https-mcp-maintenance/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"146cd5fba2efcc436c6cfc9adb870eabb53c861733bd5582d1d2eb824a81f0fb","plan":"b77abcf730cb0a0c463b1654624c4459ee1ddf830654a483d328215d2fefe20d"}}
-```
-
-**Goal:** Donut users connect their MCP clients directly to the backend's HTTPS
-service, and maintainers support that service with one coherent set of behavior
-tests after completely deleting the standalone local server and its dependents.
-
-- **For / why:** Users and maintainers need the supported connection, setup
-  instructions, build tooling, and E2E coverage to agree on the backend-owned
-  HTTPS service.
-- **Scope:** Delete every remaining part of the standalone local MCP server,
-  recursively including its exclusive tests, fixtures, helpers, dependencies,
-  package and lockfile entries, build/distribution outputs, scripts, CI wiring,
-  configuration, documentation, comments, agent guidance, and generated
-  artifacts. Sweep backend, frontend, CLI, MCP, tooling, and documentation;
-  keep shared code and dependencies that surviving callers need. Document the
-  supported connection directly to the existing backend `/api/mcp` endpoint.
-- **E2E disposition:** Redirect any tests still using the local process or stdio
-  transport to the backend's HTTPS service. Where coverage already exercises
-  HTTPS, compare the promised behaviors and delete redundant tests and their
-  exclusive support. Retain meaningful proof of each distinct surviving
-  behavior, including token-scoped access, candidate search, attributed reads,
-  bounded graph context, and isolated E2E operation. The E2E TLS proxy is test
-  transport infrastructure forwarding to the backend, not the standalone MCP
-  implementation targeted for deletion.
-- **Evaluation:** A client configured with the Donut HTTPS URL and a personal
-  token discovers and uses the backend tools. The retained E2E journeys exercise
-  those behaviors through verified HTTPS against their own disposable stack.
-  Local-only coverage moves to that boundary; duplicate HTTPS coverage is
-  deleted without discarding distinct behavior proof.
-- **Removal reading:** At acceptance, perform a one-time whole-product search
-  for the retired package, process, bundle, commands, and setup names, and
-  inspect exclusive dependents transitively. Record the search and classified
-  result as a reading in the execution plan, separately from surviving-behavior
-  tests. Add no absence assertion, permanent checker, compatibility guard, or
-  historical removal note. Preserve the provenance of retained dated evidence;
-  resolve obsolete dependent observations with their consumers rather than
-  relabeling an observed action to clear a search.
-- **Boundary:** Reuse the delivered HTTPS service and existing tool semantics.
-  OAuth account linking and ChatGPT onboarding remain with stories 2 and 3.
-  Follow [ADR 0005 — Web routes](../../docs/adrs/0005-web-routes-accepted.md)
-  for the API boundary and
-  [ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md)
-  for disposable E2E ownership.
-- **Value / learning:** Finish the retirement and remove maintenance duplication
-  while preserving confidence in the connection users actually use.
-- **Effort hypothesis:** S (30–60 minutes), medium confidence because tracked
-  package deletion and HTTPS E2E migration have already landed; refinement
-  should size any newly discovered dependents before execution.
-- **Safe stopping point:** The existing HTTPS service and its distinct behavior
-  coverage remain useful independently of later OAuth or ChatGPT work.
-
-**Key examples:**
-
-1. A user has a personal token and follows the supported HTTPS setup. Their
-   client discovers the three note tools, finds matching candidates, reads a
-   candidate with its accepted notebook revision, and obtains graph context
-   within the requested budget. An unmatched query gives the existing empty
-   result. The setup and feature description describe these read operations.
-2. Two users have different private notebooks. Each client's personal token
-   permits searching its user's readable notes; the other user's private notes
-   stay inaccessible. Existing token withdrawal and notebook-access refusals
-   remain supported behavior, not removal assertions.
-3. A maintainer runs the focused MCP feature in an isolated checkout. It uses
-   that checkout's disposable application through verified HTTPS and retains
-   distinct candidate, attribution, access, and graph-budget observations.
-   Equivalent positive-search examples share the richer candidate proof.
-   The separate paired-worktree isolation scenario and its support remain.
-4. A maintainer uses the supported setup and build guidance after cleanup.
-   It describes the backend service directly. The integration checkout's
-   generated package outputs and exclusive installation links are included in
-   the deletion; shared dependency targets and authored work remain intact.
-   The deletion itself is accepted by the separate one-time removal reading.
-
-**Current evidence, 2026-10-27:** Repository reading at
-`3d32688d4a040ab4e57e8a5a03d48963e4dc157f` found that
-`b8c5d9ae302d4be49c63edeaea06e5b7ffe7b158` had already deleted the tracked
-`mcp-server` package and updated workspace/build/CI/setup references.
-`e2e_test/support/mcp_client.ts` already uses `StreamableHTTPClientTransport`
-through a trusted TLS proxy to the backend `/api/mcp` endpoint;
-`e2e_test/features/mcp/mcp_services.feature` uses that client. This checkout
-still contains the untracked generated bundle
-`mcp-server/dist/mcp-server.bundle.mjs`. These are source and filesystem
-observations, not a new test run or a finding that existing HTTPS scenarios
-are redundant. Start from the delivered behavior and classify remaining work
-rather than repeating the completed migration.
-
-**Investigation, 2026-10-28:** In the established preparation checkout at
-`d65e2550331fea6682c0405813085516a4164c98`, tracked-file and explicit ignored-file
-readings confirmed the delivered HTTPS transport and package deletion. The
-generated directory is absent in this fresh worktree but remains at
-`/Users/terryyin/git/doughnut/mcp-server`: compiled `build/` files,
-`dist/mcp-server.bundle.mjs`, and package-local `node_modules` links/cache.
-These observations distinguish the two checkouts; they do not revise the
-dated observation above. The root MCP SDK is still consumed by the HTTPS E2E
-client, and the TLS proxy forwards requests to the real backend.
-
-The generic positive-search outline rows overlap richer candidate scenarios.
-A disposable edit replaced that outline with its unmatched-query case. Running
-`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature`
-passed all seven remaining ordinary cases, including token-user isolation,
-revision-changing reads, and both graph budgets. A second disposable run
-focused the all-candidates scenario and replaced the real search response's
-content with `[]` at the client boundary: it failed at the candidate assertion.
-Both source files were restored byte for byte before this refinement write.
-The paired-worktree case was excluded by ordinary runner selection; this is
-not a fresh concurrent-worktree observation. Full commands, setup, results,
-and proof limits belong in the associated plan.
-
-Remaining work is cleanup within the existing scope: the observed generated
-directory, redundant search rows, the feature's unsupported write-operation
-description, removal wording in current MCP guidance, and obsolete current
-transport assumptions in planning consumers. Preserve needed dated evidence
-with its actual date, revision, action, result, and limits; replace obsolete
-current guidance without changing what a historical observation says.
-A final process-ownership observation found seven live bundle processes owned
-by Cursor extension hosts, Cursor's MCP process, and cursor-agent sessions.
-The `doughnut` entry in `/Users/terryyin/.cursor/mcp.json` still launches that
-exact bundle. Only command/path and environment-key names were inspected for
-reporting; token values were not exposed. The directory therefore has active
-consumers and cannot be treated as unused generated output.
-
-**Local client disposition, selected by Terry Yin on 2026-10-28:** Terry selected
-a separate Cursor-agent migration of his private clients to HTTPS, using
-the handoff supplied in chat. Private configuration migration is outside
-this story's implementation; its verified completion is a prerequisite to
-taking this cleanup story. The handoff must verify the remote endpoint and
-tool discovery using the existing personal token privately, update the
-`doughnut` client entry, and reconnect affected clients while preserving
-unrelated work. It reports any still-active bundle consumer or unavailable
-HTTPS endpoint rather than deleting files or claiming success.
-
-**Client migration verification, 2026-10-28:** After Terry reported that Cursor
-MCP was updated, a fresh read in the default checkout at
-`3d4da7a333d562d2b8ed3c60db2b32c8d2d2d918` found the private `doughnut` entry
-pointing directly to `https://doughnut.odd-e.com/api/mcp` with an Authorization
-header and no launch command. No live Node process used the former bundle.
-Using that entry's credentials privately, the maintained MCP SDK initialized
-the connection and discovered `list_note_candidates`, `read_note`, and
-`get_note_graph` with normal TLS certificate verification. This confirms the
-endpoint/discovery and consumer-release prerequisite, rather than inferring
-completion from the configuration alone. The associated plan retains the
-literal command, results, and limits.
-
-The generated directory still contains compiled `build/` files and
-package-local installation links/cache; `dist/` is now empty. These fresh
-observations do not alter the earlier dated bundle and consumer observations.
-This preparation changed no private configuration, running session, or
-generated artifact. Artifact deletion remains part of execution and rechecks
-ownership, preserving any new authored or foreign-owned work. The existing
-plan remains the selected approach; no new plan or execution starts here.
-
 ## Ordering and Scope Reduction
 
 The order delivers an immediately usable remote knowledge service, then
@@ -417,10 +258,6 @@ user-controlled account linking, then the specific ChatGPT experience. Keep
 each supplier's working outcome available to compatible clients even if a
 later story is cancelled. Necessary blocking supplier agreements belong in
 the consumers' canonical sections and must be recorded with the backlog tool.
-
-Story 4 closes the local-server retirement against the delivered HTTPS
-service. It is queued next and can proceed independently of account linking;
-it adds no prerequisite to stories 2 or 3.
 
 If scope must shrink, defer public-directory distribution, editing tools,
 custom ChatGPT UI, and broader search before changing the three read
