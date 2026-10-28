@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import type { ConsentContext } from "@generated/donut-backend-api"
 import { AssistantConsentController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -9,6 +9,9 @@ import { namedLocationHref } from "@/routes/namedLocationHref"
 const props = defineProps<{ clientId: string; state: string }>()
 const consent = ref<ConsentContext>()
 const failed = ref(false)
+const canRecord = computed(() =>
+  consent.value?.scopes?.includes("learning_session:record")
+)
 
 onMounted(async () => {
   const { data, error } = await apiCallWithLoading(() =>
@@ -28,18 +31,23 @@ onMounted(async () => {
         <p>Unable to load this authorization request. Return to your assistant and start connecting again.</p>
       </div>
       <div v-else-if="consent" class="daisy-card-body gap-4">
-        <h1 class="daisy-card-title">Allow {{ consent.clientName }} to read your notebooks?</h1>
+        <h1 class="daisy-card-title">Allow {{ consent.clientName }} to read your notebooks{{ canRecord ? " and record learning sessions" : "" }}?</h1>
         <p>Donut account: <strong>{{ consent.accountName }}</strong></p>
         <p>This assistant can search, read, and explore notebooks that this account can currently read.</p>
+        <p v-if="canRecord">This assistant can also record Learning Session Reports, saving Feedback and updating learning schedules for completed items.</p>
         <p>Access can continue through automatic renewal until you withdraw permission.</p>
         <p>You can withdraw this assistant’s access at any time in <a :href="namedLocationHref({ name: 'settingsConnectedAssistants' })" class="daisy-link">Settings</a>.</p>
-        <form :action="consent.formAction" method="post" class="flex flex-wrap gap-3">
-          <input type="hidden" name="client_id" :value="consent.clientId" />
-          <input type="hidden" name="state" :value="consent.state" />
-          <input type="hidden" :name="consent.csrfParameterName" :value="consent.csrfToken" />
-          <button type="submit" name="scope" :value="consent.scopes?.join(' ')" class="daisy-btn daisy-btn-primary">Allow</button>
-          <button type="submit" class="daisy-btn daisy-btn-outline">Deny</button>
-        </form>
+        <div class="flex flex-wrap gap-3">
+          <form v-for="decision in ['Allow', 'Deny']" :key="decision" :action="consent.formAction" method="post">
+            <input type="hidden" name="client_id" :value="consent.clientId" />
+            <input type="hidden" name="state" :value="consent.state" />
+            <input type="hidden" :name="consent.csrfParameterName" :value="consent.csrfToken" />
+            <template v-if="decision === 'Allow'">
+              <input v-for="scope in consent.scopes" :key="scope" type="hidden" name="scope" :value="scope" />
+            </template>
+            <button type="submit" class="daisy-btn" :class="decision === 'Allow' ? 'daisy-btn-primary' : 'daisy-btn-outline'">{{ decision }}</button>
+          </form>
+        </div>
       </div>
     </div>
   </ContainerPage>

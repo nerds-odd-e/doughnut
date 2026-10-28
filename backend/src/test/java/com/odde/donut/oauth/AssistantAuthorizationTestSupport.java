@@ -9,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,12 +128,22 @@ abstract class AssistantAuthorizationTestSupport extends SpringTestBase {
             .param("client_id", "test-assistant")
             .param("state", state)
             .param(body.get("csrfParameterName").asString(), body.get("csrfToken").asString());
-    if (allow) form.param("scope", "notes:read");
+    if (allow) {
+      form.param(
+          "scope",
+          StreamSupport.stream(body.get("scopes").spliterator(), false)
+              .map(JsonNode::asString)
+              .toArray(String[]::new));
+    }
     return mockMvc.perform(form).andExpect(status().isFound()).andReturn();
   }
 
   protected String approvedCode() throws Exception {
-    String state = begin(Map.of("code_challenge", CHALLENGE));
+    return approvedCode("notes:read");
+  }
+
+  protected String approvedCode(String scopes) throws Exception {
+    String state = begin(Map.of("code_challenge", CHALLENGE, "scope", scopes));
     var context = context(state, "test-assistant").andReturn();
     var body = objectMapper.readTree(context.getResponse().getContentAsString());
     return query(decide(state, context, body, true).getResponse().getRedirectedUrl(), "code");

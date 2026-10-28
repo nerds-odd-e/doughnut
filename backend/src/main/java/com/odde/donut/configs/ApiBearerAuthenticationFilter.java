@@ -19,6 +19,9 @@ public class ApiBearerAuthenticationFilter extends OncePerRequestFilter {
   public static final String AUTHENTICATED_USER_ATTRIBUTE =
       ApiBearerAuthenticationFilter.class.getName() + ".user";
 
+  public static final String ASSISTANT_SCOPES_ATTRIBUTE =
+      ApiBearerAuthenticationFilter.class.getName() + ".assistantScopes";
+
   private final UserService userService;
   private final AssistantAccessTokenResolver assistantTokens;
   private final AssistantOAuthEndpoints endpoints;
@@ -53,7 +56,11 @@ public class ApiBearerAuthenticationFilter extends OncePerRequestFilter {
     String token = hasBearerToken ? header.substring(7) : "";
     if (mcp) token = token.trim();
     Optional<User> user = token.isBlank() ? Optional.empty() : userService.findUserByToken(token);
-    if (mcp && user.isEmpty() && !token.isBlank()) user = assistantTokens.resolve(token);
+    if (mcp && user.isEmpty() && !token.isBlank()) {
+      var access = assistantTokens.resolve(token);
+      user = access.map(AssistantAccessTokenResolver.Access::user);
+      access.ifPresent(value -> request.setAttribute(ASSISTANT_SCOPES_ATTRIBUTE, value.scopes()));
+    }
     if (!mcp && user.isEmpty() && testTokens.isPresent() && testTokens.get().handles(token)) {
       user = testTokens.get().resolve(token);
     }

@@ -48,6 +48,7 @@ public class AssistantClientBootstrap {
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
             .scope(AssistantAuthorizationConfiguration.READ_SCOPE)
+            .scope(AssistantAuthorizationConfiguration.RECORD_SCOPE)
             .clientSettings(
                 ClientSettings.builder()
                     .requireProofKey(true)

@@ -32,7 +32,9 @@ the example is a placeholder, not an encoded value. Keep the corresponding raw
 secret on the assistant server. Register the exact HTTPS callback, including its
 path; redirect matching is exact. The supported initial journey uses
 `client_secret_basic`, authorization code with S256 PKCE and state, and
-`notes:read`. Multiple configured clients are supported. Dynamic registration
+`notes:read`, optionally with `learning_session:record` for saving Learning Session
+Reports. The record grant requires `notes:read`; general note editing is not
+granted. Multiple configured clients are supported. Dynamic registration
 and public-client renewal are separate work.
 
 The assistant begins with the MCP URL and registered client information. A real
@@ -66,7 +68,8 @@ reading and may contain truncated excerpts.
 ## Consent and continued access
 
 The user signs in through existing GitHub login, then sees the assistant name,
-Donut account, current readable-notebook access, automatic renewal and where to
+Donut account, current readable-notebook access, requested Learning Session Report
+recording permission, automatic renewal and where to
 withdraw permission. Allow authorizes the exact callback and code exchange. Deny
 returns an authorization refusal; the assistant can offer a fresh attempt.
 GitHub sign-in alone grants no assistant permission. This linking journey supports
@@ -84,7 +87,10 @@ lifetime is test configuration.
 
 Every call checks the current user/client/resource/read grant and current
 notebook permissions. The assistant can search candidates, read attributed notes
-and request bounded graph context. It gains no general API access, personal-token
+and request bounded graph context. With `learning_session:record`, it can also
+record Learning Session Reports, saving Feedback and updating schedules for
+completed items. Existing read-only connections need fresh authorization requesting
+both scopes to gain recording permission. It gains no general API access, personal-token
 creation or content editing. Losing notebook permission affects subsequent reads.
 
 In **Settings → Connected Assistants**, the user identifies the assistant and

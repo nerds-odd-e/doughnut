@@ -39,7 +39,8 @@ class AssistantDiscoveryTest extends SpringTestBase {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.resource").value(origin.value() + "/api/mcp"))
         .andExpect(jsonPath("$.authorization_servers[0]").value(origin.value()))
-        .andExpect(jsonPath("$.scopes_supported[0]").value("notes:read"))
+        .andExpect(
+            jsonPath("$.scopes_supported").value(contains("notes:read", "learning_session:record")))
         .andExpect(jsonPath("$.tls_client_certificate_bound_access_tokens").value(false));
   }
 
@@ -62,6 +63,8 @@ class AssistantDiscoveryTest extends SpringTestBase {
                 .value(contains("authorization_code", "refresh_token")))
         .andExpect(
             jsonPath("$.token_endpoint_auth_methods_supported[0]").value("client_secret_basic"))
+        .andExpect(
+            jsonPath("$.scopes_supported").value(contains("notes:read", "learning_session:record")))
         .andExpect(jsonPath("$.code_challenge_methods_supported[0]").value("S256"));
   }
 }

@@ -48,6 +48,34 @@ describe("AssistantConsentPage", () => {
     })
   })
 
+  it("explains report recording and submits both requested permissions", async () => {
+    mockSdkService(
+      AssistantConsentController,
+      "getAssistantConsentContext",
+      makeMe.aConsentContext
+        .scopes("notes:read", "learning_session:record")
+        .please()
+    )
+    const view = renderConsent()
+    await flushPromises()
+    expect(
+      view.getByText(
+        "Allow Test assistant to read your notebooks and record learning sessions?"
+      )
+    ).toBeVisible()
+    expect(
+      view.getByText(
+        /saving Feedback and updating learning schedules for completed items/
+      )
+    ).toBeVisible()
+    const form = view.container.querySelector("form")!
+    expect(
+      new FormData(form, view.getByText("Allow") as HTMLButtonElement).getAll(
+        "scope"
+      )
+    ).toEqual(["notes:read", "learning_session:record"])
+  })
+
   it("denies through the native protocol form without granting a scope", async () => {
     mockSdkService(
       AssistantConsentController,
@@ -56,8 +84,8 @@ describe("AssistantConsentPage", () => {
     )
     const view = renderConsent()
     await flushPromises()
-    const form = view.container.querySelector("form")!
     const deny = view.getByText("Deny") as HTMLButtonElement
+    const form = deny.closest("form")!
     expect(Object.fromEntries(new FormData(form, deny))).toEqual({
       client_id: "test-assistant",
       state: "pending-state",

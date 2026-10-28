@@ -1,6 +1,7 @@
 # Conduct a commissioned learning session in ChatGPT through MCP
 
 **Source:** [Conduct a commissioned learning session in ChatGPT through MCP](../../seeds/SEED-090-commissioned-learning-via-mcp.md#story-1)
+**Source review:** [Independent source review](source-review.md)
 **Identity:** SEED-090#story-1
 
 ## Goal and scope
@@ -72,7 +73,7 @@ Preparation checkout:
 | Hosted assistant discovery/consent today advertise and grant only `notes:read`; `notes:write` is rejected | Slice 1 changes policy, bootstrap, discovery, consent | Same suite with `--tests 'com.odde.donut.oauth.AssistantConsentTest' --tests 'com.odde.donut.oauth.AssistantDiscoveryTest'` | PASS — current single-scope model |
 | MCP servlet lists registered tools for an authenticated personal token | Slices 2–3 register new tools | `--tests 'com.odde.donut.mcp.McpEndpointTest'` | PASS |
 | `AssistantResourcePolicy` requires exact `{notes:read}` | Slice 1 must permit `{notes:read}` and `{notes:read, learning_session:record}` | Read `AssistantResourcePolicy.permits` + tests rejecting `notes:write` / multi-scope with write | Confirmed — multi-scope needs an explicit permitted-set change |
-| Consent Allow already submits `consent.scopes.join(' ')` | Slice 1 consent copy / scopes list | Read `AssistantConsentPage.vue` | Confirmed — UI can grant two scopes once policy and `consent.scopes` include them |
+| Consent Allow's joined scope value can grant both permissions | Slice 1 consent form / scopes list | Full backend slice 1 run: SAS rejects joined dual scopes with `invalid_scope` | Invalidated — use repeated native form scope fields on Allow; Deny submits no scopes |
 | Tools do not see OAuth scopes today | Slice 3 write gate | Read `ApiBearerAuthenticationFilter` + MCP transport context (user only) | Confirmed — scopes must be added to transport (or equivalent) before the record tool can refuse `notes:read`-only assistants |
 | ChatGPT Advanced OAuth accepts requesting `notes:read` and `learning_session:record` together | Slice 4 early probe | Not observed (credentialed ChatGPT) | Open — bounded by slice 4 |
 
@@ -93,7 +94,7 @@ code in slices 1–3.
 
 ### 1. Grant learning_session:record beside notes:read for hosted assistants
 Type: Structure
-Status: planned
+Status: done
 Proof: Extend `AssistantDiscoveryTest`, `AssistantConsentTest`, and related
 OAuth/MCP access tests so discovery lists `learning_session:record`, a
 consent request for both scopes can be allowed, tokens with
@@ -167,9 +168,72 @@ tutors, and saves Feedback for completed items through MCP. Update
   each; ChatGPT interoperability is an authorized early probe (slice 4), not
   an unresolved boundary inside 1–3.
 
+## Execution context
+
+- Established claim: `SEED-090#story-1`, publisher
+  `dashboard-territory.local-doughnut`, agent Maria-chan; Story Branch Mode.
+- Execution checkout (also originating checkout):
+  `/Users/terryyin/git/doughnut/.worktrees/conduct-a-commissioned-learning-session-in-chatg`;
+  branch `codex/conduct-a-commissioned-learning-session-in-chatg`.
+  Existing owned linked worktree; no integration checkout selected.
+- Authorized publication: `origin` (`nerds-odd-e/doughnut`), trunk `main`;
+  increments publish to the execution branch. Starting revision
+  `ed515bc49f23186828a7c439ba762b2ec4424b72`; accepted claim and initial
+  candidate `9acdb9fceb886a6b766f76d7a8aac378c4e77e20`, confirmed on both
+  remote branches on 2026-10-28. Claim CI: unobserved.
+- Checkout setup: `./scripts/run.sh bash scripts/worktree_setup.sh` passed
+  (locked workspace installation current), then
+  `./scripts/run.sh pnpm -C frontend exec vue-tsc --version` passed.
+- Replanning: existing planned-work authority retained; no `--no-replan`.
+- CI: GitHub Actions `ci.yml`, verified active display name `donut CI`;
+  target execution branch, coordinator `maria-chan-090`, observer
+  `/tmp/dough-ci-501/watch-XohUdl`, PID `54859`, stream session `8558`,
+  yielded cell `8`. Runtime is the same checkout's
+  `.agents/skills/dough-execute-plan`. Reuse this observer for increments.
+
 ## Remaining concerns
 
 None identified for readiness beyond slice 4's early probe, which the plan
 already bounds. Existing assistant grants remain read-only until reconnect
 with the new scope set; that reconnection is part of slice 4 / operator docs,
 not a separate readiness block.
+
+## Story obligations
+
+### G1. Native consent must grant the requested dual scopes
+Reported: slice 1 — "SAS consent expects repeated scope form fields, whereas the existing Allow button submits notes:read learning_session:record as one value and dual consent fails invalid_scope."
+Story clause: "Expand hosted-assistant OAuth and consent with a narrow grant for recording Learning Session Reports"
+Disposition: proved by slice 1: AssistantConsentTest.contextComesFromThePendingGrantAndAllowPersistsTheSamePermission (repeated scope fields, persisted exact scopes) and AssistantConsentPage.spec.ts (native FormData.getAll on Allow and no scopes on Deny); full backend and browser tests pass.
+Commitment: C20
+
+## Accepted slice 1 evidence — 2026-10-28
+
+- Narrow grant registration/discovery and exact read/read+record resource policy
+  implemented; consent and code exchange persist the exact scopes. Validated
+  token scopes are carried to MCP; the record-tool gate is owned by slice 3.
+- `AssistantGrantService` also required scope aggregation: the Settings backend
+  now returns actual granted scopes and dual grants renew/withdraw correctly.
+- `./scripts/run.sh pnpm backend:test_only`: PASS, 2,971 tests, no failures or
+  errors, two skipped. Inspected discovery, native repeated-field consent,
+  dual-scope token exchange/MCP read, management/renewal/withdrawal assertions
+  in `AssistantDiscoveryTest`, `AssistantConsentTest`, `AssistantMcpAccessTest`,
+  and `AssistantManagementTest`; XML in `backend/build/test-results/test`.
+- `./scripts/run.sh pnpm frontend:test tests/pages/AssistantConsentPage.spec.ts`:
+  PASS, four browser tests. Actual native form data proves Allow submits both
+  scope fields and Deny submits none; conditional recording copy is visible.
+- `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` and
+  `./scripts/run.sh pnpm -C frontend exec tsc --noEmit`: PASS after final edits.
+- Initial backend run: five failures. Three arose from joined consent scope
+  fields, one stale bootstrap expectation, one incorrect record-only refusal
+  expectation. Fixed these concrete causes before the passing full run.
+- Consumer trace: `/tmp/seed090-slice1-consumer-trace-final.md`, generated by
+  `node .agents/skills/dough-execute-plan/scripts/consumer-trace.mjs --checkout /Users/terryyin/git/doughnut/.worktrees/conduct-a-commissioned-learning-session-in-chatg --base 9acdb9fceb886a6b766f76d7a8aac378c4e77e20 --term learning_session:record --term AssistantAccessTokenResolver --term connectedAssistants`.
+  All reached consumers dispositioned. Settings name/withdraw rendering and
+  route contract unchanged; generated HTTP signatures unchanged. Existing
+  read-only browser journey remains covered by native-form and MVC observations.
+- Independent `/root/refactor_oauth_grant`: `none — already clean`,
+  `## REFACTOR COMPLETE`; no edits/tests, accepted proof remains applicable.
+- Host decision: local 48 GiB machine, moderate load, no other owned heavy
+  command; one required full backend suite at a time. Reconsider on pressure
+  or changed workload. Cohesive OAuth lifecycle and mandatory suite justified
+  exceeding the five-minute target; about eight minutes active implementation.

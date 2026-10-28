@@ -20,7 +20,10 @@ skills.
 Connect any MCP client that speaks Streamable HTTP with a personal bearer token.
 Registered confidential hosted assistants can instead use
 [GitHub-backed OAuth account linking](../../../docs/assistant-oauth.md), including
-consent, automatic renewal and Settings withdrawal. Personal-token connections
+consent, automatic renewal and Settings withdrawal. Hosted assistants may request
+`notes:read` with the narrow `learning_session:record` permission to save Learning
+Session Reports; read-only grants do not permit report recording. Existing
+read-only connections need authorization with both scopes to gain that permission. Personal-token connections
 need no OAuth setup.
 
 1. Open Donut in the browser and sign in.

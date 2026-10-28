@@ -1,7 +1,11 @@
 package com.odde.donut.oauth;
 
 import com.odde.donut.entities.repositories.UserRepository;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -75,23 +79,29 @@ public class AssistantGrantService {
   }
 
   public List<ConnectedAssistant> connectedAssistants(String principal) {
-    return jdbc
-        .queryForList(
-            "SELECT registered_client_id FROM oauth2_authorization_consent WHERE principal_name = ?"
-                + " UNION SELECT registered_client_id FROM oauth2_authorization"
-                + " WHERE principal_name = ? AND authorized_scopes = ?",
-            String.class,
-            principal,
-            principal,
-            AssistantAuthorizationConfiguration.READ_SCOPE)
-        .stream()
-        .map(clients::findById)
+    Map<String, Set<String>> scopesByClient = new HashMap<>();
+    jdbc.query(
+        "SELECT registered_client_id, authorities AS scopes FROM oauth2_authorization_consent"
+            + " WHERE principal_name = ?"
+            + " UNION SELECT registered_client_id, authorized_scopes AS scopes"
+            + " FROM oauth2_authorization WHERE principal_name = ? AND authorized_scopes <> ''",
+        row -> {
+          Set<String> scopes =
+              scopesByClient.computeIfAbsent(
+                  row.getString("registered_client_id"), ignored -> new HashSet<>());
+          Arrays.stream(row.getString("scopes").split(","))
+              .map(scope -> scope.startsWith("SCOPE_") ? scope.substring(6) : scope)
+              .forEach(scopes::add);
+        },
+        principal,
+        principal);
+    return scopesByClient.entrySet().stream()
         .map(
-            client ->
-                new ConnectedAssistant(
-                    client.getClientId(),
-                    client.getClientName(),
-                    Set.of(AssistantAuthorizationConfiguration.READ_SCOPE)))
+            entry -> {
+              var client = clients.findById(entry.getKey());
+              return new ConnectedAssistant(
+                  client.getClientId(), client.getClientName(), entry.getValue());
+            })
         .toList();
   }
 

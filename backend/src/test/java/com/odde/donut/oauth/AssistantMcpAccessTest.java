@@ -51,6 +51,32 @@ class AssistantMcpAccessTest extends AssistantAuthorizationTestSupport {
     assertThat(read(firstToken, firstNote.getId()).get("noteId").asInt(), is(firstNote.getId()));
   }
 
+  @Test
+  void reportCapableAssistantCanReadWithItsConsentedScopes() throws Exception {
+    var note =
+        makeMe
+            .aNote("Session instructions")
+            .notebookOwnedBy(users.findByExternalIdentifier("old_learner"))
+            .please();
+    var reply =
+        exchange(
+                approvedCode("notes:read learning_session:record"),
+                Map.of(),
+                "test-assistant-secret")
+            .andExpect(status().isOk())
+            .andReturn();
+    var credentials = objectMapper.readTree(reply.getResponse().getContentAsString());
+    String token = credentials.get("access_token").asString();
+    assertThat(
+        authorizations
+            .findByToken(token, OAuth2TokenType.ACCESS_TOKEN)
+            .getAccessToken()
+            .getToken()
+            .getScopes(),
+        is(Set.of("notes:read", "learning_session:record")));
+    assertThat(read(token, note.getId()).get("title").asString(), is("Session instructions"));
+  }
+
   @ParameterizedTest
   @ValueSource(strings = {"bearer", "bEaReR"})
   void bearerSchemeIsCaseInsensitiveForAssistantMcpReads(String scheme) throws Exception {

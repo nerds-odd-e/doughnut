@@ -1,6 +1,7 @@
 package com.odde.donut.oauth;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -38,6 +39,24 @@ class AssistantManagementTest extends AssistantAuthorizationTestSupport {
         .perform(get(AssistantOAuthEndpoints.ASSISTANTS).cookie(session))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.assistants").isEmpty());
+  }
+
+  @Test
+  void reportGrantIsVisibleAndRenewableUntilWithdrawn() throws Exception {
+    JsonNode original = credentials(approvedCode("notes:read learning_session:record"));
+    mockMvc
+        .perform(get(AssistantOAuthEndpoints.ASSISTANTS).cookie(session))
+        .andExpect(status().isOk())
+        .andExpect(
+            jsonPath("$.assistants[0].scopes")
+                .value(containsInAnyOrder("notes:read", "learning_session:record")));
+    var renewed =
+        refresh(original.get("refresh_token").asString()).andExpect(status().isOk()).andReturn();
+    JsonNode current = objectMapper.readTree(renewed.getResponse().getContentAsString());
+    read(current.get("access_token").asString()).andExpect(status().isOk());
+    withdraw(management()).andExpect(status().isOk());
+    read(current.get("access_token").asString()).andExpect(status().isUnauthorized());
+    refresh(current.get("refresh_token").asString()).andExpect(status().isBadRequest());
   }
 
   @Test

@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 @EnableConfigurationProperties(AssistantClientProperties.class)
 public class AssistantAuthorizationConfiguration {
   public static final String READ_SCOPE = "notes:read";
+  public static final String RECORD_SCOPE = "learning_session:record";
 
   @Bean
   RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {

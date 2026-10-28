@@ -104,7 +104,7 @@ class TestabilityDbResetTest extends SpringTestBase {
             Set.of(
                 AuthorizationGrantType.AUTHORIZATION_CODE, AuthorizationGrantType.REFRESH_TOKEN)));
     assertThat(restored.getRedirectUris(), equalTo(Set.of("https://assistant.example/callback")));
-    assertThat(restored.getScopes(), equalTo(Set.of("notes:read")));
+    assertThat(restored.getScopes(), equalTo(Set.of("notes:read", "learning_session:record")));
     assertThat(restored.getClientSettings().isRequireProofKey(), equalTo(true));
     assertThat(restored.getClientSettings().isRequireAuthorizationConsent(), equalTo(true));
     assertThat(

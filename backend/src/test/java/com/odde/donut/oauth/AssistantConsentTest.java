@@ -1,6 +1,7 @@
 package com.odde.donut.oauth;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -16,6 +17,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -59,15 +61,17 @@ class AssistantConsentTest extends AssistantAuthorizationTestSupport {
         .andExpect(header().string(HttpHeaders.LOCATION, containsString("/login")));
   }
 
-  @Test
-  void contextComesFromThePendingGrantAndAllowPersistsTheSamePermission() throws Exception {
-    String state = begin(Map.of());
+  @ParameterizedTest
+  @ValueSource(strings = {"notes:read", "notes:read learning_session:record"})
+  void contextComesFromThePendingGrantAndAllowPersistsTheSamePermission(String scopes)
+      throws Exception {
+    String state = begin(Map.of("scope", scopes));
     var result = context(state, "test-assistant");
     result
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.accountName").value("old_learner"))
         .andExpect(jsonPath("$.clientName").value("Test assistant"))
-        .andExpect(jsonPath("$.scopes[0]").value("notes:read"))
+        .andExpect(jsonPath("$.scopes").value(containsInAnyOrder(scopes.split(" "))))
         .andExpect(jsonPath("$.resource").value(endpoints.resource()))
         .andExpect(jsonPath("$.redirectUri").value("https://assistant.example/callback"))
         .andExpect(jsonPath("$.formAction").value(AssistantOAuthEndpoints.AUTHORIZE));
@@ -85,7 +89,7 @@ class AssistantConsentTest extends AssistantAuthorizationTestSupport {
         consents
             .findById(clients.findByClientId("test-assistant").getId(), "old_learner")
             .getScopes(),
-        is(Set.of("notes:read")));
+        is(Set.of(scopes.split(" "))));
   }
 
   @Test
@@ -129,6 +133,8 @@ class AssistantConsentTest extends AssistantAuthorizationTestSupport {
   @CsvSource({
     "resource,https://foreign.example/api/mcp,invalid_target",
     "scope,notes:write,invalid_scope",
+    "scope,learning_session:record,invalid_target",
+    "scope,notes:read notes:write,invalid_scope",
     "code_challenge_method,plain,invalid_request",
     "code_challenge,'',invalid_request"
   })

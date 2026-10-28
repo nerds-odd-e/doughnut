@@ -146,7 +146,9 @@ public class AssistantAuthorizationServerConfiguration {
                                                   "scopes_supported",
                                                   List.of(
                                                       AssistantAuthorizationConfiguration
-                                                          .READ_SCOPE));
+                                                          .READ_SCOPE,
+                                                      AssistantAuthorizationConfiguration
+                                                          .RECORD_SCOPE));
                                               claims.put(
                                                   "grant_types_supported",
                                                   List.of("authorization_code", "refresh_token"));
@@ -202,6 +204,7 @@ public class AssistantAuthorizationServerConfiguration {
                 .resource(endpoints.resource())
                 .authorizationServer(endpoints.issuer())
                 .scope(AssistantAuthorizationConfiguration.READ_SCOPE)
+                .scope(AssistantAuthorizationConfiguration.RECORD_SCOPE)
                 .tlsClientCertificateBoundAccessTokens(false));
     FilterRegistrationBean<OAuth2ProtectedResourceMetadataFilter> registration =
         new FilterRegistrationBean<>(filter);

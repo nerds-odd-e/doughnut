@@ -11,6 +11,7 @@ import io.modelcontextprotocol.server.transport.HttpServletStatelessServerTransp
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpStatelessServerTransport;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 public class McpServerConfiguration {
   public static final String MCP_ENDPOINT = "/api/mcp";
   public static final String TRANSPORT_USER_KEY = "donut.user";
+  public static final String TRANSPORT_ASSISTANT_SCOPES_KEY = "donut.assistantScopes";
   static final McpSchema.ToolAnnotations READ_ONLY_TOOL_ANNOTATIONS =
       McpSchema.ToolAnnotations.builder()
           .readOnlyHint(true)
@@ -79,7 +81,11 @@ public class McpServerConfiguration {
     }
     User user =
         (User) request.getAttribute(ApiBearerAuthenticationFilter.AUTHENTICATED_USER_ATTRIBUTE);
-    return McpTransportContext.create(Map.of(TRANSPORT_USER_KEY, user));
+    Map<String, Object> context = new HashMap<>();
+    context.put(TRANSPORT_USER_KEY, user);
+    Object scopes = request.getAttribute(ApiBearerAuthenticationFilter.ASSISTANT_SCOPES_ATTRIBUTE);
+    if (scopes != null) context.put(TRANSPORT_ASSISTANT_SCOPES_KEY, scopes);
+    return McpTransportContext.create(context);
   }
 
   private McpStatelessServerHandler reportingHandler(McpStatelessServerHandler delegate) {
