@@ -1,5 +1,6 @@
 package com.odde.donut.mcp;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -97,7 +98,15 @@ class McpEndpointTest extends McpEndpointTestBase {
           .andExpect(jsonPath("$.result.tools[1].inputSchema.properties.noteId").exists())
           .andExpect(jsonPath("$.result.tools[2].name", equalTo(GetNoteGraphTool.NAME)))
           .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.noteId").exists())
-          .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.tokenLimit").exists());
+          .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.tokenLimit").exists())
+          .andExpect(
+              jsonPath("$.result.tools[*].annotations.readOnlyHint", contains(true, true, true)))
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[*].annotations.destructiveHint", contains(false, false, false)))
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[*].annotations.openWorldHint", contains(false, false, false)));
     }
   }
 }

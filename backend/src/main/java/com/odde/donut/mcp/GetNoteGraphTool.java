@@ -61,6 +61,7 @@ public class GetNoteGraphTool {
             McpSchema.Tool.builder()
                 .name(NAME)
                 .description(DESCRIPTION)
+                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
                 .inputSchema(
                     Map.of(
                         "type",

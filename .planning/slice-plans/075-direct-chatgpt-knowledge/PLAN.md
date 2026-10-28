@@ -17,11 +17,14 @@ script, packaged skill or new test harness. Existing repository commands and
 stable-boundary tests are available. Public distribution, custom ChatGPT UI,
 body search, editing and signup during linking remain deferred.
 
-This is preparation, not execution or release authority. The story-2 supplier
-agreement is satisfied by its compatible-SDK result, not by a ChatGPT result.
-No slice is done and no real grant, deployment or installation was performed.
+Preparation granted no release authority. The story-2 supplier agreement is
+satisfied by its compatible-SDK result, not by a ChatGPT result. Execution
+progress and acceptance evidence are linked below; live results remain unproved.
 
 ## Current decisions and existing owners
+
+Execution identity, readiness, observation handles and proof decisions are in
+[execution evidence](EXECUTION-EVIDENCE.md#execution-identity-and-readiness).
 
 - PFE: reuse `NoteSearchService` (also used by `SearchController`),
   `AttributedNoteContentService` (shared with `AttributedNoteContentController`),
@@ -53,79 +56,14 @@ No slice is done and no real grant, deployment or installation was performed.
   successful SDK call or displayed setup form alone is insufficient proof of
   the actual ChatGPT request/result journey.
 
-## Premises and observations
+## Preparation evidence
 
-Preparation checkout:
-`/Users/terryyin/git/doughnut/.worktrees/use-donut-knowledge-directly-in-chatgpt`,
-at `3d4da7a333d562d2b8ed3c60db2b32c8d2d2d918`. Fetched trunk later advanced to
-`58112ba5f50b79a8377518dbb6f9900ebe2accd2` with story-4 preparation changes;
-that does not change this observation's code revision.
+See the dated [premises and observations](EXECUTION-EVIDENCE.md#premises-and-observations).
 
-| Premise / consuming operation | Observation and result | Remaining proof owner |
-| --- | --- | --- |
-| Existing tools need accurate read-only descriptors for client discovery | A scratch assertion in `McpEndpointTest.ProtocolNegotiation.initializesAndListsRegisteredToolsThroughServlet` expected `$.result.tools[0].annotations.readOnlyHint == true` in the actual authenticated `tools/list` HTTP response. `CURSOR_DEV=true nix develop -c pnpm backend:test_only` ran 2,961 tests with precisely that failure (missing `annotations`) and two skips. The test file was restored byte for byte before record writes. | Slice 1 adds the real contract and a permanent discriminating boundary test; no passing metadata implementation is claimed. |
-| Production discovery is ready for ChatGPT | On 2026-10-28 local time, `curl --silent --show-error --max-time 20 --dump-header /tmp/donut-chatgpt-resource-headers.txt --output /tmp/donut-chatgpt-resource.json https://doughnut.odd-e.com/.well-known/oauth-protected-resource/api/mcp` returned HTTP 200 HTML. The same command with `/tmp/donut-chatgpt-issuer-headers.txt`, `/tmp/donut-chatgpt-issuer.json` and `https://doughnut.odd-e.com/.well-known/oauth-authorization-server` also returned HTML. The same request with `/tmp/donut-chatgpt-mcp-headers.txt`, `/tmp/donut-chatgpt-mcp-response.txt` and `https://doughnut.odd-e.com/api/mcp` returned HTTP 401 without `WWW-Authenticate`. | False at observation time. Slice 2 waits for the independently authorized release, then reaches real discovery and linking. Do not infer the operational cause or deploy from this plan. |
-| The actual ChatGPT account offers the intended client configuration | Chrome → `https://chatgpt.com/plugins` → Add → Add custom MCP server → public Donut URL → Advanced OAuth settings. The form exposed User-Defined OAuth Client, a connection-specific callback, credentials, scopes and `client_secret_basic`; discovery visibly failed. Cancelled without creating anything or entering credentials. | Slice 2 proves creation, installation, GitHub/Donut consent and an authenticated read. The abandoned callback is not reusable configuration. |
-| ChatGPT supports this grant's complete lifecycle and account isolation | Story 2's inherited SDK evidence exercises the backend, but does not observe ChatGPT. Neither public GETs nor the configuration form reaches renewal, withdrawal or the second account. | Early probes 3–5 reach these credentialed operations before the answer-quality work. |
-| ChatGPT uses full current source evidence, graph context and direct cloud access | Existing descriptors and source code expose these operations. No live ChatGPT answer or computer-off observation was made. | Slices 6–8 own the real outcomes; the source reading is not accepted journey proof. |
+## Live observation gate
 
-Official guidance fetched on 2026-10-28:
-[custom MCP setup](https://developers.openai.com/api/docs/guides/custom-mcp-server),
-[OAuth](https://developers.openai.com/plugins/build/auth), and
-[MCP descriptors](https://developers.openai.com/plugins/build/mcp-server).
-Accurate read-only annotations describe the existing behavior; they do not
-replace server authorization. The documented predefined-client path and actual
-form justify trying it, not claiming interoperability.
-
-The local observation ran one backend suite on this Mac (16 logical CPUs,
-48 GiB memory; initial load averages 10.38/8.74/8.60). It used only assigned
-disposable database `doughnut_wt_1326852caae5497c9310b5ace6e44c47_test`.
-Reported migration and test phases took 18 s and 79 s respectively. No other
-suite failure was reported. This is an intentional failing premise observation,
-not a green baseline after restoration. Execution reassesses host capacity
-before its required suite; no new profiling script is needed.
-
-## Production proof and human participation
-
-Use `https://doughnut.odd-e.com/api/mcp`. Before slice 2's live action, Terry or
-the deployment operator supplies the separately authorized schema-first release
-receipt, deployed immutable revision and registered ChatGPT client configuration,
-following `docs/assistant-oauth.md`. Current production discovery is known to be
-unavailable; repeating creation against it is not useful. The release remains
-outside this preparation's authority. Execution stops at that gate until it is
-satisfied, without substituting a local tunnel, mock host or another deployment.
-
-At the first request for owner participation, present the complete bounded
-observation sequence below, not successive surprise requests. Terry supplies the
-ChatGPT account, two existing Donut accounts with deliberately chosen, non-sensitive
-acceptance notes, and a second device. Keep credentials out of source, transcripts
-and screenshots. The owner performs credential entry, consent and any required
-security confirmation. Normal UI edits to the owner's acceptance notes are the
-only production fixture setup; no automated reset or testability endpoint is used.
-
-Record in this plan for each actual round: deployed revision, date, setup/account
-labels (no secrets), literal UI steps and prompts, selected tools and arguments,
-returned evidence, final visible result and limits. Retain fresh source markers
-and revisions sufficient to distinguish new reads from chat history. When the
-agent can inspect these results, it does so; Terry supplies only observations the
-tools cannot reach, particularly the computer-off round. Reuse passing rounds
-unless the changed candidate alters their boundary. Authentication compatibility
-failures stop downstream work for diagnosis and in-place replanning; a script,
-new provider or changed grant model is not an automatic fallback.
-
-## Outside-in proof ownership
-
-| Source promise | Owning slice and observable proof |
-| --- | --- |
-| Accurate read-only tool discovery | 1: serialized `tools/list` annotations at the HTTP boundary; 2: actual installed ChatGPT tool list. |
-| Personal creation/installation, GitHub identity, informed allow/deny and initial read | 2: cancel then retry/allow through real ChatGPT, with a private acceptance-note read. |
-| Ordinary renewal without repeat browser consent | 3: actual expiry followed by a new successful MCP read and renewal evidence. |
-| Withdrawal invalidates access/renewal; actionable reconnect and fresh consent | 4: new calls fail after withdrawal, reconnect visibly asks again and restores a read. |
-| Current permissions and independent user grants, including direct IDs and graph | 5: B's authorized read succeeds while requests for A's private acceptance note are refused by Donut; A retains access. The retained backend current-permission tests, run in 1, prove permission reevaluation on each request. |
-| Title/alias candidates, same-title disambiguation, empty-result feedback, attributed full reads and evidence/instruction distinction | 6: real prompts and tool traces, with an answer attributable to full-read evidence and a bounded retry after no match. |
-| Bounded graph context used as relevant evidence, full reads for cited related notes | 7: graph call with an explicit budget, related full-read calls and an inspectable answer. |
-| Current accepted content/revision while original computer is off | 8: owner edits an acceptance note, powers off the original computer, then retrieves the new marker/revision from another device in a fresh chat. |
-| Reproducible onboarding and recovery instructions without another script | 2–8: build the guide incrementally from the actual steps; slice 5's second account follows it, and later rounds use its renewal/reconnect guidance. |
+Follow [production proof and human participation](EXECUTION-EVIDENCE.md#production-proof-and-human-participation)
+before slice 2. The release and real-client activation need separate operator authority.
 
 ## Ordered slices
 
@@ -138,7 +76,7 @@ before continuing. No slice can be completed by reporting its unproved promise.
 
 ### 1. Advertise the existing read operations accurately
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `McpEndpointTest` at authenticated `tools/list` to observe the three
 tools' accurate annotations, first failing without the change and then passing.
 Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (all backend unit
@@ -260,44 +198,45 @@ hosted service. Finalize the guide from the demonstrated journey, including its
 prerequisites and actual source attribution. Stop short of story completion if
 the off-device observation is unavailable. Explicit owner/device-wait exception.
 
-## Verification and delivery
+## Story obligations
 
-New metadata proof belongs at `McpEndpointTest`'s real serialized servlet
-boundary. Existing callers are the HTTPS SDK E2E client and any MCP consumer;
-the REST/CLI retrieval boundaries keep their payload semantics. The inspected
-E2E client consumes tool names and content, not read-only annotations. Existing
-MCP and OAuth tests cover retained server behavior; they do not replace the
-ChatGPT observations. Source inspection located these consumers; slice 1 runs
-the full backend suite and retains its actual results before accepting the change.
-If implementation alters payloads, auth handling or other contracts, extend the
-consumer trace and proof before proceeding rather than inheriting this exclusion.
+### G1. Production release and real connection are not yet observed
+Reported: slice 1 — "Acceptance confirms no separately authorized schema-first release receipt, deployed revision or registered ChatGPT configuration has been supplied; real creation/installation, consent and authenticated read remain unobserved."
+Story clause: "The plugin creator/operator configures the connection"
+Disposition: receiving slice 2
 
-When a live probe reveals a defect, first isolate it with the existing high-level
-MCP/OAuth tests and refine the affected remaining slice before implementation.
-Use E2E only when the changed browser/HTTPS journey requires it, through the
-existing `e2e_test/features/mcp/assistant_account_linking.feature` and
-`mcp_services.feature` runners. No new scripts or duplicate hosted client.
-Generated REST clients need regeneration only if a REST signature/DTO changes.
+### G2. Real ChatGPT renewal is not yet observed
+Reported: slice 1 — "Only the inherited compatible-SDK result exists; ChatGPT expiry, renewal and a fresh read require the connection from slice 2."
+Story clause: "After actual access-token expiry, another request succeeds through ordinary renewal without repeating browser consent."
+Disposition: receiving slice 3
 
-Execution follows the repository's required delivery sequence: Jidoka, a fresh
-dough-post-change-refactor agent, API generation when required, coordinator
-`./scripts/run.sh pnpm format:changed` once, plan update, agent commit with the
-check-only hook, and publication with the selected execution mode and CI owner.
-This preparation performs no execution claim or implementation. Keep probe
-failures and unproved story promises in this plan under the execution workflow's
-story-obligation rules; publication never makes them complete.
+### G3. Real ChatGPT withdrawal and reconnect are not yet observed
+Reported: slice 1 — "Withdrawal, failed new reads/renewal and fresh-consent recovery have not been observed in ChatGPT."
+Story clause: "ChatGPT offers an actionable route to connect again; a new grant requires informed consent."
+Disposition: receiving slice 4
 
-## Plan review
+### G4. Real ChatGPT account isolation is not yet observed
+Reported: slice 1 — "No independent second-account connection has exercised private-note search, direct-ID read and graph access alongside the first account."
+Story clause: "Its new requests follow its own permissions, including direct note-ID reads and graph access."
+Disposition: receiving slice 5
 
-Slice-plan refinement was not needed: the eight leaves each own one externally
-observable outcome and proof loop. The early credentialed probes isolate setup,
-renewal, withdrawal and account scope before answer-quality work. The last leaf
-combines freshness and computer independence in one discriminating new-read round.
-The cumulative design extends one existing MCP/OAuth model and one guide, without
-an additional runtime, script or knowledge representation.
+### G5. ChatGPT source selection and attribution are not yet observed
+Reported: slice 1 — "Same-title disambiguation, full-read citations including null revision, bounded search retry and instruction-like source handling have no live ChatGPT result."
+Story clause: "Use full reads for cited evidence; graph excerpts can be truncated."
+Disposition: receiving slice 6
 
-No unbounded slice-specific concern remains. Actual ChatGPT compatibility and
-production availability are explicitly unproved and bounded by the early probes;
-their owner-held release and credential requirements remain in force. Readiness
-means this bounded plan can be selected for execution, not that those probes
-passed or that deployment is authorized. No human refinement decision remains.
+### G6. ChatGPT graph evidence is not yet observed
+Reported: slice 1 — "A relevant bounded graph call followed by full reads of cited related notes and evidence/inference distinction has not been observed."
+Story clause: "ChatGPT requests graph context with a token budget and reads any related note it relies on for a citation."
+Disposition: receiving slice 7
+
+### G7. Computer-off freshness is not yet observed
+Reported: slice 1 — "No owner-observed second-device fresh search/read has returned an accepted new marker/revision with the original computer off."
+Story clause: "From another device, with the original computer switched off, a fresh conversation still completes a real search and read."
+Disposition: receiving slice 8
+
+
+## Delivery evidence
+
+[Execution evidence](EXECUTION-EVIDENCE.md) retains the source-only review, original
+proof ownership, verification contract, plan review and accepted observations.

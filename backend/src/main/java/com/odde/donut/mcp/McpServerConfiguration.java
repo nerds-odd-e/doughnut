@@ -21,6 +21,12 @@ import reactor.core.publisher.Mono;
 public class McpServerConfiguration {
   public static final String MCP_ENDPOINT = "/api/mcp";
   public static final String TRANSPORT_USER_KEY = "donut.user";
+  static final McpSchema.ToolAnnotations READ_ONLY_TOOL_ANNOTATIONS =
+      McpSchema.ToolAnnotations.builder()
+          .readOnlyHint(true)
+          .destructiveHint(false)
+          .openWorldHint(false)
+          .build();
 
   private final McpFailureReporter mcpFailureReporter;
 
