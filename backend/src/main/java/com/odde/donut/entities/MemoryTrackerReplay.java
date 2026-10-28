@@ -54,7 +54,7 @@ final class MemoryTrackerReplay {
       tracker.setLastRecalledAt(null);
       tracker.setNextRecallAt(tracker.calculateNextRecallAt());
     } else {
-      MemoryTrackerRecallDue.scheduleNextRecallFromStability(tracker, lastRecalledAt);
+      tracker.scheduleNextRecallAt(lastRecalledAt);
     }
     for (RecallLog log : events.stream().filter(RecallLog::isValidEvent).toList()) {
       log.recordStateBefore(tracker);

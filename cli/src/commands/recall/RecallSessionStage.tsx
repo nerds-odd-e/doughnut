@@ -1,47 +1,21 @@
-import { useCallback, useRef, useState, type ReactNode } from 'react'
-import { Box, Text } from 'ink'
+import { useCallback, useRef, useState } from 'react'
 import type { MemoryTrackerLite } from 'donut-api'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
-import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
 import { AsyncAssistantFetchStage } from '../gmail/AsyncAssistantFetchStage.js'
 import {
   fetchDueMemoryTrackerIds,
-  fetchShuffledDueMemoryTrackerIds,
   loadRecallCardForMemoryTrackerId,
   type RecallCard,
 } from './nextRecallCardLoad.js'
-import { JustReviewRecallStage } from './JustReviewRecallStage.js'
-import { RecallMcqStage } from './RecallMcqStage.js'
-import { SpellingRecallStage } from './SpellingRecallStage.js'
+import { RecallSessionActiveCard } from './RecallSessionActiveCard.js'
+import { RecallSessionChrome } from './RecallSessionChrome.js'
+import { RecallSessionLoadMoreView } from './RecallSessionLoadMoreView.js'
 import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { RECALL_LOADING_NEXT_QUESTION_LABEL } from './recallBusyInputCopy.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
 import { recallAnsweredScrollbackItem } from './recallAnsweredScrollback.js'
 import type { RecallPromptAnswerOutcome } from './recallPromptAnswerOutcome.js'
 import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
-
-const RECALL_NOTEBOOK_LINE_EMOJI = '📓'
-
-function RecallSessionChrome({
-  notebookName,
-  children,
-}: {
-  readonly notebookName?: string
-  readonly children: ReactNode
-}) {
-  const trimmed = notebookName?.trim()
-  const showNotebook = trimmed !== undefined && trimmed.length > 0
-  return (
-    <Box flexDirection="column">
-      {showNotebook ? (
-        <Text>
-          {RECALL_NOTEBOOK_LINE_EMOJI} {trimmed}
-        </Text>
-      ) : null}
-      {children}
-    </Box>
-  )
-}
 
 export function RecallSessionStage({
   onSettled,
@@ -56,11 +30,8 @@ export function RecallSessionStage({
   const [initialResolved, setInitialResolved] = useState(false)
   const submittingRef = useRef(false)
   const sessionAnsweredCardsRef = useRef(0)
-  const startedWithEmptyTodayRef = useRef(false)
   const activeOperationAbortRef = useRef<AbortController | null>(null)
-  const currentRecallCardRef = useRef<RecallCard | null>(null)
   const trackerQueueRef = useRef<MemoryTrackerLite[]>([])
-  currentRecallCardRef.current = card
 
   const settleSessionSummary = useCallback(() => {
     onSettled(recallSessionSummaryLine(sessionAnsweredCardsRef.current))
@@ -73,7 +44,6 @@ export function RecallSessionStage({
     }
     trackerQueueRef.current = lites
     if (lites.length > 0) {
-      startedWithEmptyTodayRef.current = false
       const head = lites[0]!
       const next = await loadRecallCardForMemoryTrackerId(
         head.memoryTrackerId,
@@ -86,7 +56,6 @@ export function RecallSessionStage({
       setCard(next)
       setUiMode('card')
     } else {
-      startedWithEmptyTodayRef.current = true
       setCard(null)
       setLoadMoreFetching(false)
       setUiMode('loadMore')
@@ -99,7 +68,7 @@ export function RecallSessionStage({
   }, [])
 
   const runLoadMoreRecall = useCallback(async (signal: AbortSignal) => {
-    const lites = await fetchShuffledDueMemoryTrackerIds(3, signal)
+    const lites = await fetchDueMemoryTrackerIds(3, signal)
     if (signal.aborted) {
       throw new DOMException('Aborted', 'AbortError')
     }
@@ -234,30 +203,17 @@ export function RecallSessionStage({
   }
 
   if (uiMode === 'loadMore') {
-    if (loadMoreFetching) {
-      return (
-        <RecallSessionChrome>
-          <AsyncAssistantFetchStage
-            spinnerLabel="Loading more…"
-            runAssistantMessage={runLoadMoreRecall}
-            onFetchSuccess={onLoadMoreFetchSuccess}
-            onSettled={onSettled}
-            onAbortWithError={handleLoadMoreAbort}
-          />
-        </RecallSessionChrome>
-      )
-    }
     return (
-      <RecallSessionChrome>
-        <YesNoStagePrompt
-          key="load-more"
-          prompt="Load more from next 3 days?"
-          onAnswer={submitLoadMore}
-          defaultAnswer={true}
-          onCancel={escapeLoadMorePrompt}
-          inputBlockedRef={submittingRef}
-        />
-      </RecallSessionChrome>
+      <RecallSessionLoadMoreView
+        loadMoreFetching={loadMoreFetching}
+        runLoadMoreRecall={runLoadMoreRecall}
+        onLoadMoreFetchSuccess={onLoadMoreFetchSuccess}
+        onSettled={onSettled}
+        onAbortWithError={handleLoadMoreAbort}
+        submitLoadMore={submitLoadMore}
+        escapeLoadMorePrompt={escapeLoadMorePrompt}
+        submittingRef={submittingRef}
+      />
     )
   }
 
@@ -280,48 +236,15 @@ export function RecallSessionStage({
     return null
   }
 
-  if (card.variant === 'mcq') {
-    return (
-      <RecallSessionChrome notebookName={card.payload.notebookName}>
-        <RecallMcqStage
-          key={card.payload.recallPromptId}
-          payload={card.payload}
-          choicesGuidanceRowBudget={10}
-          inputBlockedRef={submittingRef}
-          onRecallQuestionAnswered={onRecallQuestionAnswered}
-          onReplaceCurrentRecallCard={setCard}
-          onRecallFatalError={onRecallFatalError}
-          onConfirmLeaveRecall={onConfirmLeaveRecall}
-        />
-      </RecallSessionChrome>
-    )
-  }
-
-  if (card.variant === 'spelling-session') {
-    return (
-      <RecallSessionChrome notebookName={card.payload.notebookName}>
-        <SpellingRecallStage
-          key={card.payload.memoryTrackerId}
-          payload={card.payload}
-          inputBlockedRef={submittingRef}
-          onRecallQuestionAnswered={onRecallQuestionAnswered}
-          onRecallFatalError={onRecallFatalError}
-          onConfirmLeaveRecall={onConfirmLeaveRecall}
-        />
-      </RecallSessionChrome>
-    )
-  }
-
   return (
-    <RecallSessionChrome>
-      <JustReviewRecallStage
-        payload={card.payload}
-        inputBlockedRef={submittingRef}
-        activeOperationAbortRef={activeOperationAbortRef}
-        onRecallQuestionAnswered={onRecallQuestionAnswered}
-        onRecallFatalError={onRecallFatalError}
-        onConfirmLeaveRecall={onConfirmLeaveRecall}
-      />
-    </RecallSessionChrome>
+    <RecallSessionActiveCard
+      card={card}
+      submittingRef={submittingRef}
+      activeOperationAbortRef={activeOperationAbortRef}
+      onRecallQuestionAnswered={onRecallQuestionAnswered}
+      onReplaceCurrentRecallCard={setCard}
+      onRecallFatalError={onRecallFatalError}
+      onConfirmLeaveRecall={onConfirmLeaveRecall}
+    />
   )
 }

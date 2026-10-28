@@ -48,10 +48,8 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
 
     MemoryTracker hola = fixture.holaTracker();
     assertThat(hola.getLastRecalledAt(), equalTo(secondSessionAt));
-    assertThat(
-        hola.getNextRecallAt(),
-        equalTo(
-            TimestampOperations.addHoursToTimestamp(
-                secondSessionAt, Math.round(hola.getStability()))));
+    Timestamp dueAfterGrade = hola.getNextRecallAt();
+    hola.scheduleNextRecallAt(secondSessionAt);
+    assertThat(hola.getNextRecallAt(), equalTo(dueAfterGrade));
   }
 }

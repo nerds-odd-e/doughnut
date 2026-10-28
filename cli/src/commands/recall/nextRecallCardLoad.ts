@@ -23,19 +23,6 @@ export {
   type RecallMcqCardPayload,
 } from './recallMcqCardLoad.js'
 
-function shuffleMemoryTrackerLites(
-  lites: readonly MemoryTrackerLite[]
-): MemoryTrackerLite[] {
-  const a = [...lites]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const t = a[i]!
-    a[i] = a[j]!
-    a[j] = t
-  }
-  return a
-}
-
 export async function fetchDueMemoryTrackerIds(
   dueInDays: number,
   signal?: AbortSignal
@@ -47,15 +34,6 @@ export async function fetchDueMemoryTrackerIds(
     })
   )
   return due.toRepeat ?? []
-}
-
-export async function fetchShuffledDueMemoryTrackerIds(
-  dueInDays: number,
-  signal?: AbortSignal
-): Promise<MemoryTrackerLite[]> {
-  return shuffleMemoryTrackerLites(
-    await fetchDueMemoryTrackerIds(dueInDays, signal)
-  )
 }
 
 /** Just-review recall card (fallback when MCQ is not available). */

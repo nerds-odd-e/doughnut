@@ -1,5 +1,20 @@
 # Recall question loading
 
+## Shared due list order
+
+Eligible due work for web and CLI comes from the shared due list. Order is
+ascending 12-hour UTC bands of `next_recall_at` (hour floors). Within a band,
+SPELLING trackers stay ahead of other types; remaining peers are randomized
+when the list is built. Client-side shuffles are not the product rule for that
+order. Eligibility and commissioned separation stay with the due query.
+
+[ADR 0003](adrs/0003-spaced-repetition-scheduling-policy-accepted.md) owns
+Grade scheduling, including whole-hour interval fuzzing when writing the next
+due. Exact fuzz bands and durable hash inputs live with the scheduling
+implementation beside FSRS.
+
+## Question load states
+
 Web recall distinguishes a pending question, a failed load, and a loaded prompt
 for each memory tracker. A failed load offers **Retry** on that tracker without
 changing recall progress. Multiple-choice failures also offer **Self-review**,

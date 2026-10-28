@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Vary recall spacing and the order of similarly due questions](seeds/SEED-088-varied-recall-spacing-and-order.md#story-1) — SEED-088#story-1 ([plan](slice-plans/076-vary-recall-spacing-and-order/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1

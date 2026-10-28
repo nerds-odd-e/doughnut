@@ -14,8 +14,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 class MemoryTrackerCorrectRecallSchedulingTest extends MemoryTrackerRecallSchedulingTestBase {
   static final float FIRST_GOOD_DIFFICULTY = 2.118104f;
   static final float FIRST_GOOD_STABILITY_HOURS = 55.0f;
-  static final float MAXIMUM_INTERVAL_HOURS = 876000f;
-  static final float LEGACY_LADDER_MAX_STABILITY_HOURS = 1_800_600f;
 
   @ParameterizedTest
   @CsvSource({"EASY, 199, 1", "GOOD, 55, 2.118104", "HARD, 31, 5.1121707"})
@@ -28,9 +26,6 @@ class MemoryTrackerCorrectRecallSchedulingTest extends MemoryTrackerRecallSchedu
 
     assertThat(memoryTracker.getDifficulty(), equalTo(difficulty));
     assertThat(memoryTracker.getStability(), equalTo(stabilityHours));
-    assertThat(
-        memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, Math.round(stabilityHours))));
   }
 
   @ParameterizedTest
@@ -156,12 +151,7 @@ class MemoryTrackerCorrectRecallSchedulingTest extends MemoryTrackerRecallSchedu
     wholeHourRecall.applyGrade(wholeHourGradeTime, Grade.GOOD);
     recallWithSubHourRemainder.applyGrade(gradeTimeWithSubHourRemainder, Grade.GOOD);
 
-    long wholeHourInterval =
-        TimestampOperations.getDiffInHours(wholeHourRecall.getNextRecallAt(), wholeHourGradeTime);
-    long subHourRemainderInterval =
-        TimestampOperations.getDiffInHours(
-            recallWithSubHourRemainder.getNextRecallAt(), gradeTimeWithSubHourRemainder);
-    assertThat(subHourRemainderInterval, equalTo(wholeHourInterval));
+    assertThat(recallWithSubHourRemainder.getStability(), equalTo(wholeHourRecall.getStability()));
     assertThat(wholeHourRecall.getLastRecalledAt(), equalTo(wholeHourGradeTime));
     assertThat(
         recallWithSubHourRemainder.getLastRecalledAt(), equalTo(gradeTimeWithSubHourRemainder));
@@ -183,28 +173,12 @@ class MemoryTrackerCorrectRecallSchedulingTest extends MemoryTrackerRecallSchedu
   }
 
   @Test
-  void nextRecallAtIsLastRecalledAtPlusStabilityHours() {
-    MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
-    Timestamp gradeTime = onTimeGradeTime(memoryTracker);
-
-    memoryTracker.applyGrade(gradeTime, Grade.GOOD);
-
-    long interval = TimestampOperations.getDiffInHours(memoryTracker.getNextRecallAt(), gradeTime);
-    assertThat(interval, equalTo((long) Math.round(memoryTracker.getStability())));
-  }
-
-  @Test
   void overdueCorrectRecallLengthensStabilityMoreThanOnTime() {
     MemoryTracker onTime = aGradedTrackerAtThreeDayStability();
     MemoryTracker overdue = aGradedTrackerAtThreeDayStability();
     onTime.applyGrade(onTimeGradeTime(onTime), Grade.GOOD);
     overdue.applyGrade(overdueGradeTime(overdue), Grade.GOOD);
 
-    long onTimeInterval =
-        TimestampOperations.getDiffInHours(onTime.getNextRecallAt(), onTime.getLastRecalledAt());
-    long overdueInterval =
-        TimestampOperations.getDiffInHours(overdue.getNextRecallAt(), overdue.getLastRecalledAt());
-    assertThat(overdueInterval, greaterThan(onTimeInterval));
     assertThat(overdue.getStability(), greaterThan(onTime.getStability()));
   }
 
@@ -222,30 +196,11 @@ class MemoryTrackerCorrectRecallSchedulingTest extends MemoryTrackerRecallSchedu
             elapsedHundredTimesStability.getLastRecalledAt(), stabilityHours * 100),
         Grade.GOOD);
 
-    long tenTimesInterval =
-        TimestampOperations.getDiffInHours(
-            elapsedTenTimesStability.getNextRecallAt(),
-            elapsedTenTimesStability.getLastRecalledAt());
-    long hundredTimesInterval =
-        TimestampOperations.getDiffInHours(
-            elapsedHundredTimesStability.getNextRecallAt(),
-            elapsedHundredTimesStability.getLastRecalledAt());
-    assertThat(hundredTimesInterval, greaterThan(tenTimesInterval));
-    assertThat(hundredTimesInterval - tenTimesInterval, lessThan(tenTimesInterval));
-  }
-
-  @Test
-  void correctRecallFromOverCapStabilityLandsAtTheCap() {
-    MemoryTracker memoryTracker = aGradedTrackerAtStability(LEGACY_LADDER_MAX_STABILITY_HOURS);
-    Timestamp gradeTime = onTimeGradeTime(memoryTracker);
-
-    memoryTracker.applyGrade(gradeTime, Grade.GOOD);
-
-    assertThat(memoryTracker.getStability(), equalTo(MAXIMUM_INTERVAL_HOURS));
     assertThat(
-        memoryTracker.getNextRecallAt(),
-        equalTo(
-            TimestampOperations.addHoursToTimestamp(
-                gradeTime, Math.round(MAXIMUM_INTERVAL_HOURS))));
+        elapsedHundredTimesStability.getStability(),
+        greaterThan(elapsedTenTimesStability.getStability()));
+    assertThat(
+        elapsedHundredTimesStability.getStability() - elapsedTenTimesStability.getStability(),
+        lessThan(elapsedTenTimesStability.getStability()));
   }
 }

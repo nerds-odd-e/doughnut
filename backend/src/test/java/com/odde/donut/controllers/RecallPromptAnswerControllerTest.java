@@ -140,8 +140,8 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     assertThat(sixtySeconds.getStability(), equalTo(memoryTracker.getStability()));
     assertThat(zeroMs.getDifficulty(), equalTo(memoryTracker.getDifficulty()));
     assertThat(sixtySeconds.getDifficulty(), equalTo(memoryTracker.getDifficulty()));
-    assertThat(zeroMs.getNextRecallAt(), equalTo(memoryTracker.getNextRecallAt()));
-    assertThat(sixtySeconds.getNextRecallAt(), equalTo(memoryTracker.getNextRecallAt()));
+    assertThat(zeroMs.getLastRecalledAt(), equalTo(memoryTracker.getLastRecalledAt()));
+    assertThat(sixtySeconds.getLastRecalledAt(), equalTo(memoryTracker.getLastRecalledAt()));
   }
 
   @Test

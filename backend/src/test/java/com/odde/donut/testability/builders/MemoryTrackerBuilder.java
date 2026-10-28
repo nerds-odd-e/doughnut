@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 
 public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   private int recallLogsToCreate = 0;
+  private Integer afterNthStrictRecall;
+  private boolean rescheduleDueFromStability;
 
   public MemoryTrackerBuilder(MemoryTracker memoryTracker, MakeMe makeMe) {
     super(makeMe, memoryTracker);
@@ -30,9 +32,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   }
 
   public MemoryTrackerBuilder afterNthStrictRecall(Integer recallDone) {
-    for (int i = 0; i < recallDone; i++) {
-      entity.applyGrade(entity.getNextRecallAt(), Grade.GOOD);
-    }
+    this.afterNthStrictRecall = recallDone;
     return this;
   }
 
@@ -46,6 +46,14 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   @Override
   protected void afterCreate(boolean needPersist) {
+    if (rescheduleDueFromStability && entity.getLastRecalledAt() != null) {
+      entity.scheduleNextRecallAt(entity.getLastRecalledAt());
+    }
+    if (afterNthStrictRecall != null) {
+      for (int i = 0; i < afterNthStrictRecall; i++) {
+        entity.applyGrade(entity.getNextRecallAt(), Grade.GOOD);
+      }
+    }
     for (int i = 0; i < recallLogsToCreate; i++) {
       RecallLog log = makeMe.aRecallLogFor(entity).grade(Grade.GOOD).please(needPersist);
       entity.addRecallLog(log);
@@ -57,7 +65,11 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     if (!entity.isNew() && entity.getLastRecalledAt() == null) {
       entity.setLastRecalledAt(entity.getAssimilatedAt());
     }
-    entity.setNextRecallAt(entity.calculateNextRecallAt());
+    if (entity.getLastRecalledAt() != null) {
+      rescheduleDueFromStability = true;
+    } else {
+      entity.setNextRecallAt(entity.calculateNextRecallAt());
+    }
     return this;
   }
 

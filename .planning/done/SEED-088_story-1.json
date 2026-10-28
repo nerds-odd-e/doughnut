@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-088#story-1",
+  "title": "Vary recall spacing and the order of similarly due questions",
+  "completedAt": "2026-10-28T04:08:42.703Z",
+  "developer": "Terry Yin",
+  "agent": "Julia-chan",
+  "host": "cursor",
+  "model": "auto"
+}

@@ -4,7 +4,6 @@ describeRecallJustReviewInteractive((api) => {
   const {
     test,
     expect,
-    vi,
     makeMe,
     MemoryTrackerController,
     RecallsController,
@@ -15,8 +14,7 @@ describeRecallJustReviewInteractive((api) => {
     mockMarkAsRecalledCounting,
   } = api
 
-  test('load more y shows first card in shuffled order for extended window', async () => {
-    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+  test('load more y shows first card in shared due-list order for extended window', async () => {
     let recallingCall = 0
     api.recallingSpy.mockImplementation(
       async (opts: Parameters<typeof RecallsController.recalling>[0]) => {
@@ -52,8 +50,8 @@ describeRecallJustReviewInteractive((api) => {
         const title =
           id === 1
             ? 'Alpha'
-            : id === 11
-              ? 'FIRST_AFTER_SHUFFLE'
+            : id === 10
+              ? 'FIRST_IN_SHARED_ORDER'
               : `unexpected-${String(id)}`
         const noteRealm = makeMe.aNoteRealm
           .title(title)
@@ -74,13 +72,9 @@ describeRecallJustReviewInteractive((api) => {
       <InteractiveCliApp />
     )
 
-    try {
-      await recallSingleAlphaToLoadMore(stdin, ink)
-      stdin.write('y\r')
-      await waitJustReviewCard(ink, 'FIRST_AFTER_SHUFFLE')
-      expect(api.recallingSpy).toHaveBeenCalledTimes(2)
-    } finally {
-      randomSpy.mockRestore()
-    }
+    await recallSingleAlphaToLoadMore(stdin, ink)
+    stdin.write('y\r')
+    await waitJustReviewCard(ink, 'FIRST_IN_SHARED_ORDER')
+    expect(api.recallingSpy).toHaveBeenCalledTimes(2)
   })
 })
