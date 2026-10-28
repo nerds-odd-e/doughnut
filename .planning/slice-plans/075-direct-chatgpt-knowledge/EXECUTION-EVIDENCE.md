@@ -2,6 +2,10 @@
 
 [Active plan](PLAN.md) · SEED-002#story-3
 
+These records preserve preparation and slice 1 observations before the subsequent
+release and client registration. See [live observations](LIVE-OBSERVATIONS.md)
+for the current slice 2 handoff.
+
 ## Slice 1 accepted observations
 
 On 2026-10-28, the owned execution checkout's authenticated `tools/list`

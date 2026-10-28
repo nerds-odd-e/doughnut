@@ -64,6 +64,8 @@ See the dated [premises and observations](EXECUTION-EVIDENCE.md#premises-and-obs
 
 Follow [production proof and human participation](EXECUTION-EVIDENCE.md#production-proof-and-human-participation)
 before slice 2. The release and real-client activation need separate operator authority.
+Terry authorized landing, release and continued setup on 2026-10-28; the release
+and client registration are recorded in [live observations](LIVE-OBSERVATIONS.md).
 
 ## Ordered slices
 
