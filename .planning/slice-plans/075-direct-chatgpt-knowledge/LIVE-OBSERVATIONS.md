@@ -86,12 +86,8 @@ under `/Users/terryyin/.config/donut/chatgpt-3NC-kjDLBDdP/`; no secret value was
 printed in the conversation or retained in this source. Only the public client
 ID was entered in ChatGPT.
 
-Chrome tab `137235836` remains at the actual form, marked for handoff, with the
-same callback, client ID and auth method. Screenshot `/tmp/donut-chatgpt-setup.jpg`
-shows an empty secret field and unchecked risk acknowledgment. The owner must
-enter the secret, create/install, and complete the planned cancel/retry/allow
-and private acceptance-note read. No plugin was created, no user grant issued,
-and no ChatGPT tool result or answer exists yet. G1 and slices 2–8 remain open;
-renewal, withdrawal, isolation, citations, graph and computer-off freshness are
-unproved. Use the same form/callback; re-establish registration if a replacement
-form displays a different callback. No production note fixtures were changed.
+The owner completed client creation and the existing connection now appears as
+**Terry's Donut account (Primary)**, using OAuth. Current connection, consent,
+expiry and read-result observations are in [connection evidence](CONNECTION-EVIDENCE.md).
+This supersedes the earlier pending-form handoff; the dated registration and
+release receipts above remain applicable. No production note fixtures changed.

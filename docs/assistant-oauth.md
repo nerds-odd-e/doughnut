@@ -32,14 +32,36 @@ the example is a placeholder, not an encoded value. Keep the corresponding raw
 secret on the assistant server. Register the exact HTTPS callback, including its
 path; redirect matching is exact. The supported initial journey uses
 `client_secret_basic`, authorization code with S256 PKCE and state, and
-`notes:read`. Multiple configured clients are supported. Dynamic registration,
-public-client renewal and ChatGPT-specific onboarding are separate work.
+`notes:read`. Multiple configured clients are supported. Dynamic registration
+and public-client renewal are separate work.
 
 The assistant begins with the MCP URL and registered client information. A real
 MCP 401 points to protected-resource metadata; the client discovers authorization
 and token endpoints and sends the canonical resource through authorization,
 exchange and renewal. Keep client secrets, PKCE verifiers, access credentials and
 refresh credentials server-held, outside browser storage and logs.
+
+## Personal ChatGPT setup
+
+In ChatGPT, open **Plugins → Add → Add custom MCP server**. Use a name such as
+**Donut**, the server URL `https://doughnut.odd-e.com/api/mcp`, and **OAuth**.
+Open **Advanced OAuth settings** and copy the exact displayed callback for the
+operator to register. Each created connection may have a different callback;
+use its actual value rather than copying another installation's callback.
+
+After registration, select **User-Defined OAuth Client**, enter the client ID
+and its raw secret directly in ChatGPT, select `client_secret_basic`, and keep
+`notes:read` checked as the default scope. Create/install the plugin, connect
+the intended Donut account, and review Donut's read-access consent. Keep the
+secret out of prompts and source control. Existing GitHub/Donut sign-in and an
+operator-registered confidential client are prerequisites.
+
+Try: “Find my Donut note titled <title>, read it in full, and explain it. Cite
+the returned title, notebook, folder path, note ID and acceptedRevision.”
+`acceptedRevision` identifies the accepted commit of the whole notebook.
+Search matches titles and aliases; use a more precise title when no match is
+found. A full read supplies citation evidence; graph context guides further
+reading and may contain truncated excerpts.
 
 ## Consent and continued access
 

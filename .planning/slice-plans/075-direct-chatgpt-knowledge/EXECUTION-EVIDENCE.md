@@ -4,7 +4,9 @@
 
 These records preserve preparation and slice 1 observations before the subsequent
 release and client registration. See [live observations](LIVE-OBSERVATIONS.md)
-for the current slice 2 handoff.
+for the original slice 2 handoff. Current evidence is in
+[connection evidence](CONNECTION-EVIDENCE.md); remaining slices were renumbered
+under [compatibility refinement](READ-COMPATIBILITY.md).
 
 ## Slice 1 accepted observations
 
@@ -233,3 +235,11 @@ production availability are explicitly unproved and bounded by the early probes;
 their owner-held release and credential requirements remain in force. Readiness
 means this bounded plan can be selected for execution, not that those probes
 passed or that deployment is authorized. No human refinement decision remains.
+
+## Resumed CI observation
+
+The prior stream ended with a confirmed stopped receipt and process exit.
+Resumed same coordinator/checkout/branch on 2026-10-28; GitHub selector `ci.yml`,
+workflow 5208694 (`donut CI`) verified active. Cell 146, session 58407, PID 41368,
+directory `/tmp/dough-ci-501/watch-ggakYT`, coordinator
+`codex-direct-chatgpt-20261028`. This stream owns subsequent publications.
