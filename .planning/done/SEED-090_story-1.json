@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-090#story-1",
+  "title": "Conduct a commissioned learning session in ChatGPT through MCP",
+  "completedAt": "2026-10-28T10:00:56.679Z",
+  "developer": "Terry Yin",
+  "agent": "Maria-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
