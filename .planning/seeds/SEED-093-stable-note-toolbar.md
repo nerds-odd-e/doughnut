@@ -5,7 +5,7 @@
 
 **Identity:** SEED-093#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planless"}
+{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"5ad8eb55e38991e42273073c6c9c352cf9b4dea57fb1c9e6e1c6f6f48e256640"}}
 ```
 
 **Goal:** Fix the Safari on Mac toolbar jump and gray flash when the developer switches between rich-content and Markdown editing.

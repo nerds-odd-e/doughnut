@@ -15,6 +15,53 @@ export function switchToRichContentIfNeeded() {
 }
 
 export const noteContentEditingMethods = () => ({
+  expectStationaryToolbarDuringEditModeChanges() {
+    cy.get('[data-note-toolbar]').then(($toolbar) => {
+      const toolbar = $toolbar[0]!
+      const scrollport = toolbar.parentElement!.parentElement!
+      const command = toolbar.querySelector<HTMLElement>('[title]')!
+      const win = toolbar.ownerDocument.defaultView!
+      const initialLeft = command.getBoundingClientRect().left
+      const positions: number[] = []
+      const verticalScrollRanges: number[] = []
+      const sampleFrames = () =>
+        new Cypress.Promise<void>((resolve) => {
+          let frames = 0
+          const sample = () => {
+            positions.push(command.getBoundingClientRect().left)
+            const scrollsVertically = ['auto', 'scroll'].includes(
+              win.getComputedStyle(scrollport).overflowY
+            )
+            verticalScrollRanges.push(
+              scrollsVertically
+                ? Math.max(0, scrollport.scrollHeight - scrollport.clientHeight)
+                : 0
+            )
+            if (++frames === 12) resolve()
+            else win.requestAnimationFrame(sample)
+          }
+          win.requestAnimationFrame(sample)
+        })
+      toolbarButton('Edit as markdown').click()
+      cy.then(sampleFrames)
+      toolbarButton('Edit as rich content').click()
+      cy.then(sampleFrames)
+      cy.then(() => {
+        expect(
+          { min: Math.min(...positions), max: Math.max(...positions) },
+          'note toolbar position through both editing modes'
+        ).to.deep.equal({
+          min: initialLeft,
+          max: initialLeft,
+        })
+        expect(
+          Math.max(...verticalScrollRanges),
+          'vertical scroll range of the horizontal note tools'
+        ).to.equal(0)
+      })
+    })
+    return this
+  },
   switchToRichContent() {
     switchToRichContentIfNeeded()
     return this

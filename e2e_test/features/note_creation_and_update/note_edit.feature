@@ -42,6 +42,10 @@ Feature: Note Edit
       | list item          | Specification by Example |
       | indented list item | Living documentation     |
 
+  Scenario: Switching edit modes keeps note tools in place
+    When I visit note "LeSS in Action"
+    Then the note toolbar should stay in place while switching editing modes
+
   Scenario: Saving a note with no frontmatter stores type Note
     When I update note "LeSS in Action" content using markdown to become:
       """
