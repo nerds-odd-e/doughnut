@@ -8,6 +8,8 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Toggle note edit modes without moving the toolbar](seeds/SEED-093-stable-note-toolbar.md#story-1) — SEED-093#story-1
+
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
