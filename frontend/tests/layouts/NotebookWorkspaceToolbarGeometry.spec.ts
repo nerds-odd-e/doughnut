@@ -2,7 +2,7 @@ import { useAssimilationView } from "@/composables/useAssimilationView"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { afterEach, expect, it, vi } from "vitest"
+import { afterEach, expect, it, onTestFinished, vi } from "vitest"
 import { page } from "vitest/browser"
 import {
   atViewportWidth,
@@ -21,6 +21,55 @@ afterEach(() => {
   wrapper.unmount()
   useAssimilationView().dismiss()
   document.body.innerHTML = ""
+})
+
+it("keeps note commands stationary while changing edit modes", async () => {
+  await atViewportWidth(1280)
+  const scrollbarStyle = document.createElement("style")
+  // Match Safari's classic scrollbar width even when the test browser uses overlays.
+  scrollbarStyle.textContent =
+    ".daisy-navbar > div::-webkit-scrollbar { width: 17px; height: 17px; }"
+  document.head.append(scrollbarStyle)
+  onTestFinished(() => scrollbarStyle.remove())
+  ;({ wrapper } = await mountNotebookWorkspace([makeMe.aNoteRealm.please()]))
+  const firstTitle = noteMoreOptionsTitles.wiki
+  await vi.waitFor(() => expect(pageBarCommand(firstTitle)).not.toBeNull())
+  const initialLeft = pageBarCommand(firstTitle)!.getBoundingClientRect().left
+  const positions: number[] = []
+  const verticalScrollStates: { scrollHeight: number; clientHeight: number }[] =
+    []
+  let collecting = true
+  onTestFinished(() => {
+    collecting = false
+  })
+  const sample = () => {
+    if (!collecting) return
+    positions.push(pageBarCommand(firstTitle)!.getBoundingClientRect().left)
+    const port = pageBarEl().children[1] as HTMLElement
+    if (
+      port.scrollHeight > port.clientHeight &&
+      ["auto", "scroll"].includes(getComputedStyle(port).overflowY)
+    ) {
+      verticalScrollStates.push({
+        scrollHeight: port.scrollHeight,
+        clientHeight: port.clientHeight,
+      })
+    }
+    requestAnimationFrame(sample)
+  }
+  sample()
+  for (const title of ["Edit as markdown (m)", "Edit as rich content (m)"]) {
+    await page.elementLocator(pageBarCommand(title)!).click({ delay: 100 })
+    for (let frame = 0; frame < 12; frame++) {
+      await new Promise(requestAnimationFrame)
+    }
+  }
+  collecting = false
+  expect(verticalScrollStates).toEqual([])
+  expect({ min: Math.min(...positions), max: Math.max(...positions) }).toEqual({
+    min: initialLeft,
+    max: initialLeft,
+  })
 })
 it.each([768, 1024, 1280])(
   "aligns contents and note tools with the pane boundary at %ipx",

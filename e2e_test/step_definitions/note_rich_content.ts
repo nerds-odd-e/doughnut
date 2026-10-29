@@ -154,6 +154,13 @@ When('I view the note content as rich content', () => {
   start.assumeNotePage().switchToRichContent()
 })
 
+Then(
+  'the note toolbar should stay in place while switching editing modes',
+  () => {
+    start.assumeNotePage().expectStationaryToolbarDuringEditModeChanges()
+  }
+)
+
 When('I view the note content as markdown', () => {
   start.assumeNotePage().toolbarButton('Edit as markdown').click()
 })

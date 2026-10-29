@@ -4,7 +4,7 @@
       <DonutMenu :user="user" />
       <slot name="navigation" />
     </div>
-    <div class="flex flex-1 min-w-0 overflow-x-auto border-l border-base-300 pl-1" :class="{ 'ml-1': !dockedContents }">
+    <div class="flex flex-1 min-w-0 overflow-x-auto overflow-y-hidden border-l border-base-300 pl-1" :class="{ 'ml-1': !dockedContents }">
       <slot />
     </div>
     <div class="daisy-join daisy-join-horizontal flex-none">
