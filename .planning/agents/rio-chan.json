@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Rio-chan",
-  "email": "rio-chan@example.org",
-  "identity": "SEED-092#story-1",
-  "mode": "story-branch",
-  "branch": "codex/confirm-note-toolbar-shift",
-  "host": "codex"
-}
