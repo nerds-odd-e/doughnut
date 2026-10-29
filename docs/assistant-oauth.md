@@ -100,8 +100,10 @@ to submit his result. Its Report gave Grade 2 with descriptive Feedback. Donutâ€
 **Memory Tracker** page for the item showed the matching **HARD** history entry
 (Grade 2) and the complete Feedback, with the next review updated. To inspect a
 saved result, open the completed item's tracker and compare its newest history
-entry with the submitted Report. The full round's structured tool response still
-needs capture; partial completion and the no-session response need separate rounds.
+entry with the submitted Report. The returned result contained one recorded item,
+Grade 2 and tracker 130239, with no rejected entries; its timestamp matched the
+saved history entry exactly. Partial completion and the no-session response need
+separate rounds.
 
 ## Consent and continued access
 

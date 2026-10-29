@@ -24,7 +24,7 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 | 16 | Follow the Request’s tutoring instructions. | slice 2 | observed: full-session-evidence.md Japanese voice tutoring from the reported item, learner-start wait, actual answers and matching Report; initial explanatory error was corrected and retained |
 | 17 | Submit the existing Report markdown for completed items at normal finish. | slice 2 | observed: full-session-evidence.md exact existing Report markdown in native call after Terry asked to submit his result |
 | 18 | Submit the existing Report markdown for completed items after early end. | slice 3 |  |
-| 19 | Compare the returned recording result with actual Donut Feedback history. | slice 2 | G5 |
+| 19 | Compare the returned recording result with actual Donut Feedback history. | slice 2 | observed: full-session-evidence.md Terry-supplied original result has one Grade-2 item, tracker 130239 and exact recordedAt matching saved log 139509; rejectedEntries is empty |
 | 20 | Verify that incomplete items retain their prior Feedback. | slice 3 |  |
 | 21 | Verify that incomplete items retain their prior schedule. | slice 3 |  |
 | 22.1 | Retain each round’s date. | slice 5 |  |

@@ -41,7 +41,8 @@
   the native call's arguments and completed status, but hides the structured
   Request/Report response bodies. Neither recordedItems nor rejectedEntries
   was copied in the chat. Parent asked Terry to supply the Report result;
-  its exact returned counts remain an explicit acceptance gap (G5).
+  this initially left the exact returned counts as acceptance gap G5. Terry later
+  supplied the original result below; no Report was replayed.
 
 ## Saved Feedback and schedule comparison
 
@@ -71,12 +72,46 @@
   This is interpretation of actual saved/visible data, not replacement proof
   from source or a test. No product code, learning state or schedule was edited.
 - Core Request → learner-started Japanese tutoring → real Report → matching
-  visible saved Feedback is observed. Slice 2 remains in progress solely for
-  G5's original Report response capture. Partial A/B/C and no-session examples
+  visible saved Feedback is observed. Terry's returned-result capture below
+  completes slice 2 and its G5 comparison. Partial A/B/C and no-session examples
   remain unobserved; no additional Request or further learning round was started.
 
 - Fresh `/root/full_round_evidence_refactor` reviewed all four owned files and
   returned `## REFACTOR COMPLETE`, no edits or introduced gaps. Whitespace checks
   passed; no product tests reran. The basic story-obligation check passed with
   five entries and 77 commitments, preserving G5 and slice 2's planned status.
-  User response capture remains pending; this publication retains progress only.
+  That initial publication retained progress while awaiting Terry's result.
+
+## Original returned result supplied by Terry — 2026-10-29
+
+Terry answered the parent's explicit request to expand the original
+`record_learning_session` call in **Prepare today’s commission lesson**, supplying:
+
+```json
+{
+  "recordedAt": "2026-10-29T03:39:08.997+00:00",
+  "recordedItems": [
+    {
+      "noteTitle": "なにしろ",
+      "grade": 2,
+      "memoryTrackerId": 130239
+    }
+  ],
+  "rejectedEntries": []
+}
+```
+
+The returned sole item's title, Grade 2 and tracker 130239 match the native
+Report arguments and saved recall log 139509. Its recordedAt is the exact same
+instant as the saved log's `2026-10-29T03:39:08.997Z`; rejectedEntries is empty.
+Parent checked these identities and the timestamp against the retained after-state
+without another production call. This closes G5 and accepts full-session slice 2.
+The original Request response body remains hidden by the thread reader; its native
+arguments, completed status, reported item and learner-start/tutoring transcript
+are retained above. No missing Request body is reconstructed or claimed verbatim.
+
+Fresh `/root/full_report_result_refactor` inspected the four owned evidence/guide
+files, returned `## REFACTOR COMPLETE` without edits, and preserved all accepted
+proof. Whitespace checks passed; no product tests reran. The slice-2 obligation
+check passed with five obligations and 77 commitments; source freshness remained
+unchanged. Guarded delivery owns the slice-2 done transition.

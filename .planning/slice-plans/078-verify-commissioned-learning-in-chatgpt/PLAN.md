@@ -118,7 +118,7 @@ or client activation is part of this probe.
 
 ### 2. Complete the Japanese session and inspect saved Feedback
 Type: Behavior
-Status: planned
+Status: done
 Proof: Real ChatGPT Request → tutoring → Report transcript plus matching Grade
 and descriptive Feedback in Donut recall history for each completed item.
 
@@ -175,8 +175,8 @@ response to the guide and review the final guide against retained observations.
 
 - Slice 6's primary declaration is proved and deployed in `v1.3.62`.
   The existing client's stale scope allowlist was corrected; informed consent
-  and the native empty Report now pass. Full tutoring saved matching Feedback;
-  exact Report response capture remains G5. See [full-round proof](full-session-evidence.md).
+  and the native empty Report now pass. Full tutoring and the returned Report
+  match saved Feedback; G5 is proved. See [full-round proof](full-session-evidence.md).
 
 - One Request/Report protocol and Feedback model serve all independently
   observable rounds; authorization first bounds the interoperability risk.
@@ -187,8 +187,8 @@ response to the guide and review the final guide against retained observations.
 - Execute Plan owns fresh refactor review, formatting once, commit and push;
   preparation alone does not accept manual observations.
 - Original preparation had five observation rounds; Terry's 2026-10-29 amendment
-  added repair/release slices 6–7. Full-session response capture, partial completion
-  and no-session proof remain open after the observed saved-Feedback journey.
+  added repair/release slices 6–7. Full-session response capture now matches saved
+  Feedback; partial completion and no-session proof remain open.
 
 ## Retained observations
 
@@ -206,8 +206,8 @@ response to the guide and review the final guide against retained observations.
 - Resumed Codex CI observation after confirmed prior shutdown; selector `ci.yml`,
   workflow 5208694 **donut CI**, repository `nerds-odd-e/doughnut`, target
   `codex/verify-commissioned-learning-chatgpt`, coordinator `aino-seed090`,
-  directory `/tmp/dough-ci-501/watch-iq3Ndu`, PID 28888, PTY 67621, yielded cell 181.
-  Runtime and checkout identities match. Prior watch-dYZr0f stopped with coverage
+  directory `/tmp/dough-ci-501/watch-ll1wzy`, PID 98323, PTY 8269, yielded cell 190.
+  Runtime and checkout identities match. Prior watch-iq3Ndu stopped with coverage
   ended, zero unread events and confirmed process exit; no CI success is inferred.
 
 - Story Branch Mode; identity `SEED-090#story-2`, publisher
@@ -246,4 +246,4 @@ Disposition: proved by slice 1: fresh-chat-evidence.md parent-inspected recordin
 ### G5. Capture the full round’s returned Report result
 Reported: slice 2 — "The thread reader exposes the completed native Report call and exact arguments but hides its structured recordedItems/rejectedEntries response. Matching Grade and descriptive Feedback are saved and visible."
 Story clause: "Compare the returned recording result with actual Feedback in Donut recall history"
-Disposition: return
+Disposition: proved by slice 2: full-session-evidence.md original result supplied by Terry; sole Grade-2 item and tracker match the native Report and saved log 139509 at the exact recordedAt instant, with zero rejections
