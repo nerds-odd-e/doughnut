@@ -7,16 +7,17 @@
 ## Goal and scope
 
 Observe Terry's real ChatGPT OAuth connection requesting a commissioned
-Learning Session and recording Feedback in Donut, including a partial session,
-immediate end, and no available session. Retain reproducible operator steps in
+Learning Session and recording Feedback in Donut, including immediate end.
+Terry's closure amendment waives the partial and no-session observation rounds;
+neither waived example is claimed as verified. Retain reproducible operator steps in
 [the existing guide](../../../docs/assistant-oauth.md) only after observing them.
 The source owns the complete examples, boundaries and evidence requirements.
 The original verification-only boundary was expanded by Terry on 2026-10-29 to
 repair Donut's OAuth integration and release the tested correction.
 
-New real-client activation, notebook selection, automatic further sessions,
-another protocol, general editing and additional clients remain deferred.
-SDK or personal-token results cannot replace any ChatGPT observation below.
+New client activation, notebook selection, automatic further sessions, another
+protocol, general editing and additional clients remain deferred; SDK/personal-token
+results cannot replace ChatGPT observations.
 
 ## Existing solution and constraints
 
@@ -94,7 +95,7 @@ check through the connected plugin; any required consent stays informed.
 
 ### 1. Authorize the real ChatGPT connection for report recording
 Type: Behavior
-Status: planned
+Status: done
 Proof: Actual connection setup and consent observations, requested scope string,
 connection result, and visibility of the Request/Report tools. Slice 2 owns
 functional confirmation that this same connection retains recording authority.
@@ -118,7 +119,7 @@ or client activation is part of this probe.
 
 ### 2. Complete the Japanese session and inspect saved Feedback
 Type: Behavior
-Status: planned
+Status: done
 Proof: Real ChatGPT Request → tutoring → Report transcript plus matching Grade
 and descriptive Feedback in Donut recall history for each completed item.
 
@@ -133,22 +134,9 @@ functional scope probe. Add the observed start/finish and Feedback-review steps
 to the guide. If recording fails, retain the partial journey and stop the
 dependent recording rounds; it does not establish full-session success.
 
-### 3. End after A and preserve B/C's learning state
-Type: Behavior
-Status: planned
-Proof: A/B/C in the actual Request, A only in the Report/recorded result, A's
-new Feedback in history, and B/C's history and schedule matching their baseline.
-
-Behavior: Arrange due commissioned items A/B/C with distinct titles and capture
-their history and schedule. Terry obtains their Request through ChatGPT,
-completes A, then asks to end before B/C. ChatGPT reports A's Grade/text only;
-compare Donut's actual state with the baseline. Add the observed early-end
-instruction and outcome to the guide. Do not manufacture the observation by
-submitting a Report through another client.
-
 ### 4. End immediately with an empty Report
 Type: Behavior
-Status: planned
+Status: done
 Proof: A real ChatGPT call to `record_learning_session` with empty
 `session_item_feedback`, zero recorded items in its result, and unchanged
 history/schedule for every item against the pre-call baseline.
@@ -159,69 +147,68 @@ Observe the empty call/result and Donut state. A skipped recording call alone
 does not observe the promised empty-Report path. Add only the observed behavior
 to the guide.
 
-### 5. Explain that no commissioned session is available
-Type: Behavior
-Status: planned
-Proof: `request_learning_session` returns the explicit no-session result for
-the recorded timezone and ChatGPT explains that outcome to Terry.
+## Execution complete
 
-Behavior: With no due commissioned items in the connected account, Terry asks
-ChatGPT to start learning. Inspect the actual tool result and conversation
-response. Use naturally eligible data or supported owner operations; do not
-reset persistent data to create this precondition. Add the observed no-session
-response to the guide and review the final guide against retained observations.
+Product advice: no change. The owner explicitly waives the two unobserved examples.
+The product retrospective found no required correction after inspecting the narrow
+metadata projection, shared scope owner, consent/old-token tests, existing SDK/E2E
+journey and real native saved-Feedback proof. No tests reran for record cleanup.
+Process review was enabled by `.planning/open-dough.json`; the four records-only
+refactor returns are recorded as another ODF-141 occurrence in `DearDough.md`.
+Related code revisions are 358ad5c and 8e90688; 3bcf245, 6cc7f56, 4b5780c,
+64022c1 and bd9dde8 are release/manual-evidence provenance. Unrelated trunk work
+is excluded. Accepted code CI and deployment remain distinct from pending closure CI.
 
 ## Current decisions and remaining concerns
 
-- Slice 6's primary declaration is now proved and deployed in `v1.3.62`.
-  Actual ChatGPT authorization/recording remains separate: the fresh
-  verification chat is paused on built-in approval. See [observations](oauth-correction-evidence.md).
+- Slice 6's primary declaration is proved and deployed in `v1.3.62`.
+  The existing client's stale scope allowlist was corrected; informed consent
+  and the native empty Report now pass. Full tutoring and the returned Report
+  match saved Feedback; G5 is proved. See [full-round proof](full-session-evidence.md).
 
-- One coherent Request/Report protocol and one Feedback model serve every
-  example. Slices separate independently observable operator rounds, with
-  authorization first to bound the external interoperability risk.
+- One Request/Report protocol and Feedback model serve all independently
+  observable rounds; authorization first bounds the interoperability risk.
 - Evidence and guide edits reuse accepted implementation proof only for its
   stated boundary. Slice 6 adds MCP/OAuth regression tests; no API generation is
   needed. Further product changes require refinement before execution and bring
   their own stack proof and delivery requirements.
-- Execute Plan owns the required fresh refactor review, formatting once,
-  commit and push after authorized changes. Preparation does not perform the
-  manual rounds or mark any slice done.
-- Original preparation used five bounded observation rounds, with the first
-  credentialed probe bounding external prerequisites. Terry's 2026-10-29 amendment
-  added the authorized correction and release in slices 6–7. The unchanged
-  ChatGPT observations remain open after the bounded automated proof.
+- Execute Plan owns fresh refactor review, formatting once, commit and push;
+  preparation alone does not accept manual observations.
+- Original preparation had five observation rounds; Terry's 2026-10-29 amendment
+  added repair/release slices 6–7. Full-session response capture matches saved
+  Feedback. Terry's explicit closure amendment skips slices 3 and 5; their examples
+  remain unobserved, and those leaves are removed from the required execution.
 
 ## Retained observations
 
 - [Discovery and the first empty-Report probe](execution-evidence.md).
 - [Reauthorization, retries and observed read-access consent](connection-evidence.md).
 - [Accepted MCP/OAuth correction proof](oauth-correction-evidence.md).
+- [Real authorization, empty Report and unchanged state](fresh-chat-evidence.md).
+- [Completed Japanese tutoring and saved Feedback](full-session-evidence.md).
 
 ## Execution context
 
-- 2026-10-29 continuation: fast-forwarded the owned execution branch to
-  `c51f7b619a` from fetched origin/main, preserving local evidence. Locked
-  worktree setup passed. The fresh source-only review now includes Terry's
-  repair/release amendment. All unchanged manual-round obligations remain open.
-- Rearmed Codex CI observation after the earlier stopped observer had exited:
-  selector `ci.yml`, workflow 5208694 **donut CI**, repository
-  `nerds-odd-e/doughnut`, target `codex/verify-commissioned-learning-chatgpt`,
-  coordinator `aino-seed090`, directory `/tmp/dough-ci-501/watch-BQSBYB`,
-  PID 94735, PTY 13250, yielded cell 101. Runtime and checkout identities match.
+- 2026-10-29 continuation fast-forwarded to `c51f7b619a` from origin/main with
+  local evidence preserved and locked setup passed. The source-only review includes
+  Terry's repair/release amendment; fresh-chat proof observes authorization/empty end.
+- Closure CI observer is bound to authorized trunk `main`, workflow 5208694
+  **donut CI**, repository `nerds-odd-e/doughnut`, coordinator `aino-seed090`,
+  directory `/tmp/dough-ci-501/watch-G36plk`, PID 22008, PTY 65371, cell 204.
+  Runtime/checkout identities match. Earlier branch observer watch-ll1wzy stopped
+  with zero unread events and confirmed exit; its documentation CI is unobserved.
+  Final integration requires its own successful main completion/shutdown receipt.
 
 - Story Branch Mode; identity `SEED-090#story-2`, publisher
   `codex-seed090-chatgpt-verification`, assigned agent Aino-chan.
-- Created execution checkout
-  `/Users/terryyin/git/doughnut/.worktrees/verify-commissioned-learning-chatgpt`,
+- Execution checkout `/Users/terryyin/git/doughnut/.worktrees/verify-commissioned-learning-chatgpt`,
   branch `codex/verify-commissioned-learning-chatgpt`, from
   `7001846a8d141d6bbc48b48b0669c0db542bbe51`.
   Originating/integration checkout: `/Users/terryyin/git/doughnut`.
 - Take accepted on `origin/main` and the execution branch at
   `4ef50afd67cdb5f3fe91242e30f41016d8d240d6`; increments target
   `origin` / `refs/heads/codex/verify-commissioned-learning-chatgpt`.
-The [historical connection status](execution-evidence.md#historical-connection-status-before-the-oauth-repair)
-is retained with the observations.
+[Historical connection status](execution-evidence.md#historical-connection-status-before-the-oauth-repair) remains in the observations.
 
 ## Story obligations
 
@@ -233,14 +220,19 @@ Disposition: proved by slice 6: oauth-correction-evidence.md primary descriptor 
 ### G1. Recording authority after tool discovery (first reported in slice 1)
 Reported: slice 1 — "The available Donut tool inventory in this chat contains only list_note_candidates, read_note and get_note_graph; request_learning_session and record_learning_session are unavailable."
 Story clause: "resulting connection can both request and record a session."
-Disposition: return
+Disposition: proved by slice 1: fresh-chat-evidence.md matching native Request and successful empty Report after informed dual-scope consent; completed-item recording remains owned by slice 2
 
 ### G3. The reauthorized plugin must remain callable
 Reported: slice 1 — "After Terry reported reauthorization done, record_learning_session, request_learning_session and list_note_candidates all returned Unknown tool from the plugin runtime, while direct production tools/list still returned all five tools."
 Story clause: "resulting connection can both request and record a session."
-Disposition: return
+Disposition: proved by slice 1: fresh-chat-evidence.md fresh conversation's completed native record_learning_session call with zero items and zero rejections; historical stale-chat failures retained
 
 ### G2. Recording consent must be observed
 Reported: slice 1 — "Terry answered I did not check the wording when asked whether Donut consent explicitly mentioned permission to record Learning Session Reports."
 Story clause: "observe Donut consent describing report recording"
-Disposition: return
+Disposition: proved by slice 1: fresh-chat-evidence.md parent-inspected recording-consent screenshot followed by Terry's explicit I clicked Allow observation
+
+### G5. Capture the full round’s returned Report result
+Reported: slice 2 — "The thread reader exposes the completed native Report call and exact arguments but hides its structured recordedItems/rejectedEntries response. Matching Grade and descriptive Feedback are saved and visible."
+Story clause: "Compare the returned recording result with actual Feedback in Donut recall history"
+Disposition: proved by slice 2: full-session-evidence.md original result supplied by Terry; sole Grade-2 item and tracker match the native Report and saved log 139509 at the exact recordedAt instant, with zero rejections

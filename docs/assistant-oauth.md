@@ -69,6 +69,39 @@ Search matches titles and aliases; use a more precise title when no match is
 found. A full read supplies citation evidence; graph context guides further
 reading and may contain truncated excerpts.
 
+## Commissioned learning through ChatGPT
+
+Before connecting, confirm that the registered client's allowed scopes include
+both `notes:read` and `learning_session:record`. If ChatGPT requests both but the
+registration permits only reading, authorization returns `invalid_scope`; the
+operator must correct the existing registration before reconnecting.
+
+After deploying changed tool authentication metadata, refresh the plugin's tools
+and start a fresh conversation. On Donut's consent screen, confirm that the
+heading includes **and record learning sessions** and that the explanation
+mentions saving Feedback and updating learning schedules. The learner clicks
+**Allow**. A conversation retaining stale tool routing may require another fresh
+conversation after the connection and metadata refresh.
+
+Ask ChatGPT to prepare commissioned learning using the learner's IANA timezone,
+for example `Asia/Singapore`. It retrieves the first available Request, identifies
+its Session Items and waits for the learner to start. After tutoring, ask it to
+submit the result. The Report supplies each completed item's Grade and
+descriptive Feedback to `record_learning_session` for the returned notebook.
+Inspect `recordedItems` and `rejectedEntries` in the result.
+
+To end before completing any item, submit the returned notebook ID and an empty
+`session_item_feedback` block. Preserve the Report markdown's raw angle brackets;
+HTML-escaped delimiters are parsed as invalid entries. A valid empty Report
+returns zero recorded items and leaves the items' history and schedules unchanged.
+
+To inspect a saved result, open the completed item's **Memory Tracker** page and
+compare its newest history entry with the returned Report result. History renders
+Grade 1–4 as **AGAIN**, **HARD**, **GOOD**, **EASY**, respectively, alongside the
+descriptive Feedback and recording time. The tracker's next recall time reflects
+the saved Grade. Do not resubmit a successful Report to obtain evidence: another
+Report records another Grade.
+
 ## Consent and continued access
 
 The user signs in through existing GitHub login, then sees the assistant name,

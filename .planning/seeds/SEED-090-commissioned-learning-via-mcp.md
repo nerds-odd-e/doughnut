@@ -74,6 +74,14 @@ and retain only operator steps that have actually been observed.
   scopes; do not widen an existing token or bypass consent. Continue verification
   through the existing connected plugin after release. Real ChatGPT success
   remains a separate observation from automated proof and deployment success.
+- **Closure amendment — 2026-10-29:** After the remaining checks were identified
+  as partial completion and no-session verification, Terry instructed: "skip them
+  and wrap up." For this story's closure, the owner waives further manual
+  verification of the A/B/C partial-completion example and the no-session
+  example, including their corresponding observations. They remain unobserved
+  and are not represented as passing. Close on the observed authorization,
+  full Japanese session with saved Feedback, and immediate-end empty Report.
+  No further learning session or new follow-up story is requested.
 - **Owner / operation:** On 2026-10-28 Terry clarified that the assistant should
   use the connected Donut plugin directly in this chat as the ChatGPT surface;
   opening a separate ChatGPT app is unnecessary. The assistant runs available

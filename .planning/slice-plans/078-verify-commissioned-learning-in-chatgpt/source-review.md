@@ -1,85 +1,126 @@
-# Independent source review
+# Independent source review for closure
 
-Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The launch supplied only the selected story's Goal, Scope, key examples, evidence requirements, exclusions, provenance and explicit 2026-10-28/29 owner amendments. It instructed the reviewer to read no files, change nothing, derive individual commitments, and neither allocate slices nor accept proof. A follow-up requested splitting compound evidence fields and outcomes; it supplied no product, plan, implementation or proof. The returned commitments below retain that final numbered return. Source: [selected story](../../seeds/SEED-090-commissioned-learning-via-mcp.md#story-2). The former review predates the repair/release amendment and is superseded for acceptance by this fresh return.
+Fresh `/root/closure_source_review`, launched on 2026-10-29 with `fork_turns: none`,
+received only the selected story's Goal, Scope, key examples, evidence requirements,
+exclusions, owner operation/provenance, repair/release amendment and Terry's explicit
+closure waiver. The actual launch and returned JSON are retained in the coordinator's
+conversation. The reviewer was instructed to read no files, change nothing and derive
+individual source commitments without plan, product, proof or acceptance context.
+This 109-item return supersedes the earlier review after the human amendment.
+Source: [selected story](../../seeds/SEED-090-commissioned-learning-via-mcp.md#story-2).
+The owner waiver changes required observation coverage; it does not claim either
+skipped example passed. Remaining leaves are already done; closure keeps their proof.
 
 ## Commitments
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | Correct Donut’s declaration of recording scopes. | slice 6 | G4 |
-| 2 | Correct the permission-upgrade response. | slice 6 | observed: AssistantLearningSessionTest.readOnlyAssistantIsChallengedForRecordingPermissionWithoutChangingLearningState asserts the exact structured insufficient_scope challenge |
-| 3 | Prove the corrected contracts at the MCP/OAuth boundary. | slice 6 | observed: [Slice 6 accepted boundary proof](oauth-correction-evidence.md#slice-6-accepted-boundary-proof--2026-10-29); full backend suite passed, 2981 tests, zero failures/errors, two skipped |
-| 4 | Release the tested correction through the application release workflow. | slice 7 | observed: oauth-correction-evidence.md forward release; v1.3.62, release job 123195649747 succeeded, exact build 8e90688 verified by health and artifact/metadata smoke |
-| 5 | Continue the journey through the existing Donut plugin after release. | slice 1 |  |
-| 6 | Verify a real OAuth connection to an operator-authorized HTTPS deployment exposing Request and Report. | slice 1 |  |
-| 7 | Request both `notes:read` and `learning_session:record`. | slice 1 |  |
-| 8 | Observe consent wording that describes recording. | slice 1 |  |
-| 9 | Verify that the authorized connection can request sessions. | slice 1 |  |
-| 10 | Verify that the authorized connection can record completed items. | slice 2 |  |
-| 11 | Require fresh authorization for both scopes when upgrading an existing read-only connection. | slice 1 |  |
-| 12 | Preserve read-only access until informed authorization grants both scopes. | slice 6 | observed: read-only challenge test retains zero logs and unchanged due date; upgrade test records Feedback only after fresh consent-issued token |
-| 13 | Never widen an existing token. | slice 6 | observed: recordingChallengeLeadsToFreshConsentAndSavedFeedbackWithoutWideningTheOldToken reuses the old token and receives a challenge while history retains one Feedback |
-| 14 | Never bypass consent. | slice 6 | observed: upgrade test consumes challenge scopes through approvedCode → begin → consent-context → Allow → exchange; AssistantConsentTest checks exact consent scopes and CSRF/denial proof ran |
-| 15 | Have ChatGPT obtain the first available Request using the learner’s IANA timezone. | slice 2 |  |
-| 16 | Follow the Request’s tutoring instructions. | slice 2 |  |
-| 17 | Submit the existing Report markdown for completed items at normal finish. | slice 2 |  |
-| 18 | Submit the existing Report markdown for completed items after early end. | slice 3 |  |
-| 19 | Compare the returned recording result with actual Donut Feedback history. | slice 2 |  |
-| 20 | Verify that incomplete items retain their prior Feedback. | slice 3 |  |
-| 21 | Verify that incomplete items retain their prior schedule. | slice 3 |  |
-| 22.1 | Retain each round’s date. | slice 5 |  |
-| 22.2 | Retain each round’s origin. | slice 5 |  |
-| 22.3 | Retain each round’s revision. | slice 5 |  |
-| 22.4 | Retain each round’s account setup. | slice 5 |  |
-| 22.5 | Retain each round’s data setup. | slice 5 |  |
-| 22.6 | Retain each round’s timezone. | slice 5 |  |
-| 22.7 | Retain each round’s actual scope string. | slice 5 |  |
-| 22.8 | Retain each round’s consent wording. | slice 5 |  |
-| 22.9 | Retain each round’s tool arguments. | slice 5 |  |
-| 22.10 | Retain each round’s tool results. | slice 5 |  |
-| 22.11 | Retain each round’s history comparisons. | slice 5 |  |
-| 22.12 | Retain each round’s schedule comparisons. | slice 5 |  |
-| 23 | Retain failures and unreached steps. | slice 5 |  |
-| 24 | Update the existing guide using observed setup and session steps only. | slice 5 |  |
-| 25 | Keep credentials out of retained evidence and the guide. | slice 5 |  |
-| 26.1 | The first probe establishes the actual HTTPS origin. | slice 1 |  |
-| 26.2 | The first probe establishes the actual revision. | slice 1 |  |
-| 26.3 | The first probe establishes the actual scopes. | slice 1 |  |
-| 26.4 | The first probe establishes the actual client registration. | slice 1 |  |
-| 26.5 | The first probe establishes suitable data. | slice 1 |  |
-| 27 | Use ordinary supported operations on owner-approved data. | slice 5 |  |
-| 28 | Credentials remain in the connection UI. | slice 5 |  |
-| 29 | The connected Donut plugin counts as the ChatGPT surface; a separate ChatGPT application is unnecessary. | slice 1 |  |
-| 30 | The assistant runs available plugin tools. | slice 1 |  |
-| 31 | Terry supplies learning responses. | slice 2 |  |
-| 32.1 | Terry supplies connection UI observations unavailable through tools. | slice 1 |  |
-| 32.2 | Terry supplies consent observations unavailable through tools. | slice 1 |  |
-| 33 | Automated MCP/OAuth/SDK evidence establishes only its own boundary, not the ChatGPT journey. | slice 5 |  |
-| 34 | Deployment and automated proof do not establish ChatGPT success. | slice 7 | observed: forward-release evidence keeps deployment success separate from the fresh chat paused on built-in approval; no Report success is claimed |
-| 35 | Failed or unavailable probes leave affected examples unverified and inform remaining interoperability refinement. | slice 5 |  |
-| 36 | A sole Japanese notebook with an available session produces Japanese tutoring. | slice 2 |  |
-| 37 | Tutoring waits for the learner to start. | slice 2 |  |
-| 38.1 | Completed items produce recorded Grades. | slice 2 |  |
-| 38.2 | Completed items produce recorded descriptive Feedback. | slice 2 |  |
-| 38.3 | Recorded Grades are visible in history. | slice 2 |  |
-| 38.4 | Recorded descriptive Feedback is visible in history. | slice 2 |  |
-| 39 | For Request items A/B/C, completing A and then ending saves A-only Feedback. | slice 3 |  |
-| 40.1 | After that early end, B’s history matches its baseline. | slice 3 |  |
-| 40.2 | After that early end, B’s schedule matches its baseline. | slice 3 |  |
-| 40.3 | After that early end, C’s history matches its baseline. | slice 3 |  |
-| 40.4 | After that early end, C’s schedule matches its baseline. | slice 3 |  |
-| 41 | Immediately ending an available Request submits an empty Report. | slice 4 |  |
-| 42 | The immediate-end result records zero items. | slice 4 |  |
-| 43.1 | Immediate end leaves all history unchanged. | slice 4 |  |
-| 43.2 | Immediate end leaves all schedules unchanged. | slice 4 |  |
-| 44 | No due commissioned items produces an explicit no-session result. | slice 5 |  |
-| 45 | ChatGPT explains that no-session result. | slice 5 |  |
-| 46 | Notebook/program choice is deferred. | slice 5 |  |
-| 47 | Automatic further sessions are deferred. | slice 5 |  |
-| 48 | A replacement protocol is deferred. | slice 5 |  |
-| 49 | General note editing is deferred. | slice 5 |  |
-| 50 | Additional clients are deferred. | slice 5 |  |
-| 51 | New real-client activation is deferred. | slice 5 |  |
-| 52 | The journey moved from former implementation slice 4 by the owner’s 2026-10-28 direction. | slice 5 |  |
-| 53 | The 2026-10-29 amendment adds the integration correction and application release. | slice 6 | observed: selected story Owner amendment — 2026-10-29 and the user’s explicit repair/release instruction |
-| 54 | Earlier accepted MCP/OAuth evidence is reusable only within its original boundary. | slice 5 |  |
+| SC-001 | Source: SEED-090#story-2, Verify a commissioned learning session directly in ChatGPT. | slice 2 | observed: selected story identity and provenance; execution-evidence.md retains original probe provenance |
+| SC-002 | The learner can verify that a real commissioned Learning Session saves Feedback in Donut for items actually completed. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-003 | The intended behavior includes ending early; further manual observation of the partial-completion example is waived by the final owner amendment. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-004 | The observed journey supplies reliable setup instructions for other learners. | slice 2 | observed: docs/assistant-oauth.md maintained setup, consent, Request/Report and history-review instructions assimilated from observed journeys |
+| SC-005 | Verify the existing implementation through a real ChatGPT OAuth connection. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-006 | Use an operator-authorized HTTPS deployment containing the MCP Request tool. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-007 | That deployment must contain the MCP Report tool. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-008 | Request notes:read. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-009 | Request learning_session:record. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-010 | Observe Donut consent describing report recording. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-011 | Demonstrate that the resulting connection can request a session. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-012 | Demonstrate that the resulting connection can record a session. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-013 | An existing read-only connection requires fresh authorization for both scopes. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-014 | ChatGPT retrieves the first available Request. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-015 | Supply the learner's IANA timezone when retrieving the Request. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-016 | ChatGPT follows the Request's tutoring instructions. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-017 | ChatGPT submits the existing Report markdown for completed Session Items when the session finishes. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-018 | ChatGPT submits the existing Report markdown when the session ends early; the final amendment waives further partial-completion observation. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-019 | Compare the returned recording result with actual Feedback in Donut recall history. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-020 | Incomplete items retain prior Feedback; further manual verification through the A/B/C example is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-021 | Incomplete items retain their learning schedule; further manual verification through the A/B/C example is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-022 | Verify an empty Report on immediate end. | slice 4 | observed: fresh-chat-evidence.md exact native empty Report, zero items/zero rejections and unchanged complete history/tracker |
+| SC-023 | The original explicit no-session verification requirement is waived for closure by the final owner amendment. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-024 | Full-session example precondition: Japanese is the sole notebook with a Potential learning session. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-025 | In that example, asking ChatGPT to start learning returns Japanese's Request. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-026 | After the learner starts and completes the items, ChatGPT records their Grades. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-027 | After completion, ChatGPT records descriptive Feedback. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-028 | The same Feedback is visible in Donut recall history. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-029 | Original partial-completion example: a Request contains A/B/C, and the learner completes A before ending ahead of B/C; further manual verification is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-030 | That partial-completion example originally required ChatGPT to submit Feedback for A only; its further observation is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-031 | That partial-completion example originally required A's new Feedback in Donut history; its further observation is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-032 | That partial-completion example originally required B/C history to match the recorded baseline; its further observation is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-033 | That partial-completion example originally required B/C schedules to match the recorded baseline; its further observation is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-034 | Immediate-end example precondition: a Request is available, but the learner ends before completing any item. | slice 4 | observed: fresh-chat-evidence.md exact native empty Report, zero items/zero rejections and unchanged complete history/tracker |
+| SC-035 | For immediate end, ChatGPT submits an empty Report. | slice 4 | observed: fresh-chat-evidence.md exact native empty Report, zero items/zero rejections and unchanged complete history/tracker |
+| SC-036 | The immediate-end result records zero items. | slice 4 | observed: fresh-chat-evidence.md exact native empty Report, zero items/zero rejections and unchanged complete history/tracker |
+| SC-037 | The immediate-end session items retain their prior history. | slice 4 | observed: fresh-chat-evidence.md exact native empty Report, zero items/zero rejections and unchanged complete history/tracker |
+| SC-038 | The immediate-end session items retain their prior schedule. | slice 4 | observed: fresh-chat-evidence.md exact native empty Report, zero items/zero rejections and unchanged complete history/tracker |
+| SC-039 | Original no-session example precondition: the learner has no due commissioned items; further verification is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-040 | That example originally required asking to start to return the explicit no-session result; further verification is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-041 | That example originally required ChatGPT to explain the no-session result to the learner; further verification is waived. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-042 | For each retained round, retain its observation date. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-043 | For each retained round, retain its deployment origin. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-044 | For each retained round, retain its deployment revision. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-045 | For each retained round, retain its account preconditions. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-046 | For each retained round, retain its data preconditions. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-047 | For each retained round, retain the learner timezone. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-048 | For each retained round, retain the actual requested scope string. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-049 | For each retained round, retain the consent wording. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-050 | For each retained round, retain ChatGPT tool arguments. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-051 | For each retained round, retain ChatGPT tool results. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-052 | Retain Donut history comparisons for applicable observed rounds; corresponding observations for the waived examples are not required for closure. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-053 | Retain Donut schedule comparisons for applicable observed rounds; corresponding observations for the waived examples are not required for closure. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md dated origin/build/account/data/timezone, actual auth scopes/consent reused for same connection, native arguments/reported results and full state comparisons; hidden Request-body limit retained |
+| SC-054 | Record failures precisely. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-055 | Record unreached steps precisely. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-056 | Update the existing hosted-assistant guide with setup steps actually observed. | slice 2 | observed: docs/assistant-oauth.md maintained setup, consent, Request/Report and history-review instructions assimilated from observed journeys |
+| SC-057 | Update that guide with session steps actually observed. | slice 2 | observed: docs/assistant-oauth.md maintained setup, consent, Request/Report and history-review instructions assimilated from observed journeys |
+| SC-058 | Keep credentials out of evidence. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-059 | Automated MCP/OAuth proof supports its own boundary and cannot establish the ChatGPT journey. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-060 | Automated SDK proof supports its own boundary and cannot establish the ChatGPT journey. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-061 | A failed or unavailable probe leaves the relevant example unverified. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-062 | Retain evidence of failed or unavailable probes. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-063 | The original instruction to refine remaining interoperability work is qualified by the final amendment: no further learning session or new follow-up story is requested. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-064 | Notebook choice is deferred. | slice 2 | observed: selected story Deferred promises and retained bounded changes; none of these deferred capabilities added or activated |
+| SC-065 | Program choice is deferred. | slice 2 | observed: selected story Deferred promises and retained bounded changes; none of these deferred capabilities added or activated |
+| SC-066 | Automatic further sessions are deferred. | slice 2 | observed: selected story Deferred promises and retained bounded changes; none of these deferred capabilities added or activated |
+| SC-067 | A replacement Request/Report protocol is deferred. | slice 2 | observed: selected story Deferred promises and retained bounded changes; none of these deferred capabilities added or activated |
+| SC-068 | General note editing is deferred. | slice 2 | observed: selected story Deferred promises and retained bounded changes; none of these deferred capabilities added or activated |
+| SC-069 | Additional client compatibility is deferred. | slice 2 | observed: selected story Deferred promises and retained bounded changes; none of these deferred capabilities added or activated |
+| SC-070 | Activation of a new real client is deferred. | slice 2 | observed: selected story Deferred promises and retained bounded changes; none of these deferred capabilities added or activated |
+| SC-071 | Owner amendment dated 2026-10-29 authorizes fixing Donut's OAuth integration so ChatGPT requests recording permission. | slice 6 | observed: oauth-correction-evidence.md accepted servlet/SDK primary-and-mirror metadata and fresh-consent challenge proof; read-only old token preserved |
+| SC-072 | Correct the existing integration declaration of required recording scopes. | slice 6 | observed: oauth-correction-evidence.md accepted servlet/SDK primary-and-mirror metadata and fresh-consent challenge proof; read-only old token preserved |
+| SC-073 | Correct the permission-upgrade response. | slice 6 | observed: oauth-correction-evidence.md accepted servlet/SDK primary-and-mirror metadata and fresh-consent challenge proof; read-only old token preserved |
+| SC-074 | Prove those corrected contracts at the MCP/OAuth boundary. | slice 6 | observed: oauth-correction-evidence.md accepted servlet/SDK primary-and-mirror metadata and fresh-consent challenge proof; read-only old token preserved |
+| SC-075 | Release the tested correction through the application release workflow. | slice 7 | observed: oauth-correction-evidence.md exact-build v1.3.62 release CI, deployment and health/artifact/metadata smoke |
+| SC-076 | Preserve read-only access until informed authorization grants both scopes. | slice 6 | observed: oauth-correction-evidence.md accepted servlet/SDK primary-and-mirror metadata and fresh-consent challenge proof; read-only old token preserved |
+| SC-077 | Do not widen an existing token. | slice 6 | observed: oauth-correction-evidence.md accepted servlet/SDK primary-and-mirror metadata and fresh-consent challenge proof; read-only old token preserved |
+| SC-078 | Do not bypass consent. | slice 6 | observed: oauth-correction-evidence.md accepted servlet/SDK primary-and-mirror metadata and fresh-consent challenge proof; read-only old token preserved |
+| SC-079 | Continue verification through the existing connected plugin after release, subject to the final closure amendment. | slice 2 | observed: fresh-chat-evidence.md and full-session-evidence.md native plugin verification after release, ending under the explicit closure waiver |
+| SC-080 | Real ChatGPT success remains separate from automated proof. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-081 | Real ChatGPT success remains separate from deployment. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-082 | Owner operation dated 2026-10-28 uses the connected Donut plugin directly in this chat as the ChatGPT surface. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-083 | A separate ChatGPT app is unnecessary. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-084 | The assistant runs available plugin tools. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-085 | Terry supplies learning responses. | slice 2 | observed: full-session-evidence.md native Request, learner-started Japanese tutoring, exact Report/result and matching visible saved Feedback |
+| SC-086 | Terry supplies connection UI observations unavailable through tools. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-087 | Terry supplies consent observations unavailable through tools. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-088 | The first probe establishes the actual HTTPS origin. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-089 | The first probe establishes the actual revision. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-090 | The first probe establishes scopes. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-091 | The first probe establishes the existing registration. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-092 | The first probe establishes suitable session data. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-093 | Those first-probe facts are execution prerequisites, not claims that the candidate is already deployed. | slice 1 | observed: fresh-chat-evidence.md real HTTPS build/client scope inspection, informed recording consent and actual native Request/Report; earlier failed connection attempts retained |
+| SC-094 | Use ordinary supported operations on owner-approved data. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-095 | Credentials stay in the connection UI. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-096 | Provenance: moved from former slice 4 of commissioned-learning MCP execution by owner direction on 2026-10-28. | slice 2 | observed: selected story identity and provenance; execution-evidence.md retains original probe provenance |
+| SC-097 | Existing MCP/OAuth automated proof is reusable within its own boundary. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-098 | The real ChatGPT journey requires its own observation. | slice 2 | observed: execution-evidence.md, connection-evidence.md, oauth-correction-evidence.md, fresh-chat-evidence.md and full-session-evidence.md preserve failures/limits and keep automated/deployment/native observations distinct; no credentials retained |
+| SC-099 | Final owner amendment dated 2026-10-29 overrides further manual verification of the A/B/C partial-completion example. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-100 | The final owner amendment waives that example's corresponding observations for this story's closure. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-101 | The final owner amendment overrides further manual verification of the no-session example. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-102 | The final owner amendment waives that example's corresponding observations for this story's closure. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-103 | The waived partial-completion example remains unobserved and must not be represented as passing. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-104 | The waived no-session example remains unobserved and must not be represented as passing. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-105 | The owner directs closure based on observed authorization. | slice 2 | observed: fresh-chat-evidence.md real dual-scope authorization and recording consent |
+| SC-106 | The owner directs closure based on the full Japanese session with saved Feedback. | slice 2 | observed: full-session-evidence.md completed Japanese round, one recorded Grade-2 item and exact matching saved Feedback |
+| SC-107 | The owner directs closure based on the immediate-end empty Report. | slice 4 | observed: fresh-chat-evidence.md exact native empty Report, zero items/zero rejections and unchanged complete history/tracker |
+| SC-108 | No further learning session is requested. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
+| SC-109 | No new follow-up story is requested. | slice 2 | observed: selected story Closure amendment — 2026-10-29: Terry explicitly waived the two remaining observations; they are unobserved and not claimed passing; no new session or follow-up requested |
