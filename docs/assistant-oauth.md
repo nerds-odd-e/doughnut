@@ -69,41 +69,38 @@ Search matches titles and aliases; use a more precise title when no match is
 found. A full read supplies citation evidence; graph context guides further
 reading and may contain truncated excerpts.
 
-## Verified commissioned-learning setup
+## Commissioned learning through ChatGPT
 
-The production `v1.3.62` verification on 2026-10-29 established this sequence for
-Terry's existing **Donut in ChatGPT** connection:
+Before connecting, confirm that the registered client's allowed scopes include
+both `notes:read` and `learning_session:record`. If ChatGPT requests both but the
+registration permits only reading, authorization returns `invalid_scope`; the
+operator must correct the existing registration before reconnecting.
 
-1. Confirm the registered client's allowed scopes include both `notes:read` and
-   `learning_session:record`. An existing registration allowing reading alone
-   returned `invalid_scope` even though ChatGPT requested both advertised scopes.
-   The operator corrected that existing registration before reconnecting.
-2. Refresh the plugin's tools and start a fresh conversation. On Donut's consent
-   screen, confirm the heading includes **and record learning sessions** and the
-   explanation describes saving Feedback and updating schedules. The learner
-   clicks **Allow**.
-3. Request a session through the plugin with the learner's IANA timezone. In the
-   observed round, `Asia/Singapore` returned 日本語学習 and the item なにしろ.
-4. To end before completing an item, submit the returned notebook ID and an empty
-   `session_item_feedback` block using raw angle brackets. The observed native
-   call returned `recordedItems: []` and `rejectedEntries: []`; the complete
-   item's history and tracker, including schedule, matched the pre-call baseline.
+After deploying changed tool authentication metadata, refresh the plugin's tools
+and start a fresh conversation. On Donut's consent screen, confirm that the
+heading includes **and record learning sessions** and that the explanation
+mentions saving Feedback and updating learning schedules. The learner clicks
+**Allow**. A conversation retaining stale tool routing may require another fresh
+conversation after the connection and metadata refresh.
 
-The installed conversation continued returning `Unknown tool` after authorization
-and refresh; another fresh conversation completed the same authorized empty
-Report. An HTML-escaped handoff returned two parse rejections, so keep the Report
-markdown unchanged. This round establishes authorization and immediate end.
+Ask ChatGPT to prepare commissioned learning using the learner's IANA timezone,
+for example `Asia/Singapore`. It retrieves the first available Request, identifies
+its Session Items and waits for the learner to start. After tutoring, ask it to
+submit the result. The Report supplies each completed item's Grade and
+descriptive Feedback to `record_learning_session` for the returned notebook.
+Inspect `recordedItems` and `rejectedEntries` in the result.
 
-Terry subsequently completed a Japanese voice lesson on なにしろ through the
-plugin. The tutor waited for his start instruction; after tutoring, he asked it
-to submit his result. Its Report gave Grade 2 with descriptive Feedback. Donut’s
-**Memory Tracker** page for the item showed the matching **HARD** history entry
-(Grade 2) and the complete Feedback, with the next review updated. To inspect a
-saved result, open the completed item's tracker and compare its newest history
-entry with the submitted Report. The returned result contained one recorded item,
-Grade 2 and tracker 130239, with no rejected entries; its timestamp matched the
-saved history entry exactly. Partial completion and the no-session response need
-separate rounds.
+To end before completing any item, submit the returned notebook ID and an empty
+`session_item_feedback` block. Preserve the Report markdown's raw angle brackets;
+HTML-escaped delimiters are parsed as invalid entries. A valid empty Report
+returns zero recorded items and leaves the items' history and schedules unchanged.
+
+To inspect a saved result, open the completed item's **Memory Tracker** page and
+compare its newest history entry with the returned Report result. History renders
+Grade 1–4 as **AGAIN**, **HARD**, **GOOD**, **EASY**, respectively, alongside the
+descriptive Feedback and recording time. The tracker's next recall time reflects
+the saved Grade. Do not resubmit a successful Report to obtain evidence: another
+Report records another Grade.
 
 ## Consent and continued access
 

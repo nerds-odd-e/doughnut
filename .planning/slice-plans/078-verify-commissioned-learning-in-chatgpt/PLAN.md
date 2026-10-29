@@ -7,8 +7,9 @@
 ## Goal and scope
 
 Observe Terry's real ChatGPT OAuth connection requesting a commissioned
-Learning Session and recording Feedback in Donut, including a partial session,
-immediate end, and no available session. Retain reproducible operator steps in
+Learning Session and recording Feedback in Donut, including immediate end.
+Terry's closure amendment waives the partial and no-session observation rounds;
+neither waived example is claimed as verified. Retain reproducible operator steps in
 [the existing guide](../../../docs/assistant-oauth.md) only after observing them.
 The source owns the complete examples, boundaries and evidence requirements.
 The original verification-only boundary was expanded by Terry on 2026-10-29 to
@@ -133,19 +134,6 @@ functional scope probe. Add the observed start/finish and Feedback-review steps
 to the guide. If recording fails, retain the partial journey and stop the
 dependent recording rounds; it does not establish full-session success.
 
-### 3. End after A and preserve B/C's learning state
-Type: Behavior
-Status: planned
-Proof: A/B/C in the actual Request, A only in the Report/recorded result, A's
-new Feedback in history, and B/C's history and schedule matching their baseline.
-
-Behavior: Arrange due commissioned items A/B/C with distinct titles and capture
-their history and schedule. Terry obtains their Request through ChatGPT,
-completes A, then asks to end before B/C. ChatGPT reports A's Grade/text only;
-compare Donut's actual state with the baseline. Add the observed early-end
-instruction and outcome to the guide. Do not manufacture the observation by
-submitting a Report through another client.
-
 ### 4. End immediately with an empty Report
 Type: Behavior
 Status: done
@@ -159,17 +147,17 @@ Observe the empty call/result and Donut state. A skipped recording call alone
 does not observe the promised empty-Report path. Add only the observed behavior
 to the guide.
 
-### 5. Explain that no commissioned session is available
-Type: Behavior
-Status: planned
-Proof: `request_learning_session` returns the explicit no-session result for
-the recorded timezone and ChatGPT explains that outcome to Terry.
+## Execution complete
 
-Behavior: With no due commissioned items in the connected account, Terry asks
-ChatGPT to start learning. Inspect the actual tool result and conversation
-response. Use naturally eligible data or supported owner operations; do not
-reset persistent data to create this precondition. Add the observed no-session
-response to the guide and review the final guide against retained observations.
+Product advice: no change. The owner explicitly waives the two unobserved examples.
+The product retrospective found no required correction after inspecting the narrow
+metadata projection, shared scope owner, consent/old-token tests, existing SDK/E2E
+journey and real native saved-Feedback proof. No tests reran for record cleanup.
+Process review was enabled by `.planning/open-dough.json`; the four records-only
+refactor returns are recorded as another ODF-141 occurrence in `DearDough.md`.
+Related code revisions are 358ad5c and 8e90688; 3bcf245, 6cc7f56, 4b5780c,
+64022c1 and bd9dde8 are release/manual-evidence provenance. Unrelated trunk work
+is excluded. Accepted code CI and deployment remain distinct from pending closure CI.
 
 ## Current decisions and remaining concerns
 
@@ -187,8 +175,9 @@ response to the guide and review the final guide against retained observations.
 - Execute Plan owns fresh refactor review, formatting once, commit and push;
   preparation alone does not accept manual observations.
 - Original preparation had five observation rounds; Terry's 2026-10-29 amendment
-  added repair/release slices 6–7. Full-session response capture now matches saved
-  Feedback; partial completion and no-session proof remain open.
+  added repair/release slices 6–7. Full-session response capture matches saved
+  Feedback. Terry's explicit closure amendment skips slices 3 and 5; their examples
+  remain unobserved, and those leaves are removed from the required execution.
 
 ## Retained observations
 
@@ -203,12 +192,12 @@ response to the guide and review the final guide against retained observations.
 - 2026-10-29 continuation fast-forwarded to `c51f7b619a` from origin/main with
   local evidence preserved and locked setup passed. The source-only review includes
   Terry's repair/release amendment; fresh-chat proof observes authorization/empty end.
-- Resumed Codex CI observation after confirmed prior shutdown; selector `ci.yml`,
-  workflow 5208694 **donut CI**, repository `nerds-odd-e/doughnut`, target
-  `codex/verify-commissioned-learning-chatgpt`, coordinator `aino-seed090`,
-  directory `/tmp/dough-ci-501/watch-ll1wzy`, PID 98323, PTY 8269, yielded cell 190.
-  Runtime and checkout identities match. Prior watch-iq3Ndu stopped with coverage
-  ended, zero unread events and confirmed process exit; no CI success is inferred.
+- Closure CI observer is bound to authorized trunk `main`, workflow 5208694
+  **donut CI**, repository `nerds-odd-e/doughnut`, coordinator `aino-seed090`,
+  directory `/tmp/dough-ci-501/watch-G36plk`, PID 22008, PTY 65371, cell 204.
+  Runtime/checkout identities match. Earlier branch observer watch-ll1wzy stopped
+  with zero unread events and confirmed exit; its documentation CI is unobserved.
+  Final integration requires its own successful main completion/shutdown receipt.
 
 - Story Branch Mode; identity `SEED-090#story-2`, publisher
   `codex-seed090-chatgpt-verification`, assigned agent Aino-chan.
