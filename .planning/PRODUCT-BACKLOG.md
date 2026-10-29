@@ -9,7 +9,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Verify a commissioned learning session directly in ChatGPT](seeds/SEED-090-commissioned-learning-via-mcp.md#story-2) — SEED-090#story-2 ([plan](slice-plans/078-verify-commissioned-learning-in-chatgpt/PLAN.md))
-- [Confirm whether clicking note actions shifts the toolbar](seeds/SEED-092-note-toolbar-observation.md#story-1) — SEED-092#story-1
 
 ## Backlog list
 
