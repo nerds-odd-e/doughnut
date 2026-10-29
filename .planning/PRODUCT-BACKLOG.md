@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Verify a commissioned learning session directly in ChatGPT](seeds/SEED-090-commissioned-learning-via-mcp.md#story-2) — SEED-090#story-2 ([plan](slice-plans/078-verify-commissioned-learning-in-chatgpt/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
