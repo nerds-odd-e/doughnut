@@ -79,7 +79,7 @@ support or scope selection requires broader work, refine this leaf before expand
 
 ### 7. Release the tested OAuth correction
 Type: Behavior
-Status: planned
+Status: done
 Proof: Corrected source integrated on main, successful applicable CI and required
 artifacts, next increasing immutable stable tag, Application Release publication
 job success, and production smoke identifying the selected build and corrected
@@ -173,9 +173,9 @@ response to the guide and review the final guide against retained observations.
 
 ## Current decisions and remaining concerns
 
-- Reopened slice 6 after post-release read-only consent: compatibility-metadata
-  and challenge proof remains valid, but primary `securitySchemes` is missing.
-  See G4 and [release observations](oauth-correction-evidence.md).
+- Slice 6's primary declaration is now proved and deployed in `v1.3.62`.
+  Actual ChatGPT authorization/recording remains separate: the fresh
+  verification chat is paused on built-in approval. See [observations](oauth-correction-evidence.md).
 
 - One coherent Request/Report protocol and one Feedback model serve every
   example. Slices separate independently observable operator rounds, with

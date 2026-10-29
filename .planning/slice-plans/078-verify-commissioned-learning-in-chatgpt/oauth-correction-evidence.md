@@ -139,3 +139,47 @@ through the documented `_meta.securitySchemes` compatibility field.
   retries do not establish that fresh-context journey. Asked Terry whether to
   create a fresh verification chat after the forward release; no new chat is
   created without that authorization. No new client registration is proposed.
+
+## Forward release and fresh-context verification — 2026-10-29
+
+- Corrected commit `8e90688d04aa2ef7a6a2137fea14797a89e8123f` passed guarded
+  formatting/agent commit and published to the execution branch, then integrated
+  unchanged on main. The clean default checkout fast-forwarded. Main CI
+  [40796058190](https://github.com/nerds-odd-e/doughnut/actions/runs/40796058190),
+  attempt 1, passed every job; execution-branch CI 40795965781 also passed.
+- All three unexpired artifacts were confirmed before tagging. Immutable
+  `v1.3.62` has raw tag object `825d8a0a54bdae9a9b45c603a37cca67b694c080`;
+  release/build SHA both `8e90688d04aa2ef7a6a2137fea14797a89e8123f`.
+  [Application Release 40796899837](https://github.com/nerds-odd-e/doughnut/actions/runs/40796899837)
+  selected that identity and CI attempt. Admission succeeded and publication
+  job 123195649747 succeeded in 6m11s. Its log records the target template
+  reached, HTTP 200 with the selected build, and successful deployment record.
+- Smoke at `2026-10-29T01:00:38.039265+00:00` confirmed selected backend health,
+  frontend index/script and CLI bytes matching the exact artifacts, all five
+  tool descriptors, and primary securitySchemes equal to the metadata mirror.
+  Report declares `notes:read` and `learning_session:record`; four other tools
+  declare reading alone. Evidence files: `/tmp/seed090-production-smoke-v62.json`,
+  `/tmp/seed090-v62-release-admission.log`,
+  `/tmp/seed090-v62-release-publication.log`. Personal credentials were used
+  only for read-only tool listing and state inspection, never Report recording.
+- After deployment, the assistant ran **Refresh tools** on the existing app
+  again. The loading control returned to enabled. Screenshot:
+  `/tmp/seed090-v62-refreshed-plugin.png`. This UI does not expose stored OAuth
+  default scopes or prove that a conversation has loaded changed auth metadata.
+- Terry answered **Yes, create a verification chat** to the explicit
+  fresh-context question. Created **Verify Donut recording permission**, thread
+  `01a1852d-cd35-7273-8a16-d324e2b533ba`, local host, after deployment and refresh.
+  Its initial instruction authorizes the matching Japanese Request and empty
+  Report only, no tutoring or Grades, no automatic further session, one retry
+  after an authentication-accepted result, then a stop on an authentication loop.
+  Any expanded consent remains Terry's action. It reads no CLI credentials.
+- Parent's before-state: `/tmp/seed090-v62-fresh-empty-baseline.json`, observed
+  `2026-10-29T01:01:36.973679+00:00`, tracker 130239 with seven history entries.
+  Parent owns the full tracker/history comparison after the new chat's result.
+  Creating the chat does not itself accept any learning-session example.
+- The fresh chat requested `request_learning_session({"timezone":"Asia/Singapore"})`.
+  Its native status then reported `waitingOnApproval`. The available turn read
+  contains the tool marker but no Request result body or Report result, so it
+  does not yet establish either a matching Request or recording permission.
+  Parent asked Terry to approve the built-in prompt in the new chat. The actual
+  OAuth consent scope/wording and the empty Report result remain unverified.

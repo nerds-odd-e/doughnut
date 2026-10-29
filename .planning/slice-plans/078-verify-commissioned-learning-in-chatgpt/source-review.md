@@ -9,7 +9,7 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 | 1 | Correct Donut’s declaration of recording scopes. | slice 6 | G4 |
 | 2 | Correct the permission-upgrade response. | slice 6 | observed: AssistantLearningSessionTest.readOnlyAssistantIsChallengedForRecordingPermissionWithoutChangingLearningState asserts the exact structured insufficient_scope challenge |
 | 3 | Prove the corrected contracts at the MCP/OAuth boundary. | slice 6 | observed: [Slice 6 accepted boundary proof](oauth-correction-evidence.md#slice-6-accepted-boundary-proof--2026-10-29); full backend suite passed, 2981 tests, zero failures/errors, two skipped |
-| 4 | Release the tested correction through the application release workflow. | slice 7 |  |
+| 4 | Release the tested correction through the application release workflow. | slice 7 | observed: oauth-correction-evidence.md forward release; v1.3.62, release job 123195649747 succeeded, exact build 8e90688 verified by health and artifact/metadata smoke |
 | 5 | Continue the journey through the existing Donut plugin after release. | slice 1 |  |
 | 6 | Verify a real OAuth connection to an operator-authorized HTTPS deployment exposing Request and Report. | slice 1 |  |
 | 7 | Request both `notes:read` and `learning_session:record`. | slice 1 |  |
@@ -55,7 +55,7 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 | 32.1 | Terry supplies connection UI observations unavailable through tools. | slice 1 |  |
 | 32.2 | Terry supplies consent observations unavailable through tools. | slice 1 |  |
 | 33 | Automated MCP/OAuth/SDK evidence establishes only its own boundary, not the ChatGPT journey. | slice 5 |  |
-| 34 | Deployment and automated proof do not establish ChatGPT success. | slice 7 |  |
+| 34 | Deployment and automated proof do not establish ChatGPT success. | slice 7 | observed: forward-release evidence keeps deployment success separate from the fresh chat paused on built-in approval; no Report success is claimed |
 | 35 | Failed or unavailable probes leave affected examples unverified and inform remaining interoperability refinement. | slice 5 |  |
 | 36 | A sole Japanese notebook with an available session produces Japanese tutoring. | slice 2 |  |
 | 37 | Tutoring waits for the learner to start. | slice 2 |  |
