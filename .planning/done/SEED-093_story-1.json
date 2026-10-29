@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-093#story-1",
+  "title": "Toggle note edit modes without moving the toolbar",
+  "completedAt": "2026-10-29T04:43:08.204Z",
+  "developer": "Terry Yin",
+  "agent": "Airi-chan",
+  "host": "codex"
+}
