@@ -148,7 +148,7 @@ submitting a Report through another client.
 
 ### 4. End immediately with an empty Report
 Type: Behavior
-Status: planned
+Status: done
 Proof: A real ChatGPT call to `record_learning_session` with empty
 `session_item_feedback`, zero recorded items in its result, and unchanged
 history/schedule for every item against the pre-call baseline.
