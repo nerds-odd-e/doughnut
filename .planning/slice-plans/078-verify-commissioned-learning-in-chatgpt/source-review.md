@@ -6,7 +6,7 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | Correct Donut’s declaration of recording scopes. | slice 6 | observed: McpEndpointTest.ProtocolNegotiation.initializesAndListsRegisteredToolsThroughServlet asserts the five wire securitySchemes and their read/record scopes |
+| 1 | Correct Donut’s declaration of recording scopes. | slice 6 | G4 |
 | 2 | Correct the permission-upgrade response. | slice 6 | observed: AssistantLearningSessionTest.readOnlyAssistantIsChallengedForRecordingPermissionWithoutChangingLearningState asserts the exact structured insufficient_scope challenge |
 | 3 | Prove the corrected contracts at the MCP/OAuth boundary. | slice 6 | observed: [Slice 6 accepted boundary proof](oauth-correction-evidence.md#slice-6-accepted-boundary-proof--2026-10-29); full backend suite passed, 2981 tests, zero failures/errors, two skipped |
 | 4 | Release the tested correction through the application release workflow. | slice 7 |  |

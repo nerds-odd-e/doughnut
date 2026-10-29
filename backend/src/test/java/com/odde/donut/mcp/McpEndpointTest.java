@@ -1,11 +1,17 @@
 package com.odde.donut.mcp;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.McpJsonDefaults;
+import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -103,6 +109,25 @@ class McpEndpointTest extends McpEndpointTestBase {
           .andExpect(jsonPath("$.result.tools[3].inputSchema.properties.timezone").exists())
           .andExpect(jsonPath("$.result.tools[4].name", equalTo(RecordLearningSessionTool.NAME)))
           .andExpect(jsonPath("$.result.tools[4].inputSchema.properties.reportMarkdown").exists())
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[*].securitySchemes[0].type",
+                  contains("oauth2", "oauth2", "oauth2", "oauth2", "oauth2")))
+          .andExpect(
+              result -> {
+                String json = result.getResponse().getContentAsString();
+                var mapper = McpJsonDefaults.getMapper();
+                var response = mapper.readValue(json, McpSchema.JSONRPCResponse.class);
+                var decodedTools =
+                    mapper.convertValue(response.result(), McpSchema.ListToolsResult.class);
+                assertThat(decodedTools.tools(), hasSize(5));
+                JsonNode tools = new ObjectMapper().readTree(json).path("result").path("tools");
+                for (JsonNode tool : tools) {
+                  assertThat(
+                      tool.path("securitySchemes"),
+                      equalTo(tool.path("_meta").path("securitySchemes")));
+                }
+              })
           .andExpect(
               jsonPath(
                   "$.result.tools[*]._meta.securitySchemes[0].type",

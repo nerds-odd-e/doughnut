@@ -3,6 +3,8 @@ package com.odde.donut.mcp;
 import com.odde.donut.configs.ApiBearerAuthenticationFilter;
 import com.odde.donut.entities.User;
 import io.modelcontextprotocol.common.McpTransportContext;
+import io.modelcontextprotocol.json.McpJsonDefaults;
+import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpStatelessServerHandler;
 import io.modelcontextprotocol.server.McpStatelessSyncServer;
@@ -99,6 +101,7 @@ public class McpServerConfiguration {
           McpTransportContext transportContext, McpSchema.JSONRPCRequest request) {
         return delegate
             .handleRequest(transportContext, request)
+            .map(McpServerConfiguration::withToolSecuritySchemes)
             .onErrorResume(
                 failure ->
                     Mono.just(
@@ -118,5 +121,25 @@ public class McpServerConfiguration {
                 });
       }
     };
+  }
+
+  private static McpSchema.JSONRPCResponse withToolSecuritySchemes(
+      McpSchema.JSONRPCResponse response) {
+    if (!(response.result() instanceof McpSchema.ListToolsResult tools)) return response;
+
+    // SDK 2.1 models the compatibility metadata but not the primary tool securitySchemes field.
+    var mapper = McpJsonDefaults.getMapper();
+    Map<String, Object> result = mapper.convertValue(tools, new TypeRef<>() {});
+    result.put(
+        "tools",
+        tools.tools().stream()
+            .map(
+                tool -> {
+                  Map<String, Object> descriptor = mapper.convertValue(tool, new TypeRef<>() {});
+                  descriptor.put("securitySchemes", tool.meta().get("securitySchemes"));
+                  return descriptor;
+                })
+            .toList());
+    return McpSchema.JSONRPCResponse.result(response.id(), result);
   }
 }

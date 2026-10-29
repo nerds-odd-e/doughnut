@@ -60,7 +60,8 @@ Type: Behavior
 Status: done
 Proof: Reproduce missing recording auth metadata/challenge through the real MCP
 endpoint, then pass the complete backend suite. The wire descriptor declares
-`notes:read` and `learning_session:record` for recording; a read-only OAuth call
+`notes:read` and `learning_session:record` for recording in primary
+`securitySchemes` and its `_meta.securitySchemes` mirror; a read-only OAuth call
 returns a structured insufficient-scope challenge with the canonical resource
 metadata URL and both required scopes while preserving learning state. Existing
 dual-scope recording, personal-token access and notebook authorization retain
@@ -172,6 +173,10 @@ response to the guide and review the final guide against retained observations.
 
 ## Current decisions and remaining concerns
 
+- Reopened slice 6 after post-release read-only consent: compatibility-metadata
+  and challenge proof remains valid, but primary `securitySchemes` is missing.
+  See G4 and [release observations](oauth-correction-evidence.md).
+
 - One coherent Request/Report protocol and one Feedback model serve every
   example. Slices separate independently observable operator rounds, with
   authorization first to bound the external interoperability risk.
@@ -202,8 +207,8 @@ response to the guide and review the final guide against retained observations.
 - Rearmed Codex CI observation after the earlier stopped observer had exited:
   selector `ci.yml`, workflow 5208694 **donut CI**, repository
   `nerds-odd-e/doughnut`, target `codex/verify-commissioned-learning-chatgpt`,
-  coordinator `aino-seed090`, directory `/tmp/dough-ci-501/watch-f9raBS`,
-  PID 35943, PTY 67819, yielded cell 31. Runtime and checkout identities match.
+  coordinator `aino-seed090`, directory `/tmp/dough-ci-501/watch-BQSBYB`,
+  PID 94735, PTY 13250, yielded cell 101. Runtime and checkout identities match.
 
 - Story Branch Mode; identity `SEED-090#story-2`, publisher
   `codex-seed090-chatgpt-verification`, assigned agent Aino-chan.
@@ -215,15 +220,15 @@ response to the guide and review the final guide against retained observations.
 - Take accepted on `origin/main` and the execution branch at
   `4ef50afd67cdb5f3fe91242e30f41016d8d240d6`; increments target
   `origin` / `refs/heads/codex/verify-commissioned-learning-chatgpt`.
-- `./scripts/run.sh bash scripts/worktree_setup.sh` passed with the locked
-  workspace installation current. The same checkout's
-  `./scripts/run.sh node .agents/skills/dough-product-backlog/scripts/product-backlog.mjs read-state --link 'seeds/SEED-090-commissioned-learning-via-mcp.md#story-2'`
-  passed and read the published preparation. Existing planned-work replanning
-  authority remains; no overrun replan was selected.
 The [historical connection status](execution-evidence.md#historical-connection-status-before-the-oauth-repair)
 is retained with the observations.
 
 ## Story obligations
+
+### G4. Primary recording-scope declaration
+Reported: slice 6 — "The deployed descriptors declare scopes in _meta.securitySchemes but omit the documented primary securitySchemes field; Terry still observed read-only consent after disconnecting and allowing the new connection."
+Story clause: "Correct the existing integration's declaration of required recording scopes"
+Disposition: proved by slice 6: oauth-correction-evidence.md primary descriptor correction; current servlet primary/mirror equality and standard SDK decoding proof
 
 ### G1. Recording authority after tool discovery (first reported in slice 1)
 Reported: slice 1 — "The available Donut tool inventory in this chat contains only list_note_candidates, read_note and get_note_graph; request_learning_session and record_learning_session are unavailable."

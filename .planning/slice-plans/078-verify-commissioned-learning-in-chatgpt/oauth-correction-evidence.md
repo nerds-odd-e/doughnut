@@ -43,3 +43,99 @@ through the documented `_meta.securitySchemes` compatibility field.
   Actual ChatGPT metadata refresh, recording consent and production Report
   remain open in slices 1–5 after release. The private read-only consent
   screenshot remains a failed-journey observation, not recording consent.
+
+## Release and post-release observations — 2026-10-29
+
+- Reviewed correction commit `358ad5c0767a179134ff295b1bcfdfc43959f736`
+  published to the execution branch and integrated unchanged on `origin/main`.
+  The clean default checkout fast-forwarded. The guarded fresh preparation's
+  first attempt refused trailing blank lines in three evidence files; those
+  mechanical issues were corrected before successful commit/publication.
+- The independent refactor returned `## REFACTOR COMPLETE`: no product edits;
+  cohesive planning-only evidence extraction, approximately 15 active minutes.
+  The existing backend proof remained valid. This overran the five-minute
+  refactor hypothesis; the remaining product correction should keep evidence
+  maintenance separate and bounded rather than repeat that broad pass.
+- Main CI run 40789602019, attempt 1, passed every job at this exact commit.
+  Execution-branch CI run 40789533523 also passed. The three required, unexpired
+  artifacts were present: backend jar, frontend-dist and cli-dist.
+- Published immutable annotated tag `v1.3.61`; raw tag object
+  `c12c4d431798faf9e18c302a83664d6e74e82bf4`, release/build SHA both
+  `358ad5c0767a179134ff295b1bcfdfc43959f736`. Application Release run
+  [40790678996](https://github.com/nerds-odd-e/doughnut/actions/runs/40790678996)
+  selected this tag and CI run/attempt. Admission succeeded; publication job
+  123175055587 succeeded in 5m54s. The rollout temporarily served backend 503;
+  its target template was reached and health recovered. The job observed HTTP
+  200 with the selected build and wrote the successful deployment record.
+- Production smoke at `2026-10-29T00:03:31.893221+00:00` observed that build,
+  frontend index and script bytes matching the exact CI artifact, CLI bytes
+  matching its artifact, and all five live tool descriptors. Four declared
+  read scope; Report declared both scopes in `_meta.securitySchemes`. Retained
+  private inspection files: `/tmp/seed090-production-smoke.json`,
+  `/tmp/seed090-release-admission.log`, `/tmp/seed090-release-publication.log`.
+  No Report was written through the personal credential used for tool listing.
+- Captured seven-entry history/tracker baseline at
+  `2026-10-29T00:03:51.662902+00:00`, in
+  `/tmp/seed090-post-release-empty-baseline.json`. Retried the previously
+  authorized notebook-15 empty Report through the connected plugin. It returned
+  `Authentication for Donut was requested and accepted. Retry this tool call now.`
+  with `isError:true`; the subsequent retry returned the same result. Neither
+  result confirms report recording or zero recorded items. Terry then asked to
+  wait while disconnecting/reconnecting; no further Report call was made.
+- The CI observer was stopped on that wait: directory
+  `/tmp/dough-ci-501/watch-f9raBS`, terminal `stopped`, coverage `ended`, pending
+  CI `unobserved`, recorded/delivered/unread all zero. Stream cell 31 completed;
+  elevated `ps` confirmed PID 35943 exited. Independently observed successful CI
+  runs above remain valid, but the observer itself recorded no delivered events.
+- Terry next supplied
+  `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/codex-clipboard-22b7164d-a530-46dd-9970-54d8c15060af.png`
+  and reported allowing the new connection. It still shows only **Allow Donut
+  in ChatGPT to read your notebooks?**, without recording consent. This leaves
+  real recording authorization unverified after the successful deployment.
+- The assistant opened the existing ChatGPT app settings and ran **Refresh
+  tools**. The disabled loading button returned to enabled; no success toast or
+  actual stored scope values were exposed. The details UI lists one write and
+  four read tools, but exposes no OAuth scope settings. Export download did not
+  yield a file path; browser policy blocked the download-management URL. No
+  alternate download surface or filesystem workaround was attempted.
+- Reassessment: OpenAI's reference describes `_meta.securitySchemes` as a
+  compatibility mirror and shows a primary `securitySchemes` declaration too.
+  The first automated test observed only the mirror, so that proof does not
+  establish the primary field or actual ChatGPT scope selection. Reopened
+  slice 6 with G4 for the missing primary field. This is an evidenced wire gap,
+  not a claim that it is the sole cause of the installed app's read-only scope.
+
+## Primary descriptor correction — 2026-10-29
+
+- Reproduction at base `358ad5c0767a179134ff295b1bcfdfc43959f736`:
+  `./scripts/run.sh pnpm backend:test_only` exited 1, 2981 tests, one expected
+  missing-primary-field failure, two skipped. The servlet assertion expected
+  five `$.result.tools[*].securitySchemes[0].type` values and found none.
+- PFE: reuse `McpToolAuthorization` as the sole scope owner and the existing
+  `McpServerConfiguration` response handler as the SDK wire seam. The SDK's final
+  Tool record has no primary field, while its ListToolsResult response can be
+  mapped using the SDK mapper. The bounded adaptation retains every SDK field
+  and projects each tool's existing metadata into primary securitySchemes.
+  No SDK upgrade, parallel domain DTO or authorization-store change is needed.
+- The same full backend command then exited 0: 2981 tests, zero failures/errors,
+  two skipped, 1m22s test stage plus migration. The canonical servlet assertion
+  now observes primary declarations, exact mirror equality, four read scope
+  sets, both Report scopes, and standard Java SDK JSONRPCResponse→ListToolsResult
+  decoding. Existing challenge/consent/Feedback/original-token proof passed.
+  Logs: `/tmp/seed090-primary-descriptor-red.log` and
+  `/tmp/seed090-primary-descriptor-green.log`.
+- `/root/oauth_primary_descriptor` returned the uncommitted correction. Parent
+  inspected the configuration, mapper seam, servlet assertions and documentation.
+  Consumer trace `/tmp/seed090-primary-consumer-trace.md` follows Java and TS SDK
+  parsing through Cypress discovery. The TS SDK strips unknown primary fields
+  but keeps its existing names/metadata; exact-base main CI 40789602019 supports
+  unchanged journeys, and current standard SDK decoding observes the new field.
+- Fresh `/root/oauth_primary_refactor` returned `## REFACTOR COMPLETE`, no edits,
+  no uncovered code consumers, approximately five active minutes. It reused
+  accepted proof, ran whitespace checking and launched no additional heavy tests.
+- The installed app's actual scope defaults remain unexposed. Official OpenAI
+  refresh guidance, fetched again on this date, explicitly requires a new
+  conversation after auth-metadata refresh. Earlier same-chat authentication
+  retries do not establish that fresh-context journey. Asked Terry whether to
+  create a fresh verification chat after the forward release; no new chat is
+  created without that authorization. No new client registration is proposed.

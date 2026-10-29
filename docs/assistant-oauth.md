@@ -97,7 +97,8 @@ completed items. Existing read-only connections need fresh authorization request
 both scopes to gain recording permission. It gains no general API access, personal-token
 creation or content editing. Losing notebook permission affects subsequent reads.
 
-The MCP tool descriptors declare their OAuth scopes in `_meta.securitySchemes`:
+The MCP tool descriptors declare their OAuth scopes in `securitySchemes`, mirrored
+in `_meta.securitySchemes` for compatibility:
 the reading and Request tools require `notes:read`, and the Report tool requires
 both scopes. A Report attempted through a read-only connection returns a tool
 error with an `mcp/www_authenticate` insufficient-scope challenge identifying
@@ -107,7 +108,9 @@ permissions. This follows the [ChatGPT authentication contract](https://develope
 and its [tool metadata compatibility field](https://developers.openai.com/apps-sdk/reference#_meta-fields-on-tool-descriptor).
 In ChatGPT, refresh the plugin's tools after deploying changed
 metadata before testing that permission upgrade. This describes the supported
-wire contract; the actual ChatGPT permission-upgrade and recording journey must
+wire contract. OpenAI's [metadata refresh guidance](https://developers.openai.com/apps-sdk/deploy/connect-chatgpt#refresh-metadata)
+then requires starting a new conversation for the affected tests. The actual
+ChatGPT permission-upgrade and recording journey must
 be observed separately from backend tests. A connection completing after Donut
 showed only notebook-reading consent has not established recording permission.
 

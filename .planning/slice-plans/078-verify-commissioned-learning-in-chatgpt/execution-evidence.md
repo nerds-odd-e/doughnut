@@ -200,3 +200,11 @@ the next acceptance.
   requested scopes and recording consent remain unobserved. Resume slice 1 by
   inspecting that authorization request, then verify its recording grant with
   the empty Report. No accepted slice result or story completion is claimed.
+
+## Original execution setup receipts
+
+- `./scripts/run.sh bash scripts/worktree_setup.sh` passed with the locked
+  workspace installation current. The same checkout's
+  `./scripts/run.sh node .agents/skills/dough-product-backlog/scripts/product-backlog.mjs read-state --link 'seeds/SEED-090-commissioned-learning-via-mcp.md#story-2'`
+  passed and read the published preparation. Existing planned-work replanning
+  authority remains; no overrun replan was selected.
