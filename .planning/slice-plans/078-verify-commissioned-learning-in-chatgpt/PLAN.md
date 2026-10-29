@@ -94,7 +94,7 @@ check through the connected plugin; any required consent stays informed.
 
 ### 1. Authorize the real ChatGPT connection for report recording
 Type: Behavior
-Status: planned
+Status: done
 Proof: Actual connection setup and consent observations, requested scope string,
 connection result, and visibility of the Request/Report tools. Slice 2 owns
 functional confirmation that this same connection retains recording authority.
@@ -173,9 +173,9 @@ response to the guide and review the final guide against retained observations.
 
 ## Current decisions and remaining concerns
 
-- Slice 6's primary declaration is now proved and deployed in `v1.3.62`.
-  Actual ChatGPT authorization/recording remains separate: the fresh
-  verification chat is paused on built-in approval. See [observations](oauth-correction-evidence.md).
+- Slice 6's primary declaration is proved and deployed in `v1.3.62`.
+  The existing client's stale scope allowlist was corrected; informed consent
+  and the native empty Report now pass. See [fresh-chat proof](fresh-chat-evidence.md).
 
 - One coherent Request/Report protocol and one Feedback model serve every
   example. Slices separate independently observable operator rounds, with
@@ -190,25 +190,27 @@ response to the guide and review the final guide against retained observations.
 - Original preparation used five bounded observation rounds, with the first
   credentialed probe bounding external prerequisites. Terry's 2026-10-29 amendment
   added the authorized correction and release in slices 6–7. The unchanged
-  ChatGPT observations remain open after the bounded automated proof.
+  full/partial/no-session observations remain open after the empty-Report proof.
 
 ## Retained observations
 
 - [Discovery and the first empty-Report probe](execution-evidence.md).
 - [Reauthorization, retries and observed read-access consent](connection-evidence.md).
 - [Accepted MCP/OAuth correction proof](oauth-correction-evidence.md).
+- [Real authorization, empty Report and unchanged state](fresh-chat-evidence.md).
 
 ## Execution context
 
 - 2026-10-29 continuation: fast-forwarded the owned execution branch to
   `c51f7b619a` from fetched origin/main, preserving local evidence. Locked
   worktree setup passed. The fresh source-only review now includes Terry's
-  repair/release amendment. All unchanged manual-round obligations remain open.
-- Rearmed Codex CI observation after the earlier stopped observer had exited:
-  selector `ci.yml`, workflow 5208694 **donut CI**, repository
-  `nerds-odd-e/doughnut`, target `codex/verify-commissioned-learning-chatgpt`,
-  coordinator `aino-seed090`, directory `/tmp/dough-ci-501/watch-BQSBYB`,
-  PID 94735, PTY 13250, yielded cell 101. Runtime and checkout identities match.
+  repair/release amendment. Fresh-chat proof now observes authorization and empty end.
+- Resumed Codex CI observation after confirmed prior shutdown; selector `ci.yml`,
+  workflow 5208694 **donut CI**, repository `nerds-odd-e/doughnut`, target
+  `codex/verify-commissioned-learning-chatgpt`, coordinator `aino-seed090`,
+  directory `/tmp/dough-ci-501/watch-dYZr0f`, PID 9527, PTY 65282, yielded cell 159.
+  Runtime and checkout identities match. Earlier stopped observers are retained
+  in oauth-correction-evidence.md; no success is inferred from their shutdown.
 
 - Story Branch Mode; identity `SEED-090#story-2`, publisher
   `codex-seed090-chatgpt-verification`, assigned agent Aino-chan.
@@ -233,14 +235,14 @@ Disposition: proved by slice 6: oauth-correction-evidence.md primary descriptor 
 ### G1. Recording authority after tool discovery (first reported in slice 1)
 Reported: slice 1 — "The available Donut tool inventory in this chat contains only list_note_candidates, read_note and get_note_graph; request_learning_session and record_learning_session are unavailable."
 Story clause: "resulting connection can both request and record a session."
-Disposition: return
+Disposition: proved by slice 1: fresh-chat-evidence.md matching native Request and successful empty Report after informed dual-scope consent; completed-item recording remains owned by slice 2
 
 ### G3. The reauthorized plugin must remain callable
 Reported: slice 1 — "After Terry reported reauthorization done, record_learning_session, request_learning_session and list_note_candidates all returned Unknown tool from the plugin runtime, while direct production tools/list still returned all five tools."
 Story clause: "resulting connection can both request and record a session."
-Disposition: return
+Disposition: proved by slice 1: fresh-chat-evidence.md fresh conversation's completed native record_learning_session call with zero items and zero rejections; historical stale-chat failures retained
 
 ### G2. Recording consent must be observed
 Reported: slice 1 — "Terry answered I did not check the wording when asked whether Donut consent explicitly mentioned permission to record Learning Session Reports."
 Story clause: "observe Donut consent describing report recording"
-Disposition: return
+Disposition: proved by slice 1: fresh-chat-evidence.md parent-inspected recording-consent screenshot followed by Terry's explicit I clicked Allow observation

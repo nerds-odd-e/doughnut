@@ -10,13 +10,13 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 | 2 | Correct the permission-upgrade response. | slice 6 | observed: AssistantLearningSessionTest.readOnlyAssistantIsChallengedForRecordingPermissionWithoutChangingLearningState asserts the exact structured insufficient_scope challenge |
 | 3 | Prove the corrected contracts at the MCP/OAuth boundary. | slice 6 | observed: [Slice 6 accepted boundary proof](oauth-correction-evidence.md#slice-6-accepted-boundary-proof--2026-10-29); full backend suite passed, 2981 tests, zero failures/errors, two skipped |
 | 4 | Release the tested correction through the application release workflow. | slice 7 | observed: oauth-correction-evidence.md forward release; v1.3.62, release job 123195649747 succeeded, exact build 8e90688 verified by health and artifact/metadata smoke |
-| 5 | Continue the journey through the existing Donut plugin after release. | slice 1 |  |
-| 6 | Verify a real OAuth connection to an operator-authorized HTTPS deployment exposing Request and Report. | slice 1 |  |
-| 7 | Request both `notes:read` and `learning_session:record`. | slice 1 |  |
-| 8 | Observe consent wording that describes recording. | slice 1 |  |
-| 9 | Verify that the authorized connection can request sessions. | slice 1 |  |
+| 5 | Continue the journey through the existing Donut plugin after release. | slice 1 | observed: fresh-chat-evidence.md native Donut Request and Report after v1.3.62 |
+| 6 | Verify a real OAuth connection to an operator-authorized HTTPS deployment exposing Request and Report. | slice 1 | observed: fresh-chat-evidence.md authorized production origin/build, native matching Request and successful Report in the explicitly approved fresh conversations |
+| 7 | Request both `notes:read` and `learning_session:record`. | slice 1 | observed: fresh-chat-evidence.md load-balancer actual scope string learning_session:record notes:read |
+| 8 | Observe consent wording that describes recording. | slice 1 | observed: fresh-chat-evidence.md parent-inspected consent heading and recording explanation |
+| 9 | Verify that the authorized connection can request sessions. | slice 1 | observed: fresh-chat-evidence.md matching notebook-15 Request with timezone Asia/Singapore |
 | 10 | Verify that the authorized connection can record completed items. | slice 2 |  |
-| 11 | Require fresh authorization for both scopes when upgrading an existing read-only connection. | slice 1 |  |
+| 11 | Require fresh authorization for both scopes when upgrading an existing read-only connection. | slice 1 | observed: fresh-chat-evidence.md corrected existing registration then fresh dual-scope consent; Terry clicked Allow |
 | 12 | Preserve read-only access until informed authorization grants both scopes. | slice 6 | observed: read-only challenge test retains zero logs and unchanged due date; upgrade test records Feedback only after fresh consent-issued token |
 | 13 | Never widen an existing token. | slice 6 | observed: recordingChallengeLeadsToFreshConsentAndSavedFeedbackWithoutWideningTheOldToken reuses the old token and receives a challenge while history retains one Feedback |
 | 14 | Never bypass consent. | slice 6 | observed: upgrade test consumes challenge scopes through approvedCode → begin → consent-context → Allow → exchange; AssistantConsentTest checks exact consent scopes and CSRF/denial proof ran |
@@ -42,20 +42,20 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 | 23 | Retain failures and unreached steps. | slice 5 |  |
 | 24 | Update the existing guide using observed setup and session steps only. | slice 5 |  |
 | 25 | Keep credentials out of retained evidence and the guide. | slice 5 |  |
-| 26.1 | The first probe establishes the actual HTTPS origin. | slice 1 |  |
-| 26.2 | The first probe establishes the actual revision. | slice 1 |  |
-| 26.3 | The first probe establishes the actual scopes. | slice 1 |  |
-| 26.4 | The first probe establishes the actual client registration. | slice 1 |  |
-| 26.5 | The first probe establishes suitable data. | slice 1 |  |
+| 26.1 | The first probe establishes the actual HTTPS origin. | slice 1 | observed: fresh-chat-evidence.md production origin https://doughnut.odd-e.com |
+| 26.2 | The first probe establishes the actual revision. | slice 1 | observed: fresh-chat-evidence.md deployed v1.3.62 build 8e90688 confirmed again at the after-state reading |
+| 26.3 | The first probe establishes the actual scopes. | slice 1 | observed: fresh-chat-evidence.md actual authorization scopes and corrected stored allowlist |
+| 26.4 | The first probe establishes the actual client registration. | slice 1 | observed: fresh-chat-evidence.md Donut in ChatGPT existing registration fingerprint 97130bd51a6c, before/after read and one-client correction |
+| 26.5 | The first probe establishes suitable data. | slice 1 | observed: fresh-chat-evidence.md notebook 15 sole item なにしろ, tracker 130239 and seven-entry baseline |
 | 27 | Use ordinary supported operations on owner-approved data. | slice 5 |  |
 | 28 | Credentials remain in the connection UI. | slice 5 |  |
-| 29 | The connected Donut plugin counts as the ChatGPT surface; a separate ChatGPT application is unnecessary. | slice 1 |  |
-| 30 | The assistant runs available plugin tools. | slice 1 |  |
+| 29 | The connected Donut plugin counts as the ChatGPT surface; a separate ChatGPT application is unnecessary. | slice 1 | observed: fresh-chat-evidence.md connected Donut plugin used in Codex chats; no separate ChatGPT application |
+| 30 | The assistant runs available plugin tools. | slice 1 | observed: fresh-chat-evidence.md native request_learning_session and record_learning_session markers and arguments |
 | 31 | Terry supplies learning responses. | slice 2 |  |
-| 32.1 | Terry supplies connection UI observations unavailable through tools. | slice 1 |  |
-| 32.2 | Terry supplies consent observations unavailable through tools. | slice 1 |  |
+| 32.1 | Terry supplies connection UI observations unavailable through tools. | slice 1 | observed: fresh-chat-evidence.md Terry authorized new verification chats and reported Allow; parent-inspected setup observations are retained |
+| 32.2 | Terry supplies consent observations unavailable through tools. | slice 1 | observed: fresh-chat-evidence.md consent screenshot plus Terry’s I clicked Allow observation |
 | 33 | Automated MCP/OAuth/SDK evidence establishes only its own boundary, not the ChatGPT journey. | slice 5 |  |
-| 34 | Deployment and automated proof do not establish ChatGPT success. | slice 7 | observed: forward-release evidence keeps deployment success separate from the fresh chat paused on built-in approval; no Report success is claimed |
+| 34 | Deployment and automated proof do not establish ChatGPT success. | slice 7 | observed: oauth-correction-evidence.md separate release proof; fresh-chat-evidence.md separately observes native success after the retained invalid_scope failure |
 | 35 | Failed or unavailable probes leave affected examples unverified and inform remaining interoperability refinement. | slice 5 |  |
 | 36 | A sole Japanese notebook with an available session produces Japanese tutoring. | slice 2 |  |
 | 37 | Tutoring waits for the learner to start. | slice 2 |  |
@@ -68,10 +68,10 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 | 40.2 | After that early end, B’s schedule matches its baseline. | slice 3 |  |
 | 40.3 | After that early end, C’s history matches its baseline. | slice 3 |  |
 | 40.4 | After that early end, C’s schedule matches its baseline. | slice 3 |  |
-| 41 | Immediately ending an available Request submits an empty Report. | slice 4 |  |
-| 42 | The immediate-end result records zero items. | slice 4 |  |
-| 43.1 | Immediate end leaves all history unchanged. | slice 4 |  |
-| 43.2 | Immediate end leaves all schedules unchanged. | slice 4 |  |
+| 41 | Immediately ending an available Request submits an empty Report. | slice 4 | observed: fresh-chat-evidence.md user-selected immediate end, matching available Request and exact raw-delimiter native empty Report |
+| 42 | The immediate-end result records zero items. | slice 4 | observed: fresh-chat-evidence.md clean native result recordedItems:[] and rejectedEntries:[] |
+| 43.1 | Immediate end leaves all history unchanged. | slice 4 | observed: fresh-chat-evidence.md complete seven-entry history equals pre-call baseline |
+| 43.2 | Immediate end leaves all schedules unchanged. | slice 4 | observed: fresh-chat-evidence.md complete sole-item tracker including schedule equals pre-call baseline |
 | 44 | No due commissioned items produces an explicit no-session result. | slice 5 |  |
 | 45 | ChatGPT explains that no-session result. | slice 5 |  |
 | 46 | Notebook/program choice is deferred. | slice 5 |  |

@@ -183,3 +183,45 @@ through the documented `_meta.securitySchemes` compatibility field.
   does not yet establish either a matching Request or recording permission.
   Parent asked Terry to approve the built-in prompt in the new chat. The actual
   OAuth consent scope/wording and the empty Report result remain unverified.
+
+## Fresh-chat failure and registration diagnostic — 2026-10-29
+
+- Later thread inspection establishes the first verification turn completed:
+  Request returned notebook 15, 日本語学習, sole item なにしろ. Both empty
+  Report attempts returned the authentication-requested-and-accepted retry
+  message; the chat stopped its retry loop without a recording result.
+- Terry then reported a connection error in that chat and supplied
+  `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/codex-clipboard-ef4ae672-0ab3-450f-a79d-f310e0ed64ef.png`.
+  Parent inspected it: **OAuth failed: invalid_scope - OAuth 2.0 Parameter: scope**.
+  The prior built-in approval stop is superseded by this observed scope failure.
+- Source reading: `AssistantAuthorizationRequestValidator` invokes Spring's
+  registered-client scope validator before the resource policy; the latter
+  reports `invalid_target`. The error therefore narrows the next check to the
+  actual requested scope values versus that client's allowed scope values.
+  It does not establish which value was rejected. Both public metadata and
+  deployed primary/mirrored tool declarations are already verified.
+- Repository application/application-prod YAML contain no OAuth client entries;
+  configured client defaults are empty. That does not establish the deployed
+  environment or persisted registration. No registration value was guessed or
+  changed. Reading production OAuth request logs via existing gcloud auth failed:
+  token refresh requires reauthentication and cannot prompt noninteractively.
+  Asked Terry to run `gcloud auth login`; no credential was copied or displayed.
+- After-observation `/tmp/seed090-v62-fresh-empty-after-auth-loop.json`, at
+  `2026-10-29T01:22:35.894735+00:00`, matches the fresh baseline's complete
+  tracker and all seven history entries. This establishes unchanged state after
+  failed authentication, not successful empty-Report recording. G1/G2/G3 remain
+  open under slice 1; the next prerequisite is the request/registration check.
+- Release-evidence commit `3bcf2454de655ebb39673e435b340ba0230e35e8` published
+  on the execution branch and main. It changes planning only; deployed code
+  remains the verified v1.3.62 build. The current diagnostic notes remain local
+  and resumable while the credential-dependent inspection is held.
+- Observer `/tmp/dough-ci-501/watch-BQSBYB` stopped with coverage ended,
+  pending CI unobserved and recorded/delivered/unread all zero. Stream cell 101
+  completed and PID 94735 exited. Independent successful code CI and deployment
+  observations remain valid; no observer success is inferred from them.
+
+- Subsequent user-authorized investigation in the verification chat corrected
+  the existing client allowlist and observed recording consent and a clean native
+  empty Report. See [fresh-chat evidence](fresh-chat-evidence.md) for actual scopes,
+  Terry’s consent, exact call/result and unchanged full history/tracker. This
+  supersedes the prerequisite above while retaining its dated failure evidence.

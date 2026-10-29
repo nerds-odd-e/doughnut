@@ -69,6 +69,33 @@ Search matches titles and aliases; use a more precise title when no match is
 found. A full read supplies citation evidence; graph context guides further
 reading and may contain truncated excerpts.
 
+## Verified commissioned-learning setup
+
+The production `v1.3.62` verification on 2026-10-29 established this sequence for
+Terry's existing **Donut in ChatGPT** connection:
+
+1. Confirm the registered client's allowed scopes include both `notes:read` and
+   `learning_session:record`. An existing registration allowing reading alone
+   returned `invalid_scope` even though ChatGPT requested both advertised scopes.
+   The operator corrected that existing registration before reconnecting.
+2. Refresh the plugin's tools and start a fresh conversation. On Donut's consent
+   screen, confirm the heading includes **and record learning sessions** and the
+   explanation describes saving Feedback and updating schedules. The learner
+   clicks **Allow**.
+3. Request a session through the plugin with the learner's IANA timezone. In the
+   observed round, `Asia/Singapore` returned 日本語学習 and the item なにしろ.
+4. To end before completing an item, submit the returned notebook ID and an empty
+   `session_item_feedback` block using raw angle brackets. The observed native
+   call returned `recordedItems: []` and `rejectedEntries: []`; the complete
+   item's history and tracker, including schedule, matched the pre-call baseline.
+
+The installed conversation continued returning `Unknown tool` after authorization
+and refresh; another fresh conversation completed the same authorized empty
+Report. An HTML-escaped handoff returned two parse rejections, so keep the Report
+markdown unchanged. This round establishes authorization and immediate end;
+full tutoring, partial completion and the no-session response still need their
+own observations.
+
 ## Consent and continued access
 
 The user signs in through existing GitHub login, then sees the assistant name,
