@@ -15,16 +15,16 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 | 7 | Request both `notes:read` and `learning_session:record`. | slice 1 | observed: fresh-chat-evidence.md load-balancer actual scope string learning_session:record notes:read |
 | 8 | Observe consent wording that describes recording. | slice 1 | observed: fresh-chat-evidence.md parent-inspected consent heading and recording explanation |
 | 9 | Verify that the authorized connection can request sessions. | slice 1 | observed: fresh-chat-evidence.md matching notebook-15 Request with timezone Asia/Singapore |
-| 10 | Verify that the authorized connection can record completed items. | slice 2 |  |
+| 10 | Verify that the authorized connection can record completed items. | slice 2 | observed: full-session-evidence.md native Report followed by one matching new saved recall log 139509 with HARD(2) and exact descriptive Feedback |
 | 11 | Require fresh authorization for both scopes when upgrading an existing read-only connection. | slice 1 | observed: fresh-chat-evidence.md corrected existing registration then fresh dual-scope consent; Terry clicked Allow |
 | 12 | Preserve read-only access until informed authorization grants both scopes. | slice 6 | observed: read-only challenge test retains zero logs and unchanged due date; upgrade test records Feedback only after fresh consent-issued token |
 | 13 | Never widen an existing token. | slice 6 | observed: recordingChallengeLeadsToFreshConsentAndSavedFeedbackWithoutWideningTheOldToken reuses the old token and receives a challenge while history retains one Feedback |
 | 14 | Never bypass consent. | slice 6 | observed: upgrade test consumes challenge scopes through approvedCode → begin → consent-context → Allow → exchange; AssistantConsentTest checks exact consent scopes and CSRF/denial proof ran |
-| 15 | Have ChatGPT obtain the first available Request using the learner’s IANA timezone. | slice 2 |  |
-| 16 | Follow the Request’s tutoring instructions. | slice 2 |  |
-| 17 | Submit the existing Report markdown for completed items at normal finish. | slice 2 |  |
+| 15 | Have ChatGPT obtain the first available Request using the learner’s IANA timezone. | slice 2 | observed: full-session-evidence.md completed native Request with Asia/Singapore, sole なにしろ item reported in the chat |
+| 16 | Follow the Request’s tutoring instructions. | slice 2 | observed: full-session-evidence.md Japanese voice tutoring from the reported item, learner-start wait, actual answers and matching Report; initial explanatory error was corrected and retained |
+| 17 | Submit the existing Report markdown for completed items at normal finish. | slice 2 | observed: full-session-evidence.md exact existing Report markdown in native call after Terry asked to submit his result |
 | 18 | Submit the existing Report markdown for completed items after early end. | slice 3 |  |
-| 19 | Compare the returned recording result with actual Donut Feedback history. | slice 2 |  |
+| 19 | Compare the returned recording result with actual Donut Feedback history. | slice 2 | G5 |
 | 20 | Verify that incomplete items retain their prior Feedback. | slice 3 |  |
 | 21 | Verify that incomplete items retain their prior schedule. | slice 3 |  |
 | 22.1 | Retain each round’s date. | slice 5 |  |
@@ -51,18 +51,18 @@ Launched `/root/oauth_source_review` on 2026-10-29 with `fork_turns: none`. The 
 | 28 | Credentials remain in the connection UI. | slice 5 |  |
 | 29 | The connected Donut plugin counts as the ChatGPT surface; a separate ChatGPT application is unnecessary. | slice 1 | observed: fresh-chat-evidence.md connected Donut plugin used in Codex chats; no separate ChatGPT application |
 | 30 | The assistant runs available plugin tools. | slice 1 | observed: fresh-chat-evidence.md native request_learning_session and record_learning_session markers and arguments |
-| 31 | Terry supplies learning responses. | slice 2 |  |
+| 31 | Terry supplies learning responses. | slice 2 | observed: full-session-evidence.md voice transcript contains Terry’s actual learning responses |
 | 32.1 | Terry supplies connection UI observations unavailable through tools. | slice 1 | observed: fresh-chat-evidence.md Terry authorized new verification chats and reported Allow; parent-inspected setup observations are retained |
 | 32.2 | Terry supplies consent observations unavailable through tools. | slice 1 | observed: fresh-chat-evidence.md consent screenshot plus Terry’s I clicked Allow observation |
 | 33 | Automated MCP/OAuth/SDK evidence establishes only its own boundary, not the ChatGPT journey. | slice 5 |  |
 | 34 | Deployment and automated proof do not establish ChatGPT success. | slice 7 | observed: oauth-correction-evidence.md separate release proof; fresh-chat-evidence.md separately observes native success after the retained invalid_scope failure |
 | 35 | Failed or unavailable probes leave affected examples unverified and inform remaining interoperability refinement. | slice 5 |  |
-| 36 | A sole Japanese notebook with an available session produces Japanese tutoring. | slice 2 |  |
-| 37 | Tutoring waits for the learner to start. | slice 2 |  |
-| 38.1 | Completed items produce recorded Grades. | slice 2 |  |
-| 38.2 | Completed items produce recorded descriptive Feedback. | slice 2 |  |
-| 38.3 | Recorded Grades are visible in history. | slice 2 |  |
-| 38.4 | Recorded descriptive Feedback is visible in history. | slice 2 |  |
+| 36 | A sole Japanese notebook with an available session produces Japanese tutoring. | slice 2 | observed: full-session-evidence.md sole Japanese item and Japanese tutoring observed in the supplied chat |
+| 37 | Tutoring waits for the learner to start. | slice 2 | observed: full-session-evidence.md preparation invites 始めよう, voice transcript starts じゃあ始めましょうか before tutoring |
+| 38.1 | Completed items produce recorded Grades. | slice 2 | observed: full-session-evidence.md new recall log 139509 stores HARD, Grade.HARD(2), matching the submitted Grade 2 |
+| 38.2 | Completed items produce recorded descriptive Feedback. | slice 2 | observed: full-session-evidence.md saved tutorFeedback exactly equals all submitted descriptive text |
+| 38.3 | Recorded Grades are visible in history. | slice 2 | observed: full-session-evidence.md actual Donut tracker page visibly renders the new HARD entry; Grade.HARD(2) explains its label |
+| 38.4 | Recorded descriptive Feedback is visible in history. | slice 2 | observed: full-session-evidence.md actual tracker page visibly renders the complete matching descriptive Feedback |
 | 39 | For Request items A/B/C, completing A and then ending saves A-only Feedback. | slice 3 |  |
 | 40.1 | After that early end, B’s history matches its baseline. | slice 3 |  |
 | 40.2 | After that early end, B’s schedule matches its baseline. | slice 3 |  |

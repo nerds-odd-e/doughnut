@@ -14,9 +14,9 @@ The source owns the complete examples, boundaries and evidence requirements.
 The original verification-only boundary was expanded by Terry on 2026-10-29 to
 repair Donut's OAuth integration and release the tested correction.
 
-New real-client activation, notebook selection, automatic further sessions,
-another protocol, general editing and additional clients remain deferred.
-SDK or personal-token results cannot replace any ChatGPT observation below.
+New client activation, notebook selection, automatic further sessions, another
+protocol, general editing and additional clients remain deferred; SDK/personal-token
+results cannot replace ChatGPT observations.
 
 ## Existing solution and constraints
 
@@ -175,22 +175,20 @@ response to the guide and review the final guide against retained observations.
 
 - Slice 6's primary declaration is proved and deployed in `v1.3.62`.
   The existing client's stale scope allowlist was corrected; informed consent
-  and the native empty Report now pass. See [fresh-chat proof](fresh-chat-evidence.md).
+  and the native empty Report now pass. Full tutoring saved matching Feedback;
+  exact Report response capture remains G5. See [full-round proof](full-session-evidence.md).
 
-- One coherent Request/Report protocol and one Feedback model serve every
-  example. Slices separate independently observable operator rounds, with
-  authorization first to bound the external interoperability risk.
+- One Request/Report protocol and Feedback model serve all independently
+  observable rounds; authorization first bounds the interoperability risk.
 - Evidence and guide edits reuse accepted implementation proof only for its
   stated boundary. Slice 6 adds MCP/OAuth regression tests; no API generation is
   needed. Further product changes require refinement before execution and bring
   their own stack proof and delivery requirements.
-- Execute Plan owns the required fresh refactor review, formatting once,
-  commit and push after authorized changes. Preparation does not perform the
-  manual rounds or mark any slice done.
-- Original preparation used five bounded observation rounds, with the first
-  credentialed probe bounding external prerequisites. Terry's 2026-10-29 amendment
-  added the authorized correction and release in slices 6–7. The unchanged
-  full/partial/no-session observations remain open after the empty-Report proof.
+- Execute Plan owns fresh refactor review, formatting once, commit and push;
+  preparation alone does not accept manual observations.
+- Original preparation had five observation rounds; Terry's 2026-10-29 amendment
+  added repair/release slices 6–7. Full-session response capture, partial completion
+  and no-session proof remain open after the observed saved-Feedback journey.
 
 ## Retained observations
 
@@ -198,32 +196,30 @@ response to the guide and review the final guide against retained observations.
 - [Reauthorization, retries and observed read-access consent](connection-evidence.md).
 - [Accepted MCP/OAuth correction proof](oauth-correction-evidence.md).
 - [Real authorization, empty Report and unchanged state](fresh-chat-evidence.md).
+- [Completed Japanese tutoring and saved Feedback](full-session-evidence.md).
 
 ## Execution context
 
-- 2026-10-29 continuation: fast-forwarded the owned execution branch to
-  `c51f7b619a` from fetched origin/main, preserving local evidence. Locked
-  worktree setup passed. The fresh source-only review now includes Terry's
-  repair/release amendment. Fresh-chat proof now observes authorization and empty end.
+- 2026-10-29 continuation fast-forwarded to `c51f7b619a` from origin/main with
+  local evidence preserved and locked setup passed. The source-only review includes
+  Terry's repair/release amendment; fresh-chat proof observes authorization/empty end.
 - Resumed Codex CI observation after confirmed prior shutdown; selector `ci.yml`,
   workflow 5208694 **donut CI**, repository `nerds-odd-e/doughnut`, target
   `codex/verify-commissioned-learning-chatgpt`, coordinator `aino-seed090`,
-  directory `/tmp/dough-ci-501/watch-dYZr0f`, PID 9527, PTY 65282, yielded cell 159.
-  Runtime and checkout identities match. Earlier stopped observers are retained
-  in oauth-correction-evidence.md; no success is inferred from their shutdown.
+  directory `/tmp/dough-ci-501/watch-iq3Ndu`, PID 28888, PTY 67621, yielded cell 181.
+  Runtime and checkout identities match. Prior watch-dYZr0f stopped with coverage
+  ended, zero unread events and confirmed process exit; no CI success is inferred.
 
 - Story Branch Mode; identity `SEED-090#story-2`, publisher
   `codex-seed090-chatgpt-verification`, assigned agent Aino-chan.
-- Created execution checkout
-  `/Users/terryyin/git/doughnut/.worktrees/verify-commissioned-learning-chatgpt`,
+- Execution checkout `/Users/terryyin/git/doughnut/.worktrees/verify-commissioned-learning-chatgpt`,
   branch `codex/verify-commissioned-learning-chatgpt`, from
   `7001846a8d141d6bbc48b48b0669c0db542bbe51`.
   Originating/integration checkout: `/Users/terryyin/git/doughnut`.
 - Take accepted on `origin/main` and the execution branch at
   `4ef50afd67cdb5f3fe91242e30f41016d8d240d6`; increments target
   `origin` / `refs/heads/codex/verify-commissioned-learning-chatgpt`.
-The [historical connection status](execution-evidence.md#historical-connection-status-before-the-oauth-repair)
-is retained with the observations.
+[Historical connection status](execution-evidence.md#historical-connection-status-before-the-oauth-repair) remains in the observations.
 
 ## Story obligations
 
@@ -246,3 +242,8 @@ Disposition: proved by slice 1: fresh-chat-evidence.md fresh conversation's comp
 Reported: slice 1 — "Terry answered I did not check the wording when asked whether Donut consent explicitly mentioned permission to record Learning Session Reports."
 Story clause: "observe Donut consent describing report recording"
 Disposition: proved by slice 1: fresh-chat-evidence.md parent-inspected recording-consent screenshot followed by Terry's explicit I clicked Allow observation
+
+### G5. Capture the full round’s returned Report result
+Reported: slice 2 — "The thread reader exposes the completed native Report call and exact arguments but hides its structured recordedItems/rejectedEntries response. Matching Grade and descriptive Feedback are saved and visible."
+Story clause: "Compare the returned recording result with actual Feedback in Donut recall history"
+Disposition: return

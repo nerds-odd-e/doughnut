@@ -92,9 +92,16 @@ Terry's existing **Donut in ChatGPT** connection:
 The installed conversation continued returning `Unknown tool` after authorization
 and refresh; another fresh conversation completed the same authorized empty
 Report. An HTML-escaped handoff returned two parse rejections, so keep the Report
-markdown unchanged. This round establishes authorization and immediate end;
-full tutoring, partial completion and the no-session response still need their
-own observations.
+markdown unchanged. This round establishes authorization and immediate end.
+
+Terry subsequently completed a Japanese voice lesson on なにしろ through the
+plugin. The tutor waited for his start instruction; after tutoring, he asked it
+to submit his result. Its Report gave Grade 2 with descriptive Feedback. Donut’s
+**Memory Tracker** page for the item showed the matching **HARD** history entry
+(Grade 2) and the complete Feedback, with the next review updated. To inspect a
+saved result, open the completed item's tracker and compare its newest history
+entry with the submitted Report. The full round's structured tool response still
+needs capture; partial completion and the no-session response need separate rounds.
 
 ## Consent and continued access
 
