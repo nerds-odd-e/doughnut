@@ -133,3 +133,4 @@ minimumReleaseAgeExclude:
   - '@storybook/vue3-vite@10.6.5'
   - '@storybook/vue3@10.6.5'
   - storybook@10.6.5
+  - cypress@16.2.1
