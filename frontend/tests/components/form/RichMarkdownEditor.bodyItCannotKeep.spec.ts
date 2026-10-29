@@ -79,6 +79,23 @@ describe("RichMarkdownEditor with a body it cannot keep", () => {
     )
   })
 
+  it("converts breaks beside a list into content that stays editable when reopened", async () => {
+    await h.mountEditor("- <br> item\n- second\n\n<br>\n<br>\n例：\n\nB")
+
+    await convert()
+
+    expect(h.lastEmittedMarkdown()).toBe("- <br> item\n- second\n\n例：\n\nB")
+    expect(h.quillReadonly()).toBe(false)
+    expect(h.quillEditorEl().getAttribute("contenteditable")).toBe("true")
+
+    const saved = h.lastEmittedMarkdown()
+    h.cleanup()
+    await h.mountEditor(saved)
+
+    expect(h.quillReadonly()).toBe(false)
+    expect(h.getWrapper().emitted("update:modelValue")).toBeUndefined()
+  })
+
   it.each(["&nbsp;", "<p></p>", "<br/>\n"])(
     "opens a blank-looking body editable without changing it: %j",
     async (body) => {

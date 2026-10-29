@@ -102,7 +102,12 @@ export const bodyTheRichEditorKeeps = (body: string) => {
     const held = heldHtml(markdown)
     if (richEditorKeepsBody(markdown, held)) return markdown
     const heldMarkdown = markdownizer.htmlToMarkdown(held)
-    if (sameReadableText(markdown, heldMarkdown)) return heldMarkdown
+    if (
+      sameReadableText(markdown, heldMarkdown) &&
+      richEditorKeepsBody(heldMarkdown, heldHtml(heldMarkdown))
+    ) {
+      return heldMarkdown
+    }
     return plainParagraphs(readableLines(markdown))
   }
   return asTheEditorKeeps(
