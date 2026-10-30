@@ -56,7 +56,7 @@ authorizes no implementation, profiling run, or executable slice plan.
 
 **Identity:** SEED-039#candidate-resolution
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-cheaper-local-test-feedback/PLAN.md","assessment":"not-ready","reasons":["Slices 1–4 require fresh ordinary-command baselines; resolve-only mode performs no measurement.","Slice 1 requires observed healthcheck cost and readiness/failure discrimination before selecting a shorter cadence.","Slice 2 requires real-LFS fixture-hook discrimination before bypassing fixture-authoring hooks.","Slice 3 requires observed mounted-panel mock/timer compatibility and a whole-command baseline before consolidation."],"basis":{"document":"736305e29dbd36c72b09ac08ecaa157ad22a2e22e62febd83617e09d57887052","plan":"9ae1bd8974a97adb0278731f5620b5b39267f7c62dcc29bcc9ba462d745055ef"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-cheaper-local-test-feedback/PLAN.md","assessment":"not-ready","reasons":["Slices 1–4 require fresh ordinary-command baselines; resolve-only mode performs no measurement.","Slice 1 requires observed healthcheck cost and readiness/failure discrimination (via SUT_POLL_MS) before changing the shared cadence default.","Slice 2 requires real-LFS fixture-hook discrimination before bypassing fixture-authoring hooks.","Slice 3 requires observed mounted-panel mock/timer compatibility and a whole-command baseline before consolidation."],"basis":{"document":"dd6f3daf6f8fdeee51c6b4351ed0ca3fb065a32b650b8311cbad3b9462dcbec9","plan":"b522195ab82ab4fa4d9b90af7aed50013758ba40a28a8cc6d15ff6de5c3f6ed4"}}
 ```
 
 **Goal:** Give contributors shorter trustworthy local test feedback by reducing
@@ -73,6 +73,18 @@ avoidable readiness, fixture-commit, and browser-spec setup costs.
   and hydration proof; consolidated panel specs retain every distinct visible
   behavior. Retain changes only with comparable ordinary-command wall-time
   improvement, including replacement proof costs.
+- **Architecture:** The experiments move no responsibility between owners and
+  follow [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md)
+  (the E2E runner keeps owning its disposable stack) and
+  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
+  (fixtures keep standard LFS filters, transfer, and history). Readiness
+  cadence is one shared default in `scripts/sut-start-health-wait.mjs`, also
+  used by Development start (`dev-start.mjs`) and owned-stack restart; change
+  it in that one place for every consumer rather than adding an E2E-only
+  cadence, and verify those consumers too. The existing `SUT_POLL_MS` override
+  lets baselines compare cadences before any edit. A hook bypass applies only
+  to the test-owned fixture commit command, never to a checkout setting the
+  installed CLI later reads.
 - **Execution boundary:** The
   [replacement experiment plan](../slice-plans/001-cheaper-local-test-feedback/PLAN.md)
   belongs to this same story. Resolve-only preparation established dispositions

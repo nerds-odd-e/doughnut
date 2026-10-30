@@ -103,8 +103,12 @@ runner retains cancellation, failure reporting, and complete owned cleanup.
 
 Hypothesis: Reduce the current polling gap after measuring healthcheck cost;
 expected saving is 0–2.9s per batch, not the historical entire ~33s startup.
-Smallest experiment: adjust the existing default cadence without changing the
-health predicate, deadline, lifetime, or ownership boundaries.
+Smallest experiment: compare cadences first through the existing
+`SUT_POLL_MS` override with no code edit, then change the one shared
+`POLL_MS` default without changing the health predicate, deadline, lifetime,
+or ownership boundaries. That default also serves `dev-start.mjs` and
+`sut-owned-restart.mjs`; keep one cadence for all consumers rather than an
+E2E-only value, and confirm Development start still reports readiness.
 
 Proof/measurement: Before and after, time
 `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`.
