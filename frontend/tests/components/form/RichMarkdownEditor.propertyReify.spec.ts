@@ -65,12 +65,6 @@ Body`
   it.each([
     ["a plain-text value", "kind", "kind: training", notLinkReason],
     [
-      "a list value",
-      "tags",
-      'tags:\n  - "[[Other]]"\n  - plain',
-      notLinkReason,
-    ],
-    [
       "a structural property",
       "source",
       'type: Relationship\nsource: "[[Src]]"\ntarget: "[[Other]]"',

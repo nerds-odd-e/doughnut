@@ -8,6 +8,7 @@
     <AssimilationModes
       :allowed-modes="allowedModes"
       :trackers="noteRecallInfo?.memoryTrackers"
+      :loading="!noteInfoLoaded"
       :disabled="!noteInfoLoaded"
       :skipped-from-assimilation-sequence="
         isSkippedFromAssimilationSequence(noteRecallInfo)

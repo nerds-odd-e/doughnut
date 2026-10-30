@@ -1,6 +1,7 @@
 <template>
   <div
     class="grid grid-cols-[minmax(0,auto)_minmax(max-content,1fr)] items-center gap-x-2 gap-y-2"
+    :class="{ 'list-assimilation-modes': isList }"
     data-testid="assimilation-modes"
   >
     <div
@@ -30,7 +31,14 @@
         :class="rowHeightClass"
         :data-test="`assimilation-action-${row.mode}`"
       >
-        <template v-if="row.tracker">
+        <span
+          v-if="loading && showLearningControls"
+          class="daisy-loading daisy-loading-spinner daisy-loading-xs"
+          role="status"
+          aria-label="Loading tracker information"
+          data-app-busy="true"
+        />
+        <template v-else-if="row.tracker">
           <router-link
             :to="row.trackerLocation!"
             class="daisy-link daisy-link-primary shrink-0 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
@@ -114,6 +122,7 @@ const props = withDefaults(
     propertyValues?: readonly string[]
     authoredPropertyValues?: readonly string[]
     showLearningControls?: boolean
+    loading?: boolean
     disabled?: boolean
     skippedFromAssimilationSequence?: boolean
     size?: "default" | "sm"
@@ -122,10 +131,8 @@ const props = withDefaults(
   }>(),
   {
     trackers: () => [],
-    propertyKey: undefined,
-    propertyValues: undefined,
-    authoredPropertyValues: undefined,
     showLearningControls: true,
+    loading: false,
     disabled: false,
     skippedFromAssimilationSequence: false,
     size: "default",
@@ -146,6 +153,11 @@ const modeLabels: Record<MemoryTrackerType, string> = {
 }
 
 const sizeClass = computed(() => (props.size === "sm" ? "daisy-btn-sm" : ""))
+const isList = computed(
+  () =>
+    props.authoredPropertyValues !== undefined ||
+    props.propertyValues !== undefined
+)
 const rowHeightClass = computed(() =>
   props.size === "sm" ? "min-h-8" : "min-h-12"
 )
@@ -218,33 +230,20 @@ function unitRow(
   }
 }
 
-/** A list property is skipped as a whole, so its values share one Skip row. */
-function keySkipRow() {
-  return {
-    ...unitRow("UNDERSTANDING"),
-    key: "skip",
-    label: "",
-    assimilable: false,
-    tracker: undefined,
-    showSkipAffordance: true,
-  }
-}
-
 const rows = computed(() => {
   const displayValues = props.authoredPropertyValues ?? props.propertyValues
   if (!displayValues) return props.allowedModes.map((mode) => unitRow(mode))
   const eligibleValues = new Set(props.propertyValues ?? displayValues)
-  return props.allowedModes.flatMap((mode) => {
-    const valueRows = displayValues.map((value, index) => ({
+  return props.allowedModes.flatMap((mode) =>
+    displayValues.map((value, index) => ({
       ...unitRow(mode, value, {
         eligible: eligibleValues.has(value),
         firstOccurrence: displayValues.indexOf(value) === index,
       }),
       key: `${mode}:${index}:${value}`,
     }))
-    return mode === "UNDERSTANDING" && props.showLearningControls
-      ? [...valueRows, keySkipRow()]
-      : valueRows
-  })
+  )
 })
 </script>
+
+<style scoped lang="scss" src="./AssimilationModes.scss"></style>

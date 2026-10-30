@@ -52,11 +52,12 @@ export function useMemoryTrackerActions(
   const noteRecallInfo = ref<NoteRecallInfo | null>(null)
 
   const reloadNoteInfo = async () => {
-    if (!noteId.value) return
+    const requestedNoteId = noteId.value
+    if (!requestedNoteId) return
     const { data, error } = await apiCallWithLoading(() =>
-      NoteController.getNoteInfo({ path: { note: noteId.value } })
+      NoteController.getNoteInfo({ path: { note: requestedNoteId } })
     )
-    if (!error) {
+    if (!error && noteId.value === requestedNoteId) {
       noteRecallInfo.value = data ?? null
       noteInfoLoaded.value = true
     }
@@ -65,6 +66,8 @@ export function useMemoryTrackerActions(
   watch(
     noteId,
     () => {
+      noteInfoLoaded.value = false
+      noteRecallInfo.value = null
       reloadNoteInfo()
     },
     { immediate: true }

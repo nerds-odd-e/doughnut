@@ -1,6 +1,7 @@
 <template>
   <div
-    class="pl-8 flex flex-wrap items-center gap-2 gap-y-1"
+    class="pl-8 flex gap-2 gap-y-1"
+    :class="authoredListValues ? 'items-start' : 'flex-wrap items-center'"
     data-testid="rich-note-property-panel"
   >
     <button
@@ -12,7 +13,7 @@
     >
       <Minus class="h-4 w-4" aria-hidden="true" />
     </button>
-    <template v-if="noteId">
+    <template v-if="noteId && !authoredListValues">
       <button
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm shrink-0"
@@ -34,6 +35,7 @@
     </template>
     <AssimilationModes
       v-if="showAssimilationModes"
+      class="min-w-0 flex-1"
       size="sm"
       :allowed-modes="allowedModes"
       :trackers="hasSavedNote ? noteRecallInfo?.memoryTrackers : undefined"
@@ -41,6 +43,7 @@
       :property-values="assimilableListValues(propertyValue)"
       :authored-property-values="authoredListValues"
       :show-learning-controls="hasSavedNote"
+      :loading="hasSavedNote && !noteInfoLoaded"
       :disabled="assimilatingPropertyKey === propertyKey"
       :skipped-from-assimilation-sequence="
         isSkippedFromAssimilationSequence(noteRecallInfo, propertyKey)
@@ -94,6 +97,7 @@ const emit = defineEmits<{
 }>()
 
 const {
+  noteInfoLoaded,
   noteRecallInfo,
   assimilatingPropertyKey,
   assimilate,

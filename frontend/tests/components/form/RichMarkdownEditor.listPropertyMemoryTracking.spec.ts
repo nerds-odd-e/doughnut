@@ -49,7 +49,7 @@ Workshop body.`
     h.cleanup()
   })
 
-  it("offers one Assimilate per value and one Skip for the key", async () => {
+  it("offers one Assimilate per value", async () => {
     const wrapper = await mountListEditor()
 
     expect(
@@ -63,9 +63,6 @@ Workshop body.`
     expect(
       wrapper.find(`${listRowSelector} [data-property-value="[[run]]"]`).text()
     ).not.toContain("[[")
-    expect(
-      wrapper.findAll(`${listRowSelector} [data-test="skip"]`)
-    ).toHaveLength(1)
   })
 
   it("reads the complete authored list in order in detail, with and without a saved note", async () => {
@@ -138,11 +135,6 @@ Body`
         )
         .map((b) => b.attributes("aria-label"))
     ).toEqual(["Assimilate [[Grammar]]", "Assimilate https://example.com/path"])
-    expect(
-      wrapper.findAll(
-        `${urlRowSelector} [data-testid="rich-note-property-panel"] [data-test="skip"]`
-      )
-    ).toHaveLength(1)
 
     const unsavedWrapper = await h.mountEditor(authoredMarkdown, {
       route: noteShowLocation(99),
