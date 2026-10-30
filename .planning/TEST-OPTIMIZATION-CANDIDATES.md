@@ -2,116 +2,28 @@
 
 ## Latest pass
 
-- **Command / scope:** `CURSOR_DEV=true nix develop -c pnpm frontend:test`; complete frontend unit suite, 2026-09-26. macOS, local Nix shell, warm
-  pnpm/Vite caches, default file parallelism, headless Chromium, no filters or
-  retries; worker count was not recorded.
-- **Revision:** baseline `8d79d96a09`; optimized `8df4a87262`; results recorded at `fe990eff58`.
-- **Before / after:** executed cases 1937 / 1900; files 346 / 295. Alternating whole-suite Vitest elapsed durations: 47.28/46.61/55.84s before and
-  37.49/42.24/39.58s after (means 49.9s / 39.8s). Whole-command wall time: initial baseline 75.8s; comparable final before/after totals unavailable.
-- **Outcome:** incomplete measurement — runner-reported elapsed time improved ~20% through responsibility-based sibling-spec merges and shared setup. Removed cases
-  were named duplicates or folded into `it.each` rows with surviving proof.
-- **Limits:** alternating runs passed at load averages 4.6–12.4; whole-command wall-time improvement is unmeasured. This record was migrated on 2026-10-30
-  using retained evidence; migration ran no new optimization pass.
-- **Evidence:** [completed pass and measurements](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md).
+- **Command / scope:** `dough-test-optimization --resolve`, 2026-10-30;
+  source/evidence triage of all six pending candidates across backend, frontend,
+  CLI E2E, and batch startup. No profiling, tests, or optimization changes ran.
+- **Revision:** `bf0bbc01b3b90db7ed4e88b237474e4a7133ba15`; product tree at
+  admission base `6ad57b7a366e40154c5140e1a79be330213801d8`.
+- **Before / after:** unavailable; no new command wall time or case counts.
+  Prior measurements remain dated observations within the relevant entries.
+- **Outcome:** incomplete measurement by resolve-only design — three candidates
+  accepted as necessary costs and three transferred to one future experiment
+  plan. No candidate decision remains pending. No speedup is claimed.
+- **Limits:** current behavior was inspected in source, not experimentally
+  re-established. The replacement plan is not ready pending its fresh baselines
+  and discriminating observations; implementation requires a later instruction.
+  Existing accepted costs and profile-only exclusions were preserved, with no
+  new tags or narrowed normal/CI coverage.
+- **Evidence:** [future experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md),
+  [mission source](seeds/SEED-039-faster-ci-feedback.md#candidate-resolution),
+  and each finding's original dated evidence below.
 
 ## Pending candidates
 
-### notebook-git-proposal-fixtures
-
-- **Locations / scope:** `backend/src/test/java/com/odde/donut/controllers/NotebookGit*ControllerTest`; 51 files called `GitBundleTestReader.fetchHead` in the 2026-09-20 observation.
-- **Observed cost:** unmeasured; repeated proposal crafting and tip-commit inspection scaffolding (`InMemoryRepository`, `readContent`/`readExactTree`).
-- **Unique protection:** parent count, first-parent ancestry, and author identity require inspecting the tip commit, beyond reading its tree entries.
-- **Alternatives attempted:** three attachment classes shared their live
-  projection read. The three byte-identical `acceptedEntriesOf` copies now use
-  `NotebookGitControllerTestBase.acceptedHistory(notebook).exactTree()`, backed
-  by `testability/GitBundleTestReader.fetchAcceptedHistory`. A helper for only
-  3 of 51 callers was rejected as an additional idiom; other commit readers
-  correctly open their own repository for the distinct commit observations.
-- **Disposition / rationale:** pending — evaluate proposal-crafting duplication separately from the already shared plain tree read.
-- **Date:** 2026-09-20; reader names updated 2026-09-24.
-- **Human decision needed:** owner to choose whether a `GitBundleTestWriter` mirror merits a sweep of the 51 callers or the local idiom is preferred.
-- **Evidence / follow-up:** [attachment-work observation](https://github.com/nerds-odd-e/doughnut/commit/6b906462dd),
-  [reader-name update](https://github.com/nerds-odd-e/doughnut/commit/c50a90c159). Establish a focused timing baseline before proposing a speedup.
-
-### e2e-vite-first-page-load
-
-- **Locations / scope:** local `pnpm cy:run`, Vite-served frontend; 14 CLI features in the 2026-09-25 pass.
-- **Observed cost:** ~0.7–1s for the first page load of each web-using scenario; a production build was estimated to save ~15–25s across that scope.
-- **Unique protection:** frontend HMR in local E2E batches.
-- **Alternatives attempted:** production-build serving was proposed and declined
-  by the owner on 2026-09-25 when the CLI E2E pass stopped at ~41% improvement.
-- **Disposition / rationale:** pending owner decision; retain the owner's
-  existing decision to keep local HMR. The estimated saving was not measured.
-- **Date:** 2026-09-25.
-- **Human decision needed:** owner to authorize trading local `cy:run` HMR for
-  a built frontend before this alternative can be attempted.
-- **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
-  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d).
-
-### e2e-batch-startup
-
-- **Locations / scope:** fixed startup of a local `pnpm cy:run` batch.
-- **Observed cost:** ~33s per batch on 2026-09-25: SUT 13.5s (backend boot ~9s,
-  Gradle compile check, mocks, Vite), Cypress launch 2.7s, ~1.2s per spec load.
-- **Unique protection:** a fresh owned stack per batch.
-- **Alternatives attempted:** none recorded.
-- **Disposition / rationale:** pending — retain the recorded startup-cost
-  candidate for investigation with fresh-stack protection intact.
-- **Date:** 2026-09-25.
-- **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
-  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d).
-
-### cli-git-lfs-hook-installation
-
-- **Locations / scope:** CLI E2E Git checkouts with attachments and git-lfs 3.7.1.
-- **Observed cost:** on 2026-09-25, commits cost ~213ms rather than ~15ms after
-  the first real git-lfs command reinstalls `post-checkout`, `post-commit`,
-  `post-merge`, and `pre-push` hooks despite filter installation with `--skip-repo`.
-- **Unique protection:** none recorded for these hooks; the observation states
-  that Donut uses neither LFS locking nor `git push`.
-- **Alternatives attempted:** no change attempted; no setting to prevent hook
-  reinstallation was found in the installed git-lfs 3.7.1.
-- **Disposition / rationale:** pending — retain the hook overhead for a later
-  measured experiment.
-- **Date:** 2026-09-25.
-- **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
-  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d).
-
-### backend-profile-context-boots
-
-- **Locations / scope:** `DevelopmentAuthenticationConfigurationTest` (`dev`),
-  `ShedLockConfigProdTest` (`prod`), and failure-injection profiles
-  `notebook-git-publication-atomic-test` and `batch-row-import-atomic-test`.
-- **Observed cost:** ~1s per distinct context boot on 2026-09-26. Sharing
-  `testability/SpringTestBase` for other `test`-profile tests reduced the suite
-  from 21 boots to 5.
-- **Unique protection:** profile-specific configuration and injected
-  persistence failures require their distinct contexts.
-- **Alternatives attempted:** ordinary test-profile contexts were consolidated;
-  no alternative for the remaining distinct contexts was attempted.
-- **Disposition / rationale:** pending — preserve this legacy candidate and
-  its protected profile differences for later assessment.
-- **Date:** 2026-09-26.
-- **Evidence / follow-up:** [backend re-profile](https://github.com/nerds-odd-e/doughnut/commit/db643ef844),
-  [shared-context guidance](https://github.com/nerds-odd-e/doughnut/commit/97ce679b18).
-
-### frontend-sibling-spec-setup
-
-- **Locations / scope:** the 2026-09-26 pass left ~25 families of 2–3 sibling
-  frontend specs; BookReadingPage's stub-book/mount/wait-for-PDF setup repeated
-  across about six support files, and `BookReadingPage.snap.spec.ts` was 404 lines.
-- **Observed cost:** retained merges saved ~70–250ms per removed file in focused
-  runs. The remaining opportunities were unpicked and have no measured saving.
-- **Unique protection:** each family's distinct component behavior, harness,
-  mock boundaries, and real/fake timer requirements.
-- **Alternatives attempted:** responsibility-based merges reduced the measured
-  suite from 346 to 295 files; incompatible file-level `vi.mock` choices and
-  the then-applicable 250-line refactor limit bounded those merges.
-- **Disposition / rationale:** pending — carry the legacy note's unpicked
-  opportunities into the problem list; establish current family costs before
-  selecting work. Individual 13–34ms test bodies alone were below file-cost noise.
-- **Date:** 2026-09-26.
-- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md).
+None.
 
 ## Accepted necessary costs
 
@@ -133,6 +45,51 @@
 - **Date:** 2026-09-19.
 - **Evidence / follow-up:** [retained profiling observation](https://github.com/nerds-odd-e/doughnut/blob/82e789ee86/.planning/test-optimization-candidates.md#frontend-profiling-note).
   Preserve isolation while assessing the pending sibling-spec opportunity.
+
+### notebook-git-proposal-fixtures
+
+- **Locations / scope:** `backend/src/test/java/com/odde/donut/controllers/NotebookGit*ControllerTest`; 51 files called `GitBundleTestReader.fetchHead` in the 2026-09-20 observation.
+- **Observed cost:** unmeasured; repeated proposal crafting and tip-commit inspection scaffolding (`InMemoryRepository`, `readContent`/`readExactTree`).
+- **Unique protection:** parent count, first-parent ancestry, and author identity require inspecting the tip commit, beyond reading its tree entries.
+- **Alternatives attempted:** three attachment classes shared their live
+  projection read. The three byte-identical `acceptedEntriesOf` copies now use
+  `NotebookGitControllerTestBase.acceptedHistory(notebook).exactTree()`, backed
+  by `testability/GitBundleTestReader.fetchAcceptedHistory`. A helper for only
+  3 of 51 callers was rejected as an additional idiom; other commit readers
+  correctly open their own repository for the distinct commit observations.
+- **Disposition / rationale:** accepted necessary cost — current proposal construction already shares `proposalBundleBytes`, `localCommitOnTopOf`, and `commitOnTopOf` in `NotebookGitCommitFixtureTestSupport`. Multi-commit/range and author/parent observations still need real repositories and history; a blanket writer mirror would duplicate that existing seam without demonstrated removable cost. Retain this real Git proof and the local idiom for distinct history shapes. Acceptance changes no selection.
+- **Date:** 2026-09-20; reader names updated 2026-09-24.
+- **Evidence / follow-up:** [attachment-work observation](https://github.com/nerds-odd-e/doughnut/commit/6b906462dd),
+  [reader-name update](https://github.com/nerds-odd-e/doughnut/commit/c50a90c159). Establish a focused timing baseline before proposing a speedup. Current-source reading on 2026-10-30 at `bf0bbc01b3`: `controllers/NotebookGitCommitFixtureTestSupport.java`, `NotebookGitAttachmentLocalChangeControllerTest.java`, `NotebookGitComposedMoveEditControllerTest.java`, `NotebookGitBundleDownloadControllerTest.java`, and `testability/GitBundleTestReader.java`. No writer sweep or timing run was performed. Resolution: 2026-10-30.
+
+### e2e-vite-first-page-load
+
+- **Locations / scope:** local `pnpm cy:run`, Vite-served frontend; 14 CLI features in the 2026-09-25 pass.
+- **Observed cost:** ~0.7–1s for the first page load of each web-using scenario; a production build was estimated to save ~15–25s across that scope.
+- **Unique protection:** frontend HMR in local E2E batches.
+- **Alternatives attempted:** production-build serving was proposed and declined
+  by the owner on 2026-09-25 when the CLI E2E pass stopped at ~41% improvement.
+- **Disposition / rationale:** accepted necessary cost — reuse the owner's 2026-09-25 decision to keep local HMR. The current batch wrapper still serves Vite by default; built-asset serving exists for other invocations but does not supersede that decision. Real first-load integration remains necessary under the selected mode. No new authorization question or exclusion is needed.
+- **Date:** 2026-09-25.
+- **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
+  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Current-source reading on 2026-10-30 at `bf0bbc01b3`: `scripts/e2e-runner.mjs`, `scripts/sut-services.mjs`, and `.agents/skills/e2e-authoring/SKILL.md` confirm the default local HMR path. The historical 15–25s estimate remains unmeasured. Resolution: 2026-10-30.
+
+### backend-profile-context-boots
+
+- **Locations / scope:** `DevelopmentAuthenticationConfigurationTest` (`dev`),
+  `ShedLockConfigProdTest` (`prod`), and failure-injection profiles
+  `notebook-git-publication-atomic-test` and `batch-row-import-atomic-test`.
+- **Observed cost:** ~1s per distinct context boot on 2026-09-26. Sharing
+  `testability/SpringTestBase` for other `test`-profile tests reduced the suite
+  from 21 boots to 5.
+- **Unique protection:** profile-specific configuration and injected
+  persistence failures require their distinct contexts.
+- **Alternatives attempted:** ordinary test-profile contexts were consolidated;
+  no alternative for the remaining distinct contexts was attempted.
+- **Disposition / rationale:** accepted necessary cost — retain real profile-specific wiring and isolated persistence-failure seams. The dev test exercises sign-in, stored sessions, and cookie behavior; production attachment wiring has its own narrow context. Git and batch-import failure tests already share configuration within their families. Merging failure injection into the ordinary test context would spread exceptional mutable failure state to unrelated tests, while a mock would lose transaction rollback proof. No worthwhile cheaper replacement is evidenced; acceptance changes no selection.
+- **Date:** 2026-09-26.
+- **Evidence / follow-up:** [backend re-profile](https://github.com/nerds-odd-e/doughnut/commit/db643ef844),
+  [shared-context guidance](https://github.com/nerds-odd-e/doughnut/commit/97ce679b18). Current-source reading on 2026-10-30 at `bf0bbc01b3`: `DevelopmentAuthenticationConfigurationTest`, `NotebookAttachmentContentConfigurationProdTest`, `NotebookGitPublicationAtomicTestSupport`, `NotebookGitPublicationAtomicControllerTest`, and `QuestionGenerationBatchRowImportServiceAtomicTest` plus its support. `ShedLockConfigProdTest` is a historical location; it is not present at the inspected revision. Current boot count and cost were not measured. Resolution: 2026-10-30.
 
 ## Profile-only exclusions
 
@@ -246,4 +203,45 @@ The entries below inventory existing tags; their original decisions are retained
 
 ## Transferred obligations
 
-None.
+### e2e-batch-startup
+
+- **Locations / scope:** fixed startup of a local `pnpm cy:run` batch.
+- **Observed cost:** ~33s per batch on 2026-09-25: SUT 13.5s (backend boot ~9s,
+  Gradle compile check, mocks, Vite), Cypress launch 2.7s, ~1.2s per spec load.
+- **Unique protection:** a fresh owned stack per batch.
+- **Alternatives attempted:** none recorded.
+- **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 1 and 4. Current readiness observation defaults to a 3000ms polling gap (`scripts/sut-start-health-wait.mjs`). Try reducing avoidable observation delay while preserving the fresh owned stack, actual health checks, cancellation, deadlines, and failure cleanup. Backend boot, Cypress launch, and per-spec costs are not claimed removable. Baseline and healthcheck-cost observation are prerequisites; nothing was implemented.
+- **Date:** 2026-09-25.
+- **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
+  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned.
+
+### cli-git-lfs-hook-installation
+
+- **Locations / scope:** CLI E2E Git checkouts with attachments and git-lfs 3.7.1.
+- **Observed cost:** on 2026-09-25, commits cost ~213ms rather than ~15ms after
+  the first real git-lfs command reinstalls `post-checkout`, `post-commit`,
+  `post-merge`, and `pre-push` hooks despite filter installation with `--skip-repo`.
+- **Unique protection:** none recorded for these hooks; the observation states
+  that Donut uses neither LFS locking nor `git push`.
+- **Alternatives attempted:** no change attempted; no setting to prevent hook
+  reinstallation was found in the installed git-lfs 3.7.1.
+- **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 2 and 4. Try command-scoped hook bypass only for test-authored commits in existing E2E Git plumbing; preserve real clean filters, installed-CLI operations, standard-client transfers, pointer history, and exact hydration. Current standard-client fixture tasks do use `git lfs push --object-id`, so the historical no-push statement cannot justify bypassing protocol operations. Fresh timing and discrimination are prerequisites; nothing was implemented.
+- **Date:** 2026-09-25.
+- **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
+  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned.
+
+### frontend-sibling-spec-setup
+
+- **Locations / scope:** the 2026-09-26 pass left ~25 families of 2–3 sibling
+  frontend specs; BookReadingPage's stub-book/mount/wait-for-PDF setup repeated
+  across about six support files, and `BookReadingPage.snap.spec.ts` was 404 lines.
+- **Observed cost:** retained merges saved ~70–250ms per removed file in focused
+  runs. The remaining opportunities were unpicked and have no measured saving.
+- **Unique protection:** each family's distinct component behavior, harness,
+  mock boundaries, and real/fake timer requirements.
+- **Alternatives attempted:** responsibility-based merges reduced the measured
+  suite from 346 to 295 files; incompatible file-level `vi.mock` choices and
+  the then-applicable 250-line refactor limit bounded those merges.
+- **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 3 and 4. Start with the compatible-looking reading-panel visibility and targeting specs, retaining their distinct mounted-page observations and existing PDF/support seam. The old snap-spec size is historical; current code already shares fixtures. Do not sweep all historical sibling families or force incompatible mock/timer contracts together. Current browser-mode baselines and compatibility observations are prerequisites; nothing was implemented.
+- **Date:** 2026-09-26.
+- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned.

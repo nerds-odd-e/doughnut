@@ -52,25 +52,32 @@ authorizes no implementation, profiling run, or executable slice plan.
 
 <a id="candidate-resolution"></a>
 
-### Resolve recorded test optimization candidates
+### Shorten local test feedback by reducing repeated setup
 
 **Identity:** SEED-039#candidate-resolution
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-cheaper-local-test-feedback/PLAN.md","assessment":"not-ready","reasons":["Slices 1–4 require fresh ordinary-command baselines; resolve-only mode performs no measurement.","Slice 1 requires observed healthcheck cost and readiness/failure discrimination before selecting a shorter cadence.","Slice 2 requires real-LFS fixture-hook discrimination before bypassing fixture-authoring hooks.","Slice 3 requires observed mounted-panel mock/timer compatibility and a whole-command baseline before consolidation."],"basis":{"document":"736305e29dbd36c72b09ac08ecaa157ad22a2e22e62febd83617e09d57887052","plan":"9ae1bd8974a97adb0278731f5620b5b39267f7c62dcc29bcc9ba462d745055ef"}}
 ```
 
-**Goal:** Give contributors an actionable disposition for each pending test
-optimization candidate, preserving protected behavior and existing owner decisions.
+**Goal:** Give contributors shorter trustworthy local test feedback by reducing
+avoidable readiness, fixture-commit, and browser-spec setup costs.
 
-- **Scope:** Resolve the six pending entries in
-  [the candidate record](../TEST-OPTIMIZATION-CANDIDATES.md) against current tests
-  and retained evidence. Accept inherent costs, use only existing profile-only
-  exclusion mechanisms where justified, or transfer cheaper-proof experiments
-  into one executable plan for later authorization.
-- **Known expectations:** `dough-test-optimization --resolve` runs no profiles,
-  tests, or optimization experiments. Preserve dated evidence, accepted costs,
-  exclusions, and the owner's decision to retain local HMR. Planning does not
-  authorize implementation; report any concrete unresolved human decision.
+- **Scope:** Evaluate the three transferred obligations in
+  [the candidate record](../TEST-OPTIMIZATION-CANDIDATES.md): E2E readiness
+  polling, hooks during test-owned LFS fixture commits, and compatible
+  BookReadingPage reading-panel sibling setup. Preserve real health checks,
+  runner ownership, authentic Git/LFS proof, mounted-page behavior, browser
+  isolation, existing profile exclusions, and owner-selected local HMR.
+- **Key examples:** A healthy owned stack is observed promptly without losing
+  cancellation or failure cleanup; a fixture commit retains real LFS pointer
+  and hydration proof; consolidated panel specs retain every distinct visible
+  behavior. Retain changes only with comparable ordinary-command wall-time
+  improvement, including replacement proof costs.
+- **Execution boundary:** The
+  [replacement experiment plan](../slice-plans/001-cheaper-local-test-feedback/PLAN.md)
+  belongs to this same story. Resolve-only preparation established dispositions
+  without profiling or implementation. Fresh baselines and discrimination
+  remain prerequisites. Queuing and landing preparation do not start execution.
 
 <a id="story-2"></a>
 
