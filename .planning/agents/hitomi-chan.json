@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Hitomi-chan",
+  "email": "hitomi-chan@example.org",
+  "identity": "SEED-039#candidate-resolution",
+  "mode": "story-branch",
+  "branch": "codex/resolve-test-optimization-candidates",
+  "host": "codex"
+}

@@ -8,6 +8,8 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Resolve recorded test optimization candidates](seeds/SEED-039-faster-ci-feedback.md#candidate-resolution) — SEED-039#candidate-resolution
+
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1

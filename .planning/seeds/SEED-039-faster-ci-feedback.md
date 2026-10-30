@@ -50,6 +50,28 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. These
 rough hypotheses; measurement may require refinement or resplitting. This seed
 authorizes no implementation, profiling run, or executable slice plan.
 
+<a id="candidate-resolution"></a>
+
+### Resolve recorded test optimization candidates
+
+**Identity:** SEED-039#candidate-resolution
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** Give contributors an actionable disposition for each pending test
+optimization candidate, preserving protected behavior and existing owner decisions.
+
+- **Scope:** Resolve the six pending entries in
+  [the candidate record](../TEST-OPTIMIZATION-CANDIDATES.md) against current tests
+  and retained evidence. Accept inherent costs, use only existing profile-only
+  exclusion mechanisms where justified, or transfer cheaper-proof experiments
+  into one executable plan for later authorization.
+- **Known expectations:** `dough-test-optimization --resolve` runs no profiles,
+  tests, or optimization experiments. Preserve dated evidence, accepted costs,
+  exclusions, and the owner's decision to retain local HMR. Planning does not
+  authorize implementation; report any concrete unresolved human decision.
+
 <a id="story-2"></a>
 
 ### Run related E2E tests systematically faster through cohesive test design
