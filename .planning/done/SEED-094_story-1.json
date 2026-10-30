@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-094#story-1",
+  "title": "Regenerate a recall question successfully",
+  "completedAt": "2026-10-30T01:47:21.059Z",
+  "developer": "Terry Yin",
+  "agent": "Shunka-chan",
+  "host": "codex",
+  "model": "gpt-6"
+}
