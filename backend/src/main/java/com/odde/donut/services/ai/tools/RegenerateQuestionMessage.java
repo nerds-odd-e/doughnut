@@ -37,6 +37,10 @@ final class RegenerateQuestionMessage {
 
   private static GeneratedMcq generatedMcqView(Mcq mcq) {
     List<String> choices = mcq.getResponseChoices();
+    if (choices == null) {
+      return new GeneratedMcq(
+          mcq.getQuestionStem(), null, null, mcq.getTestedFocus(), mcq.getValidationRationale());
+    }
     int correctIndex = mcq.getCorrectAnswerIndex();
     List<String> distractors = new ArrayList<>(choices);
     distractors.remove(correctIndex);

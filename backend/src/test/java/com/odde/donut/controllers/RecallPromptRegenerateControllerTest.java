@@ -116,6 +116,21 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
   }
 
   @Test
+  void shouldRegenerateStoredQuestionWithoutChoices()
+      throws JsonProcessingException, UnexpectedNoAccessRightException {
+    makeMe.anMcq().mcq(recallPrompt.getMcq()).choices((List<String>) null).please();
+    makeMe.refresh(recallPrompt.getMcq());
+    openAiStructuredResponseMock.stubStructuredResponse(
+        makeMe.aGeneratedMcq().stem("A replacement question").please());
+
+    var regeneratedPrompt =
+        controller.regenerate(recallPrompt, contestAdvice("Replace this question"));
+
+    Assertions.assertThat(regeneratedPrompt.getMcq().getQuestionStem())
+        .isEqualTo("A replacement question");
+  }
+
+  @Test
   void shouldThrowWhenOpenAiNotAvailable() {
     testabilitySettings.setOpenAiTokenOverride("");
     assertThrows(
