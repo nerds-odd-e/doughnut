@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Shunka-chan",
+  "email": "shunka-chan@example.org",
+  "identity": "SEED-094#story-1",
+  "mode": "story-branch",
+  "branch": "codex/recall-question-regeneration",
+  "host": "codex",
+  "model": "gpt-6"
+}
