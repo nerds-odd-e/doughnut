@@ -15,7 +15,7 @@ For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log
 Planning lives under `.planning/`. Decomposition and slice quality:
 `.agents/skills/dough-story-decomposition/references/problem-decomposition.md`; planning artifacts and lifecycle:
 `.agents/skills/dough-story-refinement/references/planning.md`.
-Do not put new plans under `ongoing/`. Test-optimization candidates live in `.planning/test-optimization-candidates.md`.
+Do not put new plans under `ongoing/`. Test-optimization candidates live in `.planning/TEST-OPTIMIZATION-CANDIDATES.md`.
 
 ## Principles
 
