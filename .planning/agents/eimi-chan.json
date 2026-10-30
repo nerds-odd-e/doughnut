@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Eimi-chan",
+  "email": "eimi-chan@example.org",
+  "identity": "SEED-095#story-1",
+  "mode": "story-branch",
+  "branch": "codex/property-list-ui",
+  "host": "codex"
+}
