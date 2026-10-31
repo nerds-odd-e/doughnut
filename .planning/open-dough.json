@@ -1,3 +1,6 @@
 {
-  "skipProcessRetrospective": false
+  "skipProcessRetrospective": false,
+  "intent": {
+    "locations": [{ "path": "e2e_test/features", "kind": "gherkin" }]
+  }
 }
