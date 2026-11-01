@@ -3,7 +3,7 @@
 ## Latest pass
 
 - **Command / scope:** SEED-039#candidate-resolution via
-  [001-cheaper-local-test-feedback](slice-plans/001-cheaper-local-test-feedback/PLAN.md);
+  [001-cheaper-local-test-feedback](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
   warm ordinary commands only (LFS `cy:run`; shell-expanded 13-feature
   `cli_notebook_*` `cy:run`, 40 cases; focused BookReadingPage Vitest + one
   full `frontend:test` each side). Three transferred obligations only; HMR and
@@ -21,7 +21,7 @@
 - **Limits:** Elevated host load in slice 1; cold first LFS (~4m18s) not used
   for gain; other E2E startup costs and remaining sibling-spec families not
   claimed solved; per-command measurement only.
-- **Evidence:** plan Accepted notes slices 1–4; transferred closed for work
+- **Evidence:** [before-cleanup plan Accepted notes](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md); transferred closed for work
   done; unfinished parts returned to pending.
 
 ## Pending candidates
@@ -39,7 +39,7 @@
 - **Disposition / rationale:** pending — cold-versus-warm gap returned from the
   cheaper-local-feedback experiment; not claimed solved by the `POLL_MS` keep.
 - **Date:** 2026-11-01
-- **Evidence / follow-up:** [plan premises and learnings](slice-plans/001-cheaper-local-test-feedback/PLAN.md);
+- **Evidence / follow-up:** [plan premises and learnings](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
   prior transferred `e2e-batch-startup` closed for polling cadence only.
 
 ### frontend-sibling-spec-setup
@@ -60,7 +60,7 @@
   incompatible mock/timer contracts together.
 - **Date:** 2026-09-26; unfinished remainder returned 2026-11-01.
 - **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md);
-  [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md) slice 3 Accepted.
+  [replacement experiment plan](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md) slice 3 Accepted.
 
 ## Accepted necessary costs
 

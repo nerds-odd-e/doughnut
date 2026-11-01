@@ -50,65 +50,6 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. These
 rough hypotheses; measurement may require refinement or resplitting. This seed
 authorizes no implementation, profiling run, or executable slice plan.
 
-<a id="candidate-resolution"></a>
-
-### Shorten local test feedback by reducing repeated setup
-
-**Identity:** SEED-039#candidate-resolution
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-cheaper-local-test-feedback/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"63cd74846696eb57494ea8f6ec703d5e100595e403c4c294d6cb0e29902e5012","plan":"1f5a54bdcef6802cb6c2e7e0f0ddb3491be170001269b7aab4602df6a2387dec"}}
-```
-
-**Goal:** Give contributors shorter trustworthy local test feedback by removing
-three small, avoidable setup costs: waiting longer than needed to notice that
-an owned E2E stack is ready, running Git LFS hooks on test-owned fixture
-commits, and preparing the same mounted BookReadingPage twice in two
-reading-panel spec files. Each cost is small; the story is worth it only for
-the changes whose ordinary command measurably improves.
-
-- **Scope:** The three transferred obligations in
-  [the candidate record](../TEST-OPTIMIZATION-CANDIDATES.md):
-  `e2e-batch-startup` (readiness polling cadence only),
-  `cli-git-lfs-hook-installation` (test-owned fixture commits only), and
-  `frontend-sibling-spec-setup` (the reading-panel visibility and target specs
-  only). Required restrictions, each protecting existing proof: real health
-  checks, deadline, cancellation and failure cleanup stay; the E2E runner keeps
-  owning its fresh stack; real LFS filters, transfer, pointer history and
-  hydration stay real; mounted-page behavior and per-file browser isolation stay;
-  existing profile exclusions and owner-selected local HMR stay.
-- **Scope limits:** No other startup cost (backend boot, Gradle check, Cypress
-  launch, database provisioning), no other sibling-spec families, no shard or
-  worker changes. Costs found there go back to the candidate record.
-- **Key examples:**
-  - A fresh owned stack becomes healthy between two polls → the runner notices
-    within a shorter gap than today's 3s → Cypress starts only after a real
-    healthy check; a stack that never gets healthy still times out with its
-    log tail, and Ctrl-C still cleans up.
-  - An E2E step commits a changed attachment in a CLI checkout → the commit
-    still stores a real LFS pointer and the installed CLI still publishes and
-    hydrates the exact bytes, but the commit no longer runs the LFS
-    `post-commit`/`post-checkout` hooks.
-  - The eight visibility cases and three target cases → run from one spec
-    file with one setup → every case still observes its distinct visible
-    behavior, and the file stays within the 250-line limit.
-  - A change whose ordinary command shows no comparable improvement (including
-    added proof cost) → is undone and recorded as no gain.
-- **Architecture:** No responsibility moves between owners.
-  [ADR 0007](../../docs/adrs/0007-environments-and-isolation-accepted.md): the
-  E2E runner keeps owning its disposable stack.
-  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md):
-  fixtures keep standard LFS filters, transfer, and history. Readiness cadence
-  is one shared default in `scripts/sut-start-health-wait.mjs`, also used by
-  `dev-start.mjs`, `sut-owned-restart.mjs` and `sut-owned-lifetime.mjs`; change
-  it there for every consumer, not as an E2E-only value. A hook bypass applies
-  only to test-owned fixture commit commands (`-c core.hooksPath=…` on that
-  command), never to a setting saved in a checkout the installed CLI later reads.
-- **Execution boundary:** The
-  [experiment plan](../slice-plans/001-cheaper-local-test-feedback/PLAN.md)
-  belongs to this story. Its premises were re-observed on 2026-11-01 at
-  `ee6ecf2549`; each slice still takes its own comparable before/after
-  measurement as part of the experiment. Landing preparation starts no execution.
-
 <a id="story-2"></a>
 
 ### Run related E2E tests systematically faster through cohesive test design

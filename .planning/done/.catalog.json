@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-039_candidate-resolution.json",
+      "identity": "SEED-039#candidate-resolution",
+      "completedAt": "2026-11-01T02:22:21.798Z",
+      "blob": "7784a1612015aed50a41bc8ce9f80b109c71f8a8"
+    },
+    {
       "fileName": "SEED-095_story-1.json",
       "identity": "SEED-095#story-1",
       "completedAt": "2026-10-30T03:33:22.923Z",
