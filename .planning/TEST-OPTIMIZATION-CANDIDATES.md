@@ -213,7 +213,7 @@ The entries below inventory existing tags; their original decisions are retained
 - **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 1 and 4. Current readiness observation defaults to a 3000ms polling gap (`scripts/sut-start-health-wait.mjs`). Try reducing avoidable observation delay while preserving the fresh owned stack, actual health checks, cancellation, deadlines, and failure cleanup. Backend boot, Cypress launch, and per-spec costs are not claimed removable. Baseline and healthcheck-cost observation are prerequisites; nothing was implemented.
 - **Date:** 2026-09-25.
 - **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
-  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned.
+  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned. Premises re-observed at `ee6ecf2549` on 2026-11-01 and recorded in the plan; nothing was implemented.
 
 ### cli-git-lfs-hook-installation
 
@@ -228,7 +228,7 @@ The entries below inventory existing tags; their original decisions are retained
 - **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 2 and 4. Try command-scoped hook bypass only for test-authored commits in existing E2E Git plumbing; preserve real clean filters, installed-CLI operations, standard-client transfers, pointer history, and exact hydration. Current standard-client fixture tasks do use `git lfs push --object-id`, so the historical no-push statement cannot justify bypassing protocol operations. Fresh timing and discrimination are prerequisites; nothing was implemented.
 - **Date:** 2026-09-25.
 - **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
-  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned.
+  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned. Premises re-observed at `ee6ecf2549` on 2026-11-01 and recorded in the plan; nothing was implemented.
 
 ### frontend-sibling-spec-setup
 
@@ -244,4 +244,4 @@ The entries below inventory existing tags; their original decisions are retained
   the then-applicable 250-line refactor limit bounded those merges.
 - **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 3 and 4. Start with the compatible-looking reading-panel visibility and targeting specs, retaining their distinct mounted-page observations and existing PDF/support seam. The old snap-spec size is historical; current code already shares fixtures. Do not sweep all historical sibling families or force incompatible mock/timer contracts together. Current browser-mode baselines and compatibility observations are prerequisites; nothing was implemented.
 - **Date:** 2026-09-26.
-- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned.
+- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned. Premises re-observed at `ee6ecf2549` on 2026-11-01 and recorded in the plan; nothing was implemented.
