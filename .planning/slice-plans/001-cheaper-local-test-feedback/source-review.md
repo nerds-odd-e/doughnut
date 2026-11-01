@@ -9,9 +9,9 @@
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | Shorter trustworthy local test feedback by removing the three named avoidable setup costs; keep only changes whose ordinary command measurably improves | slice 4 | |
-| 2 | A change whose ordinary command shows no comparable improvement (including added proof cost) is undone and recorded as no gain | slice 4 | |
-| 3 | Work is limited to the three transferred obligations `e2e-batch-startup`, `cli-git-lfs-hook-installation`, and `frontend-sibling-spec-setup` | slice 4 | |
+| 1 | Shorter trustworthy local test feedback by removing the three named avoidable setup costs; keep only changes whose ordinary command measurably improves | slice 4 | observed: all three kept under warm ordinary-command averages (LFS wall 133.0→77.3s; `cli_notebook_*` 148.5→135.5s; BookReadingPage 10.72→6.69s); recorded in candidate Latest pass |
+| 2 | A change whose ordinary command shows no comparable improvement (including added proof cost) is undone and recorded as no gain | slice 4 | observed: no undo required; Latest pass states no-gain path unused; no claim from historical numbers, fewer files, or summed durations |
+| 3 | Work is limited to the three transferred obligations `e2e-batch-startup`, `cli-git-lfs-hook-installation`, and `frontend-sibling-spec-setup` | slice 4 | observed: only those three closed; cold-start and remaining sibling families returned pending; Transferred obligations = None. |
 | 3a.1 | `e2e-batch-startup` — change only the readiness polling cadence for owned E2E stack readiness | slice 1 | observed: `scripts/sut-start-health-wait.mjs` default `POLL_MS` 3000→500; LFS `cy:run` after runs noticed healthy sooner (avg 23.0s vs 47.9s) |
 | 3a.2 | `cli-git-lfs-hook-installation` — address LFS hook cost only on test-owned fixture commits | slice 2 | observed: shared `fixtureCommit` / `commitCheckout`/`amendCheckout` only; `git add` and `git lfs` / CLI unchanged; batch 40/40 |
 | 3a.3 | `frontend-sibling-spec-setup` — consolidate setup only for the reading-panel visibility and target specs | slice 3 | observed: target spec merged into visibility spec; other sibling families untouched |
@@ -30,14 +30,14 @@
 | 8a.2 | Every case still observes its distinct visible behavior | slice 3 | observed: original `it` names and assertions retained in merged file; focused 39/39 |
 | 8a.3 | Per-file browser isolation stays | slice 3 | observed: still one Vitest file per remaining panel concern; no cross-file browser sharing introduced |
 | 8a.4 | Consolidated file stays within the 250-line limit | slice 3 | observed: merged visibility spec 245 lines |
-| 9 | Existing profile exclusions stay | slice 4 | |
-| 10 | Owner-selected local HMR stays | slice 4 | |
+| 9 | Existing profile exclusions stay | slice 4 | observed: profile-only exclusion inventory unchanged; no new tags; confirmed in Latest pass Limits |
+| 10 | Owner-selected local HMR stays | slice 4 | observed: `e2e-vite-first-page-load` remains accepted necessary cost; no built-frontend substitution |
 | 11 | Hook bypass only via `-c core.hooksPath=…` on that commit command; never a saved checkout setting the CLI later reads | slice 2 | observed: `E2E_FIXTURE_COMMIT_CONFIG_ARGS` command-scoped; LFS scratch prep no longer saves `user.name`/`user.email` |
 | 12 | Readiness cadence is one shared default in `scripts/sut-start-health-wait.mjs` for `dev-start.mjs`, `sut-owned-restart.mjs`, and `sut-owned-lifetime.mjs`; not an E2E-only value | slice 1 | observed: single `POLL_MS` default in `sut-start-health-wait.mjs`; LFS `cy:run` + `test:sut-start` + `test:development-stack` (`Development healthy after 1 poll(s)`) |
-| 13a.1 | No other startup cost (backend boot, Gradle check, Cypress launch, database provisioning); costs found there return to the candidate record | slice 4 | |
-| 13a.2 | No other sibling-spec families; costs return to the candidate record | slice 4 | |
-| 13a.3 | No shard or worker changes | slice 4 | |
-| 14 | Experiment plan belongs to this story; each change takes its own comparable before/after measurement; landing preparation starts no execution | slice 4 | |
+| 13a.1 | No other startup cost (backend boot, Gradle check, Cypress launch, database provisioning); costs found there return to the candidate record | slice 4 | observed: only `POLL_MS` changed; cold-start returned as pending `e2e-batch-cold-start`; other startup costs not claimed solved |
+| 13a.2 | No other sibling-spec families; costs return to the candidate record | slice 4 | observed: only reading-panel pair merged; remaining families pending under `frontend-sibling-spec-setup` |
+| 13a.3 | No shard or worker changes | slice 4 | observed: none; Latest pass Limits |
+| 14 | Experiment plan belongs to this story; each change takes its own comparable before/after measurement; landing preparation starts no execution | slice 4 | observed: per-slice warm before/after recorded in Latest pass and plan Accepted; recording only, no delivery in this slice |
 
 ## Slice 1 acceptance comparison
 

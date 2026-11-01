@@ -155,7 +155,7 @@ matches). `vue-tsc` / `tsc --noEmit` pass.
 
 ### 4. Record the local-feedback result
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: A contributor runs each selected ordinary command after the kept
 experiments → gets the same behavioral confidence with a measured shorter
@@ -167,6 +167,15 @@ transferred entries for what was done; return any newly seen removable cost
 (for example cold-start time, or other sibling-spec families under the
 original `frontend-sibling-spec-setup` slug) as pending candidates. Claim no
 gain from historical numbers, fewer files, or summed durations.
+
+Accepted (2026-11-01, recording only — status left planned for coordinator):
+candidate record Latest pass replaced with the three kept warm measurements
+above; transferred `e2e-batch-startup`, `cli-git-lfs-hook-installation`, and
+`frontend-sibling-spec-setup` removed for work done; pending
+`e2e-batch-cold-start` and remaining `frontend-sibling-spec-setup` families
+returned. Scope stayed the three obligations; profile exclusions and HMR
+unchanged; no shard/worker changes; other startup costs not claimed solved.
+No gain claimed from historical numbers, fewer files, or summed durations.
 
 ## Current decisions
 
@@ -221,3 +230,8 @@ commits. `cli_notebook_*` batch before avg wall 148.5s → after 135.5s (40/40);
 2026-11-01 execution: Slice 3 kept reading-panel visibility+target merge.
 Focused BookReadingPage avg 10.72s→6.69s (39/39); full frontend:test
 84.69s→84.28s; merged file 245 lines.
+
+2026-11-01 execution: Slice 4 recorded the three kept warm measurements in
+`.planning/TEST-OPTIMIZATION-CANDIDATES.md` Latest pass; closed the three
+transferred obligations for work done; returned pending `e2e-batch-cold-start`
+and remaining `frontend-sibling-spec-setup` families.
