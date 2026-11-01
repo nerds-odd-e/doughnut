@@ -235,3 +235,16 @@ Focused BookReadingPage avg 10.72s→6.69s (39/39); full frontend:test
 `.planning/TEST-OPTIMIZATION-CANDIDATES.md` Latest pass; closed the three
 transferred obligations for work done; returned pending `e2e-batch-cold-start`
 and remaining `frontend-sibling-spec-setup` families.
+
+## Execution complete
+
+Product advice: No backlog change. SEED-039#candidate-resolution delivered its
+three measured ordinary-command keeps (`POLL_MS` 500; command-scoped
+`fixtureCommit` hooksPath; reading-panel visibility+target merge). Pending
+`e2e-batch-cold-start` and remaining `frontend-sibling-spec-setup` families
+already sit in `.planning/TEST-OPTIMIZATION-CANDIDATES.md`—do not promote them
+onto the product backlog without a later resolve/selection pass. When
+CI-feedback work is next chosen, the seed’s next story is SEED-039#story-2
+(global related-test optimization), not these residual micro-candidates.
+Near-future direction (ChatGPT plugin / learning) is unrelated to this
+increment.

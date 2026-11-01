@@ -98,6 +98,14 @@ Distinct executions, original timestamps/releases/tools, observed effects and qu
 Distinct executions, original provenance, observations and qualified inferences are
 [retained at ODF-141](https://github.com/terryyin/open-dough/blob/692bf5162b86fca9cbebc1c57c98efd227198e9d/docs/maintainer/findings/ODF-141.md); source recovery remains in this project’s pre-compaction revision.
 
+- Execution: SEED-039#candidate-resolution
+  - Timestamp: 2026-11-01T09:34:00+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.79
+  - Evidence: plan `001-cheaper-local-test-feedback` slices 1–3; published SHAs `0c77890cce`, `3ef0e813af`, `3399d65a06`; refactor agent transcripts `b7bd06bc` (09:34), `79a09877` (09:54), `353a76ac` (10:02) under parent `23d3c3d7-4825-4f17-822c-c7d19fb11b58`
+  - Observed effect: three consecutive post-slice refactor agents each returned “none — already clean” / no edits on one-line or already-cohesive keeps (`POLL_MS` default; `fixtureCommit` seam; reading-panel merge). Slice 4’s later refactor did edit the candidate catalog and is outside this no-op count.
+  - Inference: same fixed per-slice refactor launch cost as ODF-141; token/time cost of the three empty passes was not separately measured here.
+
 <a id="odf-208"></a>
 
 ## ODF-208 — Observer worker exits without a recorded cause
