@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nana-chan",
+  "email": "nana-chan@example.org",
+  "identity": "SEED-039#candidate-resolution",
+  "mode": "story-branch",
+  "branch": "cursor/shorten-local-test-feedback-by-reducing-repeated",
+  "host": "cursor",
+  "model": "auto"
+}
