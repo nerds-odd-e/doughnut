@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Honoka-chan",
+  "email": "honoka-chan@example.org",
+  "identity": "SEED-096#cucumber-proof",
+  "mode": "story-branch",
+  "branch": "codex/cucumber-proof",
+  "host": "codex"
+}
