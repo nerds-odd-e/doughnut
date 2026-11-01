@@ -128,7 +128,7 @@ wall 148.5s; after avg 135.5s; both after runs 40/40. `pnpm cli:test` 440 pass.
 
 ### 3. Prove reading-panel behavior from one spec file
 Type: Structure
-Status: planned
+Status: done
 
 Change: merge `BookReadingPage.readingPanelTarget.spec.ts` into
 `BookReadingPage.readingControlPanel.visibility.spec.ts` under one setup,
@@ -147,6 +147,11 @@ once before and once after, and `pnpm -C frontend exec vue-tsc --noEmit` plus
 Decide: keep the merge only if the focused command does not get slower and
 every case still observes its own behavior; a cleaner single file with an
 unmeasurable saving is acceptable only if the full-suite run is not slower.
+
+Accepted (2026-11-01): **kept** merge. Focused BookReadingPage before avg
+10.72s → after 6.69s (39/39; files 6→5). Full `frontend:test` 84.69s → 84.28s
+(2454 tests). Merged file 245 lines. Old target filename swept (no product
+matches). `vue-tsc` / `tsc --noEmit` pass.
 
 ### 4. Record the local-feedback result
 Type: Behavior
@@ -212,3 +217,7 @@ Playwright; direction still favored keep. Linked worktrees refuse live
 2026-11-01 execution: Slice 2 kept command-scoped hook bypass on fixture
 commits. `cli_notebook_*` batch before avg wall 148.5s → after 135.5s (40/40);
 `cli:test` 440 pass.
+
+2026-11-01 execution: Slice 3 kept reading-panel visibility+target merge.
+Focused BookReadingPage avg 10.72s→6.69s (39/39); full frontend:test
+84.69s→84.28s; merged file 245 lines.

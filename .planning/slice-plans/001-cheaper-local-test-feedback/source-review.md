@@ -14,7 +14,7 @@
 | 3 | Work is limited to the three transferred obligations `e2e-batch-startup`, `cli-git-lfs-hook-installation`, and `frontend-sibling-spec-setup` | slice 4 | |
 | 3a.1 | `e2e-batch-startup` — change only the readiness polling cadence for owned E2E stack readiness | slice 1 | observed: `scripts/sut-start-health-wait.mjs` default `POLL_MS` 3000→500; LFS `cy:run` after runs noticed healthy sooner (avg 23.0s vs 47.9s) |
 | 3a.2 | `cli-git-lfs-hook-installation` — address LFS hook cost only on test-owned fixture commits | slice 2 | observed: shared `fixtureCommit` / `commitCheckout`/`amendCheckout` only; `git add` and `git lfs` / CLI unchanged; batch 40/40 |
-| 3a.3 | `frontend-sibling-spec-setup` — consolidate setup only for the reading-panel visibility and target specs | slice 3 | |
+| 3a.3 | `frontend-sibling-spec-setup` — consolidate setup only for the reading-panel visibility and target specs | slice 3 | observed: target spec merged into visibility spec; other sibling families untouched |
 | 4 | Fresh owned stack healthy between polls → runner notices within a shorter gap than today's 3s → Cypress starts only after a real healthy check | slice 1 | observed: after LFS runs poll counts 15–22 at 500ms; Cypress proceeded only after healthy; three consecutive passes |
 | 5a.1 | Real health checks stay | slice 1 | observed: `pnpm test:sut-start` (health wait paths); LFS feature uses real healthcheck |
 | 5a.2 | Deadline stays; never-healthy stack still times out with log tail | slice 1 | observed: `pnpm test:sut-start` timeout-with-log-tail cases (80 pass) |
@@ -26,10 +26,10 @@
 | 7a.3 | Real pointer history stays; commit stores a real LFS pointer | slice 2 | observed: pointer history / historical-fetch scenarios in AFTER batch |
 | 7a.4 | Installed CLI still hydrates the exact bytes | slice 2 | observed: exact hydrated bytes scenarios in AFTER batch; `pnpm cli:test` 440 pass |
 | 7a.5 | Test-owned fixture commit no longer runs LFS `post-commit`/`post-checkout` hooks | slice 2 | observed: `fixtureCommit` passes `-c core.hooksPath=/dev/null` on commit/amend only (no hook-count test per plan) |
-| 8a.1 | Eight visibility + three target cases from one spec file with one setup | slice 3 | |
-| 8a.2 | Every case still observes its distinct visible behavior | slice 3 | |
-| 8a.3 | Per-file browser isolation stays | slice 3 | |
-| 8a.4 | Consolidated file stays within the 250-line limit | slice 3 | |
+| 8a.1 | Eight visibility + three target cases from one spec file with one setup | slice 3 | observed: visibility spec runs 11 tests under one `beforeAll`/`beforeEach`; BookReadingPage suite 39/39 on 5 files |
+| 8a.2 | Every case still observes its distinct visible behavior | slice 3 | observed: original `it` names and assertions retained in merged file; focused 39/39 |
+| 8a.3 | Per-file browser isolation stays | slice 3 | observed: still one Vitest file per remaining panel concern; no cross-file browser sharing introduced |
+| 8a.4 | Consolidated file stays within the 250-line limit | slice 3 | observed: merged visibility spec 245 lines |
 | 9 | Existing profile exclusions stay | slice 4 | |
 | 10 | Owner-selected local HMR stays | slice 4 | |
 | 11 | Hook bypass only via `-c core.hooksPath=…` on that commit command; never a saved checkout setting the CLI later reads | slice 2 | observed: `E2E_FIXTURE_COMMIT_CONFIG_ARGS` command-scoped; LFS scratch prep no longer saves `user.name`/`user.email` |
@@ -57,3 +57,12 @@
 | 7a.1–7a.4 | LFS fixture publish/hydrate journeys | Real filters, transfer, pointer, exact bytes | AFTER `cli_notebook_*` 40/40 incl. LFS; `cli:test` 440 | slice 2 |
 | 7a.5 | Same commits | Skip LFS post-commit/post-checkout | `-c core.hooksPath=/dev/null` on command | slice 2 |
 | 11 | Bypass mechanism | Command-scoped only; no saved checkout setting | Config args on command; removed saved author config from LFS scratch prep | slice 2 |
+
+## Slice 3 acceptance comparison
+
+| Id | Trigger / setup | Source-expected result | Actual observation | Owner |
+| --- | --- | --- | --- | --- |
+| 3a.3 / 8a.1 | Merge visibility + target specs | One file, one setup, 11 cases | Merged visibility file; 11 tests; suite 39/39 | slice 3 |
+| 8a.2 | Each case | Distinct visible behavior | Original case names/assertions kept | slice 3 |
+| 8a.3 | Browser isolation | Per-file isolation stays | No cross-file browser share added | slice 3 |
+| 8a.4 | After merge | ≤250 lines | 245 lines | slice 3 |

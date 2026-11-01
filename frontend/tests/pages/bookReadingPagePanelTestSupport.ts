@@ -40,6 +40,27 @@ export async function mountSection2DirectContentBboxBook(options?: {
   return wrapper
 }
 
+export async function mountFirstBlockWithContentBbox(options?: {
+  lastContentBottomVisible?: boolean
+}) {
+  stubGetBookWithTopMathsLikeContentLocators((i) =>
+    i === 0
+      ? [
+          makeMe.pdfLocator.pageIndexOnly(0),
+          makeMe.pdfLocator.withBbox(0, [10, 700, 500, 750]),
+        ]
+      : [makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(i)]
+  )
+  mockNotebookBookFilePdfOk(bookId, getTopMathsPdfBytes())
+  const wrapper = mountBookReadingPage(notebookId)
+  await waitForPdfViewer(wrapper)
+  mockIsLastContentBottomVisible(
+    wrapper,
+    options?.lastContentBottomVisible ?? true
+  )
+  return wrapper
+}
+
 async function selectSection1AndShowPanel(wrapper: BookReadingPageWrapper) {
   await clickBookBlockAndExpectSelection(wrapper, "Section 1")
   await emitViewportAndSettleCurrentBlock(wrapper, {
