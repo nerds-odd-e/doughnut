@@ -97,7 +97,7 @@ live `pnpm dev` refused in linked worktree (G1).
 
 ### 2. Commit E2E fixtures without running Git LFS hooks
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: E2E setup has a real LFS checkout → a test-owned step commits a note
 or attachment change → the commit stores a real LFS pointer without running the
@@ -121,6 +121,10 @@ profile-excluded `cli_notebook_existing_note_edits.feature`. Run
 
 Decide: keep the change only if the whole command improves; otherwise undo it
 and record no gain. No test counts or checks hooks.
+
+Accepted (2026-11-01): **kept** shared `fixtureCommit` with command-scoped
+`core.hooksPath=/dev/null`. Warm `cli_notebook_*` batch (40 cases): before avg
+wall 148.5s; after avg 135.5s; both after runs 40/40. `pnpm cli:test` 440 pass.
 
 ### 3. Prove reading-panel behavior from one spec file
 Type: Structure
@@ -204,3 +208,7 @@ time-to-healthy 47.9s / wall 133s (7–16 polls); after avg 23.0s / wall 77s
 (15–22 polls). Host load rose during measurement from other worktrees'
 Playwright; direction still favored keep. Linked worktrees refuse live
 `pnpm dev`; Development consumer covered by `test:development-stack`.
+
+2026-11-01 execution: Slice 2 kept command-scoped hook bypass on fixture
+commits. `cli_notebook_*` batch before avg wall 148.5s → after 135.5s (40/40);
+`cli:test` 440 pass.

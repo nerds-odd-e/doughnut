@@ -6,9 +6,9 @@
 
 import { existsSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
+import { commitCheckout } from './cliE2eNotebookCloneGit'
 import {
   clearLfsObjectCache,
-  commitWithE2eAuthor,
   lfsObjectPath,
   runOrThrow,
   sha256Hex,
@@ -90,10 +90,7 @@ export function createCliE2eNotebookLfsHistoricalFetchTasks() {
     }): { head: string } {
       runOrThrow('git', ['rm', '--', relativePath], checkoutDir)
       return {
-        head: commitWithE2eAuthor(
-          checkoutDir,
-          message ?? `remove ${relativePath}`
-        ),
+        head: commitCheckout(checkoutDir, message ?? `remove ${relativePath}`),
       }
     },
   }

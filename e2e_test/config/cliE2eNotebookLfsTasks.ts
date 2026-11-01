@@ -15,6 +15,7 @@ import {
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { commitCheckout } from './cliE2eNotebookCloneGit'
 import {
   clearLfsObjectCache,
   runOrThrow,
@@ -47,12 +48,10 @@ function prepareLfsRepo(payload: string): {
   const oid = sha256Hex(bytes)
   runOrThrow('git', ['init'], dir)
   runOrThrow('git', ['lfs', 'install', '--local'], dir)
-  runOrThrow('git', ['config', 'user.email', 'lfs-e2e@example.com'], dir)
-  runOrThrow('git', ['config', 'user.name', 'LFS E2E'], dir)
   writeFileSync(join(dir, 'payload.bin'), bytes)
   runOrThrow('git', ['lfs', 'track', '*.bin'], dir)
   runOrThrow('git', ['add', '.gitattributes', 'payload.bin'], dir)
-  runOrThrow('git', ['commit', '-m', 'lfs payload'], dir)
+  commitCheckout(dir, 'lfs payload')
   return { dir, oid, bytes }
 }
 

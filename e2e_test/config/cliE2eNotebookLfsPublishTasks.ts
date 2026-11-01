@@ -13,8 +13,8 @@ import {
 } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { commitCheckout } from './cliE2eNotebookCloneGit'
 import {
-  commitWithE2eAuthor,
   lfsObjectPath,
   runOrThrow,
   sha256Hex,
@@ -39,7 +39,7 @@ function commitLfsAttachmentBytes(
   mkdirSync(dirname(filePath), { recursive: true })
   writeFileSync(filePath, bytes)
   runOrThrow('git', ['add', '--', relativePath], checkoutDir)
-  const head = commitWithE2eAuthor(checkoutDir, message)
+  const head = commitCheckout(checkoutDir, message)
   const pointerText = runOrThrow(
     'git',
     ['cat-file', 'blob', `${head}:${relativePath}`],

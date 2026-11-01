@@ -22,6 +22,13 @@ const E2E_GIT_IDENTITY_ARGS = [
   'user.email=donut-e2e@example.com',
 ] as const
 
+/** Command-scoped empty hooks path; never saved into the checkout config. */
+const E2E_FIXTURE_COMMIT_CONFIG_ARGS = [
+  ...E2E_GIT_IDENTITY_ARGS,
+  '-c',
+  'core.hooksPath=/dev/null',
+] as const
+
 const TEST_OWNED_REBASE_EDITOR_ENV = {
   GIT_EDITOR: 'true',
   GIT_SEQUENCE_EDITOR: 'true',
@@ -49,9 +56,17 @@ export function git(checkoutDir: string, ...args: string[]): string {
   }).trim()
 }
 
-export function commitCheckout(checkoutDir: string, message: string): string {
-  git(checkoutDir, ...E2E_GIT_IDENTITY_ARGS, 'commit', '-m', message)
+/**
+ * Test-owned fixture commit: fixed E2E author and no Git hooks on this one
+ * command (skips LFS post-commit while clean/smudge filters still run).
+ */
+function fixtureCommit(checkoutDir: string, ...commitArgs: string[]): string {
+  git(checkoutDir, ...E2E_FIXTURE_COMMIT_CONFIG_ARGS, ...commitArgs)
   return git(checkoutDir, 'rev-parse', 'HEAD')
+}
+
+export function commitCheckout(checkoutDir: string, message: string): string {
+  return fixtureCommit(checkoutDir, 'commit', '-m', message)
 }
 
 export function stageNoteChanges(
@@ -122,8 +137,7 @@ export function checkoutFilledBytesMatch(
 
 /** Amends HEAD in place (unpublished tip) after staging; returns the new commit id. */
 export function amendCheckout(checkoutDir: string): string {
-  git(checkoutDir, ...E2E_GIT_IDENTITY_ARGS, 'commit', '--amend', '--no-edit')
-  return git(checkoutDir, 'rev-parse', 'HEAD')
+  return fixtureCommit(checkoutDir, 'commit', '--amend', '--no-edit')
 }
 
 /** The checked-out file's bytes as lowercase hex, never decoded as text. */

@@ -13,7 +13,7 @@
 | 2 | A change whose ordinary command shows no comparable improvement (including added proof cost) is undone and recorded as no gain | slice 4 | |
 | 3 | Work is limited to the three transferred obligations `e2e-batch-startup`, `cli-git-lfs-hook-installation`, and `frontend-sibling-spec-setup` | slice 4 | |
 | 3a.1 | `e2e-batch-startup` — change only the readiness polling cadence for owned E2E stack readiness | slice 1 | observed: `scripts/sut-start-health-wait.mjs` default `POLL_MS` 3000→500; LFS `cy:run` after runs noticed healthy sooner (avg 23.0s vs 47.9s) |
-| 3a.2 | `cli-git-lfs-hook-installation` — address LFS hook cost only on test-owned fixture commits | slice 2 | |
+| 3a.2 | `cli-git-lfs-hook-installation` — address LFS hook cost only on test-owned fixture commits | slice 2 | observed: shared `fixtureCommit` / `commitCheckout`/`amendCheckout` only; `git add` and `git lfs` / CLI unchanged; batch 40/40 |
 | 3a.3 | `frontend-sibling-spec-setup` — consolidate setup only for the reading-panel visibility and target specs | slice 3 | |
 | 4 | Fresh owned stack healthy between polls → runner notices within a shorter gap than today's 3s → Cypress starts only after a real healthy check | slice 1 | observed: after LFS runs poll counts 15–22 at 500ms; Cypress proceeded only after healthy; three consecutive passes |
 | 5a.1 | Real health checks stay | slice 1 | observed: `pnpm test:sut-start` (health wait paths); LFS feature uses real healthcheck |
@@ -21,18 +21,18 @@
 | 5a.3 | Cancellation still cleans up (Ctrl-C) | slice 1 | observed: `pnpm test:sut-start` cancellation cases |
 | 5a.4 | Failure cleanup stays | slice 1 | observed: `pnpm test:sut-start` child-exit / failure cleanup cases |
 | 6 | E2E runner keeps owning its fresh disposable stack (ADR 0007); no ownership move | slice 1 | observed: LFS `cy:run` owned stack start/cleanup; no ownership change in diff |
-| 7a.1 | Real LFS filters stay | slice 2 | |
-| 7a.2 | Real LFS transfer stays | slice 2 | |
-| 7a.3 | Real pointer history stays; commit stores a real LFS pointer | slice 2 | |
-| 7a.4 | Installed CLI still hydrates the exact bytes | slice 2 | |
-| 7a.5 | Test-owned fixture commit no longer runs LFS `post-commit`/`post-checkout` hooks | slice 2 | |
+| 7a.1 | Real LFS filters stay | slice 2 | observed: `cli_notebook_lfs.feature` scenarios pass in AFTER batch (filters still produce pointers) |
+| 7a.2 | Real LFS transfer stays | slice 2 | observed: LFS publish/hydrate scenarios in AFTER `cli_notebook_*` batch 40/40 |
+| 7a.3 | Real pointer history stays; commit stores a real LFS pointer | slice 2 | observed: pointer history / historical-fetch scenarios in AFTER batch |
+| 7a.4 | Installed CLI still hydrates the exact bytes | slice 2 | observed: exact hydrated bytes scenarios in AFTER batch; `pnpm cli:test` 440 pass |
+| 7a.5 | Test-owned fixture commit no longer runs LFS `post-commit`/`post-checkout` hooks | slice 2 | observed: `fixtureCommit` passes `-c core.hooksPath=/dev/null` on commit/amend only (no hook-count test per plan) |
 | 8a.1 | Eight visibility + three target cases from one spec file with one setup | slice 3 | |
 | 8a.2 | Every case still observes its distinct visible behavior | slice 3 | |
 | 8a.3 | Per-file browser isolation stays | slice 3 | |
 | 8a.4 | Consolidated file stays within the 250-line limit | slice 3 | |
 | 9 | Existing profile exclusions stay | slice 4 | |
 | 10 | Owner-selected local HMR stays | slice 4 | |
-| 11 | Hook bypass only via `-c core.hooksPath=…` on that commit command; never a saved checkout setting the CLI later reads | slice 2 | |
+| 11 | Hook bypass only via `-c core.hooksPath=…` on that commit command; never a saved checkout setting the CLI later reads | slice 2 | observed: `E2E_FIXTURE_COMMIT_CONFIG_ARGS` command-scoped; LFS scratch prep no longer saves `user.name`/`user.email` |
 | 12 | Readiness cadence is one shared default in `scripts/sut-start-health-wait.mjs` for `dev-start.mjs`, `sut-owned-restart.mjs`, and `sut-owned-lifetime.mjs`; not an E2E-only value | slice 1 | observed: single `POLL_MS` default in `sut-start-health-wait.mjs`; LFS `cy:run` + `test:sut-start` + `test:development-stack` (`Development healthy after 1 poll(s)`) |
 | 13a.1 | No other startup cost (backend boot, Gradle check, Cypress launch, database provisioning); costs found there return to the candidate record | slice 4 | |
 | 13a.2 | No other sibling-spec families; costs return to the candidate record | slice 4 | |
@@ -48,3 +48,12 @@
 | 5a.1–5a.4 | Timeout / cancel / failure paths | Unchanged reporting and cleanup | `pnpm test:sut-start` 80 pass | slice 1 |
 | 6 | Owned E2E stack lifecycle | Runner still owns disposable stack | LFS feature owned start/cleanup; diff has no ownership move | slice 1 |
 | 12 | Change shared `POLL_MS` default | All listed consumers share one value | One default; consumers import shared wait; live `pnpm dev` refused in linked worktree → G1 / `test:development-stack` | slice 1 |
+
+## Slice 2 acceptance comparison
+
+| Id | Trigger / setup | Source-expected result | Actual observation | Owner |
+| --- | --- | --- | --- | --- |
+| 3a.2 | Test-owned fixture commit | Hook cost only on those commits | `fixtureCommit` only on commit/amend paths | slice 2 |
+| 7a.1–7a.4 | LFS fixture publish/hydrate journeys | Real filters, transfer, pointer, exact bytes | AFTER `cli_notebook_*` 40/40 incl. LFS; `cli:test` 440 | slice 2 |
+| 7a.5 | Same commits | Skip LFS post-commit/post-checkout | `-c core.hooksPath=/dev/null` on command | slice 2 |
+| 11 | Bypass mechanism | Command-scoped only; no saved checkout setting | Config args on command; removed saved author config from LFS scratch prep | slice 2 |
