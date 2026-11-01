@@ -95,23 +95,8 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
 
 Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-141](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-141.md); rereading adds no occurrence.
 
-- Execution: SEED-090#story-1 / first implementation `6a12f6bbc287099c6e1c00916df4b48249cb0d8e`
-  - Timestamp: unknown (execution date 2026-10-28)
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: Codex session `01a181b0-57f4-7e02-9474-3ba08c605ec8`, returns from `refactor_oauth_grant`, `refactor_ci_e2e`, `refactor_session_request`, `refactor_session_record`, `refactor_probe_checkpoint`, and `refactor_authorized_probe_record`; retained execution evidence at `75fece3:.planning/slice-plans/077-commissioned-learning-session-in-chatgpt/execution-evidence.md`.
-  - Observed effect: Six fresh passes returned no refactor edits and reported approximately 2–5 active minutes each (about 17 minutes summed). Two were records-only stop checkpoints, reporting about four minutes together. One pass usefully caught an oversized PLAN and the coordinator moved its evidence to a linked file; accepted product proof stayed unchanged throughout.
-  - Inference: The records-only passes exhibit recurring fixed review cost without product change. Times are agent reports, not independently measured wall time or token cost; the useful size finding prevents treating every pass as wasted.
-
-
-
-- Execution: SEED-090#story-2 / first implementation `358ad5c0767a179134ff295b1bcfdfc43959f736`
-  - Timestamp: unknown (records-only continuation on 2026-10-29)
-  - Tool: Codex
-  - Open Dough release: unknown (the repair continuation used the guidance update at `c51f7b619a`)
-  - Evidence: `fresh_chat_evidence_refactor`, `empty_report_acceptance_refactor`, `full_round_evidence_refactor` and `full_report_result_refactor` returned no edits; retained proof at `bd9dde8e55bfdd54d4d1338d04ab1f9bd6c031c7:.planning/slice-plans/078-verify-commissioned-learning-in-chatgpt/` and documentation-only commits `6cc7f56b`, `4b5780c6`, `64022c1a`, `bd9dde8e`.
-  - Observed effect: Four further fresh passes reviewed evidence/guide changes or an empty scope, returned no edits and reported about two minutes, under one minute, two minutes and one minute respectively. Product boundaries and previously accepted tests stayed unchanged.
-  - Inference: This is another execution of ODF-141's fixed review cost, approximately five to six agent-reported active minutes for these four passes; no independent wall-time or token measurement is available. The required independent review contract, rather than product uncertainty, triggered these passes.
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-141](https://github.com/terryyin/open-dough/blob/692bf5162b86fca9cbebc1c57c98efd227198e9d/docs/maintainer/findings/ODF-141.md); source recovery remains in this project’s pre-compaction revision.
 
 <a id="odf-208"></a>
 
@@ -355,15 +340,8 @@ Former local code: DD-319. Acceptance traced the unchanged transport API but not
 
 Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-150](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-150.md); rereading adds no occurrence.
 
-- Execution: SEED-090#story-1 / first implementation `6a12f6bbc287099c6e1c00916df4b48249cb0d8e`
-  - Timestamp: 2026-10-28T09:01:43Z
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: slice-1 consumer trace excluded `hostedAssistant.ts` as an unchanged read-only journey; CI run `40660492127`, attempt 1, job `122722010192`, failed its old consent heading. Repair `4f226b3c992ff723868e5e4086ed2748a25cee28` and its retained plan/evidence record show the cause and focused reproduction.
-  - Observed effect: Advertising `learning_session:record` changed SDK 1.32.2's selected scopes because it prefers discovered `scopes_supported` over provider `clientMetadata.scope`. The existing SDK journey requested both scopes and failed in CI despite passing selected backend/browser proof. Four E2E-only expectation edits then passed the unchanged real SDK consent/read/renewal/withdrawal journey (1/1, 16 seconds).
-  - Inference: Consumer acceptance stopped at an unchanged transport/default-scope assumption instead of tracing discovery into actual client selection. The product/test repair is complete; shared prevention remains unproved. Inspect indirect discovery/default consumers before excluding an existing journey.
-
-
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-150](https://github.com/terryyin/open-dough/blob/692bf5162b86fca9cbebc1c57c98efd227198e9d/docs/maintainer/findings/ODF-150.md); source recovery remains in this project’s pre-compaction revision.
 
 <a id="odf-323"></a>
 
