@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-039#candidate-resolution",
+  "title": "Shorten local test feedback by reducing repeated setup",
+  "completedAt": "2026-11-01T02:22:21.798Z",
+  "developer": "Terry Yin",
+  "agent": "Nana-chan",
+  "host": "cursor",
+  "model": "auto"
+}

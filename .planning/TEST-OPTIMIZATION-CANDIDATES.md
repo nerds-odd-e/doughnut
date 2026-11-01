@@ -2,28 +2,65 @@
 
 ## Latest pass
 
-- **Command / scope:** `dough-test-optimization --resolve`, 2026-10-30;
-  source/evidence triage of all six pending candidates across backend, frontend,
-  CLI E2E, and batch startup. No profiling, tests, or optimization changes ran.
-- **Revision:** `bf0bbc01b3b90db7ed4e88b237474e4a7133ba15`; product tree at
-  admission base `6ad57b7a366e40154c5140e1a79be330213801d8`.
-- **Before / after:** unavailable; no new command wall time or case counts.
-  Prior measurements remain dated observations within the relevant entries.
-- **Outcome:** incomplete measurement by resolve-only design — three candidates
-  accepted as necessary costs and three transferred to one future experiment
-  plan. No candidate decision remains pending. No speedup is claimed.
-- **Limits:** current behavior was inspected in source, not experimentally
-  re-established. The replacement plan is not ready pending its fresh baselines
-  and discriminating observations; implementation requires a later instruction.
-  Existing accepted costs and profile-only exclusions were preserved, with no
-  new tags or narrowed normal/CI coverage.
-- **Evidence:** [future experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md),
-  [mission source](seeds/SEED-039-faster-ci-feedback.md#candidate-resolution),
-  and each finding's original dated evidence below.
+- **Command / scope:** SEED-039#candidate-resolution via
+  [001-cheaper-local-test-feedback](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
+  warm ordinary commands only (LFS `cy:run`; shell-expanded 13-feature
+  `cli_notebook_*` `cy:run`, 40 cases; focused BookReadingPage Vitest + one
+  full `frontend:test` each side). Three transferred obligations only; HMR and
+  profile exclusions unchanged; no shard/worker changes.
+- **Revision:** `3399d65a06b87b0b2d9d6f9c3abb27f928dcc04e`
+  (commits `0c77890cce`, `3ef0e813af`, `3399d65a06`).
+- **Before / after:** warm averages (per-slice; not summed; raw runs in plan
+  Accepted notes): Slice 1 `POLL_MS` 3000→500 wall 133.0→77.3s, time-to-healthy
+  47.86→23.01s (×3); Slice 2 `fixtureCommit` hooksPath bypass wall 148.5→135.5s
+  (×2, 40/40); Slice 3 reading-panel merge focused 10.72→6.69s (×3, 39/39,
+  files 6→5), full `frontend:test` 84.69→84.28s, merged file 245 lines.
+- **Outcome:** measured gain — all three kept under warm alternating ordinary
+  commands; no-gain undo unused; no claim from historical numbers, fewer files,
+  or summed durations.
+- **Limits:** Elevated host load in slice 1; cold first LFS (~4m18s) not used
+  for gain; other E2E startup costs and remaining sibling-spec families not
+  claimed solved; per-command measurement only.
+- **Evidence:** [before-cleanup plan Accepted notes](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md); transferred closed for work
+  done; unfinished parts returned to pending.
 
 ## Pending candidates
 
-None.
+### e2e-batch-cold-start
+
+- **Locations / scope:** first cold local `pnpm cy:run` batch versus later warm
+  runs of the same owned stack; seen on `cli_notebook_lfs.feature`.
+- **Observed cost:** 2026-11-01 at `ee6ecf2549`, cold first LFS ~4m18s (18
+  polls) vs warm under ~1 minute; cold and warm not comparable for cadence.
+- **Unique protection:** fresh owned stack with cold caches/boot on a session's
+  first batch.
+- **Alternatives attempted:** SEED-039#candidate-resolution measured warm
+  readiness polling only; cold-start was outside that experiment.
+- **Disposition / rationale:** pending — cold-versus-warm gap returned from the
+  cheaper-local-feedback experiment; not claimed solved by the `POLL_MS` keep.
+- **Date:** 2026-11-01
+- **Evidence / follow-up:** [plan premises and learnings](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
+  prior transferred `e2e-batch-startup` closed for polling cadence only.
+
+### frontend-sibling-spec-setup
+
+- **Locations / scope:** remaining cohesive sibling frontend Vitest families
+  after the reading-panel visibility/target merge (~25 families of 2–3 siblings
+  historically). BookReadingPage still has separate marking, notebookSwitch,
+  readingPosition, and base specs beside the merged visibility file.
+- **Observed cost:** retained merges historically ~70–250ms per removed file;
+  remaining families unpicked here with no fresh measured saving. Reading-panel
+  pair done (Latest pass).
+- **Unique protection:** each family's distinct component behavior, harness,
+  mock boundaries, and real/fake timer requirements.
+- **Alternatives attempted:** earlier responsibility-based merges (346→295
+  files); this story merged only the compatible reading-panel pair (245 lines).
+- **Disposition / rationale:** pending — unfinished remainder of the former
+  transferred obligation after the reading-panel pair closed; do not force
+  incompatible mock/timer contracts together.
+- **Date:** 2026-09-26; unfinished remainder returned 2026-11-01.
+- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md);
+  [replacement experiment plan](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md) slice 3 Accepted.
 
 ## Accepted necessary costs
 
@@ -69,7 +106,7 @@ None.
 - **Unique protection:** frontend HMR in local E2E batches.
 - **Alternatives attempted:** production-build serving was proposed and declined
   by the owner on 2026-09-25 when the CLI E2E pass stopped at ~41% improvement.
-- **Disposition / rationale:** accepted necessary cost — reuse the owner's 2026-09-25 decision to keep local HMR. The current batch wrapper still serves Vite by default; built-asset serving exists for other invocations but does not supersede that decision. Real first-load integration remains necessary under the selected mode. No new authorization question or exclusion is needed.
+- **Disposition / rationale:** accepted necessary cost — reuse the owner's 2026-09-25 decision to keep local HMR. The current batch wrapper still serves Vite by default; built-asset serving exists for other invocations but does not supersede that decision. Real first-load integration remains necessary under the selected mode. No new authorization question or exclusion is needed. SEED-039#candidate-resolution (2026-11-01) left this unchanged (no built-frontend substitution).
 - **Date:** 2026-09-25.
 - **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
   [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Current-source reading on 2026-10-30 at `bf0bbc01b3`: `scripts/e2e-runner.mjs`, `scripts/sut-services.mjs`, and `.agents/skills/e2e-authoring/SKILL.md` confirm the default local HMR path. The historical 15–25s estimate remains unmeasured. Resolution: 2026-10-30.
@@ -100,6 +137,8 @@ features from the profile; the wrapper drops `--expose tags=...`. Normal
 verification and CI still run them. See
 [E2E profiling guidance](../.agents/skills/e2e-authoring/SKILL.md#test-optimization-profiling).
 The entries below inventory existing tags; their original decisions are retained.
+SEED-039#candidate-resolution (2026-11-01) added no tags and narrowed no
+normal/CI coverage.
 
 ### bazaar-subscription-journey
 
@@ -197,51 +236,10 @@ The entries below inventory existing tags; their original decisions are retained
 - **Observed cost:** no numeric timing or measurement conditions retained with the exclusion decision.
 - **Unique protection:** creating person notes whose content includes country and date of birth from Wikidata data.
 - **Alternatives attempted:** not recorded with the original tag decision.
-- **Disposition / rationale:** profile-only exclusion — existing outline tag for cost judged inherent to the journey.
+- **Disposition / rationale:** profile-only exclusion — existing scenario tag for cost judged inherent to the journey.
 - **Date:** 2026-07-23.
 - **Evidence / follow-up:** [original exclusion decision](https://github.com/nerds-odd-e/doughnut/commit/f975c3dbb6); current tag in the linked feature.
 
 ## Transferred obligations
 
-### e2e-batch-startup
-
-- **Locations / scope:** fixed startup of a local `pnpm cy:run` batch.
-- **Observed cost:** ~33s per batch on 2026-09-25: SUT 13.5s (backend boot ~9s,
-  Gradle compile check, mocks, Vite), Cypress launch 2.7s, ~1.2s per spec load.
-- **Unique protection:** a fresh owned stack per batch.
-- **Alternatives attempted:** none recorded.
-- **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 1 and 4. Current readiness observation defaults to a 3000ms polling gap (`scripts/sut-start-health-wait.mjs`). Try reducing avoidable observation delay while preserving the fresh owned stack, actual health checks, cancellation, deadlines, and failure cleanup. Backend boot, Cypress launch, and per-spec costs are not claimed removable. Baseline and healthcheck-cost observation are prerequisites; nothing was implemented.
-- **Date:** 2026-09-25.
-- **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
-  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned. Premises re-observed at `ee6ecf2549` on 2026-11-01 and recorded in the plan; nothing was implemented.
-
-### cli-git-lfs-hook-installation
-
-- **Locations / scope:** CLI E2E Git checkouts with attachments and git-lfs 3.7.1.
-- **Observed cost:** on 2026-09-25, commits cost ~213ms rather than ~15ms after
-  the first real git-lfs command reinstalls `post-checkout`, `post-commit`,
-  `post-merge`, and `pre-push` hooks despite filter installation with `--skip-repo`.
-- **Unique protection:** none recorded for these hooks; the observation states
-  that Donut uses neither LFS locking nor `git push`.
-- **Alternatives attempted:** no change attempted; no setting to prevent hook
-  reinstallation was found in the installed git-lfs 3.7.1.
-- **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 2 and 4. Try command-scoped hook bypass only for test-authored commits in existing E2E Git plumbing; preserve real clean filters, installed-CLI operations, standard-client transfers, pointer history, and exact hydration. Current standard-client fixture tasks do use `git lfs push --object-id`, so the historical no-push statement cannot justify bypassing protocol operations. Fresh timing and discrimination are prerequisites; nothing was implemented.
-- **Date:** 2026-09-25.
-- **Evidence / follow-up:** [CLI E2E pass](https://github.com/nerds-odd-e/doughnut/blob/e2f9929fe9/.planning/quick/032-halve-cli-e2e-time/PLAN.md),
-  [candidate recording](https://github.com/nerds-odd-e/doughnut/commit/753dbd9b5d). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned. Premises re-observed at `ee6ecf2549` on 2026-11-01 and recorded in the plan; nothing was implemented.
-
-### frontend-sibling-spec-setup
-
-- **Locations / scope:** the 2026-09-26 pass left ~25 families of 2–3 sibling
-  frontend specs; BookReadingPage's stub-book/mount/wait-for-PDF setup repeated
-  across about six support files, and `BookReadingPage.snap.spec.ts` was 404 lines.
-- **Observed cost:** retained merges saved ~70–250ms per removed file in focused
-  runs. The remaining opportunities were unpicked and have no measured saving.
-- **Unique protection:** each family's distinct component behavior, harness,
-  mock boundaries, and real/fake timer requirements.
-- **Alternatives attempted:** responsibility-based merges reduced the measured
-  suite from 346 to 295 files; incompatible file-level `vi.mock` choices and
-  the then-applicable 250-line refactor limit bounded those merges.
-- **Disposition / rationale:** transferred obligation — [replacement experiment plan](slice-plans/001-cheaper-local-test-feedback/PLAN.md), slices 3 and 4. Start with the compatible-looking reading-panel visibility and targeting specs, retaining their distinct mounted-page observations and existing PDF/support seam. The old snap-spec size is historical; current code already shares fixtures. Do not sweep all historical sibling families or force incompatible mock/timer contracts together. Current browser-mode baselines and compatibility observations are prerequisites; nothing was implemented.
-- **Date:** 2026-09-26.
-- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md). Resolution and source reading at `bf0bbc01b3`: 2026-10-30; baseline, experiment, verification, and re-profile remain planned. Premises re-observed at `ee6ecf2549` on 2026-11-01 and recorded in the plan; nothing was implemented.
+None.

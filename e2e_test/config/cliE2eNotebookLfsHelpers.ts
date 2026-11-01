@@ -50,24 +50,3 @@ export function clearLfsObjectCache(checkoutDir: string): void {
     force: true,
   })
 }
-
-/** Commit with the fixed Donut E2E author identity used by CLI notebook fixtures. */
-export function commitWithE2eAuthor(
-  checkoutDir: string,
-  message: string
-): string {
-  runOrThrow(
-    'git',
-    [
-      '-c',
-      'user.name=Donut E2E',
-      '-c',
-      'user.email=donut-e2e@example.com',
-      'commit',
-      '-m',
-      message,
-    ],
-    checkoutDir
-  )
-  return runOrThrow('git', ['rev-parse', 'HEAD'], checkoutDir).trim()
-}
