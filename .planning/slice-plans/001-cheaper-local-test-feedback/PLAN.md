@@ -1,6 +1,7 @@
 # Cheaper local test feedback
 
 **Source:** [Shorten local test feedback by reducing repeated setup](../../seeds/SEED-039-faster-ci-feedback.md#candidate-resolution)
+**Source review:** [source-review.md](./source-review.md)
 **Identity:** SEED-039#candidate-resolution
 **Instruction:** first planned by `dough-test-optimization --resolve` on
 2026-10-30 (no measurement); refreshed by story refinement and slice planning
@@ -64,7 +65,7 @@ names once at acceptance; add no test that the old files are absent.
 
 ### 1. Notice an owned stack's readiness sooner
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: A fresh owned stack becomes healthy between two polls → the wait
 notices it within a shorter gap than today's 3000ms → Cypress starts only after
@@ -87,6 +88,12 @@ consecutive focused E2E passes cover the changed waiting.
 Decide: keep the change only if time-to-healthy improves across the
 alternating runs without a slower or failing command; otherwise undo it and
 record no gain.
+
+Accepted (2026-11-01): **kept** `POLL_MS` 500. Warm LFS before avg
+time-to-healthy 47.9s / wall 133s (polls 7–16); after avg 23.0s / wall 77s
+(polls 15–22); three after passes. `pnpm test:sut-start` 80 pass;
+`pnpm test:development-stack` 19 pass (`Development healthy after 1 poll(s)`);
+live `pnpm dev` refused in linked worktree (G1).
 
 ### 2. Commit E2E fixtures without running Git LFS hooks
 Type: Behavior
@@ -178,9 +185,22 @@ slice-specific concern was found; the small size of each saving relative to
 machine noise is handled by the alternating measurement and the no-gain
 outcome, not left open.
 
+## Story obligations
+
+### G1. Live Development start refused in linked worktree
+Reported: slice 1 — "Live `pnpm dev` / `dev:stop` on this linked worktree — actively refused; Development readiness covered by `test:development-stack` instead."
+Story clause: "Readiness cadence is one shared default in `scripts/sut-start-health-wait.mjs`, also used by `dev-start.mjs`"
+Disposition: proved by slice 1: `CURSOR_DEV=true nix develop -c pnpm test:development-stack` observed `Development healthy after 1 poll(s)` via the same `waitForSutHealthy` path `dev-start.mjs` uses
+
 ## Learnings
 
 2026-11-01: Cold and warm E2E runs differ by minutes on this machine (4m18s vs
 under 1 minute for the same feature), so only warm, alternating runs are
 comparable. The readiness wait is 13–31s, of which polling cadence can remove
 at most ~3s.
+
+2026-11-01 execution: Slice 1 kept `POLL_MS` 500. Warm LFS before avg
+time-to-healthy 47.9s / wall 133s (7–16 polls); after avg 23.0s / wall 77s
+(15–22 polls). Host load rose during measurement from other worktrees'
+Playwright; direction still favored keep. Linked worktrees refuse live
+`pnpm dev`; Development consumer covered by `test:development-stack`.

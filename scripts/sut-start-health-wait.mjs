@@ -4,7 +4,7 @@ import { LOG_TARGETS } from './log-utils.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
 
 const TIMEOUT_MS = Number(process.env.SUT_TIMEOUT_MS ?? 120_000)
-const POLL_MS = Number(process.env.SUT_POLL_MS ?? 3_000)
+const POLL_MS = Number(process.env.SUT_POLL_MS ?? 500)
 
 /** Number of log tail lines to include in failure output. */
 const TAIL_LINES = 40
