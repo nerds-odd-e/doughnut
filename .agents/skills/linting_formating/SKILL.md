@@ -148,7 +148,7 @@ Running `biome migrate` from inside `frontend/` sometimes suggests adding `"root
 
 ### CRITICAL: Project-domain (MFA) rules and Vue SFCs
 
-Biome 2.x introduces "project" / multi-file-analysis (MFA) rules that build a cross-file import graph. As of Biome 2.4.x, **the MFA resolver does not understand Vue SFC `<script setup>` implicit default exports**. Every `import X from "./X.vue"` in the frontend is flagged as unresolved once MFA activates.
+Biome 2.x introduces "project" / multi-file-analysis (MFA) rules that build a cross-file import graph. As of Biome 2.6.3, **the MFA resolver does not understand Vue SFC `<script setup>` implicit default exports**. Every `import X from "./X.vue"` in the frontend is flagged as unresolved once MFA activates.
 
 Project-domain rules include (non-exhaustive):
 - `correctness/noUnresolvedImports`

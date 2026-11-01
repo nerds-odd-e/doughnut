@@ -9,7 +9,7 @@ and `doughnut/frontend/package.json`.
 
 #### 1.1. Install [Biome](https://biomejs.dev/guides/editors/first-party-plugins/)
 
-[Biome](https://biomejs.dev/) One toolchain for your web project
+[Biome](https://biomejs.dev/) v2.6.3: one toolchain for your web project
 Format, lint, and more in a fraction of a second.
 
 #### 2.1. Format All code

@@ -16,7 +16,7 @@ runs:
       with:
         node-version: ${{ inputs.node_version }}
     # Omit version so pnpm/action-setup reads package.json packageManager
-    # (keeps CI in sync with Dependabot bumps; do not reintroduce vars.PNPM_VERSION).
+    # (keeps CI in sync with Dependabot bumps).
     - name: Install pnpm
       uses: pnpm/action-setup@v6
     - name: Install dependencies

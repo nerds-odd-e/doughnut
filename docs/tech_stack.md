@@ -10,7 +10,7 @@
 - [Cypress 16](https://www.cypress.io/)
 - [@badeball/cypress-cucumber-preprocessor](https://github.com/badeball/cypress-cucumber-preprocessor)
 - [Cypress Testing Library](https://testing-library.com/docs/cypress-testing-library/intro/)
-- [Node.js 26](https://nodejs.org/)
+- [Node.js v26.13.0](https://nodejs.org/)
 - [pnpm 12](https://pnpm.io/)
 - [TypeScript 6](https://www.typescriptlang.org/)
 - [Biome 2.6](https://biomejs.dev/)

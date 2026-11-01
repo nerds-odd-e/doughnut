@@ -18,7 +18,7 @@ Output: Environment ready for tests + summary ending with `## CLOUD VM READY`.
 <context>
 **On Cloud VM: do NOT use `CURSOR_DEV=true nix develop -c` prefix. Run commands directly.**
 
-**Pre-configured:** Node.js v24.16.0, pnpm 11.3.0 — no nix needed.
+**Pre-configured:** Node.js v26.13.0 and pnpm (pnpm follows root `packageManager`) — no nix needed.
 
 **Ports:**
 
