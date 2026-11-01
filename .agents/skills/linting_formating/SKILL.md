@@ -133,11 +133,11 @@ Both configs must pin `$schema` to the exact CLI version. A mismatch emits a `de
 i The configuration schema version does not match the CLI version 2.6.x
 ```
 
-When upgrading `@biomejs/biome`, run `pnpx @biomejs/biome migrate --write` from both the repo root and `frontend/` to bump the schema URLs (and auto-apply any rule renames / config restructuring).
+When upgrading `@biomejs/biome`, run `pnpm exec biome migrate --write` from the repo root to bump the schema URLs (and auto-apply any rule renames / config restructuring). It processes both `biome.json` and `frontend/biome.json`.
 
-### Ignore quirk: `biome migrate` suggesting `root: false` in the root config
+### Run `biome migrate` from the repo root
 
-Running `biome migrate` from inside `frontend/` sometimes suggests adding `"root": false` to **the workspace root** `biome.json`. **Do not apply it.** The workspace root must remain the root. This is a known artifact of the migrator walking up from a nested package.
+Running `biome migrate --write` from inside `frontend/` writes `"root": false` into **the workspace root** `biome.json` (seen on 2.6.4). The migrator walks up from the nested package. The workspace root must remain the root: with that line, `pnpm cy:lint` fails with `Found a nested root configuration`. If it appears, delete the line.
 
 ### Path scoping: use `files.includes`, not separate `linter.includes`
 
@@ -148,7 +148,15 @@ Running `biome migrate` from inside `frontend/` sometimes suggests adding `"root
 
 ### CRITICAL: Project-domain (MFA) rules and Vue SFCs
 
-Biome 2.x introduces "project" / multi-file-analysis (MFA) rules that build a cross-file import graph. As of Biome 2.6.3, **the MFA resolver does not understand Vue SFC `<script setup>` implicit default exports**. Every `import X from "./X.vue"` in the frontend is flagged as unresolved once MFA activates.
+Biome 2.x introduces "project" / multi-file-analysis (MFA) rules that build a cross-file import graph. As of Biome 2.6.4 (measured on 2.6.3 and 2.6.4, identical results), **the MFA resolver does not understand Vue SFC `<script setup>` implicit default exports**. Once MFA activates, `import X from "./X.vue"` fails with `The path ./X.vue has no default export` for every SFC that lacks an explicit `export default` (most of `frontend/src`). SFCs with an explicit `export default` resolve.
+
+The changelog and rule docs do not cover this behaviour, so measure it after each Biome bump, from `frontend/`:
+
+```bash
+pnpm biome lint --only=correctness/noUnresolvedImports --max-diagnostics=none --reporter=github . | grep -c '\.vue has no default export'
+```
+
+`--only` activates MFA without a config edit. 2.6.4 baseline: 704 errors, 696 of them this false positive. A count near zero means the limitation is gone: lift the rule below and update this section.
 
 Project-domain rules include (non-exhaustive):
 - `correctness/noUnresolvedImports`
@@ -158,11 +166,11 @@ Project-domain rules include (non-exhaustive):
 - `correctness/noMisusedPromises`
 - `correctness/noPrivateImports`
 
-**Rule**: Do NOT enable any of these in the workspace root `biome.json`. Enabling them anywhere the project graph reaches Vue SFCs (which includes the root config, since it delegates to `frontend/biome.json` via MFA) produces 400+ false-positive `noUnresolvedImports` errors even in pure `.ts` files that import from `.vue`.
+**Rule**: Do NOT enable any of these in the workspace root `biome.json`. Enabling them anywhere the project graph reaches Vue SFCs (which includes the root config, since it delegates to `frontend/biome.json` via MFA) produces about 700 false-positive `noUnresolvedImports` errors, including in pure `.ts` files that import from `.vue`.
 
 - `frontend/biome.json` currently has `noUnresolvedImports: "error"`. It is silently a no-op today because MFA is not activated (no project-domain rule is triggering it). If you add one of the rules above at the root, `frontend:lint` will break even though `frontend/biome.json` hasn't changed.
 - Safe alternative for TS-only subtrees: put project-domain rules in a TS-only override, or in a scoped nested config (e.g. `cli/biome.json`) — but test carefully, since MFA scope is workspace-wide.
-- Revisit this restriction once Biome releases proper Vue SFC module resolution. See Biome issues on `<script setup>` default-export detection.
+- Revisit this restriction once the measurement above shows Biome resolves Vue SFC default exports.
 
 ### `noUnusedExpressions` and Chai/Cypress assertions
 
