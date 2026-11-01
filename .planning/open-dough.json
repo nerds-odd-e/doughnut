@@ -1,6 +1,23 @@
 {
   "skipProcessRetrospective": false,
   "intent": {
-    "locations": [{ "path": "e2e_test/features", "kind": "gherkin" }]
+    "locations": [
+      { "path": "e2e_test/features", "kind": "gherkin" },
+      {
+        "path": "frontend/tests",
+        "kind": "typescript",
+        "include": ["**/*.spec.ts"]
+      },
+      {
+        "path": "scripts",
+        "kind": "javascript",
+        "include": ["**/*.test.mjs"]
+      },
+      {
+        "path": "infra",
+        "kind": "javascript",
+        "include": ["**/*.test.mjs"]
+      }
+    ]
   }
 }
