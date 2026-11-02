@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Koharu-chan",
+  "email": "koharu-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-098#remaining-test-costs",
+  "host": "claude",
+  "model": "opus"
+}
