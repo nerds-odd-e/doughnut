@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-097_resolve-candidates.json",
+      "identity": "SEED-097#resolve-candidates",
+      "completedAt": "2026-11-02T04:24:02.272Z",
+      "blob": "8b35237484210e25ee554ce5659258744d4df984"
+    },
+    {
       "fileName": "SEED-096_cucumber-proof.json",
       "identity": "SEED-096#cucumber-proof",
       "completedAt": "2026-11-02T03:43:56.265Z",

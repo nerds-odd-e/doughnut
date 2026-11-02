@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-097#resolve-candidates",
+  "title": "Triage the migrated test optimization candidates",
+  "completedAt": "2026-11-02T04:24:02.272Z",
+  "developer": "Terry Yin",
+  "agent": "Anri-chan",
+  "host": "codex"
+}
