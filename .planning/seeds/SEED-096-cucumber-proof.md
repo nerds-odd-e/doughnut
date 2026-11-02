@@ -6,7 +6,7 @@
 
 **Identity:** SEED-096#cucumber-proof
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/079-cucumber-proof/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3a3d3ee00eae013637a51fbdd2e948dc7386521d962e31e98fbec1cc382574e4","plan":"e6e2a957311dc784d987fb8fc3f4c75c3fd275f1da51913e56fc063bdacea2b5"}}
 ```
 
 **Goal:** Readers of Donut's published Gherkin can see the latest observed

@@ -8,7 +8,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Record ordinary Cypress/Cucumber runs as published proof](seeds/SEED-096-cucumber-proof.md#cucumber-proof) — SEED-096#cucumber-proof
+- [Record ordinary Cypress/Cucumber runs as published proof](seeds/SEED-096-cucumber-proof.md#cucumber-proof) — SEED-096#cucumber-proof ([plan](slice-plans/079-cucumber-proof/PLAN.md))
 
 ## Backlog list
 
