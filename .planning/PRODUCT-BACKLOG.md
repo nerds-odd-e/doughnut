@@ -10,6 +10,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Shorten ordinary local feedback without losing behavioral proof](seeds/SEED-098-remaining-local-test-costs.md#remaining-test-costs) — SEED-098#remaining-test-costs
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
