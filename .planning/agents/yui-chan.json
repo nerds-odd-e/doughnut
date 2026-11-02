@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Yui-chan",
-  "email": "yui-chan@example.org",
-  "identity": "SEED-099#deliberate-cucumber-proof",
-  "mode": "story-branch",
-  "branch": "codex/deliberate-cucumber-proof",
-  "host": "codex"
-}
