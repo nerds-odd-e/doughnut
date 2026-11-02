@@ -27,6 +27,7 @@ export function writeRunnerFixture(root) {
       | value |
       | a\\|b |
       | back\\\\slash |
+  @permanent
   Scenario: Permanent failure
     Given an intentional failure
   Scenario: Cucumber hook fails
@@ -56,7 +57,7 @@ const { Given, After } = require('@badeball/cypress-cucumber-preprocessor')
 let attempts = 0
 Given('a retry succeeds', () => { attempts++; expect(attempts, 'retry count').to.be.greaterThan(1) })
 Given('an accepted value {string}', value => { expect(value).to.be.a('string') })
-Given('an intentional failure', () => { throw new Error('proof fixture intentional failure') })
+Given('an intentional failure', () => { if (Cypress.expose('proofPass')) return; throw new Error('proof fixture intentional failure') })
 After(({ pickle }) => { if (pickle.name === 'Cucumber hook fails') throw new Error('proof fixture Cucumber hook failure') })
 beforeEach(function () { if (this.currentTest.title === 'Raw hook fails') throw new Error('proof fixture raw hook failure') })
 `
@@ -77,6 +78,7 @@ module.exports = {
   expose: {
     stepDefinitions: [path.join(__dirname, 'steps.cjs')],
     dryRun: process.env.PROOF_MODE === 'dry',
+    proofPass: process.env.PROOF_MODE === 'recover',
     omitFiltered: true,
     ...(process.env.PROOF_MODE === 'report' ? { messagesEnabled: true, messagesOutput: path.join(__dirname, 'existing.ndjson') } : {}),
   },

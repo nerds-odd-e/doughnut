@@ -171,3 +171,6 @@ dev.log.*
 
 # repowise owner-digest key (local)
 .repowise/events.key
+
+# Transient scenario-proof writer ownership.
+e2e_test/proof.lock

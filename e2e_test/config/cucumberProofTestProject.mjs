@@ -82,6 +82,7 @@ export function proofProject(t) {
           testCase: { id: `case-${pickle.id}`, pickleId: pickle.id },
         }))
       )
+      this.messages = messages
       send('spec-envelopes', { messages })
       return pickles
     },
@@ -93,17 +94,18 @@ export function proofProject(t) {
         durations = [100],
         retry = false,
         seconds = 1793577790,
-      } = {}
+      } = {},
+      observe = send
     ) {
       const id = `attempt-${sequence++}`
-      send('test-case-started', {
+      observe('test-case-started', {
         id,
         testCaseId: `case-${pickle.id}`,
         attempt: index,
         timestamp: { seconds, nanos: 0 },
       })
       results.forEach((status, step) =>
-        send('test-step-finished', {
+        observe('test-step-finished', {
           testCaseStartedId: id,
           testStepId: `step-${step}`,
           testStepResult: {
@@ -112,7 +114,7 @@ export function proofProject(t) {
           },
         })
       )
-      send('test-case-finished', {
+      observe('test-case-finished', {
         testCaseStartedId: id,
         willBeRetried: retry,
         timestamp: { seconds, nanos: 500000000 },
@@ -120,9 +122,10 @@ export function proofProject(t) {
     },
     files() {
       try {
-        return readdirSync(join(root, 'proof')).filter((name) =>
-          name.endsWith('.json')
-        )
+        return readdirSync(join(root, 'proof'), {
+          recursive: true,
+          encoding: 'utf8',
+        }).filter((name) => name.endsWith('.json'))
       } catch {
         return []
       }

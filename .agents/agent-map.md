@@ -87,9 +87,14 @@ commands and parsing notes live in the `frontend-testing`,
 `backend-testing`, `cli`, `mcp-server`, or `e2e-authoring` skills.
 Raw profiles are local evidence and must not be committed.
 
-Ordinary terminal Cucumber runs record version-1 observations in `e2e_test/proof`,
-declared on the Gherkin location in `.planning/open-dough.json`. Commit generated
-proof with the work it observed. Recorder and real-run compatibility checks:
+Ordinary terminal Cucumber runs maintain version-1 last successful proof in
+`e2e_test/proof`, declared on the Gherkin location in `.planning/open-dough.json`.
+Passing scenarios retain attempts (including retries), total duration and tested
+source. A final executed unsuccessful result clears that identity's earlier
+proof; unexecuted cases and unrelated or newer successes remain. Commit proof
+and cleanup deletions with the work they observed. Writer ownership is transient
+and ignored; mutations are serialized and atomic within this checkout. Separate
+worktree Git reconciliation must preserve cleanup. Recorder and real-run compatibility checks:
 `CURSOR_DEV=true nix develop -c pnpm test:cucumber-proof`.
 
 **Development vs E2E:** For manual product feedback from the primary checkout,
