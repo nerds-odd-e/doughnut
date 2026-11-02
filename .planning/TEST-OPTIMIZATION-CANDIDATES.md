@@ -2,65 +2,16 @@
 
 ## Latest pass
 
-- **Command / scope:** SEED-039#candidate-resolution via
-  [001-cheaper-local-test-feedback](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
-  warm ordinary commands only (LFS `cy:run`; shell-expanded 13-feature
-  `cli_notebook_*` `cy:run`, 40 cases; focused BookReadingPage Vitest + one
-  full `frontend:test` each side). Three transferred obligations only; HMR and
-  profile exclusions unchanged; no shard/worker changes.
-- **Revision:** `3399d65a06b87b0b2d9d6f9c3abb27f928dcc04e`
-  (commits `0c77890cce`, `3ef0e813af`, `3399d65a06`).
-- **Before / after:** warm averages (per-slice; not summed; raw runs in plan
-  Accepted notes): Slice 1 `POLL_MS` 3000→500 wall 133.0→77.3s, time-to-healthy
-  47.86→23.01s (×3); Slice 2 `fixtureCommit` hooksPath bypass wall 148.5→135.5s
-  (×2, 40/40); Slice 3 reading-panel merge focused 10.72→6.69s (×3, 39/39,
-  files 6→5), full `frontend:test` 84.69→84.28s, merged file 245 lines.
-- **Outcome:** measured gain — all three kept under warm alternating ordinary
-  commands; no-gain undo unused; no claim from historical numbers, fewer files,
-  or summed durations.
-- **Limits:** Elevated host load in slice 1; cold first LFS (~4m18s) not used
-  for gain; other E2E startup costs and remaining sibling-spec families not
-  claimed solved; per-command measurement only.
-- **Evidence:** [before-cleanup plan Accepted notes](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md); transferred closed for work
-  done; unfinished parts returned to pending.
+- **Command / scope:** `dough-test-optimization --resolve`; the two pending migrated candidates only. Inspected current startup owners and frontend sibling families; preserved all accepted costs and existing profile exclusions.
+- **Revision:** `23eb70051fddbc51df81f5086589b56b780ac666` (resolve reading, 2026-11-02).
+- **Before / after:** unavailable; no tests, profiling, timing or optimization experiment ran in resolve mode.
+- **Outcome:** incomplete measurement — resolve-only triage transferred both candidates to one replacement plan; replacement work remains unimplemented.
+- **Limits:** cold-start phase attribution and current ordinary-command baselines are later prerequisites. Historical timings remain dated evidence, not a new speedup claim. No selection, tag, worker or shard changed.
+- **Evidence:** [replacement plan](slice-plans/080-remaining-local-test-costs/PLAN.md); [preceding measured pass and dated observations](https://github.com/nerds-odd-e/doughnut/blob/23eb70051fddbc51df81f5086589b56b780ac666/.planning/TEST-OPTIMIZATION-CANDIDATES.md).
 
 ## Pending candidates
 
-### e2e-batch-cold-start
-
-- **Locations / scope:** first cold local `pnpm cy:run` batch versus later warm
-  runs of the same owned stack; seen on `cli_notebook_lfs.feature`.
-- **Observed cost:** 2026-11-01 at `ee6ecf2549`, cold first LFS ~4m18s (18
-  polls) vs warm under ~1 minute; cold and warm not comparable for cadence.
-- **Unique protection:** fresh owned stack with cold caches/boot on a session's
-  first batch.
-- **Alternatives attempted:** SEED-039#candidate-resolution measured warm
-  readiness polling only; cold-start was outside that experiment.
-- **Disposition / rationale:** pending — cold-versus-warm gap returned from the
-  cheaper-local-feedback experiment; not claimed solved by the `POLL_MS` keep.
-- **Date:** 2026-11-01
-- **Evidence / follow-up:** [plan premises and learnings](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
-  prior transferred `e2e-batch-startup` closed for polling cadence only.
-
-### frontend-sibling-spec-setup
-
-- **Locations / scope:** remaining cohesive sibling frontend Vitest families
-  after the reading-panel visibility/target merge (~25 families of 2–3 siblings
-  historically). BookReadingPage still has separate marking, notebookSwitch,
-  readingPosition, and base specs beside the merged visibility file.
-- **Observed cost:** retained merges historically ~70–250ms per removed file;
-  remaining families unpicked here with no fresh measured saving. Reading-panel
-  pair done (Latest pass).
-- **Unique protection:** each family's distinct component behavior, harness,
-  mock boundaries, and real/fake timer requirements.
-- **Alternatives attempted:** earlier responsibility-based merges (346→295
-  files); this story merged only the compatible reading-panel pair (245 lines).
-- **Disposition / rationale:** pending — unfinished remainder of the former
-  transferred obligation after the reading-panel pair closed; do not force
-  incompatible mock/timer contracts together.
-- **Date:** 2026-09-26; unfinished remainder returned 2026-11-01.
-- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md);
-  [replacement experiment plan](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md) slice 3 Accepted.
+None.
 
 ## Accepted necessary costs
 
@@ -242,4 +193,36 @@ normal/CI coverage.
 
 ## Transferred obligations
 
-None.
+### e2e-batch-cold-start
+
+- **Locations / scope:** first cold local `pnpm cy:run` batch versus later warm
+  runs of the same owned stack; seen on `cli_notebook_lfs.feature`.
+- **Observed cost:** 2026-11-01 at `ee6ecf2549`, cold first LFS ~4m18s (18
+  polls) vs warm under ~1 minute; cold and warm not comparable for cadence.
+- **Unique protection:** fresh owned stack with cold caches/boot on a session's
+  first batch.
+- **Alternatives attempted:** SEED-039#candidate-resolution measured warm
+  readiness polling only; cold-start was outside that experiment.
+- **Disposition / rationale:** transferred obligation — [replacement plan](slice-plans/080-remaining-local-test-costs/PLAN.md) slice 1 owns a stage-attributed ordinary first/warm baseline before a startup replacement is selected. Existing provisioning, Gradle boot, readiness and Vite launch have distinct owners; the dated total does not identify an inherent or removable stage. No exclusion applies to a batch-wide startup cost. No experiment was run or implemented; retain real ownership, HMR and Cucumber proof.
+- **Date:** observed 2026-11-01; resolution 2026-11-02
+- **Evidence / follow-up:** [plan premises and learnings](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
+  prior transferred `e2e-batch-startup` closed for polling cadence only.
+
+### frontend-sibling-spec-setup
+
+- **Locations / scope:** remaining cohesive sibling frontend Vitest families
+  after the reading-panel visibility/target merge (~25 families of 2–3 siblings
+  historically). BookReadingPage still has separate marking, notebookSwitch,
+  readingPosition, and base specs beside the merged visibility file.
+- **Observed cost:** retained merges historically ~70–250ms per removed file;
+  remaining families unpicked here with no fresh measured saving. Reading-panel
+  pair completed by SEED-039#candidate-resolution on 2026-11-01.
+- **Unique protection:** each family's distinct component behavior, harness,
+  mock boundaries, and real/fake timer requirements.
+- **Alternatives attempted:** earlier responsibility-based merges (346→295
+  files); SEED-039#candidate-resolution merged only the compatible reading-panel
+  pair (245 lines) on 2026-11-01.
+- **Disposition / rationale:** transferred obligation — [replacement plan](slice-plans/080-remaining-local-test-costs/PLAN.md) slices 2–3 propose compatible AI-reply protocol and mounted streaming/unknown-tool sibling merges, preserving all 16 cases plus the independent exclusion-proposal proof. Current reading found common reset/mock contracts without fake timers; the BookReadingPage remainder has distinct journeys and a 245-line visibility spec. No merge or speedup is claimed. The plan must return every unpicked family to pending; browser isolation and existing exclusions remain intact.
+- **Date:** 2026-09-26; unfinished remainder returned 2026-11-01; resolution 2026-11-02.
+- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md);
+  [replacement experiment plan](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md) slice 3 Accepted.

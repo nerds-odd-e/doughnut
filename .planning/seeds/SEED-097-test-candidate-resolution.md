@@ -6,7 +6,7 @@
 
 **Identity:** SEED-097#resolve-candidates
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/080-remaining-local-test-costs/PLAN.md","assessment":"not-ready","reasons":["Cold-start stage attribution and current comparable ordinary-command baselines must be established by a later authorized optimization pass before replacements are selected or accepted."],"basis":{"document":"fe20ac0cfa8f5238e823779fdb3692379f16a97a3d9ab802438c206f1e7963fd","plan":"221fe2b8272c7a95c11f1aee32ddd09c8a4cd445be7e794b92432750130fbecf"}}
 ```
 
 **Goal:** Give every currently pending test-optimization candidate an evidenced
@@ -25,3 +25,9 @@ observations; do not report new timings or a speedup from read-only triage.
 
 **Delivery:** Publish the reviewed result to `origin` `refs/heads/main` through
 Dough Land, preserving any unfinished future replacement work.
+
+**Planned follow-up:** The replacement plan owns the missing cold-start
+baseline and two small AI-reply sibling-spec experiments. Its intended later
+outcome is less ordinary local feedback time with the same observable
+protection, or an evidenced no-gain result. This request authorizes writing
+that plan, not running its measurements or implementing its experiments.

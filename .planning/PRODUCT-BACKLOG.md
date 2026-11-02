@@ -8,7 +8,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Triage the migrated test optimization candidates](seeds/SEED-097-test-candidate-resolution.md#resolve-candidates) — SEED-097#resolve-candidates
+- [Triage the migrated test optimization candidates](seeds/SEED-097-test-candidate-resolution.md#resolve-candidates) — SEED-097#resolve-candidates ([plan](slice-plans/080-remaining-local-test-costs/PLAN.md))
 
 ## Backlog list
 
