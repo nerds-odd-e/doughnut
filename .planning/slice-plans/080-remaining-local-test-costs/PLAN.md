@@ -2,12 +2,10 @@
 
 **Identity:** SEED-098#remaining-test-costs
 **Source:** [unexecuted optimization follow-up](../../seeds/SEED-098-remaining-local-test-costs.md#remaining-test-costs)
-**Instruction:** `dough-test-optimization --resolve` and land the result,
-2026-11-02. This is a replacement plan; no slice has been executed. A later
-optimization instruction must authorize measurement and implementation.
-Prepared by resolve-only triage SEED-097#resolve-candidates, published in
-`3ca2684040c9c89995bd9bd107d2760c330305a7`. The completed triage's assignment
-and workspace are separate from this future work.
+**Preparation:** written by resolve-only triage SEED-097#resolve-candidates
+(`3ca2684040c9c89995bd9bd107d2760c330305a7`); refined for planned execution
+on 2026-11-02 at `22b377bc242ae9da744ae287040bd98adf590e4b`. No slice has been
+executed; execution needs its own instruction.
 
 ## Goal and scope
 
@@ -52,8 +50,8 @@ Historical evidence remains dated, not a current timing claim:
   `.unknownToolCall.spec.ts` use the same EventSource mock and
   `useAiResponseMount` reset contract (7 cases). Keep their separate contexts
   for different event preconditions, within one spec per responsibility.
-  The exclusion-proposal spec's answered-question/confirmation setup stays
-  distinct. Protocol callback proof and mounted DOM proof remain separate.
+  The exclusion-proposal spec's answered-question/confirmation setup (7
+  cases) stays distinct. Protocol callback proof and mounted DOM proof remain separate.
 
 PFE reuses `aiReplyStateTestSupport`, `aiResponseTestSupport`, the ordinary
 runner, and owned-stack lifecycle. No new fixture framework or telemetry system.
@@ -62,8 +60,8 @@ startup change. Existing North Star domain direction is unaffected.
 
 ## Baseline prerequisite and outside-in proof
 
-This resolve pass runs no baseline, profile, experiment or product test.
-Before each later experiment, record literal command, revision, macOS/runtime,
+Preparation ran one focused observation (below) and no profile or experiment.
+Before each experiment, record literal command, revision, macOS/runtime,
 worker/filter mode, host load, caches, wall time and executed cases. Raw logs
 stay outside Git. Obtain comparable ordinary-command before/after observations;
 plain Vitest JSON durations alone cannot prove local feedback improvement.
@@ -152,10 +150,31 @@ Remove a transferred entry only for work actually done. Return all unpicked
 sibling families or unresolved cold cost to pending under their original slugs;
 the two AI-reply merges do not claim every sibling opportunity solved.
 
+## Settled premises
+
+Observed 2026-11-02 in this preparation's workspace at `22b377bc24`:
+
+- Focused proof route and case counts:
+  `./scripts/run.sh env -u NODE_ENV pnpm frontend:test tests/models/aiReplyState tests/components/conversation/AiResponse`
+  passed 5 files / 23 tests (content 2, toolCalls 7, streaming 3,
+  unknownToolCall 4, exclusionProposal 7); Vitest 4.33s, wall 8.2s including
+  install check. One untimed-conditions observation, not a baseline.
+- Shared setup: both protocol specs import `createAiReplyStates` and
+  `aiReplyStateTestSupport` with a plain `beforeEach`, no `vi.mock` or fake
+  timers; both mounted specs register the identical
+  `@/managedApi/AiReplyEventSource` tracking mock and the same
+  `beforeEachMount`/`afterEachReset` contract, no fake timers. Merged sizes
+  stay under 250 lines (217 and 144 before import deduplication).
+- Filename consumers: `git grep` for the four spec names finds only this plan,
+  so the removals have no other consumer to repair.
+- Slice 1's stage attribution depends on what the owned-stack log exposes; that
+  is its own bounded probe, and an inconclusive result keeps the startup
+  candidate pending without blocking slices 2–3.
+
 ## Current decisions
 
-- Resolve-only ends after preparation/landing; no timings collected here and
-  no measurement or optimization execution authorized by this plan.
+- Preparation collected no baseline timings; each experiment measures its own
+  comparable before/after.
 - Each experiment uses hypothesize → comparable baseline → smallest change →
   verify and measure → keep/undo → reassess. No loss of existing behavior proof.
 - Code/edit leaves target ~5 minutes, scrutinize >5 and stop/refine >10 active
@@ -171,8 +190,7 @@ the two AI-reply merges do not claim every sibling opportunity solved.
 ## Concerns and readiness
 
 Refinement is not needed: each spec experiment has one compatible setup and
-one proof loop; the cold path is explicitly bounded by observation and a
-decision before any implementation. The cold stage baseline and current
-ordinary-command timings are missing, so this is not a ready implementation
-plan. A later optimization pass must obtain those prerequisites and reassess
-the plan before executing replacements. No new human trade-off was identified.
+one proof loop, and the cold path is an early probe slice with a decision
+before any startup implementation. Missing current timings are produced by
+the slices themselves. No remaining slice-specific concern or human trade-off
+was identified.
