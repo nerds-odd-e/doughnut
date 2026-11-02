@@ -2,16 +2,40 @@
 
 ## Latest pass
 
-- **Command / scope:** `dough-test-optimization --resolve`; the two pending migrated candidates only. Inspected current startup owners and frontend sibling families; preserved all accepted costs and existing profile exclusions.
-- **Revision:** `23eb70051fddbc51df81f5086589b56b780ac666` (resolve reading, 2026-11-02).
-- **Before / after:** unavailable; no tests, profiling, timing or optimization experiment ran in resolve mode.
-- **Outcome:** incomplete measurement — resolve-only triage transferred both candidates to one replacement plan; replacement work remains unimplemented.
-- **Limits:** cold-start phase attribution and current ordinary-command baselines are later prerequisites. Historical timings remain dated evidence, not a new speedup claim. No selection, tag, worker or shard changed.
-- **Evidence:** [replacement plan](slice-plans/080-remaining-local-test-costs/PLAN.md); [preceding measured pass and dated observations](https://github.com/nerds-odd-e/doughnut/blob/23eb70051fddbc51df81f5086589b56b780ac666/.planning/TEST-OPTIMIZATION-CANDIDATES.md).
+- **Command / scope:** planned execution of SEED-098#remaining-test-costs, covering the two transferred candidates: first-batch E2E startup attribution and two AI-reply sibling-spec merges. Preserved owned-stack readiness and cleanup, HMR, browser-file isolation, Cucumber proof and normal selection.
+- **Revision:** measured on `6c045ccfd5` (E2E attribution), `0d343fdc2a` (protocol merge experiment) and `4ae0329ed8` (mounted merge experiment and re-profile); 2026-11-02, macOS 26.6.2, 16 cores, shared host load 3–20 from unrelated sessions.
+- **Before / after:** ordinary LFS batch 55.0s first in a fresh checkout vs 41.9/43.3s warm. Focused AI-reply command: protocol merge no gain (~60–80ms slower, within noise); mounted merge faster in 6/6 pairs (Vitest ~−0.2s, ranges not overlapping under calm load). Full frontend suite before 85.03/91.70/84.82s vs after 84.10/94.35/87.37s; final re-profile 87.37s, 396 files / 2454 tests.
+- **Outcome:** measured gain — focused command only; the mounted streaming/unknown-tool merge is kept. Protocol merge undone for no demonstrated gain. No removable E2E startup stage was found.
+- **Limits:** one natural first E2E sample, which cannot be repeated without deleting caches. The full suite's ~10s load-following spread cannot resolve per-file savings. Host was not quiet.
+- **Evidence:** [execution plan results](slice-plans/080-remaining-local-test-costs/PLAN.md); raw logs stayed outside Git.
 
 ## Pending candidates
 
-None.
+### e2e-batch-cold-start
+
+- **Locations / scope:** first cold local `pnpm cy:run` batch versus later warm
+  runs of the same owned stack; seen on `cli_notebook_lfs.feature`.
+- **Observed cost:** 2026-11-01 at `ee6ecf2549`, cold first LFS ~4m18s vs warm under ~1 minute. 2026-11-02 at `6c045ccfd5`, first run in a fresh checkout with a warm `~/.gradle` build cache 55.0s vs warm 41.9/43.3s, 10/10 scenarios each. Of the ~12.4s gap, Cypress healthy→run-start was +6.8s (unattributed) and backend readiness +4.2s (Gradle first configuration plus `compileJava` FROM-CACHE, Flyway first migration ~0.7s). Mountebank and Vite are off the critical path.
+- **Unique protection:** fresh owned stack with cold caches/boot on a session's
+  first batch.
+- **Alternatives attempted:** SEED-039#candidate-resolution measured warm readiness polling only. SEED-098#remaining-test-costs attributed stages from existing logs and found no measured removable stage, so no startup change was made.
+- **Disposition / rationale:** pending — missing evidence: a stage breakdown of the Cypress launch window (config, `setupNodeEvents`, browser launch) on a genuine first run in another freshly prepared worktree versus a warm run, and a first run with a `compileJava` build-cache miss to show whether real compilation explains the historical ~4m18s. Flyway first migration of the per-worktree database is inherent under ADR 0007. Retain real ownership, readiness, cleanup, HMR and Cucumber proof.
+- **Date:** observed 2026-11-01; attributed 2026-11-02.
+- **Evidence / follow-up:** [plan premises and learnings](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md); [stage attribution](https://github.com/nerds-odd-e/doughnut/blob/0d343fdc2aa9484665381b89545b24f66ac14139/.planning/slice-plans/080-remaining-local-test-costs/PLAN.md) slice 1 Result.
+
+### frontend-sibling-spec-setup
+
+- **Locations / scope:** remaining cohesive sibling frontend Vitest families
+  after the reading-panel visibility/target merge (~25 families of 2–3 siblings
+  historically). BookReadingPage still has separate marking, notebookSwitch,
+  readingPosition, and base specs beside the merged visibility file.
+- **Observed cost:** retained merges historically ~70–250ms per removed file. 2026-11-02: merging the mounted `AiResponse` streaming/unknown-tool pair saved ~0.2s on the focused command; merging the `aiReplyState` content/toolCalls protocol pair showed no gain. The full suite cannot resolve either.
+- **Unique protection:** each family's distinct component behavior, harness,
+  mock boundaries, and real/fake timer requirements.
+- **Alternatives attempted:** earlier responsibility-based merges (346→295 files); SEED-039#candidate-resolution merged the compatible reading-panel pair (245 lines) on 2026-11-01. SEED-098#remaining-test-costs kept the mounted reply merge (`AiResponse.reply.spec.ts`) and undid the protocol merge for no demonstrated gain on 2026-11-02.
+- **Disposition / rationale:** pending for the unpicked families, including the BookReadingPage remainder with its distinct journeys and 245-line visibility spec. Do not retry the `aiReplyState` protocol pair without new evidence. Judge any merge by alternating focused ordinary-command runs, because full-suite noise (~10s) hides per-file savings. Browser isolation and existing exclusions remain intact.
+- **Date:** 2026-09-26; unfinished remainder returned 2026-11-01; AI-reply pairs assessed 2026-11-02.
+- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md); [AI-reply merge measurements](slice-plans/080-remaining-local-test-costs/PLAN.md) slices 2–3 Results.
 
 ## Accepted necessary costs
 
@@ -193,38 +217,4 @@ normal/CI coverage.
 
 ## Transferred obligations
 
-### e2e-batch-cold-start
-
-- **Locations / scope:** first cold local `pnpm cy:run` batch versus later warm
-  runs of the same owned stack; seen on `cli_notebook_lfs.feature`.
-- **Observed cost:** 2026-11-01 at `ee6ecf2549`, cold first LFS ~4m18s (18
-  polls) vs warm under ~1 minute; cold and warm not comparable for cadence.
-- **Unique protection:** fresh owned stack with cold caches/boot on a session's
-  first batch.
-- **Alternatives attempted:** SEED-039#candidate-resolution measured warm
-  readiness polling only; cold-start was outside that experiment.
-- **Disposition / rationale:** transferred obligation — [replacement plan](slice-plans/080-remaining-local-test-costs/PLAN.md) slice 1 owns a stage-attributed ordinary first/warm baseline before a startup replacement is selected. Existing provisioning, Gradle boot, readiness and Vite launch have distinct owners; the dated total does not identify an inherent or removable stage. No exclusion applies to a batch-wide startup cost. No experiment was run or implemented; retain real ownership, HMR and Cucumber proof.
-- **Date:** observed 2026-11-01; resolution 2026-11-02
-- **Evidence / follow-up:** [plan premises and learnings](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
-  prior transferred `e2e-batch-startup` closed for polling cadence only.
-  Receiver: [SEED-098#remaining-test-costs](seeds/SEED-098-remaining-local-test-costs.md#remaining-test-costs), preserved without an active assignment.
-
-### frontend-sibling-spec-setup
-
-- **Locations / scope:** remaining cohesive sibling frontend Vitest families
-  after the reading-panel visibility/target merge (~25 families of 2–3 siblings
-  historically). BookReadingPage still has separate marking, notebookSwitch,
-  readingPosition, and base specs beside the merged visibility file.
-- **Observed cost:** retained merges historically ~70–250ms per removed file;
-  remaining families unpicked here with no fresh measured saving. Reading-panel
-  pair completed by SEED-039#candidate-resolution on 2026-11-01.
-- **Unique protection:** each family's distinct component behavior, harness,
-  mock boundaries, and real/fake timer requirements.
-- **Alternatives attempted:** earlier responsibility-based merges (346→295
-  files); SEED-039#candidate-resolution merged only the compatible reading-panel
-  pair (245 lines) on 2026-11-01.
-- **Disposition / rationale:** transferred obligation — [replacement plan](slice-plans/080-remaining-local-test-costs/PLAN.md) slices 2–3 propose compatible AI-reply protocol and mounted streaming/unknown-tool sibling merges, preserving all 16 cases plus the independent exclusion-proposal proof. Current reading found common reset/mock contracts without fake timers; the BookReadingPage remainder has distinct journeys and a 245-line visibility spec. No merge or speedup is claimed. The plan must return every unpicked family to pending; browser isolation and existing exclusions remain intact.
-- **Date:** 2026-09-26; unfinished remainder returned 2026-11-01; resolution 2026-11-02.
-- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md);
-  [replacement experiment plan](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md) slice 3 Accepted.
-  Receiver: [SEED-098#remaining-test-costs](seeds/SEED-098-remaining-local-test-costs.md#remaining-test-costs), preserved without an active assignment.
+None.

@@ -185,7 +185,34 @@ acceptance reading, separately from the surviving behavioral proof above.
 
 ### 3. Share mounted streamed-reply spec setup and re-profile
 Type: Structure
-Status: planned
+Status: done
+Outcome: merge kept; the focused ordinary command is consistently faster; the full suite cannot resolve the change.
+
+Result (2026-11-02, `4ae0329ed8`, same environment as slice 2; host load
+4.5–20 from unrelated sessions). `AiResponse.reply.spec.ts` (132 lines) holds
+the 7 mounted cases verbatim, with one shared `@/managedApi/AiReplyEventSource`
+mock. Its two describes keep their own `useAiResponseMount` and setup:
+`submitAiReply` for streaming, and the `unknown_tool` call for unknown tools.
+`AiResponse.exclusionProposal.spec.ts` is unchanged. Both typechecks passed.
+
+- Focused command, six alternating pairs, 23/23 tests each: after was faster
+  in every pair (Vitest −0.18 to −0.31s, wall mean ~−0.22s). In the calm-load
+  pairs (load 5.0–5.9) the Vitest ranges do not overlap: before 3.39–3.46s,
+  after 3.21–3.28s.
+- Full command, three alternating pairs, 2454 tests each (397 → 396 files):
+  before 85.03/91.70/84.82s, after 84.10/94.35/87.37s. The ~10s
+  load-following spread cannot resolve a ~0.2s change in either direction.
+- Final re-profile in the kept state: 87.37s wall, Vitest 85.33s, 396 files /
+  2454 tests passed, load 14.5→12.9 (not quiet).
+- Kept on the measured focused-command improvement, with no demonstrated
+  full-suite gain or regression. Removed-name sweep: `git grep` for the two
+  removed spec names matches only this plan's dated evidence, so there is no
+  consumer to repair.
+
+Candidate return: `e2e-batch-cold-start` returns pending with slice 1's
+missing evidence. `frontend-sibling-spec-setup` returns pending for the
+unpicked families. This plan removed only the mounted streaming/unknown-tool
+pair, and the protocol pair is recorded as no demonstrated gain.
 Proof: all 7 mounted streaming/unknown-tool cases plus the independent exclusion
 proposal cases, both frontend typechecks, focused and full ordinary commands.
 
