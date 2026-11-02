@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 332. Removed numbers are never reused.
+- Highest allocated local number: 333. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
@@ -378,3 +378,16 @@ A pre-format refactor can approve a file below the maintained250-line limit, the
 ### Occurrences
 
 Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-218](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-218.md); rereading adds no occurrence.
+
+## DD-333 — Lifecycle duties enter the slice acceptance gate
+
+A source-only review of the complete implementation-and-landing task returned both product requirements and later publication/CI/reporting duties. The coordinator initially allocated all187 clauses to the last implementation slice; the pre-commit gate then required observations for duties that could only follow that commit and execution completion. The coordinator separated18 future-phase clauses into G3, explicitly retaining their mandatory continuation without claiming they had passed. This was a coordinator allocation mismatch; whether guidance should distinguish lifecycle clauses earlier remains a proposal, not an established shared defect. Relationship to ODF-267/270 is uncertain: this case has settled authority and a later lifecycle owner, rather than an unchanged defect or pending human decision.
+
+### Occurrences
+- Execution: SEED-096#cucumber-proof; first implementation d648487d39f67a47f05072ca21947b9926ef2c4d
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: 0.3.81
+  - Evidence: e87c86c692cb11685a25c7f78d874a587f6abb10:.planning/slice-plans/079-cucumber-proof/source-review.md (187 source clauses,18 G3 links) and PLAN.md G3; this chat's2026-11-02 acceptance/record operations.
+  - Observed effect: the coordinator needed a separate phase-applicability disposition before guarded delivery; final landing and main CI remained pending, with the checkout and observer retained.
+  - Inference: allocating only implementation outputs to slices, while preserving delivery duties in their owning workflow, may avoid this circular gate without weakening task completion.
