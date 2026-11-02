@@ -6,9 +6,6 @@ import { fileURLToPath } from 'node:url'
 const require = createRequire(import.meta.url)
 
 export function writeRunnerFixture(root) {
-  const preprocessor = require.resolve(
-    '@badeball/cypress-cucumber-preprocessor'
-  )
   const esbuild = require.resolve(
     '@badeball/cypress-cucumber-preprocessor/esbuild'
   )
@@ -69,7 +66,6 @@ beforeEach(function () { if (this.currentTest.title === 'Raw hook fails') throw 
     join(root, 'cypress.config.cjs'),
     `
 const fs = require('node:fs')
-const { addCucumberPreprocessorPlugin } = require(${JSON.stringify(preprocessor)})
 const { createEsbuildPlugin } = require(${JSON.stringify(esbuild)})
 const createBundler = require(${JSON.stringify(bundler)})
 const path = require('node:path')
@@ -89,11 +85,8 @@ module.exports = {
       on = composeCypressPluginEvents(on)
       on('before:run', () => fs.appendFileSync(path.join(__dirname, 'owners.log'), 'start\\n'))
       on('after:run', () => fs.appendFileSync(path.join(__dirname, 'owners.log'), 'cleanup\\n'))
-      if (process.env.PROOF_MODE === 'baseline') await addCucumberPreprocessorPlugin(on, config)
-      else {
-        const { addCucumberPreprocessorWithProof } = await import(${JSON.stringify(adapter)})
-        await addCucumberPreprocessorWithProof(on, config, __dirname)
-      }
+      const { addCucumberPreprocessorWithProof } = await import(${JSON.stringify(adapter)})
+      await addCucumberPreprocessorWithProof(on, config, __dirname)
       on('after:spec', () => fs.appendFileSync(path.join(__dirname, 'owners.log'), 'spec-cleanup\\n'))
       on('file:preprocessor', createBundler({ nodePaths: [${JSON.stringify(fileURLToPath(new URL('../../node_modules', import.meta.url)))}], plugins: [createEsbuildPlugin(config)] }))
       return config

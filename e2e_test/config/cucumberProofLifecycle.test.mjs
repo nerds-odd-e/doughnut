@@ -16,7 +16,7 @@ test('a final failure clears its previous successes and a later pass restores pr
   const [selected, retained] = p.source(source)
   p.attempt(selected)
   p.attempt(retained)
-  const other = p.proof()[1]
+  const other = p.proof().find((row) => row.scenario === 'Retained')
   p.recorder.start()
   p.source(source)
   p.attempt(selected, { results: ['FAILED'], seconds: 1793577791 })
@@ -73,7 +73,10 @@ test('a continuing writer keeps another recorder’s completed identity cleanup'
   p.recorder.start()
   const [selected, retained] = p.source(source)
   p.attempt(selected)
-  const peer = createCucumberProofRecorder({ repoRoot: p.root })
+  const peer = createCucumberProofRecorder({
+    repoRoot: p.root,
+    env: { RECORD_CUCUMBER_PROOF: '1' },
+  })
   peer.start()
   peer.observe('cypress-cucumber-preprocessor:spec-envelopes', {
     messages: p.messages,

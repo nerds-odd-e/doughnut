@@ -10,18 +10,19 @@ const {
 
 /** Preserve active reports; otherwise consume only the message transport. */
 export async function addCucumberPreprocessorWithProof(on, config, repoRoot) {
+  const recorder = createCucumberProofRecorder({
+    repoRoot,
+    projectRoot: config.projectRoot,
+  })
+  if (!(config.isTextTerminal && recorder.configured)) {
+    return addCucumberPreprocessorPlugin(on, config)
+  }
   const resolved = await resolvePreprocessorConfiguration(
     config,
     config.expose,
     '/'
   )
-  const recorder = createCucumberProofRecorder({
-    repoRoot,
-    projectRoot: config.projectRoot,
-  })
-  if (!config.isTextTerminal || resolved.dryRun || !recorder.configured) {
-    return addCucumberPreprocessorPlugin(on, config)
-  }
+  if (resolved.dryRun) return addCucumberPreprocessorPlugin(on, config)
   const messageOnly = !resolved.isTrackingState
   if (messageOnly) {
     config.expose.messagesEnabled = true

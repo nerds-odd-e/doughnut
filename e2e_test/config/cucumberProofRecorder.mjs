@@ -1,5 +1,4 @@
 import { execFileSync } from 'node:child_process'
-import { randomUUID } from 'node:crypto'
 import { readFileSync, realpathSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { cucumberProofCases } from './cucumberProofCases.mjs'
@@ -29,12 +28,14 @@ const silently = (action) => {
 export function createCucumberProofRecorder({
   repoRoot,
   projectRoot = repoRoot,
+  env = process.env,
 }) {
   const disabled = {
     configured: false,
     start: () => undefined,
     observe: () => undefined,
   }
+  if (env.RECORD_CUCUMBER_PROOF !== '1') return disabled
   return (
     silently(() => {
       projectRoot = resolve(projectRoot)
@@ -58,7 +59,6 @@ export function createCucumberProofRecorder({
         }))
       if (!locations.length) return disabled
       let commit
-      let filename
       const cases = new Map()
       const attempts = new Map()
       const retries = new Map()
@@ -97,9 +97,7 @@ export function createCucumberProofRecorder({
           commit,
         }
         for (const directory of new Set(directories))
-          silently(() =>
-            maintainScenarioProof(directory, filename, observation)
-          )
+          silently(() => maintainScenarioProof(directory, observation))
         retries.delete(attempt.testCaseId)
       }
 
@@ -116,7 +114,6 @@ export function createCucumberProofRecorder({
               encoding: 'utf8',
               stdio: ['ignore', 'pipe', 'ignore'],
             }).trim()
-            filename = `${new Date().toISOString().replaceAll(/[-:.]/g, '')}-${randomUUID()}.json`
           })
         },
         observe(name, data) {

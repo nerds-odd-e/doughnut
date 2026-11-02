@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-099_deliberate-cucumber-proof.json",
+      "identity": "SEED-099#deliberate-cucumber-proof",
+      "completedAt": "2026-11-02T10:11:19.274Z",
+      "blob": "de4df4b7bc036dfd3c55240d8c969c3d7ba2ed1e"
+    },
+    {
       "fileName": "SEED-098_remaining-test-costs.json",
       "identity": "SEED-098#remaining-test-costs",
       "completedAt": "2026-11-02T05:36:23.008Z",

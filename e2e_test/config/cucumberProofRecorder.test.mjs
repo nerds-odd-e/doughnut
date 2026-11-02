@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { createCucumberProofRecorder } from './cucumberProofRecorder.mjs'
@@ -7,6 +8,62 @@ import { proofProject } from './cucumberProofTestProject.mjs'
 
 const plain =
   'Feature: Observe\n  Scenario: Save a note\n    Given a saved note\n'
+
+test('recording requires the literal option before Git or Intent discovery', (t) => {
+  const project = proofProject(t)
+  const bin = join(project.root, 'bin')
+  mkdirSync(bin)
+  const marker = join(project.root, 'git-discovery')
+  writeFileSync(
+    join(bin, 'git'),
+    `#!${process.execPath}
+const fs = require('node:fs')
+fs.appendFileSync(${JSON.stringify(marker)}, 'git\\n')
+process.stdout.write(process.argv.includes('--show-toplevel') ? process.env.PROOF_ROOT : 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+`,
+    { mode: 0o755 }
+  )
+  const script = `
+    import { createCucumberProofRecorder } from ${JSON.stringify(new URL('./cucumberProofRecorder.mjs', import.meta.url).href)}
+    const recorder = createCucumberProofRecorder({ repoRoot: process.env.PROOF_ROOT })
+    recorder.start()
+    process.stdout.write(String(recorder.configured))
+  `
+  for (const option of [undefined, '0', 'true']) {
+    const env = {
+      ...process.env,
+      PATH: `${bin}:${process.env.PATH}`,
+      PROOF_ROOT: project.root,
+    }
+    delete env.RECORD_CUCUMBER_PROOF
+    if (option !== undefined) env.RECORD_CUCUMBER_PROOF = option
+    const result = spawnSync(
+      process.execPath,
+      ['--input-type=module', '-e', script],
+      { env, encoding: 'utf8' }
+    )
+    assert.equal(result.status, 0, result.stderr)
+    assert.equal(result.stdout, 'false')
+    assert.equal(existsSync(marker), false)
+    assert.deepEqual(project.proofState(), [])
+  }
+  const enabled = spawnSync(
+    process.execPath,
+    ['--input-type=module', '-e', script],
+    {
+      env: {
+        ...process.env,
+        PATH: `${bin}:${process.env.PATH}`,
+        PROOF_ROOT: project.root,
+        RECORD_CUCUMBER_PROOF: '1',
+      },
+      encoding: 'utf8',
+    }
+  )
+  assert.equal(enabled.status, 0, enabled.stderr)
+  assert.equal(enabled.stdout, 'true')
+  assert.ok(existsSync(marker))
+})
 
 test('final observation keeps the run-start commit and compiled source version after later edits', (t) => {
   const project = proofProject(t)
@@ -79,7 +136,7 @@ test('only the last retry publishes, with all attempt durations and final hook o
   )
 })
 
-test('later executions of one identity replace the earlier observation in this run', (t) => {
+test('later executions of one identity replace its earlier observation', (t) => {
   const project = proofProject(t)
   project.recorder.start()
   const [pickle] = project.source(plain)
@@ -129,12 +186,13 @@ test('proof failures and a missing Git checkout remain silent and harmless', (t)
   assert.doesNotThrow(() => project.attempt(pickle))
   const unavailable = createCucumberProofRecorder({
     repoRoot: '/not-a-git-checkout',
+    env: { RECORD_CUCUMBER_PROOF: '1' },
   })
   assert.equal(unavailable.configured, false)
   assert.doesNotThrow(() => unavailable.start())
 })
 
-test('each run keeps its own complete proof file and needs no end-of-run flush', (t) => {
+test('repeated runs refresh one durable snapshot without an end-of-run flush', (t) => {
   const project = proofProject(t)
   project.recorder.start()
   const [pickle] = project.source(plain)
@@ -142,6 +200,6 @@ test('each run keeps its own complete proof file and needs no end-of-run flush',
   project.recorder.start()
   const [second] = project.source(plain)
   project.attempt(second)
-  assert.equal(project.files().length, 2)
-  assert.equal(project.proof().length, 2)
+  assert.deepEqual(project.files(), ['latest.json'])
+  assert.equal(project.proof().length, 1)
 })

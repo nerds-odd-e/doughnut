@@ -39,17 +39,12 @@ const reporter = (output) => {
       )
     }
   }
-  assert.deepEqual([...specs.keys()].sort(), [
-    'features/hooks.feature',
-    'features/normal.feature',
-    'outside/outside.feature',
-  ])
   return [...specs.entries()].sort(([left], [right]) =>
     left.localeCompare(right)
   )
 }
 
-test('real full, focused, tagged and dry Cypress runs preserve results and publish scoped proof', {
+test('ordinary and explicit full, focused, tagged, dry and reported Cypress runs preserve results and proof ownership', {
   timeout: 180000,
 }, async (t) => {
   const project = proofProject(t)
@@ -57,11 +52,15 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
   const logs = mkdtempSync(join(tmpdir(), 'donut-cucumber-proof-runner-'))
   t.diagnostic(`Cypress fixture evidence: ${logs}`)
   let runNumber = 0
-  async function run(mode, args = [], reset = true) {
+  async function run(mode, args = [], { reset = true, record = true } = {}) {
     if (reset)
       rmSync(join(project.root, 'proof'), { recursive: true, force: true })
     rmSync(join(project.root, 'owners.log'), { force: true })
-    const label = `${runNumber++}-${mode}`
+    const before = project.proofState()
+    const label = `${runNumber++}-${mode}-${record ? 'record' : 'ordinary'}`
+    const env = { ...process.env, PROOF_MODE: mode }
+    delete env.RECORD_CUCUMBER_PROOF
+    if (record) env.RECORD_CUCUMBER_PROOF = '1'
     const child = spawn(
       process.execPath,
       [
@@ -77,7 +76,7 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
       ],
       {
         cwd: project.root,
-        env: { ...process.env, PROOF_MODE: mode },
+        env,
         stdio: ['ignore', 'pipe', 'pipe'],
       }
     )
@@ -95,9 +94,10 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
       .split('\n')
     assert.equal(owners[0], 'start', output)
     assert.equal(owners.at(-1), 'cleanup', output)
-    return { code, output, proof: project.proof() }
+    if (!record) assert.deepEqual(project.proofState(), before, output)
+    return { code, output, owners, proof: project.proof() }
   }
-  const baseline = await run('baseline')
+  const baseline = await run('enabled', [], { record: false })
   const observed = await run('enabled')
   assert.equal(baseline.code, 3, baseline.output)
   assert.match(baseline.output, /3 passing/, baseline.output)
@@ -116,8 +116,17 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
     /proof fixture Cucumber hook failure/,
     baseline.output
   )
+  assert.deepEqual(
+    reporter(baseline.output).map(([spec]) => spec),
+    [
+      'features/hooks.feature',
+      'features/normal.feature',
+      'outside/outside.feature',
+    ]
+  )
   assert.equal(observed.code, baseline.code, observed.output)
   assert.deepEqual(reporter(observed.output), reporter(baseline.output))
+  assert.deepEqual(observed.owners, baseline.owners)
   assert.doesNotMatch(
     observed.output,
     /Hook failures can't be represented|Due to browser crash, no reports/
@@ -141,6 +150,19 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
     retried.featureBlob,
     project.git('hash-object', 'features/normal.feature')
   )
+  const ordinaryReported = await run('report', [], {
+    reset: false,
+    record: false,
+  })
+  assert.equal(ordinaryReported.code, baseline.code, ordinaryReported.output)
+  const ordinaryMessageTypes = readFileSync(
+    join(project.root, 'existing.ndjson'),
+    'utf8'
+  )
+    .trim()
+    .split('\n')
+    .flatMap((line) => Object.keys(JSON.parse(line)))
+    .sort()
   const dry = await run('dry')
   assert.equal(dry.code, 0, dry.output)
   assert.deepEqual(dry.proof, [])
@@ -150,31 +172,54 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
   ])
   assert.equal(focused.code, 2, focused.output)
   assert.equal(focused.proof.length, 3)
+  const ordinaryTagged = await run('enabled', ['--expose', 'tags=@selected'], {
+    record: false,
+  })
+  assert.equal(ordinaryTagged.code, 0, ordinaryTagged.output)
   const tagged = await run('enabled', ['--expose', 'tags=@selected'])
   assert.equal(tagged.code, 0, tagged.output)
   assert.equal(tagged.proof.length, 2)
+  assert.deepEqual(reporter(tagged.output), reporter(ordinaryTagged.output))
+  assert.deepEqual(tagged.owners, ordinaryTagged.owners)
   const reported = await run('report')
   assert.equal(reported.code, baseline.code, reported.output)
   assert.equal(reported.proof.length, 3)
+  assert.deepEqual(reporter(reported.output), reporter(ordinaryReported.output))
+  assert.deepEqual(reported.owners, ordinaryReported.owners)
   const messages = readFileSync(join(project.root, 'existing.ndjson'), 'utf8')
     .trim()
     .split('\n')
     .map(JSON.parse)
   assert.ok(messages.some((message) => message.testCaseFinished))
+  assert.deepEqual(messages.flatMap(Object.keys).sort(), ordinaryMessageTypes)
   const selection = ['--expose', 'tags=@permanent']
-  const passed = await run('recover', selection)
+  const ordinaryPassed = await run('recover', selection, {
+    reset: false,
+    record: false,
+  })
+  assert.equal(ordinaryPassed.code, 0, ordinaryPassed.output)
+  const retained = reported.proof
+  const passed = await run('recover', selection, { reset: false })
   assert.equal(passed.code, 0, passed.output)
+  assert.deepEqual(reporter(passed.output), reporter(ordinaryPassed.output))
+  assert.deepEqual(passed.owners, ordinaryPassed.owners)
   assert.deepEqual(
     passed.proof.map((row) => row.scenario),
-    ['Permanent failure']
+    ['Parsed <value>', 'Parsed <value>', 'Permanent failure', 'Retry succeeds']
   )
-  const failed = await run('enabled', selection, false)
+  const failed = await run('enabled', selection, { reset: false })
   assert.equal(failed.code, 1, failed.output)
-  assert.deepEqual(failed.proof, [])
-  const recovered = await run('recover', selection, false)
+  assert.deepEqual(failed.proof, retained)
+  const recovered = await run('recover', selection, { reset: false })
   assert.equal(recovered.code, 0, recovered.output)
   assert.deepEqual(
-    recovered.proof.map((row) => row.outcome),
+    recovered.proof
+      .filter((row) => row.scenario === 'Permanent failure')
+      .map((row) => row.outcome),
     ['passed']
+  )
+  assert.deepEqual(
+    recovered.proof.filter((row) => row.scenario !== 'Permanent failure'),
+    retained
   )
 })

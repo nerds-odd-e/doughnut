@@ -1,5 +1,5 @@
-// Successful scenario proof in this checkout. Serialize writers, read their
-// current files rather than run snapshots, and remove only the failed identity.
+// Successful scenario proof in this checkout. Serialize refreshes against all
+// current observations and retain one latest successful snapshot.
 import {
   existsSync,
   mkdirSync,
@@ -25,7 +25,9 @@ function writeAtomically(file, observations) {
   try {
     writeFileSync(
       temporary,
-      `${JSON.stringify({ version: 1, observations }, null, 2)}\n`
+      `{\n  \"version\": 1,\n  \"observations\": [\n${observations
+        .map((row) => `    ${JSON.stringify(row)}`)
+        .join(',\n')}\n  ]\n}\n`
     )
     renameSync(temporary, file)
   } finally {
@@ -63,42 +65,38 @@ function acquire(directory) {
   }
 }
 
-export function maintainScenarioProof(directory, runName, observation) {
+export function maintainScenarioProof(directory, observation) {
   mkdirSync(directory, { recursive: true })
   const release = acquire(directory)
   try {
-    const identity = identityOf(observation)
-    if (observation.outcome === 'passed') {
-      const file = path.join(directory, runName)
-      const rows = existsSync(file) ? observationsAt(file) : []
-      const previous = rows.find((row) => identityOf(row) === identity)
-      if (
-        previous &&
-        Date.parse(previous.finishedAt) > Date.parse(observation.finishedAt)
-      )
-        return
-      writeAtomically(file, [
-        ...rows.filter((row) => identityOf(row) !== identity),
-        observation,
-      ])
-      return
-    }
-    for (const name of readdirSync(directory, {
+    const files = readdirSync(directory, {
       recursive: true,
       encoding: 'utf8',
-    })) {
-      if (!name.endsWith('.json')) continue
-      const file = path.join(directory, name)
-      const rows = observationsAt(file)
-      const kept = rows.filter(
-        (row) =>
-          identityOf(row) !== identity ||
-          Date.parse(row.finishedAt) > Date.parse(observation.finishedAt)
+    })
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => path.join(directory, name))
+    const latest = new Map()
+    for (const row of [...files.flatMap(observationsAt), observation]) {
+      const identity = identityOf(row)
+      const previous = latest.get(identity)
+      const difference = previous
+        ? Date.parse(row.finishedAt) - Date.parse(previous.finishedAt)
+        : 1
+      if (
+        difference > 0 ||
+        (difference === 0 &&
+          (row.outcome !== 'passed' || previous.outcome === 'passed'))
       )
-      if (kept.length === rows.length) continue
-      if (kept.length) writeAtomically(file, kept)
-      else unlinkSync(file)
+        latest.set(identity, row)
     }
+    const kept = [...latest.entries()]
+      .filter(([, row]) => row.outcome === 'passed')
+      .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+      .map(([, row]) => row)
+    const snapshot = path.join(directory, 'latest.json')
+    if (kept.length) writeAtomically(snapshot, kept)
+    for (const file of files)
+      if (file !== snapshot || !kept.length) unlinkSync(file)
   } finally {
     release()
   }
