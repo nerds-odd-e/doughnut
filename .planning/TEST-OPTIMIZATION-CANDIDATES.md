@@ -7,7 +7,7 @@
 - **Before / after:** ordinary LFS batch 55.0s first in a fresh checkout vs 41.9/43.3s warm. Focused AI-reply command: protocol merge no gain (~60–80ms slower, within noise); mounted merge faster in 6/6 pairs (Vitest ~−0.2s, ranges not overlapping under calm load). Full frontend suite before 85.03/91.70/84.82s vs after 84.10/94.35/87.37s; final re-profile 87.37s, 396 files / 2454 tests.
 - **Outcome:** measured gain — focused command only; the mounted streaming/unknown-tool merge is kept. Protocol merge undone for no demonstrated gain. No removable E2E startup stage was found.
 - **Limits:** one natural first E2E sample, which cannot be repeated without deleting caches. The full suite's ~10s load-following spread cannot resolve per-file savings. Host was not quiet.
-- **Evidence:** [execution plan results](slice-plans/080-remaining-local-test-costs/PLAN.md); raw logs stayed outside Git.
+- **Evidence:** [execution plan results](https://github.com/nerds-odd-e/doughnut/blob/e48370f021a6c393481b4a8e7bcafd7c56c65100/.planning/slice-plans/080-remaining-local-test-costs/PLAN.md); raw logs stayed outside Git.
 
 ## Pending candidates
 
@@ -35,7 +35,7 @@
 - **Alternatives attempted:** earlier responsibility-based merges (346→295 files); SEED-039#candidate-resolution merged the compatible reading-panel pair (245 lines) on 2026-11-01. SEED-098#remaining-test-costs kept the mounted reply merge (`AiResponse.reply.spec.ts`) and undid the protocol merge for no demonstrated gain on 2026-11-02.
 - **Disposition / rationale:** pending for the unpicked families, including the BookReadingPage remainder with its distinct journeys and 245-line visibility spec. Do not retry the `aiReplyState` protocol pair without new evidence. Judge any merge by alternating focused ordinary-command runs, because full-suite noise (~10s) hides per-file savings. Browser isolation and existing exclusions remain intact.
 - **Date:** 2026-09-26; unfinished remainder returned 2026-11-01; AI-reply pairs assessed 2026-11-02.
-- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md); [AI-reply merge measurements](slice-plans/080-remaining-local-test-costs/PLAN.md) slices 2–3 Results.
+- **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md); [AI-reply merge measurements](https://github.com/nerds-odd-e/doughnut/blob/e48370f021a6c393481b4a8e7bcafd7c56c65100/.planning/slice-plans/080-remaining-local-test-costs/PLAN.md) slices 2–3 Results.
 
 ## Accepted necessary costs
 

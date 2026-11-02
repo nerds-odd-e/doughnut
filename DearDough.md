@@ -110,7 +110,7 @@ Distinct executions, original provenance, observations and qualified inferences 
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.81
-  - Evidence: plan `080-remaining-local-test-costs` slices 1–2; published SHAs `0d343fdc2a`, `4ae0329ed8`; coordinator task-notification usage for the two refactor agents (58,306 tokens / 54s and 48,367 tokens / 27s)
+  - Evidence: [plan `080-remaining-local-test-costs`](https://github.com/nerds-odd-e/doughnut/blob/e48370f021a6c393481b4a8e7bcafd7c56c65100/.planning/slice-plans/080-remaining-local-test-costs/PLAN.md) slices 1–2; published SHAs `0d343fdc2a`, `4ae0329ed8`; coordinator task-notification usage for the two refactor agents (58,306 tokens / 54s and 48,367 tokens / 27s)
   - Observed effect: both slices changed only planning records and generated proof (slice 1: investigation; slice 2: experiment undone byte-identical to HEAD), yet each required a fresh full refactor agent. Each returned one planning-text wording edit and ran no tests. Slice 3's refactor, on a real spec merge plus a candidate-record rewrite, made useful format fixes and is outside this count.
   - Inference: same fixed cost as ODF-141, here on record-only slices; the wording edits were cheap enough for the coordinator's own plan update.
 
