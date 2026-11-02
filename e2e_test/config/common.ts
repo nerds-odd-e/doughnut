@@ -40,6 +40,8 @@ const commonConfig = {
   environment: 'ci',
   viewportWidth: 1200,
   viewportHeight: 800,
+  // One runMode retry so ordinary cy:run can record retry-assisted passes.
+  retries: { runMode: 1, openMode: 0 },
 
   e2e: {
     baseUrl: E2E_APP_BASE_URL,
