@@ -8,6 +8,8 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Triage the migrated test optimization candidates](seeds/SEED-097-test-candidate-resolution.md#resolve-candidates) — SEED-097#resolve-candidates
+
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
