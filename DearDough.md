@@ -105,6 +105,14 @@ Distinct executions, original provenance, observations and qualified inferences 
   - Evidence: plan `001-cheaper-local-test-feedback` slices 1–3; published SHAs `0c77890cce`, `3ef0e813af`, `3399d65a06`; refactor agent transcripts `b7bd06bc` (09:34), `79a09877` (09:54), `353a76ac` (10:02) under parent `23d3c3d7-4825-4f17-822c-c7d19fb11b58`
   - Observed effect: three consecutive post-slice refactor agents each returned “none — already clean” / no edits on one-line or already-cohesive keeps (`POLL_MS` default; `fixtureCommit` seam; reading-panel merge). Slice 4’s later refactor did edit the candidate catalog and is outside this no-op count.
   - Inference: same fixed per-slice refactor launch cost as ODF-141; token/time cost of the three empty passes was not separately measured here.
+- Execution: SEED-098#remaining-test-costs
+  - Timestamp: unknown (2026-11-02, between published SHAs `6c045ccfd5` and `4ae0329ed8`)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.81
+  - Evidence: [plan `080-remaining-local-test-costs`](https://github.com/nerds-odd-e/doughnut/blob/e48370f021a6c393481b4a8e7bcafd7c56c65100/.planning/slice-plans/080-remaining-local-test-costs/PLAN.md) slices 1–2; published SHAs `0d343fdc2a`, `4ae0329ed8`; coordinator task-notification usage for the two refactor agents (58,306 tokens / 54s and 48,367 tokens / 27s)
+  - Observed effect: both slices changed only planning records and generated proof (slice 1: investigation; slice 2: experiment undone byte-identical to HEAD), yet each required a fresh full refactor agent. Each returned one planning-text wording edit and ran no tests. Slice 3's refactor, on a real spec merge plus a candidate-record rewrite, made useful format fixes and is outside this count.
+  - Inference: same fixed cost as ODF-141, here on record-only slices; the wording edits were cheap enough for the coordinator's own plan update.
 
 <a id="odf-208"></a>
 

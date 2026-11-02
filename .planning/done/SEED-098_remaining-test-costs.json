@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-098#remaining-test-costs",
+  "title": "Shorten ordinary local feedback without losing behavioral proof",
+  "completedAt": "2026-11-02T05:36:23.008Z",
+  "developer": "Terry Yin",
+  "agent": "Rina-chan",
+  "host": "claude",
+  "model": "opus"
+}
