@@ -207,6 +207,7 @@ normal/CI coverage.
 - **Date:** observed 2026-11-01; resolution 2026-11-02
 - **Evidence / follow-up:** [plan premises and learnings](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md);
   prior transferred `e2e-batch-startup` closed for polling cadence only.
+  Receiver: [SEED-098#remaining-test-costs](seeds/SEED-098-remaining-local-test-costs.md#remaining-test-costs), preserved without an active assignment.
 
 ### frontend-sibling-spec-setup
 
@@ -226,3 +227,4 @@ normal/CI coverage.
 - **Date:** 2026-09-26; unfinished remainder returned 2026-11-01; resolution 2026-11-02.
 - **Evidence / follow-up:** [completed frontend pass, remaining families, and merge constraints](https://github.com/nerds-odd-e/doughnut/blob/fe990eff58/.planning/quick/041-faster-frontend-unit-tests/PLAN.md);
   [replacement experiment plan](https://github.com/nerds-odd-e/doughnut/blob/744541489cee5b4a24ae7277cab65668fad452e3/.planning/slice-plans/001-cheaper-local-test-feedback/PLAN.md) slice 3 Accepted.
+  Receiver: [SEED-098#remaining-test-costs](seeds/SEED-098-remaining-local-test-costs.md#remaining-test-costs), preserved without an active assignment.

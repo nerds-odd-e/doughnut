@@ -1,10 +1,13 @@
 # Assess remaining local setup cost without weakening proof
 
-**Identity:** SEED-097#resolve-candidates
-**Source:** [resolve-only instruction and receiving story](../../seeds/SEED-097-test-candidate-resolution.md#resolve-candidates)
+**Identity:** SEED-098#remaining-test-costs
+**Source:** [unexecuted optimization follow-up](../../seeds/SEED-098-remaining-local-test-costs.md#remaining-test-costs)
 **Instruction:** `dough-test-optimization --resolve` and land the result,
 2026-11-02. This is a replacement plan; no slice has been executed. A later
 optimization instruction must authorize measurement and implementation.
+Prepared by resolve-only triage SEED-097#resolve-candidates, published in
+`3ca2684040c9c89995bd9bd107d2760c330305a7`. The completed triage's assignment
+and workspace are separate from this future work.
 
 ## Goal and scope
 
