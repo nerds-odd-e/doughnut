@@ -12,6 +12,23 @@ function lastWriteWinsOn() {
   }
 }
 
+test('run-start and spec-start retain existing owners alongside new observers', async () => {
+  const { listeners, on } = lastWriteWinsOn()
+  const composed = composeCypressPluginEvents(on)
+  const ran = []
+  for (const event of ['before:run', 'before:spec']) {
+    composed(event, () => ran.push(`${event}:owner`))
+    composed(event, () => ran.push(`${event}:observer`))
+    await listeners[event]()
+  }
+  assert.deepEqual(ran, [
+    'before:run:owner',
+    'before:run:observer',
+    'before:spec:owner',
+    'before:spec:observer',
+  ])
+})
+
 test('later after:spec and after:run registrations still run earlier cleanup', async () => {
   const { listeners, on } = lastWriteWinsOn()
   const composed = composeCypressPluginEvents(on)

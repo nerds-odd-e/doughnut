@@ -87,6 +87,11 @@ commands and parsing notes live in the `frontend-testing`,
 `backend-testing`, `cli`, `mcp-server`, or `e2e-authoring` skills.
 Raw profiles are local evidence and must not be committed.
 
+Ordinary terminal Cucumber runs record version-1 observations in `e2e_test/proof`,
+declared on the Gherkin location in `.planning/open-dough.json`. Commit generated
+proof with the work it observed. Recorder and real-run compatibility checks:
+`CURSOR_DEV=true nix develop -c pnpm test:cucumber-proof`.
+
 **Development vs E2E:** For manual product feedback from the primary checkout,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
 `doughnut_development`, `dev.log`; restart with `pnpm dev:restart`, stop with `pnpm dev:stop`;

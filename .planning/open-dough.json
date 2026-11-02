@@ -2,7 +2,11 @@
   "skipProcessRetrospective": false,
   "intent": {
     "locations": [
-      { "path": "e2e_test/features", "kind": "gherkin" },
+      {
+        "path": "e2e_test/features",
+        "kind": "gherkin",
+        "proof": "e2e_test/proof"
+      },
       {
         "path": "frontend/tests",
         "kind": "typescript",
