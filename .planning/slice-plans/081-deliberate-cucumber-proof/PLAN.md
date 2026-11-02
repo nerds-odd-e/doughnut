@@ -24,7 +24,9 @@ Research in this checkout found one proof pipeline: `common.ts` → `cucumberPro
 
 Existing scenarios preserve run-start SHA, tested feature blob, retry attempts/durations, parsed outline identity, final hook results, scoped features and immediate persistence. Store locking and atomic writes already protect checkout-local writers. Keep these responsibilities in their owners; replace run filenames with one snapshot. ADR 0006 permits best-effort recording without disturbing results; ADR 0007 owns isolated test resources. North Star product topics do not constrain this local tooling migration.
 
-Baseline in this worktree: `./scripts/run.sh node --test e2e_test/config/cucumberProofRecorder.test.mjs e2e_test/config/cucumberProofLifecycle.test.mjs e2e_test/config/cucumberProofProcess.test.mjs` passed 20/20 at claim revision. With no recording option set these tests observe generated files, demonstrating the implicit-write behavior being migrated. Six committed legacy files contain 43 observations. New contract tests must discriminate before implementation; existing passing assertions are retained only where their promise survives.
+Baseline in this worktree: `./scripts/run.sh node --test e2e_test/config/cucumberProofRecorder.test.mjs e2e_test/config/cucumberProofLifecycle.test.mjs e2e_test/config/cucumberProofProcess.test.mjs` passed 20/20 at claim revision. With no recording option set these tests observe generated files, demonstrating the implicit-write behavior being migrated. Six committed legacy files contain 43 observations for 23 identities; all latest observations passed. New contract tests must discriminate before implementation; existing passing assertions are retained only where their promise survives.
+
+The actual isolated selection consumer `assertSupportedIsolatedCypressSpecs` accepted `note_creation.feature` here and returned both private-mock requirements false. `./scripts/run.sh mysql --protocol=TCP --host=127.0.0.1 --port=3309 --user=root --batch --skip-column-names --execute 'SELECT VERSION()'` reached MySQL 8.4.11. Application allocation/start remains the slice-2 probe; no foreign database or listener may be adopted. Installation CI run 41420017308 completed successfully for exact d43e39016a; it is independent from migration proof.
 
 ## Proof ownership
 
@@ -40,10 +42,10 @@ Baseline in this worktree: `./scripts/run.sh node --test e2e_test/config/cucumbe
 
 ## Ordered slices
 
-### Slice 1 — Enable proof recording explicitly
+### 1. Enable proof recording explicitly
 
 Type: Behavior
-Status: planned
+Status: done
 
 Pre-condition: an ordinary terminal Cypress run shares configuration with deliberate proof generation.
 Trigger: run tests with recording omitted or explicitly set to `RECORD_CUCUMBER_PROOF=1`.
@@ -53,7 +55,9 @@ Proof: add discriminating normal passing/failing checks with absent and preexist
 
 Sizing: target 5–10 minutes implementation plus serial real-Cypress proof; the existing fixture starts many real browsers, so the proof loop may exceed 10 minutes. This bounded compatibility loop is kept cohesive rather than split by test modes. Slice 2 replaces the accepted interim run-file layout; no accumulation is claimed final.
 
-### Slice 2 — Refresh one maintained successful snapshot
+Accepted proof: new runner check first failed in 8.28s because an ordinary run created proof; the public recorder check first failed because it configured itself without the option. After the single early recorder gate and adapter reorder, `./scripts/run.sh pnpm test:cucumber-proof` passed 23/23 in 66.14s, including 12 serial real Cypress launches. One metadata-only mirror assertion was subsequently removed, leaving 22 retained behavioral tests all covered by that run. Composer 3/3 passed. `./scripts/run.sh pnpm cy:lint` passed 1958 files after direct equivalent-boolean/layout repairs. No browser replay was needed for those repairs, restored original 180-second harness timeout or docs/comments. Parent inspected the four ordinary verdict × absent/existing inventories, explicit reporter/selection/exit/ownership comparisons and all 44 consumer dispositions in `/tmp/codex-deliberate-proof-slice1-trace.md`. Implementation active elapsed was about 15 minutes including the integrated compatibility loop and its obligatory consumer/contract trace; retained as the stated cohesive proof-loop exception, without expanding scope. Committed legacy proof remained untouched.
+
+### 2. Refresh one maintained successful snapshot
 
 Type: Behavior
 Status: planned
@@ -71,11 +75,13 @@ Sizing: target 5–10 minutes implementation plus serial proof. Real application
 - Recording option is exactly `RECORD_CUCUMBER_PROOF=1`; no default, CI or optimization command enables it.
 - Snapshot schema remains version 1, successful observations only, preserving original timestamps and source versions during adoption.
 - Filesystem no-write assertions establish the explicit ongoing opt-in contract requested by Terry. The one-time product sweep for obsolete automatic-recording wording and run filename allocation is an acceptance reading, separate from retained behavioral proof.
-- Expensive proof runs serially on Terry's Mac. Other Open Dough Playwright work is active; leave it untouched. Before launching real Cypress, inspect memory/load; use one fixture process or one application stack at a time. Reconsider on contention, failure or changed workload; each command owner follows its terminal result.
+- Expensive proof runs serially on Terry's Mac (48 GiB; 45% free memory, load 7.74 at preparation). Other Open Dough Playwright work is active; leave it untouched. Before launching real Cypress, inspect memory/load; use one fixture process or one application stack at a time. Reconsider on contention, failure or changed workload; each command owner follows its terminal result.
 
 ## Concern review
 
 Refinement was not needed: the two behavior slices separate explicit authorization from maintained storage, each with one evaluable proof loop. Remaining concerns: none; application allocation is an explicitly bounded early probe before its dependent live test run.
+
+Independent slice-1 refactor returned `none — already clean`, `REFACTOR COMPLETE`; no edits or repeated tests. All affected code files remain below 250 lines. Source freshness was unchanged against trunk a919988a84 (only backend dependency updates beyond preparation); 46 source-review entries passed the slice-1 check.
 
 ## Learnings
 

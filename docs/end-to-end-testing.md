@@ -35,6 +35,28 @@ WSL2 users must install `xvfb` outside Nix. Set
 | Run all E2E tests | `pnpm verify` |
 | Regenerate TypeScript API | `pnpm generateTypeScript` |
 
+## Retained Cucumber proof
+
+Ordinary passing and failing test runs, including CI and test optimization,
+leave retained proof untouched. Deliberately generate proof from the repository
+root with the command declared in `.planning/open-dough.json`:
+
+```bash
+RECORD_CUCUMBER_PROOF=1 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature
+```
+
+Choose another supported feature or comma-separated feature selection with
+`--spec` for a focused recording. `RECORD_CUCUMBER_PROOF=1` enables the shared
+Cypress Messages recorder for both the wrapper and terminal Cypress runs;
+tests, selection, reports and exit meaning stay the same.
+
+Successful proof in `e2e_test/proof` records tested source, completion time,
+attempt count and total duration. Final executed failures clear earlier proof
+for that identity; unexecuted scenarios keep theirs. Commit deliberately
+generated proof and cleanup with the observed work or in an intentional proof
+checkpoint. Recording never commits automatically. Published proof is the last
+deliberately retained verification; CI results are independent observations.
+
 ## Structure
 
 | Purpose | Location |

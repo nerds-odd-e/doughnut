@@ -32,7 +32,11 @@ test('interrupted concurrent processes preserve independent completed observatio
   `
   const children = [0, 1].map(() =>
     spawn(process.execPath, ['--input-type=module', '-e', script], {
-      env: { ...process.env, PROOF_ROOT: project.root },
+      env: {
+        ...process.env,
+        PROOF_ROOT: project.root,
+        RECORD_CUCUMBER_PROOF: '1',
+      },
       stdio: ['ignore', 'ignore', 'pipe', 'ipc'],
     })
   )

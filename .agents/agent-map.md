@@ -87,14 +87,25 @@ commands and parsing notes live in the `frontend-testing`,
 `backend-testing`, `cli`, `mcp-server`, or `e2e-authoring` skills.
 Raw profiles are local evidence and must not be committed.
 
-Ordinary terminal Cucumber runs maintain version-1 last successful proof in
-`e2e_test/proof`, declared on the Gherkin location in `.planning/open-dough.json`.
+Ordinary Cucumber runs, including CI and test optimization, leave retained proof
+untouched. To deliberately generate proof, run from the repository root:
+
+```bash
+RECORD_CUCUMBER_PROOF=1 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature
+```
+
+The Gherkin location in `.planning/open-dough.json` declares this instruction and
+`e2e_test/proof`. Select another supported feature or comma-separated selection
+with `--spec` to record that scope. Only the explicit `RECORD_CUCUMBER_PROOF=1`
+option enables recording through both `cy:run` and terminal Cypress.
 Passing scenarios retain attempts (including retries), total duration and tested
 source. A final executed unsuccessful result clears that identity's earlier
 proof; unexecuted cases and unrelated or newer successes remain. Commit proof
-and cleanup deletions with the work they observed. Writer ownership is transient
-and ignored; mutations are serialized and atomic within this checkout. Separate
-worktree Git reconciliation must preserve cleanup. Recorder and real-run compatibility checks:
+and cleanup deletions deliberately with the work they observed or in a proof
+checkpoint; the recorder does not commit. Published proof and CI results are
+independent observations. Writer ownership is transient and ignored; mutations
+are serialized and atomic within this checkout. Separate worktree Git
+reconciliation must preserve cleanup. Recorder and real-run compatibility checks:
 `CURSOR_DEV=true nix develop -c pnpm test:cucumber-proof`.
 
 **Development vs E2E:** For manual product feedback from the primary checkout,

@@ -29,12 +29,14 @@ const silently = (action) => {
 export function createCucumberProofRecorder({
   repoRoot,
   projectRoot = repoRoot,
+  env = process.env,
 }) {
   const disabled = {
     configured: false,
     start: () => undefined,
     observe: () => undefined,
   }
+  if (env.RECORD_CUCUMBER_PROOF !== '1') return disabled
   return (
     silently(() => {
       projectRoot = resolve(projectRoot)

@@ -1,9 +1,11 @@
 import { execFileSync } from 'node:child_process'
 import {
+  lstatSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
   readFileSync,
+  readlinkSync,
   realpathSync,
   rmSync,
   writeFileSync,
@@ -50,7 +52,10 @@ export function proofProject(t) {
     '-m',
     'Starting point'
   )
-  const recorder = createCucumberProofRecorder({ repoRoot: root })
+  const recorder = createCucumberProofRecorder({
+    repoRoot: root,
+    env: { RECORD_CUCUMBER_PROOF: '1' },
+  })
   const send = (event, data) =>
     recorder.observe(`cypress-cucumber-preprocessor:${event}`, data)
   let sequence = 0
@@ -119,6 +124,38 @@ export function proofProject(t) {
         willBeRetried: retry,
         timestamp: { seconds, nanos: 500000000 },
       })
+    },
+    proofState() {
+      const entries = []
+      function visit(name) {
+        let stat
+        try {
+          stat = lstatSync(join(root, name))
+        } catch (error) {
+          if (error.code === 'ENOENT') return
+          throw error
+        }
+        if (stat.isDirectory()) {
+          entries.push({ path: name, kind: 'directory' })
+          for (const child of readdirSync(join(root, name)).sort())
+            visit(join(name, child))
+        } else if (stat.isSymbolicLink()) {
+          entries.push({
+            path: name,
+            kind: 'link',
+            target: readlinkSync(join(root, name)),
+          })
+        } else {
+          entries.push({
+            path: name,
+            kind: 'file',
+            bytes: readFileSync(join(root, name)),
+          })
+        }
+      }
+      visit('proof')
+      visit('proof.lock')
+      return entries
     },
     files() {
       try {
