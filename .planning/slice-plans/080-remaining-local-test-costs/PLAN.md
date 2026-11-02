@@ -2,10 +2,11 @@
 
 **Identity:** SEED-098#remaining-test-costs
 **Source:** [unexecuted optimization follow-up](../../seeds/SEED-098-remaining-local-test-costs.md#remaining-test-costs)
+**Source review:** [source-review.md](source-review.md)
 **Preparation:** written by resolve-only triage SEED-097#resolve-candidates
 (`3ca2684040c9c89995bd9bd107d2760c330305a7`); refined for planned execution
-on 2026-11-02 at `22b377bc242ae9da744ae287040bd98adf590e4b`. No slice has been
-executed; execution needs its own instruction.
+on 2026-11-02 at `22b377bc242ae9da744ae287040bd98adf590e4b`. No slice had been
+executed at preparation; execution needed its own instruction.
 
 ## Goal and scope
 
@@ -77,7 +78,42 @@ plain Vitest JSON durations alone cannot prove local feedback improvement.
 
 ### 1. Attribute a fresh E2E batch's extra startup cost
 Type: Behavior
-Status: planned
+Status: done
+Outcome: no measured removable stage; `e2e-batch-cold-start` stays pending.
+
+Result (2026-11-02, `6c045ccfd5`, macOS 26.6.2, 16 cores, Node 26.13.0, Java
+25.0.3, Gradle 9.8.2, Cypress 16.2.1; load 3.4→6.0 across runs, unrelated
+cursor-agent present). Same ordinary command, sequential, 10/10 scenarios
+green each, no leftover processes/ports, one proof recording per run:
+
+| Run | State before | Wall | SUT healthy | Cypress `(Run Starting)` |
+| --- | --- | --- | --- | --- |
+| 1 (first in checkout) | no `backend/build`, `backend/.gradle`, Vite cache, worktree DB; `~/.gradle` build cache warm | 54.95s | 16.46s | 25.22s |
+| 2 | warm | 41.89s | 12.12s | 13.93s |
+| 3 | warm | 43.25s | 12.28s | 14.34s |
+
+Attribution of the ~12.4s first-run gap (one first sample; stamped from
+stdout, `sut.log` and Spring log timestamps):
+- Cypress healthy→run-start window +6.8s (8.8s vs ~2s): unattributed; existing
+  logs print nothing inside it. Missing evidence: a stage breakdown (config,
+  `setupNodeEvents`, browser launch) on a genuine first run in another freshly
+  prepared worktree versus a warm run.
+- Backend readiness +4.2s: Gradle start to task graph +3.2s (first
+  configuration plus `compileJava` FROM-CACHE versus UP-TO-DATE, not separable
+  without Gradle timestamps); Flyway first migration of the empty isolated
+  schema ~0.7s (inherent to per-worktree databases, ADR 0007); Spring boot
+  unchanged (6.0–6.5s); remainder within 500ms poll granularity, not
+  attributed to polling.
+- Mountebank (+2.8s) and Vite (+1.9s) finished before the backend, so they
+  are not on the critical path. `optimizeDeps.force` reoptimizes on every run,
+  so it is not a first-run cost.
+- The historical ~4m18s did not recur because `compileJava` came from the
+  build cache. Missing evidence: a first run with a build-cache miss, to show
+  whether real compilation is the inherent cost.
+
+No startup edit was made or proposed. A missing stage baseline is not an
+accepted inherent cost, so the candidate returns pending with the missing
+evidence above. Raw logs stayed outside Git.
 Proof: `./scripts/run.sh pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`
 through its normal owner, recording case count, total wall and stage evidence.
 

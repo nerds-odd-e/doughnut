@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "observations": [
+    {
+      "scenario": "Standard Git LFS client uploads and downloads exact content",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 1396,
+      "finishedAt": "2026-11-02T04:52:42.577Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "Unauthorized Git LFS upload is refused",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 1014,
+      "finishedAt": "2026-11-02T04:52:43.640Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "CLI clone hydrates the current LFS tip into a clean usable checkout",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 1414,
+      "finishedAt": "2026-11-02T04:52:45.178Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "Failed CLI clone leaves an existing destination untouched",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 492,
+      "finishedAt": "2026-11-02T04:52:45.721Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "CLI publishes two LFS versions and a fresh clone receives current bytes after a web save",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 7001,
+      "finishedAt": "2026-11-02T04:52:52.868Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "Three incompressible LFS versions keep pointer history and current-only clone download",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 3018,
+      "finishedAt": "2026-11-02T04:52:55.996Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "Explicit Git LFS fetch recovers a published version after replacement and after current-row deletion",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 3015,
+      "finishedAt": "2026-11-02T04:52:59.189Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "Same-checkout pull keeps a local note and image over a web save, then publishes",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 4853,
+      "finishedAt": "2026-11-02T04:53:04.180Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "An image uploaded on the web arrives in the owner's clone beside its note",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 2666,
+      "finishedAt": "2026-11-02T04:53:06.929Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    },
+    {
+      "scenario": "A Book attached to a notebook arrives in the owner's clone as its source file",
+      "featureBlob": "efc9c72eb9bf3ee31f16f00686f5c593c33a20ae",
+      "feature": "e2e_test/features/cli/cli_notebook_lfs.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 1389,
+      "finishedAt": "2026-11-02T04:53:08.376Z",
+      "commit": "6c045ccfd5d27af88590b132ce379a9ac8abedab"
+    }
+  ]
+}
