@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "observations": [
+    {
+      "scenario": "Only admins can open failure reports",
+      "example": ["none", "sign in"],
+      "featureBlob": "ceef901b4b437afbd1fb816f6acb74b0a36bc4bf",
+      "feature": "e2e_test/features/users/account_control.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 4124,
+      "finishedAt": "2026-11-02T06:48:08.950Z",
+      "commit": "796b350c0975e9c2bb06d152f8593dc2d4b38ff4"
+    },
+    {
+      "scenario": "Only admins can open failure reports",
+      "example": ["admin", "failure reports"],
+      "featureBlob": "ceef901b4b437afbd1fb816f6acb74b0a36bc4bf",
+      "feature": "e2e_test/features/users/account_control.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 1059,
+      "finishedAt": "2026-11-02T06:48:10.046Z",
+      "commit": "796b350c0975e9c2bb06d152f8593dc2d4b38ff4"
+    },
+    {
+      "scenario": "Only admins can open failure reports",
+      "example": ["non_admin", "access denied"],
+      "featureBlob": "ceef901b4b437afbd1fb816f6acb74b0a36bc4bf",
+      "feature": "e2e_test/features/users/account_control.feature",
+      "outcome": "passed",
+      "attempts": 1,
+      "durationMs": 909,
+      "finishedAt": "2026-11-02T06:48:10.993Z",
+      "commit": "796b350c0975e9c2bb06d152f8593dc2d4b38ff4"
+    }
+  ]
+}
