@@ -31,6 +31,10 @@ also applies. Known failures remain repair obligations under that policy.
   execution branch published at that claim. Originating/default integration
   checkout: `/Users/terryyin/git/doughnut`. Authorized landing target:
   `origin` `refs/heads/main` (`nerds-odd-e/doughnut`).
+- Recorder increment accepted on `origin/codex/cucumber-proof` as
+  `d648487d39f67a47f05072ca21947b9926ef2c4d`; formatter and independent hook
+  passed. Its CI remains owned by the live execution observer. Adding the
+  Intent proof declaration changes no CI source, workflow, or completion setting.
 - `./scripts/run.sh bash scripts/worktree_setup.sh` passed, preserving locked
   dependencies. `./scripts/run.sh node --test e2e_test/config/composeCypressPluginEvents.test.mjs`
   passed both tests from this checkout. CI: push-triggered `ci.yml`, verified
@@ -135,7 +139,7 @@ the guarded formatter to run again before delivery.
 
 ### 2. Ordinary Donut runs expose proof beside declared Gherkin
 Type: Behavior
-Status: planned
+Status: done
 Proof: shared common setup configures the adapter and declaring Gherkin proof
 directory; focused and full fixture runs cover that shared integration. Run
 meaningful existing Donut feature(s) through the owning `pnpm cy:run` wrapper,
@@ -146,38 +150,48 @@ invoke Dough Land after execution/review settlement and await applicable trunk C
 Behavior: ordinary Donut Cucumber invocation → shared setup → executed scoped
 scenarios update published proof without changing the invocation's own result.
 
+Accepted proof before final independent refactor:
+
+- `./scripts/run.sh pnpm test:cucumber-proof` passed 15 tests: all six new
+  mixed-status outcomes, prior recorder/process promises, and six actual
+  Cypress modes. An initial failure exposed nondeterministic inter-spec
+  discovery order; comparison now asserts the exact spec set and each spec's
+  ordered reporter/error rows, without changing scheduling or warning checks.
+- `./scripts/run.sh env -u SPRING_DATASOURCE_URL -u DB_URL -u SPRING_FLYWAY_URL -u INPUT_DB_URL -u SERVER_PORT -u LOCAL_LB_BACKEND -u LOCAL_LB_VITE_UPSTREAM -u LOCAL_LB_LISTEN_PORT -u FRONTEND_DEV_PORT -u FRONTEND_BACKEND_ORIGIN -u SUT_RUNTIME_TARGET pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature`
+  passed all 9 scenarios, zero skipped/failed (20s). The owning isolated wrapper
+  provisioned its recorded database/ports and completed cleanup.
+- `./scripts/run.sh node --test e2e_test/config/composeCypressPluginEvents.test.mjs`
+  passed all 3. `common.ts` registers the adapter once; `ci.ts` and the default
+  `cypress.config.ts` inherit it; `lint:all` invokes the tested new command.
+- Reading `e2e_test/proof/20261102T030305438Z-d4182692-ae90-4ae0-981d-a993fec40c59.json`
+  confirms valid version 1, nine exact feature scenario names, passed/attempts 1,
+  positive durations, commit `d648487d39f67a47f05072ca21947b9926ef2c4d`, and
+  blob `f6bd4975da729f087a51a5817fa8575aa1b9dd70`; it is not ignored. These are
+  real ordinary observations, not fixture proof. Full trace and 67 dispositions
+  plus transitive ordinary/CI consumers are retained at
+  `/private/tmp/donut-cucumber-slice2-consumer-trace.md` and
+  `/private/tmp/donut-cucumber-slice2-consumer-dispositions.md`.
+
+Independent refactor: already clean, no edits; 67 dispositions plus three
+transitive consumers checked, accepted proofs reused. Project whitespace check passed.
+
 ## Current decisions
 
-- Slice 1 sizing checkpoint: resumed implementation/debug reached about 10
-  active minutes, excluding approval-service and browser waits. Retain one
-  bounded focused-proof exception: finish the existing six-mode real-run
-  harness, then trace/check and return. The real consumer exposed URI
-  coordinates across `/tmp` and `/private/tmp` that the initial generated
-  fixtures did not represent; the corrected real-shape boundary suite now
-  passes all 11 tests. Splitting delivery before this integration verdict
-  would accept the same false unit-only confidence. No new capability is
-  authorized by this exception; another implementation change returns its
-  concrete failure and remaining work for reassessment. Browser startup/wait
-  remains the existing external-wait exception.
+- Slice 1 sizing reached about 10 active minutes, excluding external waits.
+  The bounded exception finished the existing real-run harness and tracing;
+  it exposed lexical/physical URI coordinates missing from the first fixtures.
+  No expanded capability was authorized by that exception.
 - Interruption proof uses the actual Node writer processes: their parent
   reads both completed files before terminating the live children, then
   confirms both survive and the unfinished case contributes nothing. Combined
   with real Cypress final-event transport proof, this observes the requested
   durable-run behavior directly. It replaces the plan's unnecessary choice
   of killing a whole Cypress/browser tree; the source outcome is unchanged.
-- The real-run transport probe passed in this owned checkout: ordinary
-  `PROBE_MODE=baseline|enabled|dry pnpm exec cypress run --project <checkout>
-  --config-file <scratch>/cypress.config.cjs --browser electron`, through
-  `./scripts/run.sh node`, exercised two tiny features. Baseline and enabled
-  runs both exited 2 with the same 3 passed, 2 intentionally failed, 1 skipped
-  scenarios and matching reporter/error text after duration/port normalization.
-  Received source bytes matched consumed files, outline cells decoded pipes
-  and backslashes, retries emitted attempts 0/1 and final flags true/false.
-  Dry-run exited 0 while emitting synthetic passed attempts. Inspectable
-  literal commands, payloads, scripts and logs are retained outside Git at
-  `/private/tmp/donut-cucumber-proof-probe-YXYlus`; all checkout scratch was
-  removed. This settles transport, not the unwritten recorder or run-start
-  composition: slices own their discriminating proof.
+- Initial real-run transport probe: baseline/enabled exit 2 with matching
+  3 passed, 2 intentionally failed, 1 skipped; source bytes/parsed cells and
+  retry flags matched. Dry-run exit 0 emitted synthetic passed attempts.
+  Literal commands, payloads and logs: `/private/tmp/donut-cucumber-proof-probe-YXYlus`.
+  Later slice evidence above proves recorder and run-start composition.
 - Enable message transport only for ordinary terminal runs with an applicable
   proof declaration. Keep existing active reporting intact. Explicit resolved
   dry-run suppresses observations even if upstream emits synthetic passed steps.
@@ -189,12 +203,6 @@ scenarios update published proof without changing the invocation's own result.
   memory ~20 GB, no competing Cypress/Gradle/E2E processes observed. Sequence
   one lightweight Electron probe/test process and one scoped application batch;
   command owner rechecks if load, contention or failures change this basis.
-
-## Plan review
-
-Refinement is not needed: two cohesive tooling outcomes, one recorder boundary
-followed by its ordinary product consumer. The decisive transport premise was
-settled by the real-run probe; no remaining slice-specific concern was identified.
 
 ## Learnings
 
@@ -221,9 +229,16 @@ settled by the real-run probe; no remaining slice-specific concern was identifie
 ### G1. Ordinary product integration remains for its receiving slice
 Reported: slice 1 — "Ordinary Donut configuration, proof declaration, meaningful product proof, and CI test-script integration remain for slice 2."
 Story clause: "Ordinary focused and full runs record only executed scenarios within the declaring locations, in version-1 proof files. Dry runs record nothing."
-Disposition: receiving slice 2
+Disposition: proved by slice 2: common.ts single registration, open-dough.json declaration, registered 15-test suite, ordinary nine-scenario wrapper pass and the inspected real proof file.
 
 ### G2. Remaining outcome-rank observations
 Reported: slice 1 — "ambiguous, undefined, pending, and unknown outcome variants use the generic rank map but have no dedicated observing test yet."
 Story clause: "A retried outline records its original Gherkin name, parsed example cells, final attempt outcome, all attempts' duration, and final completion time."
-Disposition: receiving slice 2
+Disposition: proved by slice 2: cucumberProofRecorder.test.mjs data-driven mixed-status cases observe ambiguous, undefined, pending, skipped, passed and unknown; prior failed/hook and all-skipped observations remain green in the 15-test suite.
+
+
+### G3. Post-implementation delivery belongs to the coordinator continuation
+Reported: slice 2 — "Source-only review includes landing, publication, final CI and reporting duties whose trigger follows delivered implementation; these are not yet fulfilled observations."
+Story clause: "Readers of Donut's published Gherkin can see the latest observed scenario outcome, when it ran, the run-start commit, and the tested feature version through Open Dough Intent."
+Disposition: no user cost "Readers of Donut's published Gherkin can see the latest observed scenario outcome, when it ran, the run-start commit, and the tested feature version through Open Dough Intent.": these rows specify the subsequent coordinator delivery phase, not omitted product behavior. They remain mandatory task duties: normal-hook proof commit, retrospective/completion, explicit Dough Land to origin/main, actual final main CI, containment and final report. Implementation acceptance asserts none of those future results; the coordinator retains the checkout and live observer through fulfillment.
+Commitment: C03, C22, C31, C32, C33, C34, C35, C36, C37, C38, C39, C40, C48, C50, R18, R61, X26, X27

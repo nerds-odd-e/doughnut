@@ -13,12 +13,10 @@ import {
   WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
   worktreeResetIsolationCypressTasks,
 } from '../../scripts/worktree-reset-isolation-barrier.mjs'
-const {
-  addCucumberPreprocessorPlugin,
-} = require('@badeball/cypress-cucumber-preprocessor')
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import { composeCypressPluginEvents } from './composeCypressPluginEvents.mjs'
+import { addCucumberPreprocessorWithProof } from './cucumberProof.mjs'
 import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { E2E_APP_BASE_URL } from './constants'
@@ -90,7 +88,7 @@ const commonConfig = {
       if (barrierAt === WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK) {
         appendCucumberExposeTag(config, 'not @openaiUnavailableWhenPaired')
       }
-      await addCucumberPreprocessorPlugin(on, config)
+      await addCucumberPreprocessorWithProof(on, config, repoRoot)
       const generatedBackendPath = join(
         repoRoot,
         'packages',

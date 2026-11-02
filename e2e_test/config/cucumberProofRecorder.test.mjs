@@ -90,6 +90,23 @@ test('later executions of one identity replace the earlier observation in this r
   assert.equal(project.proof()[0].finishedAt, '2026-11-02T00:03:11.500Z')
 })
 
+for (const [results, outcome] of [
+  [['UNKNOWN', 'PASSED', 'UNDEFINED', 'AMBIGUOUS'], 'ambiguous'],
+  [['UNKNOWN', 'PENDING', 'UNDEFINED', 'SKIPPED'], 'undefined'],
+  [['SKIPPED', 'PASSED', 'PENDING'], 'pending'],
+  [['PASSED', 'SKIPPED'], 'skipped'],
+  [['UNKNOWN', 'PASSED'], 'passed'],
+  [['UNKNOWN'], 'unknown'],
+]) {
+  test(`the final attempt's worst result is ${outcome}`, (t) => {
+    const project = proofProject(t)
+    project.recorder.start()
+    const [pickle] = project.source(plain)
+    project.attempt(pickle, { results })
+    assert.equal(project.proof()[0]?.outcome, outcome)
+  })
+}
+
 test('only executed scenarios in declaring locations contribute proof', (t) => {
   const project = proofProject(t)
   project.recorder.start()

@@ -15,21 +15,39 @@ const cypress = join(
   dirname(require.resolve('cypress/package.json')),
   'bin/cypress'
 )
-const reporter = (output) =>
-  stripVTControlCharacters(output)
-    .split('\n')
-    .map((line) =>
-      line
-        .trim()
-        .replaceAll(/\(\d+(?:ms|s)\)/g, '(duration)')
-        .replaceAll(/\d+ms|\d+s/g, 'duration')
-        .replaceAll(/localhost:\d+/g, 'localhost:port')
-    )
-    .filter(
-      (line) =>
-        /^([✔✓]|\d+\)|\d+ passing|\d+ failing|\d+ pending)/.test(line) ||
-        line.includes('proof fixture')
-    )
+const reporter = (output) => {
+  const specs = new Map()
+  let rows
+  for (const line of stripVTControlCharacters(output).split('\n')) {
+    const spec = line.match(/^\s*Running:\s+(.*?)\s+\(\d+ of \d+\)/)?.[1]
+    if (spec) {
+      assert.ok(!specs.has(spec), `Duplicate spec: ${spec}`)
+      rows = []
+      specs.set(spec, rows)
+    }
+    if (
+      /^\s*([✔✓]|\d+\)|\d+ passing|\d+ failing|\d+ pending)/.test(line) ||
+      line.includes('proof fixture')
+    ) {
+      assert.ok(rows, line)
+      rows.push(
+        line
+          .trim()
+          .replaceAll(/\(\d+(?:ms|s)\)/g, '(duration)')
+          .replaceAll(/\d+ms|\d+s/g, 'duration')
+          .replaceAll(/localhost:\d+/g, 'localhost:port')
+      )
+    }
+  }
+  assert.deepEqual([...specs.keys()].sort(), [
+    'features/hooks.feature',
+    'features/normal.feature',
+    'outside/outside.feature',
+  ])
+  return [...specs.entries()].sort(([left], [right]) =>
+    left.localeCompare(right)
+  )
+}
 
 test('real full, focused, tagged and dry Cypress runs preserve results and publish scoped proof', {
   timeout: 180000,
