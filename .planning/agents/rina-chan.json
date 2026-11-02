@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Rina-chan",
+  "email": "rina-chan@example.org",
+  "identity": "SEED-098#remaining-test-costs",
+  "mode": "story-branch",
+  "branch": "claude/shorten-ordinary-local-feedback-without-losing-b",
+  "host": "claude",
+  "model": "opus"
+}
