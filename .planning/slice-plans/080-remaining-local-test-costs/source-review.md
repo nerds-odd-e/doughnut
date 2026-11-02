@@ -25,9 +25,9 @@ examples; item 9 keeps unpicked families on record, it does not drop them.
 | 1.3 | A no-gain result must be backed by evidence | slice 3 | |
 | 2 | Attribute the recorded first-batch E2E startup cost | slice 1 | observed: PLAN.md slice 1 Result: per-stage first vs warm attribution of the ~12.4s gap |
 | 3 | Assess the compatible spec merges in the replacement plan | slice 3 | |
-| 3.1 | Assess the compatible AI-reply protocol spec merge | slice 2 | |
+| 3.1 | Assess the compatible AI-reply protocol spec merge | slice 2 | observed: PLAN.md slice 2 Result: merge assessed with alternating focused and full measurements, undone for no demonstrated gain |
 | 3.2 | Assess the compatible mounted-component sibling-spec merges | slice 3 | |
-| 3.3 | Only compatible merges are in scope, assessed in the replacement plan | slice 2 | |
+| 3.3 | Only compatible merges are in scope, assessed in the replacement plan | slice 2 | observed: PLAN.md slice 2 Result: only the planned compatible content+toolCalls merge was tried, with no production or runner change |
 | 4 | Preserve the listed protections | slice 3 | |
 | 4.1 | Existing cases | slice 3 | |
 | 4.2 | Owned-stack readiness | slice 1 | observed: slice 1 runs: real health predicate "SUT healthy after N poll(s)" each run, no startup change |

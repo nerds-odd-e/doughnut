@@ -138,7 +138,28 @@ shown inherent may be accepted only under the candidate acceptance rule.
 
 ### 2. Share AI reply protocol spec setup
 Type: Structure
-Status: planned
+Status: done
+Outcome: no demonstrated gain; merge undone, both original specs restored unchanged.
+
+Result (2026-11-02, `0d343fdc2a`, macOS 26.6.2, Node 26.13.0, Vitest 5.0.5
+browser chromium headless, default workers/isolation; host load not quiet:
+1-minute average rose ~4.4→16 from unrelated sessions). The merged
+`aiReplyState.spec.ts` (207 lines, all 9 cases verbatim, one fresh
+`createMockAiReplyContext` per case) passed with both typechecks.
+
+- Focused command, alternating three pairs: before 4.96/5.10/5.15s wall
+  (Vitest 3.35/3.45/3.50s, 5 files) versus after 5.08/4.98/5.32s (Vitest
+  3.41/3.46/3.67s, 4 files), 23/23 tests each. Means: after ~60–80ms slower,
+  within the 0.2–0.35s spread.
+- Full command: before 77.87s and 86.55s, after 84.56s and 86.68s (397 vs
+  396 files, 2454 tests each). Load swings of ~8s are far larger than the
+  historical 70–250ms per-file saving; the closest-load pair differs by 0.13s
+  with after slower.
+- Limits: three focused pairs cannot resolve a saving under ~100ms. One
+  unmeasured explanation is that in parallel browser mode a small file's setup
+  overlaps other workers instead of extending the critical path.
+
+The removed-name sweep was not needed because the merge was not kept.
 Proof: normal focused AI-reply command before/after, all 9 protocol cases;
 same-content frontend typechecks and ordinary full-suite comparison.
 
@@ -184,7 +205,7 @@ under comparable conditions; a failed re-profile is incomplete measurement.
 Record each keep/rejection, before/after wall and cases, and measurement limits.
 Remove a transferred entry only for work actually done. Return all unpicked
 sibling families or unresolved cold cost to pending under their original slugs;
-the two AI-reply merges do not claim every sibling opportunity solved.
+the two AI-reply merge assessments do not claim every sibling opportunity solved.
 
 ## Settled premises
 
