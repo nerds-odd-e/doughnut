@@ -234,6 +234,16 @@ Remove a transferred entry only for work actually done. Return all unpicked
 sibling families or unresolved cold cost to pending under their original slugs;
 the two AI-reply merge assessments do not claim every sibling opportunity solved.
 
+## Execution complete
+
+Product advice: no change to backlog priorities. Further frontend sibling-spec
+merges are worth only ~0.2s on a focused command each, and the full suite
+cannot resolve that, so `frontend-sibling-spec-setup` stays a low-value
+pending candidate. Treat `e2e-batch-cold-start` as worth new work only when
+the missing Cypress-launch or build-cache-miss evidence is gathered. Wrap-up
+must re-point the candidate record's relative links to this plan to a
+commit-pinned revision before deleting the plan.
+
 ## Settled premises
 
 Observed 2026-11-02 in this preparation's workspace at `22b377bc24`:
