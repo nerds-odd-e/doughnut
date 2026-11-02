@@ -10,7 +10,7 @@ id: SEED-099
 
 **Identity:** SEED-099#deliberate-cucumber-proof
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/081-deliberate-cucumber-proof/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4fc14b4549bb8b163f7063132d003a63377b5498892ff59a9a01827a65055845","plan":"87cbb63a03298bd061be71ea180838e163394f6ae858e6f9d92c2b48ece8620f"}}
 ```
 
 **Goal:** A contributor can deliberately refresh retained Cucumber proof while ordinary passing and failing test runs leave that evidence untouched.
