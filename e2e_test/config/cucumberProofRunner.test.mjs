@@ -198,21 +198,28 @@ test('ordinary and explicit full, focused, tagged, dry and reported Cypress runs
     record: false,
   })
   assert.equal(ordinaryPassed.code, 0, ordinaryPassed.output)
-  const passed = await run('recover', selection)
+  const retained = reported.proof
+  const passed = await run('recover', selection, { reset: false })
   assert.equal(passed.code, 0, passed.output)
   assert.deepEqual(reporter(passed.output), reporter(ordinaryPassed.output))
   assert.deepEqual(passed.owners, ordinaryPassed.owners)
   assert.deepEqual(
     passed.proof.map((row) => row.scenario),
-    ['Permanent failure']
+    ['Parsed <value>', 'Parsed <value>', 'Permanent failure', 'Retry succeeds']
   )
   const failed = await run('enabled', selection, { reset: false })
   assert.equal(failed.code, 1, failed.output)
-  assert.deepEqual(failed.proof, [])
+  assert.deepEqual(failed.proof, retained)
   const recovered = await run('recover', selection, { reset: false })
   assert.equal(recovered.code, 0, recovered.output)
   assert.deepEqual(
-    recovered.proof.map((row) => row.outcome),
+    recovered.proof
+      .filter((row) => row.scenario === 'Permanent failure')
+      .map((row) => row.outcome),
     ['passed']
+  )
+  assert.deepEqual(
+    recovered.proof.filter((row) => row.scenario !== 'Permanent failure'),
+    retained
   )
 })

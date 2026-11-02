@@ -16,7 +16,7 @@ test('a final failure clears its previous successes and a later pass restores pr
   const [selected, retained] = p.source(source)
   p.attempt(selected)
   p.attempt(retained)
-  const other = p.proof()[1]
+  const other = p.proof().find((row) => row.scenario === 'Retained')
   p.recorder.start()
   p.source(source)
   p.attempt(selected, { results: ['FAILED'], seconds: 1793577791 })

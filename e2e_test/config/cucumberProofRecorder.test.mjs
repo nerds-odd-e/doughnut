@@ -136,7 +136,7 @@ test('only the last retry publishes, with all attempt durations and final hook o
   )
 })
 
-test('later executions of one identity replace the earlier observation in this run', (t) => {
+test('later executions of one identity replace its earlier observation', (t) => {
   const project = proofProject(t)
   project.recorder.start()
   const [pickle] = project.source(plain)
@@ -192,7 +192,7 @@ test('proof failures and a missing Git checkout remain silent and harmless', (t)
   assert.doesNotThrow(() => unavailable.start())
 })
 
-test('each run keeps its own complete proof file and needs no end-of-run flush', (t) => {
+test('repeated runs refresh one durable snapshot without an end-of-run flush', (t) => {
   const project = proofProject(t)
   project.recorder.start()
   const [pickle] = project.source(plain)
@@ -200,6 +200,6 @@ test('each run keeps its own complete proof file and needs no end-of-run flush',
   project.recorder.start()
   const [second] = project.source(plain)
   project.attempt(second)
-  assert.equal(project.files().length, 2)
-  assert.equal(project.proof().length, 2)
+  assert.deepEqual(project.files(), ['latest.json'])
+  assert.equal(project.proof().length, 1)
 })

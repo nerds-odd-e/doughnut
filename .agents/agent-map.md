@@ -98,8 +98,12 @@ The Gherkin location in `.planning/open-dough.json` declares this instruction an
 `e2e_test/proof`. Select another supported feature or comma-separated selection
 with `--spec` to record that scope. Only the explicit `RECORD_CUCUMBER_PROOF=1`
 option enables recording through both `cy:run` and terminal Cypress.
-Passing scenarios retain attempts (including retries), total duration and tested
-source. A final executed unsuccessful result clears that identity's earlier
+Each completed scenario refreshes `e2e_test/proof/latest.json`, retaining one
+success per identity in stable order, with attempts (including retries), total
+duration and tested source. Refresh reads all nested proof files, reduces each
+identity to its latest observation (unsuccessful timestamp ties win), then keeps
+passes and consumes the files into the snapshot. Original provenance remains;
+if no passes remain, the snapshot is removed. A final executed unsuccessful result clears that identity's earlier
 proof; unexecuted cases and unrelated or newer successes remain. Commit proof
 and cleanup deletions deliberately with the work they observed or in a proof
 checkpoint; the recorder does not commit. Published proof and CI results are

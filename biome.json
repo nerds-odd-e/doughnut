@@ -194,6 +194,10 @@
   },
   "overrides": [
     {
+      "includes": ["e2e_test/proof/**/*.json"],
+      "formatter": { "enabled": false }
+    },
+    {
       "includes": ["**/e2e_test/**/*.{js,ts,jsx,tsx}"],
       "linter": {
         "rules": {
@@ -242,15 +246,5 @@
       }
     }
   ],
-  "json": {
-    "parser": {
-      "allowComments": true
-    },
-    "formatter": {
-      "enabled": true,
-      "indentStyle": "space",
-      "indentWidth": 2,
-      "lineWidth": 80
-    }
-  }
+  "json": { "parser": { "allowComments": true } }
 }

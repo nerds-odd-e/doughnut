@@ -60,7 +60,7 @@ Accepted proof: new runner check first failed in 8.28s because an ordinary run c
 ### 2. Refresh one maintained successful snapshot
 
 Type: Behavior
-Status: planned
+Status: done
 
 Pre-condition: recording is explicitly enabled and legacy or maintained proof may exist.
 Trigger: a selected scenario finishes its last executed attempt.
@@ -69,6 +69,12 @@ Result: under existing checkout lock, reread all proof, reduce legacy observatio
 Proof: recorder/lifecycle/process tests cover old and new layouts, repeated refresh, both timestamp tie orders, nested files, concurrency/interruption, non-runs, final failure and restoration; real Cypress focused refresh preserves an unrelated identity and normal output/exit. Run the affected full proof suite, composer suite and E2E lint. Deliberately refresh note creation using the configured root command, retaining provenance and verifying readable compact proof plus consumed-file cleanup in the same commit.
 
 Sizing: target 5–10 minutes implementation plus serial proof. Real application proof is one unpaid focused owned-stack batch; probe its setup/selection before launch, stop dependent work on unavailable allocation, and keep this result distinct from the fixture runner's observations.
+
+Accepted proof: new snapshot cases failed 4/4 against slice 1, then the full proof suite passed 26/26 in 69.19s with 12 serial real Cypress launches; composer passed 3/3. Compact serialization and a proof-only Biome formatter override preserve parsed schema/metadata; identical redundant JSON formatter settings were replaced by inheritance so root config fits the strict 250-line limit. After this adjustment, focused recorder/lifecycle/process/snapshot checks passed 25/25 in 1.44s. No meaningful recorder/runner behavior changed after the full loop, so its evidence was reused. All 84 consumer dispositions and concrete assertions are in `/tmp/codex-deliberate-proof-slice2-trace.md`, with prior routing reused; dated proof files' final disposition is the application adoption below. Active implementation was about 12 minutes including the bounded serial proof exception, without scope widening.
+
+Actual root generation: the exact configured `RECORD_CUCUMBER_PROOF=1 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature` passed 9/9, no failures/skips, 19s feature duration. On this Mac, 46% of 48 GiB was free and load 11.66; no owned fixture process remained, so one serial unpaid application batch was chosen, leaving unrelated Playwright work untouched. Runner allocated `wt_a89ae3f51cf3415bb535d38cab70438c`, database `doughnut_e2e_wt_a89ae3f51cf3415bb535d38cab70438c`, origin `127.0.0.1:53700`. Both owner and proof locks were absent at terminal exit.
+
+Adoption comparison: six immutable legacy files/43 observations at run-start SHA `5d43f015c75be52bb50dbc8a26953e760cecd382` reduce to 23 successful identities. New `latest.json` is valid version 1, 28 lines, with all 14 unexecuted observations deep-equal in every field and nine fresh note-creation passes (one attempt, positive durations), source blob `f6bd4975da729f087a51a5817fa8575aa1b9dd70`, finished 2026-11-02T09:57:27.356Z–09:57:41.807Z. Snapshot blob is `8fc909182f46e0ee6d578b33ad444438b559be38`. HEAD remained unchanged; no automatic commit. All six input files were consumed. Post-generation `./scripts/run.sh pnpm cy:lint` passed 1954 files. One-time legacy filename/allocation sweep returned no matches in recorder modules/project guidance and only `latest.json` in the proof directory; this is an acceptance reading, separate from maintained behavior proof. Independent refactor returned `none — already clean`, `REFACTOR COMPLETE`, with no edits or repeated proof; repository whitespace passed and all current files fit the strict size gate. All 46 source-review entries and slice-2 obligations passed; source freshness remained unchanged against trunk a919988a84.
 
 ## Current decisions
 
@@ -85,4 +91,4 @@ Independent slice-1 refactor returned `none — already clean`, `REFACTOR COMPLE
 
 ## Learnings
 
-None beyond the recorded existing-solution assessment.
+The strict refactor file-size limit includes generated proof. One observation per line and a narrowly scoped proof formatter override keep this snapshot compact; JSON linter/parser remain enabled and all other formatter settings inherit their unchanged values. This affects representation only, not version-1 meaning.

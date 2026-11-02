@@ -50,8 +50,13 @@ Choose another supported feature or comma-separated feature selection with
 Cypress Messages recorder for both the wrapper and terminal Cypress runs;
 tests, selection, reports and exit meaning stay the same.
 
-Successful proof in `e2e_test/proof` records tested source, completion time,
-attempt count and total duration. Final executed failures clear earlier proof
+Each completed scenario updates `e2e_test/proof/latest.json` under the checkout
+lock. The snapshot keeps one success per identity in stable order, with tested
+source, completion time, attempt count and total duration. Refresh reads every
+nested proof file, selects each identity's latest observation (unsuccessful
+timestamp ties win), keeps passes and consumes the input files. Retained
+observations keep their original provenance. If no passes remain, the snapshot
+is removed. Final executed failures clear earlier proof
 for that identity; unexecuted scenarios keep theirs. Commit deliberately
 generated proof and cleanup with the observed work or in an intentional proof
 checkpoint. Recording never commits automatically. Published proof is the last
