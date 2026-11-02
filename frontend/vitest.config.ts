@@ -87,6 +87,8 @@ const config = defineConfig({
     environment: "node", // Browser mode uses 'node' environment
     // Parallel file imports overwhelm the browser orchestrator on CI runners.
     fileParallelism: !isCI,
+    // The default (cores - 1) saturates local Chromium: clicks and Vitest's 5s mock-interception probe time out.
+    maxWorkers: "50%",
     // Retries cover assertion-level flakes only; browser-orchestrator crashes
     // (file fails to load) are mitigated by orchestratorGcReporter + sharding.
     retry: isCI ? 1 : 0,
