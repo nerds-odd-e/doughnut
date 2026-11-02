@@ -64,7 +64,7 @@ runner-owned. North Star topics impose no additional choice on this tooling.
 | Final attempt only, correct attempts/outcome/time/duration including hooks | Retried/failing real Cypress fixture; intermediate retry produces no final observation |
 | Executed-only, declared-location scope, dry run | Fixture tag/full/focused selections and explicit resolved dry-run; outside locations produce no observations |
 | Run-start commit and source version remain truthful after edits | Temporary Git checkout changed after start/source receipt, then compare observed commit/blob |
-| Unique atomic per-run files; completed observations survive interruption | Concurrent recorder processes and a real Cypress run interrupted after a finished scenario |
+| Unique atomic per-run files; completed observations survive interruption | Two live concurrent Node recorder processes expose finished files, then are terminated with another scenario unfinished; real Cypress transport proves the same immediate final-event path |
 | Silent best effort, ordinary output/diagnostics/exit/reports preserved | Real runner positive and negative controls with/without adapter, unwritable/no-Git proof paths, existing report and composed cleanup assertions |
 | Ordinary Donut route emits useful committed proof | Existing scoped application feature(s) via `pnpm cy:run --spec …`; inspect feature identities/hashes and commit generated proof |
 
@@ -75,7 +75,7 @@ Only the declaring locations' real ordinary observations are committed.
 
 ### 1. Final scenario observations survive ordinary runner events
 Type: Behavior
-Status: planned
+Status: done
 Proof: focused Node boundary tests and a real lightweight Cypress fixture
 exercise the table's identity, retry, scope, dry-run, provenance, atomicity,
 interruption, silent-failure and output/exit promises. Run the changed tooling's
@@ -86,6 +86,52 @@ Behavior: source and runtime task messages from an executed final scenario →
 project-owned Node adapter → one compact observation in this run's atomically
 updated proof file, with preserved pre-existing runner behavior. A temporary
 fixture is a tool consumer, not committed product proof.
+
+Accepted proof (owned checkout, before independent refactor):
+
+- `./scripts/run.sh node --test e2e_test/config/cucumberProofRecorder.test.mjs e2e_test/config/cucumberProofProcess.test.mjs e2e_test/config/composeCypressPluginEvents.test.mjs`
+  passed 11 tests. Recorder assertions observe source/commit provenance after
+  edits, parsed outline/Rule identities, final retries/duration, latest identity,
+  scope/executed-only selection, silent write failure and separate run files.
+  The process test reads both live writers' files, then kills those writers
+  with unfinished cases and reads the surviving observations. Composer tests
+  observe each existing start/completion callback once.
+- `./scripts/run.sh node --test e2e_test/config/cucumberProofRunner.test.mjs`
+  passed its six-mode real Cypress fixture in 34.94s. The baseline must execute
+  passing scenarios and the intentional failure paths; adapted output/exit
+  matches those stable reporter/diagnostic signals without new report warnings.
+  Assertions inspect five scoped records, final retry/hook outcomes, escaped
+  outline cells, commit/blob, dry zero/focused five/tagged two, and retained
+  upstream message output. Fixture setup is in `cucumberProofRunnerFixture.mjs`;
+  ordinary application configuration remains a slice-2 obligation.
+- `./scripts/run.sh node --test scripts/isolated-cypress-openai-mock.test.mjs`
+  passed 8 tests; `./scripts/run.sh node --test scripts/isolated-cypress.test.mjs`
+  passed 14. Existing run-start private-mock, admission and reset owners remain
+  covered. `./scripts/run.sh bash scripts/check_diff_whitespace.sh` passed.
+- Consumer trace at base `1581250a75251575f30a32f7f3afcdbb9f39264d` completed
+  across 4,070 files with public effects `addCucumberPreprocessorWithProof`,
+  `createCucumberProofRecorder`, `composeCypressPluginEvents`. `common.ts` and
+  transitive `ci.ts` retain the composer; callback/fixture/guard proof above
+  observes that effect. `package.json` retains its existing composer command;
+  the released contract is checked against format assertions. Other matches
+  are lexical references to unexported generic helper/fixture terms, not
+  consumers. New ordinary adapter wiring/test registration is owned by slice 2.
+
+Independent refactor accepted: source/AST indexing now lives in
+`cucumberProofCases.mjs`, computing each feature hash/index once; recorder API
+and lexical URI behavior remain unchanged. The same 11-test focused command
+and real six-mode runner command passed again (35.90s), with evidence at
+`/tmp/nix-shell.SgFOfi/donut-cucumber-proof-runner-8J56v2`. Unchanged guard proofs
+remain applicable. Full trace and 144 dispositions are retained outside Git at
+`/private/tmp/donut-cucumber-refactor-consumer-trace.md`; no uncovered consumer
+remains. Source/core modules are 78/112 lines before coordinator formatting.
+
+Coordinator preparation repaired five lint findings without changing the
+recorder contract; test output normalization now uses Node's native ANSI-strip
+utility. `./scripts/run.sh node --test e2e_test/config/cucumberProofRecorder.test.mjs e2e_test/config/cucumberProofProcess.test.mjs e2e_test/config/composeCypressPluginEvents.test.mjs e2e_test/config/cucumberProofRunner.test.mjs`
+then passed all 12 tests, including the six-mode real runner (42.24s). The failed
+formatter attempt committed/published nothing; its intervening repair requires
+the guarded formatter to run again before delivery.
 
 ### 2. Ordinary Donut runs expose proof beside declared Gherkin
 Type: Behavior
@@ -102,6 +148,23 @@ scenarios update published proof without changing the invocation's own result.
 
 ## Current decisions
 
+- Slice 1 sizing checkpoint: resumed implementation/debug reached about 10
+  active minutes, excluding approval-service and browser waits. Retain one
+  bounded focused-proof exception: finish the existing six-mode real-run
+  harness, then trace/check and return. The real consumer exposed URI
+  coordinates across `/tmp` and `/private/tmp` that the initial generated
+  fixtures did not represent; the corrected real-shape boundary suite now
+  passes all 11 tests. Splitting delivery before this integration verdict
+  would accept the same false unit-only confidence. No new capability is
+  authorized by this exception; another implementation change returns its
+  concrete failure and remaining work for reassessment. Browser startup/wait
+  remains the existing external-wait exception.
+- Interruption proof uses the actual Node writer processes: their parent
+  reads both completed files before terminating the live children, then
+  confirms both survive and the unfinished case contributes nothing. Combined
+  with real Cypress final-event transport proof, this observes the requested
+  durable-run behavior directly. It replaces the plan's unnecessary choice
+  of killing a whole Cypress/browser tree; the source outcome is unchanged.
 - The real-run transport probe passed in this owned checkout: ordinary
   `PROBE_MODE=baseline|enabled|dry pnpm exec cypress run --project <checkout>
   --config-file <scratch>/cypress.config.cjs --browser electron`, through
@@ -145,3 +208,22 @@ settled by the real-run probe; no remaining slice-specific concern was identifie
   does its subsequent skipped scenario. These unexecuted Cucumber scenarios
   retain earlier observations; their raw runner diagnostics and exit remain
   intact. Cucumber case hooks are included in observed step results.
+- Cypress URIs are relative to its original lexical project root while the
+  compiler can use physical paths. Resolve in those original coordinates
+  before mapping a path beneath that root to its canonical root. The unit
+  fixture now generates the real compiler's URI shape.
+- A matching failure count can hide fixture compilation failures. The real
+  runner test now requires actual passing scenario signals and each intended
+  error before interpreting its exit status or comparing recorder output.
+
+## Story obligations
+
+### G1. Ordinary product integration remains for its receiving slice
+Reported: slice 1 — "Ordinary Donut configuration, proof declaration, meaningful product proof, and CI test-script integration remain for slice 2."
+Story clause: "Ordinary focused and full runs record only executed scenarios within the declaring locations, in version-1 proof files. Dry runs record nothing."
+Disposition: receiving slice 2
+
+### G2. Remaining outcome-rank observations
+Reported: slice 1 — "ambiguous, undefined, pending, and unknown outcome variants use the generic rank map but have no dedicated observing test yet."
+Story clause: "A retried outline records its original Gherkin name, parsed example cells, final attempt outcome, all attempts' duration, and final completion time."
+Disposition: receiving slice 2

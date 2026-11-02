@@ -1,14 +1,19 @@
-const COMPOSED_COMPLETION_EVENTS = new Set(['after:spec', 'after:run'])
+const COMPOSED_EVENTS = new Set([
+  'before:run',
+  'before:spec',
+  'after:spec',
+  'after:run',
+])
 
 /**
  * Cypress keeps one server callback per event. Wrap `on` so every
- * after:spec / after:run handler still runs and returned promises settle.
+ * run/spec lifecycle handler still runs and returned promises settle.
  */
 export function composeCypressPluginEvents(on) {
   const handlersByEvent = new Map()
 
   return (event, handler) => {
-    if (!COMPOSED_COMPLETION_EVENTS.has(event)) {
+    if (!COMPOSED_EVENTS.has(event)) {
       return on(event, handler)
     }
     let handlers = handlersByEvent.get(event)
