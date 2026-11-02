@@ -68,6 +68,7 @@ export const APPLICATION_ONLY_ACTIVE_SPECS = [
   'e2e_test/features/relationships/add_relationship.feature',
   'e2e_test/features/relationships/relationship_edit_and_remove.feature',
   'e2e_test/features/relationships/reify_property.feature',
+  'e2e_test/features/testability/cypress_retry.feature',
   'e2e_test/features/testability/feature_toggle.feature',
   'e2e_test/features/testability/show_failure_report.feature',
   'e2e_test/features/user_admin/manage_bazaar.feature',

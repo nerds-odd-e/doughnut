@@ -6,6 +6,14 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
+// Module-scoped so Cypress runMode retries keep the counter across attempts.
+let retrySucceedsAttempts = 0
+
+Given('a retry succeeds', () => {
+  retrySucceedsAttempts += 1
+  expect(retrySucceedsAttempts, 'retry count').to.be.greaterThan(1)
+})
+
 When('Someone triggered an exception', () => {
   start.testability().triggerException()
 })
