@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Record ordinary Cypress/Cucumber runs as published proof](seeds/SEED-096-cucumber-proof.md#cucumber-proof) — SEED-096#cucumber-proof ([plan](slice-plans/079-cucumber-proof/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
