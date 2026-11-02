@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-098_remaining-test-costs.json",
+      "identity": "SEED-098#remaining-test-costs",
+      "completedAt": "2026-11-02T05:36:23.008Z",
+      "blob": "2ec37770fc347f9b35998ac4c3f4292f06321242"
+    },
+    {
       "fileName": "SEED-097_resolve-candidates.json",
       "identity": "SEED-097#resolve-candidates",
       "completedAt": "2026-11-02T04:24:02.272Z",
