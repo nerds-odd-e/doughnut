@@ -1,15 +1,9 @@
 import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import {
-  mkdirSync,
-  readFileSync,
-  realpathSync,
-  renameSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs'
+import { readFileSync, realpathSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { cucumberProofCases } from './cucumberProofCases.mjs'
+import { maintainScenarioProof } from './cucumberProofStore.mjs'
 
 const statuses = [
   'failed',
@@ -68,35 +62,6 @@ export function createCucumberProofRecorder({
       const cases = new Map()
       const attempts = new Map()
       const retries = new Map()
-      const files = new Map()
-
-      function flush(directory, observation) {
-        let observations = files.get(directory)
-        if (!observations) {
-          observations = new Map()
-          files.set(directory, observations)
-        }
-        observations.set(
-          JSON.stringify([
-            observation.feature,
-            observation.scenario,
-            observation.example,
-          ]),
-          observation
-        )
-        mkdirSync(directory, { recursive: true })
-        const temporary = resolve(directory, `.${filename}.${randomUUID()}.tmp`)
-        try {
-          writeFileSync(
-            temporary,
-            `${JSON.stringify({ version: 1, observations: [...observations.values()] })}\n`
-          )
-          renameSync(temporary, resolve(directory, filename))
-        } finally {
-          rmSync(temporary, { force: true })
-        }
-      }
-
       function finish(data) {
         const attempt = attempts.get(data.testCaseStartedId)
         if (!attempt) return
@@ -132,7 +97,9 @@ export function createCucumberProofRecorder({
           commit,
         }
         for (const directory of new Set(directories))
-          silently(() => flush(directory, observation))
+          silently(() =>
+            maintainScenarioProof(directory, filename, observation)
+          )
         retries.delete(attempt.testCaseId)
       }
 
@@ -144,7 +111,6 @@ export function createCucumberProofRecorder({
             cases.clear()
             attempts.clear()
             retries.clear()
-            files.clear()
             commit = execFileSync('git', ['rev-parse', 'HEAD'], {
               cwd: repoRoot,
               encoding: 'utf8',

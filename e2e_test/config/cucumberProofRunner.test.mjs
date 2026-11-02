@@ -57,8 +57,9 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
   const logs = mkdtempSync(join(tmpdir(), 'donut-cucumber-proof-runner-'))
   t.diagnostic(`Cypress fixture evidence: ${logs}`)
   let runNumber = 0
-  async function run(mode, args = []) {
-    rmSync(join(project.root, 'proof'), { recursive: true, force: true })
+  async function run(mode, args = [], reset = true) {
+    if (reset)
+      rmSync(join(project.root, 'proof'), { recursive: true, force: true })
     rmSync(join(project.root, 'owners.log'), { force: true })
     const label = `${runNumber++}-${mode}`
     const child = spawn(
@@ -121,7 +122,7 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
     observed.output,
     /Hook failures can't be represented|Due to browser crash, no reports/
   )
-  assert.equal(observed.proof.length, 5)
+  assert.equal(observed.proof.length, 3)
   assert.ok(
     observed.proof.every((row) => row.feature === 'features/normal.feature')
   )
@@ -131,11 +132,6 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
   assert.equal(retried.attempts, 2)
   assert.equal(retried.outcome, 'passed')
   assert.ok(retried.durationMs > 0)
-  assert.equal(
-    observed.proof.find((row) => row.scenario === 'Cucumber hook fails')
-      .outcome,
-    'failed'
-  )
   assert.deepEqual(
     observed.proof.filter((row) => row.example).map((row) => row.example),
     [['a|b'], ['back\\slash']]
@@ -153,16 +149,32 @@ test('real full, focused, tagged and dry Cypress runs preserve results and publi
     `${project.git('rev-parse', '--show-toplevel')}/features/normal.feature`,
   ])
   assert.equal(focused.code, 2, focused.output)
-  assert.equal(focused.proof.length, 5)
+  assert.equal(focused.proof.length, 3)
   const tagged = await run('enabled', ['--expose', 'tags=@selected'])
   assert.equal(tagged.code, 0, tagged.output)
   assert.equal(tagged.proof.length, 2)
   const reported = await run('report')
   assert.equal(reported.code, baseline.code, reported.output)
-  assert.equal(reported.proof.length, 5)
+  assert.equal(reported.proof.length, 3)
   const messages = readFileSync(join(project.root, 'existing.ndjson'), 'utf8')
     .trim()
     .split('\n')
     .map(JSON.parse)
   assert.ok(messages.some((message) => message.testCaseFinished))
+  const selection = ['--expose', 'tags=@permanent']
+  const passed = await run('recover', selection)
+  assert.equal(passed.code, 0, passed.output)
+  assert.deepEqual(
+    passed.proof.map((row) => row.scenario),
+    ['Permanent failure']
+  )
+  const failed = await run('enabled', selection, false)
+  assert.equal(failed.code, 1, failed.output)
+  assert.deepEqual(failed.proof, [])
+  const recovered = await run('recover', selection, false)
+  assert.equal(recovered.code, 0, recovered.output)
+  assert.deepEqual(
+    recovered.proof.map((row) => row.outcome),
+    ['passed']
+  )
 })

@@ -69,13 +69,13 @@ test('only the last retry publishes, with all attempt durations and final hook o
   assert.equal(project.files().length, 0)
   project.attempt(pickle, {
     index: 1,
-    results: ['PASSED', 'FAILED', 'SKIPPED'],
-    durations: [10, 20, 0],
+    results: ['PASSED', 'PASSED'],
+    durations: [10, 20],
   })
   const [observation] = project.proof()
   assert.deepEqual(
     [observation.outcome, observation.attempts, observation.durationMs],
-    ['failed', 2, 110]
+    ['passed', 2, 110]
   )
 })
 
@@ -83,6 +83,7 @@ test('later executions of one identity replace the earlier observation in this r
   const project = proofProject(t)
   project.recorder.start()
   const [pickle] = project.source(plain)
+  project.attempt(pickle)
   project.attempt(pickle, { results: ['FAILED'] })
   project.attempt(pickle, { seconds: 1793577791 })
   assert.equal(project.proof().length, 1)
@@ -95,15 +96,16 @@ for (const [results, outcome] of [
   [['UNKNOWN', 'PENDING', 'UNDEFINED', 'SKIPPED'], 'undefined'],
   [['SKIPPED', 'PASSED', 'PENDING'], 'pending'],
   [['PASSED', 'SKIPPED'], 'skipped'],
-  [['UNKNOWN', 'PASSED'], 'passed'],
+  [['PASSED', 'FAILED'], 'failed'],
   [['UNKNOWN'], 'unknown'],
 ]) {
-  test(`the final attempt's worst result is ${outcome}`, (t) => {
+  test(`a final ${outcome} result clears earlier successful proof`, (t) => {
     const project = proofProject(t)
     project.recorder.start()
     const [pickle] = project.source(plain)
+    project.attempt(pickle)
     project.attempt(pickle, { results })
-    assert.equal(project.proof()[0]?.outcome, outcome)
+    assert.deepEqual(project.proof(), [])
   })
 }
 
