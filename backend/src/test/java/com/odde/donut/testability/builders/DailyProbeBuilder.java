@@ -19,7 +19,7 @@ public class DailyProbeBuilder extends EntityBuilder<DailyProbe> {
     entity.setAccuracy(100);
     entity.setLapseCount(0);
     entity.setVariability(0.0);
-    entity.setTrialsJson(trialsJson(scoredTrials()));
+    entity.setTrials(scoredTrials());
   }
 
   public DailyProbeBuilder by(User user) {
@@ -75,26 +75,5 @@ public class DailyProbeBuilder extends EntityBuilder<DailyProbe> {
       trials.add(trial);
     }
     return trials;
-  }
-
-  private static String trialsJson(List<DailyProbeTrialDTO> trials) {
-    StringBuilder json = new StringBuilder("[");
-    for (int i = 0; i < trials.size(); i++) {
-      if (i > 0) {
-        json.append(',');
-      }
-      DailyProbeTrialDTO trial = trials.get(i);
-      json.append("{\"stimulus\":\"")
-          .append(trial.stimulus)
-          .append("\",\"response\":\"")
-          .append(trial.response)
-          .append("\",\"rtMs\":")
-          .append(trial.rtMs)
-          .append(",\"correct\":")
-          .append(trial.correct)
-          .append('}');
-    }
-    json.append(']');
-    return json.toString();
   }
 }

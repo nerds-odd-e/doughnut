@@ -11,9 +11,14 @@ import jakarta.persistence.Converter;
 public class GradeOrConfusionConverter implements AttributeConverter<Grade, String> {
   static final String CONFUSION = "CONFUSION";
 
+  /** The grade name, or {@code CONFUSION} for a {@code null} grade. */
+  public static String productOutcomeOf(Grade grade) {
+    return grade == null ? CONFUSION : grade.name();
+  }
+
   @Override
   public String convertToDatabaseColumn(Grade grade) {
-    return grade == null ? CONFUSION : grade.name();
+    return productOutcomeOf(grade);
   }
 
   @Override

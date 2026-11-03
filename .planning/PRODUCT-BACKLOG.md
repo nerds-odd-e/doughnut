@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Export my entire recall history with my daily probe results](seeds/SEED-100-recall-history-export.md#story-1) — SEED-100#story-1 ([plan](slice-plans/001-recall-history-export/PLAN.md))
-
 ## Backlog list
 
 - [Find how the morning probe relates to recall, and how to make the probe more useful](seeds/SEED-100-recall-history-export.md#story-2) — SEED-100#story-2

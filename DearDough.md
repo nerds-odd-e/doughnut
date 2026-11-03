@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 333. Removed numbers are never reused.
+- Highest allocated local number: 334. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
@@ -399,3 +399,17 @@ A source-only review of the complete implementation-and-landing task returned bo
   - Evidence: e87c86c692cb11685a25c7f78d874a587f6abb10:.planning/slice-plans/079-cucumber-proof/source-review.md (187 source clauses,18 G3 links) and PLAN.md G3; this chat's2026-11-02 acceptance/record operations.
   - Observed effect: the coordinator needed a separate phase-applicability disposition before guarded delivery; final landing and main CI remained pending, with the checkout and observer retained.
   - Inference: allocating only implementation outputs to slices, while preserving delivery duties in their owning workflow, may avoid this circular gate without weakening task completion.
+
+## DD-334 — A commitment was recorded as observed before its output was inspected
+
+During slice 1 acceptance, the coordinator recorded the source-review commitment "The `GET` is described in OpenAPI" as observed, pointing at generated output that did not exist yet. The API client was regenerated afterwards, during delivery, and nobody read the generated schemas. Springdoc names a schema after the simple class name, so the nested export record `RecallHistoryExport.Answer` was published as the existing entity `Answer` schema, without three of its fields. The slice 2 implementer noticed a possible name clash for its own new record; the coordinator then inspected the spec, found the slice 1 defect, and opened obligation G1 to return it to slice 2.
+
+### Occurrences
+- Execution: SEED-100#story-1; first implementation cede42a5792d64fbd2784167abbd216dbfdbf5dd
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: 1e5c2b8e1b:.planning/slice-plans/001-recall-history-export/source-review.md row 2a.3 and PLAN.md G1; cede42a579:open_api_docs.yaml `Event.answer: $ref Answer`; corrected in 6932a70eb6; occurred 2026-11-03 between slice 1 acceptance and the slice 1 push (cede42a579).
+  - Observed effect: a published increment carried a wrong OpenAPI contract for one slice. The correction cost one extra round trip with the implementer and one regeneration.
+  - Inference: writing an `observed:` location only after reading the output it names, and reading the diff of generated output before committing, would probably have caught this in slice 1.

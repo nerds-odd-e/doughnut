@@ -37,6 +37,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `updateUser`: PATCH `/api/user/{user}` -> `UpdateUserResponse` (request: `UpdateUserData`; path: user; body: UserDto; response body: User)
 - `getTokenInfo`: GET `/api/user/token-info` -> `GetTokenInfoResponse` (request: none; response body: UserToken)
 - `getRecallStats`: GET `/api/user/recall-stats` -> `GetRecallStatsResponse` (request: `GetRecallStatsData`; query: timezone; response body: RecallStatsDto)
+- `exportRecallHistory`: GET `/api/user/recall-history-export` -> `ExportRecallHistoryResponse` (request: `ExportRecallHistoryData`; query: timezone; response body: RecallHistoryExport)
 - `getMenuData`: GET `/api/user/menu-data` -> `GetMenuDataResponse` (request: `GetMenuDataData`; query: timezone; response body: MenuDataDto)
 - `getTokens`: GET `/api/user/get-tokens` -> `GetTokensResponse` (request: none; response body: Array<UserToken>)
 - `deleteToken`: DELETE `/api/user/token/{tokenId}` -> `DeleteTokenResponse` (request: `DeleteTokenData`; path: tokenId; response body: void)

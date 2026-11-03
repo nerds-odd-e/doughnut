@@ -1,12 +1,16 @@
 package com.odde.donut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.donut.controllers.dto.DailyProbeTrialDTO;
+import com.odde.donut.entities.converters.DailyProbeTrialsConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,5 +41,6 @@ public class DailyProbe extends EntityIdentifiedByIdOnly {
   private Double variability;
 
   @Column(name = "trials_json", nullable = false, columnDefinition = "TEXT")
-  private String trialsJson;
+  @Convert(converter = DailyProbeTrialsConverter.class)
+  private List<DailyProbeTrialDTO> trials;
 }

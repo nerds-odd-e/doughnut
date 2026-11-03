@@ -52,7 +52,8 @@ public class RecallStatsService {
     }
     List<DailyProbeDay> dailyProbe =
         user.getDailyProbeEnabled()
-            ? DailyProbeDaySeries.from(dailyProbeRepository.findByUser(user), zoneId)
+            ? DailyProbeDaySeries.from(
+                dailyProbeRepository.findByUserOrderByCompletedAtAscIdAsc(user), zoneId)
             : List.of();
     return aggregateRows(recent, allTime, zoneId, now, dailyProbe);
   }

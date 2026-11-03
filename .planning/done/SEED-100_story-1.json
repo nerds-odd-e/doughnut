@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-100#story-1",
+  "title": "Export my entire recall history with my daily probe results",
+  "completedAt": "2026-11-03T03:28:18.713Z",
+  "developer": "Terry Yin",
+  "agent": "Yuma-chan",
+  "host": "claude",
+  "model": "opus"
+}
