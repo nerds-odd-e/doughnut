@@ -410,6 +410,6 @@ During slice 1 acceptance, the coordinator recorded the source-review commitment
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.82
-  - Evidence: .planning/slice-plans/001-recall-history-export/source-review.md row 2a.3 and PLAN.md G1; cede42a579:open_api_docs.yaml `Event.answer: $ref Answer`; corrected in 6932a70eb6; occurred 2026-11-03 between slice 1 acceptance and the slice 1 push (cede42a579).
+  - Evidence: 1e5c2b8e1b:.planning/slice-plans/001-recall-history-export/source-review.md row 2a.3 and PLAN.md G1; cede42a579:open_api_docs.yaml `Event.answer: $ref Answer`; corrected in 6932a70eb6; occurred 2026-11-03 between slice 1 acceptance and the slice 1 push (cede42a579).
   - Observed effect: a published increment carried a wrong OpenAPI contract for one slice. The correction cost one extra round trip with the implementer and one regeneration.
   - Inference: writing an `observed:` location only after reading the output it names, and reading the diff of generated output before committing, would probably have caught this in slice 1.
