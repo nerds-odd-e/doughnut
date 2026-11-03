@@ -1,6 +1,7 @@
 # Plan: Recall history export
 
 **Source:** [SEED-100#story-1](../../seeds/SEED-100-recall-history-export.md#story-1)
+**Source review:** [source-review.md](source-review.md)
 **Identity:** SEED-100#story-1
 
 ## Goal and scope
@@ -63,7 +64,7 @@ to stream.
 ### 1. Recall events through the export API
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new `UserRecallHistoryExportControllerTest` (extends `ControllerTestBase`,
 calls `UserController` directly, plus one MockMvc case for example 6);
 `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.UserRecallHistoryExportControllerTest'`
@@ -74,6 +75,16 @@ tutor feedback → `GET` the export with `timezone=Asia/Bangkok` → the respons
 names the timezone and export time and lists one event per recall log, oldest
 first, each with the fields the story lists and timestamps ending `+07:00`;
 the probe list is empty. Without a signed-in user or valid token → 401.
+
+Accepted (2026-11-03): `GET /api/user/recall-history-export` returns
+`RecallHistoryExport(timezone, exportedAt, recallEvents)`, with the answer
+details as a nested `answer` object (null for a just review or tutor feedback).
+The test class has 11 passing cases, covering trackers removed from recall and
+notes in trash. The regression runs `User*`, `RecallPrompt*`, `MemoryTracker*`,
+and `*RecallLog*` also pass. The `dailyProbes` field is not in the response
+yet; slice 2 adds the field together with its content.
+Learnings: `pnpm backend:test:worktree` takes one `--tests` pattern per run;
+MySQL `FLOAT` columns round, so stability assertions compare persisted values.
 
 ### 2. Daily probes in the export
 

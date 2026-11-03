@@ -112,7 +112,7 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
       requiredMode = Schema.RequiredMode.REQUIRED,
       allowableValues = {"AGAIN", "HARD", "GOOD", "EASY", "CONFUSION"})
   public String getProductOutcome() {
-    return isConfusion() ? GradeOrConfusionConverter.CONFUSION : grade.name();
+    return GradeOrConfusionConverter.productOutcomeOf(grade);
   }
 
   @JsonProperty

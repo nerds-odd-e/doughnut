@@ -2675,6 +2675,24 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallStatsDTO"
+  /api/user/recall-history-export:
+    get:
+      tags:
+      - user-controller
+      operationId: exportRecallHistory
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecallHistoryExport"
   /api/user/menu-data:
     get:
       tags:
@@ -5970,6 +5988,75 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DailyProbeDay"
+    Event:
+      type: object
+      properties:
+        recordedAt:
+          type: string
+        grade:
+          type: string
+          enum:
+          - AGAIN
+          - HARD
+          - GOOD
+          - EASY
+          - CONFUSION
+        kind:
+          type: string
+          enum:
+          - ANSWERED_RECALL_PROMPT
+          - JUST_REVIEW
+          - TUTOR_FEEDBACK
+        tutorFeedback:
+          type: string
+        elapsedHours:
+          type: integer
+          format: int32
+        stabilityBefore:
+          type: number
+          format: float
+        difficultyBefore:
+          type: number
+          format: float
+        retrievability:
+          type: number
+          format: double
+        memoryTrackerId:
+          type: integer
+          format: int32
+        memoryTrackerType:
+          type: string
+          enum:
+          - UNDERSTANDING
+          - SPELLING
+          - COMMISSIONED
+        noteId:
+          type: integer
+          format: int32
+        answer:
+          $ref: "#/components/schemas/Answer"
+      required:
+      - elapsedHours
+      - grade
+      - kind
+      - memoryTrackerId
+      - memoryTrackerType
+      - recordedAt
+    RecallHistoryExport:
+      type: object
+      properties:
+        timezone:
+          type: string
+        exportedAt:
+          type: string
+        recallEvents:
+          type: array
+          items:
+            $ref: "#/components/schemas/Event"
+      required:
+      - exportedAt
+      - recallEvents
+      - timezone
     AssimilationCountDTO:
       type: object
       properties:

@@ -1098,6 +1098,27 @@ export type RecallStatsDto = {
     dailyProbe?: Array<DailyProbeDay>;
 };
 
+export type Event = {
+    recordedAt: string;
+    grade: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY' | 'CONFUSION';
+    kind: 'ANSWERED_RECALL_PROMPT' | 'JUST_REVIEW' | 'TUTOR_FEEDBACK';
+    tutorFeedback?: string;
+    elapsedHours: number;
+    stabilityBefore?: number;
+    difficultyBefore?: number;
+    retrievability?: number;
+    memoryTrackerId: number;
+    memoryTrackerType: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
+    noteId?: number;
+    answer?: Answer;
+};
+
+export type RecallHistoryExport = {
+    timezone: string;
+    exportedAt: string;
+    recallEvents: Array<Event>;
+};
+
 export type AssimilationCountDto = {
     dueCount?: number;
     assimilatedCountOfTheDay?: number;
@@ -3673,6 +3694,24 @@ export type GetRecallStatsResponses = {
 };
 
 export type GetRecallStatsResponse = GetRecallStatsResponses[keyof GetRecallStatsResponses];
+
+export type ExportRecallHistoryData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/user/recall-history-export';
+};
+
+export type ExportRecallHistoryResponses = {
+    /**
+     * OK
+     */
+    200: RecallHistoryExport;
+};
+
+export type ExportRecallHistoryResponse = ExportRecallHistoryResponses[keyof ExportRecallHistoryResponses];
 
 export type GetMenuDataData = {
     body?: never;
