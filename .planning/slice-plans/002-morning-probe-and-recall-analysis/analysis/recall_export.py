@@ -116,11 +116,16 @@ def activity(events):
     return act.assign(start=start, end=end)
 
 
-def session_spans(day_activity):
-    """A new session starts when an event starts more than SESSION_GAP_MINUTES after the previous one ended."""
+def session_ids(day_activity):
+    """Each event's session number within its day: a new session starts when an event starts more than
+    SESSION_GAP_MINUTES after the previous one ended."""
     ordered = day_activity.sort_values("end")
     new_session = (ordered["start"] - ordered["end"].shift()) > pd.Timedelta(minutes=SESSION_GAP_MINUTES)
-    return ordered.groupby(new_session.cumsum()).agg(start=("start", "min"), end=("end", "max"))
+    return new_session.cumsum()
+
+
+def session_spans(day_activity):
+    return day_activity.groupby(session_ids(day_activity)).agg(start=("start", "min"), end=("end", "max"))
 
 
 def session_ms(day_activity, after=None):

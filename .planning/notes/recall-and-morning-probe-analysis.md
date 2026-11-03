@@ -151,7 +151,55 @@ Sample: the 65 days of the after-probe relation table. A row's n counts the days
 
 ## Recall-session efficiency
 
-Pending.
+Period: 2026-08-29 to 2026-11-03, from the first probe day on, where every answer carries its timing fields (`thinkingTimeMs` missing on 0 of 7318 (0%) answered prompts in the period); before it most answers lack them, so no all-time figures are given. Not related to the probe here. Each cell is median (first quartile–third quartile); measures, sessions and positions are defined under Method and limits.
+
+Sample: 67 days with at least one review; 349 sessions on them, 0 of which have no review (only `JUST_REVIEW` or excluded answers) and are left out of the per-session rows; 7317 reviews. Distraction share clipped at 1 on 0 days and 1 session.
+
+### Overall
+
+| Unit | n | Median response time (s) | Distraction share | Session length (min) | Pace (reviews per active min) |
+| --- | --- | --- | --- | --- | --- |
+| per day (n days) | 67 | 17.9 (16.2–19.9) | 0.141 (0.0694–0.249) | 140 (94.8–179) | 1.03 (0.812–1.34) |
+| per session (n sessions) | 349 | 17.9 (15.3–21.4) | 0.0349 (0–0.167) | 12.2 (3.52–37.6) | 1.64 (0.848–2.42) |
+
+Sessions per day: 5 (4–6).
+
+### By weekday (per day, n days)
+
+| Weekday | n days | Median response time (s) | Distraction share | Session length (min) | Pace (reviews per active min) |
+| --- | --- | --- | --- | --- | --- |
+| Monday | 10 | 18.3 (17.9–18.6) | 0.0641 (0.039–0.149) | 116 (77.9–147) | 1.24 (1.03–1.48) |
+| Tuesday | 10 | 17.9 (16.5–20) | 0.201 (0.0957–0.259) | 175 (124–192) | 0.956 (0.845–1.19) |
+| Wednesday | 9 | 17.1 (15.8–19.6) | 0.127 (0.0747–0.222) | 115 (95.8–174) | 0.858 (0.829–1.18) |
+| Thursday | 9 | 16.9 (16–17.3) | 0.17 (0.0476–0.373) | 138 (113–143) | 1.11 (0.871–1.18) |
+| Friday | 9 | 19.9 (16.4–22) | 0.137 (0.0926–0.162) | 119 (84.3–151) | 1.03 (0.961–1.48) |
+| Saturday | 10 | 19.7 (16.6–20.1) | 0.173 (0.093–0.267) | 155 (118–190) | 0.796 (0.721–1.24) |
+| Sunday | 10 | 17.6 (17.3–18.4) | 0.167 (0.133–0.295) | 157 (101–211) | 0.949 (0.678–1.29) |
+
+### By session start time (per session, n sessions)
+
+| Session start | n sessions | Median response time (s) | Distraction share | Session length (min) | Pace (reviews per active min) |
+| --- | --- | --- | --- | --- | --- |
+| 00:00–05:59 | 34 | 20.4 (17.8–25.1) | 0.0911 (0.0419–0.177) | 11 (6.71–67.3) | 1.61 (1.04–2.07) |
+| 06:00–08:59 | 91 | 18.2 (16–20.7) | 0.0569 (0.00157–0.122) | 24 (6.35–53.2) | 1.52 (0.897–2.26) |
+| 09:00–11:59 | 44 | 18.8 (15.4–24.1) | 0.00816 (0–0.233) | 21 (3.76–31.6) | 1.64 (0.811–2.35) |
+| 12:00–14:59 | 30 | 16.7 (13.5–21.7) | 0.0292 (0–0.377) | 7.2 (2.86–35.9) | 1.69 (0.91–2.64) |
+| 15:00–17:59 | 38 | 17.5 (13.3–22.6) | 0 (0–0.195) | 3.63 (2.47–21.7) | 2.08 (1.07–2.73) |
+| 18:00–20:59 | 75 | 17 (14.4–19.7) | 0.00177 (0–0.0983) | 8.57 (2.12–31.2) | 1.69 (0.649–2.84) |
+| 21:00–23:59 | 37 | 16.3 (13.8–18.9) | 0.0333 (0–0.161) | 19.5 (3.12–34.1) | 1.39 (0.794–2.67) |
+
+### By position in the session (per review, n reviews)
+
+Position applies to the per-review measures only: response time and the review's own distraction (`awayMs + detourMs + idleMs` over its `thinkingTimeMs + awayMs + detourMs`). Session length and pace belong to a whole session and have no position.
+
+| Position | n reviews | Response time (s) | Distraction share of review time | Same, without the 10 most distracted reviews | Reviews with any distraction |
+| --- | --- | --- | --- | --- | --- |
+| First 10 reviews of a session | 2927 | 18.4 (11.8–29.4) | 0.550 | 0.346 | 272 of 2927 (9%) |
+| Later reviews | 4390 | 17.9 (11.7–28.1) | 0.322 | 0.267 | 418 of 4390 (10%) |
+
+The distraction share of review time is a ratio of sums, driven by a few long absences: the 10 most distracted reviews of a position hold 58% for first 10 reviews of a session (longest 186 min) and 24% for later reviews (longest 31 min) of its distracted time.
+
+Paired by day: later reviews have a higher median response time than the first 10 on 30 of 66 (45%) days with both.
 
 ## Repetition efficiency
 
@@ -186,5 +234,6 @@ Pending.
 - A day enters the relation only with at least 10 reviews after its probe (in the all-day sensitivity variant, 10 reviews that day).
 - Strength: Spearman rho over days with a 95% percentile bootstrap interval (2000 resamples of days, fixed seed 20261103, so the report regenerates identically). Days needed: `(z(0.975) + z(0.8))^2 / atanh(0.3)^2 + 3`, the Fisher-z approximation.
 - Baselines: each after-probe recall measure is predicted for every day from all other days by least squares (leave one day out) and scored by mean absolute error. Typical day: the overall mean, or the mean adjusted by weekday and by the probe's completion hour band, whichever errs less. Yesterday: a linear prediction from the previous paired day's value of the same measure. The probe gains over a baseline when adding the probe measure to it lowers that error; a row's days are those with the measure, its previous paired day's value, and the probe measure.
+- Recall-session efficiency: from the first probe day on, the same measures per day (days with at least one review) and per session (sessions with at least one review), grouped by weekday (per day) and by the hour band of the session's first event start (per session). Position: a review's rank by `answer.createdAt` among its session's reviews; the first 10 are "first", the rest "later". A review's own distraction share is `awayMs + detourMs + idleMs` over `thinkingTimeMs + awayMs + detourMs`, summed over the reviews of a position; the companion column sums without the position's 10 most distracted reviews.
 - Aggregates only: no note ids, note titles, tutor feedback, or exclusion reason text.
 - Scripts: `analysis/` in `.planning/slice-plans/002-morning-probe-and-recall-analysis`, recoverable with `git log --all -- .planning/slice-plans/002-morning-probe-and-recall-analysis`. They run with system Python 3 (pandas, numpy, scipy) and are outside any product build or lint.

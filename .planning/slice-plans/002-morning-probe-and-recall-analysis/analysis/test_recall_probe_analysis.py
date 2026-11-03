@@ -10,7 +10,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import recall_probe_analysis as analysis  # noqa: E402
 
 
-def answer(created_at, outcome=None, excluded_at=None, reason=None, thinking_time_ms=5000, away_ms=0):
+def answer(
+    created_at, outcome=None, excluded_at=None, reason=None, thinking_time_ms=5000, away_ms=0, detour_ms=0, idle_ms=0
+):
     return {
         "id": 1,
         "questionType": "SPELLING",
@@ -19,9 +21,9 @@ def answer(created_at, outcome=None, excluded_at=None, reason=None, thinking_tim
         "thinkingTimeMs": thinking_time_ms,
         "awayMs": away_ms,
         "awayCount": 0,
-        "detourMs": 0,
+        "detourMs": detour_ms,
         "detourCount": 0,
-        "idleMs": 0,
+        "idleMs": idle_ms,
         "outcome": outcome,
         "excludedAt": excluded_at,
         "exclusionReason": reason,

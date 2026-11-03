@@ -24,6 +24,7 @@ from recall_export import (
     surprise,
 )
 from gain import gain
+from session import METHOD, session
 from markdown import band_label, share, table
 from relation import (
     BOOTSTRAP_RESAMPLES,
@@ -154,6 +155,7 @@ def method(data):
             "linear prediction from the previous paired day's value of the same measure. The probe gains over a "
             "baseline when adding the probe measure to it lowers that error; a row's days are those with the "
             "measure, its previous paired day's value, and the probe measure.",
+            METHOD,
             "- Aggregates only: no note ids, note titles, tutor feedback, or exclusion reason text.",
             "- Scripts: `analysis/` in `.planning/slice-plans/002-morning-probe-and-recall-analysis`, "
             "recoverable with `git log --all -- .planning/slice-plans/002-morning-probe-and-recall-analysis`. "
@@ -234,6 +236,7 @@ SECTIONS = {
     "h-check": h_check,
     "relation": relation,
     "gain": gain,
+    "session": session,
 }
 
 

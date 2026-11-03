@@ -179,7 +179,7 @@ would leave the report without one.)
 ### 4. Recall-session efficiency
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `test_session*`: a fixture with a trailing `JUST_REVIEW` extends the
 session span; distraction share and pace computed from known `awayMs`,
 `detourMs`, `idleMs`; then the real run writes the "Recall-session
@@ -289,6 +289,15 @@ the early probe that settles them before dependent slices.
   `HOUR_BANDS` in `recall_export.py`; `recall_probe_analysis.py` is near
   250 lines, so slices 4 and 5 add their sections in their own modules.
   Method lines live in `method()` and print with the `inventory` section.
+- **Sessions (slice 4).** Probe period 2026-08-29 to 2026-11-03: 67 days
+  with reviews (one without a probe), 349 sessions, 7,317 reviews. Per day:
+  median response time 17.9 s, distraction share 0.141, 140 min, pace 1.03
+  reviews per active minute, 5 sessions. Response time barely moves with
+  weekday (16.9–19.9 s) or position (18.4 s first ten, 17.9 s later);
+  session length and distraction vary more by weekday (Tuesday 175 min and
+  0.201; Monday 0.064) and start hour (06:00–08:59 sessions longest, n 91).
+  The first-ten distraction ratio is driven by a few long absences.
+  Each section module owns its Method text (`session.METHOD`).
 - **Date range (slice 5).** The relation slices use 2026-08-29 onward;
   slice 5 states the date range it uses, since the export reaches back to
   2023.
