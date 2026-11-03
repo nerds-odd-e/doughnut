@@ -96,12 +96,11 @@ public class AssistantGrantService {
         principal,
         principal);
     return scopesByClient.entrySet().stream()
-        .map(
-            entry -> {
-              var client = clients.findById(entry.getKey());
-              return new ConnectedAssistant(
-                  client.getClientId(), client.getClientName(), entry.getValue());
-            })
+        .map(entry -> {
+          var client = clients.findById(entry.getKey());
+          return new ConnectedAssistant(
+              client.getClientId(), client.getClientName(), entry.getValue());
+        })
         .toList();
   }
 

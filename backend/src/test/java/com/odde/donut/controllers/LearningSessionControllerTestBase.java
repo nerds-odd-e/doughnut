@@ -35,15 +35,15 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
   protected static String sessionItemFeedbackReport(
       String title, int grade, String descriptiveText) {
     return """
-        # Learning Session Report
+    # Learning Session Report
 
-        <session_item_feedback>
-        <session_item>
-        %s: %d
-        %s
-        </session_item>
-        </session_item_feedback>
-        """
+    <session_item_feedback>
+    <session_item>
+    %s: %d
+    %s
+    </session_item>
+    </session_item_feedback>
+    """
         .formatted(title, grade, descriptiveText);
   }
 

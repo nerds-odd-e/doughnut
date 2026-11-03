@@ -10,9 +10,8 @@ public class BadRequestRecoveryConfiguration
     implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
   @Override
   public void customize(TomcatServletWebServerFactory factory) {
-    factory.addContextCustomizers(
-        context ->
-            ((StandardHost) context.getParent())
-                .setErrorReportValveClass(BadRequestRecoveryValve.class.getName()));
+    factory.addContextCustomizers(context ->
+        ((StandardHost) context.getParent())
+            .setErrorReportValveClass(BadRequestRecoveryValve.class.getName()));
   }
 }

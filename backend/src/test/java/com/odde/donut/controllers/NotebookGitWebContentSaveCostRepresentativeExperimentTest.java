@@ -94,11 +94,10 @@ class NotebookGitWebContentSaveCostRepresentativeExperimentTest
       if (sample == 0) {
         callLog
             .executions()
-            .forEach(
-                execution ->
-                    System.out.printf(
-                        "representative-sql depth=%d method=%s sql=%s%n",
-                        depth, execution.method(), execution.sql()));
+            .forEach(execution ->
+                System.out.printf(
+                    "representative-sql depth=%d method=%s sql=%s%n",
+                    depth, execution.method(), execution.sql()));
       }
       last = observationFrom(callLog, entityManager.find(Notebook.class, notebookId));
       System.out.printf(

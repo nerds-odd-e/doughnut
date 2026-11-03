@@ -41,7 +41,8 @@ public class ListNoteCandidatesTool {
       - If no note matches, returns "%s"
       - Use a candidate's noteId with 'read_note' to read it in full for citing, or with 'get_note_graph' for its context and connections
 
-      For best results, search with a likely note title or a distinctive word from it."""
+      For best results, search with a likely note title or a distinctive word from it.\
+      """
           .formatted(EMPTY_SEARCH_SIGNAL);
 
   private final NoteSearchService noteSearchService;

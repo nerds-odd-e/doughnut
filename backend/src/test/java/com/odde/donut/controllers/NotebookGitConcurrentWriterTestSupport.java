@@ -44,17 +44,15 @@ final class NotebookGitConcurrentWriterTestSupport {
 
     try {
       Future<?> lockHolder =
-          executor.submit(
-              () -> {
-                TransactionTemplate transaction = new TransactionTemplate(transactionManager);
-                transaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-                transaction.executeWithoutResult(
-                    ignored -> {
-                      bindingRepository.findByNotebookIdForUpdate(notebookId).orElseThrow();
-                      bindingLocked.countDown();
-                      await(releaseBinding);
-                    });
-              });
+          executor.submit(() -> {
+            TransactionTemplate transaction = new TransactionTemplate(transactionManager);
+            transaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            transaction.executeWithoutResult(ignored -> {
+              bindingRepository.findByNotebookIdForUpdate(notebookId).orElseThrow();
+              bindingLocked.countDown();
+              await(releaseBinding);
+            });
+          });
       await(bindingLocked);
 
       Future<F> first =

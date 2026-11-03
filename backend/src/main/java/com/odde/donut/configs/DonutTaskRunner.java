@@ -30,28 +30,26 @@ public record DonutTaskRunner(ConfigurableApplicationContext context) {
   }
 
   public void generateOpenAPIDocs() {
-    runTask(
-        () -> {
-          String docsUrl = "http://localhost:" + getPort() + "/api-docs.yaml";
-          RestTemplate restTemplate = new RestTemplate();
-          String openApiDocs = restTemplate.getForObject(docsUrl, String.class);
-          // Save the OpenAPI docs to a file
-          try {
-            Files.writeString(Paths.get("../open_api_docs.yaml"), openApiDocs);
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-          System.out.println("OpenAPI documentation saved successfully.");
-        });
+    runTask(() -> {
+      String docsUrl = "http://localhost:" + getPort() + "/api-docs.yaml";
+      RestTemplate restTemplate = new RestTemplate();
+      String openApiDocs = restTemplate.getForObject(docsUrl, String.class);
+      // Save the OpenAPI docs to a file
+      try {
+        Files.writeString(Paths.get("../open_api_docs.yaml"), openApiDocs);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      System.out.println("OpenAPI documentation saved successfully.");
+    });
   }
 
   public void migrateTestDB() {
-    runTask(
-        () -> {
-          Flyway flyway = context.getBean(Flyway.class);
-          flyway.repair();
-          flyway.migrate();
-          System.out.println("Test database migrated successfully.");
-        });
+    runTask(() -> {
+      Flyway flyway = context.getBean(Flyway.class);
+      flyway.repair();
+      flyway.migrate();
+      System.out.println("Test database migrated successfully.");
+    });
   }
 }

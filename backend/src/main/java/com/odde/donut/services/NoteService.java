@@ -69,28 +69,24 @@ public class NoteService {
     if (anchor.getFolder() != null && anchor.getFolder().getId() != null) {
       Integer folderId = anchor.getFolder().getId();
       return sampleSeed
-          .map(
-              seed ->
-                  noteRepository.findStructuralPeersInFolderOrderBySeedLimited(
-                      folderId, excludeIds, Long.toString(seed), cap))
-          .orElseGet(
-              () ->
-                  noteRepository.findStructuralPeersInFolderOrderByIdAscLimited(
-                      folderId, excludeIds, cap));
+          .map(seed ->
+              noteRepository.findStructuralPeersInFolderOrderBySeedLimited(
+                  folderId, excludeIds, Long.toString(seed), cap))
+          .orElseGet(() ->
+              noteRepository.findStructuralPeersInFolderOrderByIdAscLimited(
+                  folderId, excludeIds, cap));
     }
     if (anchor.getNotebook() == null || anchor.getNotebook().getId() == null) {
       return List.of();
     }
     Integer notebookId = anchor.getNotebook().getId();
     return sampleSeed
-        .map(
-            seed ->
-                noteRepository.findStructuralPeersInNotebookRootOrderBySeedLimited(
-                    notebookId, excludeIds, Long.toString(seed), cap))
-        .orElseGet(
-            () ->
-                noteRepository.findStructuralPeersInNotebookRootOrderByIdAscLimited(
-                    notebookId, excludeIds, cap));
+        .map(seed ->
+            noteRepository.findStructuralPeersInNotebookRootOrderBySeedLimited(
+                notebookId, excludeIds, Long.toString(seed), cap))
+        .orElseGet(() ->
+            noteRepository.findStructuralPeersInNotebookRootOrderByIdAscLimited(
+                notebookId, excludeIds, cap));
   }
 
   private static List<Integer> structuralPeerExcludeIds(

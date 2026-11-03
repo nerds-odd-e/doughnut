@@ -78,11 +78,10 @@ final class BookLayoutReorganizer {
     BookLayoutReorganizationSuggestion suggestion =
         openAiApiHandler
             .requestAndGetStructuredResponseResult(params)
-            .orElseThrow(
-                () ->
-                    new OpenAIServiceErrorException(
-                        "AI did not return a book layout reorganization suggestion",
-                        HttpStatus.BAD_GATEWAY));
+            .orElseThrow(() ->
+                new OpenAIServiceErrorException(
+                    "AI did not return a book layout reorganization suggestion",
+                    HttpStatus.BAD_GATEWAY));
     validateSuggestedLayout(ordered, suggestion);
     return suggestion;
   }

@@ -140,10 +140,9 @@ class NotebookGitWebContentHistoryControllerTest
         inCommittedTransaction(
             transactionManager,
             () ->
-                assertDoesNotThrow(
-                    () ->
-                        textContentController.updateNoteTitle(
-                            noteRepository.findById(note.getId()).orElseThrow(), title)));
+                assertDoesNotThrow(() ->
+                    textContentController.updateNoteTitle(
+                        noteRepository.findById(note.getId()).orElseThrow(), title)));
 
     Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
     assertThat(response.getNote().getId(), is(note.getId()));

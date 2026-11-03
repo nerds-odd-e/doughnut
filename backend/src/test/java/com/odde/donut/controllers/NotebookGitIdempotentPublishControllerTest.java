@@ -193,14 +193,13 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
               binding.getAcceptedGitObjectId(),
               binding.getUpdatedAt(),
               notes.stream()
-                  .map(
-                      note ->
-                          new PublishedNoteState(
-                              note.getId(),
-                              note.getTitle(),
-                              note.getContent(),
-                              note.getCreatedAt(),
-                              note.getUpdatedAt()))
+                  .map(note ->
+                      new PublishedNoteState(
+                          note.getId(),
+                          note.getTitle(),
+                          note.getContent(),
+                          note.getCreatedAt(),
+                          note.getUpdatedAt()))
                   .toList(),
               noteRepository.findById(deleted.getId()).isPresent(),
               dependentCounts(deleted));

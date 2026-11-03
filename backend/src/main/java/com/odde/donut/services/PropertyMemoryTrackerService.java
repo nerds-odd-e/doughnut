@@ -64,11 +64,10 @@ public class PropertyMemoryTrackerService {
     PropertyFocus singleValue = new PropertyFocus(propertyKey, "");
     memoryTrackerRepository.findByNote_IdIn(List.of(note.getId())).stream()
         .filter(tracker -> singleValue.equals(tracker.propertyFocus()))
-        .forEach(
-            tracker -> {
-              tracker.setPropertyValue(propertyValue);
-              entityPersister.save(tracker);
-            });
+        .forEach(tracker -> {
+          tracker.setPropertyValue(propertyValue);
+          entityPersister.save(tracker);
+        });
   }
 
   /**
@@ -80,12 +79,11 @@ public class PropertyMemoryTrackerService {
     memoryTrackerRepository.findByNote_IdIn(List.of(source.getId())).stream()
         .filter(tracker -> propertyKey.equalsIgnoreCase(tracker.getPropertyKey()))
         .filter(tracker -> tracker.getPropertyValue().isEmpty())
-        .forEach(
-            tracker -> {
-              tracker.setNote(relationshipNote);
-              tracker.setPropertyKey("");
-              entityPersister.merge(tracker);
-            });
+        .forEach(tracker -> {
+          tracker.setNote(relationshipNote);
+          tracker.setPropertyKey("");
+          entityPersister.merge(tracker);
+        });
   }
 
   /**
@@ -102,21 +100,19 @@ public class PropertyMemoryTrackerService {
         memoryTrackerRepository.findByNote_IdIn(List.of(sourceNote.getId()));
     memoryTrackerRepository
         .findByNote_IdIn(List.of(relationNote.getId()))
-        .forEach(
-            tracker -> {
-              if (tracker.isUnderstanding()
-                  && tracker.isNoteLevelTracker()
-                  && sourceTrackers.stream()
-                      .noneMatch(
-                          existing -> sameLearnersUnderstandingOf(existing, tracker, focus))) {
-                tracker.setNote(sourceNote);
-                tracker.setPropertyKey(focus.key());
-                tracker.setPropertyValue(focus.value());
-                entityPersister.merge(tracker);
-              } else {
-                entityPersister.detach(tracker);
-              }
-            });
+        .forEach(tracker -> {
+          if (tracker.isUnderstanding()
+              && tracker.isNoteLevelTracker()
+              && sourceTrackers.stream()
+                  .noneMatch(existing -> sameLearnersUnderstandingOf(existing, tracker, focus))) {
+            tracker.setNote(sourceNote);
+            tracker.setPropertyKey(focus.key());
+            tracker.setPropertyValue(focus.value());
+            entityPersister.merge(tracker);
+          } else {
+            entityPersister.detach(tracker);
+          }
+        });
   }
 
   private static boolean sameLearnersUnderstandingOf(

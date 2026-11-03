@@ -110,10 +110,9 @@ public class NotebookCatalogService {
     dto.catalogItems = buildCatalogItems(allNotebooks, groups, subscriptions, wrap, withBook);
     dto.subscriptions =
         subscriptions.stream()
-            .map(
-                s ->
-                    SubscriptionForNotebooksListing.from(
-                        s, s.getNotebook(), withBook.contains(s.getNotebook().getId())))
+            .map(s ->
+                SubscriptionForNotebooksListing.from(
+                    s, s.getNotebook(), withBook.contains(s.getNotebook().getId())))
             .toList();
     return dto;
   }
@@ -167,20 +166,18 @@ public class NotebookCatalogService {
     for (NotebookGroup group : groups) {
       List<Notebook> members =
           allNotebooks.stream()
-              .filter(
-                  nb ->
-                      nb.getNotebookGroup() != null
-                          && Objects.equals(nb.getNotebookGroup().getId(), group.getId()))
+              .filter(nb ->
+                  nb.getNotebookGroup() != null
+                      && Objects.equals(nb.getNotebookGroup().getId(), group.getId()))
               .sorted(
                   Comparator.comparing(NotebookCatalogService::catalogSortTimestamp)
                       .thenComparing(Notebook::getId))
               .toList();
       List<Notebook> subscribedMembers =
           subscriptions.stream()
-              .filter(
-                  s ->
-                      s.getNotebookGroup() != null
-                          && Objects.equals(s.getNotebookGroup().getId(), group.getId()))
+              .filter(s ->
+                  s.getNotebookGroup() != null
+                      && Objects.equals(s.getNotebookGroup().getId(), group.getId()))
               .sorted(
                   Comparator.comparing((Subscription s) -> catalogSortTimestamp(s.getNotebook()))
                       .thenComparing(s -> s.getNotebook().getId()))

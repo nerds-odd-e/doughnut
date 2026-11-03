@@ -83,9 +83,8 @@ public class ClozedString {
 
   private String cloze(String content) {
     return new HtmlOrMarkdown(content)
-        .replaceTextWithContext(
-            (text, followsNonWhitespace) ->
-                clozeReplacement.maskPronunciationsAndTitles(
-                    text, noteTitles, extraAliases, followsNonWhitespace));
+        .replaceTextWithContext((text, followsNonWhitespace) ->
+            clozeReplacement.maskPronunciationsAndTitles(
+                text, noteTitles, extraAliases, followsNonWhitespace));
   }
 }

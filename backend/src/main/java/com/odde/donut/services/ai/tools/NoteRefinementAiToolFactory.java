@@ -81,12 +81,12 @@ final class NoteRefinementAiToolFactory {
       questionBlock.append("Tested focus: ").append(questionContext.getTestedFocus()).append('\n');
     }
     return """
-        %s
-        When building the refinement layout:
-        - Separate content points that led to or are tested by this question as distinct refinement layout items at the appropriate hierarchy level (top-level or child).
-        - Set ledToQuestion=true on those items that capture the knowledge the question was testing or that led to this question.
-        - Set ledToQuestion=false on all other items.
-        """
+    %s
+    When building the refinement layout:
+    - Separate content points that led to or are tested by this question as distinct refinement layout items at the appropriate hierarchy level (top-level or child).
+    - Set ledToQuestion=true on those items that capture the knowledge the question was testing or that led to this question.
+    - Set ledToQuestion=false on all other items.
+    """
         .formatted(questionBlock.toString().stripTrailing());
   }
 

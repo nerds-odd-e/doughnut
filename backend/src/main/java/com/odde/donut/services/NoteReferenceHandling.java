@@ -79,11 +79,10 @@ final class NoteReferenceHandling {
                 canonicalPropertyKey,
                 targetAuthoredFromSourceNotebook(
                     relationship.targetScalar(), relationNote, sourceNote, viewer))
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "The source note's \"" + canonicalPropertyKey + "\" cannot take a value."));
+            .orElseThrow(() ->
+                new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The source note's \"" + canonicalPropertyKey + "\" cannot take a value."));
     persistReplacedAuthoredContent(sourceNote, added.content(), updatedAt, viewer);
     if (added.formerSingleValue() != null) {
       propertyMemoryTrackerService.followPropertyValue(
@@ -105,10 +104,9 @@ final class NoteReferenceHandling {
 
   private RelationshipFrontmatter relationshipOf(Note relationNote) {
     return parseRelationshipFrontmatter(relationNote.getContent())
-        .orElseThrow(
-            () ->
-                new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
+        .orElseThrow(() ->
+            new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
   }
 
   private Note editableRelationshipSource(
@@ -116,10 +114,9 @@ final class NoteReferenceHandling {
     Note sourceNote =
         wikiLinkResolver
             .resolveFirstWikiLink(relationship.sourceScalar(), relationNote, viewer)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note."));
+            .orElseThrow(() ->
+                new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note."));
     try {
       authorizationService.assertAuthorization(viewer, sourceNote);
     } catch (UnexpectedNoAccessRightException e) {
@@ -150,9 +147,8 @@ final class NoteReferenceHandling {
       Note referrer = inboundReference.referrer();
       NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
               referrer.getContent(), Set.copyOf(inboundReference.authoredLinkTexts()))
-          .ifPresent(
-              updatedContent ->
-                  persistReplacedAuthoredContent(referrer, updatedContent, updatedAt, viewer));
+          .ifPresent(updatedContent ->
+              persistReplacedAuthoredContent(referrer, updatedContent, updatedAt, viewer));
     }
   }
 
@@ -171,22 +167,21 @@ final class NoteReferenceHandling {
 
   private Optional<RelationshipFrontmatter> parseRelationshipFrontmatter(String content) {
     return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
-        .flatMap(
-            lf -> {
-              Frontmatter fm = lf.frontmatter();
-              if (!RELATIONSHIP_NOTE_TYPE.equalsIgnoreCase(
-                  fm.getString("type").map(String::trim).orElse(""))) {
-                return Optional.empty();
-              }
-              Optional<String> source =
-                  fm.getString("source").map(String::trim).filter(s -> !s.isEmpty());
-              Optional<String> target =
-                  fm.getString("target").map(String::trim).filter(s -> !s.isEmpty());
-              if (source.isEmpty() || target.isEmpty()) {
-                return Optional.empty();
-              }
-              String relation = fm.getString("relation").map(String::trim).orElse(null);
-              return Optional.of(new RelationshipFrontmatter(relation, source.get(), target.get()));
-            });
+        .flatMap(lf -> {
+          Frontmatter fm = lf.frontmatter();
+          if (!RELATIONSHIP_NOTE_TYPE.equalsIgnoreCase(
+              fm.getString("type").map(String::trim).orElse(""))) {
+            return Optional.empty();
+          }
+          Optional<String> source =
+              fm.getString("source").map(String::trim).filter(s -> !s.isEmpty());
+          Optional<String> target =
+              fm.getString("target").map(String::trim).filter(s -> !s.isEmpty());
+          if (source.isEmpty() || target.isEmpty()) {
+            return Optional.empty();
+          }
+          String relation = fm.getString("relation").map(String::trim).orElse(null);
+          return Optional.of(new RelationshipFrontmatter(relation, source.get(), target.get()));
+        });
   }
 }

@@ -34,7 +34,8 @@ public class ReadNoteTool {
 
       Cite the note by noteId and acceptedRevision. A later edit anywhere in the notebook yields a different acceptedRevision.
 
-      You MUST obtain a valid note ID first using 'list_note_candidates' unless the user explicitly provides a numeric note ID.""";
+      You MUST obtain a valid note ID first using 'list_note_candidates' unless the user explicitly provides a numeric note ID.\
+      """;
 
   private final AttributedNoteContentService attributedNoteContentService;
   private final JsonMapper objectMapper;

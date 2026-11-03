@@ -116,10 +116,9 @@ class UserController {
     return userService
         .findTokenByToken(token)
         .or(() -> userTokenFromTestAccessToken(token))
-        .orElseThrow(
-            () ->
-                new ResponseStatusException(
-                    org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
+        .orElseThrow(() ->
+            new ResponseStatusException(
+                org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
   }
 
   private String bearerTokenFromRequestOrThrow(HttpServletRequest request) {

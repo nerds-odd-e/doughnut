@@ -27,13 +27,15 @@ final class QuestionGenerationBatchOutputCollectionTestSupport {
 
   static String successLine(String customId) {
     return """
-        {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":{"id":"resp-1"}},"error":null}"""
+    {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":{"id":"resp-1"}},"error":null}\
+    """
         .formatted(customId);
   }
 
   static String errorLine(String customId, String message) {
     return """
-        {"id":"batch_req_2","custom_id":"%s","response":null,"error":{"code":"invalid_request_error","message":"%s"}}"""
+    {"id":"batch_req_2","custom_id":"%s","response":null,"error":{"code":"invalid_request_error","message":"%s"}}\
+    """
         .formatted(customId, message);
   }
 }

@@ -82,13 +82,12 @@ class NotebookGitConcurrentProjectionDriftControllerTest extends NotebookGitCont
                     TransactionTemplate transaction = new TransactionTemplate(transactionManager);
                     transaction.setPropagationBehavior(
                         TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-                    transaction.executeWithoutResult(
-                        ignored -> {
-                          applyWebChange(webChange, notebook.getId(), note.getId());
-                          entityManager.flush();
-                          writeFlushed.countDown();
-                          ConcurrentControllerTestSupport.await(releaseWriter);
-                        });
+                    transaction.executeWithoutResult(ignored -> {
+                      applyWebChange(webChange, notebook.getId(), note.getId());
+                      entityManager.flush();
+                      writeFlushed.countDown();
+                      ConcurrentControllerTestSupport.await(releaseWriter);
+                    });
                     return null;
                   }));
 

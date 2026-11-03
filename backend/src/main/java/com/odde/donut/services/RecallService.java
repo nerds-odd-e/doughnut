@@ -73,15 +73,14 @@ public class RecallService {
             .toList();
     List<DueCommissionedMemoryTrackerLite> dueCommissioned =
         getCommissionedMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, dueInDays)
-            .map(
-                mt -> {
-                  DueCommissionedMemoryTrackerLite lite = new DueCommissionedMemoryTrackerLite();
-                  lite.setMemoryTrackerId(mt.getId());
-                  Notebook notebook = mt.getNote().getNotebook();
-                  lite.setNotebookId(notebook.getId());
-                  lite.setNotebookName(notebook.getName());
-                  return lite;
-                })
+            .map(mt -> {
+              DueCommissionedMemoryTrackerLite lite = new DueCommissionedMemoryTrackerLite();
+              lite.setMemoryTrackerId(mt.getId());
+              Notebook notebook = mt.getNote().getNotebook();
+              lite.setNotebookId(notebook.getId());
+              lite.setNotebookName(notebook.getName());
+              return lite;
+            })
             .toList();
     DueMemoryTrackers dueMemoryTrackers = new DueMemoryTrackers();
     dueMemoryTrackers.setDueInDays(dueInDays);

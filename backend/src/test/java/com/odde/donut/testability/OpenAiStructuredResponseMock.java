@@ -34,27 +34,25 @@ public class OpenAiStructuredResponseMock {
     this.responseService = Mockito.mock(ResponseService.class);
     Mockito.when(officialClient.responses()).thenReturn(responseService);
     Mockito.when(responseService.create(ArgumentMatchers.any(StructuredResponseCreateParams.class)))
-        .thenAnswer(
-            invocation -> {
-              if (beforeCreate != null) {
-                beforeCreate.run();
-              }
-              StructuredResponseCreateParams<?> params = invocation.getArgument(0);
-              Object result = pollStructuredResult(params.responseType());
-              if (result == null) {
-                return null;
-              }
-              if (result instanceof Response response) {
-                return new StructuredResponse(params.responseType(), response);
-              }
-              String content =
-                  result instanceof MalformedStructuredContent malformed
-                      ? malformed.content()
-                      : objectMapperConfig.objectMapper().valueToTree(result).toString();
-              return new StructuredResponse(
-                  params.responseType(),
-                  buildStructuredResponse(content, ResponseStatus.COMPLETED));
-            });
+        .thenAnswer(invocation -> {
+          if (beforeCreate != null) {
+            beforeCreate.run();
+          }
+          StructuredResponseCreateParams<?> params = invocation.getArgument(0);
+          Object result = pollStructuredResult(params.responseType());
+          if (result == null) {
+            return null;
+          }
+          if (result instanceof Response response) {
+            return new StructuredResponse(params.responseType(), response);
+          }
+          String content =
+              result instanceof MalformedStructuredContent malformed
+                  ? malformed.content()
+                  : objectMapperConfig.objectMapper().valueToTree(result).toString();
+          return new StructuredResponse(
+              params.responseType(), buildStructuredResponse(content, ResponseStatus.COMPLETED));
+        });
   }
 
   public ResponseService responseService() {

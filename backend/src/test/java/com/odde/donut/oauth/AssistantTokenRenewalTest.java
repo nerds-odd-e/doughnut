@@ -157,9 +157,8 @@ class AssistantTokenRenewalTest extends AssistantAuthorizationTestSupport {
                 .attribute(
                     OAuth2AuthorizationRequest.class.getName(),
                     OAuth2AuthorizationRequest.from(request)
-                        .additionalParameters(
-                            parameters ->
-                                parameters.put("resource", "https://foreign.example/api/mcp"))
+                        .additionalParameters(parameters ->
+                            parameters.put("resource", "https://foreign.example/api/mcp"))
                         .build())
                 .build());
       }

@@ -116,13 +116,12 @@ class NotebookGitProposalInitialPublicationRejectionControllerTest
 
     List<NotebookGitProposalFile> correctedFiles =
         invalidFiles.stream()
-            .map(
-                file ->
-                    new NotebookGitProposalFile(
-                        file.path(),
-                        file.path().equals("Topic/Nested/A.md")
-                            ? invalidContent.replace("note_level: 7", "note_level: 1")
-                            : SECOND_NOTE))
+            .map(file ->
+                new NotebookGitProposalFile(
+                    file.path(),
+                    file.path().equals("Topic/Nested/A.md")
+                        ? invalidContent.replace("note_level: 7", "note_level: 1")
+                        : SECOND_NOTE))
             .toList();
     byte[] correctedProposal = proposalBundleBytes(initialBinding, correctedFiles);
     GitBundleTestReader.SingleParentGitCommit proposedCommit;

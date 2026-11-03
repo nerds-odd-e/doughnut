@@ -79,34 +79,28 @@ public class FolderSiblingNameValidation {
     Integer parentFolderId = parentOrNull == null ? null : parentOrNull.getId();
     String prefix = NotebookGitPortablePath.folderPath(parentOrNull);
     return folderHolding(notebook, parentOrNull, entryName, excludedFolderIds)
-        .map(
-            f ->
-                new TakenEntry(
-                    TakenEntry.Kind.FOLDER, NotebookGitPortablePath.ofFolder(prefix, f.getName())))
-        .or(
-            () ->
-                noteRepository
-                    .findNotesWhoseFileIsNamedIgnoringCase(
-                        notebook.getId(), parentFolderId, entryName)
-                    .stream()
-                    .filter(note -> !note.getId().equals(excludedNoteId))
-                    .findFirst()
-                    .map(
-                        note ->
-                            new TakenEntry(
-                                TakenEntry.Kind.NOTE,
-                                NotebookGitPortablePath.ofNote(prefix, note.getTitle()))))
-        .or(
-            () ->
-                notebookAttachmentRepository
-                    .findFilenamesNamedIgnoringCase(notebook.getId(), parentFolderId, entryName)
-                    .stream()
-                    .findFirst()
-                    .map(
-                        filename ->
-                            new TakenEntry(
-                                TakenEntry.Kind.FILE,
-                                NotebookGitPortablePath.ofAttachment(prefix, filename))));
+        .map(f ->
+            new TakenEntry(
+                TakenEntry.Kind.FOLDER, NotebookGitPortablePath.ofFolder(prefix, f.getName())))
+        .or(() ->
+            noteRepository
+                .findNotesWhoseFileIsNamedIgnoringCase(notebook.getId(), parentFolderId, entryName)
+                .stream()
+                .filter(note -> !note.getId().equals(excludedNoteId))
+                .findFirst()
+                .map(note ->
+                    new TakenEntry(
+                        TakenEntry.Kind.NOTE,
+                        NotebookGitPortablePath.ofNote(prefix, note.getTitle()))))
+        .or(() ->
+            notebookAttachmentRepository
+                .findFilenamesNamedIgnoringCase(notebook.getId(), parentFolderId, entryName)
+                .stream()
+                .findFirst()
+                .map(filename ->
+                    new TakenEntry(
+                        TakenEntry.Kind.FILE,
+                        NotebookGitPortablePath.ofAttachment(prefix, filename))));
   }
 
   /** The folder in {@code parentOrNull} named {@code entryName}, ignoring letter case. */
@@ -128,13 +122,12 @@ public class FolderSiblingNameValidation {
   public void requireFolderNameFree(
       Notebook notebook, Folder parentOrNull, DisplayName name, Set<Integer> excludedFolderIds) {
     entryHolding(notebook, parentOrNull, name.value(), excludedFolderIds)
-        .ifPresent(
-            taken -> {
-              if (taken.kind() != TakenEntry.Kind.FOLDER) {
-                refuseTaken(taken);
-              }
-              throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
-            });
+        .ifPresent(taken -> {
+          if (taken.kind() != TakenEntry.Kind.FOLDER) {
+            refuseTaken(taken);
+          }
+          throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
+        });
   }
 
   /**

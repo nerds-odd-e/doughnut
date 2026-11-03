@@ -179,11 +179,10 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(persistedNote.getFolder().getId()).isEqualTo(folder.getId());
       assertThat(response.getWikiLinks())
-          .anyMatch(
-              wikiLink ->
-                  wikiLink.getTarget().equals("sample")
-                      && wikiLink.getDisplayText().equals("the original note")
-                      && wikiLink.getDestinationNoteId().equals(sourceNote.getId()));
+          .anyMatch(wikiLink ->
+              wikiLink.getTarget().equals("sample")
+                  && wikiLink.getDisplayText().equals("the original note")
+                  && wikiLink.getDestinationNoteId().equals(sourceNote.getId()));
     }
   }
 }

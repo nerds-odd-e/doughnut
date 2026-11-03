@@ -72,9 +72,8 @@ public class MovedNoteImage {
         .findNotesInContainer(note.getNotebook().getId(), folderId(note.getFolder()))
         .stream()
         .filter(other -> !other.getId().equals(note.getId()))
-        .anyMatch(
-            other ->
-                NoteContentMarkdown.noteImage(other.getContent()).equals(Optional.of(filename)));
+        .anyMatch(other ->
+            NoteContentMarkdown.noteImage(other.getContent()).equals(Optional.of(filename)));
   }
 
   private static NotebookAttachment copyOf(NotebookAttachment file) {

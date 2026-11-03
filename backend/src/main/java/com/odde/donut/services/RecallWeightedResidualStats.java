@@ -45,10 +45,8 @@ final class RecallWeightedResidualStats {
     double weightedMedianValue = weightedMedian(residuals);
     List<WeightedResidual> deviations =
         residuals.stream()
-            .map(
-                wr ->
-                    new WeightedResidual(
-                        Math.abs(wr.residual() - weightedMedianValue), wr.weight()))
+            .map(wr ->
+                new WeightedResidual(Math.abs(wr.residual() - weightedMedianValue), wr.weight()))
             .toList();
     return weightedMedian(deviations);
   }

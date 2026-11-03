@@ -52,20 +52,18 @@ public class QuestionGenerationBatchAdminStatusService {
     dto.setSchedulerActive(isQuestionGenerationBatchMaintenanceScheduled());
     maintenanceRunService
         .findLatestRun(QuestionGenerationBatchMaintenanceTriggerSource.SCHEDULED)
-        .ifPresent(
-            run -> {
-              dto.setLastScheduledMaintenanceStartedAt(run.getStartedAt());
-              dto.setLastScheduledMaintenanceFinishedAt(run.getFinishedAt());
-              dto.setLastScheduledMaintenanceError(run.getError());
-            });
+        .ifPresent(run -> {
+          dto.setLastScheduledMaintenanceStartedAt(run.getStartedAt());
+          dto.setLastScheduledMaintenanceFinishedAt(run.getFinishedAt());
+          dto.setLastScheduledMaintenanceError(run.getError());
+        });
     maintenanceRunService
         .findLatestRun(QuestionGenerationBatchMaintenanceTriggerSource.MANUAL_RESUME)
-        .ifPresent(
-            run -> {
-              dto.setLastManualMaintenanceStartedAt(run.getStartedAt());
-              dto.setLastManualMaintenanceFinishedAt(run.getFinishedAt());
-              dto.setLastManualMaintenanceError(run.getError());
-            });
+        .ifPresent(run -> {
+          dto.setLastManualMaintenanceStartedAt(run.getStartedAt());
+          dto.setLastManualMaintenanceFinishedAt(run.getFinishedAt());
+          dto.setLastManualMaintenanceError(run.getError());
+        });
     return dto;
   }
 

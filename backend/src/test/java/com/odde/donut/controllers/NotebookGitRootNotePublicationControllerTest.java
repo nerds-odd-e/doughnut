@@ -152,14 +152,13 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitController
               binding.getUpdatedAt(),
               acceptedHistory,
               notes.stream()
-                  .map(
-                      note ->
-                          new PublishedNoteState(
-                              note.getId(),
-                              note.getTitle(),
-                              note.getContent(),
-                              note.getCreatedAt(),
-                              note.getUpdatedAt()))
+                  .map(note ->
+                      new PublishedNoteState(
+                          note.getId(),
+                          note.getTitle(),
+                          note.getContent(),
+                          note.getCreatedAt(),
+                          note.getUpdatedAt()))
                   .toList());
         });
   }

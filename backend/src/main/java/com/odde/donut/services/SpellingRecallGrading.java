@@ -117,12 +117,11 @@ final class SpellingRecallGrading {
         if (matches.size() == 1) {
           memoryTrackerService
               .findConfusionAdjustmentTracker(user, matches.getFirst())
-              .ifPresent(
-                  target -> {
-                    memoryTrackerService.persistRecallLog(
-                        target, currentUTCTimestamp, null, gradedAnswer, null);
-                    memoryTrackerService.applyConfusionAdjustment(target, currentUTCTimestamp);
-                  });
+              .ifPresent(target -> {
+                memoryTrackerService.persistRecallLog(
+                    target, currentUTCTimestamp, null, gradedAnswer, null);
+                memoryTrackerService.applyConfusionAdjustment(target, currentUTCTimestamp);
+              });
         }
       }
     }

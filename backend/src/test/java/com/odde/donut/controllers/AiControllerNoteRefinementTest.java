@@ -170,10 +170,9 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
 
         assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
         assertThat(logAppender.list)
-            .anyMatch(
-                event ->
-                    event.getLevel() == Level.WARN
-                        && event.getFormattedMessage().contains("duplicate item id"));
+            .anyMatch(event ->
+                event.getLevel() == Level.WARN
+                    && event.getFormattedMessage().contains("duplicate item id"));
       } finally {
         logAppender.stop();
         validatorLogger.detachAppender(logAppender);

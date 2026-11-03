@@ -14,15 +14,14 @@ public final class BookMutationResponseMapper {
       Book book, Set<Integer> blockIdsIncludingUpdatedLocators) {
     List<BookBlockMutationResponse> blocks =
         book.getBlocks().stream()
-            .map(
-                b ->
-                    new BookBlockMutationResponse(
-                        b.getId(),
-                        b.getDepth(),
-                        b.getStructuralTitle(),
-                        blockIdsIncludingUpdatedLocators.contains(b.getId())
-                            ? b.getContentLocators()
-                            : null))
+            .map(b ->
+                new BookBlockMutationResponse(
+                    b.getId(),
+                    b.getDepth(),
+                    b.getStructuralTitle(),
+                    blockIdsIncludingUpdatedLocators.contains(b.getId())
+                        ? b.getContentLocators()
+                        : null))
             .toList();
     Integer notebookId = book.getNotebookId();
     return new BookMutationResponse(

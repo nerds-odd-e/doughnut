@@ -53,16 +53,15 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
         transactionManager,
         () ->
             List.of("A", "B").stream()
-                .map(
-                    value ->
-                        makeMe
-                            .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
-                            .propertyKey("topic")
-                            .propertyValue(value)
-                            .afterNthStrictRecall(2)
-                            .recallCount(2)
-                            .please()
-                            .getId())
+                .map(value ->
+                    makeMe
+                        .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
+                        .propertyKey("topic")
+                        .propertyValue(value)
+                        .afterNthStrictRecall(2)
+                        .recallCount(2)
+                        .please()
+                        .getId())
                 .toList());
   }
 

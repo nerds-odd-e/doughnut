@@ -218,9 +218,9 @@ public class Note extends EntityIdentifiedByIdOnly {
     String prettyString =
         new ObjectMapperConfig().objectMapper().valueToTree(shape).toPrettyString();
     return """
-        The %s (in JSON format):
-        %s
-        """
+    The %s (in JSON format):
+    %s
+    """
         .formatted(NOTE_OF_CURRENT_FOCUS, prettyString);
   }
 

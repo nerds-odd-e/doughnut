@@ -177,19 +177,17 @@ public class NoteConstructionService {
             .getString(propertyKey)
             .map(String::trim)
             .filter(WikiLinkMarkdown::isWellFormedWholeLinkToken)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Only a property whose value is a link to a note can be reified."));
+            .orElseThrow(() ->
+                new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Only a property whose value is a link to a note can be reified."));
     Note target =
         wikiLinkResolver
             .resolveFirstWikiLink(targetLink, source, viewer)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "The link " + targetLink + " does not name an existing note."));
+            .orElseThrow(() ->
+                new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The link " + targetLink + " does not name an existing note."));
     String title =
         RelationshipNoteComposition.title(source.getTitle(), propertyKey, target.getTitle());
     noteTitleNameRule.requireTitleFree(source.getNotebook(), source.getFolder(), title);

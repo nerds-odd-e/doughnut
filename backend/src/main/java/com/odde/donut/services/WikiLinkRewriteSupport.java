@@ -227,20 +227,17 @@ final class WikiLinkRewriteSupport {
         sourceNote.getNotebook() == null ? null : sourceNote.getNotebook().getName();
     return PortablePath.parse(portablePath)
         .resolve(sourceNotebookName)
-        .filter(
-            resolved ->
-                destinationNote.getNotebook() != null
-                    && destinationNote
-                        .getNotebook()
-                        .getName()
-                        .equalsIgnoreCase(resolved.notebookName()))
-        .flatMap(
-            resolved ->
-                PathShapedTarget.tryParse(resolved.noteTitle())
-                    .filter(
-                        path ->
-                            path.matchesTitleAndFolderTrail(
-                                destinationNote.getTitle(), destinationNote.folderNamesFromRoot())))
+        .filter(resolved ->
+            destinationNote.getNotebook() != null
+                && destinationNote
+                    .getNotebook()
+                    .getName()
+                    .equalsIgnoreCase(resolved.notebookName()))
+        .flatMap(resolved ->
+            PathShapedTarget.tryParse(resolved.noteTitle())
+                .filter(path ->
+                    path.matchesTitleAndFolderTrail(
+                        destinationNote.getTitle(), destinationNote.folderNamesFromRoot())))
         .isPresent();
   }
 }

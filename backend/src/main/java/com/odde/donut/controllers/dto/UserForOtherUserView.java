@@ -11,12 +11,11 @@ public class UserForOtherUserView {
 
   public static List<UserForOtherUserView> fromList(List<User> users) {
     return users.stream()
-        .map(
-            u -> {
-              UserForOtherUserView ufv = new UserForOtherUserView();
-              ufv.setName(u.getName());
-              return ufv;
-            })
+        .map(u -> {
+          UserForOtherUserView ufv = new UserForOtherUserView();
+          ufv.setName(u.getName());
+          return ufv;
+        })
         .collect(Collectors.toUnmodifiableList());
   }
 }

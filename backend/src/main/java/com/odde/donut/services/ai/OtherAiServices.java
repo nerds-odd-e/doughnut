@@ -26,12 +26,11 @@ public final class OtherAiServices {
 
     openAiApiHandler
         .getModels()
-        .forEach(
-            (e) -> {
-              if (e.id().startsWith("ft:") || e.id().startsWith("gpt")) {
-                modelVersionOptions.add(e.id());
-              }
-            });
+        .forEach(e -> {
+          if (e.id().startsWith("ft:") || e.id().startsWith("gpt")) {
+            modelVersionOptions.add(e.id());
+          }
+        });
 
     return modelVersionOptions;
   }

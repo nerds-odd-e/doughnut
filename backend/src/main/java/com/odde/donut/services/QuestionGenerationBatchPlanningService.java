@@ -51,10 +51,9 @@ public class QuestionGenerationBatchPlanningService {
     Timestamp windowStart = new Timestamp(currentTime.getTime() - RECENT_RECALL_WINDOW_MILLIS);
     return findUsersWithRecentRecallActivity(windowStart, currentTime).stream()
         .filter(user -> isUserEligibleForNewBatchSubmission(user))
-        .filter(
-            user ->
-                isUserOverdueForBatch(user, currentTime, windowStart)
-                    || isUserEligibleViaOpenAiFailureRetryPath(user, currentTime, windowStart))
+        .filter(user ->
+            isUserOverdueForBatch(user, currentTime, windowStart)
+                || isUserEligibleViaOpenAiFailureRetryPath(user, currentTime, windowStart))
         .toList();
   }
 
@@ -95,16 +94,15 @@ public class QuestionGenerationBatchPlanningService {
     final Integer batchId = savedBatch.getId();
     List<QuestionGenerationBatchRequest> requests =
         candidates.stream()
-            .map(
-                tracker -> {
-                  QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
-                  request.setBatch(savedBatch);
-                  request.setMemoryTracker(tracker);
-                  request.setContextSeed(ThreadLocalRandom.current().nextLong());
-                  request.setCustomId(
-                      QuestionGenerationBatchRequest.customIdFor(batchId, tracker.getId()));
-                  return request;
-                })
+            .map(tracker -> {
+              QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
+              request.setBatch(savedBatch);
+              request.setMemoryTracker(tracker);
+              request.setContextSeed(ThreadLocalRandom.current().nextLong());
+              request.setCustomId(
+                  QuestionGenerationBatchRequest.customIdFor(batchId, tracker.getId()));
+              return request;
+            })
             .toList();
     batchRequestRepository.saveAll(requests);
 
@@ -113,14 +111,11 @@ public class QuestionGenerationBatchPlanningService {
 
   private boolean isUserOverdueForBatch(User user, Timestamp currentTime, Timestamp windowStart) {
     return dueInstantForUser(user, currentTime, windowStart)
-        .flatMap(
-            dueInstant ->
-                latestAcceptedBatchForUser(user)
-                    .map(
-                        latestAccepted ->
-                            isSubmissionBeforeDueInstant(
-                                latestAccepted.getSubmittedAt(), dueInstant))
-                    .or(() -> Optional.of(true)))
+        .flatMap(dueInstant ->
+            latestAcceptedBatchForUser(user)
+                .map(latestAccepted ->
+                    isSubmissionBeforeDueInstant(latestAccepted.getSubmittedAt(), dueInstant))
+                .or(() -> Optional.of(true)))
         .orElse(false);
   }
 

@@ -36,8 +36,8 @@ interface AuthoredNoteReferenceRowRepository
   /**
    * Wiki candidate rows notebook-scoped to a target's current notebook identity: either explicitly
    * qualified with {@code notebookName}, or unqualified and authored from a source note within
-   * {@code notebookId} (the source-notebook fallback unqualified wiki links resolve against). Note-
-   * portion matching is narrowed to the target's current title/alias lookup keys, plus
+   * {@code notebookId} (the source-notebook fallback unqualified wiki links resolve against).
+   * Note-portion matching is narrowed to the target's current title/alias lookup keys, plus
    * Portable-path spellings ending in its current title. Candidate rows are always re-verified by
    * the domain resolver, never treated as a resolution verdict.
    */

@@ -145,10 +145,9 @@ class NotebookGitProposalAcceptance {
         NotebookGitAcceptedTree.readEntries(proposal.repository(), proposal.mainHead());
     List<PortableTreeFolderRow> unrepresented =
         folders.stream()
-            .filter(
-                folder ->
-                    !NotebookGitAcceptedTree.representedInTree(
-                        prefixes.get(folder.id()), proposedEntries))
+            .filter(folder ->
+                !NotebookGitAcceptedTree.representedInTree(
+                    prefixes.get(folder.id()), proposedEntries))
             .sorted(
                 Comparator.comparingInt(
                         (PortableTreeFolderRow folder) -> prefixes.get(folder.id()).length())

@@ -52,11 +52,10 @@ abstract class AssistantAuthorizationTestSupport extends SpringTestBase {
   void deleteSessions() {
     var transaction = new TransactionTemplate(transactions);
     transaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-    transaction.executeWithoutResult(
-        ignored ->
-            jdbc.update(
-                "DELETE FROM SPRING_SESSION WHERE PRINCIPAL_NAME IN"
-                    + " ('old_learner', 'another_old_learner')"));
+    transaction.executeWithoutResult(ignored ->
+        jdbc.update(
+            "DELETE FROM SPRING_SESSION WHERE PRINCIPAL_NAME IN"
+                + " ('old_learner', 'another_old_learner')"));
   }
 
   protected Cookie signInAs(String username) throws Exception {

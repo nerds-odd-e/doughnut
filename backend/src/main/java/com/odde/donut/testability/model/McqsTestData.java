@@ -40,19 +40,18 @@ public class McqsTestData {
 
   public List<Mcq> buildMcqs(NoteRepository noteRepository) {
     return mcqTestData.stream()
-        .map(
-            row -> {
-              Note note = noteRepository.findFirstInNotebookByName(notebookName, row.noteTitle);
-              if (note == null) {
-                throw new IllegalArgumentException(
-                    "No note with title `"
-                        + row.noteTitle
-                        + "` in notebook named `"
-                        + notebookName
-                        + "`");
-              }
-              return row.buildMcq(note);
-            })
+        .map(row -> {
+          Note note = noteRepository.findFirstInNotebookByName(notebookName, row.noteTitle);
+          if (note == null) {
+            throw new IllegalArgumentException(
+                "No note with title `"
+                    + row.noteTitle
+                    + "` in notebook named `"
+                    + notebookName
+                    + "`");
+          }
+          return row.buildMcq(note);
+        })
         .collect(Collectors.toList());
   }
 }

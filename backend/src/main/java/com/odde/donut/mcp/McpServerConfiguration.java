@@ -102,11 +102,10 @@ public class McpServerConfiguration {
         return delegate
             .handleRequest(transportContext, request)
             .map(McpServerConfiguration::withToolSecuritySchemes)
-            .onErrorResume(
-                failure ->
-                    Mono.just(
-                        McpSchema.JSONRPCResponse.error(
-                            request.id(), mcpFailureReporter.toJsonRpcError(failure))));
+            .onErrorResume(failure ->
+                Mono.just(
+                    McpSchema.JSONRPCResponse.error(
+                        request.id(), mcpFailureReporter.toJsonRpcError(failure))));
       }
 
       @Override
@@ -114,11 +113,10 @@ public class McpServerConfiguration {
           McpTransportContext transportContext, McpSchema.JSONRPCNotification notification) {
         return delegate
             .handleNotification(transportContext, notification)
-            .onErrorResume(
-                failure -> {
-                  mcpFailureReporter.reportUnexpected(failure);
-                  return Mono.error(failure);
-                });
+            .onErrorResume(failure -> {
+              mcpFailureReporter.reportUnexpected(failure);
+              return Mono.error(failure);
+            });
       }
     };
   }
@@ -133,12 +131,11 @@ public class McpServerConfiguration {
     result.put(
         "tools",
         tools.tools().stream()
-            .map(
-                tool -> {
-                  Map<String, Object> descriptor = mapper.convertValue(tool, new TypeRef<>() {});
-                  descriptor.put("securitySchemes", tool.meta().get("securitySchemes"));
-                  return descriptor;
-                })
+            .map(tool -> {
+              Map<String, Object> descriptor = mapper.convertValue(tool, new TypeRef<>() {});
+              descriptor.put("securitySchemes", tool.meta().get("securitySchemes"));
+              return descriptor;
+            })
             .toList());
     return McpSchema.JSONRPCResponse.result(response.id(), result);
   }

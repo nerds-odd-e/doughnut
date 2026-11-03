@@ -121,9 +121,9 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
 
   private static String toolsCallBody(String query) {
     return """
-        {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{\
-        "name":"%s","arguments":{"query":%s}}}
-        """
+    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{\
+    "name":"%s","arguments":{"query":%s}}}
+    """
         .formatted(ListNoteCandidatesTool.NAME, quoteJson(query));
   }
 

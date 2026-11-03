@@ -16,14 +16,13 @@ public record HtmlOrMarkdown(String htmlOrMarkdown) {
   public String replaceTextWithContext(BiFunction<String, Boolean, String> callback) {
     Pattern pattern = Pattern.compile("(?s)(?<=^|>)[^<]+?(?=<|$)");
     Matcher matcher = pattern.matcher(htmlOrMarkdown);
-    return matcher.replaceAll(
-        matchResult -> {
-          String text = matchResult.group();
-          int start = matchResult.start();
-          // Check if this segment follows a non-whitespace character (before the preceding tag)
-          boolean followsNonWhitespace = checkPrecedingNonWhitespace(start);
-          return Matcher.quoteReplacement(callback.apply(text, followsNonWhitespace));
-        });
+    return matcher.replaceAll(matchResult -> {
+      String text = matchResult.group();
+      int start = matchResult.start();
+      // Check if this segment follows a non-whitespace character (before the preceding tag)
+      boolean followsNonWhitespace = checkPrecedingNonWhitespace(start);
+      return Matcher.quoteReplacement(callback.apply(text, followsNonWhitespace));
+    });
   }
 
   private boolean checkPrecedingNonWhitespace(int segmentStart) {

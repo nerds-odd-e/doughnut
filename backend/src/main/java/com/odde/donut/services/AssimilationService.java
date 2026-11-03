@@ -82,10 +82,8 @@ public class AssimilationService {
   private List<Subscription> subscriptionsWithinBudget() {
     List<Integer> todaysAssimilatedNoteIds = assimilatedNoteIdsForToday();
     return getSubscriptionStream()
-        .filter(
-            sub ->
-                subscriptionService.remainingDailyAssimilationTarget(sub, todaysAssimilatedNoteIds)
-                    > 0)
+        .filter(sub ->
+            subscriptionService.remainingDailyAssimilationTarget(sub, todaysAssimilatedNoteIds) > 0)
         .toList();
   }
 
@@ -127,10 +125,9 @@ public class AssimilationService {
   private List<MemoryTracker> getNotesAssimilatedToday() {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userService.getRecentMemoryTrackers(user, oneDayAgo).stream()
-        .filter(
-            p ->
-                TimestampOperations.getDayId(p.getAssimilatedAt(), timeZone)
-                    == TimestampOperations.getDayId(currentUTCTimestamp, timeZone))
+        .filter(p ->
+            TimestampOperations.getDayId(p.getAssimilatedAt(), timeZone)
+                == TimestampOperations.getDayId(currentUTCTimestamp, timeZone))
         .filter(p -> !p.getRemovedFromTracking())
         .toList();
   }

@@ -50,10 +50,9 @@ final class BookReadingProgress {
     return bookBlockReadingRecordRepository
         .findAllByUser_IdAndBookBlock_Book_Id(user.getId(), book.getId())
         .stream()
-        .map(
-            row ->
-                new BookBlockReadingRecordListItem(
-                    row.getBookBlock().getId(), row.getStatus(), row.getCompletedAt()))
+        .map(row ->
+            new BookBlockReadingRecordListItem(
+                row.getBookBlock().getId(), row.getStatus(), row.getCompletedAt()))
         .toList();
   }
 
@@ -70,21 +69,19 @@ final class BookReadingProgress {
             : Optional.of(resolveBookBlockForBook(request.getSelectedBookBlockId(), book));
     bookUserLastReadPositionRepository
         .findByUser_IdAndBook_Id(user.getId(), book.getId())
-        .map(
-            existing -> {
-              applyReadingPositionFields(existing, request);
-              selectedBlockPatch.ifPresent(existing::setSelectedBookBlock);
-              return entityPersister.save(existing);
-            })
-        .orElseGet(
-            () -> {
-              var row = new BookUserLastReadPosition();
-              row.setUser(user);
-              row.setBook(book);
-              applyReadingPositionFields(row, request);
-              selectedBlockPatch.ifPresent(row::setSelectedBookBlock);
-              return entityPersister.save(row);
-            });
+        .map(existing -> {
+          applyReadingPositionFields(existing, request);
+          selectedBlockPatch.ifPresent(existing::setSelectedBookBlock);
+          return entityPersister.save(existing);
+        })
+        .orElseGet(() -> {
+          var row = new BookUserLastReadPosition();
+          row.setUser(user);
+          row.setBook(book);
+          applyReadingPositionFields(row, request);
+          selectedBlockPatch.ifPresent(row::setSelectedBookBlock);
+          return entityPersister.save(row);
+        });
     entityPersister.flush();
   }
 
@@ -98,21 +95,19 @@ final class BookReadingProgress {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     bookBlockReadingRecordRepository
         .findByUser_IdAndBookBlock_Id(user.getId(), bookBlock.getId())
-        .map(
-            existing -> {
-              existing.setStatus(status);
-              existing.setCompletedAt(now);
-              return entityPersister.save(existing);
-            })
-        .orElseGet(
-            () -> {
-              var row = new BookBlockReadingRecord();
-              row.setUser(user);
-              row.setBookBlock(bookBlock);
-              row.setStatus(status);
-              row.setCompletedAt(now);
-              return entityPersister.save(row);
-            });
+        .map(existing -> {
+          existing.setStatus(status);
+          existing.setCompletedAt(now);
+          return entityPersister.save(existing);
+        })
+        .orElseGet(() -> {
+          var row = new BookBlockReadingRecord();
+          row.setUser(user);
+          row.setBookBlock(bookBlock);
+          row.setStatus(status);
+          row.setCompletedAt(now);
+          return entityPersister.save(row);
+        });
     entityPersister.flush();
   }
 

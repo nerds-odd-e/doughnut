@@ -46,13 +46,12 @@ public class ConversationService {
     return conversationRepository
         .findFirstBySubject_RecallPromptAndConversationInitiatorAndAccessOwnershipOrderByIdAsc(
             lockedPrompt, initiator, initiator.getOwnership())
-        .orElseGet(
-            () -> {
-              Conversation conversation = initializeConversation(initiator);
-              conversation.setRecallPrompt(lockedPrompt);
-              conversation.setAccessOwnership(initiator.getOwnership());
-              return conversationRepository.save(conversation);
-            });
+        .orElseGet(() -> {
+          Conversation conversation = initializeConversation(initiator);
+          conversation.setRecallPrompt(lockedPrompt);
+          conversation.setAccessOwnership(initiator.getOwnership());
+          return conversationRepository.save(conversation);
+        });
   }
 
   public Conversation startConversationOfNote(Note note, User initiator, String message) {
@@ -148,14 +147,13 @@ public class ConversationService {
   public void markConversationAsRead(Conversation conversation, User user) {
     conversation
         .getConversationMessages()
-        .forEach(
-            conversationMessage -> {
-              if (!conversationMessage.getReadByReceiver()
-                  && !Objects.equals(conversationMessage.getSender(), user)) {
-                conversationMessage.setReadByReceiver(true);
-                conversationMessageRepository.save(conversationMessage);
-              }
-            });
+        .forEach(conversationMessage -> {
+          if (!conversationMessage.getReadByReceiver()
+              && !Objects.equals(conversationMessage.getSender(), user)) {
+            conversationMessage.setReadByReceiver(true);
+            conversationMessageRepository.save(conversationMessage);
+          }
+        });
   }
 
   public List<ConversationMessage> getUnreadMessages(User user) {

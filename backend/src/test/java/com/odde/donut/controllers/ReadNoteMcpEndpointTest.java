@@ -157,9 +157,9 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
 
   private static String toolsCallBody(Integer noteId) {
     return """
-        {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{\
-        "name":"%s","arguments":{"noteId":%d}}}
-        """
+    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{\
+    "name":"%s","arguments":{"noteId":%d}}}
+    """
         .formatted(ReadNoteTool.NAME, noteId);
   }
 }

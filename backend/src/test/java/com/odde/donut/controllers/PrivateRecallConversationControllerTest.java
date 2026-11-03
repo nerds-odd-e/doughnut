@@ -134,9 +134,8 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
 
   static Stream<Arguments> privateChannels() {
     return Arrays.stream(OtherParticipant.values())
-        .flatMap(
-            participant ->
-                Arrays.stream(Channel.values()).map(channel -> Arguments.of(participant, channel)));
+        .flatMap(participant ->
+            Arrays.stream(Channel.values()).map(channel -> Arguments.of(participant, channel)));
   }
 
   @ParameterizedTest

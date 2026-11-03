@@ -30,14 +30,14 @@ public class WikidataClaimJsonBuilder {
 
   public String please() {
     return """
-      {
-        "entities": {
-           "%s": {
-              %s
-           }
+        {
+          "entities": {
+             "%s": {
+                %s
+             }
+          }
         }
-      }
-  """
+    """
         .formatted(
             wikidataId,
             Stream.of(englishLabel, getClaims())
@@ -72,28 +72,27 @@ public class WikidataClaimJsonBuilder {
       String property, String type, List<String> values) {
     String innerArray =
         values.stream()
-            .map(
-                value ->
-                    """
-          {
-            "mainsnak": {
-              "snaktype": "value",
-              "property": "%s",
-              "datavalue": {
-                "value": %s,
-                "type": "%s"
-              }
-            }
-          }
-          """
-                        .formatted(property, value, type))
+            .map(value ->
+                """
+                {
+                  "mainsnak": {
+                    "snaktype": "value",
+                    "property": "%s",
+                    "datavalue": {
+                      "value": %s,
+                      "type": "%s"
+                    }
+                  }
+                }
+                """
+                    .formatted(property, value, type))
             .collect(Collectors.joining(","));
     this.claims.add(
         """
-                "%s": [
-                  %s
-                ]
-      """
+                  "%s": [
+                    %s
+                  ]
+        """
             .formatted(property, innerArray));
   }
 

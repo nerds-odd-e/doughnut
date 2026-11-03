@@ -137,10 +137,9 @@ public record PortablePath(
    */
   public PortablePath withFolderTrail(List<String> newFolderNames) {
     return PathShapedTarget.tryParse(notePortion)
-        .map(
-            path ->
-                new PortablePath(
-                    notebookQualifier, path.atFolderTrail(newFolderNames), encodedPropertyKey))
+        .map(path ->
+            new PortablePath(
+                notebookQualifier, path.atFolderTrail(newFolderNames), encodedPropertyKey))
         .orElse(this);
   }
 

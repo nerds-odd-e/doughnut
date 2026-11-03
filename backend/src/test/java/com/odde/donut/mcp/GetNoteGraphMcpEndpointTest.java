@@ -112,9 +112,9 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
 
   private static String toolsCallBody(Integer noteId, int tokenLimit) {
     return """
-        {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{\
-        "name":"%s","arguments":{"noteId":%d,"tokenLimit":%d}}}
-        """
+    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{\
+    "name":"%s","arguments":{"noteId":%d,"tokenLimit":%d}}}
+    """
         .formatted(GetNoteGraphTool.NAME, noteId, tokenLimit);
   }
 

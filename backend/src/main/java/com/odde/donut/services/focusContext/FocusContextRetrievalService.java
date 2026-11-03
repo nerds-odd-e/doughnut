@@ -45,12 +45,11 @@ public class FocusContextRetrievalService {
   public FocusContextResult retrieve(Note focusNote, User viewer, RetrievalConfig config) {
     Note hydrated =
         Optional.ofNullable(focusNote.getId())
-            .flatMap(
-                id ->
-                    noteRepository
-                        .hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(id))
-                        .stream()
-                        .findFirst())
+            .flatMap(id ->
+                noteRepository
+                    .hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(id))
+                    .stream()
+                    .findFirst())
             .orElse(focusNote);
 
     int combinedContentBudget = config.getFocusContextContentTokenBudget();

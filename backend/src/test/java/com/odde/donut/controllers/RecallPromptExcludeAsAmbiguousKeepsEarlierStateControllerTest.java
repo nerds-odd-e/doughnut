@@ -194,15 +194,14 @@ class RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest
                 tracker.getDifficulty(),
                 tracker.getLastRecalledAt(),
                 tracker.getNextRecallAt()));
-    logs.forEach(
-        log ->
-            schedule.addAll(
-                Arrays.asList(
-                    log.getId(),
-                    log.getStabilityBefore(),
-                    log.getDifficultyBefore(),
-                    log.getRetrievability(),
-                    log.getElapsedHours())));
+    logs.forEach(log ->
+        schedule.addAll(
+            Arrays.asList(
+                log.getId(),
+                log.getStabilityBefore(),
+                log.getDifficultyBefore(),
+                log.getRetrievability(),
+                log.getElapsedHours())));
     return schedule;
   }
 

@@ -79,20 +79,18 @@ class HealthCheckStartupReadinessTest {
               .listeners(
                   (ApplicationListener<WebServerInitializedEvent>)
                       started -> port.set(started.getWebServer().getPort()))
-              .initializers(
-                  starting -> {
-                    context.set(starting);
-                    starting.getBeanFactory().registerSingleton("migrationBarrier", barrier());
-                  });
-      startup =
-          CompletableFuture.runAsync(
-              () -> {
-                application.run(
-                    "--spring.profiles.active=e2e",
-                    "--server.port=0",
-                    "--" + UnitTestDatasource.URL_PROPERTY);
-                events.add("startup completed");
+              .initializers(starting -> {
+                context.set(starting);
+                starting.getBeanFactory().registerSingleton("migrationBarrier", barrier());
               });
+      startup =
+          CompletableFuture.runAsync(() -> {
+            application.run(
+                "--spring.profiles.active=e2e",
+                "--server.port=0",
+                "--" + UnitTestDatasource.URL_PROPERTY);
+            events.add("startup completed");
+          });
     }
 
     void awaitMigrationEntered() throws Exception {

@@ -70,13 +70,12 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
     MemoryTracker rebuilt = aNewTracker();
     List<RecallLog> replayedLogs =
         incrementalLogs.stream()
-            .map(
-                log ->
-                    makeMe
-                        .aRecallLogFor(rebuilt)
-                        .recordedAt(log.getRecordedAt())
-                        .grade(log.getGrade())
-                        .inMemoryPlease())
+            .map(log ->
+                makeMe
+                    .aRecallLogFor(rebuilt)
+                    .recordedAt(log.getRecordedAt())
+                    .grade(log.getGrade())
+                    .inMemoryPlease())
             .toList();
     RecallLog excluded = anExcludedAttemptWithoutCachedState(rebuilt, 20);
     List<RecallLog> history = new ArrayList<>(replayedLogs);
@@ -122,13 +121,12 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
     MemoryTrackerTestIds.assign(rebuilt, 42);
     List<RecallLog> replayedLogs =
         incrementalLogs.stream()
-            .map(
-                log ->
-                    makeMe
-                        .aRecallLogFor(rebuilt)
-                        .recordedAt(log.getRecordedAt())
-                        .grade(log.getGrade())
-                        .inMemoryPlease())
+            .map(log ->
+                makeMe
+                    .aRecallLogFor(rebuilt)
+                    .recordedAt(log.getRecordedAt())
+                    .grade(log.getGrade())
+                    .inMemoryPlease())
             .toList();
     RecallLog excluded = anExcludedAttemptWithoutCachedState(rebuilt, 20);
     List<RecallLog> history = new ArrayList<>(replayedLogs);

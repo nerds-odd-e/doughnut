@@ -77,8 +77,7 @@ class OkfIncompatibleTitleHealthRuleTest extends SpringTestBase {
     return report.getGroups().stream()
         .filter(g -> HealthRuleIds.OKF_INCOMPATIBLE_TITLES.equals(g.getRuleId()))
         .findFirst()
-        .orElseThrow(
-            () ->
-                new AssertionError("missing " + HealthRuleIds.OKF_INCOMPATIBLE_TITLES + " group"));
+        .orElseThrow(() ->
+            new AssertionError("missing " + HealthRuleIds.OKF_INCOMPATIBLE_TITLES + " group"));
   }
 }

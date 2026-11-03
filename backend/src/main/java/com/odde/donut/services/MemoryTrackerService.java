@@ -121,12 +121,11 @@ public class MemoryTrackerService {
     history.stream()
         .filter(log -> excluded.equals(log.getAnswer()))
         .findFirst()
-        .ifPresent(
-            attempt -> {
-              memoryTracker.rebuildWithout(attempt, history);
-              history.forEach(entityPersister::save);
-              entityPersister.save(memoryTracker);
-            });
+        .ifPresent(attempt -> {
+          memoryTracker.rebuildWithout(attempt, history);
+          history.forEach(entityPersister::save);
+          entityPersister.save(memoryTracker);
+        });
   }
 
   /** Persist a graded recall log, or CONFUSION when {@code grade} is null. */
@@ -197,11 +196,10 @@ public class MemoryTrackerService {
     if (!unansweredPrompts.isEmpty()) {
       conversationRepository
           .findBySubjectRecallPromptIn(unansweredPrompts)
-          .forEach(
-              conversation -> {
-                conversation.getSubject().setRecallPrompt(null);
-                conversationRepository.save(conversation);
-              });
+          .forEach(conversation -> {
+            conversation.getSubject().setRecallPrompt(null);
+            conversationRepository.save(conversation);
+          });
     }
     unansweredPrompts.forEach(entityPersister::remove);
   }

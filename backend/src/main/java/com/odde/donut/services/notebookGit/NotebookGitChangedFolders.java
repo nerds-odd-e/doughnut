@@ -37,13 +37,12 @@ final class NotebookGitChangedFolders {
     previousPaths.putAll(updated);
     previousPaths.putAll(deleted);
     deleted.forEach((id, path) -> relocations.put(previousPrefixOf(path), null));
-    updated.forEach(
-        (id, path) -> {
-          Folder folder = folderRepository.findById(id).orElseThrow();
-          String currentPrefix = NotebookGitPortablePath.folderPath(folder);
-          relocations.put(previousPrefixOf(path), currentPrefix);
-          currentFolders.put(currentPrefix, folder);
-        });
+    updated.forEach((id, path) -> {
+      Folder folder = folderRepository.findById(id).orElseThrow();
+      String currentPrefix = NotebookGitPortablePath.folderPath(folder);
+      relocations.put(previousPrefixOf(path), currentPrefix);
+      currentFolders.put(currentPrefix, folder);
+    });
     change.inserted.stream()
         .filter(Folder.class::isInstance)
         .map(Folder.class::cast)
@@ -68,16 +67,14 @@ final class NotebookGitChangedFolders {
     Set<String> touched = new LinkedHashSet<>();
     relocations
         .keySet()
-        .forEach(
-            previous ->
-                currentPathOf(NotebookGitPortablePath.parentOf(previous)).ifPresent(touched::add));
+        .forEach(previous ->
+            currentPathOf(NotebookGitPortablePath.parentOf(previous)).ifPresent(touched::add));
     currentFolders
         .keySet()
-        .forEach(
-            current -> {
-              touched.add(current);
-              touched.add(NotebookGitPortablePath.parentOf(current));
-            });
+        .forEach(current -> {
+          touched.add(current);
+          touched.add(NotebookGitPortablePath.parentOf(current));
+        });
     return touched;
   }
 
@@ -96,12 +93,11 @@ final class NotebookGitChangedFolders {
     relocations.entrySet().stream()
         .sorted(
             Comparator.comparing((Map.Entry<String, String> e) -> e.getKey().length()).reversed())
-        .forEach(
-            relocation -> {
-              Optional<NotebookGitDirectoryTree> taken = tree.takeDirectory(relocation.getKey());
-              if (relocation.getValue() == null) return;
-              taken.ifPresent(subtree -> tree.putDirectory(relocation.getValue(), subtree));
-            });
+        .forEach(relocation -> {
+          Optional<NotebookGitDirectoryTree> taken = tree.takeDirectory(relocation.getKey());
+          if (relocation.getValue() == null) return;
+          taken.ifPresent(subtree -> tree.putDirectory(relocation.getValue(), subtree));
+        });
   }
 
   /**

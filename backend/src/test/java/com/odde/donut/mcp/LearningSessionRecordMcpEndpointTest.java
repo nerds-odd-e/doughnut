@@ -46,14 +46,14 @@ class LearningSessionRecordMcpEndpointTest extends McpEndpointTestBase {
         record(
                 notebook,
                 """
-        # Learning Session Report
-        <session_item_feedback>
-        <session_item>
-        A: 3
-        Correct answer after a small hint.
-        </session_item>
-        </session_item_feedback>
-        """)
+                # Learning Session Report
+                <session_item_feedback>
+                <session_item>
+                A: 3
+                Correct answer after a small hint.
+                </session_item>
+                </session_item_feedback>
+                """)
             .at("/result/structuredContent");
 
     assertThat(result.at("/recordedItems/0/memoryTrackerId").asInt(), equalTo(completed.getId()));

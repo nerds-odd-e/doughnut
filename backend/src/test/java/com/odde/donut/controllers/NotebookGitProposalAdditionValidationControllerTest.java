@@ -108,11 +108,10 @@ class NotebookGitProposalAdditionValidationControllerTest
         proposalBundleBytes(
             binding(notebook),
             acceptedHistory(notebook).content().stream()
-                .map(
-                    entry ->
-                        entry.path().equals("Existing.md")
-                            ? new NotebookGitProposalFile("Existing.md", CHANGED_CONTENT)
-                            : new NotebookGitProposalFile(entry.path(), entry.content()))
+                .map(entry ->
+                    entry.path().equals("Existing.md")
+                        ? new NotebookGitProposalFile("Existing.md", CHANGED_CONTENT)
+                        : new NotebookGitProposalFile(entry.path(), entry.content()))
                 .toList());
 
     controller.publishNotebookGitProposal(

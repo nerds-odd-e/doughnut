@@ -113,12 +113,11 @@ public class SwaggerConfig {
     Paths existing = openApi.getPaths() != null ? openApi.getPaths() : new Paths();
     Paths ordered = new Paths();
     ordered.addPathItem(McpServerConfiguration.MCP_ENDPOINT, new PathItem().post(post));
-    existing.forEach(
-        (path, item) -> {
-          if (!McpServerConfiguration.MCP_ENDPOINT.equals(path)) {
-            ordered.addPathItem(path, item);
-          }
-        });
+    existing.forEach((path, item) -> {
+      if (!McpServerConfiguration.MCP_ENDPOINT.equals(path)) {
+        ordered.addPathItem(path, item);
+      }
+    });
     openApi.setPaths(ordered);
   }
 

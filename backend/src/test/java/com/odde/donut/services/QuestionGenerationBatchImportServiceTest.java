@@ -71,7 +71,8 @@ class QuestionGenerationBatchImportServiceTest extends SpringTestBase {
         createRequest("malformed", QuestionGenerationBatchRequestStatus.OUTPUT_READY);
     malformedRequest.setRawSuccessPayload(
         """
-        {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":{"id":"resp-1"}},"error":null}"""
+        {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":{"id":"resp-1"}},"error":null}\
+        """
             .formatted(malformedRequest.getCustomId()));
 
     alreadyImportedRequest =

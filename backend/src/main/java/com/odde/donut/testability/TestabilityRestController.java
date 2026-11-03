@@ -121,10 +121,9 @@ class TestabilityRestController {
         notebookRepository
             .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(
                 new DisplayName(request.getNotebookName()))
-            .orElseThrow(
-                () ->
-                    new IllegalArgumentException(
-                        "No notebook with name: " + request.getNotebookName()));
+            .orElseThrow(() ->
+                new IllegalArgumentException(
+                    "No notebook with name: " + request.getNotebookName()));
     bazaarService.shareNotebook(notebook);
     return "OK";
   }
@@ -149,10 +148,9 @@ class TestabilityRestController {
     entityPersister.save(entity);
     Arrays.stream(circleInfo.get("members").split(","))
         .map(String::trim)
-        .forEach(
-            s -> {
-              circleService.joinAndSave(entity, getUserModelByExternalIdentifier(s));
-            });
+        .forEach(s -> {
+          circleService.joinAndSave(entity, getUserModelByExternalIdentifier(s));
+        });
     entityPersister.flush();
     return entity.getId() + "," + entity.getInvitationCode();
   }

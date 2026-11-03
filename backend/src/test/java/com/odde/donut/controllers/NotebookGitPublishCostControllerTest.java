@@ -80,11 +80,10 @@ class NotebookGitPublishCostControllerTest extends NotebookGitAttachmentSizeAdmi
     byte[] changed = pointerFor(notebook, filledBytes(1024, (byte) 0x70));
     List<NotebookGitProposalFile> files =
         withNote("Changed file").stream()
-            .map(
-                file ->
-                    file.path().equals("file-0.bin")
-                        ? new NotebookGitProposalFile("file-0.bin", changed)
-                        : file)
+            .map(file ->
+                file.path().equals("file-0.bin")
+                    ? new NotebookGitProposalFile("file-0.bin", changed)
+                    : file)
             .toList();
     contentStore.resetAccessCounts();
 

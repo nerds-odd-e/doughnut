@@ -25,15 +25,14 @@ public final class AuthoredNoteReferences {
       return List.of();
     }
     return NoteContentMarkdown.splitLeadingFrontmatter(content)
-        .map(
-            lf -> {
-              List<AuthoredNoteReference> refs = new ArrayList<>();
-              for (String value : lf.frontmatter().supportedValueStringsInInsertionOrder()) {
-                refs.addAll(fromMarkdownFragment(value, canonicalOrigin));
-              }
-              refs.addAll(fromMarkdownFragment(lf.body(), canonicalOrigin));
-              return List.copyOf(refs);
-            })
+        .map(lf -> {
+          List<AuthoredNoteReference> refs = new ArrayList<>();
+          for (String value : lf.frontmatter().supportedValueStringsInInsertionOrder()) {
+            refs.addAll(fromMarkdownFragment(value, canonicalOrigin));
+          }
+          refs.addAll(fromMarkdownFragment(lf.body(), canonicalOrigin));
+          return List.copyOf(refs);
+        })
         .orElseGet(() -> fromMarkdownFragment(content, canonicalOrigin));
   }
 

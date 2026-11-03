@@ -51,12 +51,11 @@ class NoteTitlePersistenceTest extends ControllerTestBase {
             List.of("title_uniqueness_folder_id", "STORED GENERATED", "ifnull(`folder_id`,0)"),
             List.of("title_uniqueness_key", "STORED GENERATED", "lower(`title`)")),
         columns.stream()
-            .map(
-                column ->
-                    List.of(
-                        column.get("column_name"),
-                        column.get("extra"),
-                        column.get("generation_expression")))
+            .map(column ->
+                List.of(
+                    column.get("column_name"),
+                    column.get("extra"),
+                    column.get("generation_expression")))
             .toList());
 
     List<Map<String, Object>> indexParts =

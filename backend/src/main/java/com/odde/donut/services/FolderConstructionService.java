@@ -51,20 +51,16 @@ public class FolderConstructionService {
       parentFolder =
           folderRepository
               .findById(underFolderId)
-              .orElseThrow(
-                  () ->
-                      new ResponseStatusException(
-                          HttpStatus.NOT_FOUND, "Parent folder not found."));
+              .orElseThrow(() ->
+                  new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not found."));
     } else {
       Integer underNoteId = request.getUnderNoteId();
       if (underNoteId != null) {
         Note contextNote =
             noteRepository
                 .findById(underNoteId)
-                .orElseThrow(
-                    () ->
-                        new ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "Context note not found."));
+                .orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Context note not found."));
         if (!contextNote.getNotebook().getId().equals(notebook.getId())) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not in notebook.");
         }

@@ -37,21 +37,19 @@ class NotebookGitBookSourceFileProtection {
   private void refuseChanging(Integer notebookId, Stream<String> paths) {
     bookRepository
         .findByNotebook_Id(notebookId)
-        .ifPresent(
-            book ->
-                paths
-                    .filter(path -> path.equals(book.getSourceFilePath()))
-                    .findFirst()
-                    .ifPresent(
-                        path -> {
-                          throw new ResponseStatusException(
-                              HttpStatus.CONFLICT,
-                              "\""
-                                  + path
-                                  + "\" is the source file of the Book \""
-                                  + book.getBookName()
-                                  + "\". Remove the Book on the web before deleting, renaming or"
-                                  + " changing it.");
-                        }));
+        .ifPresent(book ->
+            paths
+                .filter(path -> path.equals(book.getSourceFilePath()))
+                .findFirst()
+                .ifPresent(path -> {
+                  throw new ResponseStatusException(
+                      HttpStatus.CONFLICT,
+                      "\""
+                          + path
+                          + "\" is the source file of the Book \""
+                          + book.getBookName()
+                          + "\". Remove the Book on the web before deleting, renaming or"
+                          + " changing it.");
+                }));
   }
 }

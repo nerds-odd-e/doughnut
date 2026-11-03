@@ -49,37 +49,36 @@ public class NoteConversationAiReplyService {
     ResponseCreateParams request = buildResponseCreateParams(conversation);
     Flowable<String> stream = openAiApiHandler.streamResponseAsLegacyChatChunks(request);
     ConversationAiReplySseStream replySseStream = new ConversationAiReplySseStream(stream);
-    return replySseStream.getSseEmitter(
-        reply -> {
-          List<ConversationNoteCorrection> corrections = new ArrayList<>();
-          for (ConversationAiReplySseStream.ToolCall tool : reply.toolCalls()) {
-            ConversationNoteCorrection.Field field;
-            String valueProperty;
-            if ("NoteContentCompletion".equals(tool.name())) {
-              field = ConversationNoteCorrection.Field.CONTENT;
-              valueProperty = "content";
-            } else if ("TitleReplacement".equals(tool.name())) {
-              field = ConversationNoteCorrection.Field.TITLE;
-              valueProperty = "newTitle";
-            } else {
-              continue;
-            }
-            try {
-              JsonNode arguments = objectMapper.readTree(tool.arguments());
-              ConversationNoteCorrection correction = new ConversationNoteCorrection();
-              correction.setNote(subject);
-              correction.setResponseId(responseId);
-              correction.setToolCallId(tool.id());
-              correction.setField(field);
-              correction.setProposedValue(arguments.path(valueProperty).asText());
-              correction.setReason(arguments.path("reason").asText(reply.content()));
-              correction.setBaseRevision(baseRevision);
-              corrections.add(correction);
-            } catch (JsonProcessingException e) {
-              throw new IllegalArgumentException("Invalid note correction arguments", e);
-            }
-          }
-          conversationService.retainAiReply(conversation, reply.content(), corrections);
-        });
+    return replySseStream.getSseEmitter(reply -> {
+      List<ConversationNoteCorrection> corrections = new ArrayList<>();
+      for (ConversationAiReplySseStream.ToolCall tool : reply.toolCalls()) {
+        ConversationNoteCorrection.Field field;
+        String valueProperty;
+        if ("NoteContentCompletion".equals(tool.name())) {
+          field = ConversationNoteCorrection.Field.CONTENT;
+          valueProperty = "content";
+        } else if ("TitleReplacement".equals(tool.name())) {
+          field = ConversationNoteCorrection.Field.TITLE;
+          valueProperty = "newTitle";
+        } else {
+          continue;
+        }
+        try {
+          JsonNode arguments = objectMapper.readTree(tool.arguments());
+          ConversationNoteCorrection correction = new ConversationNoteCorrection();
+          correction.setNote(subject);
+          correction.setResponseId(responseId);
+          correction.setToolCallId(tool.id());
+          correction.setField(field);
+          correction.setProposedValue(arguments.path(valueProperty).asText());
+          correction.setReason(arguments.path("reason").asText(reply.content()));
+          correction.setBaseRevision(baseRevision);
+          corrections.add(correction);
+        } catch (JsonProcessingException e) {
+          throw new IllegalArgumentException("Invalid note correction arguments", e);
+        }
+      }
+      conversationService.retainAiReply(conversation, reply.content(), corrections);
+    });
   }
 }

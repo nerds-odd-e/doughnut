@@ -23,7 +23,7 @@ public class ApiError {
     WIKIDATA_SERVICE_ERROR,
     QUESTION_ANSWER_ERROR,
     FOLDER_NAME_CONFLICT,
-  };
+  }
 
   public ApiError(String message, ErrorType type) {
     this.errorType = type;

@@ -199,12 +199,12 @@ class NotebookLfsTransferControllerTest extends ControllerTestBase {
 
   private static String batchJson(String operation, String oid, long size) {
     return """
-        {
-          "operation": "%s",
-          "transfers": ["basic"],
-          "objects": [{"oid": "%s", "size": %d}]
-        }
-        """
+    {
+      "operation": "%s",
+      "transfers": ["basic"],
+      "objects": [{"oid": "%s", "size": %d}]
+    }
+    """
         .formatted(operation, oid, size);
   }
 

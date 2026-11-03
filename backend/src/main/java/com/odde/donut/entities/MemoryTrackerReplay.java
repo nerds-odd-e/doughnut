@@ -36,10 +36,9 @@ final class MemoryTrackerReplay {
         .filter(log -> log.isValidEvent() && !log.isConfusion())
         .findFirst()
         .map(RecallLog::getRecordedAt)
-        .orElseGet(
-            () ->
-                TimestampOperations.addHoursToTimestamp(
-                    excluded.getRecordedAt(), -excluded.getElapsedHours()));
+        .orElseGet(() ->
+            TimestampOperations.addHoursToTimestamp(
+                excluded.getRecordedAt(), -excluded.getElapsedHours()));
   }
 
   private static void replay(

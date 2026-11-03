@@ -46,29 +46,28 @@ class BadRequestRecoveryTest {
     server =
         application
             .getBean(TomcatServletWebServerFactory.class)
-            .getWebServer(
-                context ->
-                    context
-                        .addServlet(
-                            "request-boundary",
-                            new HttpServlet() {
-                              @Override
-                              protected void doGet(
-                                  HttpServletRequest request, HttpServletResponse response)
-                                  throws IOException {
-                                servletRequests.incrementAndGet();
-                                if (request.getRequestURI().equals("/json-error")) {
-                                  response.setStatus(400);
-                                  response.setContentType("application/json");
-                                  response.getWriter().write("{\"error\":\"invalid input\"}");
-                                } else if (request.getRequestURI().equals("/missing")) {
-                                  response.sendError(404);
-                                } else {
-                                  response.getWriter().write("callback reached servlet");
-                                }
-                              }
-                            })
-                        .addMapping("/*"));
+            .getWebServer(context ->
+                context
+                    .addServlet(
+                        "request-boundary",
+                        new HttpServlet() {
+                          @Override
+                          protected void doGet(
+                              HttpServletRequest request, HttpServletResponse response)
+                              throws IOException {
+                            servletRequests.incrementAndGet();
+                            if (request.getRequestURI().equals("/json-error")) {
+                              response.setStatus(400);
+                              response.setContentType("application/json");
+                              response.getWriter().write("{\"error\":\"invalid input\"}");
+                            } else if (request.getRequestURI().equals("/missing")) {
+                              response.sendError(404);
+                            } else {
+                              response.getWriter().write("callback reached servlet");
+                            }
+                          }
+                        })
+                    .addMapping("/*"));
     server.start();
   }
 

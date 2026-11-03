@@ -42,25 +42,23 @@ final class NotebookGitChangedFiles {
     change.deleted.entrySet().stream()
         .filter(entry -> isFile(entry.getKey().kind()))
         .map(entry -> folders.previousPathOf(entry.getKey().kind(), entry.getValue()))
-        .forEach(
-            previousPath -> {
-              tree.removeFile(previousPath);
-              folders
-                  .currentPathOf(NotebookGitPortablePath.directoryOf(previousPath))
-                  .ifPresent(touchedDirectories::add);
-            });
+        .forEach(previousPath -> {
+          tree.removeFile(previousPath);
+          folders
+              .currentPathOf(NotebookGitPortablePath.directoryOf(previousPath))
+              .ifPresent(touchedDirectories::add);
+        });
     change.updated.entrySet().stream()
         .filter(entry -> isFile(entry.getKey().kind()))
-        .forEach(
-            entry -> {
-              String previousPath = folders.previousPathOf(entry.getKey().kind(), entry.getValue());
-              if (!previousPath.equals(currentFilePath(entry.getKey()))) {
-                tree.removeFile(previousPath);
-              }
-              folders
-                  .currentPathOf(NotebookGitPortablePath.directoryOf(previousPath))
-                  .ifPresent(touchedDirectories::add);
-            });
+        .forEach(entry -> {
+          String previousPath = folders.previousPathOf(entry.getKey().kind(), entry.getValue());
+          if (!previousPath.equals(currentFilePath(entry.getKey()))) {
+            tree.removeFile(previousPath);
+          }
+          folders
+              .currentPathOf(NotebookGitPortablePath.directoryOf(previousPath))
+              .ifPresent(touchedDirectories::add);
+        });
   }
 
   /** The current file of every note and attachment the change updated or inserted. */

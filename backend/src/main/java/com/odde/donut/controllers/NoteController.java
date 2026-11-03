@@ -190,7 +190,7 @@ class NoteController {
       @Parameter(
               description =
                   "Approximate token budget for focus note content plus related note content combined (bodies).")
-          @RequestParam()
+          @RequestParam
           int tokenLimit)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
@@ -211,7 +211,7 @@ class NoteController {
       @Parameter(
               description =
                   "Approximate token budget for focus note content plus related note content combined (bodies).")
-          @RequestParam()
+          @RequestParam
           int tokenLimit)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);

@@ -99,9 +99,8 @@ public class QuestionGenerationBatchImportService {
 
   private boolean allRowsImportComplete(List<QuestionGenerationBatchRequest> requests) {
     return requests.stream()
-        .allMatch(
-            request ->
-                request.getStatus() == QuestionGenerationBatchRequestStatus.IMPORTED
-                    || request.getStatus() == QuestionGenerationBatchRequestStatus.FAILED);
+        .allMatch(request ->
+            request.getStatus() == QuestionGenerationBatchRequestStatus.IMPORTED
+                || request.getStatus() == QuestionGenerationBatchRequestStatus.FAILED);
   }
 }

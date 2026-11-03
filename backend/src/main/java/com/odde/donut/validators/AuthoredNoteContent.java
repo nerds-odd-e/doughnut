@@ -42,11 +42,10 @@ public final class AuthoredNoteContent {
   }
 
   private static void throwBindingError(String field, Optional<String> error) {
-    error.ifPresent(
-        message -> {
-          ApiError apiError = new ApiError(message, ApiError.ErrorType.BINDING_ERROR);
-          apiError.add(field, message);
-          throw new ApiException(apiError);
-        });
+    error.ifPresent(message -> {
+      ApiError apiError = new ApiError(message, ApiError.ErrorType.BINDING_ERROR);
+      apiError.add(field, message);
+      throw new ApiException(apiError);
+    });
   }
 }

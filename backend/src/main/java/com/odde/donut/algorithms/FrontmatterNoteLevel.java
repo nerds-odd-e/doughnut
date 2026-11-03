@@ -61,11 +61,10 @@ public final class FrontmatterNoteLevel {
     String line = KEY + ": " + level + "\n";
     return NoteLeadingFrontmatter.splitVerbatim(content)
         .map(split -> split.rebuild(appendLine(split.yamlRaw(), line)))
-        .orElseGet(
-            () -> {
-              String body = content == null ? "" : content;
-              return "---\n" + line + "---\n" + body;
-            });
+        .orElseGet(() -> {
+          String body = content == null ? "" : content;
+          return "---\n" + line + "---\n" + body;
+        });
   }
 
   private static String appendLine(String yamlRaw, String line) {

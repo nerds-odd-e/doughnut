@@ -79,15 +79,14 @@ class RecallConversationConcurrentStartControllerTest
     ExecutorService executor = Executors.newFixedThreadPool(3);
     try {
       Future<?> lockHolder =
-          executor.submit(
-              () ->
-                  inCommittedTransaction(
-                      transactionManager,
-                      () -> {
-                        recallPromptRepository.findByIdForUpdate(prompt.getId()).orElseThrow();
-                        locked.countDown();
-                        ConcurrentControllerTestSupport.await(release);
-                      }));
+          executor.submit(() ->
+              inCommittedTransaction(
+                  transactionManager,
+                  () -> {
+                    recallPromptRepository.findByIdForUpdate(prompt.getId()).orElseThrow();
+                    locked.countDown();
+                    ConcurrentControllerTestSupport.await(release);
+                  }));
       ConcurrentControllerTestSupport.await(locked);
       Future<Conversation> first = startInWorker(executor, prompt, started);
       Future<Conversation> second = startInWorker(executor, prompt, started);

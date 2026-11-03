@@ -50,29 +50,28 @@ class QuestionGenerationBatchRetentionWithoutTransactionTest extends SpringTestB
   void prunesOldFailedBatchWhenCalledWithoutASurroundingTransaction() {
     Timestamp currentTime = makeMe.aTimestamp().please();
     Integer batchId =
-        inCommittedTransaction(
-            () -> {
-              User user = makeMe.aUser(FIXTURE_PREFIX + UUID.randomUUID()).please();
-              Note note = makeMe.aNote().notebookOwnedBy(user).please();
-              MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).please();
-              QuestionGenerationBatch batch =
-                  makeMe
-                      .aQuestionGenerationBatch()
-                      .forUser(user)
-                      .status(QuestionGenerationBatchStatus.FAILED)
-                      .plannedAt(oldTimestamp(currentTime))
-                      .submittedAt(oldTimestamp(currentTime))
-                      .openaiBatchId("batch-failed-notx")
-                      .please();
-              makeMe.entityPersister.flush();
+        inCommittedTransaction(() -> {
+          User user = makeMe.aUser(FIXTURE_PREFIX + UUID.randomUUID()).please();
+          Note note = makeMe.aNote().notebookOwnedBy(user).please();
+          MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).please();
+          QuestionGenerationBatch batch =
               makeMe
-                  .aQuestionGenerationBatchRequest()
-                  .batch(batch)
-                  .memoryTracker(tracker)
-                  .status(QuestionGenerationBatchRequestStatus.IMPORTED)
+                  .aQuestionGenerationBatch()
+                  .forUser(user)
+                  .status(QuestionGenerationBatchStatus.FAILED)
+                  .plannedAt(oldTimestamp(currentTime))
+                  .submittedAt(oldTimestamp(currentTime))
+                  .openaiBatchId("batch-failed-notx")
                   .please();
-              return batch.getId();
-            });
+          makeMe.entityPersister.flush();
+          makeMe
+              .aQuestionGenerationBatchRequest()
+              .batch(batch)
+              .memoryTracker(tracker)
+              .status(QuestionGenerationBatchRequestStatus.IMPORTED)
+              .please();
+          return batch.getId();
+        });
 
     retentionService.pruneTerminalBatches(currentTime);
 
@@ -88,10 +87,9 @@ class QuestionGenerationBatchRetentionWithoutTransactionTest extends SpringTestB
   }
 
   private void deleteCommittedPruneFixtures() {
-    inCommittedTransaction(
-        () ->
-            CommittedUserCleanup.deleteByUserExternalIdentifierLike(
-                entityManager, FIXTURE_PREFIX + "%"));
+    inCommittedTransaction(() ->
+        CommittedUserCleanup.deleteByUserExternalIdentifierLike(
+            entityManager, FIXTURE_PREFIX + "%"));
   }
 
   private <T> T inCommittedTransaction(java.util.function.Supplier<T> action) {
@@ -101,10 +99,9 @@ class QuestionGenerationBatchRetentionWithoutTransactionTest extends SpringTestB
   }
 
   private void inCommittedTransaction(Runnable action) {
-    inCommittedTransaction(
-        () -> {
-          action.run();
-          return null;
-        });
+    inCommittedTransaction(() -> {
+      action.run();
+      return null;
+    });
   }
 }

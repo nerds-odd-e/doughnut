@@ -48,10 +48,9 @@ public class QuestionGenerationBatchMaintenanceRunService {
     }
     repository
         .findById(runId)
-        .ifPresent(
-            run -> {
-              updater.accept(run);
-              repository.save(run);
-            });
+        .ifPresent(run -> {
+          updater.accept(run);
+          repository.save(run);
+        });
   }
 }

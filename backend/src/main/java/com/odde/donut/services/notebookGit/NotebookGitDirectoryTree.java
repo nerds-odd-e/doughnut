@@ -146,13 +146,12 @@ final class NotebookGitDirectoryTree {
 
   boolean hasUnresolvedTreeRefs() {
     return entries.values().stream()
-        .anyMatch(
-            entry ->
-                switch (entry) {
-                  case Entry.TreeRef ignored -> true;
-                  case Entry.Directory directory -> directory.tree().hasUnresolvedTreeRefs();
-                  case Entry.File ignored -> false;
-                });
+        .anyMatch(entry ->
+            switch (entry) {
+              case Entry.TreeRef ignored -> true;
+              case Entry.Directory directory -> directory.tree().hasUnresolvedTreeRefs();
+              case Entry.File ignored -> false;
+            });
   }
 
   /**

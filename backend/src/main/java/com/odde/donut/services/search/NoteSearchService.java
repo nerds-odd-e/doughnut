@@ -156,9 +156,8 @@ public class NoteSearchService {
       Integer notebookId) {
     List<Note> filteredPartialMatches =
         partialMatches.stream()
-            .filter(
-                note ->
-                    exactMatches.stream().noneMatch(exact -> exact.getId().equals(note.getId())))
+            .filter(note ->
+                exactMatches.stream().noneMatch(exact -> exact.getId().equals(note.getId())))
             .toList();
 
     List<NoteSearchResult> results =
@@ -212,17 +211,16 @@ public class NoteSearchService {
       List<NoteSearchResult> results, Integer notebookId) {
     if (notebookId == null) return results;
     return results.stream()
-        .sorted(
-            (a, b) -> {
-              int distCompare =
-                  Float.compare(
-                      a.getDistance() != null ? a.getDistance() : Float.MAX_VALUE,
-                      b.getDistance() != null ? b.getDistance() : Float.MAX_VALUE);
-              if (distCompare != 0) return distCompare;
-              boolean aSame = notebookId.equals(a.getNotebookId());
-              boolean bSame = notebookId.equals(b.getNotebookId());
-              return Boolean.compare(bSame, aSame);
-            })
+        .sorted((a, b) -> {
+          int distCompare =
+              Float.compare(
+                  a.getDistance() != null ? a.getDistance() : Float.MAX_VALUE,
+                  b.getDistance() != null ? b.getDistance() : Float.MAX_VALUE);
+          if (distCompare != 0) return distCompare;
+          boolean aSame = notebookId.equals(a.getNotebookId());
+          boolean bSame = notebookId.equals(b.getNotebookId());
+          return Boolean.compare(bSame, aSame);
+        })
         .toList();
   }
 

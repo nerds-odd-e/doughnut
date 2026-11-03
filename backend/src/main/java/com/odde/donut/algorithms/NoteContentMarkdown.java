@@ -85,15 +85,13 @@ public final class NoteContentMarkdown {
     UnaryOperator<String> removeLinks =
         v -> linkTexts.stream().reduce(v, (s, t) -> s.replace("[[" + t + "]]", ""));
     return NoteLeadingFrontmatter.splitVerbatim(content)
-        .flatMap(
-            split -> {
-              String yaml =
-                  FrontmatterInPlaceEdit.rewriteSupportedValues(split.yamlRaw(), removeLinks);
-              if (yaml.equals(split.yamlRaw())) {
-                return Optional.empty();
-              }
-              return Optional.of(rebuildDroppingEmptyBlock(split, yaml));
-            });
+        .flatMap(split -> {
+          String yaml = FrontmatterInPlaceEdit.rewriteSupportedValues(split.yamlRaw(), removeLinks);
+          if (yaml.equals(split.yamlRaw())) {
+            return Optional.empty();
+          }
+          return Optional.of(rebuildDroppingEmptyBlock(split, yaml));
+        });
   }
 
   /**
@@ -102,10 +100,9 @@ public final class NoteContentMarkdown {
    */
   public static String removeFrontmatterProperty(String content, String key) {
     return NoteLeadingFrontmatter.splitVerbatim(content)
-        .map(
-            split ->
-                rebuildDroppingEmptyBlock(
-                    split, FrontmatterInPlaceEdit.removeTopLevelEntry(split.yamlRaw(), key)))
+        .map(split ->
+            rebuildDroppingEmptyBlock(
+                split, FrontmatterInPlaceEdit.removeTopLevelEntry(split.yamlRaw(), key)))
         .orElse(content);
   }
 
@@ -162,10 +159,8 @@ public final class NoteContentMarkdown {
 
   private static String addListItem(String content, String key, String value) {
     return NoteLeadingFrontmatter.splitVerbatim(content)
-        .map(
-            split ->
-                split.rebuild(
-                    FrontmatterInPlaceEdit.addTopLevelListItem(split.yamlRaw(), key, value)))
+        .map(split ->
+            split.rebuild(FrontmatterInPlaceEdit.addTopLevelListItem(split.yamlRaw(), key, value)))
         .orElseThrow();
   }
 
@@ -176,10 +171,8 @@ public final class NoteContentMarkdown {
   public static String setLeadingFrontmatterProperty(String content, String key, String value) {
     String text = content == null ? "" : content;
     return NoteLeadingFrontmatter.splitVerbatim(text)
-        .map(
-            split ->
-                split.rebuild(
-                    FrontmatterInPlaceEdit.setTopLevelScalar(split.yamlRaw(), key, value)))
+        .map(split ->
+            split.rebuild(FrontmatterInPlaceEdit.setTopLevelScalar(split.yamlRaw(), key, value)))
         .orElseGet(() -> Frontmatter.empty().set(key, value).fenced(text));
   }
 }

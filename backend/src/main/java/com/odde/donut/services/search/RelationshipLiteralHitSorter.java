@@ -10,13 +10,12 @@ public class RelationshipLiteralHitSorter {
   public List<RelationshipLiteralSearchHit> sort(
       List<RelationshipLiteralSearchHit> hits, Integer notebookId) {
     Comparator<RelationshipLiteralSearchHit> byDistance =
-        Comparator.comparing(
-            h ->
-                h.isNote()
-                    ? (h.getNoteSearchResult().getDistance() != null
-                        ? h.getNoteSearchResult().getDistance()
-                        : Float.MAX_VALUE)
-                    : (h.getDistance() != null ? h.getDistance() : Float.MAX_VALUE));
+        Comparator.comparing(h ->
+            h.isNote()
+                ? (h.getNoteSearchResult().getDistance() != null
+                    ? h.getNoteSearchResult().getDistance()
+                    : Float.MAX_VALUE)
+                : (h.getDistance() != null ? h.getDistance() : Float.MAX_VALUE));
     Comparator<RelationshipLiteralSearchHit> byNotebook = byNotebook(notebookId);
     Comparator<RelationshipLiteralSearchHit> byLabel =
         Comparator.comparing(
@@ -26,11 +25,10 @@ public class RelationshipLiteralHitSorter {
                     : (h.isFolder() ? h.getFolderName() : h.getNotebookName()),
             String.CASE_INSENSITIVE_ORDER);
     Comparator<RelationshipLiteralSearchHit> byId =
-        Comparator.comparing(
-            h ->
-                h.isNote()
-                    ? h.getNoteSearchResult().getNoteTopology().getId()
-                    : (h.isFolder() ? h.getFolderId() : h.getNotebookId()));
+        Comparator.comparing(h ->
+            h.isNote()
+                ? h.getNoteSearchResult().getNoteTopology().getId()
+                : (h.isFolder() ? h.getFolderId() : h.getNotebookId()));
     return hits.stream()
         .sorted(byDistance.thenComparing(byNotebook).thenComparing(byLabel).thenComparing(byId))
         .toList();

@@ -55,22 +55,21 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
 
   @AfterEach
   void cleanupCommittedFixture() {
-    committed(
-        () -> {
-          String fixtureUsers = testFixturePrefix + "%";
-          entityManager
-              .createNativeQuery(
-                  "DELETE s FROM subscription s "
-                      + "INNER JOIN user subscriber ON s.user_id = subscriber.id "
-                      + "INNER JOIN notebook nb ON s.notebook_id = nb.id "
-                      + "INNER JOIN ownership o ON nb.ownership_id = o.id "
-                      + "INNER JOIN user owner ON o.user_id = owner.id "
-                      + "WHERE subscriber.external_identifier LIKE :like "
-                      + "OR owner.external_identifier LIKE :like")
-              .setParameter("like", fixtureUsers)
-              .executeUpdate();
-          deleteByUserExternalIdentifierLike(entityManager, fixtureUsers);
-        });
+    committed(() -> {
+      String fixtureUsers = testFixturePrefix + "%";
+      entityManager
+          .createNativeQuery(
+              "DELETE s FROM subscription s "
+                  + "INNER JOIN user subscriber ON s.user_id = subscriber.id "
+                  + "INNER JOIN notebook nb ON s.notebook_id = nb.id "
+                  + "INNER JOIN ownership o ON nb.ownership_id = o.id "
+                  + "INNER JOIN user owner ON o.user_id = owner.id "
+                  + "WHERE subscriber.external_identifier LIKE :like "
+                  + "OR owner.external_identifier LIKE :like")
+          .setParameter("like", fixtureUsers)
+          .executeUpdate();
+      deleteByUserExternalIdentifierLike(entityManager, fixtureUsers);
+    });
   }
 
   User createFixtureUser() {
@@ -178,9 +177,8 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
   }
 
   void authorReferencingContentCommitted(Note note, String content) {
-    committed(
-        () ->
-            authorReferencingContent(noteRepository.findById(note.getId()).orElseThrow(), content));
+    committed(() ->
+        authorReferencingContent(noteRepository.findById(note.getId()).orElseThrow(), content));
   }
 
   private <T> T committed(java.util.function.Supplier<T> action) {

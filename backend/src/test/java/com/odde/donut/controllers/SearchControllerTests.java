@@ -113,11 +113,10 @@ class SearchControllerTests extends SearchControllerTestBase {
 
     assertThat(
         result.stream()
-            .anyMatch(
-                h ->
-                    h.isFolder()
-                        && "Trip Planning".equals(h.getFolderName())
-                        && h.getFolderId() != null),
+            .anyMatch(h ->
+                h.isFolder()
+                    && "Trip Planning".equals(h.getFolderName())
+                    && h.getFolderId() != null),
         is(true));
     assertThat(
         RelationshipLiteralSearchHits.noteMatches(result).stream()
@@ -136,11 +135,10 @@ class SearchControllerTests extends SearchControllerTestBase {
 
     assertThat(
         result.stream()
-            .anyMatch(
-                h ->
-                    h.isNotebook()
-                        && "Recipe Ideas".equals(h.getNotebookName())
-                        && h.getNotebookId() != null),
+            .anyMatch(h ->
+                h.isNotebook()
+                    && "Recipe Ideas".equals(h.getNotebookName())
+                    && h.getNotebookId() != null),
         is(true));
   }
 

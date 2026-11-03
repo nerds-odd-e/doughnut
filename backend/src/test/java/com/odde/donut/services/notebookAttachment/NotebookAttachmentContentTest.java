@@ -56,23 +56,21 @@ class NotebookAttachmentContentTest {
     void store_persistsExactBytesAndGetReturnsThem() throws Exception {
       AtomicReference<byte[]> stored = new AtomicReference<>();
       when(storage.get(blobId()))
-          .thenAnswer(
-              invocation -> {
-                byte[] bytes = stored.get();
-                if (bytes == null) {
-                  return null;
-                }
-                Blob blob = mock(Blob.class);
-                when(blob.getContent()).thenReturn(bytes);
-                return blob;
-              });
+          .thenAnswer(invocation -> {
+            byte[] bytes = stored.get();
+            if (bytes == null) {
+              return null;
+            }
+            Blob blob = mock(Blob.class);
+            when(blob.getContent()).thenReturn(bytes);
+            return blob;
+          });
       when(storage.create(
               any(BlobInfo.class), any(byte[].class), eq(Storage.BlobTargetOption.doesNotExist())))
-          .thenAnswer(
-              invocation -> {
-                stored.set(invocation.getArgument(1));
-                return mock(Blob.class);
-              });
+          .thenAnswer(invocation -> {
+            stored.set(invocation.getArgument(1));
+            return mock(Blob.class);
+          });
 
       assertTrue(cut.store(NOTEBOOK_ID, DIGEST, PAYLOAD.length, new ByteArrayInputStream(PAYLOAD)));
 

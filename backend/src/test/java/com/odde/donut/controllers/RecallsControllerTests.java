@@ -35,14 +35,14 @@ class RecallsControllerTests extends RecallsControllerTestBase {
         delimiter = '|',
         textBlock =
             """
-                next recall at (in hours) | timezone     | expected count
-                #------------------------------------------------------------
-                -1                        | Asia/Tokyo   | 1
-                0                         | Asia/Tokyo   | 1
-                4                         | Asia/Tokyo   | 0
-                4                         | Europe/Paris | 1
-                12                        | Europe/Paris | 0
-                """)
+            next recall at (in hours) | timezone     | expected count
+            #------------------------------------------------------------
+            -1                        | Asia/Tokyo   | 1
+            0                         | Asia/Tokyo   | 1
+            4                         | Asia/Tokyo   | 0
+            4                         | Europe/Paris | 1
+            12                        | Europe/Paris | 0
+            """)
     void shouldGetMemoryTrackersBasedOnTimezone(
         int nextRecallAtHours, String timezone, int expectedCount) {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();

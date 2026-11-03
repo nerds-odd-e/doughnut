@@ -50,10 +50,9 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitControllerTe
             List.of(
                 new NotebookGitProposalFile("index.md", "---\ntype: Note\n---\nchanged content")));
 
-    assertDoesNotThrow(
-        () ->
-            controller.publishNotebookGitProposal(
-                notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
+    assertDoesNotThrow(() ->
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
   }
 
   @Test

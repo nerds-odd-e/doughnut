@@ -101,12 +101,11 @@ class NotebookGitTreeEncoder {
         notebook.getReadmeContent(),
         folders,
         storedNotes.stream()
-            .map(
-                note ->
-                    new PortableTreeNoteRow(
-                        note.getFolder() == null ? null : note.getFolder().getId(),
-                        note.getTitle(),
-                        note.getContent()))
+            .map(note ->
+                new PortableTreeNoteRow(
+                    note.getFolder() == null ? null : note.getFolder().getId(),
+                    note.getTitle(),
+                    note.getContent()))
             .toList(),
         notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebook.getId()),
         acceptedMetadata);
@@ -142,20 +141,18 @@ class NotebookGitTreeEncoder {
                 Stream.concat(
                     notes.stream()
                         .filter(note -> prefixes.containsKey(note.folderId()))
-                        .map(
-                            note ->
-                                PortableTreeEntry.ofNote(
-                                    NotebookGitPortablePath.ofNote(
-                                        prefixes.get(note.folderId()), note.title()),
-                                    note.content())),
+                        .map(note ->
+                            PortableTreeEntry.ofNote(
+                                NotebookGitPortablePath.ofNote(
+                                    prefixes.get(note.folderId()), note.title()),
+                                note.content())),
                     attachments.stream()
                         .filter(attachment -> prefixes.containsKey(attachment.folderId()))
-                        .map(
-                            attachment ->
-                                new PortableTreeEntry(
-                                    NotebookGitPortablePath.ofAttachment(
-                                        prefixes.get(attachment.folderId()), attachment.filename()),
-                                    attachment.acceptedGitContent()))),
+                        .map(attachment ->
+                            new PortableTreeEntry(
+                                NotebookGitPortablePath.ofAttachment(
+                                    prefixes.get(attachment.folderId()), attachment.filename()),
+                                attachment.acceptedGitContent()))),
                 acceptedMetadata.stream())
             .toList();
     Set<String> retainedDirectories = new LinkedHashSet<>();
@@ -176,18 +173,16 @@ class NotebookGitTreeEncoder {
       Set<String> touchedDirectories) {
     Map<ObjectId, byte[]> blobs = new HashMap<>();
     Set<String> directories = new LinkedHashSet<>(touchedDirectories);
-    files.forEach(
-        file -> {
-          NotebookGitTreeContent.putEntry(file, tree, blobs);
-          directories.add(NotebookGitPortablePath.directoryOf(file.path()));
-        });
-    readmeContents.forEach(
-        (prefix, content) -> {
-          tree.removeFile(PortableTreeEntry.readmePath(prefix));
-          PortableTreeEntry.ofReadme(prefix, content)
-              .ifPresent(entry -> NotebookGitTreeContent.putEntry(entry, tree, blobs));
-          directories.add(prefix);
-        });
+    files.forEach(file -> {
+      NotebookGitTreeContent.putEntry(file, tree, blobs);
+      directories.add(NotebookGitPortablePath.directoryOf(file.path()));
+    });
+    readmeContents.forEach((prefix, content) -> {
+      tree.removeFile(PortableTreeEntry.readmePath(prefix));
+      PortableTreeEntry.ofReadme(prefix, content)
+          .ifPresent(entry -> NotebookGitTreeContent.putEntry(entry, tree, blobs));
+      directories.add(prefix);
+    });
     directories.stream().filter(directory -> !directory.isEmpty()).forEach(tree::ensureDirectory);
     normalizeKeep(tree, directories, blobs);
     return NotebookGitTreeContent.fromDirectory(tree, blobs);
@@ -202,15 +197,14 @@ class NotebookGitTreeEncoder {
     directories.stream()
         .filter(directory -> !directory.isEmpty())
         .sorted((a, b) -> Integer.compare(b.length(), a.length()))
-        .forEach(
-            directory -> {
-              if (tree.isEmptyAsideFromKeep(directory)) {
-                NotebookGitTreeContent.putEntry(
-                    PortableTreeEntry.ofText(directory + ".keep", ""), tree, blobs);
-              } else {
-                tree.removeFile(directory + ".keep");
-              }
-            });
+        .forEach(directory -> {
+          if (tree.isEmptyAsideFromKeep(directory)) {
+            NotebookGitTreeContent.putEntry(
+                PortableTreeEntry.ofText(directory + ".keep", ""), tree, blobs);
+          } else {
+            tree.removeFile(directory + ".keep");
+          }
+        });
   }
 
   /**
@@ -226,10 +220,9 @@ class NotebookGitTreeEncoder {
     change.updated.keySet().stream()
         .filter(row -> row.kind() == Notebook.class)
         .findAny()
-        .ifPresent(
-            row ->
-                contents.put(
-                    "", notebookRepository.findById(row.id()).orElseThrow().getReadmeContent()));
+        .ifPresent(row ->
+            contents.put(
+                "", notebookRepository.findById(row.id()).orElseThrow().getReadmeContent()));
     return contents;
   }
 }

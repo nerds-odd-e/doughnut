@@ -45,7 +45,8 @@ public class GetNoteGraphTool {
       1. Use 'list_note_candidates' to list matching notes
       2. Pick a candidate and take its noteId
       3. Use this tool to load focus context around that note
-      4. Follow **outgoingLinks** / **relatedNotes** titles for deeper exploration if needed""";
+      4. Follow **outgoingLinks** / **relatedNotes** titles for deeper exploration if needed\
+      """;
 
   private final NoteGraphService noteGraphService;
   private final JsonMapper objectMapper;

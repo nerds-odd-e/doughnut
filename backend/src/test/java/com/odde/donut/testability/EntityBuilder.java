@@ -29,5 +29,4 @@ public abstract class EntityBuilder<T> {
   protected abstract void beforeCreate(boolean needPersist);
 
   protected void afterCreate(boolean needPersist) {}
-  ;
 }

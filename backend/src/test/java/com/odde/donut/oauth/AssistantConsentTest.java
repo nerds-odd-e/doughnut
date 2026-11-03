@@ -159,11 +159,10 @@ class AssistantConsentTest extends AssistantAuthorizationTestSupport {
     var client = clients.findByClientId("test-assistant");
     clients.save(
         RegisteredClient.from(client)
-            .redirectUris(
-                uris -> {
-                  uris.clear();
-                  uris.add("http://127.0.0.1:4455/callback");
-                })
+            .redirectUris(uris -> {
+              uris.clear();
+              uris.add("http://127.0.0.1:4455/callback");
+            })
             .build());
     var result = authorize(Map.of("redirect_uri", "http://127.0.0.1:5566/callback"));
     assertThat(result.getResponse().getStatus(), is(400));

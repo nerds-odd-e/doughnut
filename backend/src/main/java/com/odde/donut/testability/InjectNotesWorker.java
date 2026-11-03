@@ -118,10 +118,9 @@ class InjectNotesWorker {
     return notebookRepository
         .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(new DisplayName(notebookName))
         .map(nb -> requireMatchingOwnership(nb, ownership, notebookName))
-        .orElseGet(
-            () ->
-                notebookService.createNotebookForOwnership(
-                    ownership, user, currentUTCTimestamp, notebookName, null));
+        .orElseGet(() ->
+            notebookService.createNotebookForOwnership(
+                ownership, user, currentUTCTimestamp, notebookName, null));
   }
 
   private Notebook requireMatchingOwnership(

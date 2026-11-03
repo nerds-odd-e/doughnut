@@ -138,7 +138,8 @@ class WikiLinkMarkdownTest {
           relationship: "[[Alpha]]"
         untouched: "[[Other]]"
         ---
-        Body [[Alpha]].""";
+        Body [[Alpha]].\
+        """;
 
     String rewritten =
         WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
@@ -158,7 +159,8 @@ class WikiLinkMarkdownTest {
               relationship: "[[Alpha]]"
             untouched: "[[Other]]"
             ---
-            Body [[A\\|B]]."""));
+            Body [[A\\|B]].\
+            """));
     NoteLeadingFrontmatter.Split split = NoteLeadingFrontmatter.split(rewritten).orElseThrow();
     assertThat(
         split.frontmatter().supportedValueStringsInInsertionOrder(),
@@ -179,7 +181,8 @@ class WikiLinkMarkdownTest {
               relationship: "[[Alpha]]"
             untouched: "[[Other]]"
             ---
-            Body [[C\\|D]]."""));
+            Body [[C\\|D]].\
+            """));
   }
 
   @Test

@@ -23,15 +23,16 @@ final class RegenerateQuestionMessage {
       throw new RuntimeException(e);
     }
     return """
-                Previously generated non-feasible question:
+    Previously generated non-feasible question:
 
-                %s
+    %s
 
-                Improvement advice:
+    Improvement advice:
 
-                %s
+    %s
 
-                Please regenerate or refine the question based on the above advice."""
+    Please regenerate or refine the question based on the above advice.\
+    """
         .formatted(mcqJson, contestResult.advice);
   }
 

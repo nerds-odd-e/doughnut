@@ -118,10 +118,9 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
                 currentUser.setUser(makeMe.aUser(FIXTURE_PREFIX + UUID.randomUUID()).please());
                 return ownedTracker();
               });
-      openAiStructuredResponseMock.onBeforeCreate(
-          () ->
-              transactionActiveDuringOpenAiCalls.add(
-                  TransactionSynchronizationManager.isActualTransactionActive()));
+      openAiStructuredResponseMock.onBeforeCreate(() ->
+          transactionActiveDuringOpenAiCalls.add(
+              TransactionSynchronizationManager.isActualTransactionActive()));
       return tracker;
     }
 

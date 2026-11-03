@@ -64,9 +64,8 @@ public final class NotebookGitPortablePath {
         folders.stream().collect(Collectors.toMap(PortableTreeFolderRow::id, Function.identity()));
     Map<Integer, String> prefixes = new HashMap<>();
     prefixes.put(null, "");
-    folders.forEach(
-        folder ->
-            prefixOf(folder.id(), byId).ifPresent(prefix -> prefixes.put(folder.id(), prefix)));
+    folders.forEach(folder ->
+        prefixOf(folder.id(), byId).ifPresent(prefix -> prefixes.put(folder.id(), prefix)));
     return prefixes;
   }
 
@@ -74,10 +73,9 @@ public final class NotebookGitPortablePath {
       Integer folderId, Map<Integer, PortableTreeFolderRow> byId) {
     if (folderId == null) return Optional.of("");
     return Optional.ofNullable(byId.get(folderId))
-        .flatMap(
-            folder ->
-                prefixOf(folder.parentFolderId(), byId)
-                    .map(parentPrefix -> ofFolder(parentPrefix, folder.name())));
+        .flatMap(folder ->
+            prefixOf(folder.parentFolderId(), byId)
+                .map(parentPrefix -> ofFolder(parentPrefix, folder.name())));
   }
 
   /** The prefix of the directory holding a file path; empty at the notebook root. */

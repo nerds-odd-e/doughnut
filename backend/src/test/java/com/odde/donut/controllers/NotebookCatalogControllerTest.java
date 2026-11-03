@@ -88,10 +88,9 @@ class NotebookCatalogControllerTest extends NotebookControllerTestBase {
     var view = controller.myNotebooks();
     assertFalse(
         view.catalogItems.stream()
-            .anyMatch(
-                item ->
-                    item instanceof NotebookCatalogSubscribedNotebookItem s
-                        && s.notebook.getId().equals(bazaarNotebook.getId())));
+            .anyMatch(item ->
+                item instanceof NotebookCatalogSubscribedNotebookItem s
+                    && s.notebook.getId().equals(bazaarNotebook.getId())));
     NotebookCatalogGroupItem groupRow =
         view.catalogItems.stream()
             .filter(NotebookCatalogGroupItem.class::isInstance)

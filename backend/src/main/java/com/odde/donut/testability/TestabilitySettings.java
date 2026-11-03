@@ -84,14 +84,13 @@ public class TestabilitySettings {
   }
 
   public void replaceServiceUrls(Map<String, String> setWikidataService) {
-    setWikidataService.forEach(
-        (key, value) -> {
-          if (value == null || value.isEmpty()) {
-            this.replacedServiceUrls.remove(key);
-            return;
-          }
-          this.replacedServiceUrls.put(key, value);
-        });
+    setWikidataService.forEach((key, value) -> {
+      if (value == null || value.isEmpty()) {
+        this.replacedServiceUrls.remove(key);
+        return;
+      }
+      this.replacedServiceUrls.put(key, value);
+    });
   }
 
   public String getOpenAiApiUrl() {

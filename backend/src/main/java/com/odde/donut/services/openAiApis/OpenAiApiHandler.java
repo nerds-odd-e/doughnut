@@ -70,36 +70,33 @@ public class OpenAiApiHandler {
               .async()
               .responses()
               .createStreaming(params)
-              .subscribe(
-                  event -> {
-                    try {
-                      for (String json : mapper.map(event)) {
-                        emitter.onNext(json);
-                      }
-                    } catch (JsonProcessingException e) {
-                      emitter.onError(
-                          new RuntimeException("Failed to serialize legacy chat chunk", e));
-                    } catch (RuntimeException e) {
-                      emitter.onError(e);
-                    }
-                  })
+              .subscribe(event -> {
+                try {
+                  for (String json : mapper.map(event)) {
+                    emitter.onNext(json);
+                  }
+                } catch (JsonProcessingException e) {
+                  emitter.onError(new RuntimeException("Failed to serialize legacy chat chunk", e));
+                } catch (RuntimeException e) {
+                  emitter.onError(e);
+                }
+              })
               .onCompleteFuture()
-              .whenComplete(
-                  (unused, error) -> {
-                    if (error != null) {
-                      if (error.getMessage() != null
-                          && (error.getMessage().contains("401")
-                              || error.getMessage().contains("Unauthorized"))) {
-                        emitter.onError(
-                            new com.odde.donut.exceptions.OpenAiUnauthorizedException(
-                                "Unauthorized: " + error.getMessage()));
-                      } else {
-                        emitter.onError(error);
-                      }
-                    } else {
-                      emitter.onComplete();
-                    }
-                  });
+              .whenComplete((unused, error) -> {
+                if (error != null) {
+                  if (error.getMessage() != null
+                      && (error.getMessage().contains("401")
+                          || error.getMessage().contains("Unauthorized"))) {
+                    emitter.onError(
+                        new com.odde.donut.exceptions.OpenAiUnauthorizedException(
+                            "Unauthorized: " + error.getMessage()));
+                  } else {
+                    emitter.onError(error);
+                  }
+                } else {
+                  emitter.onComplete();
+                }
+              });
         },
         BackpressureStrategy.BUFFER);
   }

@@ -35,10 +35,9 @@ public class NoteTrashUndoService {
     }
     return folderRepository
         .findById(priorFolderId)
-        .orElseThrow(
-            () ->
-                new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Prior containing folder not found."));
+        .orElseThrow(() ->
+            new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Prior containing folder not found."));
   }
 
   public Note undoSameNotebook(

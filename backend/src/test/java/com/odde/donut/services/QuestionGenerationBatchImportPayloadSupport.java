@@ -37,7 +37,8 @@ final class QuestionGenerationBatchImportPayloadSupport {
             .formatted(OBJECT_MAPPER.writeValueAsString(structuredOutput));
 
     return """
-        {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":%s},"error":null}"""
+    {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":%s},"error":null}\
+    """
         .formatted(customId, OBJECT_MAPPER.readTree(responseBody));
   }
 }

@@ -84,15 +84,14 @@ public final class FrontmatterInPlaceEdit {
   public static String setTopLevelScalar(String yamlRaw, String key, String value) {
     String entry = dumpEntry(key, value);
     return topLevelEntry(yamlRaw, key)
-        .map(
-            tuple ->
-                splice(
-                    yamlRaw,
-                    List.of(
-                        new Replacement(
-                            offset(yamlRaw, tuple.getKeyNode().getStartMark()),
-                            offset(yamlRaw, tuple.getValueNode().getEndMark()),
-                            entry))))
+        .map(tuple ->
+            splice(
+                yamlRaw,
+                List.of(
+                    new Replacement(
+                        offset(yamlRaw, tuple.getKeyNode().getStartMark()),
+                        offset(yamlRaw, tuple.getValueNode().getEndMark()),
+                        entry))))
         .orElseGet(() -> yamlRaw.isEmpty() ? entry : yamlRaw + "\n" + entry);
   }
 
@@ -150,10 +149,9 @@ public final class FrontmatterInPlaceEdit {
       return Optional.empty();
     }
     return mapping.getValue().stream()
-        .filter(
-            tuple ->
-                tuple.getKeyNode() instanceof ScalarNode keyNode
-                    && keyNode.getValue().equalsIgnoreCase(key))
+        .filter(tuple ->
+            tuple.getKeyNode() instanceof ScalarNode keyNode
+                && keyNode.getValue().equalsIgnoreCase(key))
         .findFirst();
   }
 

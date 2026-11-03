@@ -73,10 +73,9 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest extends SpringTest
 
   @AfterEach
   void cleanupCommittedState() {
-    inCommittedTransaction(
-        () ->
-            CommittedUserCleanup.deleteByUserExternalIdentifierLike(
-                entityManager, COMMITTED_USER_PREFIX + "%"));
+    inCommittedTransaction(() ->
+        CommittedUserCleanup.deleteByUserExternalIdentifierLike(
+            entityManager, COMMITTED_USER_PREFIX + "%"));
   }
 
   @Nested
@@ -94,11 +93,9 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest extends SpringTest
           RuntimeException.class,
           () -> submissionService.submitPlannedBatch(plannedBatch, currentTime));
 
-      inCommittedTransaction(
-          () ->
-              assertThat(
-                  batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).isPresent(),
-                  is(false)));
+      inCommittedTransaction(() ->
+          assertThat(
+              batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).isPresent(), is(false)));
     }
 
     @Test
@@ -111,11 +108,10 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest extends SpringTest
               callingTx.executeWithoutResult(
                   status -> submissionService.submitPlannedBatch(plannedBatch, currentTime)));
 
-      inCommittedTransaction(
-          () ->
-              assertThat(
-                  batchRepository.findById(plannedBatch.getId()).orElseThrow().getStatus(),
-                  is(QuestionGenerationBatchStatus.FAILED)));
+      inCommittedTransaction(() ->
+          assertThat(
+              batchRepository.findById(plannedBatch.getId()).orElseThrow().getStatus(),
+              is(QuestionGenerationBatchStatus.FAILED)));
     }
   }
 
@@ -126,13 +122,8 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest extends SpringTest
     @BeforeEach
     void setupPreviousSubmission() {
       previousSubmission = new Timestamp(currentTime.getTime() - TimeUnit.DAYS.toMillis(2));
-      inCommittedTransaction(
-          () ->
-              makeMe
-                  .aQuestionGenerationBatch()
-                  .forUser(user)
-                  .completedAt(previousSubmission)
-                  .please());
+      inCommittedTransaction(() ->
+          makeMe.aQuestionGenerationBatch().forUser(user).completedAt(previousSubmission).please());
     }
 
     @Test
@@ -147,41 +138,38 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest extends SpringTest
       assertThat(counter("question_generation_batch.failed") - failedBaseline, is(1.0));
       assertThat(counter("question_generation_batch.submitted") - submittedBaseline, is(0.0));
 
-      inCommittedTransaction(
-          () -> {
-            QuestionGenerationBatch batch =
-                batchRepository.findById(plannedBatch.getId()).orElseThrow();
-            assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.FAILED));
-            assertThat(batch.getOpenaiInputFileId(), is(nullValue()));
-            assertThat(batch.getOpenaiBatchId(), is(nullValue()));
-            assertThat(batch.getSubmittedAt(), is(nullValue()));
-            List<QuestionGenerationBatchRequest> requests =
-                batchRequestRepository.findByBatch_Id(batch.getId());
-            assertThat(requests, hasSize(1));
-            assertThat(
-                requests.get(0).getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
-            assertThat(
-                requests.get(0).getErrorDetail(),
-                containsString(QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED));
-            assertThat(requests.get(0).getErrorDetail(), containsString("upload failed"));
-            assertThat(
-                batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
-                equalTo(previousSubmission));
-          });
+      inCommittedTransaction(() -> {
+        QuestionGenerationBatch batch =
+            batchRepository.findById(plannedBatch.getId()).orElseThrow();
+        assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.FAILED));
+        assertThat(batch.getOpenaiInputFileId(), is(nullValue()));
+        assertThat(batch.getOpenaiBatchId(), is(nullValue()));
+        assertThat(batch.getSubmittedAt(), is(nullValue()));
+        List<QuestionGenerationBatchRequest> requests =
+            batchRequestRepository.findByBatch_Id(batch.getId());
+        assertThat(requests, hasSize(1));
+        assertThat(requests.get(0).getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
+        assertThat(
+            requests.get(0).getErrorDetail(),
+            containsString(QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED));
+        assertThat(requests.get(0).getErrorDetail(), containsString("upload failed"));
+        assertThat(
+            batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
+            equalTo(previousSubmission));
+      });
     }
   }
 
   private void replaceWithCommittedPlannedBatch() {
-    inCommittedTransaction(
-        () -> {
-          user = uniqueCommittedUser();
-          Note note = makeMe.aNote().notebookOwnedBy(user).please();
-          makeMe
-              .aMemoryTrackerFor(note)
-              .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-              .please();
-          plannedBatch = planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
-        });
+    inCommittedTransaction(() -> {
+      user = uniqueCommittedUser();
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
+      makeMe
+          .aMemoryTrackerFor(note)
+          .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
+          .please();
+      plannedBatch = planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
+    });
   }
 
   private User uniqueCommittedUser() {

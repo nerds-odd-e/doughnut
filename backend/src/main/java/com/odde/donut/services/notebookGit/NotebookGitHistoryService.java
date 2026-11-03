@@ -66,18 +66,16 @@ public class NotebookGitHistoryService {
   public NotebookGitBinding resetHistory(Notebook notebook, Instant resetTime) {
     return notebookGitBindingRepository
         .findByNotebookIdForUpdate(notebook.getId())
-        .map(
-            binding ->
-                writeRootCommit(
-                    notebook, binding, resetTime, RESET_COMMIT_MESSAGE, acceptedMetadata(binding)))
-        .orElseGet(
-            () ->
-                writeRootCommit(
-                    notebook,
-                    newBinding(notebook),
-                    resetTime,
-                    RESET_COMMIT_MESSAGE,
-                    NotebookGitAttributes.initialMetadata()));
+        .map(binding ->
+            writeRootCommit(
+                notebook, binding, resetTime, RESET_COMMIT_MESSAGE, acceptedMetadata(binding)))
+        .orElseGet(() ->
+            writeRootCommit(
+                notebook,
+                newBinding(notebook),
+                resetTime,
+                RESET_COMMIT_MESSAGE,
+                NotebookGitAttributes.initialMetadata()));
   }
 
   private NotebookGitBinding newBinding(Notebook notebook) {

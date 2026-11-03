@@ -49,10 +49,9 @@ final class NotebookLiveProjectionTestReader {
         () -> {
           Map<Integer, Folder> folders = foldersById(folderRepository, notebookId);
           return notebookAttachmentRepository.findPortableTreeRowsByNotebookId(notebookId).stream()
-              .map(
-                  row ->
-                      new PortableTreeEntry(
-                          path(folders, row.folderId(), row.filename()), row.acceptedGitContent()))
+              .map(row ->
+                  new PortableTreeEntry(
+                      path(folders, row.folderId(), row.filename()), row.acceptedGitContent()))
               .sorted(Comparator.comparing(PortableTreeEntry::path))
               .toList();
         });

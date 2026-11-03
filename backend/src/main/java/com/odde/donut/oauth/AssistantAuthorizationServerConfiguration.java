@@ -85,111 +85,86 @@ public class AssistantAuthorizationServerConfiguration {
             server,
             config ->
                 config
-                    .clientAuthentication(
-                        endpoint ->
-                            endpoint.authenticationProviders(
-                                providers ->
-                                    providers.forEach(
-                                        provider -> {
-                                          if (provider
-                                              instanceof
-                                              ClientSecretAuthenticationProvider secret) {
-                                            secret.setPasswordEncoder(
-                                                PasswordEncoderFactories
-                                                    .createDelegatingPasswordEncoder());
-                                          }
-                                        })))
-                    .authorizationEndpoint(
-                        endpoint ->
-                            endpoint
-                                .consentPage("/assistant-consent")
-                                .authenticationProviders(
-                                    providers ->
-                                        providers.forEach(
-                                            provider -> {
-                                              if (provider
-                                                  instanceof
-                                                  OAuth2AuthorizationCodeRequestAuthenticationProvider
-                                                      codeRequest) {
-                                                codeRequest.setAuthenticationValidator(validator);
-                                              }
-                                            })))
-                    .tokenEndpoint(
-                        endpoint ->
-                            endpoint.authenticationProviders(
-                                providers ->
-                                    AssistantGrantAuthenticationProvider.serialize(
-                                        providers, grants)))
-                    .tokenRevocationEndpoint(
-                        endpoint ->
-                            endpoint.authenticationProviders(
-                                providers ->
-                                    AssistantGrantAuthenticationProvider.serialize(
-                                        providers, grants)))
-                    .authorizationServerMetadataEndpoint(
-                        metadata ->
-                            metadata.authorizationServerMetadataCustomizer(
-                                builder ->
-                                    builder
-                                        .claims(
-                                            claims -> {
-                                              claims
-                                                  .keySet()
-                                                  .retainAll(
-                                                      Set.of(
-                                                          "issuer",
-                                                          "authorization_endpoint",
-                                                          "token_endpoint",
-                                                          "revocation_endpoint",
-                                                          "response_types_supported"));
-                                              claims.put(
-                                                  "scopes_supported",
-                                                  List.of(
-                                                      AssistantAuthorizationConfiguration
-                                                          .READ_SCOPE,
-                                                      AssistantAuthorizationConfiguration
-                                                          .RECORD_SCOPE));
-                                              claims.put(
-                                                  "grant_types_supported",
-                                                  List.of("authorization_code", "refresh_token"));
-                                              claims.put(
-                                                  "token_endpoint_auth_methods_supported",
-                                                  List.of("client_secret_basic"));
-                                              claims.put(
-                                                  "revocation_endpoint_auth_methods_supported",
-                                                  List.of("client_secret_basic"));
-                                              claims.put(
-                                                  "code_challenge_methods_supported",
-                                                  List.of("S256"));
-                                            })
-                                        .tlsClientCertificateBoundAccessTokens(false))))
-        .authorizeHttpRequests(
-            authorize ->
-                authorize
-                    .requestMatchers(AssistantOAuthEndpoints.ISSUER_METADATA)
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .csrf(
-            csrf ->
-                csrf.csrfTokenRepository(new CookieCsrfTokenRepository())
-                    .withObjectPostProcessor(
-                        new ObjectPostProcessor<CsrfFilter>() {
-                          @Override
-                          public <O extends CsrfFilter> O postProcess(O filter) {
-                            // SAS adds an endpoint-wide exemption during init. Consent is a
-                            // browser form, so install its precise policy on the final filter.
-                            filter.setRequireCsrfProtectionMatcher(
-                                new OrRequestMatcher(
-                                    PathPatternRequestMatcher.withDefaults()
-                                        .matcher(
-                                            HttpMethod.POST, AssistantOAuthEndpoints.AUTHORIZE),
-                                    PathPatternRequestMatcher.withDefaults()
-                                        .matcher(
-                                            HttpMethod.DELETE, AssistantOAuthEndpoints.ASSISTANT)));
-                            return filter;
-                          }
-                        }))
+                    .clientAuthentication(endpoint ->
+                        endpoint.authenticationProviders(providers ->
+                            providers.forEach(provider -> {
+                              if (provider instanceof ClientSecretAuthenticationProvider secret) {
+                                secret.setPasswordEncoder(
+                                    PasswordEncoderFactories.createDelegatingPasswordEncoder());
+                              }
+                            })))
+                    .authorizationEndpoint(endpoint ->
+                        endpoint
+                            .consentPage("/assistant-consent")
+                            .authenticationProviders(providers ->
+                                providers.forEach(provider -> {
+                                  if (provider
+                                      instanceof
+                                      OAuth2AuthorizationCodeRequestAuthenticationProvider
+                                          codeRequest) {
+                                    codeRequest.setAuthenticationValidator(validator);
+                                  }
+                                })))
+                    .tokenEndpoint(endpoint ->
+                        endpoint.authenticationProviders(providers ->
+                            AssistantGrantAuthenticationProvider.serialize(providers, grants)))
+                    .tokenRevocationEndpoint(endpoint ->
+                        endpoint.authenticationProviders(providers ->
+                            AssistantGrantAuthenticationProvider.serialize(providers, grants)))
+                    .authorizationServerMetadataEndpoint(metadata ->
+                        metadata.authorizationServerMetadataCustomizer(builder ->
+                            builder
+                                .claims(claims -> {
+                                  claims
+                                      .keySet()
+                                      .retainAll(
+                                          Set.of(
+                                              "issuer",
+                                              "authorization_endpoint",
+                                              "token_endpoint",
+                                              "revocation_endpoint",
+                                              "response_types_supported"));
+                                  claims.put(
+                                      "scopes_supported",
+                                      List.of(
+                                          AssistantAuthorizationConfiguration.READ_SCOPE,
+                                          AssistantAuthorizationConfiguration.RECORD_SCOPE));
+                                  claims.put(
+                                      "grant_types_supported",
+                                      List.of("authorization_code", "refresh_token"));
+                                  claims.put(
+                                      "token_endpoint_auth_methods_supported",
+                                      List.of("client_secret_basic"));
+                                  claims.put(
+                                      "revocation_endpoint_auth_methods_supported",
+                                      List.of("client_secret_basic"));
+                                  claims.put("code_challenge_methods_supported", List.of("S256"));
+                                })
+                                .tlsClientCertificateBoundAccessTokens(false))))
+        .authorizeHttpRequests(authorize ->
+            authorize
+                .requestMatchers(AssistantOAuthEndpoints.ISSUER_METADATA)
+                .permitAll()
+                .anyRequest()
+                .authenticated())
+        .csrf(csrf ->
+            csrf.csrfTokenRepository(new CookieCsrfTokenRepository())
+                .withObjectPostProcessor(
+                    new ObjectPostProcessor<CsrfFilter>() {
+                      @Override
+                      public <O extends CsrfFilter> O postProcess(O filter) {
+                        // SAS adds an endpoint-wide exemption during init. Consent is a
+                        // browser form, so install its precise policy on the final filter.
+                        filter.setRequireCsrfProtectionMatcher(
+                            new OrRequestMatcher(
+                                PathPatternRequestMatcher.withDefaults()
+                                    .matcher(HttpMethod.POST, AssistantOAuthEndpoints.AUTHORIZE),
+                                PathPatternRequestMatcher.withDefaults()
+                                    .matcher(
+                                        HttpMethod.DELETE, AssistantOAuthEndpoints.ASSISTANT)));
+                        return filter;
+                      }
+                    }))
         .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(entryPoint));
     return http.build();
   }
@@ -198,14 +173,13 @@ public class AssistantAuthorizationServerConfiguration {
   FilterRegistrationBean<OAuth2ProtectedResourceMetadataFilter> assistantProtectedResourceMetadata(
       AssistantOAuthEndpoints endpoints) {
     OAuth2ProtectedResourceMetadataFilter filter = new OAuth2ProtectedResourceMetadataFilter();
-    filter.setProtectedResourceMetadataCustomizer(
-        metadata ->
-            metadata
-                .resource(endpoints.resource())
-                .authorizationServer(endpoints.issuer())
-                .scope(AssistantAuthorizationConfiguration.READ_SCOPE)
-                .scope(AssistantAuthorizationConfiguration.RECORD_SCOPE)
-                .tlsClientCertificateBoundAccessTokens(false));
+    filter.setProtectedResourceMetadataCustomizer(metadata ->
+        metadata
+            .resource(endpoints.resource())
+            .authorizationServer(endpoints.issuer())
+            .scope(AssistantAuthorizationConfiguration.READ_SCOPE)
+            .scope(AssistantAuthorizationConfiguration.RECORD_SCOPE)
+            .tlsClientCertificateBoundAccessTokens(false));
     FilterRegistrationBean<OAuth2ProtectedResourceMetadataFilter> registration =
         new FilterRegistrationBean<>(filter);
     registration.addUrlPatterns(AssistantOAuthEndpoints.RESOURCE_METADATA);

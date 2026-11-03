@@ -55,13 +55,12 @@ public class NotePropertyIndexService {
     // preventing TransientPropertyValueException.
     entityManager.persist(note);
     NoteContentMarkdown.splitLeadingFrontmatter(note.getContent() == null ? "" : note.getContent())
-        .ifPresent(
-            lf -> {
-              Map<String, AuthoredNoteReferenceRow> bySourceLocalKey =
-                  note.authoredReferenceRowsBySourceLocalKey();
-              NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)
-                  .forEach(planned -> saveIndexRow(note, planned, bySourceLocalKey));
-            });
+        .ifPresent(lf -> {
+          Map<String, AuthoredNoteReferenceRow> bySourceLocalKey =
+              note.authoredReferenceRowsBySourceLocalKey();
+          NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)
+              .forEach(planned -> saveIndexRow(note, planned, bySourceLocalKey));
+        });
   }
 
   public List<AuthoredNoteReference> authoredReferencesForPropertyValue(
@@ -94,19 +93,17 @@ public class NotePropertyIndexService {
   private List<String> plannedSourceLocalKeys(Note note, String propertyKey, String propertyValue) {
     return NoteContentMarkdown.splitLeadingFrontmatter(
             note.getContent() == null ? "" : note.getContent())
-        .map(
-            leadingFrontmatter ->
-                NotePropertyIndexPlanner.plannedRows(
-                        leadingFrontmatter.frontmatter(), canonicalDonutOrigin)
-                    .stream()
-                    .filter(
-                        planned ->
-                            planned.propertyKey().equals(propertyKey)
-                                && planned.propertyValue().equals(propertyValue))
-                    .map(NotePropertyIndexPlanner.PlannedRow::sourceLocalKey)
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .toList())
+        .map(leadingFrontmatter ->
+            NotePropertyIndexPlanner.plannedRows(
+                    leadingFrontmatter.frontmatter(), canonicalDonutOrigin)
+                .stream()
+                .filter(planned ->
+                    planned.propertyKey().equals(propertyKey)
+                        && planned.propertyValue().equals(propertyValue))
+                .map(NotePropertyIndexPlanner.PlannedRow::sourceLocalKey)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList())
         .orElseGet(List::of);
   }
 

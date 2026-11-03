@@ -25,7 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice()
+@ControllerAdvice
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(UnexpectedNoAccessRightException.class)
   public ResponseEntity<Void> handleNoAccessRight() {

@@ -34,14 +34,9 @@ public class CommonConfiguration {
   }
 
   void commonConfig(HttpSecurity http) throws Exception {
-    http.authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers("/login/continue").authenticated().anyRequest().permitAll())
-        .logout(
-            l ->
-                l.logoutUrl("/logout")
-                    .logoutSuccessUrl("/")
-                    .invalidateHttpSession(true)
-                    .permitAll());
+    http.authorizeHttpRequests(auth ->
+            auth.requestMatchers("/login/continue").authenticated().anyRequest().permitAll())
+        .logout(l ->
+            l.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true).permitAll());
   }
 }

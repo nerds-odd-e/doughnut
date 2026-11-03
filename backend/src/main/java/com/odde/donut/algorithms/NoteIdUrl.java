@@ -68,9 +68,8 @@ public final class NoteIdUrl {
     }
     String href = m.group(2);
     return noteIdFromHref(href, canonicalOrigin)
-        .map(
-            noteId ->
-                new AuthoredNoteReference.NoteIdUrlTarget(authoredLink, noteId, href, m.group(1)));
+        .map(noteId ->
+            new AuthoredNoteReference.NoteIdUrlTarget(authoredLink, noteId, href, m.group(1)));
   }
 
   /** True when {@code authoredLink} is a recognized Markdown note-ID URL spelling. */

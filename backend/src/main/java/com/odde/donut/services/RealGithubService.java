@@ -39,8 +39,7 @@ public class RealGithubService implements GithubService {
     FailureReport.GithubIssue githubIssue = failureReport.getGithubIssue();
     final String body = new ObjectMapperConfig().objectMapper().writeValueAsString(githubIssue);
     Map<String, Object> map =
-        apiRequestWithMapAsResult(
-            "issues", (builder) -> builder.POST(BodyPublishers.ofString(body)));
+        apiRequestWithMapAsResult("issues", builder -> builder.POST(BodyPublishers.ofString(body)));
 
     return (Integer) map.get("number");
   }

@@ -25,14 +25,12 @@ public class NotebookAttachmentFile {
 
   public byte[] bytes(NotebookAttachment attachment) {
     return lfsPointer(attachment)
-        .map(
-            pointer ->
-                notebookAttachmentContent
-                    .get(attachment.getNotebook().getId(), pointer.sha256Hex())
-                    .orElseThrow(
-                        () ->
-                            new IllegalStateException(
-                                "File content unavailable: " + attachment.getFilename())))
+        .map(pointer ->
+            notebookAttachmentContent
+                .get(attachment.getNotebook().getId(), pointer.sha256Hex())
+                .orElseThrow(() ->
+                    new IllegalStateException(
+                        "File content unavailable: " + attachment.getFilename())))
         .orElse(attachment.getAcceptedGitContent());
   }
 
