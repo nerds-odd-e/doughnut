@@ -110,7 +110,7 @@ client read that field. The export tests (14), `*DailyProbe*` (13), and
 ### 3. Download recall history from the recall stats tab
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `frontend/tests/pages/settings/RecallStatsSettingsTab.spec.ts` (mock the
 generated `UserController` export call with `mockSdkService`, mock
 `file-saver` as `NoteExportForm.spec.ts` does);
@@ -121,6 +121,14 @@ the learner activates the download control → the export is requested with the
 browser timezone and its response is saved as a `.json` file whose name holds
 the export date. Requires the regenerated API client (`generate-api-client`)
 after slice 1.
+
+Accepted (2026-11-03): a "Download recall history" button sits at the top
+of the tab whenever stats have loaded, with data and in the empty state. It
+saves the export response as `recall-history-<local date>.json`, where the
+date comes from `localDayIso` in the browser timezone.
+`RecallStatsSettingsTab.spec.ts` (6 tests),
+`RecallStatsSettingsTab.dailyProbe.spec.ts` (3 tests), and
+`vue-tsc --noEmit` pass.
 
 ## Plan concerns
 

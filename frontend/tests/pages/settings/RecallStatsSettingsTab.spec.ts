@@ -2,14 +2,18 @@ import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import RecallStatsSettingsTab from "@/pages/settings/RecallStatsSettingsTab.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import timezoneParam from "@/managedApi/window/timezoneParam"
+import { saveAs } from "file-saver"
 import type {
+  RecallHistoryExport,
   RecallStatsDto,
   DayCount,
   DayAvgResponseTime,
   DayRetention,
 } from "@generated/donut-backend-api"
 import { flushPromises } from "@vue/test-utils"
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
+
+vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
 function buildCalendar(): DayCount[] {
   const days: DayCount[] = []
@@ -170,5 +174,69 @@ describe("RecallStatsSettingsTab", () => {
     await wrapper.find('[data-testid="recall-stats-retry"]').trigger("click")
     await flushPromises()
     expect(UserController.getRecallStats).toHaveBeenCalledTimes(2)
+  })
+
+  describe("recall history download", () => {
+    const exported: RecallHistoryExport = {
+      timezone: timezoneParam(),
+      exportedAt: "2026-11-03T12:00:00Z",
+      recallEvents: [
+        {
+          recordedAt: "2026-11-02T08:00:00Z",
+          grade: "GOOD",
+          kind: "JUST_REVIEW",
+          elapsedHours: 24,
+          memoryTrackerId: 7,
+          memoryTrackerType: "UNDERSTANDING",
+        },
+      ],
+      dailyProbes: [],
+    }
+
+    const mountTab = async (stats: RecallStatsDto) => {
+      mockSdkService(UserController, "getRecallStats", stats)
+      const wrapper = helper
+        .component(RecallStatsSettingsTab)
+        .withRouter()
+        .mount()
+      await flushPromises()
+      return wrapper
+    }
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it.each([
+      ["with data", fixture],
+      ["in the empty state", { totals: { totalReviewsAllTime: 0 } }],
+    ])("offers the download control %s", async (_, stats) => {
+      const wrapper = await mountTab(stats)
+
+      expect(
+        wrapper.find('[data-testid="download-recall-history"]').text()
+      ).toContain("Download recall history")
+    })
+
+    it("saves the exported JSON as a dated file using the browser timezone", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] })
+      vi.setSystemTime(new Date("2026-11-03T12:00:00Z"))
+      const spy = mockSdkService(
+        UserController,
+        "exportRecallHistory",
+        exported
+      )
+      const wrapper = await mountTab({ totals: { totalReviewsAllTime: 0 } })
+
+      await wrapper
+        .find('[data-testid="download-recall-history"]')
+        .trigger("click")
+      await flushPromises()
+
+      expect(spy).toHaveBeenCalledWith({ query: { timezone: timezoneParam() } })
+      const [blob, filename] = vi.mocked(saveAs).mock.calls[0]!
+      expect(filename).toBe("recall-history-2026-11-03.json")
+      expect(JSON.parse(await (blob as Blob).text())).toEqual(exported)
+    })
   })
 })

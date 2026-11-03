@@ -1,5 +1,17 @@
 <template>
-  <div v-if="stats && (hasReviews || hasVisibleDailyProbe)">
+  <template v-if="stats">
+  <div class="flex justify-end">
+    <button
+      type="button"
+      class="daisy-btn daisy-btn-sm"
+      data-testid="download-recall-history"
+      @click="downloadRecallHistory"
+    >
+      <Download class="w-4 h-4" />
+      Download recall history
+    </button>
+  </div>
+  <div v-if="hasReviews || hasVisibleDailyProbe">
     <template v-if="hasReviews">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <PaceTile :pace="stats.pace ?? {}" />
@@ -77,7 +89,7 @@
     />
   </div>
   <div
-    v-else-if="stats"
+    v-else
     data-testid="recall-stats-empty"
     class="mt-6 rounded-box bg-base-200 p-6 text-center"
   >
@@ -86,6 +98,7 @@
       Once you start reviewing, your recall stats will appear here.
     </p>
   </div>
+  </template>
   <div
     v-else-if="error"
     data-testid="recall-stats-error"
@@ -124,6 +137,8 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import type { RecallStatsDto } from "@generated/donut-backend-api"
 import { computed, onMounted, ref } from "vue"
+import { saveAs } from "file-saver"
+import { Download } from "@lucide/vue"
 
 const stats = ref<RecallStatsDto | undefined>()
 const error = ref(false)
@@ -169,6 +184,20 @@ const load = async () => {
   } else {
     stats.value = data
   }
+}
+
+const downloadRecallHistory = async () => {
+  const timezone = timezoneParam()
+  const { data, error: apiError } = await apiCallWithLoading(() =>
+    UserController.exportRecallHistory({ query: { timezone } })
+  )
+  if (apiError) return
+  saveAs(
+    new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json;charset=utf-8",
+    }),
+    `recall-history-${localDayIso(timezone)}.json`
+  )
 }
 
 onMounted(load)

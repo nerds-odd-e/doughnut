@@ -7,13 +7,13 @@ Input: the story-1 section of `.planning/seeds/SEED-100-recall-history-export.md
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | Goal: A signed-in learner can get one JSON file holding every recall event they have and every daily probe they took. | slice 3 | |
-| 1a | Goal: The file is usable by the learner, or an agent working for them, to study recall-session efficiency, repetition efficiency, and how the morning probe relates to that day's recall. | slice 3 | |
-| 1b | Goal: The export is the data source for story 2. | slice 3 | |
+| 1 | Goal: A signed-in learner can get one JSON file holding every recall event they have and every daily probe they took. | slice 3 | observed: RecallStatsSettingsTab.spec.ts 'saves the exported JSON as a dated file using the browser timezone' saves the export holding recallEvents and dailyProbes (UserRecallHistoryExportControllerTest) |
+| 1a | Goal: The file is usable by the learner, or an agent working for them, to study recall-session efficiency, repetition efficiency, and how the morning probe relates to that day's recall. | slice 3 | observed: UserRecallHistoryExportControllerTest: per-event tracker/note ids, timing fields, grades; probes with scores and trials, all with local offsets |
+| 1b | Goal: The export is the data source for story 2. | slice 3 | observed: GET /api/user/recall-history-export and the tab download deliver that file |
 | X1 | Goal (exclusion): The export itself makes no analysis. | slice 1 | observed: RecallHistoryExportService.export maps rows to fields only; no derived statistics |
 | 2 | Who and how: Only the current user's own data is exported. | slice 1 | observed: RecallLogRepository.findRecallEventRows WHERE mt.user.id = :userId; controller passes current user |
-| 2a | Who and how: Two ways in give one (the same) response. | slice 3 | |
-| 2a.1 | Who and how: Way in 1: a download control on the recall stats settings tab. | slice 3 | |
+| 2a | Who and how: Two ways in give one (the same) response. | slice 3 | observed: RecallStatsSettingsTab.spec.ts saves exactly the parsed exportRecallHistory response; UserRecallHistoryExportControllerTest.anAgentWithTheLearnersTokenGetsTheJson same endpoint |
+| 2a.1 | Who and how: Way in 1: a download control on the recall stats settings tab. | slice 3 | observed: RecallStatsSettingsTab.spec.ts 'offers the download control with data' |
 | 2a.2 | Who and how: Way in 2: an authenticated `GET` under `/api`. | slice 1 | observed: UserRecallHistoryExportControllerTest.anAgentWithTheLearnersTokenGetsTheJson: GET /api/user/recall-history-export → 200 |
 | 2a.3 | Who and how: The `GET` is described in OpenAPI. | slice 2 | G1 |
 | 2a.4 | Who and how: An agent calls the `GET` with the user's existing API token (`Authorization: Bearer`, as generated on the settings page). | slice 1 | observed: UserRecallHistoryExportControllerTest.anAgentWithTheLearnersTokenGetsTheJson: Bearer user token → 200 JSON |
@@ -21,7 +21,7 @@ Input: the story-1 section of `.planning/seeds/SEED-100-recall-history-export.md
 | X3 | Who and how (exclusion): No MCP tool. | slice 1 | observed: diff adds no MCP tool |
 | X4 | Who and how (exclusion): No CLI command. | slice 1 | observed: diff adds no CLI command |
 | 3 | Timezone: The request names an IANA timezone, as the recall stats request already does. | slice 1 | observed: UserController.exportRecallHistory required timezone param via TimezoneUtils.parseTimezone |
-| 3a | Timezone: The page sends the browser's timezone. | slice 3 | |
+| 3a | Timezone: The page sends the browser's timezone. | slice 3 | observed: RecallStatsSettingsTab.spec.ts 'saves the exported JSON...': export called with timezoneParam() |
 | 3b.1 | Timezone: The file records that timezone. | slice 1 | observed: UserRecallHistoryExportControllerTest.namesTheTimezoneAndTheExportTimeInThatZone: timezone Asia/Bangkok |
 | 3b.2 | Timezone: The file records the export time. | slice 1 | observed: UserRecallHistoryExportControllerTest.namesTheTimezoneAndTheExportTimeInThatZone: exportedAt 1989-01-02T15:00:00+07:00 |
 | 3c | Timezone: Every timestamp in the file is ISO-8601 with that zone's offset, so "local day" and "morning" can be read directly. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials completedAt +07:00; slice 1 event timestamps +07:00 |
@@ -79,21 +79,21 @@ Input: the story-1 section of `.planning/seeds/SEED-100-recall-history-export.md
 | X5 | Deferred (not rejected): Note titles or other note content. | slice 1 | observed: RecallHistoryExport DTO carries no such field; query reads only recall logs of the current user |
 | X6 | Deferred (not rejected): Recall prompts that were shown but never answered. | slice 1 | observed: RecallHistoryExport DTO carries no such field; query reads only recall logs of the current user |
 | X7 | Deferred (not rejected): A session id or any other derived value. | slice 1 | observed: RecallHistoryExport DTO carries no such field; query reads only recall logs of the current user |
-| X8 | Deferred (not rejected): CSV or other formats. | slice 3 | |
+| X8 | Deferred (not rejected): CSV or other formats. | slice 3 | observed: RecallStatsSettingsTab.vue saves JSON only |
 | X9 | Deferred (not rejected): A format-version field (one consumer, story 2, reads it once). | slice 1 | observed: RecallHistoryExport DTO carries no such field; query reads only recall logs of the current user |
 | X10 | Out of scope: Any analysis, charts, or derived statistics. | slice 1 | observed: RecallHistoryExport DTO carries no such field; query reads only recall logs of the current user |
-| X11 | Out of scope: Importing data. | slice 3 | |
+| X11 | Out of scope: Importing data. | slice 3 | observed: diff adds no import path |
 | X12 | Out of scope: Exporting other users' data. | slice 1 | observed: RecallHistoryExport DTO carries no such field; query reads only recall logs of the current user |
-| 8 | UI: On the recall stats tab, one control labeled as downloading the recall history. | slice 3 | |
-| 8a | UI: The control is available whenever the tab is shown, including its empty state. | slice 3 | |
-| 8b | UI: It saves a `.json` file. | slice 3 | |
-| 8c | UI: The file name includes the export date. | slice 3 | |
-| X13 | UI (exclusion): No preview. | slice 3 | |
-| X14 | UI (exclusion): No options. | slice 3 | |
-| E1 | Key examples: Learner with 3 answered recall prompts, 1 just review, 1 tutor feedback, 2 daily probes, in `Asia/Bangkok`, downloads from the recall stats tab → file holds 5 recall events and 2 probes in time order; timestamps end in `+07:00`; file names `Asia/Bangkok` and the export time. | slice 3 | |
+| 8 | UI: On the recall stats tab, one control labeled as downloading the recall history. | slice 3 | observed: RecallStatsSettingsTab.spec.ts 'offers the download control': button text 'Download recall history' |
+| 8a | UI: The control is available whenever the tab is shown, including its empty state. | slice 3 | observed: RecallStatsSettingsTab.spec.ts 'offers the download control in the empty state' |
+| 8b | UI: It saves a `.json` file. | slice 3 | observed: RecallStatsSettingsTab.spec.ts 'saves the exported JSON...': Blob parsed as JSON, name ends .json |
+| 8c | UI: The file name includes the export date. | slice 3 | observed: RecallStatsSettingsTab.spec.ts 'saves the exported JSON...': recall-history-2026-11-03.json |
+| X13 | UI (exclusion): No preview. | slice 3 | observed: RecallStatsSettingsTab.vue: no preview |
+| X14 | UI (exclusion): No options. | slice 3 | observed: RecallStatsSettingsTab.vue: no options |
+| E1 | Key examples: Learner with 3 answered recall prompts, 1 just review, 1 tutor feedback, 2 daily probes, in `Asia/Bangkok`, downloads from the recall stats tab → file holds 5 recall events and 2 probes in time order; timestamps end in `+07:00`; file names `Asia/Bangkok` and the export time. | slice 3 | observed: UserRecallHistoryExportControllerTest.listsEveryKindOfRecallEventOldestFirstInTheRequestedZone + UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials (+07:00, timezone, exportedAt) + RecallStatsSettingsTab.spec.ts saves that response from the tab |
 | E2 | Key examples: Two answers on the same note's memory tracker, exported → both events carry the same memory tracker id and note id; the second has the stability and difficulty the first left. | slice 1 | observed: UserRecallHistoryExportControllerTest.twoAnswersOnOneTrackerShareItsIdsAndTheSecondStartsFromTheStateTheFirstLeft |
 | E3 | Key examples: Learner who never took a daily probe exports → recall events present; probe list empty. | slice 2 | observed: UserRecallHistoryExportControllerTest.aLearnerWithoutProbesGetsRecallEventsAndAnEmptyProbeList |
 | E4 | Key examples: Learner who took probes and later turned the daily probe off exports → the earlier probes are in the file. | slice 2 | observed: UserRecallHistoryExportControllerTest.probesTakenBeforeTheProbeWasTurnedOffAreStillExported |
 | E5 | Key examples: Answer excluded as ambiguous, exported → its event is present with its exclusion time and reason. | slice 1 | observed: UserRecallHistoryExportControllerTest.anExcludedAnswerIsPresentWithItsExclusionTimeAndReason |
-| E6a | Key examples: Agent with the learner's API token calls the endpoint with `timezone=Asia/Bangkok` → gets the same JSON the download gives. | slice 3 | |
+| E6a | Key examples: Agent with the learner's API token calls the endpoint with `timezone=Asia/Bangkok` → gets the same JSON the download gives. | slice 3 | observed: UserRecallHistoryExportControllerTest.anAgentWithTheLearnersTokenGetsTheJson + RecallStatsSettingsTab.spec.ts saves the same endpoint's response unchanged |
 | E6b | Key examples: Call without a token → refused; no data returned. | slice 1 | observed: UserRecallHistoryExportControllerTest.aRequestWithoutCredentialIsRefused: 401 |
