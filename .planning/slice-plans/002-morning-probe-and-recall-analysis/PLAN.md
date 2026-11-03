@@ -222,6 +222,17 @@ the probe change: offer timing, length, shown number, pairing with recall
 feedback, or keep collecting for a stated number of days) → the report is
 complete and dated; the story's example 9 is left to wrap-up.
 
+## Execution complete
+
+Product advice: no correction needed; the report answers the story's three
+questions with samples. For the owner to decide in wrap-up: queue Proposals
+1–3 of `.planning/notes/recall-and-morning-probe-analysis.md` (keep
+collecting to 85 usable days, around 2026-11-23, and rerun with the owner's
+usual timezone; then a split-half probe reliability check) as one or two
+analysis stories; Proposals 4–6 wait on an ADR 0003 decision. Open owner
+questions in the report: the usual timezone, and whether the calibration
+gaps (Finding 7) become a separate story outside the probe.
+
 ## Concern evidence
 
 Slice-plan refinement was not needed: each slice is one script section, one
