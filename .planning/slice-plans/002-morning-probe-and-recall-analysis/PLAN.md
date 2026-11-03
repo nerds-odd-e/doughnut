@@ -1,6 +1,7 @@
 # Plan: Morning probe and recall analysis
 
 **Source:** [SEED-100#story-2](../../seeds/SEED-100-recall-history-export.md#story-2)
+**Source review:** [source-review.md](source-review.md)
 **Identity:** SEED-100#story-2
 
 ## Goal and scope
@@ -33,8 +34,12 @@ owner's usual one (the report states it as a limitation either way).
 - **Tooling.** System `python3` (`/usr/bin/python3`, pandas 2.3.3, scipy 1.13.1,
   numpy 2.0.2, pytest 8.4.1, all observed 2026-11-03). Scripts and their
   tests live in this plan folder under `analysis/`, run as
-  `python3 -I -m pytest .planning/slice-plans/002-morning-probe-and-recall-analysis/analysis`
-  and `python3 -I .planning/slice-plans/002-morning-probe-and-recall-analysis/analysis/recall_probe_analysis.py <export.json> <section>`.
+  `cd /tmp && /usr/bin/python3 -E -B -m pytest -p no:cacheprovider -q <checkout>/.planning/slice-plans/002-morning-probe-and-recall-analysis/analysis`
+  and `/usr/bin/python3 -E -B <checkout>/.planning/slice-plans/002-morning-probe-and-recall-analysis/analysis/recall_probe_analysis.py <export.json> <section>`.
+  `-I` cannot be used: pandas, numpy and pytest are in the user site
+  (`~/Library/Python/3.9`), which `-I` disables, and Python 3.9 has no `-P`;
+  `-E -B -p no:cacheprovider` keeps the export an argument only and writes no
+  cache into the repository.
   They are outside every product build, lint, and format step (`pnpm
   format:changed` touches no `.py` file). No product dependency is added.
 - **Definitions reused from the product** (PFE: `RecallAnswerRow`,
@@ -114,7 +119,7 @@ owner's usual one (the report states it as a limitation either way).
 ### 1. Data inventory from the owner's export
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `analysis/test_recall_probe_analysis.py::test_inventory*` on a small
 synthetic export (events of all three kinds, an excluded answer, an
 `OVERLAP`, a morning and an afternoon probe, a probe day without later
@@ -220,4 +225,37 @@ the early probe that settles them before dependent slices.
 
 ## Learnings
 
-None yet; slice 1 records the inventory counts here.
+- **Input (2026-11-03).** The owner supplied a personal access token; the
+  export was fetched with `timezone=Asia/Jakarta` (this machine's zone) to
+  `~/Downloads/recall-export/recall-history-2026-11-03.json`: 133,814 events
+  (2023-07-24 to 2026-11-03), 66 probes on 66 days (2026-08-29 to
+  2026-11-03), `exportedAt` 2026-11-03T21:27:06.183+07:00. The export is
+  larger than the plan's assumption but loads in about 2 s.
+- **H1 settled: enough paired days.** 66 of 66 probe days have a review after
+  the probe; 65 have at least 10 (median 115.5 reviews after the probe per
+  day). Verdicts can reach "supported" or "not supported" (≥ 30 days).
+- **H2 settled: probes precede recall.** The probe precedes the day's first
+  review on 64 of 66 days (97%). Probe times: 61 of 66 before 09:00
+  (27 before 06:00), 3 of 66 at 12:00 or later.
+- **H3 settled: day-level recall varies.** Over the 65 usable days, correct
+  share ranges 0.769–0.935 (SD 0.040) and surprise ranges −2.588 to 3.657
+  (SD 1.262, median +0.912: raw retrievability under-predicts correctness).
+- **No `OVERLAP` answers exist** in the export (outcomes are null or
+  `ACCIDENTAL_MATCH`, which the product counts as a review), and only one
+  answer is excluded. The `OVERLAP` and exclusion rules are exercised only by
+  the fixtures.
+- **Exclusion reasons are free text that quotes note content**, so the report
+  labels them ("reason 1") with counts and never quotes them.
+- **Session span (slice 4).** `answer.promptCreatedAt` cannot mark a session
+  start: prompts are pre-generated (31% of prompt-to-answer gaps exceed
+  300 s, 90th percentile about 5 days, 30,486 negative). Slice 4 takes a
+  session's start as the first answer's `createdAt` minus its
+  `thinkingTimeMs`, and splits sessions by gaps between answers rather than
+  using one span per day.
+- **Timing fields.** Since 2026-08-29 `thinkingTimeMs` and the
+  away/detour/idle fields are present on every answer (missing on 68% of
+  all-time answers); `retrievability` is missing on 0.5%. `recordedAt`
+  matches `answer.createdAt` to within 0.4 s.
+- **Date range (slice 5).** The relation slices use 2026-08-29 onward;
+  slice 5 states the date range it uses, since the export reaches back to
+  2023.
