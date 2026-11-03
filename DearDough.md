@@ -43,7 +43,22 @@ Former local code: DD-118. Concurrent unpublished plan allocation produces two q
 
 ## ODF-074 — Unverified planning premises
 
-Former local code: DD-126. Former local code: DD-130. Former local code: DD-134. Former local code: DD-139. Former local code: DD-147. Former local code: DD-162. Former local code: DD-167. Former local code: DD-209. Concrete only-caller and host-state premises enter a plan without inspection, forcing a changed decision or stopped implementation when checked. Open after verified later recurrence; not resolved. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-074.md).
+Former local code: DD-126. Former local code: DD-130. Former local code: DD-134. Former local code: DD-139. Former local code: DD-147. Former local code: DD-162. Former local code: DD-167. Former local code: DD-209. Former local code: DD-337. Concrete only-caller and host-state premises enter a plan without inspection, forcing a changed decision or stopped implementation when checked. Open after verified later recurrence; not resolved. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-074.md).
+
+<a id="dd-337"></a>
+<a id="dd-337--plan-premises-were-checked-in-a-different-form-from-how-they-were-used"></a>
+
+The plan recorded tooling and data definitions as settled without exercising them as used: it observed `python3 -c "import pandas"` but prescribed `python3 -I`, which disables the user site where pandas is installed; and it defined session span from `answer.promptCreatedAt`, which the real export shows is generated ahead (90th percentile about 5 days before the answer). The slice 1 implementer found both; the coordinator replaced the commands and the span definition in the plan before slice 2. The early data-inventory slice is what made the data premise cheap to correct.
+
+### Occurrences
+- Execution: SEED-100#story-2; first implementation 275504cfc10cad5418f9f54f5a70dc26c331b6da
+  - Timestamp: unknown (2026-11-03, slice 1 return before 275504cfc1)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: da02e73b4a PLAN.md Current decisions "Tooling" and "Day-level measures" and premise table row 3; corrected in 275504cfc1 and 51b2d705fc PLAN.md; slice 2 also changed the answer start to include away and detour time after 4 of 65 days clipped.
+  - Observed effect: one implementer workaround (`-E -B -p no:cacheprovider`) and two definition changes; no published result was wrong.
+  - Inference: running a premise check with the exact command form, and reading a few real rows before fixing a data definition, would likely have avoided both.
 
 <a id="odf-147"></a>
 
@@ -401,20 +416,6 @@ The story required comparing the probe against two baselines; the plan's slice 3
 ### Occurrences
 
 SEED-100#story-2, first implementation `275504cfc1`. The 0.3.82 source-only review exposed the narrowed comparison before slice 3 delegation, without implementation rework. [Retained evidence](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-139.md) and [original source](https://github.com/nerds-odd-e/doughnut/blob/c4f485b9a8f3f1b0951789141732b55b52b51654/DearDough.md).
-
-## DD-337 — Plan premises were checked in a different form from how they were used
-
-The plan recorded tooling and data definitions as settled without exercising them as used: it observed `python3 -c "import pandas"` but prescribed `python3 -I`, which disables the user site where pandas is installed; and it defined session span from `answer.promptCreatedAt`, which the real export shows is generated ahead (90th percentile about 5 days before the answer). The slice 1 implementer found both; the coordinator replaced the commands and the span definition in the plan before slice 2. The early data-inventory slice is what made the data premise cheap to correct.
-
-### Occurrences
-- Execution: SEED-100#story-2; first implementation 275504cfc10cad5418f9f54f5a70dc26c331b6da
-  - Timestamp: unknown (2026-11-03, slice 1 return before 275504cfc1)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.82
-  - Evidence: da02e73b4a PLAN.md Current decisions "Tooling" and "Day-level measures" and premise table row 3; corrected in 275504cfc1 and 51b2d705fc PLAN.md; slice 2 also changed the answer start to include away and detour time after 4 of 65 days clipped.
-  - Observed effect: one implementer workaround (`-E -B -p no:cacheprovider`) and two definition changes; no published result was wrong.
-  - Inference: running a premise check with the exact command form, and reading a few real rows before fixing a data definition, would likely have avoided both.
 
 ## ODF-252 — Execution was launched before an owner-held start input existed
 
