@@ -136,6 +136,20 @@ date comes from `localDayIso` in the browser timezone.
 `RecallStatsSettingsTab.dailyProbe.spec.ts` (3 tests), and
 `vue-tsc --noEmit` pass.
 
+## Execution complete
+
+Product advice:
+- No product change is needed from this execution. SEED-100#story-2 waits on
+  the condition "A signed-in user can export their entire recall history with
+  their daily probe results from production". The condition holds only once
+  this story is on `main` and released. Story wrap-up should record the
+  dependency as satisfied at that point, not before.
+- Known limit, carried from the story: one timezone applies to the whole
+  history, so story 2 should state that limit when it reads "morning".
+- Watch: the proof-runner test still leaves any `mm:ss` run-total durations
+  unnormalized; this is unconfirmed. If that CI flake recurs, inspect the
+  `(Run Finished)` rows first.
+
 ## Plan concerns
 
 Refinement: not needed; the three slices are separate outcomes with their own
