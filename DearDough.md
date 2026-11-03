@@ -10,6 +10,7 @@ in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
 - Highest allocated local number: 335. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
+- Shared-feedback compaction recovery (2026-11-03): `0373e4129d8dbc29189e08bdcb0075969eee0f2c:DearDough.md`; its rows are retained at the linked Open Dough finding owners.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
 - Full source recovery before this adoption and compaction: `9e98f0874d9519997be4579a5fe4edde8997f496:DearDough.md`; newly supplied evidence is retained in Open Dough `341293c09f1115b8ad3412fc6da63679ce563457:docs/maintainer/findings/`.
@@ -96,23 +97,7 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
 Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-141](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-141.md); rereading adds no occurrence.
 
 Distinct executions, original provenance, observations and qualified inferences are
-[retained at ODF-141](https://github.com/terryyin/open-dough/blob/692bf5162b86fca9cbebc1c57c98efd227198e9d/docs/maintainer/findings/ODF-141.md); source recovery remains in this project’s pre-compaction revision.
-
-- Execution: SEED-039#candidate-resolution
-  - Timestamp: 2026-11-01T09:34:00+08:00
-  - Tool: Cursor
-  - Open Dough release: 0.3.79
-  - Evidence: plan `001-cheaper-local-test-feedback` slices 1–3; published SHAs `0c77890cce`, `3ef0e813af`, `3399d65a06`; refactor agent transcripts `b7bd06bc` (09:34), `79a09877` (09:54), `353a76ac` (10:02) under parent `23d3c3d7-4825-4f17-822c-c7d19fb11b58`
-  - Observed effect: three consecutive post-slice refactor agents each returned “none — already clean” / no edits on one-line or already-cohesive keeps (`POLL_MS` default; `fixtureCommit` seam; reading-panel merge). Slice 4’s later refactor did edit the candidate catalog and is outside this no-op count.
-  - Inference: same fixed per-slice refactor launch cost as ODF-141; token/time cost of the three empty passes was not separately measured here.
-- Execution: SEED-098#remaining-test-costs
-  - Timestamp: unknown (2026-11-02, between published SHAs `6c045ccfd5` and `4ae0329ed8`)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.81
-  - Evidence: [plan `080-remaining-local-test-costs`](https://github.com/nerds-odd-e/doughnut/blob/e48370f021a6c393481b4a8e7bcafd7c56c65100/.planning/slice-plans/080-remaining-local-test-costs/PLAN.md) slices 1–2; published SHAs `0d343fdc2a`, `4ae0329ed8`; coordinator task-notification usage for the two refactor agents (58,306 tokens / 54s and 48,367 tokens / 27s)
-  - Observed effect: both slices changed only planning records and generated proof (slice 1: investigation; slice 2: experiment undone byte-identical to HEAD), yet each required a fresh full refactor agent. Each returned one planning-text wording edit and ran no tests. Slice 3's refactor, on a real spec merge plus a candidate-record rewrite, made useful format fixes and is outside this count.
-  - Inference: same fixed cost as ODF-141, here on record-only slices; the wording edits were cheap enough for the coordinator's own plan update.
+[retained at ODF-141](https://github.com/terryyin/open-dough/blob/a29f625255a3368eb721249c01df96e0f98edfd4/docs/maintainer/findings/ODF-141.md); source recovery remains in this project’s pre-compaction revision.
 
 <a id="odf-208"></a>
 
@@ -387,29 +372,22 @@ A pre-format refactor can approve a file below the maintained 250-line limit, th
 
 Distinct executions, original timestamps/releases/tools, observed effects and qualified inferences are [retained at ODF-218](https://github.com/terryyin/open-dough/blob/7716badfa29258ebcd299c3f61c0966a7c6a75d1/docs/maintainer/findings/ODF-218.md); rereading adds no occurrence.
 
-## DD-333 — Lifecycle duties enter the slice acceptance gate
+## ODF-333 — Lifecycle duties enter the slice acceptance gate
+
+Former local code: DD-333.
 
 A source-only review of the complete implementation-and-landing task returned both product requirements and later publication/CI/reporting duties. The coordinator initially allocated all 187 clauses to the last implementation slice; the pre-commit gate then required observations for duties that could only follow that commit and execution completion. The coordinator separated 18 future-phase clauses into G3, explicitly retaining their mandatory continuation without claiming they had passed. This was a coordinator allocation mismatch; whether guidance should distinguish lifecycle clauses earlier remains a proposal, not an established shared defect. Relationship to ODF-267/270 is uncertain: this case has settled authority and a later lifecycle owner, rather than an unchanged defect or pending human decision.
 
 ### Occurrences
-- Execution: SEED-096#cucumber-proof; first implementation d648487d39f67a47f05072ca21947b9926ef2c4d
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: 0.3.81
-  - Evidence: e87c86c692cb11685a25c7f78d874a587f6abb10:.planning/slice-plans/079-cucumber-proof/source-review.md (187 source clauses, 18 G3 links) and PLAN.md G3; this chat's 2026-11-02 acceptance/record operations.
-  - Observed effect: the coordinator needed a separate phase-applicability disposition before guarded delivery; final landing and main CI remained pending, with the checkout and observer retained.
-  - Inference: allocating only implementation outputs to slices, while preserving delivery duties in their owning workflow, may avoid this circular gate without weakening task completion.
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-333](https://github.com/terryyin/open-dough/blob/a29f625255a3368eb721249c01df96e0f98edfd4/docs/maintainer/findings/ODF-333.md); source recovery remains in this project’s pre-compaction revision.
 
-## DD-334 — A commitment was recorded as observed before its output was inspected
+## ODF-413 — A commitment was recorded as observed before its output was inspected
+
+Former local code: DD-334.
 
 During slice 1 acceptance, the coordinator recorded the source-review commitment "The `GET` is described in OpenAPI" as observed, pointing at generated output that did not exist yet. The API client was regenerated afterwards, during delivery, and nobody read the generated schemas. The generated spec reused the existing entity `Answer` schema for the nested export record, without three of its fields. The slice 2 implementer noticed a possible name clash for its own new record; the coordinator then inspected the spec, found the slice 1 defect, and opened obligation G1 to return it to slice 2. The shared problem is recording the observation before reading its output; the Springdoc schema-name collision that produced the wrong contract is Donut's and is recorded as DD-335 in [Donut Retrospective Findings](DonutRetrospectiveFindings.md#dd-335).
 
 ### Occurrences
-- Execution: SEED-100#story-1; first implementation cede42a5792d64fbd2784167abbd216dbfdbf5dd
-  - Timestamp: unknown
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.82
-  - Evidence: 1e5c2b8e1b:.planning/slice-plans/001-recall-history-export/source-review.md row 2a.3 and PLAN.md G1; cede42a579:open_api_docs.yaml `Event.answer: $ref Answer`; corrected in 6932a70eb6; occurred 2026-11-03 between slice 1 acceptance and the slice 1 push (cede42a579).
-  - Observed effect: a published increment carried a wrong OpenAPI contract for one slice. The correction cost one extra round trip with the implementer and one regeneration.
-  - Inference: writing an `observed:` location only after reading the output it names, and reading the diff of generated output before committing, would probably have caught this in slice 1.
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-413](https://github.com/terryyin/open-dough/blob/a29f625255a3368eb721249c01df96e0f98edfd4/docs/maintainer/findings/ODF-413.md); source recovery remains in this project’s pre-compaction revision.
