@@ -193,7 +193,7 @@ reviews versus the rest), each with its `n`.
 ### 5. Repetition efficiency
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `test_repetition*`: a fixture with planted `AGAIN` grades at
 retrievability below 0.7 → the calibration band table shows observed correct
 share below predicted in that band; too-early and too-late shares computed
@@ -298,6 +298,13 @@ the early probe that settles them before dependent slices.
   0.201; Monday 0.064) and start hour (06:00–08:59 sessions longest, n 91).
   The first-ten distraction ratio is driven by a few long absences.
   Each section module owns its Method text (`session.METHOD`).
-- **Date range (slice 5).** The relation slices use 2026-08-29 onward;
-  slice 5 states the date range it uses, since the export reaches back to
-  2023.
+- **Repetition (slice 5).** Probe period: 7,135 reviews in calibration.
+  Raw retrievability under-predicts below 0.8 (observed about 0.80 at
+  predicted 0.44–0.60) and over-predicts at ≥ 0.95 (0.855 against 0.983);
+  the 0.8–0.9 band (5,139 reviews) matches. Story example 8's premise does
+  not hold: only 17% of `AGAIN` reviews sit below 0.7 (13% all time). Too
+  early 4% (all time 44%), too late 2%. No review is graded `EASY` or
+  `HARD`; `GOOD` stands in for the easy grade. MCQ is under-predicted and
+  SPELLING over-predicted. The judgment interval ignores repeated notes, so
+  it is somewhat too narrow. The section reports the probe period and all
+  time (from 2023-07-24) separately.

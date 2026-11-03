@@ -203,7 +203,77 @@ Paired by day: later reviews have a higher median response time than the first 1
 
 ## Repetition efficiency
 
-Pending.
+Not related to the probe here. Calibration compares the scheduler's raw `retrievability` with the share correct, without the recall stats tiles' per-type recalibration; with thousands of reviews per band even a small gap leaves the interval, so the size of observed − predicted matters more than the judgment. Bands, too-early and too-late reviews are defined under Method and limits.
+
+### From the first probe day on
+
+Period: 2026-08-29 to 2026-11-03. Sample: 7317 reviews; `retrievability` missing on 38 of 7317 (1%); of the 7279 with it, 144 are neither correct nor wrong and stay out of the calibration, leaving 7135. Grades: `GOOD` 6202, `AGAIN` 971, `CONFUSION` 144.
+
+Calibration by retrievability band:
+
+| Retrievability | n | Predicted (mean retrievability) | Observed correct share | 95% interval | Observed − predicted | Judgment |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0.00–<0.50 | 486 | 0.443 | 0.798 | 0.760–0.833 | +0.355 | under-predicts |
+| 0.50–<0.70 | 327 | 0.597 | 0.801 | 0.754–0.843 | +0.204 | under-predicts |
+| 0.70–<0.80 | 601 | 0.752 | 0.859 | 0.828–0.885 | +0.107 | under-predicts |
+| 0.80–<0.90 | 5139 | 0.883 | 0.876 | 0.866–0.885 | -0.008 | matched |
+| 0.90–<0.95 | 217 | 0.904 | 0.876 | 0.824–0.916 | -0.028 | matched |
+| 0.95–1.00 | 365 | 0.983 | 0.855 | 0.814–0.889 | -0.128 | over-predicts |
+| all | 7135 | 0.835 | 0.864 | 0.856–0.872 | +0.030 | under-predicts |
+
+Calibration by question type (all bands):
+
+| Question type | n | Predicted (mean retrievability) | Observed correct share | 95% interval | Observed − predicted | Judgment |
+| --- | --- | --- | --- | --- | --- | --- |
+| (none) | 337 | 0.738 | 0.751 | 0.701–0.796 | +0.012 | matched |
+| MCQ | 5170 | 0.837 | 0.883 | 0.874–0.892 | +0.047 | under-predicts |
+| SPELLING | 1628 | 0.849 | 0.828 | 0.809–0.846 | -0.021 | over-predicts |
+
+- Too early (`GOOD` at `retrievability` ≥ 0.95): 312 of 7279 (4%) reviews with a `retrievability`. Graded `EASY` at that level: 0.
+- Too late (`AGAIN` at `retrievability` < 0.7): 163 of 7279 (2%) reviews with a `retrievability`; that is 163 of 967 (17%) `AGAIN` reviews with a `retrievability`.
+
+`elapsedHours` by grade, median (first quartile–third quartile):
+
+| Grade | n reviews | elapsedHours |
+| --- | --- | --- |
+| AGAIN | 971 | 650.0 (142.0–2946.0) |
+| CONFUSION | 144 | 261.0 (50.8–1247.5) |
+| GOOD | 6202 | 568.0 (144.0–1956.0) |
+
+### All time
+
+Period: 2023-07-24 to 2026-11-03. Sample: 133763 reviews; `retrievability` missing on 14635 of 133763 (11%); of the 119128 with it, 152 are neither correct nor wrong and stay out of the calibration, leaving 118976. Grades: `GOOD` 122043, `AGAIN` 11565, `CONFUSION` 155.
+
+Calibration by retrievability band:
+
+| Retrievability | n | Predicted (mean retrievability) | Observed correct share | 95% interval | Observed − predicted | Judgment |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0.00–<0.50 | 4880 | 0.451 | 0.856 | 0.846–0.866 | +0.405 | under-predicts |
+| 0.50–<0.70 | 4708 | 0.603 | 0.862 | 0.852–0.872 | +0.260 | under-predicts |
+| 0.70–<0.80 | 7361 | 0.755 | 0.847 | 0.839–0.855 | +0.092 | under-predicts |
+| 0.80–<0.90 | 25198 | 0.867 | 0.865 | 0.861–0.870 | -0.001 | matched |
+| 0.90–<0.95 | 21258 | 0.927 | 0.905 | 0.901–0.908 | -0.023 | over-predicts |
+| 0.95–1.00 | 55571 | 0.979 | 0.953 | 0.951–0.955 | -0.026 | over-predicts |
+| all | 118976 | 0.895 | 0.912 | 0.910–0.913 | +0.016 | under-predicts |
+
+Calibration by question type (all bands):
+
+| Question type | n | Predicted (mean retrievability) | Observed correct share | 95% interval | Observed − predicted | Judgment |
+| --- | --- | --- | --- | --- | --- | --- |
+| (none) | 1361 | 0.774 | 0.822 | 0.801–0.842 | +0.048 | under-predicts |
+| MCQ | 109442 | 0.898 | 0.916 | 0.914–0.917 | +0.017 | under-predicts |
+| SPELLING | 8173 | 0.877 | 0.873 | 0.866–0.880 | -0.004 | matched |
+
+- Too early (`GOOD` at `retrievability` ≥ 0.95): 52966 of 119128 (44%) reviews with a `retrievability`. Graded `EASY` at that level: 0.
+- Too late (`AGAIN` at `retrievability` < 0.7): 1352 of 119128 (1%) reviews with a `retrievability`; that is 1352 of 10502 (13%) `AGAIN` reviews with a `retrievability`.
+
+`elapsedHours` by grade, median (first quartile–third quartile):
+
+| Grade | n reviews | elapsedHours |
+| --- | --- | --- |
+| AGAIN | 11565 | 195.0 (24.0–1821.0) |
+| CONFUSION | 155 | 254.0 (49.5–1265.0) |
+| GOOD | 122043 | 119.0 (23.0–924.0) |
 
 ## Findings
 
@@ -235,5 +305,6 @@ Pending.
 - Strength: Spearman rho over days with a 95% percentile bootstrap interval (2000 resamples of days, fixed seed 20261103, so the report regenerates identically). Days needed: `(z(0.975) + z(0.8))^2 / atanh(0.3)^2 + 3`, the Fisher-z approximation.
 - Baselines: each after-probe recall measure is predicted for every day from all other days by least squares (leave one day out) and scored by mean absolute error. Typical day: the overall mean, or the mean adjusted by weekday and by the probe's completion hour band, whichever errs less. Yesterday: a linear prediction from the previous paired day's value of the same measure. The probe gains over a baseline when adding the probe measure to it lowers that error; a row's days are those with the measure, its previous paired day's value, and the probe measure.
 - Recall-session efficiency: from the first probe day on, the same measures per day (days with at least one review) and per session (sessions with at least one review), grouped by weekday (per day) and by the hour band of the session's first event start (per session). Position: a review's rank by `answer.createdAt` among its session's reviews; the first 10 are "first", the rest "later". A review's own distraction share is `awayMs + detourMs + idleMs` over `thinkingTimeMs + awayMs + detourMs`, summed over the reviews of a position; the companion column sums without the position's 10 most distracted reviews.
+- Repetition efficiency: reviews only, in two periods (from the first probe day on, and all time). Calibration: reviews with a `retrievability` and a correctness (correct or wrong) are grouped by `retrievability` band (lower bound included, the top band includes 1); predicted is the band's mean `retrievability`, observed its correct share with an exact (Clopper-Pearson) binomial 95% interval. Judgment: "matched" when the interval contains the predicted mean, "over-predicts" when the interval lies below it, "under-predicts" when above. Too early: grade `GOOD` at `retrievability` 0.95 or more (the story's "easy grade"; no review in the export is graded `EASY`, so `GOOD` stands in for it; the report also states the `EASY` count). Too late: grade `AGAIN` at `retrievability` below 0.7. Both shares are over the reviews with a `retrievability`. Elapsed time: `elapsedHours` by grade, over all reviews of the period.
 - Aggregates only: no note ids, note titles, tutor feedback, or exclusion reason text.
 - Scripts: `analysis/` in `.planning/slice-plans/002-morning-probe-and-recall-analysis`, recoverable with `git log --all -- .planning/slice-plans/002-morning-probe-and-recall-analysis`. They run with system Python 3 (pandas, numpy, scipy) and are outside any product build or lint.

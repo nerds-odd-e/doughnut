@@ -40,7 +40,7 @@ def load(export):
             require(answer, REQUIRED_ANSWER, f"recallEvents[{i}].answer")
             row.update(answer)
         rows.append(row)
-    events = pd.DataFrame(rows, columns=EVENT_FIELDS + REQUIRED_ANSWER)
+    events = pd.DataFrame(rows, columns=EVENT_FIELDS + REQUIRED_ANSWER + ["questionType"])
     for i, probe in enumerate(export["dailyProbes"]):
         require(probe, REQUIRED_PROBE, f"dailyProbes[{i}]")
     probes = pd.DataFrame(export["dailyProbes"], columns=REQUIRED_PROBE)

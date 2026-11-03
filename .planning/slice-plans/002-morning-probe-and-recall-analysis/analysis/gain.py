@@ -14,6 +14,14 @@ GAINED = {
     (False, True): "gain over yesterday's recall only",
     (False, False): "no gain",
 }
+METHOD = (
+    "- Baselines: each after-probe recall measure is predicted for every day from all other days by least "
+    "squares (leave one day out) and scored by mean absolute error. Typical day: the overall mean, or the "
+    "mean adjusted by weekday and by the probe's completion hour band, whichever errs less. Yesterday: a "
+    "linear prediction from the previous paired day's value of the same measure. The probe gains over a "
+    "baseline when adding the probe measure to it lowers that error; a row's days are those with the "
+    "measure, its previous paired day's value, and the probe measure."
+)
 
 
 def baseline_days(data):

@@ -29,6 +29,11 @@ MIN_DAYS = 30
 DETECT_RHO = 0.3
 BOOTSTRAP_RESAMPLES = 2000
 BOOTSTRAP_SEED = 20261103
+METHOD = (
+    f"- Strength: Spearman rho over days with a 95% percentile bootstrap interval ({BOOTSTRAP_RESAMPLES} "
+    f"resamples of days, fixed seed {BOOTSTRAP_SEED}, so the report regenerates identically). Days needed: "
+    f"`(z(0.975) + z(0.8))^2 / atanh({DETECT_RHO})^2 + 3`, the Fisher-z approximation."
+)
 
 
 def days_needed(rho=DETECT_RHO, alpha=0.05, power=0.8):
