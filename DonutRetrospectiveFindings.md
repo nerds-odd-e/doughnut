@@ -26,6 +26,7 @@ principle 7 and `unit-testing` skill supply the stricter removal convention.
 | --- | --- | --- |
 | MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
 | Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
+| OpenAPI schema-name collision | One | One slice published a wrong contract, caught and repaired within the story; unqueued. |
 
 DD-317 and DD-318 (recall answer and question-load recovery) are retired:
 their responses, SEED-081#story-1 and SEED-081#story-2, completed on 2026-10-21.
@@ -44,6 +45,14 @@ The single MinerU recovery remains below the current learning/refinement
 direction. The stale Development-class cause remains unestablished after the
 healthy probes below, so no specific remedy is selected for either older
 finding. Their original evidence and uncertainty remain available.
+
+Rereviewed 2026-11-03 against Donut `afc47ea75c` and installed Open Dough
+`0.3.82`. Of the DearDough entries added since 2026-11-01, DD-333, DD-334's
+recording facet and the two ODF-141 occurrences concern shared guidance and stay
+there. DD-334's schema-name collision is Donut's own OpenAPI generation and is
+recorded below as DD-335. One repaired occurrence with no escaped defect stays
+below the current direction, so no story is queued. DD-159 and DD-161 have no
+new occurrence or repair.
 
 Shared findings retained in DearDough include changed-boundary proof acceptance
 (DD-218; public wrap-up step 2), decisive planning premises (DD-224; public
@@ -85,6 +94,28 @@ PDFs through the CLI.
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
 - Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Linked-worktree probes also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
+
+## Open, not queued: OpenAPI schema-name collision
+
+<a id="dd-335"></a>
+
+### DD-335 — A nested DTO record silently reused an existing entity's OpenAPI schema
+
+Springdoc names a schema after the simple class name. The nested export record
+`RecallHistoryExport.Answer` was therefore published as the existing entity
+`Answer` schema, without three of its fields. Nothing in Donut's generation,
+checks or backend guidance reports the collision. The product repair gave the
+export's nested records explicit `@Schema(name = ...)` names; other nested
+records with a common simple name stay unguarded. The shared facet, recording
+an observation before reading its output, remains DD-334 in
+[DearDough](DearDough.md).
+
+#### Occurrences
+
+- Execution: SEED-100#story-1; first implementation cede42a579; Timestamp: unknown (2026-11-03, between slice 1 acceptance and the slice 1 push); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.82.
+  - Evidence: `cede42a579:open_api_docs.yaml` `Event.answer: $ref Answer`; `1e5c2b8e1b:.planning/slice-plans/001-recall-history-export/source-review.md` row 2a.3 and PLAN.md G1; repaired in `6932a70eb6` (`RecallHistoryAnswer`, `RecallHistoryEvent`, `RecallHistoryDailyProbe`).
+  - Observed effect: one published increment carried a wrong OpenAPI contract; the correction cost one implementer round trip and one regeneration.
+  - Inference: a generation-time check for distinct classes that resolve to one schema name would catch this without relying on review. Qualified: one occurrence; no other current collision was searched for.
 
 ## Useful project practice (not an open problem)
 
