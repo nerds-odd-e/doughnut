@@ -208,7 +208,7 @@ reviews that look too early (retrievability ≥ 0.95 and correct) or too late
 ### 6. Findings and proposals
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the coordinator reads the Findings and Proposals sections against the
 story: every finding cites a table and its `n`; every proposal names its
 finding; an inconclusive relation carries the days-needed proposal
@@ -308,3 +308,13 @@ the early probe that settles them before dependent slices.
   SPELLING over-predicted. The judgment interval ignores repeated notes, so
   it is somewhat too narrow. The section reports the probe period and all
   time (from 2023-07-24) separately.
+- **Findings and proposals (slice 6).** The report answers the three
+  questions: no probe–recall relation at 65 days; session and repetition
+  efficiency described (Findings 4–8); Proposals 1–3 ready to queue (keep
+  collecting to 85 usable days, around 2026-11-23, rerun with the owner's
+  usual timezone; probe reliability by split halves, which the export's
+  per-trial data supports), Proposals 4–6 conflict with ADR 0003. Open
+  owner questions in the report: the usual timezone, and whether the
+  calibration gaps become a separate story. The report's Evidence line names
+  commit e82f6044 for the scripts, which leave with this plan folder at
+  wrap-up.
