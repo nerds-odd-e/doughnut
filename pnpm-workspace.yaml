@@ -119,7 +119,6 @@ minimumReleaseAgeExclude:
   - '@vue/runtime-dom@3.5.40'
   - '@vue/server-renderer@3.5.40'
   - '@vue/shared@3.5.40'
-  - '@vue/test-utils@2.4.11'
   - daisyui@5.7.0
   - tmp@0.2.6
   - vue-router@5.2.0
