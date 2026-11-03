@@ -15,7 +15,7 @@ Input: the story-1 section of `.planning/seeds/SEED-100-recall-history-export.md
 | 2a | Who and how: Two ways in give one (the same) response. | slice 3 | |
 | 2a.1 | Who and how: Way in 1: a download control on the recall stats settings tab. | slice 3 | |
 | 2a.2 | Who and how: Way in 2: an authenticated `GET` under `/api`. | slice 1 | observed: UserRecallHistoryExportControllerTest.anAgentWithTheLearnersTokenGetsTheJson: GET /api/user/recall-history-export → 200 |
-| 2a.3 | Who and how: The `GET` is described in OpenAPI. | slice 1 | observed: open_api_docs.yaml + generated client after slice 1 generate-api-client |
+| 2a.3 | Who and how: The `GET` is described in OpenAPI. | slice 2 | G1 |
 | 2a.4 | Who and how: An agent calls the `GET` with the user's existing API token (`Authorization: Bearer`, as generated on the settings page). | slice 1 | observed: UserRecallHistoryExportControllerTest.anAgentWithTheLearnersTokenGetsTheJson: Bearer user token → 200 JSON |
 | X2 | Who and how (exclusion): No new authentication. | slice 1 | observed: diff adds no auth code; endpoint uses existing assertLoggedIn |
 | X3 | Who and how (exclusion): No MCP tool. | slice 1 | observed: diff adds no MCP tool |
@@ -24,7 +24,7 @@ Input: the story-1 section of `.planning/seeds/SEED-100-recall-history-export.md
 | 3a | Timezone: The page sends the browser's timezone. | slice 3 | |
 | 3b.1 | Timezone: The file records that timezone. | slice 1 | observed: UserRecallHistoryExportControllerTest.namesTheTimezoneAndTheExportTimeInThatZone: timezone Asia/Bangkok |
 | 3b.2 | Timezone: The file records the export time. | slice 1 | observed: UserRecallHistoryExportControllerTest.namesTheTimezoneAndTheExportTimeInThatZone: exportedAt 1989-01-02T15:00:00+07:00 |
-| 3c | Timezone: Every timestamp in the file is ISO-8601 with that zone's offset, so "local day" and "morning" can be read directly. | slice 2 | |
+| 3c | Timezone: Every timestamp in the file is ISO-8601 with that zone's offset, so "local day" and "morning" can be read directly. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials completedAt +07:00; slice 1 event timestamps +07:00 |
 | 4 | Recall events: One flat list of recall events. | slice 1 | observed: UserRecallHistoryExportControllerTest.listsEveryKindOfRecallEventOldestFirstInTheRequestedZone: recallEvents flat list |
 | 4a | Recall events: One entry per recall log. | slice 1 | observed: UserRecallHistoryExportControllerTest.listsEveryKindOfRecallEventOldestFirstInTheRequestedZone: one event per log (3 logs → 3 events) |
 | 4b | Recall events: Oldest first. | slice 1 | observed: UserRecallHistoryExportControllerTest.listsEveryKindOfRecallEventOldestFirstInTheRequestedZone: recordedAt ascending |
@@ -60,20 +60,20 @@ Input: the story-1 section of `.planning/seeds/SEED-100-recall-history-export.md
 | 4g.2 | Recall events (inclusion): Trackers removed from recall are included. | slice 1 | observed: UserRecallHistoryExportControllerTest.anAnswerOnATrackerRemovedFromRecallIsStillExported |
 | 4g.3 | Recall events (inclusion): Notes in trash are included. | slice 1 | observed: UserRecallHistoryExportControllerTest.anAnswerOnANoteInTrashIsStillExportedWithThatNoteId |
 | 4g.4 | Recall events: Analysis (not the export) decides what to leave out. | slice 1 | observed: RecallLogRepository.findRecallEventRows applies no exclusion filters |
-| 5 | Daily probes: Every stored probe is exported. | slice 2 | |
-| 5a | Daily probes: Oldest first. | slice 2 | |
-| 5b.1 | Daily probes (each probe): Completed time. | slice 2 | |
-| 5b.2 | Daily probes (each probe): Speed. | slice 2 | |
-| 5b.3 | Daily probes (each probe): Accuracy. | slice 2 | |
-| 5b.4 | Daily probes (each probe): Lapse count. | slice 2 | |
-| 5b.5 | Daily probes (each probe): Variability. | slice 2 | |
-| 5b.6 | Daily probes (each probe): Its trials. | slice 2 | |
-| 5c.1 | Daily probes (each trial): Stimulus. | slice 2 | |
-| 5c.2 | Daily probes (each trial): Response. | slice 2 | |
-| 5c.3 | Daily probes (each trial): Response time. | slice 2 | |
-| 5c.4 | Daily probes (each trial): Correct. | slice 2 | |
-| 5d | Daily probes: Probes are exported whether or not the daily probe is currently enabled. | slice 2 | |
-| 6a | Empty parts: A user with no probes gets the same file with the probe list empty. | slice 2 | |
+| 5 | Daily probes: Every stored probe is exported. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: exactly the learner's 2 probes, other user's excluded |
+| 5a | Daily probes: Oldest first. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: day 1 before day 3 though created in reverse order |
+| 5b.1 | Daily probes (each probe): Completed time. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: completedAt, speed/accuracy/lapses/variability 3.5/85/2/0.4 |
+| 5b.2 | Daily probes (each probe): Speed. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: completedAt, speed/accuracy/lapses/variability 3.5/85/2/0.4 |
+| 5b.3 | Daily probes (each probe): Accuracy. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: completedAt, speed/accuracy/lapses/variability 3.5/85/2/0.4 |
+| 5b.4 | Daily probes (each probe): Lapse count. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: completedAt, speed/accuracy/lapses/variability 3.5/85/2/0.4 |
+| 5b.5 | Daily probes (each probe): Variability. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: completedAt, speed/accuracy/lapses/variability 3.5/85/2/0.4 |
+| 5b.6 | Daily probes (each probe): Its trials. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: 20 trials |
+| 5c.1 | Daily probes (each trial): Stimulus. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: first trial left/right/612/false |
+| 5c.2 | Daily probes (each trial): Response. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: first trial left/right/612/false |
+| 5c.3 | Daily probes (each trial): Response time. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: first trial left/right/612/false |
+| 5c.4 | Daily probes (each trial): Correct. | slice 2 | observed: UserRecallHistoryExportControllerTest.listsTheLearnersDailyProbesOldestFirstWithTheirScoresAndTrials: first trial left/right/612/false |
+| 5d | Daily probes: Probes are exported whether or not the daily probe is currently enabled. | slice 2 | observed: UserRecallHistoryExportControllerTest.probesTakenBeforeTheProbeWasTurnedOffAreStillExported |
+| 6a | Empty parts: A user with no probes gets the same file with the probe list empty. | slice 2 | observed: UserRecallHistoryExportControllerTest.aLearnerWithoutProbesGetsRecallEventsAndAnEmptyProbeList |
 | 6b | Empty parts: A user with no recall events gets the same file with the recall event list empty. | slice 1 | observed: UserRecallHistoryExportControllerTest.namesTheTimezoneAndTheExportTimeInThatZone: recallEvents empty |
 | 7 | Required restriction: The request is refused for a caller who is not signed in or has no valid token (recall history is private learning data, ADR 0001). | slice 1 | observed: UserRecallHistoryExportControllerTest.requiresLogin and aRequestWithoutCredentialIsRefused: 401 |
 | X5 | Deferred (not rejected): Note titles or other note content. | slice 1 | observed: RecallHistoryExport DTO carries no such field; query reads only recall logs of the current user |
@@ -92,8 +92,8 @@ Input: the story-1 section of `.planning/seeds/SEED-100-recall-history-export.md
 | X14 | UI (exclusion): No options. | slice 3 | |
 | E1 | Key examples: Learner with 3 answered recall prompts, 1 just review, 1 tutor feedback, 2 daily probes, in `Asia/Bangkok`, downloads from the recall stats tab → file holds 5 recall events and 2 probes in time order; timestamps end in `+07:00`; file names `Asia/Bangkok` and the export time. | slice 3 | |
 | E2 | Key examples: Two answers on the same note's memory tracker, exported → both events carry the same memory tracker id and note id; the second has the stability and difficulty the first left. | slice 1 | observed: UserRecallHistoryExportControllerTest.twoAnswersOnOneTrackerShareItsIdsAndTheSecondStartsFromTheStateTheFirstLeft |
-| E3 | Key examples: Learner who never took a daily probe exports → recall events present; probe list empty. | slice 2 | |
-| E4 | Key examples: Learner who took probes and later turned the daily probe off exports → the earlier probes are in the file. | slice 2 | |
+| E3 | Key examples: Learner who never took a daily probe exports → recall events present; probe list empty. | slice 2 | observed: UserRecallHistoryExportControllerTest.aLearnerWithoutProbesGetsRecallEventsAndAnEmptyProbeList |
+| E4 | Key examples: Learner who took probes and later turned the daily probe off exports → the earlier probes are in the file. | slice 2 | observed: UserRecallHistoryExportControllerTest.probesTakenBeforeTheProbeWasTurnedOffAreStillExported |
 | E5 | Key examples: Answer excluded as ambiguous, exported → its event is present with its exclusion time and reason. | slice 1 | observed: UserRecallHistoryExportControllerTest.anExcludedAnswerIsPresentWithItsExclusionTimeAndReason |
 | E6a | Key examples: Agent with the learner's API token calls the endpoint with `timezone=Asia/Bangkok` → gets the same JSON the download gives. | slice 3 | |
 | E6b | Key examples: Call without a token → refused; no data returned. | slice 1 | observed: UserRecallHistoryExportControllerTest.aRequestWithoutCredentialIsRefused: 401 |

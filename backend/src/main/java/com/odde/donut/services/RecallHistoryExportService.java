@@ -2,8 +2,10 @@ package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.RecallHistoryExport;
 import com.odde.donut.controllers.dto.RecallHistoryExport.EventKind;
+import com.odde.donut.entities.DailyProbe;
 import com.odde.donut.entities.GradeOrConfusionConverter;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.DailyProbeRepository;
 import com.odde.donut.entities.repositories.RecallLogRepository;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -13,9 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class RecallHistoryExportService {
   private final RecallLogRepository recallLogRepository;
+  private final DailyProbeRepository dailyProbeRepository;
 
-  public RecallHistoryExportService(RecallLogRepository recallLogRepository) {
+  public RecallHistoryExportService(
+      RecallLogRepository recallLogRepository, DailyProbeRepository dailyProbeRepository) {
     this.recallLogRepository = recallLogRepository;
+    this.dailyProbeRepository = dailyProbeRepository;
   }
 
   public RecallHistoryExport export(User user, ZoneId timeZone, Timestamp exportedAt) {
@@ -24,7 +29,20 @@ public class RecallHistoryExportService {
         format(exportedAt, timeZone),
         recallLogRepository.findRecallEventRows(user.getId()).stream()
             .map(row -> event(row, timeZone))
+            .toList(),
+        dailyProbeRepository.findByUserOrderByCompletedAtAscIdAsc(user).stream()
+            .map(probe -> dailyProbe(probe, timeZone))
             .toList());
+  }
+
+  private static RecallHistoryExport.DailyProbe dailyProbe(DailyProbe probe, ZoneId zone) {
+    return new RecallHistoryExport.DailyProbe(
+        format(probe.getCompletedAt(), zone),
+        probe.getSpeed(),
+        probe.getAccuracy(),
+        probe.getLapseCount(),
+        probe.getVariability(),
+        probe.getTrials());
   }
 
   private static RecallHistoryExport.Event event(RecallEventRow row, ZoneId zone) {

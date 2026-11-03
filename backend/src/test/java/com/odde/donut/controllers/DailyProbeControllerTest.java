@@ -1,17 +1,19 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.DailyProbeRequestDTO;
 import com.odde.donut.controllers.dto.DailyProbeTodayDTO;
+import com.odde.donut.controllers.dto.DailyProbeTrialDTO;
 import com.odde.donut.entities.DailyProbe;
 import com.odde.donut.entities.repositories.DailyProbeRepository;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
 class DailyProbeControllerTest extends ControllerTestBase {
   @Autowired DailyProbeController controller;
   @Autowired DailyProbeRepository dailyProbeRepository;
-  @Autowired ObjectMapper objectMapper;
 
   @BeforeEach
   void setup() {
@@ -44,13 +45,11 @@ class DailyProbeControllerTest extends ControllerTestBase {
     assertThat(loaded.getLapseCount(), equalTo(0));
     assertThat(loaded.getVariability(), equalTo(0.0));
 
-    JsonNode trials = objectMapper.readTree(loaded.getTrialsJson());
-    assertThat(trials.isArray(), is(true));
-    assertThat(trials.size(), equalTo(20));
-    assertThat(trials.get(0).get("stimulus").asText(), equalTo("left"));
-    assertThat(trials.get(0).get("response").asText(), equalTo("left"));
-    assertThat(trials.get(0).get("rtMs").asInt(), equalTo(250));
-    assertThat(trials.get(0).get("correct").asBoolean(), is(true));
+    assertThat(loaded.getTrials(), hasSize(20));
+    DailyProbeTrialDTO trial = loaded.getTrials().get(0);
+    assertThat(
+        List.of(trial.stimulus, trial.response, trial.rtMs, trial.correct),
+        contains("left", "left", 250, true));
   }
 
   @Test

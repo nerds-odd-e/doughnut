@@ -5313,8 +5313,10 @@ components:
         variability:
           type: number
           format: double
-        trialsJson:
-          type: string
+        trials:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyProbeTrialDTO"
       required:
       - id
     ConversationMessage:
@@ -5988,7 +5990,78 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DailyProbeDay"
-    Event:
+    RecallHistoryAnswer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        questionType:
+          type: string
+          enum:
+          - MCQ
+          - SPELLING
+        promptCreatedAt:
+          type: string
+        createdAt:
+          type: string
+        thinkingTimeMs:
+          type: integer
+          format: int32
+        awayMs:
+          type: integer
+          format: int32
+        awayCount:
+          type: integer
+          format: int32
+        detourMs:
+          type: integer
+          format: int32
+        detourCount:
+          type: integer
+          format: int32
+        idleMs:
+          type: integer
+          format: int32
+        outcome:
+          type: string
+          enum:
+          - ACCIDENTAL_MATCH
+          - OVERLAP
+        excludedAt:
+          type: string
+        exclusionReason:
+          type: string
+      required:
+      - createdAt
+      - id
+    RecallHistoryDailyProbe:
+      type: object
+      properties:
+        completedAt:
+          type: string
+        speed:
+          type: number
+          format: double
+        accuracy:
+          type: integer
+          format: int32
+        lapseCount:
+          type: integer
+          format: int32
+        variability:
+          type: number
+          format: double
+        trials:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyProbeTrialDTO"
+      required:
+      - accuracy
+      - completedAt
+      - lapseCount
+      - trials
+    RecallHistoryEvent:
       type: object
       properties:
         recordedAt:
@@ -6034,7 +6107,7 @@ components:
           type: integer
           format: int32
         answer:
-          $ref: "#/components/schemas/Answer"
+          $ref: "#/components/schemas/RecallHistoryAnswer"
       required:
       - elapsedHours
       - grade
@@ -6052,8 +6125,13 @@ components:
         recallEvents:
           type: array
           items:
-            $ref: "#/components/schemas/Event"
+            $ref: "#/components/schemas/RecallHistoryEvent"
+        dailyProbes:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecallHistoryDailyProbe"
       required:
+      - dailyProbes
       - exportedAt
       - recallEvents
       - timezone

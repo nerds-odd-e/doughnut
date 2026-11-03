@@ -738,7 +738,7 @@ export type DailyProbe = {
     accuracy?: number;
     lapseCount?: number;
     variability?: number;
-    trialsJson?: string;
+    trials?: Array<DailyProbeTrialDto>;
 };
 
 export type ConversationMessage = {
@@ -1098,7 +1098,32 @@ export type RecallStatsDto = {
     dailyProbe?: Array<DailyProbeDay>;
 };
 
-export type Event = {
+export type RecallHistoryAnswer = {
+    id: number;
+    questionType?: 'MCQ' | 'SPELLING';
+    promptCreatedAt?: string;
+    createdAt: string;
+    thinkingTimeMs?: number;
+    awayMs?: number;
+    awayCount?: number;
+    detourMs?: number;
+    detourCount?: number;
+    idleMs?: number;
+    outcome?: 'ACCIDENTAL_MATCH' | 'OVERLAP';
+    excludedAt?: string;
+    exclusionReason?: string;
+};
+
+export type RecallHistoryDailyProbe = {
+    completedAt: string;
+    speed?: number;
+    accuracy: number;
+    lapseCount: number;
+    variability?: number;
+    trials: Array<DailyProbeTrialDto>;
+};
+
+export type RecallHistoryEvent = {
     recordedAt: string;
     grade: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY' | 'CONFUSION';
     kind: 'ANSWERED_RECALL_PROMPT' | 'JUST_REVIEW' | 'TUTOR_FEEDBACK';
@@ -1110,13 +1135,14 @@ export type Event = {
     memoryTrackerId: number;
     memoryTrackerType: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     noteId?: number;
-    answer?: Answer;
+    answer?: RecallHistoryAnswer;
 };
 
 export type RecallHistoryExport = {
     timezone: string;
     exportedAt: string;
-    recallEvents: Array<Event>;
+    recallEvents: Array<RecallHistoryEvent>;
+    dailyProbes: Array<RecallHistoryDailyProbe>;
 };
 
 export type AssimilationCountDto = {

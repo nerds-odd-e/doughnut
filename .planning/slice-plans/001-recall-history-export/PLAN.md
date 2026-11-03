@@ -36,7 +36,8 @@ to stream.
 - The event kind is derived from existing columns: an answer present → recall
   prompt; no answer and tutor feedback text present → tutor feedback; neither →
   just review.
-- Daily probe trials are read from `trials_json` into `DailyProbeTrialDTO`.
+- Daily probe trials are read from `trials_json` into `DailyProbeTrialDTO`
+  through the entity's `DailyProbeTrialsConverter`.
 - The frontend calls the generated client (ADR 0005) and saves the response
   with `file-saver`, as `JsonExportSection` does.
 
@@ -89,13 +90,22 @@ MySQL `FLOAT` columns round, so stability assertions compare persisted values.
 ### 2. Daily probes in the export
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: same test class, same command.
 
 Behavior: a learner with stored daily probes (one taken while the probe was
 enabled, the setting now off) → `GET` the export → every probe, oldest first,
 with completed time (zone offset), speed, accuracy, lapse count, variability,
 and trials; a learner with no probes still gets their events.
+
+Accepted (2026-11-03): the response gains `dailyProbes`. The export's
+nested records are published under their own schema names
+(`RecallHistoryEvent`, `RecallHistoryAnswer`, `RecallHistoryDailyProbe`)
+because springdoc names a schema after the simple class name; this corrects
+G1. The refactor moved the `trials_json` shape into one JPA converter, so
+`POST /api/daily-probes` now returns `trials` instead of `trialsJson`; no
+client read that field. The export tests (14), `*DailyProbe*` (13), and
+`*RecallStats*` (62) pass, and frontend `vue-tsc --noEmit` passes.
 
 ### 3. Download recall history from the recall stats tab
 
@@ -119,3 +129,13 @@ proof loops, each a few minutes of work. No remaining slice-specific concern
 was found in this review. Slice 1 is the largest (query, DTO, formatting,
 and seven example cases); if it overruns, split answer-detail fields from the
 event list at the next safe point.
+
+
+## Story obligations
+
+### G1. OpenAPI schema names of the export's nested records clash (first reported in slice 1)
+Reported: slice 2 — "The nested record RecallHistoryExport.Answer is published as the existing entity Answer schema, so the OpenAPI description of the export lacks questionType, promptCreatedAt and createdAt; RecallHistoryExport.DailyProbe would clash with the entity DailyProbe schema the same way."
+Story clause: "an
+  authenticated `GET` under `/api`, described in OpenAPI"
+Disposition: proved by slice 2: open_api_docs.yaml RecallHistoryEvent/RecallHistoryAnswer/RecallHistoryDailyProbe schemas; UserRecallHistoryExportControllerTest.anAgentWithTheLearnersTokenGetsTheJson answer.questionType and dailyProbes JSON
+Commitment: 2a.3

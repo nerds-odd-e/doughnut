@@ -1,7 +1,5 @@
 package com.odde.donut.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.DailyProbeRequestDTO;
 import com.odde.donut.controllers.dto.DailyProbeTodayDTO;
 import com.odde.donut.entities.DailyProbe;
@@ -30,19 +28,16 @@ class DailyProbeController {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final AuthorizationService authorizationService;
-  private final ObjectMapper objectMapper;
   private final DailyProbeRepository dailyProbeRepository;
 
   public DailyProbeController(
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
-      ObjectMapper objectMapper,
       DailyProbeRepository dailyProbeRepository) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
-    this.objectMapper = objectMapper;
     this.dailyProbeRepository = dailyProbeRepository;
   }
 
@@ -63,8 +58,7 @@ class DailyProbeController {
 
   @PostMapping(path = "")
   @Transactional
-  public DailyProbe createDailyProbe(@RequestBody DailyProbeRequestDTO request)
-      throws JsonProcessingException {
+  public DailyProbe createDailyProbe(@RequestBody DailyProbeRequestDTO request) {
     authorizationService.assertLoggedIn();
     if (request.trials == null || request.trials.size() != 20) {
       throw new ResponseStatusException(
@@ -77,7 +71,7 @@ class DailyProbeController {
     probe.setAccuracy(request.accuracy);
     probe.setLapseCount(request.lapseCount);
     probe.setVariability(request.variability);
-    probe.setTrialsJson(objectMapper.writeValueAsString(request.trials));
+    probe.setTrials(request.trials);
     return entityPersister.save(probe);
   }
 }

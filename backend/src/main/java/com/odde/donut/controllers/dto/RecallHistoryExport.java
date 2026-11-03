@@ -9,7 +9,10 @@ import java.util.List;
 
 /** The learner's whole recall history; every timestamp is ISO-8601 in {@code timezone}. */
 public record RecallHistoryExport(
-    @NotNull String timezone, @NotNull String exportedAt, @NotNull List<Event> recallEvents) {
+    @NotNull String timezone,
+    @NotNull String exportedAt,
+    @NotNull List<Event> recallEvents,
+    @NotNull List<DailyProbe> dailyProbes) {
 
   public enum EventKind {
     ANSWERED_RECALL_PROMPT,
@@ -17,6 +20,7 @@ public record RecallHistoryExport(
     TUTOR_FEEDBACK
   }
 
+  @Schema(name = "RecallHistoryEvent")
   public record Event(
       @NotNull String recordedAt,
       @NotNull @Schema(allowableValues = {"AGAIN", "HARD", "GOOD", "EASY", "CONFUSION"})
@@ -32,6 +36,7 @@ public record RecallHistoryExport(
       Integer noteId,
       Answer answer) {}
 
+  @Schema(name = "RecallHistoryAnswer")
   public record Answer(
       @NotNull Integer id,
       QuestionType questionType,
@@ -46,4 +51,13 @@ public record RecallHistoryExport(
       AnswerOutcome outcome,
       String excludedAt,
       String exclusionReason) {}
+
+  @Schema(name = "RecallHistoryDailyProbe")
+  public record DailyProbe(
+      @NotNull String completedAt,
+      Double speed,
+      @NotNull Integer accuracy,
+      @NotNull Integer lapseCount,
+      Double variability,
+      @NotNull List<DailyProbeTrialDTO> trials) {}
 }
