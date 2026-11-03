@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-100#story-2",
+  "title": "Find how the morning probe relates to recall, and how to make the probe more useful",
+  "completedAt": "2026-11-03T15:25:53.791Z",
+  "developer": "Terry Yin",
+  "agent": "Yua-chan",
+  "host": "claude",
+  "model": "opus"
+}

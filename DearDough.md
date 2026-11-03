@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 335. Removed numbers are never reused.
+- Highest allocated local number: 338. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Shared-feedback compaction recovery (2026-11-03): `0373e4129d8dbc29189e08bdcb0075969eee0f2c:DearDough.md`; its rows are retained at the linked Open Dough finding owners.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
@@ -391,3 +391,45 @@ During slice 1 acceptance, the coordinator recorded the source-review commitment
 ### Occurrences
 Distinct executions, original provenance, observations and qualified inferences are
 [retained at ODF-413](https://github.com/terryyin/open-dough/blob/a29f625255a3368eb721249c01df96e0f98edfd4/docs/maintainer/findings/ODF-413.md); source recovery remains in this project’s pre-compaction revision.
+
+## DD-336 — A plan narrowed a story commitment and only the source-only review exposed it
+
+The story required comparing the probe against two baselines; the plan's slice 3 limited that comparison to rows the relation found supported ("unsupported rows are left as they are"). Slice 2 found no supported row on the real data, so following the plan would have left the report with no baseline comparison. The coordinator noticed because the source-only review listed the baseline commitment unqualified, corrected the plan in place, and briefed the implementer to compare every row. The practice that worked: allocating the independent review's commitments, not the plan's slice text, as the acceptance list.
+
+### Occurrences
+- Execution: SEED-100#story-2; first implementation 275504cfc10cad5418f9f54f5a70dc26c331b6da
+  - Timestamp: unknown (2026-11-03, between the slice 2 push 51b2d705fc and the slice 3 delegation)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: da02e73b4a:.planning/slice-plans/002-morning-probe-and-recall-analysis/PLAN.md slice 3 Behavior; source-review.md row 16; corrected text in d50b3c84b5 PLAN.md slice 3.
+  - Observed effect: no rework; the correction was made before delegation.
+  - Inference: a plan condition that depends on an unknown data outcome (here, whether any row is supported) can silently empty a story promise; checking each conditional narrowing against the source commitments at planning time would catch it earlier.
+
+## DD-337 — Plan premises were checked in a different form from how they were used
+
+The plan recorded tooling and data definitions as settled without exercising them as used: it observed `python3 -c "import pandas"` but prescribed `python3 -I`, which disables the user site where pandas is installed; and it defined session span from `answer.promptCreatedAt`, which the real export shows is generated ahead (90th percentile about 5 days before the answer). The slice 1 implementer found both; the coordinator replaced the commands and the span definition in the plan before slice 2. The early data-inventory slice is what made the data premise cheap to correct.
+
+### Occurrences
+- Execution: SEED-100#story-2; first implementation 275504cfc10cad5418f9f54f5a70dc26c331b6da
+  - Timestamp: unknown (2026-11-03, slice 1 return before 275504cfc1)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: da02e73b4a PLAN.md Current decisions "Tooling" and "Day-level measures" and premise table row 3; corrected in 275504cfc1 and 51b2d705fc PLAN.md; slice 2 also changed the answer start to include away and detour time after 4 of 65 days clipped.
+  - Observed effect: one implementer workaround (`-E -B -p no:cacheprovider`) and two definition changes; no published result was wrong.
+  - Inference: running a premise check with the exact command form, and reading a few real rows before fixing a data definition, would likely have avoided both.
+
+## DD-338 — Execution was launched before an owner-held start input existed
+
+The plan states execution starts only when the owner's export file is outside the repository or a token is supplied. The dashboard launched execution with neither available; the coordinator searched, found nothing, and stopped with an attention report before any slice. The owner then supplied a token in the same session. Readiness recorded the story as ready without distinguishing an owner-held input that must exist at launch.
+
+### Occurrences
+- Execution: SEED-100#story-2; first implementation 275504cfc10cad5418f9f54f5a70dc26c331b6da
+  - Timestamp: 2026-11-03T14:10:04.817Z (stop report receipt)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: da02e73b4a PLAN.md Current decisions "Input handover"; seed story-state block `assessment: ready`; dashboard receipt d3299043-df17-4ffd-a7c4-13c8cc5b2af6.
+  - Observed effect: one stop and one owner round trip before slice 1; no work lost.
+  - Inference: a readiness or launch check that surfaces owner-held start inputs would let the owner supply them with the launch.
