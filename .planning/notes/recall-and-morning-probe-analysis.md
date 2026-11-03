@@ -116,6 +116,39 @@ Sample: 66 probe days; 66 have at least one review on its local day; 0 of them h
 | variability | Session length (min) | -0.03 | [-0.27, 0.22] | 65 | not supported |
 | variability | Pace (reviews per active min) | -0.10 | [-0.34, 0.15] | 65 | not supported |
 
+### Gain over what the owner already knows
+
+Each cell is the mean absolute error (in the recall measure's unit) of predicting a day's recall after the probe from all other days by least squares (leave one day out). Typical day: the overall mean, and the mean adjusted by weekday and by the probe's completion hour band (the bands of the Inventory); the typical-day baseline is whichever of the two errs less, and "Typical day + probe" adds the probe measure to that one. Yesterday: a linear prediction from the previous paired day's value of the same measure; "Yesterday + probe" adds the probe measure. The probe gains over a baseline when adding it lowers that baseline's error. Verdict: a supported relation reads "gain over both baselines" or names the baseline it does not beat; any other row keeps its relation verdict and adds the gain as information.
+
+Sample: the 65 days of the after-probe relation table. A row's n counts the days where the recall measure, its previous paired day's value, and the probe measure all have a value, so the first paired day never counts; every error in a row is over the same days.
+
+| Probe measure | Recall measure | n days | Overall mean | Weekday & time | Typical day + probe | Yesterday | Yesterday + probe | Verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| speed | Correct share | 64 | 0.0326 | 0.0408 | 0.0331 | 0.0330 | 0.0335 | not supported; no gain |
+| speed | Surprise | 64 | 0.981 | 1.09 | 1.00 | 0.993 | 1.01 | not supported; no gain |
+| speed | Median response time (s) | 64 | 2.07 | 1.94 | 1.94 | 1.69 | 1.72 | not supported; no gain |
+| speed | Distraction share | 64 | 0.133 | 0.142 | 0.133 | 0.134 | 0.134 | not supported; no gain |
+| speed | Session length (min) | 64 | 53.5 | 59.4 | 54.4 | 54.9 | 55.8 | not supported; no gain |
+| speed | Pace (reviews per active min) | 64 | 0.327 | 0.357 | 0.333 | 0.334 | 0.341 | not supported; no gain |
+| accuracy | Correct share | 64 | 0.0326 | 0.0408 | 0.0327 | 0.0330 | 0.0334 | not supported; no gain |
+| accuracy | Surprise | 64 | 0.981 | 1.09 | 0.982 | 0.993 | 0.994 | not supported; no gain |
+| accuracy | Median response time (s) | 64 | 2.07 | 1.94 | 1.98 | 1.69 | 1.70 | not supported; no gain |
+| accuracy | Distraction share | 64 | 0.133 | 0.142 | 0.135 | 0.134 | 0.136 | not supported; no gain |
+| accuracy | Session length (min) | 64 | 53.5 | 59.4 | 53.3 | 54.9 | 54.4 | not supported; gain over both baselines |
+| accuracy | Pace (reviews per active min) | 64 | 0.327 | 0.357 | 0.336 | 0.334 | 0.342 | not supported; no gain |
+| lapseCount | Correct share | 64 | 0.0326 | 0.0408 | 0.0330 | 0.0330 | 0.0335 | not supported; no gain |
+| lapseCount | Surprise | 64 | 0.981 | 1.09 | 0.994 | 0.993 | 1.01 | not supported; no gain |
+| lapseCount | Median response time (s) | 64 | 2.07 | 1.94 | 1.98 | 1.69 | 1.68 | not supported; gain over yesterday's recall only |
+| lapseCount | Distraction share | 64 | 0.133 | 0.142 | 0.135 | 0.134 | 0.136 | not supported; no gain |
+| lapseCount | Session length (min) | 64 | 53.5 | 59.4 | 54.2 | 54.9 | 56.0 | not supported; no gain |
+| lapseCount | Pace (reviews per active min) | 64 | 0.327 | 0.357 | 0.321 | 0.334 | 0.331 | not supported; gain over both baselines |
+| variability | Correct share | 64 | 0.0326 | 0.0408 | 0.0333 | 0.0330 | 0.0336 | not supported; no gain |
+| variability | Surprise | 64 | 0.981 | 1.09 | 1.01 | 0.993 | 1.02 | not supported; no gain |
+| variability | Median response time (s) | 64 | 2.07 | 1.94 | 1.96 | 1.69 | 1.71 | not supported; no gain |
+| variability | Distraction share | 64 | 0.133 | 0.142 | 0.129 | 0.134 | 0.130 | not supported; gain over both baselines |
+| variability | Session length (min) | 64 | 53.5 | 59.4 | 55.4 | 54.9 | 56.3 | not supported; no gain |
+| variability | Pace (reviews per active min) | 64 | 0.327 | 0.357 | 0.326 | 0.334 | 0.335 | not supported; gain over the typical day only |
+
 ## Recall-session efficiency
 
 Pending.
@@ -152,5 +185,6 @@ Pending.
 - Correct share: correct over correct plus wrong among the day's reviews.
 - A day enters the relation only with at least 10 reviews after its probe (in the all-day sensitivity variant, 10 reviews that day).
 - Strength: Spearman rho over days with a 95% percentile bootstrap interval (2000 resamples of days, fixed seed 20261103, so the report regenerates identically). Days needed: `(z(0.975) + z(0.8))^2 / atanh(0.3)^2 + 3`, the Fisher-z approximation.
+- Baselines: each after-probe recall measure is predicted for every day from all other days by least squares (leave one day out) and scored by mean absolute error. Typical day: the overall mean, or the mean adjusted by weekday and by the probe's completion hour band, whichever errs less. Yesterday: a linear prediction from the previous paired day's value of the same measure. The probe gains over a baseline when adding the probe measure to it lowers that error; a row's days are those with the measure, its previous paired day's value, and the probe measure.
 - Aggregates only: no note ids, note titles, tutor feedback, or exclusion reason text.
 - Scripts: `analysis/` in `.planning/slice-plans/002-morning-probe-and-recall-analysis`, recoverable with `git log --all -- .planning/slice-plans/002-morning-probe-and-recall-analysis`. They run with system Python 3 (pandas, numpy, scipy) and are outside any product build or lint.

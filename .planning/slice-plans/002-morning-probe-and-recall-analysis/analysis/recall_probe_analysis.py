@@ -12,6 +12,7 @@ import pandas as pd
 
 from recall_export import (
     DIFF_CAP_MS,
+    HOUR_BANDS,
     MIN_REVIEWS_AFTER_PROBE,
     MIN_VALID_MS,
     SESSION_GAP_MINUTES,
@@ -22,6 +23,8 @@ from recall_export import (
     reviews_after_probe_per_day,
     surprise,
 )
+from gain import gain
+from markdown import band_label, share, table
 from relation import (
     BOOTSTRAP_RESAMPLES,
     BOOTSTRAP_SEED,
@@ -33,21 +36,6 @@ from relation import (
 )
 
 KINDS = ["ANSWERED_RECALL_PROMPT", "JUST_REVIEW", "TUTOR_FEEDBACK"]
-HOUR_BANDS = [(0, 6), (6, 9), (9, 12), (12, 15), (15, 18), (18, 21), (21, 24)]
-
-
-def band_label(start, end):
-    return f"{start:02d}:00–{end - 1:02d}:59"
-
-
-def table(header, rows):
-    lines = ["| " + " | ".join(header) + " |", "| " + " | ".join("---" for _ in header) + " |"]
-    lines += ["| " + " | ".join(str(c) for c in row) + " |" for row in rows]
-    return "\n".join(lines)
-
-
-def share(part, whole):
-    return f"{part} of {whole} ({100 * part / whole:.0f}%)" if whole else f"{part} of 0"
 
 
 def inventory(data):
@@ -160,6 +148,12 @@ def method(data):
             f"- Strength: Spearman rho over days with a 95% percentile bootstrap interval ({BOOTSTRAP_RESAMPLES} "
             f"resamples of days, fixed seed {BOOTSTRAP_SEED}, so the report regenerates identically). Days needed: "
             f"`(z(0.975) + z(0.8))^2 / atanh({DETECT_RHO})^2 + 3`, the Fisher-z approximation.",
+            "- Baselines: each after-probe recall measure is predicted for every day from all other days by least "
+            "squares (leave one day out) and scored by mean absolute error. Typical day: the overall mean, or the "
+            "mean adjusted by weekday and by the probe's completion hour band, whichever errs less. Yesterday: a "
+            "linear prediction from the previous paired day's value of the same measure. The probe gains over a "
+            "baseline when adding the probe measure to it lowers that error; a row's days are those with the "
+            "measure, its previous paired day's value, and the probe measure.",
             "- Aggregates only: no note ids, note titles, tutor feedback, or exclusion reason text.",
             "- Scripts: `analysis/` in `.planning/slice-plans/002-morning-probe-and-recall-analysis`, "
             "recoverable with `git log --all -- .planning/slice-plans/002-morning-probe-and-recall-analysis`. "
@@ -239,6 +233,7 @@ SECTIONS = {
     "inventory": lambda data: inventory(data) + "\n" + method(data),
     "h-check": h_check,
     "relation": relation,
+    "gain": gain,
 }
 
 

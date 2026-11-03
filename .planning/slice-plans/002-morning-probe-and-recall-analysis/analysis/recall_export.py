@@ -19,6 +19,7 @@ REQUIRED_ANSWER = [
 ]
 REQUIRED_PROBE = ["completedAt", "speed", "accuracy", "lapseCount", "variability"]
 MIN_REVIEWS_AFTER_PROBE = 10
+HOUR_BANDS = [(0, 6), (6, 9), (9, 12), (12, 15), (15, 18), (18, 21), (21, 24)]
 
 
 def require(record, fields, where):

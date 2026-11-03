@@ -160,16 +160,21 @@ threshold excluded and their number stated.
 ### 3. Probe gain over what the owner already knows
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `test_gain*`: a fixture where the previous day predicts surprise as
 well as the probe → "supported, no gain over the previous day"; a fixture
-where only the probe predicts → "gain over both baselines"; then the real run
-appends the gain column to the relation table.
+where only the probe predicts → "gain over both baselines"; an unsupported
+row still carries its baseline errors; then the real run writes the gain
+comparison into the "Probe and same-day recall" section.
 
-Behavior: relation table exists → run the gain comparison → each supported
-row gains a verdict against the typical-day baseline and the previous-day
-baseline from leave-one-day-out mean absolute error; unsupported rows are
-left as they are.
+Behavior: relation table exists → run the gain comparison → every row gets
+leave-one-day-out mean absolute errors for the typical-day baseline, the
+previous-day baseline, and each with the probe added; a supported row's
+verdict names its gain or lack of gain over each baseline, and other rows
+show the comparison as information. (Corrected during execution: the story
+compares the probe against both baselines without limiting it to supported
+rows, and slice 2 found no supported row, so a supported-only comparison
+would leave the report without one.)
 
 ### 4. Recall-session efficiency
 
@@ -273,6 +278,17 @@ the early probe that settles them before dependent slices.
 - **Answer span.** Starting an answer `thinkingTimeMs` before `createdAt`
   clipped distraction share on 4 of 65 days; adding `awayMs + detourMs`
   (product's `useThinkingTimeTracker` pauses on away/detour) clips none.
+- **Gain (slice 3): no meaningful gain.** All 24 rows, n = 64. The probe
+  lowers a baseline's leave-one-day-out error on 5 rows, by at most about
+  3% (for example variability × distraction share 0.133 → 0.129); the
+  comparison has no gain threshold or uncertainty, so slice 6 treats these
+  as noise. Weekday-and-hour adjustment predicts worse than the overall mean
+  on 5 of 6 measures (overfitting at 64 days); yesterday's value helps only
+  for median response time (1.69 s against 2.07 s).
+- **Module layout.** Markdown helpers live in `analysis/markdown.py`,
+  `HOUR_BANDS` in `recall_export.py`; `recall_probe_analysis.py` is near
+  250 lines, so slices 4 and 5 add their sections in their own modules.
+  Method lines live in `method()` and print with the `inventory` section.
 - **Date range (slice 5).** The relation slices use 2026-08-29 onward;
   slice 5 states the date range it uses, since the export reaches back to
   2023.
