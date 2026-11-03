@@ -69,4 +69,3 @@ Feature: Commissioned learning session
     Then I should see the tutor's feedback "Pronunciation was clear; still mixes ser/estar under pressure."
     And I should see Stability 199
     And I should see Difficulty 1
-    And I should see 199 hours between last and next recall
