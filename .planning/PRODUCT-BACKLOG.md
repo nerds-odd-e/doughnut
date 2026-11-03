@@ -8,9 +8,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Find how the morning probe relates to recall, and how to make the probe more useful](seeds/SEED-100-recall-history-export.md#story-2) — SEED-100#story-2 ([plan](slice-plans/002-morning-probe-and-recall-analysis/PLAN.md))
+
 ## Backlog list
 
-- [Find how the morning probe relates to recall, and how to make the probe more useful](seeds/SEED-100-recall-history-export.md#story-2) — SEED-100#story-2
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
