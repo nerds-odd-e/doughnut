@@ -10,14 +10,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import recall_probe_analysis as analysis  # noqa: E402
 
 
-def answer(created_at, outcome=None, excluded_at=None, reason=None):
+def answer(created_at, outcome=None, excluded_at=None, reason=None, thinking_time_ms=5000, away_ms=0):
     return {
         "id": 1,
         "questionType": "SPELLING",
         "promptCreatedAt": created_at,
         "createdAt": created_at,
-        "thinkingTimeMs": 5000,
-        "awayMs": 0,
+        "thinkingTimeMs": thinking_time_ms,
+        "awayMs": away_ms,
         "awayCount": 0,
         "detourMs": 0,
         "detourCount": 0,
@@ -45,13 +45,13 @@ def event(at, kind="ANSWERED_RECALL_PROMPT", grade="GOOD", retrievability=0.9, *
     }
 
 
-def probe(completed_at):
+def probe(completed_at, speed=1.5, accuracy=80, lapse_count=3, variability=0.5):
     return {
         "completedAt": completed_at,
-        "speed": 1.5,
-        "accuracy": 80,
-        "lapseCount": 3,
-        "variability": 0.5,
+        "speed": speed,
+        "accuracy": accuracy,
+        "lapseCount": lapse_count,
+        "variability": variability,
         "trials": [],
     }
 

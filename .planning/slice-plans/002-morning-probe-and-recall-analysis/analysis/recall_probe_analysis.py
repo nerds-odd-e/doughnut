@@ -11,12 +11,25 @@ import sys
 import pandas as pd
 
 from recall_export import (
+    DIFF_CAP_MS,
     MIN_REVIEWS_AFTER_PROBE,
+    MIN_VALID_MS,
+    SESSION_GAP_MINUTES,
+    THINKING_CAP_MS,
     day_probes,
     load,
     reviews_after_probe,
     reviews_after_probe_per_day,
     surprise,
+)
+from relation import (
+    BOOTSTRAP_RESAMPLES,
+    BOOTSTRAP_SEED,
+    DETECT_RHO,
+    MIN_DAYS,
+    day_table,
+    days_needed,
+    relation_table,
 )
 
 KINDS = ["ANSWERED_RECALL_PROMPT", "JUST_REVIEW", "TUTOR_FEEDBACK"]
@@ -124,8 +137,29 @@ def method(data):
             "`y` 1 for correct and 0 for wrong, `p` the raw `retrievability`; the recall stats tiles "
             "additionally recalibrate `p` per question type, this report does not.",
             "- Response time: `answer.thinkingTimeMs`, else `answer.createdAt - answer.promptCreatedAt` when "
-            "positive; capped at 120 s (thinking time) or 300 s (timestamp difference); dropped below 1 s.",
-            f"- A day enters the relation only with at least {MIN_REVIEWS_AFTER_PROBE} reviews after its probe.",
+            f"positive; capped at {THINKING_CAP_MS // 1000} s (thinking time) or {DIFF_CAP_MS // 1000} s "
+            f"(timestamp difference); dropped below {MIN_VALID_MS // 1000} s.",
+            "- Activity: answered prompts (reviews or not) and `JUST_REVIEW` events. An answered prompt ends at "
+            "`answer.createdAt` and starts `thinkingTimeMs + awayMs + detourMs` before it, because away and detour "
+            "pause the thinking-time clock while idle time stays inside it; a `JUST_REVIEW` is a moment at "
+            "`recordedAt`. `answer.promptCreatedAt` does not mark a start: prompts are generated ahead, often "
+            "days before they are answered.",
+            f"- Sessions: a local day's activity is split where an event starts more than {SESSION_GAP_MINUTES} "
+            "minutes after the previous one ended; a session runs from its first event's start to its last "
+            "event's end.",
+            "- Session length: the sum of the day's session spans; in the relation after the probe, only the part "
+            "of each span after the probe's `completedAt`.",
+            "- Distraction share: the reviews' `awayMs + detourMs + idleMs` over the session length, clipped at 1 "
+            "(the relation section states on how many days).",
+            "- Pace: reviews per active minute, active being session length minus the reviews' away, detour and "
+            "idle time; a day without active time has no pace.",
+            "- Median response time: the median of the day's reviews' response times.",
+            "- Correct share: correct over correct plus wrong among the day's reviews.",
+            f"- A day enters the relation only with at least {MIN_REVIEWS_AFTER_PROBE} reviews after its probe "
+            f"(in the all-day sensitivity variant, {MIN_REVIEWS_AFTER_PROBE} reviews that day).",
+            f"- Strength: Spearman rho over days with a 95% percentile bootstrap interval ({BOOTSTRAP_RESAMPLES} "
+            f"resamples of days, fixed seed {BOOTSTRAP_SEED}, so the report regenerates identically). Days needed: "
+            f"`(z(0.975) + z(0.8))^2 / atanh({DETECT_RHO})^2 + 3`, the Fisher-z approximation.",
             "- Aggregates only: no note ids, note titles, tutor feedback, or exclusion reason text.",
             "- Scripts: `analysis/` in `.planning/slice-plans/002-morning-probe-and-recall-analysis`, "
             "recoverable with `git log --all -- .planning/slice-plans/002-morning-probe-and-recall-analysis`. "
@@ -166,9 +200,45 @@ def h_check(data):
     )
 
 
+def relation(data):
+    probes = day_probes(data)
+    out = ["## Probe and same-day recall", ""]
+    out.append(
+        f"Spearman rho per probe measure and recall measure, with a 95% percentile bootstrap interval "
+        f"({BOOTSTRAP_RESAMPLES} resamples of days, seed {BOOTSTRAP_SEED}). Verdict: \"supported\" when the "
+        f"interval excludes 0; \"not supported\" when it includes 0 with at least {MIN_DAYS} days; "
+        f"\"too few days to tell\" below {MIN_DAYS} days, naming the days needed to detect "
+        f"|rho| = {DETECT_RHO} at 80% power (two-sided alpha 0.05, Fisher z): {days_needed()}. "
+        "Measures are defined under Method and limits."
+    )
+    header = ["Probe measure", "Recall measure", "rho", "95% interval", "n days", "Verdict"]
+    for after_probe, title, scope in (
+        (True, "That day's recall after the probe", "review after the probe on its local day"),
+        (False, "Sensitivity: all of the probe day's reviews", "review on its local day"),
+    ):
+        days, below = day_table(data, after_probe)
+        with_any = len(days) + below
+        clipped = int(days["clipped"].sum())
+        no_pace = int(days["pace"].isna().sum())
+        missing = days.drop(columns="clipped").isna().sum()
+        missing = ", ".join(f"{k} {v}" for k, v in missing[missing > 0].items()) or "none"
+        out += ["", f"### {title}", ""]
+        out.append(
+            f"Sample: {len(probes)} probe days; {with_any} have at least one {scope}; "
+            f"{below} of them have fewer than {MIN_REVIEWS_AFTER_PROBE} and are excluded, leaving {len(days)} days. "
+            f"Distraction share clipped at 1 on {clipped} of those days; {no_pace} have no active time and so no "
+            f"pace. Days without a value, by measure: {missing}. A row's n counts the days where both of its "
+            "measures have a value."
+        )
+        out += ["", table(header, relation_table(days))]
+    out.append("")
+    return "\n".join(out)
+
+
 SECTIONS = {
     "inventory": lambda data: inventory(data) + "\n" + method(data),
     "h-check": h_check,
+    "relation": relation,
 }
 
 

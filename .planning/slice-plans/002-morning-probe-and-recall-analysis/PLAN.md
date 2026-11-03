@@ -63,9 +63,15 @@ owner's usual one (the report states it as a limitation either way).
     `answer.createdAt > completedAt` on the same local day.
 - **Day-level measures.** Per day: reviews after the probe, correct share,
   surprise, median response time, distraction share
-  (`awayMs + detourMs + idleMs` over the span from first prompt to last
-  answer), session length (that span), pace (reviews per active minute,
-  active = span minus away/detour/idle). A day enters the relation table only
+  (`awayMs + detourMs + idleMs` over session length), session length, pace
+  (reviews per active minute, active = session length minus
+  away/detour/idle). Session length comes from answers, not prompts
+  (prompts are pre-generated, see Learnings): a day's answered prompts and
+  `JUST_REVIEW` events split into sessions at gaps over 30 minutes; an answer
+  occupies `thinkingTimeMs + awayMs + detourMs` before its `createdAt` (away
+  and detour pause the product's thinking clock, idle stays inside it); the
+  day's length is the sum of its session spans. Slice 4 reuses the same
+  helpers in `analysis/recall_export.py`. A day enters the relation table only
   with at least 10 reviews after the probe (the inventory reports how many
   days the threshold removes).
 - **Strength and verdict.** Spearman rho with a 95% bootstrap interval over
@@ -139,7 +145,7 @@ surprise are recorded in the plan under Learnings before slice 2 starts.
 ### 2. Probe-to-recall relation with strength and verdict
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `test_relation*`: a fixture with a planted monotone relation between
 probe speed and surprise → "supported" with an interval excluding 0; an
 independent fixture with 40 paired days → "not supported"; a 12-day fixture
@@ -256,6 +262,17 @@ the early probe that settles them before dependent slices.
   away/detour/idle fields are present on every answer (missing on 68% of
   all-time answers); `retrievability` is missing on 0.5%. `recordedAt`
   matches `answer.createdAt` to within 0.4 s.
+- **Relation (slice 2): nothing supported at 65 days.** All 24 after-probe
+  rows and all 24 all-day rows are "not supported"; intervals are about
+  ±0.25 wide. Largest: accuracy × surprise −0.23 [−0.45, 0.02],
+  lapseCount × pace −0.23 [−0.48, 0.03] (all-day −0.25 [−0.50, 0.00]).
+  85 days are needed to detect |rho| = 0.3. Slice 3's gain comparison
+  applies only to supported rows, so it has none on the real data; its
+  fixture proof still stands. Slice 6 carries the days-needed proposal and
+  the near-boundary rows.
+- **Answer span.** Starting an answer `thinkingTimeMs` before `createdAt`
+  clipped distraction share on 4 of 65 days; adding `awayMs + detourMs`
+  (product's `useThinkingTimeTracker` pauses on away/detour) clips none.
 - **Date range (slice 5).** The relation slices use 2026-08-29 onward;
   slice 5 states the date range it uses, since the export reaches back to
   2023.

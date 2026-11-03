@@ -83,3 +83,51 @@ def surprise(reviews):
     p = scored["retrievability"]
     variance = (p * (1 - p)).sum()
     return (scored["correct"] - p).sum() / np.sqrt(variance) if variance > 0 else np.nan
+
+
+THINKING_CAP_MS = 120_000
+DIFF_CAP_MS = 300_000
+MIN_VALID_MS = 1_000
+SESSION_GAP_MINUTES = 30
+ACTIVITY_KINDS = ["ANSWERED_RECALL_PROMPT", "JUST_REVIEW"]
+
+
+def response_time_ms(reviews):
+    """Per review, as the product's RecallStatsAggregator.responseTimeMs; invalid ones dropped."""
+    thinking = reviews["thinkingTimeMs"]
+    diff = (reviews["createdAt"] - reviews["promptCreatedAt"]).dt.total_seconds() * 1000
+    raw = thinking.where(thinking.notna(), diff.where(diff > 0))
+    capped = np.minimum(raw, np.where(thinking.notna(), THINKING_CAP_MS, DIFF_CAP_MS))
+    return capped[capped >= MIN_VALID_MS]
+
+
+def activity(events):
+    """Answered prompts and JUST_REVIEW events with the time each started and ended.
+
+    An event ends at `answer.createdAt` (`recordedAt` for JUST_REVIEW) and starts
+    `thinkingTimeMs + awayMs + detourMs` before that, since away and detour pause the
+    thinking clock while idle stays inside it (a JUST_REVIEW is a moment).
+    """
+    act = events[events["kind"].isin(ACTIVITY_KINDS)]
+    end = act["createdAt"].fillna(act["recordedAt"])
+    duration = act["thinkingTimeMs"].fillna(0) + act["awayMs"].fillna(0) + act["detourMs"].fillna(0)
+    start = end - pd.to_timedelta(duration, unit="ms")
+    return act.assign(start=start, end=end)
+
+
+def session_spans(day_activity):
+    """A new session starts when an event starts more than SESSION_GAP_MINUTES after the previous one ended."""
+    ordered = day_activity.sort_values("end")
+    new_session = (ordered["start"] - ordered["end"].shift()) > pd.Timedelta(minutes=SESSION_GAP_MINUTES)
+    return ordered.groupby(new_session.cumsum()).agg(start=("start", "min"), end=("end", "max"))
+
+
+def session_ms(day_activity, after=None):
+    """Sum of the day's session spans; with `after`, only the part of each span after that time."""
+    spans = session_spans(day_activity)
+    start = spans["start"] if after is None else spans["start"].clip(lower=after)
+    return float((spans["end"] - start).dt.total_seconds().clip(lower=0).sum() * 1000)
+
+
+def distraction_ms(reviews):
+    return float((reviews["awayMs"].fillna(0) + reviews["detourMs"].fillna(0) + reviews["idleMs"].fillna(0)).sum())
