@@ -106,6 +106,12 @@ G1. The refactor moved the `trials_json` shape into one JPA converter, so
 `POST /api/daily-probes` now returns `trials` instead of `trialsJson`; no
 client read that field. The export tests (14), `*DailyProbe*` (13), and
 `*RecallStats*` (62) pass, and frontend `vue-tsc --noEmit` passes.
+CI repair (run 41568886799): `lint:all` failed at 6932a70eb6 in
+`e2e_test/config/cucumberProofRunner.test.mjs`, a test this story did not
+touch. Its `reporter` kept Cypress's timing-dependent column padding and
+attached the run totals to whichever spec ran last. The repair normalizes
+the padding and collects the totals separately. It adds two minimal tests;
+the full file passed 4 of 4 runs.
 
 ### 3. Download recall history from the recall stats tab
 

@@ -17,6 +17,7 @@ const cypress = join(
 )
 const reporter = (output) => {
   const specs = new Map()
+  const totals = []
   let rows
   for (const line of stripVTControlCharacters(output).split('\n')) {
     const spec = line.match(/^\s*Running:\s+(.*?)\s+\(\d+ of \d+\)/)?.[1]
@@ -25,6 +26,7 @@ const reporter = (output) => {
       rows = []
       specs.set(spec, rows)
     }
+    if (/^\s*\(Run Finished\)/.test(line)) rows = totals
     if (
       /^\s*([✔✓]|\d+\)|\d+ passing|\d+ failing|\d+ pending)/.test(line) ||
       line.includes('proof fixture')
@@ -34,15 +36,43 @@ const reporter = (output) => {
         line
           .trim()
           .replaceAll(/\(\d+(?:ms|s)\)/g, '(duration)')
-          .replaceAll(/\d+ms|\d+s/g, 'duration')
+          .replaceAll(/\s*\d+(?:ms|s)\b/g, ' duration')
           .replaceAll(/localhost:\d+/g, 'localhost:port')
       )
     }
   }
-  return [...specs.entries()].sort(([left], [right]) =>
-    left.localeCompare(right)
-  )
+  return {
+    specs: [...specs.entries()].sort(([left], [right]) =>
+      left.localeCompare(right)
+    ),
+    totals,
+  }
 }
+
+test('Cypress summary rows compare equal whatever the width of their durations', () => {
+  const summary = (duration) =>
+    [
+      '  Running:  parse.feature  (1 of 1)',
+      `  \u2714  All specs passed!${duration.padStart(31)}        1        1        -        -        -`,
+    ].join('\n')
+  assert.deepEqual(reporter(summary('999ms')), reporter(summary('1s')))
+})
+
+test('Cypress run totals compare equal whatever order the specs ran in', () => {
+  const run = (...specs) =>
+    [
+      ...specs.flatMap((spec, index) => [
+        `  Running:  ${spec}  (${index + 1} of ${specs.length})`,
+        '  1 passing (5ms)',
+      ]),
+      '  (Run Finished)',
+      '    \u2714  All specs passed!    9ms        2        2        -        -        -',
+    ].join('\n')
+  assert.deepEqual(
+    reporter(run('a.feature', 'b.feature')),
+    reporter(run('b.feature', 'a.feature'))
+  )
+})
 
 test('ordinary and explicit full, focused, tagged, dry and reported Cypress runs preserve results and proof ownership', {
   timeout: 180000,
@@ -117,7 +147,7 @@ test('ordinary and explicit full, focused, tagged, dry and reported Cypress runs
     baseline.output
   )
   assert.deepEqual(
-    reporter(baseline.output).map(([spec]) => spec),
+    reporter(baseline.output).specs.map(([spec]) => spec),
     [
       'features/hooks.feature',
       'features/normal.feature',
