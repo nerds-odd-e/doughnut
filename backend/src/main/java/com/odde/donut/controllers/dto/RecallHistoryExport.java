@@ -7,7 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
-/** The learner's whole recall history; every timestamp is ISO-8601 in {@code timezone}. */
+/**
+ * The learner's whole recall history and daily probes; every timestamp is ISO-8601 in {@code
+ * timezone}. Donut stores no timezone per event or probe, so this one zone applies to the whole
+ * history: on days the learner was elsewhere, the local day and time of day can be wrong.
+ */
 public record RecallHistoryExport(
     @NotNull String timezone,
     @NotNull String exportedAt,
