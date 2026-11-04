@@ -3,7 +3,7 @@ id: SEED-007
 status: dormant
 planted: 2026-08-21
 planted_during: focus-note retrieval exploration for OKF / LLM Wiki
-updated: 2026-10-14
+updated: 2026-11-04
 trigger_when: improving question-context quality under the learning and retrieval epic, or when QG quality plateaus
 scope: medium
 ---
@@ -201,18 +201,107 @@ owner decision, not completion of the improvement story.
 
 **Identity:** SEED-007#story-3
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/005-notebook-question-instructions-by-property-type/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"598c5266f3a0c8d44bc6d08cc57f04f70aaf24419d9add8f90c90b4b60bf5bf7","plan":"ac06235b1b68843815825f2b2fdfaca68ee765f49ba311dbf0d2aed8b48585f8"}}
 ```
 
-- **Goal:** A notebook author can write one custom question-generation
-  instruction for a property type and its equivalent relationship-note type.
-  Donut includes that instruction only when generating a question for a
-  matching property or a matching relationship note in that notebook.
-- **Example:** An author sets guidance for `a part of` in `日本語学習`.
-  Donut supplies it for a recall question about a word's `a part of` property
-  and for a recall question focused on an `a-part-of` relationship note. A
-  whole-note vocabulary question, a question about a different relationship
-  type, or a question in another notebook uses its own configured instructions.
+- **Goal:** A notebook author can write one question-generation instruction
+  for a property type, such as `a part of`, in the notebook readme. Donut sends
+  it only when generating a question about a matching property, or about a
+  relationship note of the equivalent relation, in that notebook. Guidance that
+  fits only one kind of question then uses no context budget elsewhere and
+  cannot mislead other questions. Today the readme's
+  `question_generation_instruction` goes into every question of the notebook.
+- **Scope:**
+  - *Authoring (owner decision, 2026-11-04):* a nested map under one notebook
+    readme frontmatter key, from property type to instruction text. Use the
+    key `question_generation_instructions_by_property` unless planning finds a
+    naming conflict:
+
+    ```yaml
+    ---
+    question_generation_instruction: Ask in Japanese.
+    question_generation_instructions_by_property:
+      a part of: >-
+        Ask which group the word belongs to using a sentence, not the reading.
+    ---
+    ```
+
+    The owner accepted that, with this key present, the web edits the readme's
+    metadata in Markdown mode ("Nested metadata is edited in Markdown."). The
+    readme body stays as it is today. The map travels with the readme through
+    Git synchronization like other author YAML.
+  - *Matching:* a property question matches when its property key, without
+    the numeric suffix (`a part of 2` → `a part of`) and ignoring case, names a
+    map entry. This holds for both a scalar property and one list item of a
+    list property. A question focused on a relationship note matches through
+    the existing relation-to-property-key rule (`relation: a-part-of` →
+    `a part of`, including the `an example of` → `example of` family) that is
+    already used when a relationship note is reduced to a source property.
+  - *Which notebook:* the notebook of the note being asked about: the note
+    that owns the property, or the relationship note itself.
+  - *Combination:* a matching instruction is added to the existing notebook,
+    folder, and focus-note instructions, with a label naming the notebook and
+    the property type. Nothing is overridden. A blank entry adds nothing, the
+    same as a blank instruction today.
+  - *Required restriction:* a non-matching question gets no per-type
+    instruction. This is the story's purpose (owner, 2026-11-04), not only a
+    delivery limit.
+  - *Deferred promises (not rejections):* per-type instructions in folder
+    readmes or on single notes; per-type guidance in the learning-session
+    request (it carries only the notebook instruction today); showing a
+    property-focused request through the question-generation export (export is
+    whole-note only); property focus in contest evaluation (that request gets no
+    property focus today); rich-mode editing of the nested map.
+- **Key examples:**
+  - `日本語学習` has an `a part of` entry. Recall question for a word's
+    `a part of` property (or `a part of 2`) → the request carries the
+    `a part of` instruction as well as the general notebook instruction.
+  - Same notebook. Recall question focused on a relationship note with
+    `relation: a-part-of` → the request carries the `a part of` instruction.
+  - Same notebook. Whole-note question about that same word, a question about
+    a `similar to` property, or a relationship note with `relation: similar-to`
+    → no `a part of` instruction. The general notebook instruction is still
+    included.
+  - Another notebook with no map entry. Question about an `a part of` property
+    → no `a part of` instruction from `日本語学習`.
+- **Challenge note:** A conditional sentence in the general notebook
+  instruction could already guide the model. The owner chose to proceed as
+  queued (2026-11-04): the benefit is the saved context budget and avoiding
+  misapplication. Model-quality improvement is not measured by this story.
+- **Alternatives considered:** a conditional sentence in the existing
+  instruction (no change; always sent); one flat readme key per type (stays
+  rich-editable, but a naming rule must be learned); a notebook settings form
+  stored in the database (easy on the web, but does not travel with Git and
+  splits where instructions live); a separate note per property type, like a
+  Wikidata property page (a new concept and convention, heavier than needed).
+  Borrowed mechanism: a stylesheet's type selectors, where a rule keyed by type
+  applies only to matching elements and inherited rules still apply. The
+  analogy breaks at cascade precedence: Donut instructions add up and none
+  overrides another.
+- **Observed basis (read at `0c03b8e834`, no application run):**
+  `NoteRealmService.questionGenerationInstructionBlocks` builds additive,
+  deduplicated notebook → folder → focus-note blocks from
+  `question_generation_instruction`. `QuestionGenerationRequestBuilder`
+  subtracts instruction tokens from the shared content budget and receives a
+  `PropertyFocus` for property trackers (`MemoryTracker`).
+  `PropertyKeyNaming.propertyKeyBaseAndSuffix` and
+  `RelationshipNoteComposition.propertyKey` with
+  `PropertyKeyNaming.canonicalExampleOfFamilyKey` (used in
+  `NoteReferenceHandling`) give the matching rules. `Frontmatter.getString`
+  returns only scalars, so reading the map is new. The frontend
+  `RichMarkdownEditor` shows `nested_metadata` as Markdown-only metadata. No
+  backend save-time rejection of nested readme YAML was found, and
+  `NotebookGitProposalMarkdownFormat` checks only for a top-level map with a
+  non-blank `type`, so nested values pass Git publication; ADR 0004 preserves
+  author YAML. These are code readings; no save or publication was run.
+- **Architecture:** No Accepted ADR conflict found. The map is readme
+  metadata, not a **property** in ADR 0001's sense (properties are scalar or
+  one-level lists); it lives in author YAML that
+  [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+  preserves. Readmes are container columns, not notes, so the map never
+  enters the note property index or trackers. Instruction assembly is shared by
+  generation, batch generation, and evaluation; the per-type block follows the
+  focus each of those already receives.
 
 ## Ordering and Open Decisions
 
