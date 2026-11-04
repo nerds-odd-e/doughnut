@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yumi-chan",
+  "email": "yumi-chan@example.org",
+  "identity": "SEED-101#story-2",
+  "mode": "story-branch",
+  "branch": "claude/date-property-values-on-every-web-path-and-keep",
+  "host": "claude",
+  "model": "opus"
+}
