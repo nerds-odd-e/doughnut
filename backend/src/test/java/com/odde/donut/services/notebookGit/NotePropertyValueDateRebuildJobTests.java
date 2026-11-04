@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.availability.ApplicationAvailabilityBean;
+import org.springframework.boot.availability.AvailabilityChangeEvent;
+import org.springframework.boot.availability.ReadinessState;
 
 @ExtendWith(MockitoExtension.class)
 class NotePropertyValueDateRebuildJobTests {
@@ -19,7 +22,10 @@ class NotePropertyValueDateRebuildJobTests {
 
   @BeforeEach
   void setup() {
-    job = new NotePropertyValueDateRebuildJob(rebuildService);
+    var availability = new ApplicationAvailabilityBean();
+    availability.onApplicationEvent(
+        new AvailabilityChangeEvent<>(this, ReadinessState.ACCEPTING_TRAFFIC));
+    job = new NotePropertyValueDateRebuildJob(rebuildService, availability);
   }
 
   @Test

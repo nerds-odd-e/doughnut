@@ -17,6 +17,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.availability.ApplicationAvailabilityBean;
+import org.springframework.boot.availability.AvailabilityChangeEvent;
+import org.springframework.boot.availability.ReadinessState;
 
 class NotePropertyValueDateRebuildServiceTest extends SpringTestBase {
   private static final Timestamp A_CREATED = Timestamp.from(Instant.parse("2026-09-01T08:00:00Z"));
@@ -78,6 +81,22 @@ class NotePropertyValueDateRebuildServiceTest extends SpringTestBase {
     assertThat(changedAt(a, "topic", ""), equalTo(A_CREATED));
     assertThat(changedAt(a, "origin", ""), equalTo(SAVED));
     assertThat(changedAt(b, "colors", "x"), equalTo(b.getCreatedAt()));
+  }
+
+  @Test
+  void scheduledRebuildWaitsForApplicationReadiness() {
+    clearDates();
+    var availability = new ApplicationAvailabilityBean();
+    var job = new NotePropertyValueDateRebuildJob(rebuildService, availability);
+
+    job.run();
+    assertThat(changedAt(a, "topic", ""), nullValue());
+
+    availability.onApplicationEvent(
+        new AvailabilityChangeEvent<>(this, ReadinessState.ACCEPTING_TRAFFIC));
+    job.run();
+
+    assertThat(changedAt(a, "topic", ""), equalTo(A_CREATED));
   }
 
   @Test
