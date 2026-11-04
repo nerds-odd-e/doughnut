@@ -188,3 +188,39 @@ pushed note's commit precedes its publication — is settled by the floor above.
 
 Accepted Git history supplies the evidence and the publication tip supplies the
 indexed values. [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
+
+<a id="story-2"></a>
+
+### Date property values on every web path and keep one value identity
+
+**Identity:** SEED-101#story-2
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-date-property-values-on-every-web-path/PLAN.md","assessment":"not-ready","reasons":["Decisive premises are unobserved in this checkout: that wrapping createNoteFromExtractedSuggestion in AcceptedWebChangeService.apply keeps the existing AI extraction tests and save-cost guards green, and that the rebuild query can join the notebook's Git binding. Settle them at slice planning before execution."],"basis":{"document":"9cfa8c3f38a16447df6b645b954a7bfa385b00f822ae667c339072261ae49c67","plan":"15283e8e8a0384568dd7eea72162b157aa2d2bfce5b5158aae0800916f14a99a"}}
+```
+
+Correction from the execution retrospective of
+[SEED-101#story-1](#story-1) (commits `44fb2233e0`..`0beb46cd03`); the plan is
+[004](../slice-plans/004-date-property-values-on-every-web-path/PLAN.md).
+
+#### Goal
+
+A learner who adds or changes property values through AI note extraction meets
+those values in the assimilation sequence at the time of that change, as they
+already do for other web saves. The maintenance job keeps dating the remaining
+notebooks when one notebook cannot be rebuilt. One value identity serves the
+index refresh, the history dater and the rebuild.
+
+#### Scope
+
+- AI "create extracted note" commits its change through the accepted web
+  change, so the values it adds or changes are dated at that commit and appear
+  in Git history.
+- The rebuild selects only notebooks it can rebuild, so one notebook without a
+  Git binding cannot stall the job for the others.
+- The (key, value) identity of a property value has one definition, used by the
+  refresh carry-over, the dater and the rebuild.
+- Tests that repeat the controller-level dating tests or check a state no
+  learner sees are removed; the remaining tests keep every story-1 example
+  covered.
+- Not included: how a note moved to another notebook keeps or loses its values'
+  dates (awaiting an owner decision).

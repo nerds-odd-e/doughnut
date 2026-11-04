@@ -269,6 +269,21 @@ Behavior: production runs with undated rows → every five minutes the job
 dates up to ten notebooks until none remain, under one ShedLock, failing
 loudly through the scheduled-job error handler.
 
+## Execution complete
+
+Product advice:
+- A correction is planned as [SEED-101#story-2](../../seeds/SEED-101-property-assimilation-order.md#story-2)
+  ([plan 004](../004-date-property-values-on-every-web-path/PLAN.md), assessed not-ready
+  until its premises are observed). AI note extraction changes notes outside the accepted
+  web change, so its values are never dated and never committed. The rebuild can stall on
+  a notebook without a Git binding. The value identity is defined four times, and several
+  dating tests repeat the controller-level ones.
+- Owner decision needed: moving a note to another notebook on the web re-dates all its
+  property values to the move time, because the destination sees the note as inserted; the
+  history rebuild agrees, since the destination's Git history shows the file added. The
+  story lists the edits that keep dates, and a move is not among them. Decide whether dates
+  should survive such a move.
+
 ## Concern evidence
 
 Slice-plan refinement did not run: the slices are commit-sized, each owns one
