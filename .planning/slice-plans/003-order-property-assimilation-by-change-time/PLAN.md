@@ -259,7 +259,7 @@ uses those dates.
 ### 8. Rebuild runs on its own in production
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NotePropertyValueDateRebuildJobSchedulerLockTest` (annotation
 presence, lock name and durations, as the existing lock test does) and a
 job test that `run()` calls `rebuildOne()` until it returns false, at most
@@ -344,6 +344,10 @@ stated. No remaining slice-specific concern was identified.
   its note's creation time, so a rebuilt notebook never returns. Reset never
   touches the index. Accepted proof:
   `'*NotePropertyValueDateRebuildServiceTest'` (6 tests), `'*NotePropertyIndex*'`.
+- Slice 8 (2026-11-04): `NotePropertyValueDateRebuildJob` sits beside the
+  service in services/notebookGit. Accepted proof:
+  `'*NotePropertyValueDateRebuildJob*'` (lock annotations by reflection; `run()`
+  stops on false and at 10), `'*SchedulerLock*'`, `'*MaintenanceJob*'`.
 
 ## Story obligations
 
@@ -356,3 +360,8 @@ Disposition: proved by slice 6: NotebookGitPublicationPropertyDatingControllerTe
 Reported: slice 6 — "A push changing only README/container documents does reach the tail and runs the diff-cost dater, which writes nothing."
 Story clause: "Notes the push does not change are not touched."
 Disposition: no user cost "Intake then follows the learner's own authoring timeline": the range diffs hold no note file, so no note content is read and no row is written (aPushChangingOnlyAnAttachmentWritesNoDates); the cost is one tree diff per commit, which scales with the push
+
+### G3. Production job wiring and run length are not observed at runtime
+Reported: slice 8 — "No test starts a `prod`-profile Spring context, so the bean wiring and the actual scheduling are not observed at runtime." and "Whether one whole-history walk per notebook fits in the 4-minute lock in production is still unobserved."
+Story clause: "Donut fills missing dates from retained Git history on its own, in a maintenance job (existing scheduling infrastructure, one notebook at a time, bounded per run), without a learner or a save waiting for it."
+Disposition: no user cost "Intake then follows the learner's own authoring timeline": the job copies the existing prod job pattern (`QuestionGenerationBatchMaintenanceJob`, same limit), a run longer than the lock only delays dating because `rebuildOne` locks the notebook's binding for update, and until a value is dated it sorts at its note's creation, which is today's order

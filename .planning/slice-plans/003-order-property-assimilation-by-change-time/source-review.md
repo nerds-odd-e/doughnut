@@ -6,9 +6,9 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | A learner (owner or subscriber) walking the assimilation sequence meets untracked property values in the order those values were last added or changed, within the same note level, not in the order their notes were created. | slice 8 | |
+| 1 | A learner (owner or subscriber) walking the assimilation sequence meets untracked property values in the order those values were last added or changed, within the same note level, not in the order their notes were created. | slice 8 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate; NotebookGitWebContentPropertyDatingControllerTest; NotebookGitPublicationPropertyDatingControllerTest; NotePropertyValueDateRebuildServiceTest; e2e assimilation_property_order.feature |
 | 1.1 | A property added today to an old note is offered after the older material at that level. | slice 5 | observed: e2e_test/features/assimilation/assimilation_property_order.feature 'A property added to an old note comes after a newer note' (assimilating Note 2 after a day-2 property on Note 1) |
-| 1.2 | Intake follows the learner's own authoring timeline. | slice 8 | |
+| 1.2 | Intake follows the learner's own authoring timeline. | slice 8 | observed: same as 1: dates from web saves, pushes and history order the queue (assimilation_property_order.feature end to end) |
 | 1.3 | Additions to old notes stop jumping to the front. | slice 5 | observed: e2e_test/features/assimilation/assimilation_property_order.feature (fails with the dating call removed: Note 1's property came first) |
 | 2 | Value date: each indexed property value carries the committer time of the last accepted Git commit that changed its parsed value (the commit that added it or changed a scalar's content). | slice 4 | observed: NotebookGitPropertyValueDatingTest.datesEachValueAtTheCommitThatAddedItAndLeavesUnchangedValuesUndated, datesAListItemRemovedAndReAddedAtItsReAddition, followsARenamedNoteBackToTheCommitThatChangedItsValue |
 | 2.1 | This applies to a scalar per key. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_added_items_and_new_or_edited_scalars_only (topic physics→chemistry reported; unchanged status not) |
@@ -38,23 +38,23 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 6.3 | Values unchanged across the range keep their dates. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (N2 topic and beta keep earlier dates) |
 | 6.4 | Notes the push does not change are not touched. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.aPushChangingOnlyAnAttachmentWritesNoDates; eachValueIsDatedAtTheCommitThatLastChangedIt (N2 unchanged) |
 | 7 | Missing dates: a value without a date sorts at its note's creation time. | slice 2 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate.undated_property_sorts_at_its_notes_creation (COALESCE(i.changedAt, n.createdAt)) |
-| 7.1 | Donut fills missing dates from retained Git history on its own, in a maintenance job. | slice 8 | |
-| 7.1.1 | The job uses existing scheduling infrastructure. | slice 8 | |
+| 7.1 | Donut fills missing dates from retained Git history on its own, in a maintenance job. | slice 8 | observed: NotePropertyValueDateRebuildJobSchedulerLockTest.runsEveryFiveMinutesInProductionUnderOneSchedulerLock; NotePropertyValueDateRebuildJobTests |
+| 7.1.1 | The job uses existing scheduling infrastructure. | slice 8 | observed: NotePropertyValueDateRebuildJob uses @Scheduled + @SchedulerLock under @Profile(prod) like QuestionGenerationBatchMaintenanceJob; NotePropertyValueDateRebuildJobSchedulerLockTest |
 | 7.1.2 | It handles one notebook at a time. | slice 7 | observed: NotePropertyValueDateRebuildService.rebuildOne picks one notebook (Limit.of(1)) and locks its binding; NotePropertyValueDateRebuildServiceTest.aFinishedRebuildLeavesNothingForTheNextRun |
-| 7.1.3 | It is bounded per run. | slice 8 | |
-| 7.1.4 | No learner or save waits for it. | slice 8 | |
+| 7.1.3 | It is bounded per run. | slice 8 | observed: NotePropertyValueDateRebuildJobTests.datesAtMostTenNotebooksPerRun, stopsWhenNoNotebookIsLeftToDate |
+| 7.1.4 | No learner or save waits for it. | slice 8 | observed: consumer trace: the job is the only production caller of rebuildOne; no request path calls it |
 | 7.2 | A value already present in the oldest retained commit ("Create notebook" or "Reset" root) is dated at its note's creation time. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.datesUndatedValuesFromHistoryAndAtCreationForValuesInTheRoot (topic in root = A's creation) |
 | 7.3 | A finished rebuild leaves nothing undated. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.aValueOutsideTheRetainedHistoryIsDatedAtItsNotesCreation, aFinishedRebuildLeavesNothingForTheNextRun |
 | 7.4 | A history reset does not change cached dates. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.aResetKeepsDatedValues |
 | 8 | Cache: one optional timestamp per `note_property_index` row. | slice 1 | observed: NotePropertyIndex.changedAt (nullable) + V300000356; NotePropertyIndexServiceTest changeDate: date kept on body edit and reorder, null for a new value |
 | 8.1 | It is ordering data only. | slice 2 | observed: changedAt appears only in ORDER BY/select time (NotePropertyIndexRepository.unitTime); WHERE and count queries unchanged |
-| 8.2 | There is no event log. | slice 8 | |
-| 8.3 | There is no Git content change. | slice 8 | |
-| 8.4 | There is no second source of truth. | slice 8 | |
+| 8.2 | There is no event log. | slice 8 | observed: inspection of git diff d04576f870 -- backend/src/main: no new table; only changed_at column (V300000356) |
+| 8.3 | There is no Git content change. | slice 8 | observed: NotebookGitPropertyValueDating uses read-side JGit only (RevWalk, TreeWalk, DiffEntry, RenameDetector); no inserter or ref update added |
+| 8.4 | There is no second source of truth. | slice 8 | observed: only writes are setChangedAt on existing note_property_index rows; Git history stays the evidence |
 | 8.5 | Trackers and counting are unaffected. | slice 2 | observed: tracker and count suites green: *MemoryTracker*, AssimilationServiceDailyCapTest, AssimilationServicePropertyUnitsTest count tests |
 | 8.6 | A tracked value never re-enters the sequence, whatever its date. | slice 2 | observed: WHERE clauses unchanged; AssimilationServicePropertyReferenceGateTest and tracker matching tests green |
 | 9.1 | exclusion: note-level units keep creation-time order. | slice 2 | observed: NoteAssimilationQueries note ORDER BY unchanged; AssimilationServiceQueueOrderingTest green |
-| 9.2 | exclusion: no date is shown in the UI. | slice 8 | |
+| 9.2 | exclusion: no date is shown in the UI. | slice 8 | observed: changedAt is @JsonIgnore; git diff d04576f870 --stat -- frontend generated packages open_api_docs.yaml is empty |
 | 9.3 | exclusion: author time is not used instead of committer time. | slice 4 | observed: NotebookGitPropertyValueDating uses getCommitterIdent; NotebookGitPropertyValueDatingTest fixture author time = now vs fixed committer times (swap to author ident failed 4/4) |
 | 9.4 | exclusion: no clock normalization for CLI commits; a future- or back-dated local commit sorts where its committer time says. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (c3 committed 10:00, published 09:30, stays 10:00) |
 | 9.5 | exclusion: values whose history was reset before this story lands are not re-dated; they stay at note creation. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.afterAResetEveryUndatedValueIsDatedAtItsNotesCreation (origin at A's creation, not the save) |
