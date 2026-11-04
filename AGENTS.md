@@ -6,7 +6,7 @@ Donut is a Personal Knowledge Management tool combining zettelkasten-style note 
 
 Consult `.agents/agent-map.md` when you need repository entry points, generated API guidance, focused commands, service assumptions, or default indexing notes.
 
-Run repo tooling with `CURSOR_DEV=true nix develop -c …` unless documented otherwise (e.g. Cloud VM). **Git commands do not need the Nix prefix** — run `git` directly.
+Run local repo tooling with `./scripts/run.sh <command>`. It uses a cached Nix environment and sets offline defaults for local dependency tools. Run Git commands directly. If dependencies are missing, report the blocker. Use `DONUT_ALLOW_DOWNLOADS=1 ./scripts/run.sh bash scripts/worktree_setup.sh` for online setup after the user confirms an unmetered connection or authorizes the downloads.
 
 Repo conventions live in `.agents/skills/` as Agent Skills. Always-on skills for every coding session: `unit-testing`. Then the stack skill for the area you touch: frontend → `frontend`; backend → `backend`; E2E → `e2e-authoring`; lint → `linting_formating`; migrations → `db-migration`; MCP → `mcp-server`; CLI → `cli`. Do not search for other names first. Path-scoped skills (`frontend-component`, `backend-testing`, and so on) attach when matching files are in context.
 
@@ -55,7 +55,7 @@ Portable digest (details live in the cited skills — keep `AGENTS.md` and `CLAU
 
 ## Cursor Cloud specific instructions
 
-On the Cloud VM there is **no Nix** — run commands directly (drop the `CURSOR_DEV=true nix develop -c` prefix). Full details: `.agents/skills/cloud-vm-setup/SKILL.md`.
+On the Cloud VM there is **no Nix** — run commands directly (drop the `./scripts/run.sh` prefix). Full details: `.agents/skills/cloud-vm-setup/SKILL.md`.
 
 - **Dependency refresh is automatic; system services are not.** The startup update script only runs `pnpm --frozen-lockfile recursive install`. It does **not** install Java/MySQL/Redis or start any service. Before running backend tests, E2E tests, or the app, run the idempotent setup script:
   ```bash

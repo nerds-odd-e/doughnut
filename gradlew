@@ -90,6 +90,11 @@ APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exi
 
 # Donut worktree isolation: scripts/backend-worktree-gradle-route.sh
 [ -z "${DONUT_WORKTREE_HANDOFF:-}" ] && [ -x "${APP_HOME}/scripts/backend-worktree-gradle-route.sh" ] && exec "${APP_HOME}/scripts/backend-worktree-gradle-route.sh" "$@"
+# Donut's local runner keeps Gradle dependency resolution offline.
+if [ "${DONUT_OFFLINE:-}" = "1" ]; then
+    set -- --offline "$@"
+fi
+
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD=maximum
 

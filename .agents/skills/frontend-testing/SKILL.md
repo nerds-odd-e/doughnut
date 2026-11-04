@@ -17,7 +17,7 @@ also pass the typecheck required by the `frontend` skill's "Frontend proof" rule
 From the repo root:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test
+./scripts/run.sh pnpm frontend:test
 ```
 
 All frontend unit-test commands use headless Chromium and never automatically open
@@ -26,32 +26,32 @@ a browser window. Do not enable a visible browser unless the user explicitly ask
 The legacy UI command also runs headlessly:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test:ui
+./scripts/run.sh pnpm frontend:test:ui
 ```
 
 Run tests in headless watch mode (the Vitest UI remains available at its printed
 URL without opening a browser):
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test:watch
+./scripts/run.sh pnpm frontend:test:watch
 ```
 
 Run a single test file from the repo root:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts
+./scripts/run.sh pnpm frontend:test tests/path/to/TestFile.spec.ts
 ```
 
 Or only the frontend package:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/path/to/TestFile.spec.ts
+./scripts/run.sh pnpm -C frontend test tests/path/to/TestFile.spec.ts
 ```
 
 Run a specific test case:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm -C frontend test -t "test name pattern"
+./scripts/run.sh pnpm -C frontend test -t "test name pattern"
 ```
 
 The test file path is relative to `frontend/`. Do not use `pnpm ... test -- tests/...`; the `--` is forwarded to Vitest and file filtering is skipped.
@@ -61,7 +61,7 @@ In most situations, run all unit tests instead of a selected file only. Use a si
 For `dough-test-optimization`, `frontend:test` remains the ordinary local
 feedback measurement because it runs Chromium browser mode. When per-test JSON
 durations are needed for investigation, use
-`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run --reporter=json`.
+`./scripts/run.sh pnpm -C frontend exec vitest run --reporter=json`.
 That plain Vitest run is profiling evidence only; verify retained changes with
 the normal browser-mode command and do not compare its wall time directly with
 `frontend:test`.

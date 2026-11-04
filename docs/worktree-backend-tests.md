@@ -17,8 +17,8 @@ launch:
 
 ```bash
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
-CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
-CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '<pattern>'
+./scripts/run.sh pnpm backend:test:worktree
+./scripts/run.sh pnpm backend:test:worktree --tests '<pattern>'
 ```
 
 When this checkout has no `.worktree.local.json` yet, the command:
@@ -62,7 +62,7 @@ automatic first use, or a one-time manual database setup):
    existing `doughnut` user:
 
 ```bash
-CURSOR_DEV=true nix develop -c mysql -h127.0.0.1 -P3309 -u root
+./scripts/run.sh mysql -h127.0.0.1 -P3309 -u root
 ```
 
 ```sql
@@ -113,14 +113,14 @@ From the checkout root:
 
 ```bash
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB
+./scripts/run.sh backend/gradlew -p backend migrateTestDB
 ```
 
 From `backend/`:
 
 ```bash
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
-CURSOR_DEV=true nix develop -c ./gradlew migrateTestDB
+./scripts/run.sh ./gradlew migrateTestDB
 ```
 
 These commands reuse the checkout's assigned database and the same exclusive
@@ -134,8 +134,8 @@ verification uses the assigned database under one invocation owner:
 
 ```bash
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
-CURSOR_DEV=true nix develop -c pnpm backend:test
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
+./scripts/run.sh pnpm backend:test
+./scripts/run.sh pnpm backend:test_only
 ```
 
 `pnpm backend:test` still formats first (`spotlessApply`), then migrates and
@@ -157,16 +157,16 @@ From the checkout root:
 
 ```bash
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test --tests '<pattern>'
+./scripts/run.sh backend/gradlew -p backend test
+./scripts/run.sh backend/gradlew -p backend test --tests '<pattern>'
 ```
 
 From `backend/`:
 
 ```bash
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
-CURSOR_DEV=true nix develop -c ./gradlew test
-CURSOR_DEV=true nix develop -c ./gradlew test --tests '<pattern>'
+./scripts/run.sh ./gradlew test
+./scripts/run.sh ./gradlew test --tests '<pattern>'
 ```
 
 These commands reuse the checkout's assigned database and the same exclusive
@@ -188,10 +188,10 @@ From the checkout root:
 
 ```bash
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test
-CURSOR_DEV=true nix develop -c pnpm backend:test
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
+./scripts/run.sh backend/gradlew -p backend migrateTestDB
+./scripts/run.sh backend/gradlew -p backend test
+./scripts/run.sh pnpm backend:test
+./scripts/run.sh pnpm backend:test_only
 ```
 
 Later invocations in the same linked checkout skip provisioning and reuse the

@@ -13,13 +13,13 @@ paths:
 Run backend verification from the repo root:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
+./scripts/run.sh pnpm backend:verify
 ```
 
 When no database migration is involved, this is faster:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
+./scripts/run.sh pnpm backend:test_only
 ```
 
 Always run all backend unit tests instead of a selected file or test case.

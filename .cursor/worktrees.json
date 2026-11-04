@@ -1,5 +1,3 @@
 {
-  "setup-worktree": [
-    "CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh"
-  ]
+  "setup-worktree": ["./scripts/run.sh bash scripts/worktree_setup.sh"]
 }

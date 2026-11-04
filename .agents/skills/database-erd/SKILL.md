@@ -29,7 +29,7 @@ exporter after schema changes.
 - The ERD needs to match the current migrated schema
 
 **Git does not use the Nix prefix.** All other repo tooling does:
-`CURSOR_DEV=true nix develop -c …`
+`./scripts/run.sh …`
 
 **Implementation:**
 - Script: `scripts/export_database_erd.py`
@@ -65,13 +65,13 @@ specific catalog.
 From the repo root:
 
 ```bash
-CURSOR_DEV=true nix develop -c python3 scripts/export_database_erd.py
+./scripts/run.sh python3 scripts/export_database_erd.py
 ```
 
 Or:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm export:database-erd
+./scripts/run.sh pnpm export:database-erd
 ```
 </step>
 

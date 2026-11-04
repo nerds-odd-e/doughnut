@@ -13,7 +13,7 @@ Vue naming, styling, icons, and derived-state also come from the `frontend-compo
 Start Storybook locally for component development and debugging:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm storybook
+./scripts/run.sh pnpm storybook
 ```
 
 Storybook starts on `http://localhost:6006` by default.

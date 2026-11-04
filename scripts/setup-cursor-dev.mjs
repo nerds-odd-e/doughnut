@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Refresh `.nix/jdk` → JAVA_HOME from `nix develop`, for Cursor / VS Code when the IDE is not
- * started from an active nix shell. Run: `pnpm setupCursorDev` (or prefixed with CURSOR_DEV + nix develop).
+ * started from an active nix shell. Run: `./scripts/run.sh pnpm setupCursorDev`.
  */
 
 import { existsSync, mkdirSync, rmSync, symlinkSync } from 'node:fs'
@@ -15,35 +15,23 @@ function repoRoot() {
 
 function resolveJavaHomeViaNix(cwd, env) {
   const resolved = spawnSync(
-    'nix',
-    [
-      'develop',
-      '--accept-flake-config',
-      '-c',
-      'sh',
-      '-c',
-      'printf "%s" "${JAVA_HOME}"',
-    ],
+    './scripts/run.sh',
+    ['sh', '-c', 'printf "%s" "${JAVA_HOME}"'],
     {
       cwd,
       encoding: 'utf8',
-      env: {
-        ...env,
-        CURSOR_DEV: 'true',
-      },
+      env,
       shell: false,
     }
   )
   if (resolved.error) {
     throw new Error(
-      `Could not run nix (${resolved.error.message}). Install Nix or run this script inside nix develop.`
+      `Could not start the development runner (${resolved.error.message}).`
     )
   }
   if (resolved.status !== 0) {
     const err = `${resolved.stderr || ''}${resolved.stdout || ''}`.trim()
-    throw new Error(
-      `nix develop failed (${resolved.status}). Is Nix installed and is this flake valid?\n${err}`
-    )
+    throw new Error(`Development runner failed (${resolved.status}).\n${err}`)
   }
   const stdout = `${resolved.stdout}`.trim()
   const candidates = stdout
@@ -92,9 +80,11 @@ try {
 } catch (error) {
   console.error(`${error}`)
   console.error('')
-  console.error('Fix: ensure Nix is installed, then run again from repo root.')
   console.error(
-    'Equivalent: CURSOR_DEV=true nix develop -c sh -c \'printf "%s" "${JAVA_HOME}"\''
+    'Run from the repository root with the cached Nix environment ready.'
+  )
+  console.error(
+    'Equivalent: ./scripts/run.sh sh -c \'printf "%s" "${JAVA_HOME}"\''
   )
   process.exit(1)
 }

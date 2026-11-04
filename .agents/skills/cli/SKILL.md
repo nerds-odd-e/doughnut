@@ -39,7 +39,7 @@ Keep each module’s **public surface small**: `export` only what other modules 
 
 For `dough-test-optimization`, measure `pnpm cli:test` as the complete ordinary
 feedback path, including the Python tests. For per-test Vitest durations, use
-`CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run --reporter=json`;
+`./scripts/run.sh pnpm -C cli exec vitest run --reporter=json`;
 that narrower profile does not replace verification or timing of the complete
 CLI command.
 

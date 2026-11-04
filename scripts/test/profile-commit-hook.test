@@ -39,7 +39,13 @@ mkdir "$work/bin"
 cat >"$work/bin/nix" <<'NIX'
 #!/usr/bin/env bash
 [ "$1" = --version ] && { echo "nix (substitute)"; exit 0; }
-while [ "$1" != -c ]; do shift; done
+while [ "$1" != -c ]; do
+  if [ "$1" = --profile ]; then
+    ln -s "$0" "$2"
+    exit 0
+  fi
+  shift
+done
 shift
 IN_NIX_SHELL=impure exec "$@"
 NIX
@@ -61,7 +67,7 @@ chmod +x "$work/bin/nix" "$work/bin/pnpm"
 
 evidence="$work/evidence"
 set +e
-PATH="$work/bin:$PATH" PROFILE_TEST_LOG="$work/pnpm.log" \
+PATH="$work/bin:$PATH" PROFILE_TEST_LOG="$work/pnpm.log" DONUT_ALLOW_DOWNLOADS=1 \
   bash "$work/src/scripts/profiling/profile-commit-hook.sh" baseline "$evidence" >/dev/null 2>&1
 echo "driver exit: $?"
 set -e

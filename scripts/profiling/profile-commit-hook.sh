@@ -107,7 +107,7 @@ record() {
   mkdir -p "$case_dir"
   snapshot >"$case_dir/before.snapshot"
   if [[ "$entry" == inside-nix ]]; then
-    (cd "$fixture" && CURSOR_DEV=true nix develop -c bash "$driver" run-hook "$fixture" "$case_dir") \
+    (cd "$fixture" && ./scripts/run.sh bash "$driver" run-hook "$fixture" "$case_dir") \
       >"$case_dir/nix-entry.log" 2>&1 </dev/null
   else
     run_hook "$fixture" "$case_dir"

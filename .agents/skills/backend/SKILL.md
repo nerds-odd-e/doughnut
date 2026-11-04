@@ -13,13 +13,13 @@ Matching `backend-code` (production Java) and `backend-testing` (tests) skills a
 ## Commands
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
+./scripts/run.sh pnpm backend:test_only
 ```
 
 When a database migration is involved:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
+./scripts/run.sh pnpm backend:verify
 ```
 
 Always run all backend unit tests, not a selected file or test case.

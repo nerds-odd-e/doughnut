@@ -16,7 +16,7 @@ Output: Environment ready for tests + summary ending with `## CLOUD VM READY`.
 </objective>
 
 <context>
-**On Cloud VM: do NOT use `CURSOR_DEV=true nix develop -c` prefix. Run commands directly.**
+**On Cloud VM: do NOT use `./scripts/run.sh` prefix. Run commands directly.**
 
 **Pre-configured:** Node.js v26.13.0 and pnpm (pnpm follows root `packageManager`) — no nix needed.
 
@@ -105,6 +105,6 @@ Confirm environment state and which test commands to use.
 </output>
 
 <out_of_scope>
-- Do not use `CURSOR_DEV=true nix develop -c` on Cloud VM.
+- Do not use `./scripts/run.sh` on Cloud VM.
 - Do not assume local Nix shell ports or paths (`/Users/...` vs `/workspace/...`).
 </out_of_scope>

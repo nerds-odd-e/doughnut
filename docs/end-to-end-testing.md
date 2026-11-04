@@ -42,7 +42,7 @@ leave retained proof untouched. Deliberately generate proof from the repository
 root with the command declared in `.planning/open-dough.json`:
 
 ```bash
-RECORD_CUCUMBER_PROOF=1 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature
+RECORD_CUCUMBER_PROOF=1 ./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature
 ```
 
 Choose another supported feature or comma-separated feature selection with

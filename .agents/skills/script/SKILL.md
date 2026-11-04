@@ -63,14 +63,14 @@ paths:
 
 ## CURSOR_DEV Mode Behavior
 
-When scripts are run with `CURSOR_DEV=true nix develop -c <command>`, the nix shell hook (`scripts/nix_shell_hook.sh`) should:
+When scripts are run with `./scripts/run.sh <command>`, the nix shell hook (`scripts/nix_shell_hook.sh`) should:
 
 - **Output only a one-liner**: `<<running within nix env>>` at the beginning
 - **Suppress all other output**: No log messages, environment info, or setup messages should appear
 - **Preserve command output**: The actual command's stdout/stderr should be displayed normally
 - **Show errors only**: If something goes wrong during setup, errors should still be visible
 
-This ensures that when running commands via `CURSOR_DEV=true nix develop -c`, users see only:
+This ensures that when running commands via `./scripts/run.sh`, users see only:
 1. The one-liner `<<running within nix env>>`
 2. The command's actual output
 

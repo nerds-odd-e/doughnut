@@ -27,7 +27,7 @@ auto-generated from the backend OpenAPI spec.
 changes, accept it or fix the generator path.
 
 **Git does not use the Nix prefix.** All other repo tooling does:
-`CURSOR_DEV=true nix develop -c …`
+`./scripts/run.sh …`
 
 Do not run raw `git diff --check` as a generated-client cleanup gate. Use
 `scripts/check_diff_whitespace.sh`, which excludes generated API artifacts from
@@ -51,7 +51,7 @@ Fix the **Java controllers** (not the generated files).
 
 <step name="regenerate">
 ```bash
-CURSOR_DEV=true nix develop -c pnpm generateTypeScript
+./scripts/run.sh pnpm generateTypeScript
 ```
 </step>
 
@@ -59,7 +59,7 @@ CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 Check if the change affected frontend usage — run frontend tests:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test
+./scripts/run.sh pnpm frontend:test
 ```
 
 Fix any broken frontend code that used the old API signatures.

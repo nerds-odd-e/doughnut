@@ -28,7 +28,7 @@ Use this script when:
 
 For local development with Nix, use:
 ```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
+./scripts/run.sh pnpm backend:verify
 ```
 
 ## More Information

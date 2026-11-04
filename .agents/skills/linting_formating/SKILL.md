@@ -34,7 +34,7 @@ Run commands from the repo root through Nix.
 ### Lint All Code
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm lint:all
+./scripts/run.sh pnpm lint:all
 ```
 
 This runs:
@@ -63,7 +63,7 @@ This runs:
   not pre-filter paths or spawn a formatting agent. Repeat only after an
   intervening repair invalidates that preparation. The **format-changed** skill
   remains available for explicit on-demand use.
-- Use `CURSOR_DEV=true nix develop -c pnpm format:all` only when intentionally
+- Use `./scripts/run.sh pnpm format:all` only when intentionally
   formatting the entire repository.
 - The pre-commit hook runs `pnpm lint:changed` against affected staged
   components. It is check-only: it does not format files or mutate the Git
@@ -83,7 +83,7 @@ This runs:
   `bash scripts/profiling/profile-commit-hook.sh baseline <evidence-dir>`
   outside Nix: it times the fixed 40-change corpus in a disposable worktree
   at the committed `HEAD`.
-- **Use `CURSOR_DEV=true nix develop -c pnpm lint:all`** for CI/CD validation only — it checks without fixing (plus a few script unit tests that format does not run).
+- **Use `./scripts/run.sh pnpm lint:all`** for a full local check — it checks without fixing (plus a few script unit tests that format does not run).
 
 ## OpenAPI Linting
 
@@ -95,7 +95,7 @@ The OpenAPI specification (`open_api_docs.yaml`) is validated using Redocly CLI.
 2. **Fix the issue** in the backend Java controller that generates the problematic endpoint
 3. **Regenerate** the OpenAPI spec and frontend client (do not hand-edit generated files):
    ```bash
-   CURSOR_DEV=true nix develop -c pnpm generateTypeScript
+   ./scripts/run.sh pnpm generateTypeScript
    ```
    This runs OpenAPI generation from Spring controllers (`pnpm backend:generateOpenAPIDocs`) and TypeScript client generation from the spec (`pnpm openAPIToTypeScript`).
 4. **Verify** by running `pnpm openapi:lint` again

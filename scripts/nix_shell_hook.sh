@@ -67,8 +67,9 @@ if [ "${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
   export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
   export PATH="${POETRY_PATH}:$PYTHON_PATH/bin:$PATH"
 
-  # Setup Python environment if enabled
-  setup_python "${POETRY_PATH}"
+  if [ "${DONUT_OFFLINE:-}" != "1" ]; then
+    setup_python "${POETRY_PATH}"
+  fi
 fi
 
 if [ "$CURSOR_DEV_MODE" != "true" ]; then

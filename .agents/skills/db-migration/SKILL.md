@@ -100,4 +100,4 @@ If destructive DML **must** ship as a migration:
 
 ## Entity-relationship diagram
 
-After adding or changing schema migrations, regenerate **`docs/database-erd.md`** so the Mermaid ERD stays aligned with Flyway. Follow the **`database-erd`** skill (`.agents/skills/database-erd/SKILL.md`): run `CURSOR_DEV=true nix develop -c pnpm export:database-erd` (or `python3 scripts/export_database_erd.py`) against a migrated local MySQL schema. Edge labels include `DELETE_RULE` — use them when reviewing any destructive change.
+After adding or changing schema migrations, regenerate **`docs/database-erd.md`** so the Mermaid ERD stays aligned with Flyway. Follow the **`database-erd`** skill (`.agents/skills/database-erd/SKILL.md`): run `./scripts/run.sh pnpm export:database-erd` (or `python3 scripts/export_database_erd.py`) against a migrated local MySQL schema. Edge labels include `DELETE_RULE` — use them when reviewing any destructive change.
