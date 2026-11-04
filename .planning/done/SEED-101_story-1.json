@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-101#story-1",
+  "title": "Order property assimilation by when values changed",
+  "completedAt": "2026-11-04T05:58:44.307Z",
+  "developer": "Terry Yin",
+  "agent": "Kirara-chan",
+  "host": "claude",
+  "model": "opus"
+}

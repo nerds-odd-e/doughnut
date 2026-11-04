@@ -6,7 +6,8 @@
 ## Provenance and findings
 
 Correction from the execution retrospective of SEED-101#story-1 (plan
-[003](../003-order-property-assimilation-by-change-time/PLAN.md), commits
+`.planning/slice-plans/003-order-property-assimilation-by-change-time/PLAN.md` at
+`aff3fe6ea556b0800f0a7cbc0c95f09eba144bd7`, commits
 `44fb2233e0`..`0beb46cd03`, reviewed 2026-11-04 at `0beb46cd03`). Current
 findings:
 
@@ -84,7 +85,7 @@ remains.
 Type: Structure
 Status: planned
 Proof: the removed cases are listed in finding 4; each story-1 example stays
-mapped to a surviving test (plan 003's Outside-in proof table, read against the
+mapped to a surviving test (the Outside-in proof table of plan 003 at `aff3fe6ea556b0800f0a7cbc0c95f09eba144bd7`, read against the
 current tests); `'*NotePropertyIndex*'` and `'*NotebookGitPropertyValueDating*'`
 stay green.
 
