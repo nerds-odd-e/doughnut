@@ -242,7 +242,7 @@ floored at the note's creation, in the acceptance transaction.
 ### 7. Maintenance fills missing dates from retained history
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NotePropertyValueDateRebuildServiceTest`: a Git-backed notebook
 whose root commit holds note A with `topic` and a later web save that adds
 `example of` to A and creates note B with `colors: [x]`; the rows are then
@@ -338,6 +338,12 @@ stated. No remaining slice-specific concern was identified.
   `'*NotebookGitPublicationPropertyDatingControllerTest'` (5 tests),
   `'*NotebookGitPropertyValueDatingTest'` (4), `'*NotebookGitPublishCost*'`,
   `'*NotebookGitPublication*'`, `'*NotebookGit*'` (146 classes, 487 tests).
+- Slice 7 (2026-11-04): `NotePropertyValueDateRebuildService` (services/notebookGit,
+  for the package-private repository store) matches undated rows to history by
+  (portable path, key, value); an undated row the history does not date takes
+  its note's creation time, so a rebuilt notebook never returns. Reset never
+  touches the index. Accepted proof:
+  `'*NotePropertyValueDateRebuildServiceTest'` (6 tests), `'*NotePropertyIndex*'`.
 
 ## Story obligations
 

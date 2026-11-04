@@ -40,12 +40,12 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 7 | Missing dates: a value without a date sorts at its note's creation time. | slice 2 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate.undated_property_sorts_at_its_notes_creation (COALESCE(i.changedAt, n.createdAt)) |
 | 7.1 | Donut fills missing dates from retained Git history on its own, in a maintenance job. | slice 8 | |
 | 7.1.1 | The job uses existing scheduling infrastructure. | slice 8 | |
-| 7.1.2 | It handles one notebook at a time. | slice 7 | |
+| 7.1.2 | It handles one notebook at a time. | slice 7 | observed: NotePropertyValueDateRebuildService.rebuildOne picks one notebook (Limit.of(1)) and locks its binding; NotePropertyValueDateRebuildServiceTest.aFinishedRebuildLeavesNothingForTheNextRun |
 | 7.1.3 | It is bounded per run. | slice 8 | |
 | 7.1.4 | No learner or save waits for it. | slice 8 | |
-| 7.2 | A value already present in the oldest retained commit ("Create notebook" or "Reset" root) is dated at its note's creation time. | slice 7 | |
-| 7.3 | A finished rebuild leaves nothing undated. | slice 7 | |
-| 7.4 | A history reset does not change cached dates. | slice 7 | |
+| 7.2 | A value already present in the oldest retained commit ("Create notebook" or "Reset" root) is dated at its note's creation time. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.datesUndatedValuesFromHistoryAndAtCreationForValuesInTheRoot (topic in root = A's creation) |
+| 7.3 | A finished rebuild leaves nothing undated. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.aValueOutsideTheRetainedHistoryIsDatedAtItsNotesCreation, aFinishedRebuildLeavesNothingForTheNextRun |
+| 7.4 | A history reset does not change cached dates. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.aResetKeepsDatedValues |
 | 8 | Cache: one optional timestamp per `note_property_index` row. | slice 1 | observed: NotePropertyIndex.changedAt (nullable) + V300000356; NotePropertyIndexServiceTest changeDate: date kept on body edit and reorder, null for a new value |
 | 8.1 | It is ordering data only. | slice 2 | observed: changedAt appears only in ORDER BY/select time (NotePropertyIndexRepository.unitTime); WHERE and count queries unchanged |
 | 8.2 | There is no event log. | slice 8 | |
@@ -57,7 +57,7 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 9.2 | exclusion: no date is shown in the UI. | slice 8 | |
 | 9.3 | exclusion: author time is not used instead of committer time. | slice 4 | observed: NotebookGitPropertyValueDating uses getCommitterIdent; NotebookGitPropertyValueDatingTest fixture author time = now vs fixed committer times (swap to author ident failed 4/4) |
 | 9.4 | exclusion: no clock normalization for CLI commits; a future- or back-dated local commit sorts where its committer time says. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (c3 committed 10:00, published 09:30, stays 10:00) |
-| 9.5 | exclusion: values whose history was reset before this story lands are not re-dated; they stay at note creation. | slice 7 | |
+| 9.5 | exclusion: values whose history was reset before this story lands are not re-dated; they stay at note creation. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.afterAResetEveryUndatedValueIsDatedAtItsNotesCreation (origin at A's creation, not the save) |
 | 10.1 | An untracked scalar edited for a typo moves to its edit time. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.editingAScalarRedatesIt |
 | 10.2 | A wiki-link rewrite that changes a value's text (destination renamed) dates that value at the rewrite commit. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.aRenameThatRewritesALinkValueDatesItAtTheRenameCommit |
 | E1.1 | A created 2024-03 with a note-level tracker; B created 2025-06 untracked; today A gets `example of: "[[X]]"` on the web → the next unit is B's note unit. | slice 5 | observed: e2e_test/features/assimilation/assimilation_property_order.feature: next unit is Note 2's note unit after Note 1 gains a property on the web |
@@ -75,8 +75,8 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | E6.1 | A new note committed locally at 08:00 and published at 09:30 → its values dated 09:30 (the floor). | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.aNoteCommittedBeforeItsPublicationIsDatedAtItsCreation |
 | E6.2 | Same setup → the note's own unit precedes its property units. | slice 2 | observed: AssimilationServicePropertyUnitsTest.properties_dated_at_their_notes_creation_follow_the_note_unit_in_key_order |
 | E7.1 | A notebook from before this story, every value undated → the sequence is ordered as today. | slice 2 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate.undated_property_sorts_at_its_notes_creation; existing ordering tests unchanged and green |
-| E7.2 | After the maintenance job runs → values added by later commits take those commit times. | slice 7 | |
-| E7.3 | After the job runs → values present in the root commit stay at note creation. | slice 7 | |
-| E7.4 | After the job runs → the next run finds nothing to do. | slice 7 | |
-| E7.5 | A notebook whose history was reset → treated the same way from its reset root. | slice 7 | |
+| E7.2 | After the maintenance job runs → values added by later commits take those commit times. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.datesUndatedValuesFromHistoryAndAtCreationForValuesInTheRoot (origin = save commit time) |
+| E7.3 | After the job runs → values present in the root commit stay at note creation. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.datesUndatedValuesFromHistoryAndAtCreationForValuesInTheRoot (topic = A's creation) |
+| E7.4 | After the job runs → the next run finds nothing to do. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.aFinishedRebuildLeavesNothingForTheNextRun (second rebuildOne false, dates unchanged) |
+| E7.5 | A notebook whose history was reset → treated the same way from its reset root. | slice 7 | observed: NotePropertyValueDateRebuildServiceTest.afterAResetEveryUndatedValueIsDatedAtItsNotesCreation |
 | E8.1 | A subscriber's sequence over a subscribed notebook → follows the same order. | slice 2 | observed: AssimilationServiceSubscriptionQueueTest.datedPropertyInSubscribedNotebookInterleavesWithOwnedNotesByDate |
