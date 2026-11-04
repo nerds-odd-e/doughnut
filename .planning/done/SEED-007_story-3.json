@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-007#story-3",
+  "title": "Set notebook question instructions by property and relationship type",
+  "completedAt": "2026-11-04T08:34:00.247Z",
+  "developer": "Terry Yin",
+  "agent": "Julia-chan",
+  "host": "claude",
+  "model": "opus"
+}
