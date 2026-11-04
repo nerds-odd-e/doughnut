@@ -162,7 +162,7 @@ note.created_at)`, then note id, note-before-property, key, item index, with
 ### 3. Value change set between two frontmatters
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `NotePropertyIndexPlannerTest`: given two frontmatters, the changed
 set is: added list items, scalars whose content differs, scalars and items
 new in the second; reordering a list, body-only differences, excluded keys,
@@ -237,7 +237,7 @@ Type: Behavior
 Status: planned
 Proof: `NotePropertyValueDateRebuildServiceTest`: a Git-backed notebook
 whose root commit holds note A with `topic` and a later web save that adds
-`example of` to A and creates note B with `tags: [x]`; the rows are then
+`example of` to A and creates note B with `colors: [x]`; the rows are then
 cleared of dates (as a pre-existing notebook would be) → `rebuildOne()`
 returns true and dates `topic` at A's creation, `example of` at the save
 commit, `x` at B's creation; a second `rebuildOne()` returns false and
@@ -292,3 +292,10 @@ stated. No remaining slice-specific concern was identified.
   (13 classes, 41 tests), plus `'*Assimilation*'`, `'*MemoryTracker*'`,
   `'*SubscriptionControllerTest'`, `'*NotePropertyIndex*'`,
   `'*UnassimilatedPropertyServiceTest'`.
+- Slice 3 (2026-11-04): `NotePropertyIndexPlanner.changedValues(before, after)`
+  returns `Set<DatedValue(propertyKey, propertyValue, content)>`; pass
+  `Frontmatter.empty()` for a note with no earlier version. `tags`, `aliases`,
+  `overlaps`, `cssclasses` and some relationship keys (`source`) are not
+  indexed, so dating tests use neutral keys (`topic`, `colors`, `origin`).
+  Accepted proof: `'*NotePropertyIndexPlannerTest'` (11 tests),
+  `'*NotePropertyIndex*'`, `'*AssimilationService*'`.

@@ -11,14 +11,14 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 1.2 | Intake follows the learner's own authoring timeline. | slice 8 | |
 | 1.3 | Additions to old notes stop jumping to the front. | slice 5 | |
 | 2 | Value date: each indexed property value carries the committer time of the last accepted Git commit that changed its parsed value (the commit that added it or changed a scalar's content). | slice 4 | |
-| 2.1 | This applies to a scalar per key. | slice 3 | |
-| 2.2 | This applies to each list item individually. | slice 3 | |
-| 2.3 | A list item whose text changes is a new value, dated at that change. | slice 3 | |
+| 2.1 | This applies to a scalar per key. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_added_items_and_new_or_edited_scalars_only (topic physics→chemistry reported; unchanged status not) |
+| 2.2 | This applies to each list item individually. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_added_items_and_new_or_edited_scalars_only (only added colors item y reported) |
+| 2.3 | A list item whose text changes is a new value, dated at that change. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_an_item_whose_text_changed_as_the_new_item (beta→betta reports betta) |
 | 2.4 | Body edits keep existing dates. | slice 5 | |
-| 2.5 | Frontmatter reformatting keeps existing dates. | slice 3 | |
+| 2.5 | Frontmatter reformatting keeps existing dates. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_ignores_reordering_and_reformatting_of_the_same_parsed_values (empty) |
 | 2.6 | List reordering keeps existing dates. | slice 5 | |
 | 2.7 | Edits to other properties of the note keep existing dates. | slice 5 | |
-| 2.8 | Values are compared as parsed values, never as text lines. | slice 3 | |
+| 2.8 | Values are compared as parsed values, never as text lines. | slice 3 | observed: NotePropertyIndexPlanner.changedValues compares parsed DatedValue sets; NotePropertyIndexPlannerTest reformatting test |
 | 3 | Floor: a value's date is never earlier than its note's creation time. | slice 6 | |
 | 3.1 | Rationale: a note pushed from the CLI (created at publish time, committed earlier) must not show its properties before the note itself or before notes created between commit and push. | slice 6 | |
 | 4 | Order: within a level, units sort by time. | slice 2 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate.property_dated_after_a_newer_notes_creation_is_offered_after_that_note |
