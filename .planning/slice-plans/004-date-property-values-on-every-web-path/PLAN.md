@@ -233,3 +233,12 @@ Reported: slice 1 — "Source review lists binding every notebook as a deferred 
 Story clause: "Binding every notebook so that the rebuild has none to leave out"
 Disposition: excluded "Binding every notebook so that the rebuild has none to leave out"
 Commitment: X3
+## Execution complete
+
+Product advice: no change. The story's goal holds: AI extraction is an
+accepted web change, the rebuild skips unbound notebooks, and one value key
+serves refresh, dater and rebuild. The deferred scope limits (re-dating on a
+move between notebooks; the cross-notebook undo-trash branch outside the
+accepted web change) stay with the owner, who decides whether to queue them.
+Retrospective (2026-11-04): no correction needed; process finding DD-344 in
+`DearDough.md`. The review is conditional on the story branch's pending CI.
