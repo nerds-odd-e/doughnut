@@ -4,16 +4,32 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /** Plans {@code note_property_index} rows from parsed frontmatter. */
 public final class NotePropertyIndexPlanner {
 
   /**
    * One index row: a scalar has one row with an empty {@code propertyValue}; a list has one row per
-   * distinct item with the item as its value.
+   * distinct item with the item as its value. {@code content} is the parsed text the row stands
+   * for: the scalar's value, or the item itself.
    */
   public record PlannedRow(
-      String propertyKey, int itemIndex, String propertyValue, String sourceLocalKey) {}
+      String propertyKey,
+      int itemIndex,
+      String propertyValue,
+      String content,
+      String sourceLocalKey) {
+    public DatedValue datedValue() {
+      return new DatedValue(propertyKey, propertyValue, content);
+    }
+  }
+
+  /**
+   * What a value's change date belongs to: a scalar per key (its content tells an edit), a list
+   * item by its text regardless of position.
+   */
+  public record DatedValue(String propertyKey, String propertyValue, String content) {}
 
   private static final int MAX_PROPERTY_VALUE_LENGTH = 255;
 
@@ -35,6 +51,20 @@ public final class NotePropertyIndexPlanner {
     return List.copyOf(rows);
   }
 
+  /** Values in {@code after} that are absent from, or differ in content from, {@code before}. */
+  public static Set<DatedValue> changedValues(Frontmatter before, Frontmatter after) {
+    Set<DatedValue> beforeValues = datedValues(before);
+    return datedValues(after).stream()
+        .filter(value -> !beforeValues.contains(value))
+        .collect(Collectors.toSet());
+  }
+
+  private static Set<DatedValue> datedValues(Frontmatter frontmatter) {
+    return plannedRows(frontmatter).stream()
+        .map(PlannedRow::datedValue)
+        .collect(Collectors.toSet());
+  }
+
   private static void appendRows(
       List<PlannedRow> rows,
       String key,
@@ -42,7 +72,9 @@ public final class NotePropertyIndexPlanner {
       CanonicalDonutOrigin canonicalOrigin) {
     switch (propertyValue) {
       case FrontmatterPropertyValue.Scalar scalar ->
-          rows.add(new PlannedRow(key, 0, "", sourceLocalKeyFor(scalar.value(), canonicalOrigin)));
+          rows.add(
+              new PlannedRow(
+                  key, 0, "", scalar.value(), sourceLocalKeyFor(scalar.value(), canonicalOrigin)));
       case FrontmatterPropertyValue.ListItems listItems -> {
         Set<String> seen = new HashSet<>();
         for (int i = 0; i < listItems.items().size(); i++) {
@@ -50,7 +82,7 @@ public final class NotePropertyIndexPlanner {
           if (item.isBlank() || item.length() > MAX_PROPERTY_VALUE_LENGTH || !seen.add(item)) {
             continue;
           }
-          rows.add(new PlannedRow(key, i, item, sourceLocalKeyFor(item, canonicalOrigin)));
+          rows.add(new PlannedRow(key, i, item, item, sourceLocalKeyFor(item, canonicalOrigin)));
         }
       }
     }

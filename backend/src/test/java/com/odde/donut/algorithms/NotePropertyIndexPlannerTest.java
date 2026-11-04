@@ -3,10 +3,12 @@ package com.odde.donut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class NotePropertyIndexPlannerTest {
@@ -65,5 +67,67 @@ class NotePropertyIndexPlannerTest {
 
     assertThat(
         rows.stream().map(NotePropertyIndexPlanner.PlannedRow::itemIndex).toList(), contains(0, 1));
+  }
+
+  private static Set<NotePropertyIndexPlanner.DatedValue> changed(String before, String after) {
+    return NotePropertyIndexPlanner.changedValues(
+        Frontmatter.parse(before), Frontmatter.parse(after));
+  }
+
+  private static NotePropertyIndexPlanner.DatedValue item(String key, String text) {
+    return new NotePropertyIndexPlanner.DatedValue(key, text, text);
+  }
+
+  private static NotePropertyIndexPlanner.DatedValue scalar(String key, String content) {
+    return new NotePropertyIndexPlanner.DatedValue(key, "", content);
+  }
+
+  @Test
+  void changedValues_reports_every_value_of_a_frontmatter_that_had_none() {
+    assertThat(
+        NotePropertyIndexPlanner.changedValues(
+            Frontmatter.empty(), Frontmatter.parse("topic: physics\ncolors:\n  - x\n")),
+        containsInAnyOrder(scalar("topic", "physics"), item("colors", "x")));
+  }
+
+  @Test
+  void changedValues_reports_added_items_and_new_or_edited_scalars_only() {
+    assertThat(
+        changed(
+            "topic: physics\nstatus: draft\ncolors:\n  - x\n",
+            "topic: chemistry\nstatus: draft\ncolors:\n  - x\n  - y\norigin: book\n"),
+        containsInAnyOrder(
+            scalar("topic", "chemistry"), item("colors", "y"), scalar("origin", "book")));
+  }
+
+  @Test
+  void changedValues_reports_an_item_whose_text_changed_as_the_new_item() {
+    assertThat(
+        changed("colors:\n  - alpha\n  - beta\n", "colors:\n  - alpha\n  - betta\n"),
+        contains(item("colors", "betta")));
+  }
+
+  @Test
+  void changedValues_ignores_reordering_and_reformatting_of_the_same_parsed_values() {
+    assertThat(
+        changed(
+            "topic: physics\ncolors:\n  - x\n  - \"[[B]]\"\n",
+            "colors: ['[[B]]', x]\ntopic: \"physics\"\n"),
+        empty());
+  }
+
+  @Test
+  void changedValues_ignores_removed_values() {
+    assertThat(changed("topic: physics\ncolors:\n  - x\n  - y\n", "colors:\n  - y\n"), empty());
+  }
+
+  @Test
+  void changedValues_ignores_values_the_index_does_not_hold() {
+    String longItem = "x".repeat(256);
+    assertThat(
+        changed(
+            "note_level: 1\n",
+            "note_level: 2\ntags: [x]\ncolors:\n  - \"  \"\n  - " + longItem + "\n"),
+        empty());
   }
 }

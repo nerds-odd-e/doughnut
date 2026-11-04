@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 338. Removed numbers are never reused.
+- Highest allocated local number: 343. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Shared-feedback compaction recovery (2026-11-03): `0373e4129d8dbc29189e08bdcb0075969eee0f2c:DearDough.md`; its rows are retained at the linked Open Dough finding owners.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
@@ -426,3 +426,69 @@ The plan states execution starts only when the owner's export file is outside th
 ### Occurrences
 
 SEED-100#story-2, first implementation `275504cfc1`. The 0.3.82 launch stopped before slice 1 and required one owner round trip. [Retained evidence](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-252.md) and [original source](https://github.com/nerds-odd-e/doughnut/blob/c4f485b9a8f3f1b0951789141732b55b52b51654/DearDough.md).
+
+## DD-339 — A plan's lettered slice numbers were unreadable to the obligations script
+
+The slice plan named slices `3a`, `3b`, `6a` and `6b`. At the first obligations listing the execution script refused the plan with `unreadable-slices` ("An ordered-slices heading is not in the established “### N. name” form") and `unknown-slice`. The coordinator renumbered all slices 1–8 in the plan and re-allocated the source-review table before delegating slice 1.
+
+### Occurrences
+- Execution: SEED-101#story-1, first implementation `44fb2233e0`
+  - Timestamp: 2026-11-04T00:45:00Z (approximate; before the slice 1 commit)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: plan `.planning/slice-plans/003-order-property-assimilation-by-change-time/PLAN.md` at `642aa7aace` (lettered headings) versus `44fb2233e0` (renumbered); `story-obligations.mjs list --slice 1` refusal in the coordinator transcript.
+  - Observed effect: one mechanical renumbering of about 25 plan references before any implementation; slice planning had accepted headings that execution cannot read.
+
+## DD-340 — A plan decision chose a costlier mechanism than the story's own one-step case, and existing cost guards rejected it
+
+The story's Architecture names a web save "the one-step case (previous content vs new content)". The plan decided the web save would run the Git commit-range dater over the appended commit. The implementer built that, and four `NotebookGitWebContentSaveCostControllerTest` guards failed (tree fetches 39 against a cap of 13). The implementer switched to the story's previous-versus-saved comparison, which the coordinator accepted and recorded as the plan's revised "Web save" decision.
+
+### Occurrences
+- Execution: SEED-101#story-1, first implementation `44fb2233e0`
+  - Timestamp: 2026-11-04T03:30:00Z (approximate; slice 5, commit `c66303158d`)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: slice 5 implementation return (failed guards, then redesign); plan "Web save" decision at `642aa7aace` versus `c66303158d`; story Architecture bullet "One dating mechanism".
+  - Observed effect: one discarded implementation inside a roughly 28-minute slice run; existing save-cost guards were the only check that caught it.
+  - Inference: planning did not consult the save path's existing cost tests when it placed new work on that path.
+
+## DD-341 — A plan's no-op shortcut contradicted a story clause, and the implementer's gap list exposed it
+
+The plan said "A push that changes no note documents runs no dater". Story clause 6.1 requires "an edit followed by a revert inside one push" to be dated at the revert commit. A push containing only that edit and revert has no net change, so it took the publisher's early return and left the old date. The slice 6 implementer named this as an open question in its gaps. The coordinator returned it to the slice under that clause, and two more agent rounds moved dating to the single acceptance point that all three accepting push paths reach. Related to ODF-139 (a plan narrowing a story commitment); here the source review allocated 6.1 to the slice, and the implementer's gap report exposed the contradiction.
+
+### Occurrences
+- Execution: SEED-101#story-1, first implementation `44fb2233e0`
+  - Timestamp: 2026-11-04T04:20:00Z (approximate; slice 6, commit `82d047703e`)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: plan "Push" decision at `642aa7aace`; obligation G1 in the plan at `82d047703e`; tests `anEditRevertedInTheSamePushIsDatedAtTheRevert` and `anEditRevertedInAPushThatOnlyMovesAFolderIsDatedAtTheRevert`.
+  - Observed effect: two extra delegated rounds inside slice 6; the final design has one call site instead of three.
+
+## DD-342 — The coordinator sent a shell placeholder to the source-only reviewer
+
+The coordinator wrote the source-only reviewer's prompt with `$(placeholder)` where the story text belonged. The prompt was not run through a shell, so nothing was substituted. The coordinator noticed after launch, stopped the reviewer before it returned anything, and relaunched it with the verbatim story text.
+
+### Occurrences
+- Execution: SEED-101#story-1, first implementation `44fb2233e0`
+  - Timestamp: 2026-11-04T00:40:00Z (approximate; before the slice 1 commit)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: coordinator transcript (stopped reviewer task, relaunch); `source-review.md` launch note records the stopped first launch.
+  - Observed effect: one wasted agent launch, with no effect on the review's input.
+
+## DD-343 — Implementers proved discrimination by disabling the new call
+
+In slices 4–7 the implementers showed that the new tests depend on the change. Each temporarily disabled the decisive line (the dating call, the committer-time read, or the creation-time fallback), recorded the failing assertion, and restored the line. In slice 6 one such probe also proved which early-return path a test exercised. The coordinator accepted these as discriminating evidence without rerunning them.
+
+### Occurrences
+- Execution: SEED-101#story-1, first implementation `44fb2233e0`
+  - Timestamp: 2026-11-04T05:30:00Z (approximate; slices 4–7)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: slice 4–7 implementation returns (an author-time swap failing 4 of 4; a removed web dating call failing the e2e; a removed push dating call failing 4 of 5; a removed fallback failing the rebuild test).
+  - Observed effect: acceptance relied on observed failures rather than test names, at the cost of one extra focused run per probe.

@@ -61,6 +61,13 @@ public final class NoteContentMarkdown {
         .map(s -> new LeadingFrontmatter(s.frontmatter(), s.body()));
   }
 
+  /** The leading frontmatter, empty when the content has none. */
+  public static Frontmatter leadingFrontmatter(String content) {
+    return splitLeadingFrontmatter(content == null ? "" : content)
+        .map(LeadingFrontmatter::frontmatter)
+        .orElse(Frontmatter.empty());
+  }
+
   /** The leading frontmatter's {@code image:} scalar, when present. */
   public static Optional<String> noteImage(String content) {
     return splitLeadingFrontmatter(content)
@@ -127,10 +134,7 @@ public final class NoteContentMarkdown {
    */
   public static Optional<AddedPropertyValue> addPropertyValueToLeadingFrontmatter(
       String content, String key, String value) {
-    Frontmatter frontmatter =
-        splitLeadingFrontmatter(content == null ? "" : content)
-            .map(LeadingFrontmatter::frontmatter)
-            .orElse(Frontmatter.empty());
+    Frontmatter frontmatter = leadingFrontmatter(content);
     if (frontmatter.holdsUnsupportedValue(key)) {
       return Optional.empty();
     }

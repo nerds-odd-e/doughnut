@@ -1,10 +1,12 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.factoryServices.EntityPersister;
+import com.odde.donut.services.NotePropertyIndexService;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.stereotype.Service;
 
 /** Makes the live projection exactly match a proposed Portable tree before accepting it. */
@@ -29,6 +32,7 @@ class NotebookGitProposalAcceptance {
   private final NotebookAttachmentRepository attachmentRepository;
   private final NotebookGitProposalFolderMaterialization folderMaterialization;
   private final NotebookGitStateLoader stateLoader;
+  private final NotePropertyIndexService notePropertyIndexService;
 
   NotebookGitProposalAcceptance(
       NotebookGitProjection projection,
@@ -37,7 +41,8 @@ class NotebookGitProposalAcceptance {
       EntityPersister entityPersister,
       NotebookAttachmentRepository attachmentRepository,
       NotebookGitProposalFolderMaterialization folderMaterialization,
-      NotebookGitStateLoader stateLoader) {
+      NotebookGitStateLoader stateLoader,
+      NotePropertyIndexService notePropertyIndexService) {
     this.projection = projection;
     this.repositoryStore = repositoryStore;
     this.testabilitySettings = testabilitySettings;
@@ -45,6 +50,7 @@ class NotebookGitProposalAcceptance {
     this.attachmentRepository = attachmentRepository;
     this.folderMaterialization = folderMaterialization;
     this.stateLoader = stateLoader;
+    this.notePropertyIndexService = notePropertyIndexService;
   }
 
   String acceptMatchingProposedTree(
@@ -62,8 +68,31 @@ class NotebookGitProposalAcceptance {
         projectAttachments(published, proposal);
     NotebookGitStateLoader.LockedNotebookState reconciled =
         requireMatchingProposedTree(withAttachmentFolders, proposal);
+    dateChangedValues(reconciled, proposal);
     return repositoryStore.store(
         reconciled.binding(), proposal.repository(), proposal.mainHead(), publishedAt);
+  }
+
+  /**
+   * Dates each pushed note's values at the committer time of the commit, between the accepted head
+   * and the proposed head, that last changed them; the projection has already refreshed the notes'
+   * index rows, and a value edited and reverted inside the range takes the revert's time.
+   */
+  private void dateChangedValues(
+      NotebookGitStateLoader.LockedNotebookState published,
+      NotebookGitProposalImporter.ImportedProposal proposal) {
+    NotebookGitPropertyValueDating.dateValues(
+            proposal.repository(),
+            ObjectId.fromString(published.binding().getAcceptedGitObjectId()),
+            proposal.mainHead())
+        .stream()
+        .collect(Collectors.groupingBy(NotebookGitPropertyValueDating.ValueDate::tipPath))
+        .forEach((path, dates) -> {
+          Note note = projection.requireOneNoteAtPath(published.storedNotes(), path);
+          dates.forEach(date ->
+              notePropertyIndexService.writeValueDate(
+                  note, date.propertyKey(), date.propertyValue(), date.committedAt()));
+        });
   }
 
   /**

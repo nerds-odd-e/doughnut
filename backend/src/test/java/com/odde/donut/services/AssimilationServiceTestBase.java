@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import com.odde.donut.testability.SpringTestBase;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -12,6 +13,8 @@ abstract class AssimilationServiceTestBase extends SpringTestBase {
   @Autowired SubscriptionService subscriptionService;
   @Autowired UserService userService;
   @Autowired AssimilationServiceFactory assimilationServiceFactory;
+  @Autowired NotePropertyIndexService notePropertyIndexService;
+  @Autowired NotePropertyIndexRepository notePropertyIndexRepository;
 
   User user;
   User anotherUser;
@@ -28,6 +31,12 @@ abstract class AssimilationServiceTestBase extends SpringTestBase {
 
   AssimilationService assimilationServiceFor(User forUser, Timestamp at) {
     return assimilationServiceFactory.create(forUser, at, ZoneId.of("Asia/Shanghai"));
+  }
+
+  void dateScalarProperty(Note note, String propertyKey, Timestamp at) {
+    notePropertyIndexRepository
+        .findByNote_IdAndPropertyKeyAndPropertyValue(note.getId(), propertyKey, "")
+        .forEach(row -> row.setChangedAt(at));
   }
 
   Note getNextNoteToAssimilate(AssimilationService service) {

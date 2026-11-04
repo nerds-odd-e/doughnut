@@ -1,13 +1,16 @@
 package com.odde.donut.services.notebookGit;
 
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
+import com.odde.donut.services.NotePropertyIndexService;
 import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.NotebookProjectionChange;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.ProjectionChange;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,18 +30,21 @@ public class AcceptedWebChangeService {
   private final NotebookGitAcceptedRepositoryStore repositoryStore;
   private final ProjectionChangeCapture projectionChangeCapture;
   private final NotebookGitTreeEncoder treeEncoder;
+  private final NotePropertyIndexService notePropertyIndexService;
 
   public AcceptedWebChangeService(
       NotebookGitBindingRepository bindingRepository,
       EntityPersister entityPersister,
       NotebookGitAcceptedRepositoryStore repositoryStore,
       ProjectionChangeCapture projectionChangeCapture,
-      NotebookGitTreeEncoder treeEncoder) {
+      NotebookGitTreeEncoder treeEncoder,
+      NotePropertyIndexService notePropertyIndexService) {
     this.bindingRepository = bindingRepository;
     this.entityPersister = entityPersister;
     this.repositoryStore = repositoryStore;
     this.projectionChangeCapture = projectionChangeCapture;
     this.treeEncoder = treeEncoder;
+    this.notePropertyIndexService = notePropertyIndexService;
   }
 
   @FunctionalInterface
@@ -119,6 +125,22 @@ public class AcceptedWebChangeService {
             NotebookGitCommitBuilder.SYSTEM_AUTHOR_EMAIL,
             message,
             updatedAt.toInstant());
+    dateChangedValues(notebookChange, updatedAt.toInstant());
     repositoryStore.store(notebook.binding(), accepted.repository(), newHead, updatedAt);
+  }
+
+  /** Dates the values each inserted or updated note gained or changed at the appended commit. */
+  private void dateChangedValues(NotebookProjectionChange change, Instant committedAt) {
+    change.inserted.stream()
+        .filter(Note.class::isInstance)
+        .forEach(
+            note -> notePropertyIndexService.dateChangedValues((Note) note, null, committedAt));
+    change.updated.keySet().stream()
+        .filter(row -> row.kind() == Note.class)
+        .forEach(row ->
+            notePropertyIndexService.dateChangedValues(
+                entityPersister.find(Note.class, row.id()),
+                change.previousNoteContent.get(row.id()),
+                committedAt));
   }
 }

@@ -8,6 +8,7 @@ import com.odde.donut.entities.NotebookSettings;
 import com.odde.donut.services.AssimilationUnit;
 import java.util.List;
 import java.util.stream.Stream;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,12 +30,20 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + " AND "
           + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING;
 
+  String unitTime = "COALESCE(i.changedAt, n.createdAt)";
+
   String unassimilatedOrderBy =
-      " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id, i.propertyKey, i.itemIndex";
+      " ORDER BY "
+          + NoteLevelIndex.JPA_LEVEL
+          + ", "
+          + unitTime
+          + ", n.id, i.propertyKey, i.itemIndex";
 
   String selectUnassimilatedPropertyUnit =
       "SELECT NEW com.odde.donut.services.AssimilationUnit(n, i.propertyKey, i.propertyValue, "
           + NoteLevelIndex.JPA_LEVEL
+          + ", "
+          + unitTime
           + ")";
 
   String fromPropertyOfOwnership =
@@ -49,6 +58,11 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
 
   List<NotePropertyIndex> findByNote_IdAndPropertyKeyAndPropertyValue(
       Integer noteId, String propertyKey, String propertyValue);
+
+  @Query("SELECT n.notebook.id FROM NotePropertyIndex i JOIN i.note n WHERE i.changedAt IS NULL")
+  List<Integer> findNotebookIdsWithUndatedValues(Limit limit);
+
+  List<NotePropertyIndex> findByNote_Notebook_IdAndChangedAtIsNull(Integer notebookId);
 
   @Query(
       value =
