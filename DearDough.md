@@ -156,6 +156,16 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-206.md).
 
+### Occurrences
+- Execution: SEED-007#story-3, first implementation `09b54f718a`
+  - Timestamp: 2026-11-04 (both slices; exact times unknown)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: implementer agent durations 1,389 s (slice 1, 27 tool uses) and 1,638 s (slice 2, 22 tool uses); the delegation said ">10 min means stop and report as oversized".
+  - Observed effect: neither implementer stopped at 10 minutes; both returned complete, passing work, which the coordinator accepted without re-sizing.
+  - Inference: most of the time was likely serial Gradle runs (one `--tests` pattern per run, about 4–5 runs per slice); the slices themselves were small, so the bound misfired on test wall-clock rather than on scope.
+
 <a id="odf-217"></a>
 
 ## ODF-217 — Unverified refactor proof effects

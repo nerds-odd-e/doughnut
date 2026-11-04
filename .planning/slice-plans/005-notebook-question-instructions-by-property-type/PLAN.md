@@ -138,6 +138,14 @@ cases failed first), plus `QuestionGenerationRequestBuilderTests`,
 builder's `questionPropertyType` picks the focus key, else the relation's key,
 through `PropertyKeyNaming.propertyType`.
 
+## Execution complete
+
+Product advice: no change. Both slices delivered the story's promises with
+request-level proof; the deferred promises (folder or note maps, the
+learning-session request, export, contest evaluation, rich-mode editing) stay
+deferred in the story. Revisit them only if authors ask for per-type guidance
+outside the notebook readme.
+
 ## Story obligations
 
 ### O1. Deferred per-type instruction surfaces
