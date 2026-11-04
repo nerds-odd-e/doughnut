@@ -1,6 +1,7 @@
 # Plan: Order property assimilation by change time
 
 **Source:** [SEED-101#story-1](../../seeds/SEED-101-property-assimilation-order.md#story-1)
+**Source review:** [source-review.md](source-review.md)
 **Identity:** SEED-101#story-1
 
 ## Goal and scope
@@ -46,9 +47,11 @@ at note creation, which is what the e2e scenario relies on for its baseline.
   Rows are addressed by (note, property key, property value). Dates are only
   written for rows the index already holds.
 - **Index refresh carries dates.** `NotePropertyIndexService.refreshForNote`
-  keeps rows whose (key, value) survive (updating item index and authored
-  reference), deletes the rest, inserts new rows with a null date. Nothing
-  else about the refresh or its callers changes.
+  still deletes and reinserts the note's rows (an in-place list reorder would
+  collide on the unique `(note_id, property_key, item_index)` key), and each
+  reinserted row takes the date its (key, value) had before; new values get a
+  null date. Row ids change per save, as before; later slices address rows by
+  (note, key, value). Nothing else about the refresh or its callers changes.
 - **Web save.** `AcceptedWebChangeService.commitIfChanged` runs the dater over
   the one appended commit after the append, maps each reported tip path to
   the changed Note entities of that notebook's projection change (inserted or
@@ -100,12 +103,12 @@ at note creation, which is what the e2e scenario relies on for its baseline.
 | --- | --- | --- | --- |
 | Property units order by level, note creation, note id, key, item index in JPQL and the in-memory comparator, and COALESCE in that ORDER BY already works. | Slice 2 changes both. | `NotePropertyIndexRepository.unassimilatedOrderBy` and `AssimilationUnit.ORDER` read 2026-11-04; `AssimilationServicePropertyUnitsTest` run in this worktree (see run below). | Settled. |
 | The index is deleted and reinserted per save, and scalars are indexed with value `""`. | Slice 1 replaces the refresh; dater addresses rows by (key, value). | `NotePropertyIndexService.refreshForNote`, `NotePropertyIndexPlanner` read 2026-11-04. | Settled. |
-| A web save appends one commit with committer time = `updatedAt`, with the previous head and new head in hand inside the publication transaction. | Slice 4 places the dater there. | `AcceptedWebChangeService.commitIfChanged` (lines 103–123) and `NotebookGitCommitBuilder.append`; `NotebookGitWebLinkingNotebookControllerTest` run in this worktree asserts one commit per web change (see run below). | Settled. |
-| A push applies the final tree once and has `firstParentRange` over the accepted range with the stored notes list and `requireOneNoteAtPath`. | Slice 5. | `NotebookGitProposalPublisher.publish`, `NotebookGitProposalAncestry.firstParentRange`, `NotebookGitProjection.requireOneNoteAtPath` read 2026-11-04; `NotebookGitPublicationAtomicControllerTest` run in this worktree (see run below); test fixture `NotebookGitCommitFixtureTestSupport.commitOnTopOf` builds multi-commit chains (committer time fixed to now; slice 5 adds a time parameter). | Settled. |
-| JGit rename detection is available and used in this codebase. | Slice 3b follows a note's path backward. | `NotebookGitProposalRenameDetector` uses `DiffEntry`/`RenameDetector` on JGit 7.8.0 (`backend/build.gradle:96`). | Settled for availability; the walker's own test proves the follow. |
-| Scheduling is prod-only with ShedLock, and a job's method is testable directly. | Slice 6b. | `SchedulingConfig` (`@Profile("prod")`), `ShedLockConfig`, `QuestionGenerationBatchMaintenanceJobTests` and `...SchedulerLockTest` exist and run in CI. | Settled. |
-| Injected e2e notes are in a Git-bound notebook and keep injection-order creation times; adding a property on the note page commits through the web path. | Slice 4 e2e scenario. | `InjectNotesWorker.findOwnedOrCreate` → `notebookService.createNotebookForOwnership` → `startHistory`; `e2e_test/config/notebookPublicationState.ts` reads the injected notebook's accepted head; steps "I add a rich note property with key … and value …" and "I should be assimilating the note …" exist; `assimilation_walkthrough.feature` passes in "donut CI" on main at 8cc171f7bd (2026-11-03T23:28:33Z). | Settled for the route; the new scenario is the discriminating proof. |
-| Retained histories are small enough for one whole-history walk per notebook inside one job call. | Slice 6a sizing in production. | Not observable here (production data). | Bounded, not blocking: the job processes one notebook per call under a 4-minute lock; a large history makes a run slow, not wrong, and the plan records it as a learning if production shows it. |
+| A web save appends one commit with committer time = `updatedAt`, with the previous head and new head in hand inside the publication transaction. | Slice 5 places the dater there. | `AcceptedWebChangeService.commitIfChanged` (lines 103–123) and `NotebookGitCommitBuilder.append`; `NotebookGitWebLinkingNotebookControllerTest` run in this worktree asserts one commit per web change (see run below). | Settled. |
+| A push applies the final tree once and has `firstParentRange` over the accepted range with the stored notes list and `requireOneNoteAtPath`. | Slice 6. | `NotebookGitProposalPublisher.publish`, `NotebookGitProposalAncestry.firstParentRange`, `NotebookGitProjection.requireOneNoteAtPath` read 2026-11-04; `NotebookGitPublicationAtomicControllerTest` run in this worktree (see run below); test fixture `NotebookGitCommitFixtureTestSupport.commitOnTopOf` builds multi-commit chains (committer time fixed to now; slice 6 adds a time parameter). | Settled. |
+| JGit rename detection is available and used in this codebase. | Slice 4 follows a note's path backward. | `NotebookGitProposalRenameDetector` uses `DiffEntry`/`RenameDetector` on JGit 7.8.0 (`backend/build.gradle:96`). | Settled for availability; the walker's own test proves the follow. |
+| Scheduling is prod-only with ShedLock, and a job's method is testable directly. | Slice 8. | `SchedulingConfig` (`@Profile("prod")`), `ShedLockConfig`, `QuestionGenerationBatchMaintenanceJobTests` and `...SchedulerLockTest` exist and run in CI. | Settled. |
+| Injected e2e notes are in a Git-bound notebook and keep injection-order creation times; adding a property on the note page commits through the web path. | Slice 5 e2e scenario. | `InjectNotesWorker.findOwnedOrCreate` → `notebookService.createNotebookForOwnership` → `startHistory`; `e2e_test/config/notebookPublicationState.ts` reads the injected notebook's accepted head; steps "I add a rich note property with key … and value …" and "I should be assimilating the note …" exist; `assimilation_walkthrough.feature` passes in "donut CI" on main at 8cc171f7bd (2026-11-03T23:28:33Z). | Settled for the route; the new scenario is the discriminating proof. |
+| Retained histories are small enough for one whole-history walk per notebook inside one job call. | Slice 7 sizing in production. | Not observable here (production data). | Bounded, not blocking: the job processes one notebook per call under a 4-minute lock; a large history makes a run slow, not wrong, and the plan records it as a learning if production shows it. |
 
 Backend test run (this worktree, 2026-11-04): `pnpm backend:test:worktree --tests <class>` for `AssimilationServicePropertyUnitsTest`, `NotebookGitWebLinkingNotebookControllerTest` and `NotebookGitPublicationAtomicControllerTest`, one invocation each, at d761d3f0da plus the uncommitted seed: `BUILD SUCCESSFUL` in 26 s, 17 s and 18 s (Gradle fails a `--tests` filter that matches nothing); the last class report shows 2 tests, 0 failures, 0 errors at 2026-11-04T02:07:29Z.
 
@@ -113,13 +116,13 @@ Backend test run (this worktree, 2026-11-04): `pnpm backend:test:worktree --test
 
 | Story example | Owning slice | Proof |
 | --- | --- | --- |
-| 1. Property added today to an old tracked note → newer untracked note first | 2 (ordering with a dated row), 4 (date written by a web save; e2e end to end) | `AssimilationServicePropertyUnitsTest`; new scenario in `assimilation_walkthrough.feature` |
-| 2. Body edit keeps the property's date | 1 (refresh carries), 4 (dater writes nothing) | `NotePropertyIndexServiceTest`; web controller test |
-| 3. List reorder keeps dates; added item dated now | 1, 3a, 4 | `NotePropertyIndexServiceTest`; `NotePropertyIndexPlannerTest`; web controller test |
-| 4. Untracked scalar edit re-dates; tracked scalar edit re-queues nothing | 3a, 4, 2 | planner diff test; web controller test; existing tracker matching tests stay green |
-| 5. Three-commit push: per-commit times; remove-then-re-add dated at the re-add | 3b, 5 | dater unit test on an in-memory repository; publish controller test with a three-commit bundle |
-| 6. Pushed note committed before publication → floor; note unit before its properties | 5, 2 | publish controller test asserting `changed_at == createdAt`; `AssimilationServicePropertyUnitsTest` |
-| 7. Pre-existing notebook: undated → as today; job fills; root-present → creation; second run idle | 2 (undated fallback), 6a, 6b | existing ordering tests unchanged; rebuild service test; job annotation test |
+| 1. Property added today to an old tracked note → newer untracked note first | 2 (ordering with a dated row), 5 (date written by a web save; e2e end to end) | `AssimilationServicePropertyUnitsTest`; new scenario in `assimilation_walkthrough.feature` |
+| 2. Body edit keeps the property's date | 1 (refresh carries), 5 (dater writes nothing) | `NotePropertyIndexServiceTest`; web controller test |
+| 3. List reorder keeps dates; added item dated now | 1, 3, 5 | `NotePropertyIndexServiceTest`; `NotePropertyIndexPlannerTest`; web controller test |
+| 4. Untracked scalar edit re-dates; tracked scalar edit re-queues nothing | 3, 5, 2 | planner diff test; web controller test; existing tracker matching tests stay green |
+| 5. Three-commit push: per-commit times; remove-then-re-add dated at the re-add | 4, 6 | dater unit test on an in-memory repository; publish controller test with a three-commit bundle |
+| 6. Pushed note committed before publication → floor; note unit before its properties | 6, 2 | publish controller test asserting `changed_at == createdAt`; `AssimilationServicePropertyUnitsTest` |
+| 7. Pre-existing notebook: undated → as today; job fills; root-present → creation; second run idle | 2 (undated fallback), 7, 8 | existing ordering tests unchanged; rebuild service test; job annotation test |
 | 8. Subscribed notebook follows the same order | 2 | `AssimilationServiceSubscriptionQueueTest` |
 
 ## Slices
@@ -127,7 +130,7 @@ Backend test run (this worktree, 2026-11-04): `pnpm backend:test:worktree --test
 ### 1. Property index keeps a per-value date across saves
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `NotePropertyIndexServiceTest`: a row dated in the test keeps its
 date after a body-only edit and after a list reorder (item index updated),
 loses its row when the value is removed, and a newly added value's row has
@@ -136,8 +139,7 @@ no date; the existing refresh, rename, delete and cascade tests stay green.
 
 Internal change: migration `V300000356` adds `changed_at` (nullable) to
 `note_property_index`; `NotePropertyIndex.changedAt`; `refreshForNote`
-becomes a keyed refresh by (key, value) that keeps surviving rows and their
-dates. External behavior unchanged. Enables slice 2.
+carries each surviving (key, value)'s date to its reinserted row. External behavior unchanged. Enables slice 2.
 
 ### 2. Sequence orders property values by their change date
 
@@ -157,7 +159,7 @@ and subscribed property units sort by level, then `COALESCE(changed_at,
 note.created_at)`, then note id, note-before-property, key, item index, with
 `AssimilationUnit.ORDER` agreeing.
 
-### 3a. Value change set between two frontmatters
+### 3. Value change set between two frontmatters
 
 Type: Structure
 Status: planned
@@ -169,9 +171,9 @@ the set.
 
 Internal change: `NotePropertyIndexPlanner` exposes the dating identity of
 each planned value (key, index value, comparable content) and a
-`changedValues(before, after)` over two frontmatters. Enables 3b.
+`changedValues(before, after)` over two frontmatters. Enables 4.
 
-### 3b. Date a note's values from a commit range
+### 4. Date a note's values from a commit range
 
 Type: Structure
 Status: planned
@@ -185,9 +187,9 @@ root"; a range starting at a non-root exclusive commit reports nothing for
 values unchanged inside the range.
 
 Internal change: `NotebookGitPropertyValueDating.dateValues(repository,
-olderExclusiveOrNull, tip)` as decided above. Enables 4, 5, 6a.
+olderExclusiveOrNull, tip)` as decided above. Enables 5, 6, 7.
 
-### 4. Web saves date the values they change
+### 5. Web saves date the values they change
 
 Type: Behavior
 Status: planned
@@ -197,7 +199,7 @@ save time and the appended commit's committer time; a body-only save keeps
 an earlier date; reordering a list keeps both items' dates and dates a new
 item; changing an untracked scalar's content re-dates it; a save on a note
 whose creation time is later than the commit time is impossible on the web
-(same clock), so the floor is asserted in slice 5. E2E: new scenario (its own
+(same clock), so the floor is asserted in slice 6. E2E: new scenario (its own
 feature file under `e2e_test/features/assimilation/`, with its own Background
 so the order of clock and injection is owned by the scenario): It's day 1;
 there are notes from Note 1 to Note 2; Note 1 was assimilated on day 1; It's
@@ -212,7 +214,7 @@ Behavior: a learner saves a note on the web → the save appends its commit →
 the saved note's added or changed values carry that commit's time; unchanged
 values keep theirs → the next assimilation reflects it.
 
-### 5. Git publication dates values across the accepted range
+### 6. Git publication dates values across the accepted range
 
 Type: Behavior
 Status: planned
@@ -229,7 +231,7 @@ Behavior: a CLI push is accepted → each pushed note's added or changed
 values are dated at the committer time of the commit that changed them,
 floored at the note's creation, in the acceptance transaction.
 
-### 6a. Maintenance fills missing dates from retained history
+### 7. Maintenance fills missing dates from retained history
 
 Type: Behavior
 Status: planned
@@ -246,7 +248,7 @@ Behavior: index rows without dates exist → the rebuild runs → every row of
 that notebook is dated from history or at note creation; the sequence then
 uses those dates.
 
-### 6b. Rebuild runs on its own in production
+### 8. Rebuild runs on its own in production
 
 Type: Behavior
 Status: planned
@@ -262,13 +264,23 @@ loudly through the scheduled-job error handler.
 ## Concern evidence
 
 Slice-plan refinement did not run: the slices are commit-sized, each owns one
-proof loop, and the one mechanism (the dater) is built once in 3a–3b and
-consumed by 4, 5 and 6a without parallel representations. Sizing: 3b, 4 and
-5 each exceed the five-minute target because their proof is a Git fixture
+proof loop, and the one mechanism (the dater) is built once in 3–4 and
+consumed by 5, 6 and 7 without parallel representations. Sizing: 4, 5 and
+6 each exceed the five-minute target because their proof is a Git fixture
 with several commits; splitting them would separate the mechanism from the
 only observation that evaluates it, so they stay whole with that reason
 stated. No remaining slice-specific concern was identified.
 
 ## Learnings
 
-(none yet)
+- Slice 1 (2026-11-04): the unique key `(note_id, property_key, item_index)`
+  rules out updating rows in place on a list reorder, so the refresh carries
+  dates across delete-and-reinsert. Accepted proof:
+  `./scripts/run.sh pnpm backend:test:worktree --tests '*NotePropertyIndexServiceTest'`
+  (16 pass, nested `changeDate`), plus the consumer suites
+  `AssimilationServicePropertyUnitsTest`, `AssimilationServicePropertyReferenceGateTest`,
+  `NotePropertyIndexAuthoredReferenceTest`, `UnassimilatedPropertyServiceTest`,
+  `AssimilationControllerAssimilateTests`, `AssimilationControllerTests`,
+  `NotePropertyIndexPlannerTest`, `NotebookGitWebLinkingNotebookControllerTest`.
+  `docs/database-erd.md` regenerated with no diff (the ERD lists key columns
+  only). The column ships with the code that maps it, as V300000352 did.

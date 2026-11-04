@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,4 +45,10 @@ public class NotePropertyIndex extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private AuthoredNoteReferenceRow authoredNoteReference;
+
+  @Column(name = "changed_at")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Timestamp changedAt;
 }

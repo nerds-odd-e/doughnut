@@ -11,6 +11,7 @@ import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.PersistenceContext;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,9 @@ public class NotePropertyIndexService {
 
   @Transactional
   public void refreshForNote(Note note) {
+    // Rows are deleted and reinserted (a reorder would otherwise collide on the unique item
+    // index); a value that survives by (key, value) carries its change date to its new row.
+    Map<PropertyValueKey, Timestamp> changedAtByValue = new HashMap<>();
     // Detach any rows already managed in this transaction before the bulk delete, which
     // acts directly on the database and would otherwise leave stale managed copies behind.
     entityManager
@@ -43,7 +47,12 @@ public class NotePropertyIndexService {
         .setParameter("noteId", note.getId())
         .setFlushMode(FlushModeType.COMMIT)
         .getResultList()
-        .forEach(entityManager::detach);
+        .forEach(row -> {
+          changedAtByValue.put(
+              new PropertyValueKey(row.getPropertyKey(), row.getPropertyValue()),
+              row.getChangedAt());
+          entityManager.detach(row);
+        });
     // Inline deletion permits FlushModeType.COMMIT, avoiding the extra flush from the usual
     // repository @Modifying @Query.
     entityManager
@@ -59,9 +68,11 @@ public class NotePropertyIndexService {
           Map<String, AuthoredNoteReferenceRow> bySourceLocalKey =
               note.authoredReferenceRowsBySourceLocalKey();
           NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)
-              .forEach(planned -> saveIndexRow(note, planned, bySourceLocalKey));
+              .forEach(planned -> saveIndexRow(note, planned, bySourceLocalKey, changedAtByValue));
         });
   }
+
+  private record PropertyValueKey(String propertyKey, String propertyValue) {}
 
   public List<AuthoredNoteReference> authoredReferencesForPropertyValue(
       Note note, String propertyKey, String propertyValue, List<NotePropertyIndex> indexRows) {
@@ -110,12 +121,15 @@ public class NotePropertyIndexService {
   private void saveIndexRow(
       Note indexOwner,
       NotePropertyIndexPlanner.PlannedRow planned,
-      Map<String, AuthoredNoteReferenceRow> bySourceLocalKey) {
+      Map<String, AuthoredNoteReferenceRow> bySourceLocalKey,
+      Map<PropertyValueKey, Timestamp> changedAtByValue) {
     NotePropertyIndex row = new NotePropertyIndex();
     row.setNote(indexOwner);
     row.setPropertyKey(planned.propertyKey());
     row.setItemIndex(planned.itemIndex());
     row.setPropertyValue(planned.propertyValue());
+    row.setChangedAt(
+        changedAtByValue.get(new PropertyValueKey(planned.propertyKey(), planned.propertyValue())));
     resolveAuthoredReference(planned, bySourceLocalKey).ifPresent(row::setAuthoredNoteReference);
     notePropertyIndexRepository.save(row);
   }
