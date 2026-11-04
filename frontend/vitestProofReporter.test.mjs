@@ -342,10 +342,14 @@ test("the same file under two projects records one observation per project, and 
 })
 
 test("skipped, todo, not-focused and filtered-out cases keep their proof", async (t) => {
-  const f = fixture(t, {
-    "web/a.spec.ts": passing("skipped") + passing("todo") + passing("run"),
-    "web/b.spec.ts": passing("focused") + passing("unfocused"),
-  })
+  const f = fixture(
+    t,
+    {
+      "web/a.spec.ts": passing("skipped") + passing("todo") + passing("run"),
+      "web/b.spec.ts": passing("focused") + passing("unfocused"),
+    },
+    { config: { allowOnly: true } }
+  )
   assertRun(await f.run())
   const before = byKey(f.observations())
   f.write(
