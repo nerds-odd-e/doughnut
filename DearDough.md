@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 343. Removed numbers are never reused.
+- Highest allocated local number: 344. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Shared-feedback compaction recovery (2026-11-03): `0373e4129d8dbc29189e08bdcb0075969eee0f2c:DearDough.md`; its rows are retained at the linked Open Dough finding owners.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
@@ -502,3 +502,17 @@ In slices 4–7 the implementers showed that the new tests depend on the change.
   - Open Dough release: 0.3.82
   - Evidence: slice 4–7 implementation returns (an author-time swap failing 4 of 4; a removed web dating call failing the e2e; a removed push dating call failing 4 of 5; a removed fallback failing the rebuild test).
   - Observed effect: acceptance relied on observed failures rather than test names, at the cost of one extra focused run per probe.
+
+## DD-344 — A test-removal plan checked only the story's examples and dropped a test's other observation
+
+The plan for SEED-101#story-2 slice 4 listed `NotePropertyIndexPlannerTest.changedValues_ignores_reordering_and_reformatting_of_the_same_parsed_values` for deletion as a repeat of the controller reorder test. Its decisive premise mapped every story-1 key example to a surviving test, but no one checked what else each deleted test observed. That test was also the only observation that quoting a scalar or switching list style does not re-date a value. The slice 4 implementer named the loss in its gaps after deleting it. The coordinator restored a reformat-only case (`changedValues_ignores_reformatting_of_the_same_parsed_values`) before delivery.
+
+### Occurrences
+- Execution: SEED-101#story-2, first implementation `9cdb6d998d`
+  - Timestamp: 2026-11-04T08:20:00Z (approximate; slice 4 acceptance)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.82
+  - Evidence: `4b4e3ca939:.planning/slice-plans/004-date-property-values-on-every-web-path/PLAN.md`, "Decisive premises" (the last row) and slice 4; slice 4 implementation return, "Gap"; commit `47794ae3e0`.
+  - Observed effect: a learner-visible behavior (reformatting keeps a value's date) briefly lost its only test; it cost one extra focused run.
+  - Inference: proving a removal per story example does not cover every observation of each deleted test. Checking each deleted assertion for a surviving owner would have caught this at planning.

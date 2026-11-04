@@ -134,10 +134,8 @@ public class NoteConstructionService {
     return finalizeAndRespond(note, user);
   }
 
-  public NoteRealm createNoteFromExtractedSuggestion(
-      Note originalNote, NoteExtractionResult aiResult) {
-    User user = authorizationService.getCurrentUser();
-
+  /** Creates the extracted note beside {@code originalNote} and rewrites the original. */
+  public Note createNoteFromExtractedSuggestion(Note originalNote, NoteExtractionResult aiResult) {
     String newNoteContent =
         NoteContentTitleHeading.withoutRepeatedTitleHeading(
             aiResult.newNoteTitle, aiResult.newNoteContent);
@@ -149,8 +147,7 @@ public class NoteConstructionService {
             originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
     persistAuthoredContent(newNote, newNoteContent);
     persistAuthoredContent(originalNote, aiResult.updatedOriginalNoteContent);
-
-    return noteRealmService.build(newNote, user);
+    return newNote;
   }
 
   /**

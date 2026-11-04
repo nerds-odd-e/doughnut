@@ -3,7 +3,7 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NotePropertyIndexPlanner;
-import com.odde.donut.algorithms.NotePropertyIndexPlanner.DatedValue;
+import com.odde.donut.algorithms.NotePropertyIndexPlanner.ValueKey;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -39,10 +39,7 @@ public final class NotebookGitPropertyValueDating {
    * A tip note's value and when it last changed in the range; {@code committedAt} is empty when the
    * value is already in the range's parentless root commit.
    */
-  public record ValueDate(
-      String tipPath, String propertyKey, String propertyValue, Optional<Instant> committedAt) {}
-
-  private record ValueKey(String propertyKey, String propertyValue) {}
+  public record ValueDate(String tipPath, ValueKey valueKey, Optional<Instant> committedAt) {}
 
   private record TrackedNote(String tipPath, Set<ValueKey> undated) {}
 
@@ -89,8 +86,7 @@ public final class NotebookGitPropertyValueDating {
               type == DiffEntry.ChangeType.ADD
                   ? Frontmatter.empty()
                   : frontmatterOf(repository, entry.getOldId().toObjectId());
-          for (DatedValue changed : NotePropertyIndexPlanner.changedValues(before, after)) {
-            ValueKey key = new ValueKey(changed.propertyKey(), changed.propertyValue());
+          for (ValueKey key : NotePropertyIndexPlanner.changedValues(before, after)) {
             if (note.undated().remove(key)) {
               dates.add(dateOf(note, key, committedAt));
             }
@@ -110,13 +106,12 @@ public final class NotebookGitPropertyValueDating {
   }
 
   private static ValueDate dateOf(TrackedNote note, ValueKey key, Instant committedAt) {
-    return new ValueDate(
-        note.tipPath(), key.propertyKey(), key.propertyValue(), Optional.ofNullable(committedAt));
+    return new ValueDate(note.tipPath(), key, Optional.ofNullable(committedAt));
   }
 
   private static Set<ValueKey> valueKeys(Frontmatter frontmatter) {
     return NotePropertyIndexPlanner.plannedRows(frontmatter).stream()
-        .map(row -> new ValueKey(row.propertyKey(), row.propertyValue()))
+        .map(NotePropertyIndexPlanner.PlannedRow::valueKey)
         .collect(Collectors.toCollection(HashSet::new));
   }
 

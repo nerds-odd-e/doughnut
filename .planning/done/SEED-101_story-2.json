@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-101#story-2",
+  "title": "Date property values on every web path and keep one value identity",
+  "completedAt": "2026-11-04T08:49:37.805Z",
+  "developer": "Terry Yin",
+  "agent": "Yumi-chan",
+  "host": "claude",
+  "model": "opus"
+}

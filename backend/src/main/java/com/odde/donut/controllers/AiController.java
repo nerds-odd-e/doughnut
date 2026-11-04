@@ -6,12 +6,12 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.NoteConstructionService;
 import com.odde.donut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.donut.services.ai.NoteExtractionResult;
 import com.odde.donut.services.ai.NoteRefinementLayout;
 import com.odde.donut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.donut.services.ai.OtherAiServices;
+import com.odde.donut.services.notebookGit.WebNoteCreationService;
 import com.odde.donut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class AiController {
   private final OtherAiServices otherAiServices;
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final AuthorizationService authorizationService;
-  private final NoteConstructionService noteConstructionService;
+  private final WebNoteCreationService webNoteCreationService;
   private final StructuredResponseCreateParamsSerializer paramsSerializer;
 
   @Autowired
@@ -40,12 +40,12 @@ public class AiController {
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
       AuthorizationService authorizationService,
-      NoteConstructionService noteConstructionService,
+      WebNoteCreationService webNoteCreationService,
       StructuredResponseCreateParamsSerializer paramsSerializer) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
     this.authorizationService = authorizationService;
-    this.noteConstructionService = noteConstructionService;
+    this.webNoteCreationService = webNoteCreationService;
     this.paramsSerializer = paramsSerializer;
   }
 
@@ -123,13 +123,12 @@ public class AiController {
       description =
           "Persists a new note and updates the original note using the provided extraction fields (typically from extract-note-preview, possibly edited by the user).")
   @PostMapping("/create-extracted-note/{note}")
-  @Transactional
   public NoteRealm createExtractedNote(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody NoteExtractionResult request)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    return noteConstructionService.createNoteFromExtractedSuggestion(note, request);
+    return webNoteCreationService.createExtractedNote(note, request);
   }
 
   @Operation(

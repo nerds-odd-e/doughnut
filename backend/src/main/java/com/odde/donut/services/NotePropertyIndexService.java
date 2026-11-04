@@ -4,6 +4,7 @@ import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NotePropertyIndexPlanner;
+import com.odde.donut.algorithms.NotePropertyIndexPlanner.ValueKey;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotePropertyIndex;
@@ -40,7 +41,7 @@ public class NotePropertyIndexService {
   public void refreshForNote(Note note) {
     // Rows are deleted and reinserted (a reorder would otherwise collide on the unique item
     // index); a value that survives by (key, value) carries its change date to its new row.
-    Map<PropertyValueKey, Timestamp> changedAtByValue = new HashMap<>();
+    Map<ValueKey, Timestamp> changedAtByValue = new HashMap<>();
     // Detach any rows already managed in this transaction before the bulk delete, which
     // acts directly on the database and would otherwise leave stale managed copies behind.
     entityManager
@@ -49,9 +50,7 @@ public class NotePropertyIndexService {
         .setFlushMode(FlushModeType.COMMIT)
         .getResultList()
         .forEach(row -> {
-          changedAtByValue.put(
-              new PropertyValueKey(row.getPropertyKey(), row.getPropertyValue()),
-              row.getChangedAt());
+          changedAtByValue.put(row.valueKey(), row.getChangedAt());
           entityManager.detach(row);
         });
     // Inline deletion permits FlushModeType.COMMIT, avoiding the extra flush from the usual
@@ -73,19 +72,17 @@ public class NotePropertyIndexService {
         });
   }
 
-  private record PropertyValueKey(String propertyKey, String propertyValue) {}
-
   /**
    * Dates a value's index rows at its commit time, never earlier than the note's creation; a value
    * present at the history's root ({@code committedAt} empty) takes the note's creation time.
    */
-  public void writeValueDate(
-      Note note, String propertyKey, String propertyValue, Optional<Instant> committedAt) {
+  public void writeValueDate(Note note, ValueKey valueKey, Optional<Instant> committedAt) {
     Timestamp createdAt = note.getCreatedAt();
     Timestamp changedAt =
         committedAt.map(Timestamp::from).filter(createdAt::before).orElse(createdAt);
     notePropertyIndexRepository
-        .findByNote_IdAndPropertyKeyAndPropertyValue(note.getId(), propertyKey, propertyValue)
+        .findByNote_IdAndPropertyKeyAndPropertyValue(
+            note.getId(), valueKey.propertyKey(), valueKey.propertyValue())
         .forEach(row -> row.setChangedAt(changedAt));
   }
 
@@ -97,9 +94,7 @@ public class NotePropertyIndexService {
     NotePropertyIndexPlanner.changedValues(
             NoteContentMarkdown.leadingFrontmatter(previousContent),
             NoteContentMarkdown.leadingFrontmatter(note.getContent()))
-        .forEach(value ->
-            writeValueDate(
-                note, value.propertyKey(), value.propertyValue(), Optional.of(changedAt)));
+        .forEach(valueKey -> writeValueDate(note, valueKey, Optional.of(changedAt)));
   }
 
   public List<AuthoredNoteReference> authoredReferencesForPropertyValue(
@@ -146,14 +141,13 @@ public class NotePropertyIndexService {
       Note indexOwner,
       NotePropertyIndexPlanner.PlannedRow planned,
       Map<String, AuthoredNoteReferenceRow> bySourceLocalKey,
-      Map<PropertyValueKey, Timestamp> changedAtByValue) {
+      Map<ValueKey, Timestamp> changedAtByValue) {
     NotePropertyIndex row = new NotePropertyIndex();
     row.setNote(indexOwner);
     row.setPropertyKey(planned.propertyKey());
     row.setItemIndex(planned.itemIndex());
     row.setPropertyValue(planned.propertyValue());
-    row.setChangedAt(
-        changedAtByValue.get(new PropertyValueKey(planned.propertyKey(), planned.propertyValue())));
+    row.setChangedAt(changedAtByValue.get(planned.valueKey()));
     resolveAuthoredReference(planned, bySourceLocalKey).ifPresent(row::setAuthoredNoteReference);
     notePropertyIndexRepository.save(row);
   }

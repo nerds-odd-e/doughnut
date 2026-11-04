@@ -1,6 +1,7 @@
 package com.odde.donut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.donut.algorithms.NotePropertyIndexPlanner.ValueKey;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -51,4 +52,8 @@ public class NotePropertyIndex extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Timestamp changedAt;
+
+  public ValueKey valueKey() {
+    return new ValueKey(propertyKey, propertyValue);
+  }
 }

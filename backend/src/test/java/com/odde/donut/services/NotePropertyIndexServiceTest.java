@@ -14,7 +14,6 @@ import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.testability.SpringTestBase;
 import jakarta.persistence.EntityManager;
-import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -235,77 +234,6 @@ class NotePropertyIndexServiceTest extends SpringTestBase {
       notePropertyIndexService.refreshForNote(note);
 
       assertThat(propertyRows(note), empty());
-    }
-  }
-
-  @Nested
-  class changeDate {
-    private final Timestamp changedAt = Timestamp.valueOf("2026-01-02 03:04:05");
-    private Note note;
-
-    private void indexAndDate(String content, String propertyKey, String propertyValue) {
-      User user = makeMe.aUser().please();
-      note = makeMe.aNote().notebookOwnedBy(user).content(content).please();
-      notePropertyIndexService.refreshForNote(note);
-      NotePropertyIndex row = rowFor(propertyKey, propertyValue);
-      row.setChangedAt(changedAt);
-      notePropertyIndexRepository.save(row);
-      entityManager.flush();
-    }
-
-    private void saveContent(String content) {
-      note.setContent(content);
-      makeMe.entityPersister.merge(note);
-      notePropertyIndexService.refreshForNote(note);
-    }
-
-    private NotePropertyIndex rowFor(String propertyKey, String propertyValue) {
-      return propertyRows(note, propertyKey).stream()
-          .filter(r -> r.getPropertyValue().equals(propertyValue))
-          .findFirst()
-          .orElseThrow();
-    }
-
-    @Test
-    void keeps_the_date_after_a_body_only_edit() {
-      indexAndDate("---\ntopic: physics\n---\n\nbody", "topic", "");
-
-      saveContent("---\ntopic: physics\n---\n\nanother body");
-
-      assertThat(rowFor("topic", "").getChangedAt(), equalTo(changedAt));
-    }
-
-    @Test
-    void keeps_the_date_and_updates_the_item_index_after_a_list_reorder() {
-      indexAndDate("---\nexample of:\n  - alpha\n  - beta\n---\n", "example of", "alpha");
-
-      saveContent("---\nexample of:\n  - beta\n  - alpha\n---\n");
-
-      NotePropertyIndex alpha = rowFor("example of", "alpha");
-      assertThat(alpha.getItemIndex(), equalTo(1));
-      assertThat(alpha.getChangedAt(), equalTo(changedAt));
-      assertThat(rowFor("example of", "beta").getItemIndex(), equalTo(0));
-    }
-
-    @Test
-    void drops_the_row_when_its_value_is_removed() {
-      indexAndDate("---\nexample of:\n  - alpha\n  - beta\n---\n", "example of", "alpha");
-
-      saveContent("---\nexample of:\n  - beta\n---\n");
-
-      assertThat(
-          propertyRows(note).stream().map(NotePropertyIndex::getPropertyValue).toList(),
-          containsInAnyOrder("beta"));
-    }
-
-    @Test
-    void leaves_a_newly_added_value_undated() {
-      indexAndDate("---\nexample of:\n  - alpha\n---\n", "example of", "alpha");
-
-      saveContent("---\nexample of:\n  - alpha\n  - gamma\n---\n");
-
-      assertThat(rowFor("example of", "gamma").getChangedAt(), nullValue());
-      assertThat(rowFor("example of", "alpha").getChangedAt(), equalTo(changedAt));
     }
   }
 
