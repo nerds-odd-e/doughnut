@@ -294,7 +294,9 @@ Git content.
   undated.
 - A web change compares each inserted or updated note's content as first
   captured with its saved content, and dates the values it added or changed
-  at the appended commit's time. It reads no Git objects.
+  at the appended commit's time. It reads no Git objects. AI note extraction
+  is one such change: the rewritten original and the new note share one
+  commit.
 - An accepted publication walks the newly accepted range first-parent, newest
   first, following renamed notes. It dates each changed note's values at the
   newest commit that changed them, so an edit reverted inside one push is
@@ -302,7 +304,8 @@ Git content.
   the head is stored. Its cost follows the range's commits and changed files.
 - A value without a date sorts at its note's creation. In production, a
   scheduled job dates up to ten notebooks per run from their whole retained
-  history. A value already present in the root ("Create notebook" or "Reset")
+  history. It selects only notebooks with a Git binding; an unbound
+  notebook's values stay undated. A value already present in the root ("Create notebook" or "Reset")
   or outside the history takes its note's creation time, and dated rows are
   kept. A history reset leaves dates unchanged.
 - Within a level, the assimilation sequence orders a note unit by its creation
