@@ -191,6 +191,64 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
       assertThat(instructionMessage, not(containsString("PART_OF_INSTRUCTION")));
     }
 
+    @Test
+    void relationshipNoteCarriesTheEntryForItsRelation() {
+      Note relationship = relationshipNote(note.getNotebook(), "a-part-of");
+
+      String instructionMessage = firstUserMessage(relationship, null);
+
+      assertThat(instructionMessage, containsString(PART_OF_LABEL + "\nPART_OF_INSTRUCTION"));
+      assertThat(
+          instructionMessage.indexOf("GENERAL_INSTRUCTION"),
+          lessThan(instructionMessage.indexOf(PART_OF_LABEL)));
+    }
+
+    @Test
+    void relationshipNoteOfOtherRelationHasOnlyTheGeneralInstruction() {
+      String instructionMessage =
+          firstUserMessage(relationshipNote(note.getNotebook(), "similar-to"), null);
+
+      assertThat(instructionMessage, containsString("GENERAL_INSTRUCTION"));
+      assertThat(instructionMessage, not(containsString("for property")));
+    }
+
+    @Test
+    void anExampleOfRelationCarriesTheExampleOfEntry() {
+      Note relationship =
+          relationshipNote(notebookWithMap("example of: EXAMPLE_OF_INSTRUCTION"), "an-example-of");
+
+      assertThat(
+          firstUserMessage(relationship, null),
+          containsString(
+              "Instruction from notebook \"Anatomy\" for property \"example of\":"
+                  + "\nEXAMPLE_OF_INSTRUCTION"));
+    }
+
+    @Test
+    void relationshipNoteUsesItsOwnNotebooksMap() {
+      Notebook other = makeMe.aNotebook().please();
+      makeMe
+          .theNotebook(other)
+          .readmeContent("---\nquestion_generation_instruction: GENERAL_INSTRUCTION\n---\n")
+          .please();
+
+      String instructionMessage = firstUserMessage(relationshipNote(other, "a-part-of"), null);
+
+      assertThat(instructionMessage, containsString("GENERAL_INSTRUCTION"));
+      assertThat(instructionMessage, not(containsString("PART_OF_INSTRUCTION")));
+    }
+
+    private Note relationshipNote(Notebook nb, String relation) {
+      return makeMe
+          .aNote()
+          .notebook(nb)
+          .content(
+              "---\ntype: Relationship\nrelation: "
+                  + relation
+                  + "\nsource: \"[[Hand]]\"\ntarget: \"[[Body]]\"\n---\n")
+          .please();
+    }
+
     private Notebook notebookWithMap(String mapEntry) {
       Notebook nb = makeMe.aNotebook().name("Anatomy").please();
       makeMe

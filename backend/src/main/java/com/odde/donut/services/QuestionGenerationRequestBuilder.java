@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.PropertyKeyNaming;
+import com.odde.donut.algorithms.RelationshipNoteComposition;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
@@ -167,6 +168,20 @@ public class QuestionGenerationRequestBuilder {
         authorizationService.getCurrentUser());
   }
 
+  /**
+   * The property type the question is about: the focused property's, otherwise the relation's when
+   * the focus is a relationship note; null when neither.
+   */
+  private static String questionPropertyType(Note focus, PropertyFocus propertyFocus) {
+    if (propertyFocus != null) {
+      return PropertyKeyNaming.propertyType(propertyFocus.key());
+    }
+    return RelationshipNoteComposition.parse(focus.getContent())
+        .map(RelationshipNoteComposition.Relationship::propertyKey)
+        .map(PropertyKeyNaming::propertyType)
+        .orElse(null);
+  }
+
   private <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionGeneration(
       Class<T> responseType,
       Note note,
@@ -179,8 +194,7 @@ public class QuestionGenerationRequestBuilder {
 
     List<String> instructionBlocks =
         noteRealmService.questionGenerationInstructionBlocks(
-            focus,
-            propertyFocus != null ? PropertyKeyNaming.propertyType(propertyFocus.key()) : null);
+            focus, questionPropertyType(focus, propertyFocus));
     String instruction =
         instructionBlocks.isEmpty() ? null : String.join("\n\n", instructionBlocks);
     String instructionUserBlock =

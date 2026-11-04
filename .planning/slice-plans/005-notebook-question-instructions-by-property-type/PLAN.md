@@ -113,7 +113,7 @@ fallback at that line, through the same `propertyType`.
 ### 2. Relationship-note questions carry the instruction for their relation
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new cases in `NoteQuestionGenerationRequestTests` with relationship
 notes (`type: Relationship`, `source`, `target` wiki links) in the same
 notebook: `relation: a-part-of` with no property focus → the `a part of` entry
@@ -128,6 +128,15 @@ relation-to-property-key rule moves.
 Behavior: notebook map entry → a question is generated focused on a
 relationship note in that notebook → the custom instruction message includes
 the entry for the relation's property type.
+
+Accepted proof (2026-11-04): four relationship cases in
+`NoteQuestionGenerationRequestTests.InstructionsByPropertyType` (two matching
+cases failed first), plus `QuestionGenerationRequestBuilderTests`,
+`RelationControllerReduce*`, `NotebookGitWebRelationReduceControllerTest`, and
+`QuestionGenerationBatchJsonlRendererTest`, all passing. The shared reader is
+`RelationshipNoteComposition.parse` with `Relationship.propertyKey()`; the
+builder's `questionPropertyType` picks the focus key, else the relation's key,
+through `PropertyKeyNaming.propertyType`.
 
 ## Story obligations
 

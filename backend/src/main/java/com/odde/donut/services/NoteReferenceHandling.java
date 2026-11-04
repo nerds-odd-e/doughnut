@@ -1,9 +1,8 @@
 package com.odde.donut.services;
 
-import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.algorithms.NoteContentMarkdown;
-import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.algorithms.RelationshipNoteComposition;
+import com.odde.donut.algorithms.RelationshipNoteComposition.Relationship;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
@@ -12,7 +11,6 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.springframework.http.HttpStatus;
@@ -25,7 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
  * com.odde.donut.controllers.dto.NoteTrashReferenceHandling#REMOVE_FROM_PROPERTIES}).
  */
 final class NoteReferenceHandling {
-  private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
   // Temporary accommodation for legacy note data: a body that is only "[[A]] words [[B]]." is
   // discarded on reduction like a blank body.
   private static final Pattern LEGACY_RELATIONSHIP_SENTENCE =
@@ -57,22 +54,19 @@ final class NoteReferenceHandling {
    * frontmatter (hyphens become spaces). Returns the source note.
    */
   Note reduceRelationNoteToSourceProperty(Note relationNote, User viewer, Timestamp updatedAt) {
-    RelationshipFrontmatter relationship = relationshipOf(relationNote);
+    Relationship relationship = relationshipOf(relationNote);
     if (!NoteContentMarkdown.isBodyContentBlank(relationNote.getContent())
         && !isLegacyRelationshipSentence(relationNote.getContent())) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
           "This relationship note has body text and cannot be reduced to a property.");
     }
-    String effectivePropertyKey =
-        RelationshipNoteComposition.propertyKey(relationship.relationScalar());
-    if (effectivePropertyKey == null || effectivePropertyKey.isBlank()) {
+    String canonicalPropertyKey = relationship.propertyKey();
+    if (canonicalPropertyKey == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");
     }
     Note sourceNote = editableRelationshipSource(relationNote, relationship, viewer);
-    String canonicalPropertyKey =
-        PropertyKeyNaming.canonicalExampleOfFamilyKey(effectivePropertyKey);
     NoteContentMarkdown.AddedPropertyValue added =
         NoteContentMarkdown.addPropertyValueToLeadingFrontmatter(
                 sourceNote.getContent(),
@@ -102,15 +96,15 @@ final class NoteReferenceHandling {
     return editableRelationshipSource(relationNote, relationshipOf(relationNote), viewer);
   }
 
-  private RelationshipFrontmatter relationshipOf(Note relationNote) {
-    return parseRelationshipFrontmatter(relationNote.getContent())
+  private Relationship relationshipOf(Note relationNote) {
+    return RelationshipNoteComposition.parse(relationNote.getContent())
         .orElseThrow(() ->
             new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
   }
 
   private Note editableRelationshipSource(
-      Note relationNote, RelationshipFrontmatter relationship, User viewer) {
+      Note relationNote, Relationship relationship, User viewer) {
     Note sourceNote =
         wikiLinkResolver
             .resolveFirstWikiLink(relationship.sourceScalar(), relationNote, viewer)
@@ -160,28 +154,5 @@ final class NoteReferenceHandling {
     note.setUpdatedAt(updatedAt);
     entityPersister.merge(note);
     noteReferenceService.refreshDerivedIndexesForNote(note);
-  }
-
-  private record RelationshipFrontmatter(
-      String relationScalar, String sourceScalar, String targetScalar) {}
-
-  private Optional<RelationshipFrontmatter> parseRelationshipFrontmatter(String content) {
-    return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
-        .flatMap(lf -> {
-          Frontmatter fm = lf.frontmatter();
-          if (!RELATIONSHIP_NOTE_TYPE.equalsIgnoreCase(
-              fm.getString("type").map(String::trim).orElse(""))) {
-            return Optional.empty();
-          }
-          Optional<String> source =
-              fm.getString("source").map(String::trim).filter(s -> !s.isEmpty());
-          Optional<String> target =
-              fm.getString("target").map(String::trim).filter(s -> !s.isEmpty());
-          if (source.isEmpty() || target.isEmpty()) {
-            return Optional.empty();
-          }
-          String relation = fm.getString("relation").map(String::trim).orElse(null);
-          return Optional.of(new RelationshipFrontmatter(relation, source.get(), target.get()));
-        });
   }
 }
