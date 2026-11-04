@@ -1,5 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
+import com.odde.donut.algorithms.NotePropertyIndexPlanner.ValueKey;
 import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
@@ -23,16 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class NotePropertyValueDateRebuildService {
 
-  private record ValueAtPath(String path, String propertyKey, String propertyValue) {
+  private record ValueAtPath(String path, ValueKey valueKey) {
     static ValueAtPath of(ValueDate date) {
-      return new ValueAtPath(date.tipPath(), date.propertyKey(), date.propertyValue());
+      return new ValueAtPath(date.tipPath(), date.valueKey());
     }
 
     static ValueAtPath of(NotePropertyIndex row) {
-      return new ValueAtPath(
-          NotebookGitPortablePath.ofNote(row.getNote()),
-          row.getPropertyKey(),
-          row.getPropertyValue());
+      return new ValueAtPath(NotebookGitPortablePath.ofNote(row.getNote()), row.valueKey());
     }
   }
 
@@ -81,8 +79,7 @@ public class NotePropertyValueDateRebuildService {
         .forEach(row ->
             notePropertyIndexService.writeValueDate(
                 row.getNote(),
-                row.getPropertyKey(),
-                row.getPropertyValue(),
+                row.valueKey(),
                 datesByValue.getOrDefault(ValueAtPath.of(row), Optional.empty())));
   }
 }

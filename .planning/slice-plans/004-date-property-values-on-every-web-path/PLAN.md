@@ -154,7 +154,7 @@ failing with `NoSuchElementException` before the fix) and
 ### 3. One property value identity
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `'*NotePropertyIndex*'`, `'*NotebookGitPropertyValueDating*'`,
 `'*NotePropertyValueDateRebuild*'`, `'*NotebookGitWebContentPropertyDating*'`,
 `'*NotebookGitPublicationPropertyDating*'` stay green; one value-key record
@@ -163,6 +163,17 @@ remains (`PropertyValueKey`, `ValueKey` and the key half of `DatedValue` and
 
 Internal change: the planner's value key replaces the four records. Enables
 nothing further; it is the directly owned correction of finding 3.
+
+Accepted (2026-11-04): `NotePropertyIndexPlanner.ValueKey(propertyKey, propertyValue)`
+is the one record; `PlannedRow.valueKey()` and `NotePropertyIndex.valueKey()`
+build it, `changedValues` returns `Set<ValueKey>`, `writeValueDate` takes it,
+and the dater's `ValueDate` holds it (a fifth repetition, folded in). Content
+stays only in the planner's private `DatedValue(ValueKey, content)` change
+comparison. Proof, each `./scripts/run.sh pnpm backend:test:worktree --tests`:
+`'*NotePropertyIndex*'` (32), `'*NotebookGitPropertyValueDating*'` (4),
+`'*NotePropertyValueDateRebuild*'` (10), `'*NotebookGitWebContentPropertyDating*'` (7),
+`'*NotebookGitPublicationPropertyDating*'` (5),
+`'*NotebookGitWebContentExtractedNoteDating*'` (1), `'*AssimilationServiceProperty*'` (21).
 
 ### 4. Remove repeated dating tests
 

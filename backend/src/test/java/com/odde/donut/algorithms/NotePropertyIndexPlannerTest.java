@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.algorithms.NotePropertyIndexPlanner.ValueKey;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -69,17 +70,17 @@ class NotePropertyIndexPlannerTest {
         rows.stream().map(NotePropertyIndexPlanner.PlannedRow::itemIndex).toList(), contains(0, 1));
   }
 
-  private static Set<NotePropertyIndexPlanner.DatedValue> changed(String before, String after) {
+  private static Set<ValueKey> changed(String before, String after) {
     return NotePropertyIndexPlanner.changedValues(
         Frontmatter.parse(before), Frontmatter.parse(after));
   }
 
-  private static NotePropertyIndexPlanner.DatedValue item(String key, String text) {
-    return new NotePropertyIndexPlanner.DatedValue(key, text, text);
+  private static ValueKey item(String key, String text) {
+    return new ValueKey(key, text);
   }
 
-  private static NotePropertyIndexPlanner.DatedValue scalar(String key, String content) {
-    return new NotePropertyIndexPlanner.DatedValue(key, "", content);
+  private static ValueKey scalar(String key) {
+    return new ValueKey(key, "");
   }
 
   @Test
@@ -87,7 +88,7 @@ class NotePropertyIndexPlannerTest {
     assertThat(
         NotePropertyIndexPlanner.changedValues(
             Frontmatter.empty(), Frontmatter.parse("topic: physics\ncolors:\n  - x\n")),
-        containsInAnyOrder(scalar("topic", "physics"), item("colors", "x")));
+        containsInAnyOrder(scalar("topic"), item("colors", "x")));
   }
 
   @Test
@@ -96,8 +97,7 @@ class NotePropertyIndexPlannerTest {
         changed(
             "topic: physics\nstatus: draft\ncolors:\n  - x\n",
             "topic: chemistry\nstatus: draft\ncolors:\n  - x\n  - y\norigin: book\n"),
-        containsInAnyOrder(
-            scalar("topic", "chemistry"), item("colors", "y"), scalar("origin", "book")));
+        containsInAnyOrder(scalar("topic"), item("colors", "y"), scalar("origin")));
   }
 
   @Test

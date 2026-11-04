@@ -20,16 +20,19 @@ public final class NotePropertyIndexPlanner {
       String propertyValue,
       String content,
       String sourceLocalKey) {
-    public DatedValue datedValue() {
-      return new DatedValue(propertyKey, propertyValue, content);
+    public ValueKey valueKey() {
+      return new ValueKey(propertyKey, propertyValue);
     }
   }
 
   /**
-   * What a value's change date belongs to: a scalar per key (its content tells an edit), a list
-   * item by its text regardless of position.
+   * A property value's identity, which its change date belongs to: a scalar by its key (its {@code
+   * propertyValue} is empty), a list item by its key and text regardless of position.
    */
-  public record DatedValue(String propertyKey, String propertyValue, String content) {}
+  public record ValueKey(String propertyKey, String propertyValue) {}
+
+  /** A value with the content that tells whether it was edited. */
+  private record DatedValue(ValueKey valueKey, String content) {}
 
   private static final int MAX_PROPERTY_VALUE_LENGTH = 255;
 
@@ -52,16 +55,17 @@ public final class NotePropertyIndexPlanner {
   }
 
   /** Values in {@code after} that are absent from, or differ in content from, {@code before}. */
-  public static Set<DatedValue> changedValues(Frontmatter before, Frontmatter after) {
+  public static Set<ValueKey> changedValues(Frontmatter before, Frontmatter after) {
     Set<DatedValue> beforeValues = datedValues(before);
     return datedValues(after).stream()
         .filter(value -> !beforeValues.contains(value))
+        .map(DatedValue::valueKey)
         .collect(Collectors.toSet());
   }
 
   private static Set<DatedValue> datedValues(Frontmatter frontmatter) {
     return plannedRows(frontmatter).stream()
-        .map(PlannedRow::datedValue)
+        .map(row -> new DatedValue(row.valueKey(), row.content()))
         .collect(Collectors.toSet());
   }
 

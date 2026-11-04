@@ -3,6 +3,7 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
+import com.odde.donut.algorithms.NotePropertyIndexPlanner.ValueKey;
 import com.odde.donut.services.notebookGit.NotebookGitPropertyValueDating;
 import com.odde.donut.services.notebookGit.NotebookGitPropertyValueDating.ValueDate;
 import java.io.IOException;
@@ -82,8 +83,8 @@ class NotebookGitPropertyValueDatingTest extends NotebookGitCommitFixtureTestSup
     assertThat(
         NotebookGitPropertyValueDating.dateValues(repository, root, c3),
         containsInAnyOrder(
-            new ValueDate("n1.md", "topic", "", Optional.of(AT_0900)),
-            new ValueDate("n3.md", "topic", "", Optional.of(AT_1000))));
+            new ValueDate("n1.md", new ValueKey("topic", ""), Optional.of(AT_0900)),
+            new ValueDate("n3.md", new ValueKey("topic", ""), Optional.of(AT_1000))));
   }
 
   @Test
@@ -95,7 +96,8 @@ class NotebookGitPropertyValueDatingTest extends NotebookGitCommitFixtureTestSup
 
     assertThat(
         NotebookGitPropertyValueDating.dateValues(repository, root, c3),
-        containsInAnyOrder(new ValueDate("n1.md", "colors", "alpha", Optional.of(AT_1000))));
+        containsInAnyOrder(
+            new ValueDate("n1.md", new ValueKey("colors", "alpha"), Optional.of(AT_1000))));
   }
 
   @Test
@@ -107,7 +109,8 @@ class NotebookGitPropertyValueDatingTest extends NotebookGitCommitFixtureTestSup
 
     assertThat(
         NotebookGitPropertyValueDating.dateValues(repository, root, c2),
-        containsInAnyOrder(new ValueDate("folder/new.md", "origin", "", Optional.of(AT_0900))));
+        containsInAnyOrder(
+            new ValueDate("folder/new.md", new ValueKey("origin", ""), Optional.of(AT_0900))));
   }
 
   @Test
@@ -131,8 +134,8 @@ class NotebookGitPropertyValueDatingTest extends NotebookGitCommitFixtureTestSup
     assertThat(
         NotebookGitPropertyValueDating.dateValues(repository, null, c1),
         containsInAnyOrder(
-            new ValueDate("n1.md", "topic", "", Optional.empty()),
-            new ValueDate("n1.md", "colors", "x", Optional.of(AT_0900)),
-            new ValueDate("n2.md", "origin", "", Optional.empty())));
+            new ValueDate("n1.md", new ValueKey("topic", ""), Optional.empty()),
+            new ValueDate("n1.md", new ValueKey("colors", "x"), Optional.of(AT_0900)),
+            new ValueDate("n2.md", new ValueKey("origin", ""), Optional.empty())));
   }
 }

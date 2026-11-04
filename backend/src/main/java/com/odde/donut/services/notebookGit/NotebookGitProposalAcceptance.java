@@ -90,8 +90,7 @@ class NotebookGitProposalAcceptance {
         .forEach((path, dates) -> {
           Note note = projection.requireOneNoteAtPath(published.storedNotes(), path);
           dates.forEach(date ->
-              notePropertyIndexService.writeValueDate(
-                  note, date.propertyKey(), date.propertyValue(), date.committedAt()));
+              notePropertyIndexService.writeValueDate(note, date.valueKey(), date.committedAt()));
         });
   }
 
