@@ -171,9 +171,53 @@ Once those inputs settle the examples and comparison, finish refinement and
 continue into slice planning. An inconclusive result remains evidence for an
 owner decision, not completion of the improvement story.
 
+<a id="story-2"></a>
+
+### Distinguish confusable terms in generated recall questions
+
+**Identity:** SEED-007#story-2
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal:** A learner reviewing a term linked to a homophone group or a
+  documented confusion gets a self-contained question that tests which meaning
+  or usage fits a sentence. The comparison comes from the learner's notes,
+  whether the link is a property or a relationship note.
+- **Reported example:** The `つい` question gave the word in the stem and asked
+  the learner to pick its homophone group. Matching the reading was enough.
+  The supplied context showed the group and an explicit confusion with `ついに`,
+  with no other member of the exact homophone group visible.
+- **When to revisit:** Review the owner's examples after the Japanese learning
+  project tries its notebook instruction, repairs source notes, and reduces
+  eligible homophone membership notes to source properties. Use any remaining
+  weak questions to decide whether Donut needs to retrieve a relevant comparison,
+  make better use of an available comparison, or leave the outcome to notebook
+  guidance. The supporting-passages story above covers broader evidence quality.
+
+<a id="story-3"></a>
+
+### Set notebook question instructions by property and relationship type
+
+**Identity:** SEED-007#story-3
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal:** A notebook author can write one custom question-generation
+  instruction for a property type and its equivalent relationship-note type.
+  Donut includes that instruction only when generating a question for a
+  matching property or a matching relationship note in that notebook.
+- **Example:** An author sets guidance for `a part of` in `日本語学習`.
+  Donut supplies it for a recall question about a word's `a part of` property
+  and for a recall question focused on an `a-part-of` relationship note. A
+  whole-note vocabulary question, a question about a different relationship
+  type, or a question in another notebook uses its own configured instructions.
+
 ## Ordering and Open Decisions
 
-This follows the epic's two learning/refinement stories in global priority.
+The supporting-passages story follows the epic's two learning/refinement
+stories in global priority.
 Select actual question cases, human evaluation criteria, and acceptable added
 latency/cost at refinement. No experiment or implementation is authorized by
 this decomposition record. Preserve the research below as hypotheses and
