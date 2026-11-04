@@ -1,6 +1,7 @@
 # Plan: Date property values on every web path and keep one value identity
 
 **Source:** [SEED-101#story-2](../../seeds/SEED-101-property-assimilation-order.md#story-2)
+**Source review:** [source-review.md](source-review.md)
 **Identity:** SEED-101#story-2
 
 ## Provenance and findings
@@ -57,7 +58,7 @@ undated and sort at note creation.
 ## Current decisions
 
 - AI extraction wraps its construction in `acceptedWebChangeService.apply(notebookId, ...)`
-  as `PropertyReifyService` does: re-read the original note inside the
+  as reify does (both now in `WebNoteCreationService`): re-read the original note inside the
   operation after the binding lock, construct both notes there, build the
   `NoteRealm` after `apply` returns; one change, one commit, dated by the
   existing `commitIfChanged` → `dateChangedValues` for the inserted note and
@@ -98,7 +99,7 @@ undated and sort at note creation.
 ### 1. AI note extraction commits its change and dates the values it adds
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: a `NotebookGitWebContentControllerTestBase` subclass (beside
 `NotebookGitWebContentPropertyDatingControllerTest`): on a Git-backed note,
 `createExtractedNote` with an original rewrite that adds `example of` and new
@@ -112,6 +113,22 @@ Behavior: an owner creates the extracted note from the refinement preview → th
 change is applied as one accepted web change → one commit holds the rewritten
 original and the new note, and the values that change added or changed are
 dated at it.
+
+Accepted (2026-11-04): `WebNoteCreationService.createExtractedNote` wraps the
+construction in `apply`; the post-change refactor moved reify into the same
+service (`reifyProperty`, shared private `createFrom`) and deleted
+`PropertyReifyService`, because the two wrappers were the same shape.
+`AiController.createExtractedNote` no longer carries `@Transactional`; `apply`
+owns the transaction. Proof, each `./scripts/run.sh pnpm backend:test:worktree --tests`:
+`'*NotebookGitWebContentExtractedNoteDatingControllerTest'` (new; one commit on
+the previous head, tip holds `Atom.md` and `Electron.md`, committer time and
+`changed_at` of `example of` and `origin` at the save time, `topic` keeps its
+date), `'*AiControllerCreateExtractedNoteTest'` (7, refusals),
+`'*NotebookGitWebContentSaveCostControllerTest'` (8),
+`'*DisplayNameNormalizationMvcTest'` (11), `'*NoteReifyPropertyTests'`,
+`'*NoteReifyPropertyRefusalTests'`, `'*NotebookNoteCreateControllerTest'`.
+Learning: `WebNoteEditService.requireNote` is package-private, so wrappers that
+re-read a note inside an accepted web change live in `services.notebookGit`.
 
 ### 2. Rebuild leaves out notebooks without a Git binding
 
@@ -160,3 +177,25 @@ this worktree. Slice 1's proof is a Git-backed controller test, so it may
 exceed the five-minute target; splitting it would separate the wrap from the
 only observation that evaluates it. No remaining slice-specific concern was
 identified.
+
+
+## Story obligations
+
+### O1. Move between notebooks re-dating deferred
+Reported: slice 1 — "Source review lists the move-between-notebooks dating as a deferred scope limit"
+Story clause: "How a note moved to another notebook keeps or loses its values' dates"
+Disposition: excluded "How a note moved to another notebook keeps or loses its values' dates"
+Commitment: X1
+
+
+### O2. Cross-notebook undo-trash outside accepted web change deferred
+Reported: slice 1 — "Source review lists the cross-notebook undo-trash branch as a deferred scope limit"
+Story clause: "Undoing a trashed note whose prior folder now lies in another notebook"
+Disposition: excluded "Undoing a trashed note whose prior folder now lies in another notebook"
+Commitment: X2
+
+### O3. Binding every notebook deferred
+Reported: slice 1 — "Source review lists binding every notebook as a deferred scope limit"
+Story clause: "Binding every notebook so that the rebuild has none to leave out"
+Disposition: excluded "Binding every notebook so that the rebuild has none to leave out"
+Commitment: X3
