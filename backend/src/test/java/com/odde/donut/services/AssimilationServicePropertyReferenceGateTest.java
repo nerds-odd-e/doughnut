@@ -11,14 +11,11 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.Subscription;
-import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTestBase {
-  @Autowired NotePropertyIndexService notePropertyIndexService;
-  @Autowired NotePropertyIndexRepository notePropertyIndexRepository;
   @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
 
   private Note carrierWithExampleOf(Note sibling, String content) {

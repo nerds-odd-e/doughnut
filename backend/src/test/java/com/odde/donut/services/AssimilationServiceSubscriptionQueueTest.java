@@ -65,6 +65,53 @@ class AssimilationServiceSubscriptionQueueTest extends AssimilationServiceTestBa
     }
   }
 
+  @Test
+  void datedPropertyInSubscribedNotebookInterleavesWithOwnedNotesByDate() {
+    Notebook subscribedNotebook = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
+    Note subscribedNote =
+        makeMe
+            .aNote("subscribed")
+            .notebook(subscribedNotebook)
+            .createdAt(makeMe.aTimestamp().of(0, 8).fromShanghai().please())
+            .content("---\ntopic: physics\n---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(subscribedNote);
+    dateScalarProperty(
+        subscribedNote, "topic", makeMe.aTimestamp().of(0, 10).fromShanghai().please());
+    makeMe.aSubscription().forNotebook(subscribedNotebook).forUser(user).daily(5).please();
+    makeMe
+        .aMemoryTrackerFor(subscribedNote)
+        .by(user)
+        .assimilatedAt(makeMe.aTimestamp().of(0, 12).fromShanghai().please())
+        .please();
+    Note ownedBefore =
+        makeMe
+            .aNote("owned before")
+            .notebookOwnedBy(user)
+            .createdAt(makeMe.aTimestamp().of(0, 9).fromShanghai().please())
+            .please();
+    Note ownedAfter =
+        makeMe
+            .aNote("owned after")
+            .notebookOwnedBy(user)
+            .createdAt(makeMe.aTimestamp().of(0, 11).fromShanghai().please())
+            .please();
+    makeMe.refresh(user);
+
+    assertThat(getNextNoteToAssimilate(assimilationService), equalTo(ownedBefore));
+    makeMe.aMemoryTrackerFor(ownedBefore).by(user).assimilatedAt(day1).please();
+    AssimilationUnit property = assimilationService.getNextAssimilationUnit().orElseThrow();
+    assertThat(property.note(), equalTo(subscribedNote));
+    assertThat(property.propertyKey(), equalTo("topic"));
+    makeMe
+        .aMemoryTrackerFor(subscribedNote)
+        .by(user)
+        .propertyKey("topic")
+        .assimilatedAt(day1)
+        .please();
+    assertThat(getNextNoteToAssimilate(assimilationService), equalTo(ownedAfter));
+  }
+
   @Nested
   class NotesInCircle {
     @Test

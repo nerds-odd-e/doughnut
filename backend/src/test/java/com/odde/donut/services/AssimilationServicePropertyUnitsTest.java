@@ -10,11 +10,11 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import java.sql.Timestamp;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class AssimilationServicePropertyUnitsTest extends AssimilationServiceTestBase {
-  @Autowired NotePropertyIndexService notePropertyIndexService;
 
   private Note noteWithExampleOf() {
     Note note =
@@ -97,24 +97,79 @@ class AssimilationServicePropertyUnitsTest extends AssimilationServiceTestBase {
     assertThat(next.propertyKey(), nullValue());
   }
 
+  @Nested
+  class OrderedByChangeDate {
+    Timestamp oldNoteCreated = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
+    Timestamp newNoteCreated = makeMe.aTimestamp().of(0, 9).fromShanghai().please();
+    Note oldTrackedNote;
+    Note newUntrackedNote;
+
+    @BeforeEach
+    void setup() {
+      oldTrackedNote =
+          makeMe
+              .aNote("old")
+              .notebookOwnedBy(user)
+              .createdAt(oldNoteCreated)
+              .content("---\ntopic: physics\n---\n\nbody")
+              .please();
+      notePropertyIndexService.refreshForNote(oldTrackedNote);
+      makeMe.aMemoryTrackerFor(oldTrackedNote).assimilatedAt(day1).please();
+      newUntrackedNote =
+          makeMe.aNote("new").notebookOwnedBy(user).createdAt(newNoteCreated).please();
+    }
+
+    @Test
+    void property_dated_after_a_newer_notes_creation_is_offered_after_that_note() {
+      dateScalarProperty(
+          oldTrackedNote, "topic", makeMe.aTimestamp().of(0, 10).fromShanghai().please());
+
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(newUntrackedNote));
+      makeMe.aMemoryTrackerFor(newUntrackedNote).assimilatedAt(day1).please();
+      AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+      assertThat(next.note(), equalTo(oldTrackedNote));
+      assertThat(next.propertyKey(), equalTo("topic"));
+    }
+
+    @Test
+    void undated_property_sorts_at_its_notes_creation() {
+      AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+      assertThat(next.note(), equalTo(oldTrackedNote));
+      assertThat(next.propertyKey(), equalTo("topic"));
+    }
+
+    @Test
+    void property_dated_at_a_newer_notes_creation_breaks_the_tie_by_note() {
+      dateScalarProperty(oldTrackedNote, "topic", newNoteCreated);
+
+      AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+      assertThat(next.note(), equalTo(oldTrackedNote));
+      assertThat(next.propertyKey(), equalTo("topic"));
+    }
+  }
+
   @Test
-  void property_of_an_earlier_note_is_offered_before_a_later_untracked_note() {
-    Timestamp earlier = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
-    Timestamp later = makeMe.aTimestamp().of(0, 9).fromShanghai().please();
-    Note carrier =
+  void properties_dated_at_their_notes_creation_follow_the_note_unit_in_key_order() {
+    Timestamp created = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
+    Note note =
         makeMe
             .aNote()
             .notebookOwnedBy(user)
-            .createdAt(earlier)
-            .content("---\ntopic: physics\n---\n\nbody")
+            .createdAt(created)
+            .content("---\ntopic: physics\ndefinition: foo\n---\n\nbody")
             .please();
-    notePropertyIndexService.refreshForNote(carrier);
-    makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
-    makeMe.aNote("later").notebookOwnedBy(user).createdAt(later).please();
+    notePropertyIndexService.refreshForNote(note);
+    dateScalarProperty(note, "topic", created);
+    dateScalarProperty(note, "definition", created);
 
-    AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
-    assertThat(next.note(), equalTo(carrier));
-    assertThat(next.propertyKey(), equalTo("topic"));
+    AssimilationUnit first = assimilationService.getNextAssimilationUnit().orElseThrow();
+    assertThat(first.propertyKey(), nullValue());
+    makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
+    for (String expectedKey : List.of("definition", "topic")) {
+      AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+      assertThat(next.propertyKey(), equalTo(expectedKey));
+      makeMe.aMemoryTrackerFor(note).propertyKey(expectedKey).assimilatedAt(day1).please();
+    }
   }
 
   @Test

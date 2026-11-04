@@ -144,7 +144,7 @@ carries each surviving (key, value)'s date to its reinserted row. External behav
 ### 2. Sequence orders property values by their change date
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `AssimilationServicePropertyUnitsTest`: an old tracked note's
 property dated after a newer untracked note's creation is offered after that
 note; the same property undated is offered before it (today's order); a
@@ -284,3 +284,11 @@ stated. No remaining slice-specific concern was identified.
   `NotePropertyIndexPlannerTest`, `NotebookGitWebLinkingNotebookControllerTest`.
   `docs/database-erd.md` regenerated with no diff (the ERD lists key columns
   only). The column ships with the code that maps it, as V300000352 did.
+- Slice 2 (2026-11-04): units from separate queries must compare the times the
+  database returns, so the note-unit query also selects `n.createdAt`
+  (`NoteAssimilationQueries.unitTime`) instead of reading the in-memory entity,
+  whose sub-second precision the column drops. Accepted proof:
+  `./scripts/run.sh pnpm backend:test:worktree --tests '*AssimilationService*'`
+  (13 classes, 41 tests), plus `'*Assimilation*'`, `'*MemoryTracker*'`,
+  `'*SubscriptionControllerTest'`, `'*NotePropertyIndex*'`,
+  `'*UnassimilatedPropertyServiceTest'`.

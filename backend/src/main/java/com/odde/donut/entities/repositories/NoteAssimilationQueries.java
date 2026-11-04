@@ -32,11 +32,16 @@ public interface NoteAssimilationQueries {
           + " AND "
           + MemoryTrackerQueryFragments.JPA_WHERE_UNDERSTANDING_TRACKER;
 
-  String unassimilatedOrderBy = " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id";
+  String unitTime = "n.createdAt";
+
+  String unassimilatedOrderBy =
+      " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", " + unitTime + ", n.id";
 
   String selectUnassimilatedNoteUnit =
       "SELECT NEW com.odde.donut.services.AssimilationUnit(n, "
           + NoteLevelIndex.JPA_LEVEL
+          + ", "
+          + unitTime
           + ") FROM Note n";
 
   String selectFromNoteWithOwnership =

@@ -29,12 +29,20 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + " AND "
           + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING;
 
+  String unitTime = "COALESCE(i.changedAt, n.createdAt)";
+
   String unassimilatedOrderBy =
-      " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id, i.propertyKey, i.itemIndex";
+      " ORDER BY "
+          + NoteLevelIndex.JPA_LEVEL
+          + ", "
+          + unitTime
+          + ", n.id, i.propertyKey, i.itemIndex";
 
   String selectUnassimilatedPropertyUnit =
       "SELECT NEW com.odde.donut.services.AssimilationUnit(n, i.propertyKey, i.propertyValue, "
           + NoteLevelIndex.JPA_LEVEL
+          + ", "
+          + unitTime
           + ")";
 
   String fromPropertyOfOwnership =
