@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Julia-chan",
+  "email": "julia-chan@example.org",
+  "identity": "SEED-007#story-3",
+  "mode": "story-branch",
+  "branch": "claude/set-notebook-question-instructions-by-property-a",
+  "host": "claude",
+  "model": "opus"
+}
