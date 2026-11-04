@@ -280,6 +280,37 @@ changes. Known web operations already have explicit note identities and do not
 require heuristic inference. No persisted identity journal or client-side
 rename protocol is introduced.
 
+## Property value dates
+
+Each `note_property_index` row may carry `changed_at`: the committer time of the
+last accepted commit that changed that parsed value (a scalar by its content, a
+list item by its presence), never earlier than its note's creation. It is
+derived ordering data only. Git history is its evidence, and dating writes no
+Git content.
+
+- The index refresh deletes and reinserts a note's rows, and each reinserted
+  row keeps the date its (key, value) had. Body edits, reformatting, list
+  reordering and edits to other properties keep dates. A new value starts
+  undated.
+- A web change compares each inserted or updated note's content as first
+  captured with its saved content, and dates the values it added or changed
+  at the appended commit's time. It reads no Git objects.
+- An accepted publication walks the newly accepted range first-parent, newest
+  first, following renamed notes. It dates each changed note's values at the
+  newest commit that changed them, so an edit reverted inside one push is
+  dated at the revert. Every accepting path reaches this single step before
+  the head is stored. Its cost follows the range's commits and changed files.
+- A value without a date sorts at its note's creation. In production, a
+  scheduled job dates up to ten notebooks per run from their whole retained
+  history. A value already present in the root ("Create notebook" or "Reset")
+  or outside the history takes its note's creation time, and dated rows are
+  kept. A history reset leaves dates unchanged.
+- Within a level, the assimilation sequence orders a note unit by its creation
+  time and a property unit by `COALESCE(changed_at, note created_at)`. Ties
+  break by note, then the note's own unit before its properties, then key,
+  then list position. The query and the in-memory merge compare the stored
+  times.
+
 ## Unresolved policy
 
 - **Identity admission:** Beyond the ordinary-note correspondence policy above,
