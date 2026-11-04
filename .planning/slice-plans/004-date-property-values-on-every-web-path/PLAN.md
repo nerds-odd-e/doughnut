@@ -133,7 +133,7 @@ re-read a note inside an accepted web change live in `services.notebookGit`.
 ### 2. Rebuild leaves out notebooks without a Git binding
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NotePropertyValueDateRebuildServiceTest`: a notebook with undated rows
 and no binding beside the fixture's bound notebook → `rebuildOne()` dates the
 bound notebook, the next call returns false, and the unbound notebook's rows
@@ -142,6 +142,14 @@ stay undated.
 Behavior: undated rows exist in a notebook with no binding → the job runs →
 bound notebooks are dated and the job finishes without failing on the unbound
 one.
+
+Accepted (2026-11-04): the query, renamed
+`findGitBoundNotebookIdsWithUndatedValues` by the refactor, adds the `EXISTS`
+binding condition; `rebuildOne`'s javadoc names Git-bound notebooks. Proof:
+`./scripts/run.sh pnpm backend:test:worktree --tests '*NotePropertyValueDateRebuildServiceTest'`
+(7; new `aNotebookWithoutGitHistoryIsLeftUndatedWhileTheOthersAreDated`, seen
+failing with `NoSuchElementException` before the fix) and
+`--tests '*NotePropertyValueDateRebuildJobTests'` (2).
 
 ### 3. One property value identity
 

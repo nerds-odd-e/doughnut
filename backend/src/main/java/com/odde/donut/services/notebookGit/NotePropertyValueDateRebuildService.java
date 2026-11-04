@@ -52,10 +52,12 @@ public class NotePropertyValueDateRebuildService {
     this.notePropertyIndexService = notePropertyIndexService;
   }
 
-  /** Dates one notebook's undated values; false when no notebook has any. */
+  /** Dates one Git-bound notebook's undated values; false when no such notebook has any. */
   @Transactional
   public boolean rebuildOne() {
-    return notePropertyIndexRepository.findNotebookIdsWithUndatedValues(Limit.of(1)).stream()
+    return notePropertyIndexRepository
+        .findGitBoundNotebookIdsWithUndatedValues(Limit.of(1))
+        .stream()
         .findFirst()
         .map(notebookId -> {
           rebuild(notebookId);

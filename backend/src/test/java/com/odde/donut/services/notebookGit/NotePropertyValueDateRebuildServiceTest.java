@@ -2,6 +2,7 @@ package com.odde.donut.services.notebookGit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotePropertyIndex;
@@ -91,6 +92,22 @@ class NotePropertyValueDateRebuildServiceTest extends SpringTestBase {
   }
 
   @Test
+  void aNotebookWithoutGitHistoryIsLeftUndatedWhileTheOthersAreDated() {
+    Notebook unbound = makeMe.aNotebook().please();
+    Note loose =
+        makeMe.aNote("Loose").notebook(unbound).content("---\ntopic: biology\n---\nbody").please();
+    notePropertyIndexService.refreshForNote(loose);
+    clearDates(unbound);
+    clearDates();
+
+    assertThat(rebuildService.rebuildOne(), equalTo(true));
+    assertThat(rebuildService.rebuildOne(), equalTo(false));
+
+    assertThat(changedAt(a, "topic", ""), equalTo(A_CREATED));
+    assertThat(changedAt(loose, "topic", ""), nullValue());
+  }
+
+  @Test
   void aValueOutsideTheRetainedHistoryIsDatedAtItsNotesCreation() {
     Timestamp injected = Timestamp.from(Instant.parse("2026-09-10T09:00:00Z"));
     Note uncommitted =
@@ -146,11 +163,15 @@ class NotePropertyValueDateRebuildServiceTest extends SpringTestBase {
 
   /** As a notebook from before value dating: none of its values has a date. */
   private void clearDates() {
+    clearDates(notebook);
+  }
+
+  private void clearDates(Notebook target) {
     makeMe.entityPersister.flush();
     entityManager
         .createQuery(
             "UPDATE NotePropertyIndex i SET i.changedAt = NULL WHERE i.note.notebook.id = :id")
-        .setParameter("id", notebook.getId())
+        .setParameter("id", target.getId())
         .executeUpdate();
     makeMe.entityPersister.flushAndClear();
   }

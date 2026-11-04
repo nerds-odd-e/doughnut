@@ -59,8 +59,10 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
   List<NotePropertyIndex> findByNote_IdAndPropertyKeyAndPropertyValue(
       Integer noteId, String propertyKey, String propertyValue);
 
-  @Query("SELECT n.notebook.id FROM NotePropertyIndex i JOIN i.note n WHERE i.changedAt IS NULL")
-  List<Integer> findNotebookIdsWithUndatedValues(Limit limit);
+  @Query(
+      "SELECT n.notebook.id FROM NotePropertyIndex i JOIN i.note n WHERE i.changedAt IS NULL"
+          + " AND EXISTS (SELECT b FROM NotebookGitBinding b WHERE b.notebook = n.notebook)")
+  List<Integer> findGitBoundNotebookIdsWithUndatedValues(Limit limit);
 
   List<NotePropertyIndex> findByNote_Notebook_IdAndChangedAtIsNull(Integer notebookId);
 
