@@ -62,12 +62,15 @@ at note creation, which is what the e2e scenario relies on for its baseline.
   running the Git dater here broke the save-cost guards (tree fetches 39 vs a
   cap of 13), so the web save reads no Git objects for dating. No
   whole-notebook note load.
-- **Push.** `NotebookGitProposalPublisher.publish` runs the dater over the
-  newly accepted range (`acceptedHead` exclusive → `mainHead`) on
-  `proposal.repository()` after application and before acceptance, maps tip
-  paths to notes with `NotebookGitProjection.requireOneNoteAtPath(proposedNotes, path)`,
-  and writes dates in the same transaction. A push that changes no note
-  documents runs no dater.
+- **Push.** `NotebookGitProposalAcceptance.acceptMatchingProposedTree`, which
+  every accepting push path reaches (ordinary application, no-net-change, and
+  folder-move-only), runs the dater over the newly accepted range (the
+  binding's accepted head exclusive → `proposal.mainHead()`) after the
+  projection matches the proposed tree and before the head is stored, maps tip
+  paths to notes with `NotebookGitProjection.requireOneNoteAtPath` over the
+  notes already loaded, and writes dates through `writeValueDate` in the same
+  transaction. A push whose range touches no note file reads no note content
+  and writes nothing.
 - **Maintenance.** `NotePropertyValueDateRebuildService.rebuildOne()` picks
   one notebook with an undated row, opens its accepted repository, runs the
   dater over the whole retained history, writes dates for undated rows only
@@ -222,7 +225,7 @@ values keep theirs → the next assimilation reflects it.
 ### 6. Git publication dates values across the accepted range
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: a publish controller test (beside
 `NotebookGitPublicationAtomicControllerTest`) with a three-commit proposal
 bundle whose commits carry distinct committer times: N1's `topic` row is
@@ -328,3 +331,22 @@ stated. No remaining slice-specific concern was identified.
   and `SUT_TIMEOUT_MS=360000 ./scripts/run.sh pnpm cy:run --spec
   e2e_test/features/assimilation/assimilation_walkthrough.feature,e2e_test/features/assimilation/assimilation_property_order.feature`
   (10/10).
+- Slice 6 (2026-11-04): the dater finds notes from each commit's diff (a
+  parentless root diffs against the empty tree) instead of parsing every tip
+  note, and walks the whole range, so its cost follows the range's commits and
+  changed files. Accepted proof:
+  `'*NotebookGitPublicationPropertyDatingControllerTest'` (5 tests),
+  `'*NotebookGitPropertyValueDatingTest'` (4), `'*NotebookGitPublishCost*'`,
+  `'*NotebookGitPublication*'`, `'*NotebookGit*'` (146 classes, 487 tests).
+
+## Story obligations
+
+### G1. A push that only edits and reverts a value kept its old date
+Reported: slice 6 — "A push whose only content change is an edit followed by a revert has no net change to any note, so it takes the publisher's existing early return and runs no dating; the value keeps its old date."
+Story clause: "so an edit followed by a revert inside one push dates the value at the revert commit"
+Disposition: proved by slice 6: NotebookGitPublicationPropertyDatingControllerTest.anEditRevertedInTheSamePushIsDatedAtTheRevert and anEditRevertedInAPushThatOnlyMovesAFolderIsDatedAtTheRevert, through the single dating call in NotebookGitProposalAcceptance.acceptMatchingProposedTree
+
+### G2. A push touching only READMEs or attachments still runs the dater
+Reported: slice 6 — "A push changing only README/container documents does reach the tail and runs the diff-cost dater, which writes nothing."
+Story clause: "Notes the push does not change are not touched."
+Disposition: no user cost "Intake then follows the learner's own authoring timeline": the range diffs hold no note file, so no note content is read and no row is written (aPushChangingOnlyAnAttachmentWritesNoDates); the cost is one tree diff per commit, which scales with the push

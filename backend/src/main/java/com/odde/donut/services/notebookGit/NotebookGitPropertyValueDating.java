@@ -23,6 +23,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
 
@@ -49,33 +50,45 @@ public final class NotebookGitPropertyValueDating {
 
   /**
    * Values at {@code tip} changed in the commits after {@code olderExclusive} (or from the root
-   * when null) through {@code tip}; values unchanged across the range have no entry.
+   * when null) through {@code tip}; values unchanged across the range have no entry. Notes are
+   * discovered from each commit's diff, newest first, so the cost follows the range's changes, not
+   * the size of the tip tree.
    */
   public static List<ValueDate> dateValues(
       Repository repository, ObjectId olderExclusive, ObjectId tip) {
     try (RevWalk walk = new RevWalk(repository)) {
-      RevCommit commit = walk.parseCommit(tip);
-      Map<String, TrackedNote> trackedByPath = tipNotes(repository, commit);
+      Map<String, TrackedNote> trackedByPath = new HashMap<>();
+      // Paths, at the commit being walked, whose tip identity a newer commit already decided.
+      Set<String> decidedPaths = new HashSet<>();
       List<ValueDate> dates = new ArrayList<>();
-      while (!commit.equals(olderExclusive) && !trackedByPath.isEmpty()) {
-        if (commit.getParentCount() == 0) {
-          trackedByPath
-              .values()
-              .forEach(note -> note.undated().forEach(v -> dates.add(dateOf(note, v, null))));
-          break;
-        }
-        RevCommit parent = walk.parseCommit(commit.getParent(0));
-        Instant committedAt = commit.getCommitterIdent().getWhenAsInstant();
+      RevCommit commit = walk.parseCommit(tip);
+      while (commit != null && !commit.equals(olderExclusive)) {
+        RevCommit parent =
+            commit.getParentCount() == 0 ? null : walk.parseCommit(commit.getParent(0));
+        Instant committedAt = parent == null ? null : commit.getCommitterIdent().getWhenAsInstant();
+        Map<String, TrackedNote> trackedInParent = new HashMap<>();
+        List<String> decidedInParent = new ArrayList<>();
         for (DiffEntry entry : changedFiles(repository, parent, commit)) {
-          TrackedNote note = trackedByPath.remove(entry.getNewPath());
-          if (note == null) {
+          DiffEntry.ChangeType type = entry.getChangeType();
+          if (type != DiffEntry.ChangeType.ADD) {
+            decidedInParent.add(entry.getOldPath());
+          }
+          if (type == DiffEntry.ChangeType.DELETE) {
             continue;
           }
+          String path = entry.getNewPath();
+          TrackedNote note = trackedByPath.remove(path);
+          if (note == null && (decidedPaths.contains(path) || !PortablePathKind.isNote(path))) {
+            continue;
+          }
+          Frontmatter after = frontmatterOf(repository, entry.getNewId().toObjectId());
+          if (note == null) {
+            note = new TrackedNote(path, valueKeys(after));
+          }
           Frontmatter before =
-              entry.getChangeType() == DiffEntry.ChangeType.ADD
+              type == DiffEntry.ChangeType.ADD
                   ? Frontmatter.empty()
                   : frontmatterOf(repository, entry.getOldId().toObjectId());
-          Frontmatter after = frontmatterOf(repository, entry.getNewId().toObjectId());
           for (DatedValue changed : NotePropertyIndexPlanner.changedValues(before, after)) {
             ValueKey key = new ValueKey(changed.propertyKey(), changed.propertyValue());
             if (note.undated().remove(key)) {
@@ -83,9 +96,11 @@ public final class NotebookGitPropertyValueDating {
             }
           }
           if (!note.undated().isEmpty()) {
-            trackedByPath.put(entry.getOldPath(), note);
+            trackedInParent.put(entry.getOldPath(), note);
           }
         }
+        trackedByPath.putAll(trackedInParent);
+        decidedPaths.addAll(decidedInParent);
         commit = parent;
       }
       return dates;
@@ -99,36 +114,23 @@ public final class NotebookGitPropertyValueDating {
         note.tipPath(), key.propertyKey(), key.propertyValue(), Optional.ofNullable(committedAt));
   }
 
-  private static Map<String, TrackedNote> tipNotes(Repository repository, RevCommit tip)
-      throws IOException {
-    Map<String, TrackedNote> notes = new HashMap<>();
-    try (TreeWalk treeWalk = new TreeWalk(repository)) {
-      treeWalk.setRecursive(true);
-      treeWalk.addTree(tip.getTree());
-      while (treeWalk.next()) {
-        String path = treeWalk.getPathString();
-        if (!PortablePathKind.isNote(path)) {
-          continue;
-        }
-        Set<ValueKey> values =
-            NotePropertyIndexPlanner.plannedRows(frontmatterOf(repository, treeWalk.getObjectId(0)))
-                .stream()
-                .map(row -> new ValueKey(row.propertyKey(), row.propertyValue()))
-                .collect(Collectors.toCollection(HashSet::new));
-        if (!values.isEmpty()) {
-          notes.put(path, new TrackedNote(path, values));
-        }
-      }
-    }
-    return notes;
+  private static Set<ValueKey> valueKeys(Frontmatter frontmatter) {
+    return NotePropertyIndexPlanner.plannedRows(frontmatter).stream()
+        .map(row -> new ValueKey(row.propertyKey(), row.propertyValue()))
+        .collect(Collectors.toCollection(HashSet::new));
   }
 
+  /** {@code commit}'s changes against {@code parent}, or against the empty tree for a root. */
   private static List<DiffEntry> changedFiles(
       Repository repository, RevCommit parent, RevCommit commit) throws IOException {
     try (TreeWalk treeWalk = new TreeWalk(repository)) {
       treeWalk.setRecursive(true);
       treeWalk.setFilter(TreeFilter.ANY_DIFF);
-      treeWalk.addTree(parent.getTree());
+      if (parent == null) {
+        treeWalk.addTree(new EmptyTreeIterator());
+      } else {
+        treeWalk.addTree(parent.getTree());
+      }
       treeWalk.addTree(commit.getTree());
       RenameDetector detector = new RenameDetector(repository);
       detector.setRenameScore(NotebookGitProposalRenameDetector.RENAME_SCORE_THRESHOLD);

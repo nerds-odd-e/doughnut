@@ -19,8 +19,8 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 2.6 | List reordering keeps existing dates. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.reorderingAListKeepsItsItemDatesAndDatesAnAddedItem |
 | 2.7 | Edits to other properties of the note keep existing dates. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.addingAnotherPropertyKeepsTheExistingValueDate |
 | 2.8 | Values are compared as parsed values, never as text lines. | slice 3 | observed: NotePropertyIndexPlanner.changedValues compares parsed DatedValue sets; NotePropertyIndexPlannerTest reformatting test |
-| 3 | Floor: a value's date is never earlier than its note's creation time. | slice 6 | |
-| 3.1 | Rationale: a note pushed from the CLI (created at publish time, committed earlier) must not show its properties before the note itself or before notes created between commit and push. | slice 6 | |
+| 3 | Floor: a value's date is never earlier than its note's creation time. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.aNoteCommittedBeforeItsPublicationIsDatedAtItsCreation; NotePropertyIndexService.writeValueDate floors at createdAt |
+| 3.1 | Rationale: a note pushed from the CLI (created at publish time, committed earlier) must not show its properties before the note itself or before notes created between commit and push. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.aNoteCommittedBeforeItsPublicationIsDatedAtItsCreation (committed 08:00, published 09:30 → created_at = changed_at = 09:30) |
 | 4 | Order: within a level, units sort by time. | slice 2 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate.property_dated_after_a_newer_notes_creation_is_offered_after_that_note |
 | 4.1 | A note unit sorts by its creation time. | slice 2 | observed: AssimilationUnit.ORDER time + note query n.createdAt; AssimilationServiceQueueOrderingTest green |
 | 4.2 | A property unit sorts by its value date. | slice 2 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate.property_dated_after_a_newer_notes_creation_is_offered_after_that_note (dated 10:00 follows 09:00 note) |
@@ -32,11 +32,11 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 5 | Web save: saving a note dates the values that save added or changed at the save time. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.anAddedValueIsDatedAtTheCommitTheSaveAppends |
 | 5.1 | The save time is the committer time of the commit the save appends. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.anAddedValueIsDatedAtTheCommitTheSaveAppends (changed_at == tip commit committer time == save time) |
 | 5.2 | Only the saved note's rows are touched. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.savingOneNoteLeavesAnotherNotesValueDates |
-| 6 | Git publication: for each note a push changes, the newly accepted range is walked commit by commit. | slice 6 | |
-| 6.1 | An edit followed by a revert inside one push dates the value at the revert commit. | slice 6 | |
-| 6.2 | Each commit's own committer time dates the values it changed. | slice 6 | |
-| 6.3 | Values unchanged across the range keep their dates. | slice 6 | |
-| 6.4 | Notes the push does not change are not touched. | slice 6 | |
+| 6 | Git publication: for each note a push changes, the newly accepted range is walked commit by commit. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (three-commit range walked) |
+| 6.1 | An edit followed by a revert inside one push dates the value at the revert commit. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.anEditRevertedInTheSamePushIsDatedAtTheRevert, anEditRevertedInAPushThatOnlyMovesAFolderIsDatedAtTheRevert, origin in eachValueIsDatedAtTheCommitThatLastChangedIt |
+| 6.2 | Each commit's own committer time dates the values it changed. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (N1 09:00, N3 10:00) |
+| 6.3 | Values unchanged across the range keep their dates. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (N2 topic and beta keep earlier dates) |
+| 6.4 | Notes the push does not change are not touched. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.aPushChangingOnlyAnAttachmentWritesNoDates; eachValueIsDatedAtTheCommitThatLastChangedIt (N2 unchanged) |
 | 7 | Missing dates: a value without a date sorts at its note's creation time. | slice 2 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate.undated_property_sorts_at_its_notes_creation (COALESCE(i.changedAt, n.createdAt)) |
 | 7.1 | Donut fills missing dates from retained Git history on its own, in a maintenance job. | slice 8 | |
 | 7.1.1 | The job uses existing scheduling infrastructure. | slice 8 | |
@@ -56,7 +56,7 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 9.1 | exclusion: note-level units keep creation-time order. | slice 2 | observed: NoteAssimilationQueries note ORDER BY unchanged; AssimilationServiceQueueOrderingTest green |
 | 9.2 | exclusion: no date is shown in the UI. | slice 8 | |
 | 9.3 | exclusion: author time is not used instead of committer time. | slice 4 | observed: NotebookGitPropertyValueDating uses getCommitterIdent; NotebookGitPropertyValueDatingTest fixture author time = now vs fixed committer times (swap to author ident failed 4/4) |
-| 9.4 | exclusion: no clock normalization for CLI commits; a future- or back-dated local commit sorts where its committer time says. | slice 6 | |
+| 9.4 | exclusion: no clock normalization for CLI commits; a future- or back-dated local commit sorts where its committer time says. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (c3 committed 10:00, published 09:30, stays 10:00) |
 | 9.5 | exclusion: values whose history was reset before this story lands are not re-dated; they stay at note creation. | slice 7 | |
 | 10.1 | An untracked scalar edited for a typo moves to its edit time. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.editingAScalarRedatesIt |
 | 10.2 | A wiki-link rewrite that changes a value's text (destination renamed) dates that value at the rewrite commit. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.aRenameThatRewritesALinkValueDatesItAtTheRenameCommit |
@@ -68,11 +68,11 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | E3.2 | Same setup → gamma is dated now. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.reorderingAListKeepsItsItemDatesAndDatesAnAddedItem (green dated at the save) |
 | E4.1 | Untracked `definition: foo` dated 2024-05 edited to `definition: bar` today → dated today. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.editingAScalarRedatesIt |
 | E4.2 | The same edit on a tracked `definition` → nothing is re-queued. | slice 2 | observed: tracker WHERE unchanged and date-independent (scalar tracked by key); UnassimilatedPropertyServiceTest green |
-| E5.1 | CLI push of three commits: c1 (09:00) adds `topic` to N1, c2 edits N2's body, c3 (10:00) adds `topic` to N3 → N1's topic dated 09:00. | slice 6 | |
-| E5.2 | Same push → N3's topic dated 10:00. | slice 6 | |
-| E5.3 | Same push → N2's values unchanged. | slice 6 | |
-| E5.4 | A push that removes `alpha` in c1 and adds it back in c3 → alpha dated at c3. | slice 6 | |
-| E6.1 | A new note committed locally at 08:00 and published at 09:30 → its values dated 09:30 (the floor). | slice 6 | |
+| E5.1 | CLI push of three commits: c1 (09:00) adds `topic` to N1, c2 edits N2's body, c3 (10:00) adds `topic` to N3 → N1's topic dated 09:00. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (N1 topic 09:00) |
+| E5.2 | Same push → N3's topic dated 10:00. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (N3 topic 10:00) |
+| E5.3 | Same push → N2's values unchanged. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (N2 topic unchanged) |
+| E5.4 | A push that removes `alpha` in c1 and adds it back in c3 → alpha dated at c3. | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt (alpha removed c1, re-added c3 → 10:00) |
+| E6.1 | A new note committed locally at 08:00 and published at 09:30 → its values dated 09:30 (the floor). | slice 6 | observed: NotebookGitPublicationPropertyDatingControllerTest.aNoteCommittedBeforeItsPublicationIsDatedAtItsCreation |
 | E6.2 | Same setup → the note's own unit precedes its property units. | slice 2 | observed: AssimilationServicePropertyUnitsTest.properties_dated_at_their_notes_creation_follow_the_note_unit_in_key_order |
 | E7.1 | A notebook from before this story, every value undated → the sequence is ordered as today. | slice 2 | observed: AssimilationServicePropertyUnitsTest.OrderedByChangeDate.undated_property_sorts_at_its_notes_creation; existing ordering tests unchanged and green |
 | E7.2 | After the maintenance job runs → values added by later commits take those commit times. | slice 7 | |

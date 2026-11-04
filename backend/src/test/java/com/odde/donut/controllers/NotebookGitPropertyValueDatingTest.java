@@ -111,24 +111,28 @@ class NotebookGitPropertyValueDatingTest extends NotebookGitCommitFixtureTestSup
   }
 
   @Test
-  void reportsValuesAlreadyInTheRootCommitAsPresentAtRoot() throws IOException {
+  void reportsValuesAlreadyInTheRootCommitAsPresentAtRootIncludingNotesUnchangedSince()
+      throws IOException {
     ObjectId root =
         commit(
             null,
             AT_0800,
             note("n1.md", "---\ntopic: physics\n---\n"),
+            note("n2.md", "---\norigin: lab\n---\n"),
             note("README.md", "---\ntopic: notebook\n---\n"));
     ObjectId c1 =
         commit(
             root,
             AT_0900,
             note("n1.md", "---\ntopic: physics\ncolors: [x]\n---\n"),
+            note("n2.md", "---\norigin: lab\n---\n"),
             note("README.md", "---\ntopic: notebook\n---\n"));
 
     assertThat(
         NotebookGitPropertyValueDating.dateValues(repository, null, c1),
         containsInAnyOrder(
             new ValueDate("n1.md", "topic", "", Optional.empty()),
-            new ValueDate("n1.md", "colors", "x", Optional.of(AT_0900))));
+            new ValueDate("n1.md", "colors", "x", Optional.of(AT_0900)),
+            new ValueDate("n2.md", "origin", "", Optional.empty())));
   }
 }
