@@ -88,19 +88,6 @@ class NotebookGitPropertyValueDatingTest extends NotebookGitCommitFixtureTestSup
   }
 
   @Test
-  void datesAListItemRemovedAndReAddedAtItsReAddition() throws IOException {
-    ObjectId root = commit(null, AT_0800, note("n1.md", "---\ncolors: [alpha, beta]\n---\n"));
-    ObjectId c1 = commit(root, AT_0900, note("n1.md", "---\ncolors: [beta]\n---\n"));
-    ObjectId c2 = commit(c1, AT_0930, note("n1.md", "---\ncolors: [beta]\n---\nedited"));
-    ObjectId c3 = commit(c2, AT_1000, note("n1.md", "---\ncolors: [beta, alpha]\n---\nedited"));
-
-    assertThat(
-        NotebookGitPropertyValueDating.dateValues(repository, root, c3),
-        containsInAnyOrder(
-            new ValueDate("n1.md", new ValueKey("colors", "alpha"), Optional.of(AT_1000))));
-  }
-
-  @Test
   void followsARenamedNoteBackToTheCommitThatChangedItsValue() throws IOException {
     String content = "---\norigin: lab\n---\nA body long enough to be recognised as the same note.";
     ObjectId root = commit(null, AT_0800, note("old.md", "A body long enough."));

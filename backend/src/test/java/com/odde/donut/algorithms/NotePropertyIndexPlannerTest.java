@@ -92,15 +92,6 @@ class NotePropertyIndexPlannerTest {
   }
 
   @Test
-  void changedValues_reports_added_items_and_new_or_edited_scalars_only() {
-    assertThat(
-        changed(
-            "topic: physics\nstatus: draft\ncolors:\n  - x\n",
-            "topic: chemistry\nstatus: draft\ncolors:\n  - x\n  - y\norigin: book\n"),
-        containsInAnyOrder(scalar("topic"), item("colors", "y"), scalar("origin")));
-  }
-
-  @Test
   void changedValues_reports_an_item_whose_text_changed_as_the_new_item() {
     assertThat(
         changed("colors:\n  - alpha\n  - beta\n", "colors:\n  - alpha\n  - betta\n"),
@@ -108,11 +99,11 @@ class NotePropertyIndexPlannerTest {
   }
 
   @Test
-  void changedValues_ignores_reordering_and_reformatting_of_the_same_parsed_values() {
+  void changedValues_ignores_reformatting_of_the_same_parsed_values() {
     assertThat(
         changed(
             "topic: physics\ncolors:\n  - x\n  - \"[[B]]\"\n",
-            "colors: ['[[B]]', x]\ntopic: \"physics\"\n"),
+            "topic: \"physics\"\ncolors: [x, '[[B]]']\n"),
         empty());
   }
 

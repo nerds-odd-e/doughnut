@@ -178,7 +178,7 @@ comparison. Proof, each `./scripts/run.sh pnpm backend:test:worktree --tests`:
 ### 4. Remove repeated dating tests
 
 Type: Structure
-Status: planned
+Status: done
 Proof: the cases in finding 4 are deleted; each story-1 example stays mapped
 to a surviving test (the mapping in Decisive premises, re-read against the
 tests after the deletion and recorded here as a reading); `'*NotePropertyIndex*'`
@@ -187,6 +187,21 @@ and `'*NotebookGitPropertyValueDating*'` stay green.
 Internal change: delete `NotePropertyIndexServiceTest.changeDate`, the
 reorder and scalar-edit `changedValues_*` cases, and the dater's re-add
 test, with any helper only they used. Directly owned correction of finding 4.
+
+Accepted (2026-11-04): deleted as listed. The deleted reorder case also held
+the only reformat observation, so a reformat-only
+`changedValues_ignores_reformatting_of_the_same_parsed_values` (same order,
+quoting and list style changed) stays. Mapping reading after deletion: example
+2 `NotebookGitWebContentPropertyDatingControllerTest.aBodyOnlySaveKeepsTheValueDate`;
+3 `reorderingAListKeepsItsItemDatesAndDatesAnAddedItem` plus the planner's
+`changedValues_reports_an_item_whose_text_changed_as_the_new_item` and
+`..._reports_every_value_of_a_frontmatter_that_had_none`; 4
+`editingAScalarRedatesIt`; 5
+`NotebookGitPublicationPropertyDatingControllerTest.eachValueIsDatedAtTheCommitThatLastChangedIt`
+and the dater's `datesEachValueAtTheCommitThatAddedItAndLeavesUnchangedValuesUndated`.
+Sweep reading: `git grep` outside `.planning/` for the deleted names finds
+nothing. Proof: `--tests '*NotePropertyIndex*'` (26 before the reformat case),
+`'*NotePropertyIndexPlannerTest'` (10), `'*NotebookGitPropertyValueDating*'` (3).
 
 ## Concern evidence
 
@@ -211,7 +226,7 @@ Commitment: X1
 Reported: slice 1 — "Source review lists the cross-notebook undo-trash branch as a deferred scope limit"
 Story clause: "Undoing a trashed note whose prior folder now lies in another notebook"
 Disposition: excluded "Undoing a trashed note whose prior folder now lies in another notebook"
-Commitment: X2
+Commitment: X2, X2.1
 
 ### O3. Binding every notebook deferred
 Reported: slice 1 — "Source review lists binding every notebook as a deferred scope limit"
