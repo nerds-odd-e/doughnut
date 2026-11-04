@@ -80,6 +80,14 @@ public final class PropertyKeyNaming {
     return "example of " + parts.suffix();
   }
 
+  /**
+   * The property type of a key: its base without numeric suffix, trimmed, with the example-of
+   * family canonicalized. Compare property types ignoring case.
+   */
+  public static String propertyType(String key) {
+    return canonicalExampleOfFamilyKey(propertyKeyBaseAndSuffix(key.trim()).base().trim());
+  }
+
   public static boolean isTitlePatternPropertyKey(String key) {
     return "titlepattern".equals(normalizedBaseWithoutUnderscores(key));
   }

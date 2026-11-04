@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
@@ -63,34 +64,51 @@ public class NoteRealmService {
    * Every distinct {@code question_generation_instruction} on the trail to {@code focus}, each
    * rendered as a source-labeled block. Order: notebook readme, folders outermost → innermost, then
    * the focus note. Levels without a non-blank instruction are omitted; no level overrides another;
-   * identical instruction text appears only once (outermost occurrence wins).
+   * identical instruction text appears only once (outermost occurrence wins). A non-null {@code
+   * propertyType} adds the notebook's {@code question_generation_instructions_by_property} entry
+   * for that type right after the notebook's own instruction.
    */
-  public List<String> questionGenerationInstructionBlocks(Note focus) {
+  public List<String> questionGenerationInstructionBlocks(Note focus, String propertyType) {
     List<String> blocks = new ArrayList<>();
     Set<String> seenInstructionText = new HashSet<>();
     Notebook notebook = focus.getNotebook();
     if (notebook != null) {
+      String notebookLabel = "Instruction from notebook \"" + notebook.getName() + "\"";
       addLabeledInstructionBlockIfDistinct(
           blocks,
           seenInstructionText,
-          notebook.getReadmeContent(),
-          "Instruction from notebook \"" + notebook.getName() + "\":");
+          FrontmatterQuestionGenerationInstruction.fromNoteContent(notebook.getReadmeContent()),
+          notebookLabel + ":");
+      if (propertyType != null) {
+        addLabeledInstructionBlockIfDistinct(
+            blocks,
+            seenInstructionText,
+            FrontmatterQuestionGenerationInstruction.forPropertyType(
+                notebook.getReadmeContent(), propertyType),
+            notebookLabel + " for property \"" + propertyType + "\":");
+      }
       for (Folder folder : focus.folderTrailFromRoot()) {
         addLabeledInstructionBlockIfDistinct(
             blocks,
             seenInstructionText,
-            folder.getReadmeContent(),
+            FrontmatterQuestionGenerationInstruction.fromNoteContent(folder.getReadmeContent()),
             "Instruction from folder \"" + folder.getName() + "\":");
       }
     }
     addLabeledInstructionBlockIfDistinct(
-        blocks, seenInstructionText, focus.getContent(), "Instruction from the focus note:");
+        blocks,
+        seenInstructionText,
+        FrontmatterQuestionGenerationInstruction.fromNoteContent(focus.getContent()),
+        "Instruction from the focus note:");
     return blocks;
   }
 
   private void addLabeledInstructionBlockIfDistinct(
-      List<String> blocks, Set<String> seenInstructionText, String content, String label) {
-    FrontmatterQuestionGenerationInstruction.fromNoteContent(content)
+      List<String> blocks,
+      Set<String> seenInstructionText,
+      Optional<String> maybeInstruction,
+      String label) {
+    maybeInstruction
         .filter(instruction -> seenInstructionText.add(instruction))
         .ifPresent(instruction -> blocks.add(label + "\n" + instruction));
   }

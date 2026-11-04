@@ -63,7 +63,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
     NoteRealm realm = noteRealmService.build(normal, user);
 
     assertThat(realm.sidebar().getScopedReadmeContent(), equalTo(readmeContent));
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal);
+    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal, null);
     assertThat(blocks, hasSize(1));
     assertThat(blocks.get(0), containsString("Instruction from notebook"));
     assertThat(blocks.get(0), containsString("Focus on definitions"));
@@ -96,7 +96,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
         .please();
     Note normal = makeMe.aNote().notebook(notebook).please();
 
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal);
+    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal, null);
     assertThat(blocks.get(0), containsString(text));
   }
 
@@ -125,7 +125,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
     NoteRealm realm = noteRealmService.build(inInner, user);
 
     assertThat(realm.sidebar().getScopedReadmeContent(), equalTo(innerReadme));
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner);
+    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner, null);
     assertThat(blocks, hasSize(3));
     assertThat(blocks.get(0), containsString("nb-text"));
     assertThat(blocks.get(1), containsString("outer-text"));
@@ -147,7 +147,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
     NoteRealm realm = noteRealmService.build(inInner, user);
 
     assertThat(realm.sidebar().getScopedReadmeContent(), equalTo(outerReadme));
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner);
+    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner, null);
     assertThat(blocks, hasSize(1));
     assertThat(blocks.get(0), containsString("outer-only"));
   }
@@ -167,7 +167,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
 
     Note inOuter = makeMe.aNote().folder(outer).please();
 
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inOuter);
+    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inOuter, null);
     assertThat(blocks, hasSize(1));
     assertThat(blocks.get(0), containsString("Instruction from notebook"));
   }
@@ -194,7 +194,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
     NoteRealm realm = noteRealmService.build(normal, user);
 
     assertThat(realm.sidebar().getScopedReadmeContent(), nullValue());
-    assertThat(noteRealmService.questionGenerationInstructionBlocks(normal), empty());
+    assertThat(noteRealmService.questionGenerationInstructionBlocks(normal, null), empty());
   }
 
   @Test
@@ -211,7 +211,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
     NoteRealm realm = noteRealmService.build(normal, user);
 
     assertThat(realm.sidebar().getScopedReadmeContent(), nullValue());
-    assertThat(noteRealmService.questionGenerationInstructionBlocks(normal), empty());
+    assertThat(noteRealmService.questionGenerationInstructionBlocks(normal, null), empty());
   }
 
   @Test
@@ -223,7 +223,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
             .content("---\nquestion_generation_instruction: Note-level text\n---\nBody")
             .please();
 
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(note);
+    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(note, null);
     assertThat(blocks.get(0), containsString("Instruction from the focus note:"));
     assertThat(blocks.get(0), containsString("Note-level text"));
   }
@@ -232,6 +232,6 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
   void question_instruction_blocks_empty_when_absent() {
     Note note = makeMe.aNote().notebook(notebook).content("Body").please();
 
-    assertThat(noteRealmService.questionGenerationInstructionBlocks(note), empty());
+    assertThat(noteRealmService.questionGenerationInstructionBlocks(note, null), empty());
   }
 }

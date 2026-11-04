@@ -114,6 +114,23 @@ public final class Frontmatter {
     return Optional.empty();
   }
 
+  /**
+   * Case-insensitive lookup of a one-level map; returns its non-blank scalar entries in order,
+   * skipping other shapes, or an empty map when absent or not a map.
+   */
+  public Map<String, String> getStringMap(String key) {
+    Map<String, String> out = new LinkedHashMap<>();
+    rawValueIgnoreCase(key)
+        .filter(Map.class::isInstance)
+        .ifPresent(map ->
+            ((Map<?, ?>) map)
+                .forEach((k, v) ->
+                    FrontmatterPropertyValues.scalarStringFromYamlObject(v)
+                        .filter(value -> !value.isBlank())
+                        .ifPresent(value -> out.put(String.valueOf(k), value))));
+    return out;
+  }
+
   /** Case-insensitive lookup; returns items when the value is a YAML sequence, otherwise empty. */
   public Optional<List<?>> getSequenceItemsIgnoreCase(String key) {
     return rawValueIgnoreCase(key)

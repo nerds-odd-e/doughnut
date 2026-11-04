@@ -1,6 +1,7 @@
 # Plan: Notebook question instructions by property type
 
 **Source:** [SEED-007#story-3](../../seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-3)
+**Source review:** [source-review.md](source-review.md)
 **Identity:** SEED-007#story-3
 
 ## Goal and scope
@@ -79,7 +80,7 @@ Markdown mode on the web; nothing in the frontend changes.
 ### 1. Property questions carry the notebook's instruction for their property type
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new cases in `NoteQuestionGenerationRequestTests`, built through
 `service.buildQuestionGenerationRequest(note, null, propertyFocus)`. The
 notebook readme has a general instruction and an `a part of` map entry:
@@ -100,6 +101,15 @@ Behavior: notebook readme with `question_generation_instructions_by_property`
 custom instruction message includes the entry whose property type matches,
 and nothing for non-matching questions.
 
+Accepted proof (2026-11-04): nested `NoteQuestionGenerationRequestTests.InstructionsByPropertyType`
+(7 cases, including case-insensitive map key and blank entry) plus
+`QuestionGenerationRequestBuilderTests`, `NoteRealmScopedMetadataTest`,
+`QuestionGenerationBatchJsonlRendererTest`, all passing. The single rule is
+`PropertyKeyNaming.propertyType`; the request carries it from
+`QuestionGenerationRequestBuilder.openAiResponseRequestForQuestionGeneration`
+(null without a property focus). Slice 2 only adds the relationship-note
+fallback at that line, through the same `propertyType`.
+
 ### 2. Relationship-note questions carry the instruction for their relation
 
 Type: Behavior
@@ -118,6 +128,14 @@ relation-to-property-key rule moves.
 Behavior: notebook map entry → a question is generated focused on a
 relationship note in that notebook → the custom instruction message includes
 the entry for the relation's property type.
+
+## Story obligations
+
+### O1. Deferred per-type instruction surfaces
+Reported: slice 1 — "The source review lists the story's deferred promises D1–D6 as commitments."
+Story clause: "Deferred promises (not rejections)"
+Disposition: excluded "Deferred promises (not rejections)"
+Commitment: D1, D2, D3, D4, D5, D6
 
 ## Concern evidence
 

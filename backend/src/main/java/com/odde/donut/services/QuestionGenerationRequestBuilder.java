@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
@@ -176,7 +177,10 @@ public class QuestionGenerationRequestBuilder {
       User viewer) {
     Note focus = hydrateFocusNoteForQuestionGeneration(note);
 
-    List<String> instructionBlocks = noteRealmService.questionGenerationInstructionBlocks(focus);
+    List<String> instructionBlocks =
+        noteRealmService.questionGenerationInstructionBlocks(
+            focus,
+            propertyFocus != null ? PropertyKeyNaming.propertyType(propertyFocus.key()) : null);
     String instruction =
         instructionBlocks.isEmpty() ? null : String.join("\n\n", instructionBlocks);
     String instructionUserBlock =
