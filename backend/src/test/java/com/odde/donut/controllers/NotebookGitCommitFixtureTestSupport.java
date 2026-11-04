@@ -95,6 +95,17 @@ abstract class NotebookGitCommitFixtureTestSupport extends NoteDependentRowsCont
       List<NotebookGitProposalFile> files,
       String message)
       throws IOException {
+    return commitOnTopOf(repository, parents, files, message, Instant.now());
+  }
+
+  /** As above, committed at {@code committedAt}; the author time stays the current time. */
+  static ObjectId commitOnTopOf(
+      Repository repository,
+      List<ObjectId> parents,
+      List<NotebookGitProposalFile> files,
+      String message,
+      Instant committedAt)
+      throws IOException {
     try (ObjectInserter inserter = repository.newObjectInserter()) {
       DirCache dirCache = DirCache.newInCore();
       DirCacheBuilder builder = dirCache.builder();
@@ -116,7 +127,8 @@ abstract class NotebookGitCommitFixtureTestSupport extends NoteDependentRowsCont
       commitBuilder.setTreeId(treeId);
       commitBuilder.setParentIds(parents.toArray(new ObjectId[0]));
       commitBuilder.setAuthor(author);
-      commitBuilder.setCommitter(author);
+      commitBuilder.setCommitter(
+          new PersonIdent("Proposer", "proposer@example.com", committedAt, ZoneOffset.UTC));
       commitBuilder.setMessage(message);
       ObjectId commitId = inserter.insert(commitBuilder);
       inserter.flush();

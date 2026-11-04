@@ -49,6 +49,11 @@ public enum PortablePathKind {
     return path.endsWith("/" + README) ? MarkdownRole.FOLDER_README : MarkdownRole.NOTE;
   }
 
+  /** A Markdown note: neither a README nor any other kind of path. */
+  static boolean isNote(String path) {
+    return of(path) == MARKDOWN && markdownRole(path) == MarkdownRole.NOTE;
+  }
+
   /** A {@code .md} extension in another letter case, which a publish may not add or change. */
   static boolean hasMiscasedMarkdownExtension(String path) {
     return of(path) != MARKDOWN && path.toLowerCase(Locale.ROOT).endsWith(".md");

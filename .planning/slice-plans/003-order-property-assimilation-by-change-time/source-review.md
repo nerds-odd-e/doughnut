@@ -10,7 +10,7 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 1.1 | A property added today to an old note is offered after the older material at that level. | slice 5 | |
 | 1.2 | Intake follows the learner's own authoring timeline. | slice 8 | |
 | 1.3 | Additions to old notes stop jumping to the front. | slice 5 | |
-| 2 | Value date: each indexed property value carries the committer time of the last accepted Git commit that changed its parsed value (the commit that added it or changed a scalar's content). | slice 4 | |
+| 2 | Value date: each indexed property value carries the committer time of the last accepted Git commit that changed its parsed value (the commit that added it or changed a scalar's content). | slice 4 | observed: NotebookGitPropertyValueDatingTest.datesEachValueAtTheCommitThatAddedItAndLeavesUnchangedValuesUndated, datesAListItemRemovedAndReAddedAtItsReAddition, followsARenamedNoteBackToTheCommitThatChangedItsValue |
 | 2.1 | This applies to a scalar per key. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_added_items_and_new_or_edited_scalars_only (topic physics→chemistry reported; unchanged status not) |
 | 2.2 | This applies to each list item individually. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_added_items_and_new_or_edited_scalars_only (only added colors item y reported) |
 | 2.3 | A list item whose text changes is a new value, dated at that change. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_an_item_whose_text_changed_as_the_new_item (beta→betta reports betta) |
@@ -55,7 +55,7 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 8.6 | A tracked value never re-enters the sequence, whatever its date. | slice 2 | observed: WHERE clauses unchanged; AssimilationServicePropertyReferenceGateTest and tracker matching tests green |
 | 9.1 | exclusion: note-level units keep creation-time order. | slice 2 | observed: NoteAssimilationQueries note ORDER BY unchanged; AssimilationServiceQueueOrderingTest green |
 | 9.2 | exclusion: no date is shown in the UI. | slice 8 | |
-| 9.3 | exclusion: author time is not used instead of committer time. | slice 4 | |
+| 9.3 | exclusion: author time is not used instead of committer time. | slice 4 | observed: NotebookGitPropertyValueDating uses getCommitterIdent; NotebookGitPropertyValueDatingTest fixture author time = now vs fixed committer times (swap to author ident failed 4/4) |
 | 9.4 | exclusion: no clock normalization for CLI commits; a future- or back-dated local commit sorts where its committer time says. | slice 6 | |
 | 9.5 | exclusion: values whose history was reset before this story lands are not re-dated; they stay at note creation. | slice 7 | |
 | 10.1 | An untracked scalar edited for a typo moves to its edit time. | slice 5 | |

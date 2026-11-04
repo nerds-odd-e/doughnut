@@ -104,7 +104,7 @@ at note creation, which is what the e2e scenario relies on for its baseline.
 | Property units order by level, note creation, note id, key, item index in JPQL and the in-memory comparator, and COALESCE in that ORDER BY already works. | Slice 2 changes both. | `NotePropertyIndexRepository.unassimilatedOrderBy` and `AssimilationUnit.ORDER` read 2026-11-04; `AssimilationServicePropertyUnitsTest` run in this worktree (see run below). | Settled. |
 | The index is deleted and reinserted per save, and scalars are indexed with value `""`. | Slice 1 replaces the refresh; dater addresses rows by (key, value). | `NotePropertyIndexService.refreshForNote`, `NotePropertyIndexPlanner` read 2026-11-04. | Settled. |
 | A web save appends one commit with committer time = `updatedAt`, with the previous head and new head in hand inside the publication transaction. | Slice 5 places the dater there. | `AcceptedWebChangeService.commitIfChanged` (lines 103–123) and `NotebookGitCommitBuilder.append`; `NotebookGitWebLinkingNotebookControllerTest` run in this worktree asserts one commit per web change (see run below). | Settled. |
-| A push applies the final tree once and has `firstParentRange` over the accepted range with the stored notes list and `requireOneNoteAtPath`. | Slice 6. | `NotebookGitProposalPublisher.publish`, `NotebookGitProposalAncestry.firstParentRange`, `NotebookGitProjection.requireOneNoteAtPath` read 2026-11-04; `NotebookGitPublicationAtomicControllerTest` run in this worktree (see run below); test fixture `NotebookGitCommitFixtureTestSupport.commitOnTopOf` builds multi-commit chains (committer time fixed to now; slice 6 adds a time parameter). | Settled. |
+| A push applies the final tree once and has `firstParentRange` over the accepted range with the stored notes list and `requireOneNoteAtPath`. | Slice 6. | `NotebookGitProposalPublisher.publish`, `NotebookGitProposalAncestry.firstParentRange`, `NotebookGitProjection.requireOneNoteAtPath` read 2026-11-04; `NotebookGitPublicationAtomicControllerTest` run in this worktree (see run below); test fixture `NotebookGitCommitFixtureTestSupport.commitOnTopOf` builds multi-commit chains (slice 4 added a committer-time overload). | Settled. |
 | JGit rename detection is available and used in this codebase. | Slice 4 follows a note's path backward. | `NotebookGitProposalRenameDetector` uses `DiffEntry`/`RenameDetector` on JGit 7.8.0 (`backend/build.gradle:96`). | Settled for availability; the walker's own test proves the follow. |
 | Scheduling is prod-only with ShedLock, and a job's method is testable directly. | Slice 8. | `SchedulingConfig` (`@Profile("prod")`), `ShedLockConfig`, `QuestionGenerationBatchMaintenanceJobTests` and `...SchedulerLockTest` exist and run in CI. | Settled. |
 | Injected e2e notes are in a Git-bound notebook and keep injection-order creation times; adding a property on the note page commits through the web path. | Slice 5 e2e scenario. | `InjectNotesWorker.findOwnedOrCreate` → `notebookService.createNotebookForOwnership` → `startHistory`; `e2e_test/config/notebookPublicationState.ts` reads the injected notebook's accepted head; steps "I add a rich note property with key … and value …" and "I should be assimilating the note …" exist; `assimilation_walkthrough.feature` passes in "donut CI" on main at 8cc171f7bd (2026-11-03T23:28:33Z). | Settled for the route; the new scenario is the discriminating proof. |
@@ -176,7 +176,7 @@ each planned value (key, index value, comparable content) and a
 ### 4. Date a note's values from a commit range
 
 Type: Structure
-Status: planned
+Status: done
 Proof: unit test on an `InMemoryRepository` built with
 `NotebookGitCommitFixtureTestSupport.commitOnTopOf` (given a committer
 time parameter): three commits as in example 5 yield per-commit times for
@@ -299,3 +299,12 @@ stated. No remaining slice-specific concern was identified.
   indexed, so dating tests use neutral keys (`topic`, `colors`, `origin`).
   Accepted proof: `'*NotePropertyIndexPlannerTest'` (11 tests),
   `'*NotePropertyIndex*'`, `'*AssimilationService*'`.
+- Slice 4 (2026-11-04): `NotebookGitPropertyValueDating.dateValues(repository,
+  olderExclusiveOrNull, tip)` returns `List<ValueDate(tipPath, propertyKey,
+  propertyValue, Optional<Instant> committedAt)>`; an empty `committedAt` means
+  present at root, and the floor is the caller's. It runs its own first-parent
+  loop because `NotebookGitProposalAncestry.firstParentRange` cannot walk to a
+  root. `commitOnTopOf(..., Instant committedAt)` sets the committer time
+  (author stays now). Note recognition is `PortablePathKind.isNote`. Accepted
+  proof: `'*NotebookGitPropertyValueDatingTest'` (4 tests) and
+  `'*NotebookGit*'` (144 classes, 475 tests).
