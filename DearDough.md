@@ -503,6 +503,6 @@ The plan for SEED-101#story-2 slice 4 listed `NotePropertyIndexPlannerTest.chang
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.82
-  - Evidence: plan 004 "Decisive premises", the last row and slice 4; slice 4 implementation return, "Gap"; commit `47794ae3e0`.
+  - Evidence: `4b4e3ca939:.planning/slice-plans/004-date-property-values-on-every-web-path/PLAN.md`, "Decisive premises" (the last row) and slice 4; slice 4 implementation return, "Gap"; commit `47794ae3e0`.
   - Observed effect: a learner-visible behavior (reformatting keeps a value's date) briefly lost its only test; it cost one extra focused run.
   - Inference: proving a removal per story example does not cover every observation of each deleted test. Checking each deleted assertion for a surviving owner would have caught this at planning.
