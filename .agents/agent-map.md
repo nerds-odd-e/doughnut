@@ -112,6 +112,25 @@ are serialized and atomic within this checkout. Separate worktree Git
 reconciliation must preserve cleanup. Recorder and real-run compatibility checks:
 `CURSOR_DEV=true nix develop -c pnpm test:cucumber-proof`.
 
+Ordinary frontend Vitest runs, including CI shards and test optimization, also
+leave retained proof untouched. To deliberately generate frontend proof, run
+from the repository root:
+
+```bash
+RECORD_VITEST_PROOF=1 ./scripts/run.sh pnpm -C frontend test tests/utils/titlePatternRender.spec.ts tests/toolbars/DonutMenu.search.touch.spec.ts
+```
+
+The `frontend/tests` location in `.planning/open-dough.json` declares this
+instruction and `frontend/tests/proof`; select other spec paths to record that
+scope. The recorder, `frontend/vitestProofReporter.ts`, is a configured
+reporter in `frontend/vitest.config.ts` and shares the Cucumber recorder's
+store (`e2e_test/config/proofStore.mjs`). Each finished case refreshes
+`frontend/tests/proof/latest.json` with one observation per test and Vitest
+project (`chromium`, `chromium-touch`). Do not pass `--reporter` to a recording
+run: it replaces the configured reporters, so nothing is recorded. Commit proof
+deliberately as for Cucumber. Recorder checks:
+`./scripts/run.sh pnpm test:vitest-proof`.
+
 **Development vs E2E:** For manual product feedback from the primary checkout,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
 `doughnut_development`, `dev.log`; restart with `pnpm dev:restart`, stop with `pnpm dev:stop`;

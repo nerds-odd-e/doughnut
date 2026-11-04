@@ -14,6 +14,7 @@ import { VueRouterAutoImports } from "vue-router/unplugin"
 import VueRouter from "vue-router/vite"
 import checker from "vite-plugin-checker"
 import { orchestratorGcReporter } from "./orchestratorGcReporter.ts"
+import VitestProofReporter from "./vitestProofReporter.ts"
 
 // Check if we're running tests - Vitest sets process.env.VITEST
 // This is the official and most reliable way to detect test mode
@@ -92,8 +93,13 @@ const config = defineConfig({
     // Retries cover assertion-level flakes only; browser-orchestrator crashes
     // (file fails to load) are mitigated by orchestratorGcReporter + sharding.
     retry: isCI ? 1 : 0,
-    // Force-GC the orchestrator page on CI to avoid Chromium renderer crashes.
-    reporters: isCI ? ["default", orchestratorGcReporter()] : ["default"],
+    reporters: [
+      "default",
+      // Force-GC the orchestrator page on CI to avoid Chromium renderer crashes.
+      ...(isCI ? [orchestratorGcReporter()] : []),
+      // The proof recorder records only when RECORD_VITEST_PROOF=1.
+      new VitestProofReporter(),
+    ],
     setupFiles: ["./tests/setupVitest.ts"],
     include: ["./**/*.spec.{ts,tsx}"],
     exclude: [...testExcludes, touchSpecs],

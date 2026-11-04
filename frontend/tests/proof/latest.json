@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "observations": [
+    {"file":"frontend/tests/toolbars/DonutMenu.search.touch.spec.ts","test":["Donut menu touch search","prepares input synchronously from Open search"],"project":"chromium-touch","outcome":"passed","attempts":1,"durationMs":53.89999997615814,"finishedAt":"2026-11-04T09:03:53.498Z","commit":"f08c51e4ce6a7309efdc7edf89bc58fa633c58cd","fileBlob":"7b4c0341d38e6f0a64596afe736f3ed262707020"},
+    {"file":"frontend/tests/toolbars/DonutMenu.search.touch.spec.ts","test":["Donut menu touch search","prepares input synchronously from Search"],"project":"chromium-touch","outcome":"passed","attempts":1,"durationMs":13.800000011920929,"finishedAt":"2026-11-04T09:03:53.499Z","commit":"f08c51e4ce6a7309efdc7edf89bc58fa633c58cd","fileBlob":"7b4c0341d38e6f0a64596afe736f3ed262707020"},
+    {"file":"frontend/tests/utils/titlePatternRender.spec.ts","test":["renderTitleFromPattern","leaves unknown placeholders unchanged"],"project":"chromium","outcome":"passed","attempts":1,"durationMs":0.09999999403953552,"finishedAt":"2026-11-04T09:03:50.975Z","commit":"f08c51e4ce6a7309efdc7edf89bc58fa633c58cd","fileBlob":"66c152bbfedce930d1da5f11e4110b315bf466a9"},
+    {"file":"frontend/tests/utils/titlePatternRender.spec.ts","test":["renderTitleFromPattern","replaces every {{date}} occurrence"],"project":"chromium","outcome":"passed","attempts":1,"durationMs":0.09999999403953552,"finishedAt":"2026-11-04T09:03:50.974Z","commit":"f08c51e4ce6a7309efdc7edf89bc58fa633c58cd","fileBlob":"66c152bbfedce930d1da5f11e4110b315bf466a9"},
+    {"file":"frontend/tests/utils/titlePatternRender.spec.ts","test":["renderTitleFromPattern","replaces {{date}} with yyyy-MM-dd in UTC from options.now"],"project":"chromium","outcome":"passed","attempts":1,"durationMs":1,"finishedAt":"2026-11-04T09:03:50.974Z","commit":"f08c51e4ce6a7309efdc7edf89bc58fa633c58cd","fileBlob":"66c152bbfedce930d1da5f11e4110b315bf466a9"}
+  ]
+}
