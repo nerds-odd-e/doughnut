@@ -136,11 +136,7 @@ PROBE
     # harmless stdin instead, as any non-interactive real invocation would
     # have.
     local result symlinks_status deps_status
-    local probe_env=("PATH=${DONUT_TEST_REAL_PATH}")
-    if [ "${DONUT_OFFLINE:-}" = "1" ]; then
-        probe_env+=("pnpm_config_offline=true" "CYPRESS_INSTALL_BINARY=0")
-    fi
-    result="$(@real env -i "${probe_env[@]}" \
+    result="$(@real env -i "PATH=${DONUT_TEST_REAL_PATH}" \
         "${DONUT_TEST_REAL_BASH}" "${probe}" \
         "${DONUT_TEST_REAL_PATH}" "${DONUT_TEST_REPO_ROOT}" \
         "${DONUT_TEST_WORKTREE_SETUP_SH}" "${work}" </dev/null)"

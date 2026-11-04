@@ -13,13 +13,13 @@ Migrations: `db-migration` skill.
 Run backend verification from the repo root:
 
 ```bash
-./scripts/run.sh pnpm backend:verify
+CURSOR_DEV=true nix develop -c pnpm backend:verify
 ```
 
 When no database migration is involved, this is faster:
 
 ```bash
-./scripts/run.sh pnpm backend:test_only
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
 ```
 
 ## Relational Schema
@@ -27,7 +27,7 @@ When no database migration is involved, this is faster:
 The `docs/database-erd.md` Mermaid diagram documents tables, foreign keys, and key columns. After Flyway migrations change the schema, regenerate it with the `database-erd` skill:
 
 ```bash
-./scripts/run.sh pnpm export:database-erd
+CURSOR_DEV=true nix develop -c pnpm export:database-erd
 ```
 
 ## HTTP Sessions

@@ -49,7 +49,7 @@ refuses before spawn:
 unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL INPUT_DB_URL SERVER_PORT \
   LOCAL_LB_BACKEND LOCAL_LB_VITE_UPSTREAM LOCAL_LB_LISTEN_PORT \
   FRONTEND_DEV_PORT FRONTEND_BACKEND_ORIGIN SUT_RUNTIME_TARGET
-./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
 ```
 
 `pnpm cy:run` prints `Selected database:` and `Browser origin:` for the recorded
@@ -98,11 +98,11 @@ isolated-runner registry
 unsupported features are refused before reset. For example:
 
 ```bash
-./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
-./scripts/run.sh pnpm cy:run --spec e2e_test/features/ai_generated_content/note_content_completion.feature
-./scripts/run.sh pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature
-./scripts/run.sh pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature
-./scripts/run.sh pnpm cy:run --spec e2e_test/features/wikidata/note_create_with_wikidata_id.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/worktree_note_editing.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_content/note_content_completion.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_created_note.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/wikidata/note_create_with_wikidata_id.feature
 ```
 
 Each approved spec's resource requirements are declared in the same registry.
@@ -125,7 +125,7 @@ checkout. To prove the CLI notebook survives a peer worktree's fixture
 reset, invoke the paired harness directly — each role owns its own stack:
 
 ```bash
-./scripts/run.sh node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>
+CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>
 ```
 
 The note-editing spec does not start Mountebank. The note-content completion

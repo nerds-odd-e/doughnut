@@ -20,7 +20,7 @@ function resolveMysqlBasedir() {
   if (process.env.MYSQL_BASEDIR) return process.env.MYSQL_BASEDIR
   const which = spawnSync('which', ['mysqld'], { encoding: 'utf8' })
   if (which.status !== 0) {
-    throw new Error('mysqld not found; run through ./scripts/run.sh')
+    throw new Error('mysqld not found; run under CURSOR_DEV=true nix develop')
   }
   return path.dirname(path.dirname(which.stdout.trim()))
 }

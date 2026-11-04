@@ -41,13 +41,6 @@ Use [the manual Nix setup](./nix.md) only when the quick start fails.
 With `direnv` configured, entering the repository loads Nix automatically.
 Otherwise run `nix develop`.
 
-For local tooling that uses cached dependencies, run
-`./scripts/run.sh <command>`. Prepare its recorded environment and pnpm
-workspace on an unmetered connection with
-`DONUT_ALLOW_DOWNLOADS=1 ./scripts/run.sh bash scripts/worktree_setup.sh`.
-Before running backend commands, also ensure the Gradle wrapper distribution
-is available by running `./gradlew --version` on that connection.
-
 ### Persistent Development (manual feedback)
 
 From the **primary checkout** (configured or unconfigured):

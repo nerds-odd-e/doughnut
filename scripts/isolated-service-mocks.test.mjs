@@ -6,7 +6,7 @@
  * all owned listeners are gone after shutdown, an unrelated listener
  * survives, and a foreign serving endpoint refuses before mutation.
  *
- * Command: ./scripts/run.sh node --test scripts/isolated-service-mocks.test.mjs
+ * Command: CURSOR_DEV=true nix develop -c node --test scripts/isolated-service-mocks.test.mjs
  */
 import assert from 'node:assert/strict'
 import { test } from 'node:test'

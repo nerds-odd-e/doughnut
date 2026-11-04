@@ -124,7 +124,7 @@ test('second DROP failure reports partial retirement; retry completes both targe
       identityPreserved: existsSync(worktreeLocalConfigPath(checkout.root)),
       elapsedMs,
       literalTestCommand:
-        './scripts/run.sh node --test scripts/worktree-retirement*.test.mjs',
+        'CURSOR_DEV=true nix develop -c node --test scripts/worktree-retirement*.test.mjs',
     })
   )
 })

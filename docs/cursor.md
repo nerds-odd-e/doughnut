@@ -34,6 +34,6 @@ The repo `.vscode/settings.json` does **not** set `java.jdt.ls.java.home`, so Cu
 For backend / Gradle work:
 
 1. **Simplest:** Open the **repository root** in Cursor and use a **JDK 25** on your machine, or launch Cursor from a shell where you already ran `nix develop` so `JAVA_HOME` / `PATH` include Java.
-2. **Nix JDK without launching from nix develop:** Run `./scripts/run.sh pnpm setupCursorDev`, then copy the optional `java.jdt.ls.java.home` line the script prints into **Cursor → Settings → open User Settings (JSON)** (not workspace settings, if the workspace JSON editor misbehaves). Use the printed **absolute** path to `.nix/jdk` (the symlink), not the `/nix/store/...` target, so it stays valid after you re-run the script.
+2. **Nix JDK without launching from nix develop:** Run `CURSOR_DEV=true nix develop -c pnpm setupCursorDev`, then copy the optional `java.jdt.ls.java.home` line the script prints into **Cursor → Settings → open User Settings (JSON)** (not workspace settings, if the workspace JSON editor misbehaves). Use the printed **absolute** path to `.nix/jdk` (the symlink), not the `/nix/store/...` target, so it stays valid after you re-run the script.
 
 If the warning persists after pulling this change, search **User** settings JSON for `java.jdt.ls.java.home`, `java.import.gradle.java.home`, or `java.configuration.runtimes` and remove or fix any entry that still points at `.nix/jdk` when that folder does not exist.

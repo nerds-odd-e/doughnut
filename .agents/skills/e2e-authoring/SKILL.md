@@ -34,7 +34,7 @@ do not require Mountebank. Each isolated checkout needs its own healthy E2E
 allocation. Paired CLI-vs-browser reset proof:
 
 ```bash
-./scripts/run.sh node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>
+CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>
 ```
 
 CI vs `pnpm cy:run`, `wait-on`, `NO_PROXY`, and env vars are documented in
@@ -45,7 +45,7 @@ CI vs `pnpm cy:run`, `wait-on`, `NO_PROXY`, and env vars are documented in
 Agents should default to `pnpm cypress run --spec` with one or more `.feature` paths tied to the changed capability. Add adjacent specs only when regression risk warrants it. Do not run bare `pnpm cypress run`, `pnpm verify`, or the whole suite unless the user explicitly asks for a full E2E run or the instructions require reproducing CI.
 
 ```bash
-./scripts/run.sh pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
 
 Important notes:
@@ -68,7 +68,7 @@ For per-scenario timing, run the selected feature scope through the owning
 wrapper and tee its output to a local file:
 
 ```bash
-./scripts/run.sh pnpm cy:run --spec '<feature,feature,...>' 2>&1 | tee /tmp/donut-e2e-profile.log
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec '<feature,feature,...>' 2>&1 | tee /tmp/donut-e2e-profile.log
 ```
 
 - The wrapper forwards only `--spec` (and `--browser`) to Cypress
@@ -89,7 +89,7 @@ This exclusion is profiling-only and must not narrow normal verification.
 Use the canonical log-tail command for backend E2E log inspection:
 
 ```bash
-./scripts/run.sh pnpm logs:tail backend-e2e
+CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e
 ```
 
 Frontend Vite checker terminal errors still matter even though the browser overlay is disabled for E2E stability. For canonical lint and format commands, use the `linting_formating` skill.

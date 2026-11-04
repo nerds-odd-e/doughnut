@@ -24,7 +24,7 @@ Use `packages/generated/donut-backend-api/api-summary.md` as the default endpoin
 For frontend calls, import services from `@generated/donut-backend-api/sdk.gen`. For API-shaped fixtures, import `makeMe` from `donut-test-fixtures/makeMe`. Open `sdk.gen.ts` or `types.gen.ts` only when checking an exact generated signature. After backend controller signature or DTO changes, run:
 
 ```bash
-./scripts/run.sh pnpm generateTypeScript
+CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 ```
 
 Never hand-edit `packages/generated/donut-backend-api/**` or `open_api_docs.yaml`; regenerate them. For whitespace hygiene, use `scripts/check_diff_whitespace.sh` instead of raw `git diff --check` so generated artifacts are not manually "fixed".
@@ -34,14 +34,11 @@ Never hand-edit `packages/generated/donut-backend-api/**` or `open_api_docs.yaml
 A freshly created `git worktree` has tracked source but is missing the
 generated Claude skill-discovery links and its own installed dependencies.
 `./scripts/run.sh bash scripts/worktree_setup.sh` is the public preparation
-entry point. It links skill discovery and prepares pnpm dependencies from the
-local store without starting MySQL, Redis, or a Biome daemon. Linked worktrees
-can use the primary checkout's cached Nix environment when their flake matches.
-Cursor's `.cursor/worktrees.json` `setup-worktree` hook runs the same command.
-If the local environment or packages are missing, report the blocker. On an
-unmetered connection or with explicit download authorization, run
-`DONUT_ALLOW_DOWNLOADS=1 ./scripts/run.sh bash scripts/worktree_setup.sh` in
-the checkout that needs preparation.
+entry point: it links skill discovery and installs dependencies (fingerprint-
+gated, so repeats are cheap) without starting MySQL/Redis or a Biome daemon.
+Cursor's `.cursor/worktrees.json` `setup-worktree` hook already invokes this
+script (`CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh`) when
+Cursor creates a worktree, so Cursor-created worktrees prepare automatically.
 Codex has no tracked environment-setup configuration in this repo (`.codex/`
 contains only the product-backlog guard hook, nothing under a local-environment
 schema), so Codex-created worktrees are not prepared automatically — run the
@@ -58,31 +55,31 @@ run the command by hand in the new checkout, same as Codex.
 
 ## Commands
 
-Use the cached local development environment unless working on a documented Cloud VM:
+Run repo tooling through Nix unless working in a documented Cloud VM path:
 
 ```bash
-./scripts/run.sh <command>
+CURSOR_DEV=true nix develop -c <command>
 ```
 
 **Exception:** `git` commands do not need the Nix prefix — run them directly (e.g. `git status`, `git diff`, `git commit`).
 
 Useful focused checks:
 
-- Backend: `./scripts/run.sh pnpm backend:test_only`
-- Isolated worktree backend tests: [`docs/worktree-backend-tests.md`](../docs/worktree-backend-tests.md). Linked worktrees isolate ordinary `pnpm backend:test` / `backend:test_only` and wrapper `test` / `migrateTestDB` automatically. Opt-in remains: `./scripts/run.sh pnpm backend:test:worktree`
-- Frontend single file: `./scripts/run.sh pnpm frontend:test tests/path/to/TestFile.spec.ts`.
+- Backend: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Isolated worktree backend tests: [`docs/worktree-backend-tests.md`](../docs/worktree-backend-tests.md). Linked worktrees isolate ordinary `pnpm backend:test` / `backend:test_only` and wrapper `test` / `migrateTestDB` automatically. Opt-in remains: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree`
+- Frontend single file: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts`.
   If the shell sets `NODE_ENV=production`, prefix `env -u NODE_ENV`; otherwise Vue hides `<script setup>` bindings from `wrapper.vm` and mounted specs fail.
   This runs Vitest only; frontend proof also requires the typecheck in the
   `frontend` skill's "Frontend proof" rule before acceptance.
-- E2E single feature: `./scripts/run.sh pnpm cy:run --spec e2e_test/features/path/to.feature`
-- Log inspection: `./scripts/run.sh pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`, `dev`)
+- E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/path/to.feature`
+- Log inspection: `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`, `dev`)
 - Diff whitespace: `scripts/check_diff_whitespace.sh` or `scripts/check_diff_whitespace.sh --cached`
 - Coordinator format of changed working-tree components:
   `./scripts/run.sh pnpm format:changed`
 - Pre-commit hook lint of changed staged components (not a routine standalone
   wrap-up command): `./scripts/run.sh pnpm lint:changed`
-- Lint all: `./scripts/run.sh pnpm lint:all`
-- Format all: `./scripts/run.sh pnpm format:all`
+- Lint all: `CURSOR_DEV=true nix develop -c pnpm lint:all`
+- Format all: `CURSOR_DEV=true nix develop -c pnpm format:all`
 
 For `dough-test-optimization`, measure the applicable testing rule's ordinary
 stack command as the local feedback path. Runner-specific per-test profiling
@@ -94,7 +91,7 @@ Ordinary Cucumber runs, including CI and test optimization, leave retained proof
 untouched. To deliberately generate proof, run from the repository root:
 
 ```bash
-RECORD_CUCUMBER_PROOF=1 ./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature
+RECORD_CUCUMBER_PROOF=1 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature
 ```
 
 The Gherkin location in `.planning/open-dough.json` declares this instruction and
@@ -113,7 +110,7 @@ checkpoint; the recorder does not commit. Published proof and CI results are
 independent observations. Writer ownership is transient and ignored; mutations
 are serialized and atomic within this checkout. Separate worktree Git
 reconciliation must preserve cleanup. Recorder and real-run compatibility checks:
-`./scripts/run.sh pnpm test:cucumber-proof`.
+`CURSOR_DEV=true nix develop -c pnpm test:cucumber-proof`.
 
 **Development vs E2E:** For manual product feedback from the primary checkout,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,

@@ -32,7 +32,7 @@ export function getListenerPids(port, { execFileFn = execFile } = {}) {
           if (err.code === 'ENOENT') {
             reject(
               new Error(
-                'lsof not found; use `./scripts/run.sh` or install lsof.'
+                'lsof not found; use `CURSOR_DEV=true nix develop` or install lsof.'
               )
             )
             return

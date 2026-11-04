@@ -14,7 +14,7 @@ From a Git linked worktree that already has `.worktree.local.json`, inspect the
 exact disposable database names this checkout owns:
 
 ```bash
-./scripts/run.sh pnpm worktree:retire --check
+CURSOR_DEV=true nix develop -c pnpm worktree:retire --check
 ```
 
 `--check` prints the unit target `doughnut_<id>_test` and, when recorded, the
@@ -50,7 +50,7 @@ When `--check` reports an idle snapshot, reclaim the recorded disposable
 targets before you remove the checkout:
 
 ```bash
-./scripts/run.sh pnpm worktree:retire
+CURSOR_DEV=true nix develop -c pnpm worktree:retire
 ```
 
 Run this from the linked checkout being retired, through local Nix. The command:

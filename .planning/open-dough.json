@@ -7,7 +7,7 @@
         "kind": "gherkin",
         "proof": "e2e_test/proof",
         "proofGeneration": {
-          "command": "RECORD_CUCUMBER_PROOF=1 ./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature"
+          "command": "RECORD_CUCUMBER_PROOF=1 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature"
         }
       },
       {

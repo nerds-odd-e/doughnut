@@ -34,27 +34,19 @@ cat >"$work/bin/nix" <<'NIX'
 printf 'nix %s\n' "$*" | sed -e "s#$DONUT_TEST_WORK#WORK#g" >>"$DONUT_TEST_WORK/nix.log"
 if [[ "$*" == *" --profile "* ]]; then
   [[ -z "${DONUT_TEST_POPULATE_FAIL:-}" ]] || { echo "error: undefined variable" >&2; exit 1; }
-  ln -s "$DONUT_TEST_WORK/cached-env" "${@: -3:1}"
+  ln -s /nix/store/env "${@: -3:1}"
   exit 0
 fi
 while [[ "$1" != -c ]]; do shift; done
 shift
 exec "$@"
 NIX
-cat >"$work/child" <<'CHILD'
-#!/usr/bin/env bash
-printf '%s|%s|%s|%s|%s/%s/%s/%s/%s\n' "$PWD" "$1" "$2" "${CURSOR_DEV:-}" \
-  "${DONUT_OFFLINE:-}" "${PIP_NO_INDEX:-}" "${npm_config_offline:-}" \
-  "${pnpm_config_offline:-}" "${CYPRESS_INSTALL_BINARY:-}"
-exit "$3"
-CHILD
-chmod +x "$work/bin/nix" "$work/child"
-touch "$work/cached-env"
+chmod +x "$work/bin/nix"
 export DONUT_TEST_WORK="$work"
 
 runner() {
-  (cd "$repo/sub dir" && "$repo/scripts/run.sh" "$work/child" "a b" '*' "${DONUT_TEST_CHILD_EXIT:-0}") |
-    sed -e "s#$work#WORK#g"
+  (cd "$repo/sub dir" && "$repo/scripts/run.sh" bash -c 'printf "%s|%s|%s|%s\n" "$PWD" "$1" "$2" "${CURSOR_DEV:-}"; exit "$3"' child "a b" '*' "${DONUT_TEST_CHILD_EXIT:-0}") \
+    | sed -e "s#$work#WORK#g"
 }
 
 show_nix_log() {
@@ -70,37 +62,22 @@ case "$DONUT_TEST_SCENARIO" in
     PATH="$work/bin:$PATH" IN_NIX_SHELL=impure runner
     [[ ! -e "$work/nix.log" ]] && echo "nix not called"
     ;;
-  cold-profile)
-    export PATH="$work/bin:$PATH"
-    runner 2>&1 || echo "status $?"
-    [[ ! -e "$work/nix.log" ]] && echo "nix not called"
-    ;;
   populate-then-reuse)
     export PATH="$work/bin:$PATH"
-    DONUT_ALLOW_DOWNLOADS=1 runner
+    runner
     show_nix_log
     runner
     show_nix_log
     printf 'snapshot: %s\n' "$(cat "$repo"/.git/donut-nix-env/*/flake/flake.nix)"
     printf 'snapshot files: %s\n' "$(ls -A "$repo"/.git/donut-nix-env/*/flake | tr '\n' ' ')"
     ;;
-  linked-worktree)
-    export PATH="$work/bin:$PATH"
-    DONUT_ALLOW_DOWNLOADS=1 runner >/dev/null
-    git -C "$repo" add scripts/run.sh flake.nix flake.lock
-    git -C "$repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm fixture
-    git -C "$repo" worktree add --detach -q "$work/linked"
-    repo="$work/linked"
-    mkdir "$repo/sub dir"
-    runner
-    ;;
   changed-definition)
     export PATH="$work/bin:$PATH"
-    DONUT_ALLOW_DOWNLOADS=1 runner >/dev/null
+    runner >/dev/null
     first="$(ls "$repo/.git/donut-nix-env")"
     rm -f "$work/nix.log"
     printf 'definition 2\n' >"$repo/flake.nix"
-    DONUT_ALLOW_DOWNLOADS=1 runner >/dev/null
+    runner >/dev/null
     show_nix_log | grep -c -- '--profile'
     second="$(ls "$repo/.git/donut-nix-env")"
     [[ "$first" != "$second" ]] && echo "only the new definition is kept: $(ls "$repo/.git/donut-nix-env" | wc -l | tr -d ' ')"
@@ -108,7 +85,7 @@ case "$DONUT_TEST_SCENARIO" in
   populate-failure)
     export PATH="$work/bin:$PATH"
     set +e
-    DONUT_ALLOW_DOWNLOADS=1 DONUT_TEST_POPULATE_FAIL=1 runner 2>&1
+    DONUT_TEST_POPULATE_FAIL=1 runner 2>&1
     echo "status $?"
     set -e
     show_nix_log
@@ -116,7 +93,6 @@ case "$DONUT_TEST_SCENARIO" in
     ;;
   child-failure)
     export PATH="$work/bin:$PATH"
-    DONUT_ALLOW_DOWNLOADS=1 runner >/dev/null
     set +e
     DONUT_TEST_CHILD_EXIT=7 runner >/dev/null
     echo "status $?"
@@ -126,29 +102,19 @@ EOF
 }
 
 test-runs-directly-without-nix() {
-  @assert-equals 'WORK/repo/sub dir|a b|*||1/1/true/true/0' "$(run-runner no-nix)"
+  @assert-equals 'WORK/repo/sub dir|a b|*|' "$(run-runner no-nix)"
 }
 
 test-runs-directly-inside-nix() {
-  @assert-equals $'WORK/repo/sub dir|a b|*||1/1/true/true/0\nnix not called' "$(run-runner inside-nix)"
-}
-
-test-cold-profile-stops-before-nix-without-opt-in() {
-  @assert-equals "No cached Nix environment. On an unmetered connection, run DONUT_ALLOW_DOWNLOADS=1 ./scripts/run.sh bash scripts/worktree_setup.sh.
-status 1
-nix not called" "$(run-runner cold-profile)"
-}
-
-test-linked-worktree-uses-primary-profile-for-matching-flake() {
-  @assert-equals 'WORK/linked/sub dir|a b|*|true|1/1/true/true/0' "$(run-runner linked-worktree)"
+  @assert-equals $'WORK/repo/sub dir|a b|*|\nnix not called' "$(run-runner inside-nix)"
 }
 
 test-populates-recorded-environment-once-then-reuses-it() {
-  @assert-equals "WORK/repo/sub dir|a b|*|true|////
+  @assert-equals "WORK/repo/sub dir|a b|*|true
 nix develop path:WORK/repo/.git/donut-nix-env/KEY/flake --no-write-lock-file --profile WORK/repo/.git/donut-nix-env/KEY/profile -c true
-nix develop WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c WORK/child a b * 0
-WORK/repo/sub dir|a b|*|true|1/1/true/true/0
-nix develop --offline --option substitute false --max-jobs 0 --builders  WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c WORK/child a b * 0
+nix develop WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c bash -c printf \"%s|%s|%s|%s\\n\" \"\$PWD\" \"\$1\" \"\$2\" \"\${CURSOR_DEV:-}\"; exit \"\$3\" child a b * 0
+WORK/repo/sub dir|a b|*|true
+nix develop WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c bash -c printf \"%s|%s|%s|%s\\n\" \"\$PWD\" \"\$1\" \"\$2\" \"\${CURSOR_DEV:-}\"; exit \"\$3\" child a b * 0
 snapshot: definition 1
 snapshot files: flake.lock flake.nix " "$(run-runner populate-then-reuse)"
 }

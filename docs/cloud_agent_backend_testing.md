@@ -96,7 +96,7 @@ The backend has **unit tests** only (written in the "small test" style — `unit
 | Java Installation | `zulu25` from nixpkgs | Downloaded from Azul CDN |
 | MySQL Installation | `mysql84` from nixpkgs | Downloaded from MySQL CDN |
 | MySQL Port | 3309 | 3306 |
-| Command Prefix | `./scripts/run.sh` | Direct execution |
+| Command Prefix | `CURSOR_DEV=true nix develop -c` | Direct execution |
 | Test Execution | `pnpm backend:verify` | `./backend/gradlew test` |
 
 ## Troubleshooting
