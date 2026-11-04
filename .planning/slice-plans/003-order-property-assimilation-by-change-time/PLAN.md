@@ -37,8 +37,9 @@ at note creation, which is what the e2e scenario relies on for its baseline.
   by content, a list item by presence). Values unchanged across the range get
   no entry; values first seen in a parentless root commit are reported as
   "present at root". Keys and items follow `NotePropertyIndexPlanner`'s
-  rules, so the dater and the index agree on what a value is. Reused across
-  the three callers below; no second comparison or event log.
+  rules, so the dater and the index agree on what a value is. Push and
+  maintenance use it; the web save uses the same `changedValues` comparison on
+  its one step; no second comparison or event log.
 - **Value identity for dating** lives in `NotePropertyIndexPlanner`: the
   (key, index value) of each planned row plus the scalar's content, so the
   dater's "changed" test is the planner's own notion of a value.
@@ -52,11 +53,15 @@ at note creation, which is what the e2e scenario relies on for its baseline.
   reinserted row takes the date its (key, value) had before; new values get a
   null date. Row ids change per save, as before; later slices address rows by
   (note, key, value). Nothing else about the refresh or its callers changes.
-- **Web save.** `AcceptedWebChangeService.commitIfChanged` runs the dater over
-  the one appended commit after the append, maps each reported tip path to
-  the changed Note entities of that notebook's projection change (inserted or
-  updated rows of kind `Note`, path via `NotebookGitPortablePath.ofNote`), and
-  writes dates. No whole-notebook note load.
+- **Web save.** `AcceptedWebChangeService.commitIfChanged`, after the append,
+  compares each inserted or updated Note's content before the change
+  (`ProjectionChangeCapture` records it at first flush) with its saved content
+  through `NotePropertyIndexService.dateChangedValues` (which uses
+  `NotePropertyIndexPlanner.changedValues` and `writeValueDate`), dating each
+  changed value at the commit time (`updatedAt`). This is the story's one-step case;
+  running the Git dater here broke the save-cost guards (tree fetches 39 vs a
+  cap of 13), so the web save reads no Git objects for dating. No
+  whole-notebook note load.
 - **Push.** `NotebookGitProposalPublisher.publish` runs the dater over the
   newly accepted range (`acceptedHead` exclusive → `mainHead`) on
   `proposal.repository()` after application and before acceptance, maps tip
@@ -192,7 +197,7 @@ olderExclusiveOrNull, tip)` as decided above. Enables 5, 6, 7.
 ### 5. Web saves date the values they change
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: a `NotebookGitWebContentControllerTestBase` subclass: saving content
 that adds `topic: physics` leaves that row with `changed_at` equal to the
 save time and the appended commit's committer time; a body-only save keeps
@@ -308,3 +313,18 @@ stated. No remaining slice-specific concern was identified.
   (author stays now). Note recognition is `PortablePathKind.isNote`. Accepted
   proof: `'*NotebookGitPropertyValueDatingTest'` (4 tests) and
   `'*NotebookGit*'` (144 classes, 475 tests).
+- Slice 5 (2026-11-04): the shared write is
+  `NotePropertyIndexService.writeValueDate(note, key, value, Optional<Instant>)`
+  (floor at `createdAt`; empty writes `createdAt`). The e2e scenario is
+  `e2e_test/features/assimilation/assimilation_property_order.feature`
+  (registered in `scripts/isolated-cypress-active-specs.mjs`); it fails with the
+  dating call removed. The web-path floor is not separately tested (same
+  clock); slice 6 owns it. For slice 6: the dater's `tipNotes` parses every
+  note blob at the tip, so a push's cost grows with notebook size; discovering
+  tip notes from each commit's diff (root as a diff against the empty tree)
+  passed the dater tests in a prototype. Accepted proof:
+  `'*NotebookGitWebContentPropertyDatingControllerTest'` (7 tests),
+  `'*NotebookGitWebContentSaveCost*'`, the full backend suite (3021 tests),
+  and `SUT_TIMEOUT_MS=360000 ./scripts/run.sh pnpm cy:run --spec
+  e2e_test/features/assimilation/assimilation_walkthrough.feature,e2e_test/features/assimilation/assimilation_property_order.feature`
+  (10/10).

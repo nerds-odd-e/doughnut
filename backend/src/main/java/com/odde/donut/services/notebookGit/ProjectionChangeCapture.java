@@ -42,6 +42,9 @@ class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomi
 
     final Map<ProjectionRow, RowPath> updated = new LinkedHashMap<>();
     final Map<ProjectionRow, RowPath> deleted = new LinkedHashMap<>();
+
+    /** Each updated note's content as first seen, before the change. */
+    final Map<Integer, String> previousNoteContent = new HashMap<>();
   }
 
   class ProjectionChange implements AutoCloseable {
@@ -102,6 +105,9 @@ class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomi
     NotebookProjectionChange change = changeFor(entity, previous, names);
     if (change == null) return false;
     ProjectionRow row = row(entity, id);
+    if (entity instanceof Note) {
+      change.previousNoteContent.putIfAbsent(row.id(), (String) at(previous, names, "content"));
+    }
     RowPath previousPath = previousPath(entity, current, previous, names);
     if (leftNotebook(entity, current, previous, names)) {
       RowPath firstSeen = change.updated.remove(row);

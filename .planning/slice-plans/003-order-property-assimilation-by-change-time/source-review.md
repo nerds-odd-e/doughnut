@@ -7,17 +7,17 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
 | 1 | A learner (owner or subscriber) walking the assimilation sequence meets untracked property values in the order those values were last added or changed, within the same note level, not in the order their notes were created. | slice 8 | |
-| 1.1 | A property added today to an old note is offered after the older material at that level. | slice 5 | |
+| 1.1 | A property added today to an old note is offered after the older material at that level. | slice 5 | observed: e2e_test/features/assimilation/assimilation_property_order.feature 'A property added to an old note comes after a newer note' (assimilating Note 2 after a day-2 property on Note 1) |
 | 1.2 | Intake follows the learner's own authoring timeline. | slice 8 | |
-| 1.3 | Additions to old notes stop jumping to the front. | slice 5 | |
+| 1.3 | Additions to old notes stop jumping to the front. | slice 5 | observed: e2e_test/features/assimilation/assimilation_property_order.feature (fails with the dating call removed: Note 1's property came first) |
 | 2 | Value date: each indexed property value carries the committer time of the last accepted Git commit that changed its parsed value (the commit that added it or changed a scalar's content). | slice 4 | observed: NotebookGitPropertyValueDatingTest.datesEachValueAtTheCommitThatAddedItAndLeavesUnchangedValuesUndated, datesAListItemRemovedAndReAddedAtItsReAddition, followsARenamedNoteBackToTheCommitThatChangedItsValue |
 | 2.1 | This applies to a scalar per key. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_added_items_and_new_or_edited_scalars_only (topic physics→chemistry reported; unchanged status not) |
 | 2.2 | This applies to each list item individually. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_added_items_and_new_or_edited_scalars_only (only added colors item y reported) |
 | 2.3 | A list item whose text changes is a new value, dated at that change. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_reports_an_item_whose_text_changed_as_the_new_item (beta→betta reports betta) |
-| 2.4 | Body edits keep existing dates. | slice 5 | |
+| 2.4 | Body edits keep existing dates. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.aBodyOnlySaveKeepsTheValueDate |
 | 2.5 | Frontmatter reformatting keeps existing dates. | slice 3 | observed: NotePropertyIndexPlannerTest.changedValues_ignores_reordering_and_reformatting_of_the_same_parsed_values (empty) |
-| 2.6 | List reordering keeps existing dates. | slice 5 | |
-| 2.7 | Edits to other properties of the note keep existing dates. | slice 5 | |
+| 2.6 | List reordering keeps existing dates. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.reorderingAListKeepsItsItemDatesAndDatesAnAddedItem |
+| 2.7 | Edits to other properties of the note keep existing dates. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.addingAnotherPropertyKeepsTheExistingValueDate |
 | 2.8 | Values are compared as parsed values, never as text lines. | slice 3 | observed: NotePropertyIndexPlanner.changedValues compares parsed DatedValue sets; NotePropertyIndexPlannerTest reformatting test |
 | 3 | Floor: a value's date is never earlier than its note's creation time. | slice 6 | |
 | 3.1 | Rationale: a note pushed from the CLI (created at publish time, committed earlier) must not show its properties before the note itself or before notes created between commit and push. | slice 6 | |
@@ -29,9 +29,9 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 4.5 | Then by property key. | slice 2 | observed: AssimilationServicePropertyUnitsTest.properties_dated_at_their_notes_creation_follow_the_note_unit_in_key_order (definition before topic) |
 | 4.6 | Then by list position. | slice 2 | observed: NotePropertyIndexRepository.unassimilatedOrderBy ends with i.itemIndex; existing list-item tests in AssimilationServicePropertyUnitsTest green |
 | 4.7 | Owned and subscribed streams follow the same order. | slice 2 | observed: AssimilationServiceSubscriptionQueueTest.datedPropertyInSubscribedNotebookInterleavesWithOwnedNotesByDate |
-| 5 | Web save: saving a note dates the values that save added or changed at the save time. | slice 5 | |
-| 5.1 | The save time is the committer time of the commit the save appends. | slice 5 | |
-| 5.2 | Only the saved note's rows are touched. | slice 5 | |
+| 5 | Web save: saving a note dates the values that save added or changed at the save time. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.anAddedValueIsDatedAtTheCommitTheSaveAppends |
+| 5.1 | The save time is the committer time of the commit the save appends. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.anAddedValueIsDatedAtTheCommitTheSaveAppends (changed_at == tip commit committer time == save time) |
+| 5.2 | Only the saved note's rows are touched. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.savingOneNoteLeavesAnotherNotesValueDates |
 | 6 | Git publication: for each note a push changes, the newly accepted range is walked commit by commit. | slice 6 | |
 | 6.1 | An edit followed by a revert inside one push dates the value at the revert commit. | slice 6 | |
 | 6.2 | Each commit's own committer time dates the values it changed. | slice 6 | |
@@ -58,15 +58,15 @@ Launch: fresh general-purpose subagent on 2026-11-04, no conversation inheritanc
 | 9.3 | exclusion: author time is not used instead of committer time. | slice 4 | observed: NotebookGitPropertyValueDating uses getCommitterIdent; NotebookGitPropertyValueDatingTest fixture author time = now vs fixed committer times (swap to author ident failed 4/4) |
 | 9.4 | exclusion: no clock normalization for CLI commits; a future- or back-dated local commit sorts where its committer time says. | slice 6 | |
 | 9.5 | exclusion: values whose history was reset before this story lands are not re-dated; they stay at note creation. | slice 7 | |
-| 10.1 | An untracked scalar edited for a typo moves to its edit time. | slice 5 | |
-| 10.2 | A wiki-link rewrite that changes a value's text (destination renamed) dates that value at the rewrite commit. | slice 5 | |
-| E1.1 | A created 2024-03 with a note-level tracker; B created 2025-06 untracked; today A gets `example of: "[[X]]"` on the web → the next unit is B's note unit. | slice 5 | |
-| E1.2 | Same setup → A's new property comes after B's note unit. | slice 5 | |
-| E2.1 | A has untracked `topic: physics` dated 2024-05; A's body is edited today → `topic` keeps 2024-05. | slice 5 | |
-| E2.2 | Same setup → `topic` is still offered before B. | slice 5 | |
-| E3.1 | `tags: [alpha, beta]` dated 2024-05 and 2024-09; reordered to `[beta, alpha]` and `gamma` added → alpha and beta keep their dates. | slice 5 | |
-| E3.2 | Same setup → gamma is dated now. | slice 5 | |
-| E4.1 | Untracked `definition: foo` dated 2024-05 edited to `definition: bar` today → dated today. | slice 5 | |
+| 10.1 | An untracked scalar edited for a typo moves to its edit time. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.editingAScalarRedatesIt |
+| 10.2 | A wiki-link rewrite that changes a value's text (destination renamed) dates that value at the rewrite commit. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.aRenameThatRewritesALinkValueDatesItAtTheRenameCommit |
+| E1.1 | A created 2024-03 with a note-level tracker; B created 2025-06 untracked; today A gets `example of: "[[X]]"` on the web → the next unit is B's note unit. | slice 5 | observed: e2e_test/features/assimilation/assimilation_property_order.feature: next unit is Note 2's note unit after Note 1 gains a property on the web |
+| E1.2 | Same setup → A's new property comes after B's note unit. | slice 5 | observed: e2e_test/features/assimilation/assimilation_property_order.feature + AssimilationServicePropertyUnitsTest.OrderedByChangeDate.property_dated_after_a_newer_notes_creation_is_offered_after_that_note |
+| E2.1 | A has untracked `topic: physics` dated 2024-05; A's body is edited today → `topic` keeps 2024-05. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.aBodyOnlySaveKeepsTheValueDate |
+| E2.2 | Same setup → `topic` is still offered before B. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.aBodyOnlySaveKeepsTheValueDate (date kept) + AssimilationServicePropertyUnitsTest.OrderedByChangeDate.undated_property_sorts_at_its_notes_creation/ordering by date |
+| E3.1 | `tags: [alpha, beta]` dated 2024-05 and 2024-09; reordered to `[beta, alpha]` and `gamma` added → alpha and beta keep their dates. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.reorderingAListKeepsItsItemDatesAndDatesAnAddedItem (colors; tags is not indexed) |
+| E3.2 | Same setup → gamma is dated now. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.reorderingAListKeepsItsItemDatesAndDatesAnAddedItem (green dated at the save) |
+| E4.1 | Untracked `definition: foo` dated 2024-05 edited to `definition: bar` today → dated today. | slice 5 | observed: NotebookGitWebContentPropertyDatingControllerTest.editingAScalarRedatesIt |
 | E4.2 | The same edit on a tracked `definition` → nothing is re-queued. | slice 2 | observed: tracker WHERE unchanged and date-independent (scalar tracked by key); UnassimilatedPropertyServiceTest green |
 | E5.1 | CLI push of three commits: c1 (09:00) adds `topic` to N1, c2 edits N2's body, c3 (10:00) adds `topic` to N3 → N1's topic dated 09:00. | slice 6 | |
 | E5.2 | Same push → N3's topic dated 10:00. | slice 6 | |

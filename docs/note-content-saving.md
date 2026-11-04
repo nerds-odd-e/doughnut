@@ -21,7 +21,10 @@ the affected entries under their new paths with the blob ids the accepted tree
 already holds. The `.keep` and README rules are applied to the directories the
 change touched. A derived commit never adopts drift at untouched paths; drift
 stays detectable at local publication. A canonical no-op does not append a
-commit.
+commit. An appended commit dates, at its committer time, the property values
+each inserted or updated note gained or changed, comparing the note's content
+as the capture first saw it with its saved content; unchanged values keep
+their dates. No accepted Git object is read for this.
 
 The same encoder, applied to an empty base with every row as an insertion,
 assembles a notebook's complete tree for notebook creation, history reset and

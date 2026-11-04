@@ -22,6 +22,7 @@ export const ACTIVE_CLI_SPECS = [
 export const APPLICATION_ONLY_ACTIVE_SPECS = [
   'e2e_test/features/assimilation/assimilate_with_remembering_spelling.feature',
   'e2e_test/features/assimilation/assimilation_page_types.feature',
+  'e2e_test/features/assimilation/assimilation_property_order.feature',
   'e2e_test/features/assimilation/assimilation_walkthrough.feature',
   'e2e_test/features/assimilation/edit_when_assimilating.feature',
   'e2e_test/features/bazaar/browsing.feature',

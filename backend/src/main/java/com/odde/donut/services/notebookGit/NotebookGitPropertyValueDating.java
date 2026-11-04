@@ -139,9 +139,7 @@ public final class NotebookGitPropertyValueDating {
 
   private static Frontmatter frontmatterOf(Repository repository, AnyObjectId blobId)
       throws IOException {
-    String text = new String(repository.open(blobId).getBytes(), StandardCharsets.UTF_8);
-    return NoteContentMarkdown.splitLeadingFrontmatter(text)
-        .map(NoteContentMarkdown.LeadingFrontmatter::frontmatter)
-        .orElse(Frontmatter.empty());
+    return NoteContentMarkdown.leadingFrontmatter(
+        new String(repository.open(blobId).getBytes(), StandardCharsets.UTF_8));
   }
 }

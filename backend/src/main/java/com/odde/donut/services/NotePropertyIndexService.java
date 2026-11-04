@@ -12,6 +12,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,33 @@ public class NotePropertyIndexService {
 
   private record PropertyValueKey(String propertyKey, String propertyValue) {}
 
+  /**
+   * Dates a value's index rows at its commit time, never earlier than the note's creation; a value
+   * present at the history's root ({@code committedAt} empty) takes the note's creation time.
+   */
+  public void writeValueDate(
+      Note note, String propertyKey, String propertyValue, Optional<Instant> committedAt) {
+    Timestamp createdAt = note.getCreatedAt();
+    Timestamp changedAt =
+        committedAt.map(Timestamp::from).filter(createdAt::before).orElse(createdAt);
+    notePropertyIndexRepository
+        .findByNote_IdAndPropertyKeyAndPropertyValue(note.getId(), propertyKey, propertyValue)
+        .forEach(row -> row.setChangedAt(changedAt));
+  }
+
+  /**
+   * Dates, at {@code changedAt}, the values the note's content gained or changed since {@code
+   * previousContent}; unchanged values keep their dates.
+   */
+  public void dateChangedValues(Note note, String previousContent, Instant changedAt) {
+    NotePropertyIndexPlanner.changedValues(
+            NoteContentMarkdown.leadingFrontmatter(previousContent),
+            NoteContentMarkdown.leadingFrontmatter(note.getContent()))
+        .forEach(value ->
+            writeValueDate(
+                note, value.propertyKey(), value.propertyValue(), Optional.of(changedAt)));
+  }
+
   public List<AuthoredNoteReference> authoredReferencesForPropertyValue(
       Note note, String propertyKey, String propertyValue, List<NotePropertyIndex> indexRows) {
     List<String> plannedSourceLocalKeys = plannedSourceLocalKeys(note, propertyKey, propertyValue);
@@ -102,20 +130,16 @@ public class NotePropertyIndexService {
   }
 
   private List<String> plannedSourceLocalKeys(Note note, String propertyKey, String propertyValue) {
-    return NoteContentMarkdown.splitLeadingFrontmatter(
-            note.getContent() == null ? "" : note.getContent())
-        .map(leadingFrontmatter ->
-            NotePropertyIndexPlanner.plannedRows(
-                    leadingFrontmatter.frontmatter(), canonicalDonutOrigin)
-                .stream()
-                .filter(planned ->
-                    planned.propertyKey().equals(propertyKey)
-                        && planned.propertyValue().equals(propertyValue))
-                .map(NotePropertyIndexPlanner.PlannedRow::sourceLocalKey)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList())
-        .orElseGet(List::of);
+    return NotePropertyIndexPlanner.plannedRows(
+            NoteContentMarkdown.leadingFrontmatter(note.getContent()), canonicalDonutOrigin)
+        .stream()
+        .filter(planned ->
+            planned.propertyKey().equals(propertyKey)
+                && planned.propertyValue().equals(propertyValue))
+        .map(NotePropertyIndexPlanner.PlannedRow::sourceLocalKey)
+        .filter(Objects::nonNull)
+        .distinct()
+        .toList();
   }
 
   private void saveIndexRow(
