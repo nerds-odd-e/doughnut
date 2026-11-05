@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Maria-chan",
+  "email": "maria-chan@example.org",
+  "identity": "SEED-102#publish-donut-ci-proof",
+  "mode": "story-branch",
+  "branch": "claude/publish-donut-ci-proof-for-intent",
+  "host": "claude"
+}
