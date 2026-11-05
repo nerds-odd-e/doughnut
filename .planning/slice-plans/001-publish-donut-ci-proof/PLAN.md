@@ -115,7 +115,7 @@ and 2, equal to the shard logs' 1217 and 1240.
 ### 2. The summary adds end-to-end totals from all six shards
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: converter tests (final attempt after a retry, an all-skipped scenario as other); a local `pnpm cy:run` of `cypress_retry.feature` and `user_profile.feature` with the variable set, converted to 4 passed lines and then a fragment; the real run's summary shows 6/6 parts (example 1, E2E).
 
 Behavior: a push → each E2E shard writes its Cucumber messages report and
@@ -129,6 +129,14 @@ from the job index); add `E2E-tests` to the collector's `needs` and `--expect`;
 extend the workflow test.
 
 Sizing: about 8 minutes of local work plus the local E2E run and one CI wait.
+
+Accepted proof: `pnpm test:ci-proof` 8/8; a local `pnpm cy:run` of
+`cypress_retry.feature` and `user_profile.feature` converted to 4 passed
+lines. Real run 41994366067 at 02f7de38ee (green) published
+`ci-proof-summary-attempt-1` with `e2e_test/features` 372 passed in 6 of 6
+parts, equal to the six Cypress shard totals, and `frontend/tests` 2457
+passed in 2 of 2 parts. Story example 3's tab view is observed in slice 3,
+where the rerun attempt shows parts that were not re-run as missing.
 
 ### 3. The dashboard shows the totals, including for a failing run and its rerun
 

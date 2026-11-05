@@ -23,16 +23,16 @@ the exclusion 15x stay with their commitments and have no rows.
 | 1b | The developer sees which CI parts did not report | slice 3 | |
 | 2 | The developer can tell from the dashboard what an ordinary CI run actually proved, instead of only the verdict or retained proof | slice 3 | |
 | 3.1 | Copy the recipe's four collector modules into `scripts/ci/` | slice 1 | observed: cmp: scripts/ci/ci-proof-{contract,summary,fragments,collect}.mjs identical to .agents/skills/dough-test-optimization/scripts/ (0.3.86) |
-| 3.2 | Write one fragment per producer part | slice 2 | |
+| 3.2 | Write one fragment per producer part | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: eight fragment artifacts, one per part: E2E-tests 1-6 and Frontend-unit-tests 1-2 |
 | 3.3 | Add one collector job that publishes `ci-proof-summary-attempt-<n>` | slice 1 | observed: run 41992761387 at 549d54a217: artifact ci-proof-summary-attempt-1 holds only ci-proof-summary.json naming that run, attempt 1 and revision; frontend/tests 2457 passed = shard logs 1217 + 1240, parts 1 and 2 present |
-| 4 | Entries and parts are listed in `intent.locations` order | slice 2 | |
-| 4.1 | `e2e_test/features` has the six E2E matrix parts | slice 2 | |
+| 4 | Entries and parts are listed in `intent.locations` order | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: entries e2e_test/features then frontend/tests, as in .planning/open-dough.json intent.locations |
+| 4.1 | `e2e_test/features` has the six E2E matrix parts | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: e2e_test/features parts 1-6 present, 372 passed = Cypress shard totals 40+97+44+85+38+68 |
 | 4.2 | `frontend/tests` has the two Vitest shard parts | slice 1 | observed: ci.yml ci-proof job: ./.github/ci_proof_summary with expect: frontend/tests=2; scripts/ci/ci-workflow.test.mjs 'CI proof expects each entry in as many parts as its producer matrix runs' |
 | 5.1 | One outcome line per test case (Vitest) | slice 1 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a Vitest report gives one repo-relative line per test'; local 2-shard run summarized 9+11=20 passed checks |
 | 5.2 | One outcome line per scenario (Cucumber) | slice 2 | observed: scripts/ci/ci-proof-outcomes.test.mjs cucumber tests; local cy:run of cypress_retry + user_profile converted to exactly 4 lines for 4 scenarios |
 | 5.3 | Each line uses the final attempt after retries | slice 2 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a retried Cucumber scenario counts once, with its final attempt'; local NDJSON with 5 testCaseStarted gave 4 lines, the retry scenario passed |
-| 5.4 | Each line uses a repository-relative file path | slice 2 | |
-| 6.1 | Reports come from each runner's own report output in ordinary CI runs | slice 2 | |
+| 5.4 | Each line uses a repository-relative file path | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: every scenario line counted toward e2e_test/features and every test toward frontend/tests, so fragment paths are repo-relative; converter tests assert relative paths |
+| 6.1 | Reports come from each runner's own report output in ordinary CI runs | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: fragments converted from the Vitest JSON report and Cucumber messages written in the ordinary CI run |
 | 6.2 | For Vitest, its JSON report | slice 1 | observed: frontend/vitest.config.ts json reporter with outputFile CI_PROOF_VITEST_REPORT; local CI-profile shard runs wrote the JSON report |
 | 6.3 | For Cucumber, the Cucumber preprocessor's messages | slice 2 | observed: e2e_test/config/ci.ts expose messagesEnabled/messagesOutput when CI_PROOF_CUCUMBER_MESSAGES is set; local cy:run wrote the NDJSON |
 | 6.4 | Small scripts in `scripts/ci/` convert the reports | slice 2 | observed: scripts/ci/ci-proof-outcomes.mjs formats vitest and cucumber, run by .github/ci_proof_fragments/action.yml |
@@ -58,7 +58,7 @@ the exclusion 15x stay with their commitments and have no rows.
 | 14.3 | Deferred: counts for backend tests | slice 2 | observed: ci.yml ci_proof_summary expect names only e2e_test/features and frontend/tests |
 | 15 | The summary is per attempt, as the recipe defines it | slice 3 | |
 | 15.1 | After "re-run failed jobs", parts not re-run show as missing in the new attempt's summary | slice 3 | |
-| E1.1 | All green: the run has one `ci-proof-summary-attempt-1` artifact naming that run, its attempt, and the pushed revision | slice 2 | |
+| E1.1 | All green: the run has one `ci-proof-summary-attempt-1` artifact naming that run, its attempt, and the pushed revision | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: one ci-proof-summary-attempt-1 naming runId 41994366067, runAttempt 1, revision 02f7de38ee357845e335fc695291bababdcf13a4 |
 | E1.2 | All green: the tab shows `e2e_test/features` with 6 of 6 parts and its scenario counts | slice 3 | |
 | E1.3 | All green: the tab shows `frontend/tests` with 2 of 2 parts and its check counts | slice 3 | |
 | E1.4 | All green: all passed | slice 3 | |
@@ -66,7 +66,7 @@ the exclusion 15x stay with their commitments and have no rows.
 | E2.2 | One failing scenario: the other five E2E shards still finish | slice 3 | |
 | E2.3 | One failing scenario: the summary shows `e2e_test/features` with 1 failed and the passes of all six parts | slice 3 | |
 | E3.1 | Part that never ran its tests: that part writes no fragment | slice 2 | observed: ci.yml E2E fragment step if: steps.e2e-tests.outcome != 'skipped', so a shard whose setup failed writes no fragment |
-| E3.2 | Part that never ran its tests: the tab shows that part missing | slice 2 | |
+| E3.2 | Part that never ran its tests: the tab shows that part missing | slice 3 |  |
 | E3.3 | Part that never ran its tests: its scenarios are not counted as passed | slice 2 | observed: local summarize over one E2E fragment: parts 2-6 of 6 missing with no counts |
 | E4.1 | File that fails to load in shard 2: the shard fails | slice 1 | observed: Decisive premise row 1: broken spec in shard 2 gives status failed with 0 assertion results and shard 2 exits 1 |
 | E4.2 | File that fails to load: `frontend/tests` shows one failed check for that file, not 0 failed | slice 1 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a Vitest file that failed to load counts as one failed check' (observed report shape) |
@@ -74,7 +74,7 @@ the exclusion 15x stay with their commitments and have no rows.
 | E5.2 | Rerun: the re-run shard and the collector report in it | slice 3 | |
 | E5.3 | Rerun: the shards not re-run show as missing in attempt 2 | slice 3 | |
 | E5.4 | Rerun: attempt 1's summary is unchanged | slice 3 | |
-| 16.1 | CI proof fragments come from the runners' own reports | slice 2 | |
+| 16.1 | CI proof fragments come from the runners' own reports | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: fragments come from Vitest's JSON report and the Cucumber preprocessor's messages; no proof recorder runs in CI |
 | 16.2 | The proof recorders keep only deliberate retained proof | slice 2 | observed: proof recorders unchanged in the diff; test:cucumber-proof and test:vitest-proof green |
 | 16.3 | The proof recorders gain no CI duty | slice 2 | observed: no CI step or env var in ci.yml calls or sets the proof recorders |
 | 17.1 | The Vitest JSON report is added beside the existing reporters in `frontend/vitest.config.ts` | slice 1 | observed: frontend/vitest.config.ts reporters: json added after orchestratorGcReporter and VitestProofReporter |
