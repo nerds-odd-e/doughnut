@@ -155,13 +155,15 @@ review found no remaining slice-specific concern.
 
 ## Learnings
 
-- Slice 1 refactor: the fragment and upload steps live in the composite action
-  `.github/ci_proof_fragments` (inputs `format`, `report`, `entry`, `part`,
-  `parts`), and the collector steps in `.github/ci_proof_summary` (input
-  `expect`, space-separated `<entry>=<parts>`). Slice 2 calls
-  `ci_proof_fragments` from the E2E job, appends `e2e_test/features=6` before
-  `frontend/tests=2` in `expect`, and extends the entry list asserted in
-  `scripts/ci/ci-workflow.test.mjs`. This keeps `ci.yml` at 250 lines.
+- The fragment and upload steps live in the composite action
+  `.github/ci_proof_fragments` (inputs `format`, `report`, `entry`). It takes
+  the part from `strategy.job-index` plus 1 and the part count from
+  `strategy.job-total`. The collector steps live in `.github/ci_proof_summary`
+  (input `expect`, space-separated `<entry>=<parts>`). The E2E bundle cache and
+  build steps moved to `.github/e2e_bundles`, keeping `ci.yml` under 250 lines.
+- The Cucumber conversion decides each test case by its worst step status in
+  its final attempt: passed, skipped or unknown as other, and pending,
+  undefined, ambiguous or failed as failed.
 - The four collector copies are excluded from Biome in `biome.json`, so
   they stay byte-identical to the installed guidance.
 

@@ -1,0 +1,18 @@
+name: "Prepare E2E bundles"
+description: "Restore the frontend and CLI bundles the E2E run serves, building them on a cache miss"
+runs:
+  using: "composite"
+  steps:
+    - name: Restore E2E bundled dist cache
+      id: e2e-dist-cache
+      uses: actions/cache@v6
+      with:
+        path: |
+          frontend/dist
+          cli/dist
+        key: ${{ runner.os }}-e2e-dist-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'frontend/package.json', 'frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/index.html', 'frontend/src/**', 'frontend/public/**', 'cli/package.json', 'cli/src/**', 'cli/tsconfig.json', 'packages/generated/donut-backend-api/**', 'packages/donut-api/**') }}
+    - name: Build E2E bundles if needed
+      shell: bash
+      run: bash scripts/ci/e2e-bundle-if-needed.sh
+      env:
+        E2E_DIST_CACHE_HIT: ${{ steps.e2e-dist-cache.outputs.cache-hit }}

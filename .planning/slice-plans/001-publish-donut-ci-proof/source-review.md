@@ -29,33 +29,33 @@ the exclusion 15x stay with their commitments and have no rows.
 | 4.1 | `e2e_test/features` has the six E2E matrix parts | slice 2 | |
 | 4.2 | `frontend/tests` has the two Vitest shard parts | slice 1 | observed: ci.yml ci-proof job: ./.github/ci_proof_summary with expect: frontend/tests=2; scripts/ci/ci-workflow.test.mjs 'CI proof expects each entry in as many parts as its producer matrix runs' |
 | 5.1 | One outcome line per test case (Vitest) | slice 1 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a Vitest report gives one repo-relative line per test'; local 2-shard run summarized 9+11=20 passed checks |
-| 5.2 | One outcome line per scenario (Cucumber) | slice 2 | |
-| 5.3 | Each line uses the final attempt after retries | slice 2 | |
+| 5.2 | One outcome line per scenario (Cucumber) | slice 2 | observed: scripts/ci/ci-proof-outcomes.test.mjs cucumber tests; local cy:run of cypress_retry + user_profile converted to exactly 4 lines for 4 scenarios |
+| 5.3 | Each line uses the final attempt after retries | slice 2 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a retried Cucumber scenario counts once, with its final attempt'; local NDJSON with 5 testCaseStarted gave 4 lines, the retry scenario passed |
 | 5.4 | Each line uses a repository-relative file path | slice 2 | |
 | 6.1 | Reports come from each runner's own report output in ordinary CI runs | slice 2 | |
 | 6.2 | For Vitest, its JSON report | slice 1 | observed: frontend/vitest.config.ts json reporter with outputFile CI_PROOF_VITEST_REPORT; local CI-profile shard runs wrote the JSON report |
-| 6.3 | For Cucumber, the Cucumber preprocessor's messages | slice 2 | |
-| 6.4 | Small scripts in `scripts/ci/` convert the reports | slice 2 | |
-| 7.1 | The deliberate proof recorders stay untouched | slice 2 | |
-| 7.2 | Their opt-in options stay untouched | slice 2 | |
-| 7.3 | Committed proof stays untouched | slice 2 | |
-| 8.1 | Test selections stay as they are | slice 2 | |
-| 8.2 | Sharding stays as it is | slice 2 | |
-| 8.3 | Retries stay as they are | slice 2 | |
-| 8.4 | Each job's test verdict stays as it is | slice 2 | |
-| 9 | The E2E matrix gets `fail-fast: false` | slice 2 | |
+| 6.3 | For Cucumber, the Cucumber preprocessor's messages | slice 2 | observed: e2e_test/config/ci.ts expose messagesEnabled/messagesOutput when CI_PROOF_CUCUMBER_MESSAGES is set; local cy:run wrote the NDJSON |
+| 6.4 | Small scripts in `scripts/ci/` convert the reports | slice 2 | observed: scripts/ci/ci-proof-outcomes.mjs formats vitest and cucumber, run by .github/ci_proof_fragments/action.yml |
+| 7.1 | The deliberate proof recorders stay untouched | slice 2 | observed: git diff 099cc32bcf..: no change to frontend/vitestProofReporter.ts or e2e_test/config/cucumberProof*.mjs; test:cucumber-proof 29/29, test:vitest-proof 12/12 |
+| 7.2 | Their opt-in options stay untouched | slice 2 | observed: RECORD_CUCUMBER_PROOF and RECORD_VITEST_PROOF wiring unchanged in the diff; proof tests green |
+| 7.3 | Committed proof stays untouched | slice 2 | observed: git diff 099cc32bcf..: no file under e2e_test/proof or frontend/tests/proof changes |
+| 8.1 | Test selections stay as they are | slice 2 | observed: ci.yml diff: E2E matrix spec globs and frontend --shard selection unchanged |
+| 8.2 | Sharding stays as it is | slice 2 | observed: ci.yml diff: six E2E specs and two frontend shards unchanged |
+| 8.3 | Retries stay as they are | slice 2 | observed: ci.yml and e2e_test/config/ci.ts diff: no retry setting changed |
+| 8.4 | Each job's test verdict stays as it is | slice 2 | observed: ci.yml diff: test steps keep their commands; proof steps only follow them |
+| 9 | The E2E matrix gets `fail-fast: false` | slice 2 | observed: ci.yml E2E-tests strategy fail-fast: false; scripts/ci/ci-workflow.test.mjs asserts it |
 | 9.1 | One failing shard no longer cancels the others | slice 3 | |
 | 9.2 | The other shards' proof stays available | slice 3 | |
 | 10 | A failing run stays failing | slice 3 | |
 | 11 | A file reported failed without per-test results counts as one failed check for that file, not as nothing | slice 1 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a Vitest file that failed to load counts as one failed check' |
-| 12.1 | The expected part counts stay equal to the matrix lengths | slice 2 | |
-| 12.2 | A test that reads the workflow checks this | slice 2 | |
-| 12.3 | That test runs in CI | slice 2 | |
+| 12.1 | The expected part counts stay equal to the matrix lengths | slice 2 | observed: scripts/ci/ci-workflow.test.mjs asserts expect counts 6 and 2 equal the E2E and frontend matrix lengths |
+| 12.2 | A test that reads the workflow checks this | slice 2 | observed: scripts/ci/ci-workflow.test.mjs reads .github/workflows/ci.yml |
+| 12.3 | That test runs in CI | slice 2 | observed: package.json lint:all runs pnpm test:ci-proof; run 41992761387 Linting job ran it green |
 | 13.1 | Summary retention is 30 days | slice 1 | observed: .github/ci_proof_summary/action.yml summary upload retention-days: 30 |
-| 13.2 | Fragments are kept for 1 day | slice 2 | |
-| 14.1 | Deferred: counts for `scripts` | slice 2 | |
-| 14.2 | Deferred: counts for `infra` | slice 2 | |
-| 14.3 | Deferred: counts for backend tests | slice 2 | |
+| 13.2 | Fragments are kept for 1 day | slice 2 | observed: .github/ci_proof_fragments/action.yml fragment upload retention-days: 1 |
+| 14.1 | Deferred: counts for `scripts` | slice 2 | observed: ci.yml ci_proof_summary expect names only e2e_test/features and frontend/tests |
+| 14.2 | Deferred: counts for `infra` | slice 2 | observed: ci.yml ci_proof_summary expect names only e2e_test/features and frontend/tests |
+| 14.3 | Deferred: counts for backend tests | slice 2 | observed: ci.yml ci_proof_summary expect names only e2e_test/features and frontend/tests |
 | 15 | The summary is per attempt, as the recipe defines it | slice 3 | |
 | 15.1 | After "re-run failed jobs", parts not re-run show as missing in the new attempt's summary | slice 3 | |
 | E1.1 | All green: the run has one `ci-proof-summary-attempt-1` artifact naming that run, its attempt, and the pushed revision | slice 2 | |
@@ -65,9 +65,9 @@ the exclusion 15x stay with their commitments and have no rows.
 | E2.1 | One failing scenario: that shard's job fails and the run is red | slice 3 | |
 | E2.2 | One failing scenario: the other five E2E shards still finish | slice 3 | |
 | E2.3 | One failing scenario: the summary shows `e2e_test/features` with 1 failed and the passes of all six parts | slice 3 | |
-| E3.1 | Part that never ran its tests: that part writes no fragment | slice 2 | |
+| E3.1 | Part that never ran its tests: that part writes no fragment | slice 2 | observed: ci.yml E2E fragment step if: steps.e2e-tests.outcome != 'skipped', so a shard whose setup failed writes no fragment |
 | E3.2 | Part that never ran its tests: the tab shows that part missing | slice 2 | |
-| E3.3 | Part that never ran its tests: its scenarios are not counted as passed | slice 2 | |
+| E3.3 | Part that never ran its tests: its scenarios are not counted as passed | slice 2 | observed: local summarize over one E2E fragment: parts 2-6 of 6 missing with no counts |
 | E4.1 | File that fails to load in shard 2: the shard fails | slice 1 | observed: Decisive premise row 1: broken spec in shard 2 gives status failed with 0 assertion results and shard 2 exits 1 |
 | E4.2 | File that fails to load: `frontend/tests` shows one failed check for that file, not 0 failed | slice 1 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a Vitest file that failed to load counts as one failed check' (observed report shape) |
 | E5.1 | Rerun: attempt 2 has its own summary | slice 3 | |
@@ -75,8 +75,8 @@ the exclusion 15x stay with their commitments and have no rows.
 | E5.3 | Rerun: the shards not re-run show as missing in attempt 2 | slice 3 | |
 | E5.4 | Rerun: attempt 1's summary is unchanged | slice 3 | |
 | 16.1 | CI proof fragments come from the runners' own reports | slice 2 | |
-| 16.2 | The proof recorders keep only deliberate retained proof | slice 2 | |
-| 16.3 | The proof recorders gain no CI duty | slice 2 | |
+| 16.2 | The proof recorders keep only deliberate retained proof | slice 2 | observed: proof recorders unchanged in the diff; test:cucumber-proof and test:vitest-proof green |
+| 16.3 | The proof recorders gain no CI duty | slice 2 | observed: no CI step or env var in ci.yml calls or sets the proof recorders |
 | 17.1 | The Vitest JSON report is added beside the existing reporters in `frontend/vitest.config.ts` | slice 1 | observed: frontend/vitest.config.ts reporters: json added after orchestratorGcReporter and VitestProofReporter |
 | 17.2 | It is added only on CI | slice 1 | observed: ci.yml Frontend unit tests step sets CI_PROOF_VITEST_REPORT; local run without it wrote no report and kept default output |
 | 17.3 | `orchestratorGcReporter` and the proof recorder stay configured on CI | slice 1 | observed: frontend/vitest.config.ts keeps orchestratorGcReporter (isCI) and new VitestProofReporter(); pnpm test:vitest-proof 12/12 pass |
@@ -85,6 +85,6 @@ the exclusion 15x stay with their commitments and have no rows.
 | 18.3 | A failed collector does not change any producer job's result | slice 1 | observed: ci.yml: ci-proof is its own job that needs Frontend-unit-tests; no producer step depends on it |
 | 18.4 | A missing or ambiguous part is reported as such | slice 1 | observed: local summarize over part 1's fragment only printed 'part 2 of 2 missing' with {part:2,status:missing} |
 | 18.5 | Such a part is never filled in | slice 1 | observed: local summarize over part 1's fragment only: 9 passed counted, part 2 shown missing with no counts |
-| 19.1 | This only adds observation to CI as an execution location | slice 2 | |
-| 19.2 | It adds no environment | slice 2 | |
-| 20.1 | The part-count check needs a runner that CI actually invokes | slice 2 | |
+| 19.1 | This only adds observation to CI as an execution location | slice 2 | observed: the diff adds only report env vars, converter, fragment and collector steps to ci.yml |
+| 19.2 | It adds no environment | slice 2 | observed: no new environment, profile or deploy target in the diff |
+| 20.1 | The part-count check needs a runner that CI actually invokes | slice 2 | observed: run 41992761387: the Linting & Types Gen for Frontend job runs lint:all, which includes test:ci-proof |
