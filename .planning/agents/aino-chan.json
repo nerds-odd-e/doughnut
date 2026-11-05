@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Aino-chan",
+  "email": "aino-chan@example.org",
+  "identity": "SEED-104#remove-local-proof",
+  "mode": "story-branch",
+  "branch": "cursor/remove-local-proof-from-donut",
+  "host": "cursor",
+  "model": "auto"
+}
