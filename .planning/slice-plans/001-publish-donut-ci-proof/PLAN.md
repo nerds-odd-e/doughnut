@@ -5,7 +5,7 @@
 - **Story:** [Publish Donut CI proof for Intent](../../seeds/SEED-102-publish-donut-ci-proof.md#publish-donut-ci-proof)
 - **Identity:** SEED-102#publish-donut-ci-proof
 - **Recipe:** [CI proof summary](../../../.agents/skills/dough-test-optimization/references/ci-proof-summary.md)
-  (Open Dough guidance 0.3.84)
+  (Open Dough guidance 0.3.86)
 
 ## Goal and scope
 
@@ -36,7 +36,13 @@ planning (see Learnings).
   test case or scenario, using the final attempt. A Vitest file that is
   `failed` with no test results gives one `failed` line for that file. An
   absent report gives no fragment, so the collector shows that part as missing.
-- **The collector modules** go in `scripts/ci/` beside it, copied unchanged.
+- **The collector modules** go in `scripts/ci/` beside it, copied unchanged
+  from guidance 0.3.86. That release added a CI-adapter attempt identity
+  (`--attempt-id`) beside the GitHub Actions one. Donut sets no `ciAdapter`,
+  so it stays on the recipe's GitHub Actions path (steps 3 to 6, unchanged
+  in 0.3.86) and names each attempt by `--run-id` and `--attempt`.
+- **Precondition for slice 1:** the 0.3.86 guidance update is on trunk and
+  merged into this workspace, so the copies match the installed release.
 - **E2E part numbers** come from `strategy.job-index` plus 1, computed in the
   shell, because GitHub expressions have no arithmetic and the matrix values
   are spec globs.
