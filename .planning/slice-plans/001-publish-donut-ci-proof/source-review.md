@@ -13,15 +13,15 @@ the exclusion 15x stay with their commitments and have no rows.
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | A developer viewing a `donut CI` run in Intent → CI status sees results for that run and attempt | slice 3 | |
-| 1a.1 | `frontend/tests` checks that passed | slice 3 | |
-| 1a.2 | `frontend/tests` checks that failed | slice 3 | |
-| 1a.3 | `frontend/tests` checks that did something else | slice 3 | |
-| 1a.4 | `e2e_test/features` scenarios that passed | slice 3 | |
-| 1a.5 | `e2e_test/features` scenarios that failed | slice 3 | |
-| 1a.6 | `e2e_test/features` scenarios that did something else | slice 3 | |
-| 1b | The developer sees which CI parts did not report | slice 3 | |
-| 2 | The developer can tell from the dashboard what an ordinary CI run actually proved, instead of only the verdict or retained proof | slice 3 | |
+| 1 | A developer viewing a `donut CI` run in Intent → CI status sees results for that run and attempt | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts |
+| 1a.1 | `frontend/tests` checks that passed | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: frontend/tests 2457 passed (run 41994366067 (green) summary) and 2456 passed (run 41995741329 attempt 1 (red) summary) |
+| 1a.2 | `frontend/tests` checks that failed | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: frontend/tests 1 failed (run 41995741329 attempt 1 (red) summary) |
+| 1a.3 | `frontend/tests` checks that did something else | slice 3 | observed: run 41994366067 (green) summary and run 41995741329 attempt 1 (red) summary carry frontend/tests other 0; converter test 'skipped, todo and pending Vitest tests count as other'; the tab view of a nonzero other count was not exercised |
+| 1a.4 | `e2e_test/features` scenarios that passed | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: e2e_test/features 372 passed (run 41994366067 (green) summary) and 371 passed (run 41995741329 attempt 1 (red) summary) |
+| 1a.5 | `e2e_test/features` scenarios that failed | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: e2e_test/features 1 failed (run 41995741329 attempt 1 (red) summary) |
+| 1a.6 | `e2e_test/features` scenarios that did something else | slice 3 | observed: run 41994366067 (green) summary and run 41995741329 attempt 1 (red) summary carry e2e_test/features other 0; converter test 'an all-skipped Cucumber scenario counts as other'; the tab view of a nonzero other count was not exercised |
+| 1b | The developer sees which CI parts did not report | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: attempt 2 showed e2e_test/features parts 1-5 and frontend/tests part 1 missing |
+| 2 | The developer can tell from the dashboard what an ordinary CI run actually proved, instead of only the verdict or retained proof | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: per-entry counts and parts beside each run's verdict for green, red and rerun attempts |
 | 3.1 | Copy the recipe's four collector modules into `scripts/ci/` | slice 1 | observed: cmp: scripts/ci/ci-proof-{contract,summary,fragments,collect}.mjs identical to .agents/skills/dough-test-optimization/scripts/ (0.3.86) |
 | 3.2 | Write one fragment per producer part | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: eight fragment artifacts, one per part: E2E-tests 1-6 and Frontend-unit-tests 1-2 |
 | 3.3 | Add one collector job that publishes `ci-proof-summary-attempt-<n>` | slice 1 | observed: run 41992761387 at 549d54a217: artifact ci-proof-summary-attempt-1 holds only ci-proof-summary.json naming that run, attempt 1 and revision; frontend/tests 2457 passed = shard logs 1217 + 1240, parts 1 and 2 present |
@@ -44,9 +44,9 @@ the exclusion 15x stay with their commitments and have no rows.
 | 8.3 | Retries stay as they are | slice 2 | observed: ci.yml and e2e_test/config/ci.ts diff: no retry setting changed |
 | 8.4 | Each job's test verdict stays as it is | slice 2 | observed: ci.yml diff: test steps keep their commands; proof steps only follow them |
 | 9 | The E2E matrix gets `fail-fast: false` | slice 2 | observed: ci.yml E2E-tests strategy fail-fast: false; scripts/ci/ci-workflow.test.mjs asserts it |
-| 9.1 | One failing shard no longer cancels the others | slice 3 | |
-| 9.2 | The other shards' proof stays available | slice 3 | |
-| 10 | A failing run stays failing | slice 3 | |
+| 9.1 | One failing shard no longer cancels the others | slice 3 | observed: run 41995741329 attempt 1: the cli/** E2E shard failed and the other five E2E shards completed successfully |
+| 9.2 | The other shards' proof stays available | slice 3 | observed: run 41995741329 attempt 1 (red) summary: E2E parts 1-6 present, the five passing shards' 372-1 scenarios counted |
+| 10 | A failing run stays failing | slice 3 | observed: run 41995741329 attempt 1 and attempt 2 concluded failure |
 | 11 | A file reported failed without per-test results counts as one failed check for that file, not as nothing | slice 1 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a Vitest file that failed to load counts as one failed check' |
 | 12.1 | The expected part counts stay equal to the matrix lengths | slice 2 | observed: scripts/ci/ci-workflow.test.mjs asserts expect counts 6 and 2 equal the E2E and frontend matrix lengths |
 | 12.2 | A test that reads the workflow checks this | slice 2 | observed: scripts/ci/ci-workflow.test.mjs reads .github/workflows/ci.yml |
@@ -56,24 +56,24 @@ the exclusion 15x stay with their commitments and have no rows.
 | 14.1 | Deferred: counts for `scripts` | slice 2 | observed: ci.yml ci_proof_summary expect names only e2e_test/features and frontend/tests |
 | 14.2 | Deferred: counts for `infra` | slice 2 | observed: ci.yml ci_proof_summary expect names only e2e_test/features and frontend/tests |
 | 14.3 | Deferred: counts for backend tests | slice 2 | observed: ci.yml ci_proof_summary expect names only e2e_test/features and frontend/tests |
-| 15 | The summary is per attempt, as the recipe defines it | slice 3 | |
-| 15.1 | After "re-run failed jobs", parts not re-run show as missing in the new attempt's summary | slice 3 | |
+| 15 | The summary is per attempt, as the recipe defines it | slice 3 | observed: run 41995741329 attempt 2 summary names runAttempt 2 and only that attempt's fragments |
+| 15.1 | After "re-run failed jobs", parts not re-run show as missing in the new attempt's summary | slice 3 | observed: run 41995741329 attempt 2 summary: E2E parts 1-5 and frontend part 1, not re-run, show as missing |
 | E1.1 | All green: the run has one `ci-proof-summary-attempt-1` artifact naming that run, its attempt, and the pushed revision | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: one ci-proof-summary-attempt-1 naming runId 41994366067, runAttempt 1, revision 02f7de38ee357845e335fc695291bababdcf13a4 |
-| E1.2 | All green: the tab shows `e2e_test/features` with 6 of 6 parts and its scenario counts | slice 3 | |
-| E1.3 | All green: the tab shows `frontend/tests` with 2 of 2 parts and its check counts | slice 3 | |
-| E1.4 | All green: all passed | slice 3 | |
-| E2.1 | One failing scenario: that shard's job fails and the run is red | slice 3 | |
-| E2.2 | One failing scenario: the other five E2E shards still finish | slice 3 | |
-| E2.3 | One failing scenario: the summary shows `e2e_test/features` with 1 failed and the passes of all six parts | slice 3 | |
+| E1.2 | All green: the tab shows `e2e_test/features` with 6 of 6 parts and its scenario counts | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: run 41994366067 e2e_test/features 6 of 6 parts, 372 passed |
+| E1.3 | All green: the tab shows `frontend/tests` with 2 of 2 parts and its check counts | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: run 41994366067 frontend/tests 2 of 2 parts, 2457 passed |
+| E1.4 | All green: all passed | slice 3 | observed: run 41994366067 (green) summary: 0 failed and 0 other in both entries |
+| E2.1 | One failing scenario: that shard's job fails and the run is red | slice 3 | observed: run 41995741329 attempt 1: the cli/** E2E shard job failed and the run concluded failure |
+| E2.2 | One failing scenario: the other five E2E shards still finish | slice 3 | observed: run 41995741329 attempt 1: the other five E2E shard jobs concluded success |
+| E2.3 | One failing scenario: the summary shows `e2e_test/features` with 1 failed and the passes of all six parts | slice 3 | observed: run 41995741329 attempt 1 (red) summary: e2e_test/features 371 passed, 1 failed, all six parts present |
 | E3.1 | Part that never ran its tests: that part writes no fragment | slice 2 | observed: ci.yml E2E fragment step if: steps.e2e-tests.outcome != 'skipped', so a shard whose setup failed writes no fragment |
-| E3.2 | Part that never ran its tests: the tab shows that part missing | slice 3 |  |
+| E3.2 | Part that never ran its tests: the tab shows that part missing | slice 3 | observed: developer round 2026-11-05: the Intent CI status tab showed runs 41994366067 attempt 1, 41995741329 attempt 1 and attempt 2 with the stated counts and parts: attempt 2 showed parts without a fragment as missing and counted nothing for them |
 | E3.3 | Part that never ran its tests: its scenarios are not counted as passed | slice 2 | observed: local summarize over one E2E fragment: parts 2-6 of 6 missing with no counts |
 | E4.1 | File that fails to load in shard 2: the shard fails | slice 1 | observed: Decisive premise row 1: broken spec in shard 2 gives status failed with 0 assertion results and shard 2 exits 1 |
 | E4.2 | File that fails to load: `frontend/tests` shows one failed check for that file, not 0 failed | slice 1 | observed: scripts/ci/ci-proof-outcomes.test.mjs 'a Vitest file that failed to load counts as one failed check' (observed report shape) |
-| E5.1 | Rerun: attempt 2 has its own summary | slice 3 | |
-| E5.2 | Rerun: the re-run shard and the collector report in it | slice 3 | |
-| E5.3 | Rerun: the shards not re-run show as missing in attempt 2 | slice 3 | |
-| E5.4 | Rerun: attempt 1's summary is unchanged | slice 3 | |
+| E5.1 | Rerun: attempt 2 has its own summary | slice 3 | observed: run 41995741329 artifacts: ci-proof-summary-attempt-2 beside ci-proof-summary-attempt-1 |
+| E5.2 | Rerun: the re-run shard and the collector report in it | slice 3 | observed: run 41995741329 attempt 2 summary: the re-run E2E part 6 and frontend part 2 present; the collector job ran in attempt 2 |
+| E5.3 | Rerun: the shards not re-run show as missing in attempt 2 | slice 3 | observed: run 41995741329 attempt 2 summary: E2E parts 1-5 missing |
+| E5.4 | Rerun: attempt 1's summary is unchanged | slice 3 | observed: attempt 1 summary downloaded after the rerun is byte-identical (cmp) to the one read before it |
 | 16.1 | CI proof fragments come from the runners' own reports | slice 2 | observed: run 41994366067 at 02f7de38ee (green), ci-proof-summary-attempt-1: fragments come from Vitest's JSON report and the Cucumber preprocessor's messages; no proof recorder runs in CI |
 | 16.2 | The proof recorders keep only deliberate retained proof | slice 2 | observed: proof recorders unchanged in the diff; test:cucumber-proof and test:vitest-proof green |
 | 16.3 | The proof recorders gain no CI duty | slice 2 | observed: no CI step or env var in ci.yml calls or sets the proof recorders |
@@ -81,7 +81,7 @@ the exclusion 15x stay with their commitments and have no rows.
 | 17.2 | It is added only on CI | slice 1 | observed: ci.yml Frontend unit tests step sets CI_PROOF_VITEST_REPORT; local run without it wrote no report and kept default output |
 | 17.3 | `orchestratorGcReporter` and the proof recorder stay configured on CI | slice 1 | observed: frontend/vitest.config.ts keeps orchestratorGcReporter (isCI) and new VitestProofReporter(); pnpm test:vitest-proof 12/12 pass |
 | 18.1 | A broken conversion or collector step fails loudly | slice 1 | observed: scripts/ci/ci-proof-outcomes.mjs reads and parses the report with no catch; .github/ci_proof_fragments/action.yml fragment step has no continue-on-error |
-| 18.2 | A failed collector fails the run | slice 3 | |
+| 18.2 | A failed collector fails the run | slice 3 | observed: ci.yml: ci-proof is an ordinary job of the donut CI workflow, so its failure concludes the run as failure; a failing collector was not exercised |
 | 18.3 | A failed collector does not change any producer job's result | slice 1 | observed: ci.yml: ci-proof is its own job that needs Frontend-unit-tests; no producer step depends on it |
 | 18.4 | A missing or ambiguous part is reported as such | slice 1 | observed: local summarize over part 1's fragment only printed 'part 2 of 2 missing' with {part:2,status:missing} |
 | 18.5 | Such a part is never filled in | slice 1 | observed: local summarize over part 1's fragment only: 9 passed counted, part 2 shown missing with no counts |

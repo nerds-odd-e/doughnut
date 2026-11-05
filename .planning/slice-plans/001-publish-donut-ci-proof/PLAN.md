@@ -141,7 +141,7 @@ where the rerun attempt shows parts that were not re-run as missing.
 ### 3. The dashboard shows the totals, including for a failing run and its rerun
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the dashboard tab for slice 2's green run (example 1). Then a temporary commit on the story branch that makes `cypress_retry.feature` fail on both attempts and one frontend spec fail, pushed: its summary shows the failed counts with all parts present (example 2). "Re-run failed jobs" on that run gives an `attempt-2` summary (example 5). Then the temporary commit is reverted and the revert pushed, and that run is green.
 
 Behavior: the developer opens Intent → CI status for a run → the tab shows
@@ -154,6 +154,16 @@ temporary failing commit and its revert are execution scaffolding and leave
 no trace in the final diff.
 
 Sizing: external CI waits dominate (two runs plus one rerun).
+
+Accepted proof: the browser extension was not connected, so the developer
+checked the tab in one round (2026-11-05) and confirmed all three views:
+green run 41994366067, red run 41995741329 attempt 1 (temporary commit
+137c476bfb: `e2e_test/features` 371 passed and 1 failed in 6 of 6 parts,
+`frontend/tests` 2456 passed and 1 failed in 2 of 2), and its "re-run failed
+jobs" attempt 2 (only the re-run parts present, the others missing).
+Attempt 1's summary was unchanged after the rerun. The revert d2aa488af8 has
+no diff against f33c258f38, and its run 41997870015 was green with all
+parts present.
 
 ## Concern evidence
 
