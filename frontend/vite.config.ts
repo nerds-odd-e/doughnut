@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { URL, fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
+import { type Plugin, defineConfig } from 'vite'
 
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
@@ -17,6 +17,26 @@ import checker from 'vite-plugin-checker'
 const isTest = process.env.VITEST !== undefined
 const backendOrigin =
   process.env.FRONTEND_BACKEND_ORIGIN ?? 'http://localhost:9081'
+
+// lightningcss silently drops CSS rules it can't parse; Tailwind only console.warns. See patches/README.md.
+const failOnCssOptimizeWarnings = (): Plugin => {
+  let warned = false
+  return {
+    name: 'fail-on-css-optimize-warnings',
+    apply: 'build',
+    buildStart() {
+      const warn = console.warn
+      console.warn = (...args: unknown[]) => {
+        if (String(args[0]).includes('while optimizing generated CSS')) warned = true
+        warn(...args)
+      }
+    },
+    closeBundle() {
+      if (warned)
+        throw new Error('CSS optimize warnings: lightningcss dropped rules (see above)')
+    },
+  }
+}
 
 const config = defineConfig({
   // pdf.js uses `new Worker(src, { type: 'module' })`; match that in dev and build.
@@ -36,6 +56,7 @@ const config = defineConfig({
     devSourcemap: !isTest,
   },
   plugins: [
+    failOnCssOptimizeWarnings(),
     tailwindcss(),
     vue({
       template: {
