@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Remove local proof from Donut](seeds/SEED-104-remove-local-proof.md#remove-local-proof) — SEED-104#remove-local-proof ([plan](slice-plans/002-remove-local-proof/PLAN.md))
-
 ## Backlog list
 
 - [Clear CI proof docs of local-proof wording](seeds/SEED-104-remove-local-proof.md#clear-ci-docs-of-local-proof) — SEED-104#clear-ci-docs-of-local-proof

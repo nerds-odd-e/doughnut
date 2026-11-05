@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-104#remove-local-proof",
+  "title": "Remove local proof from Donut",
+  "completedAt": "2026-11-05T14:10:27.515Z",
+  "developer": "Terry Yin",
+  "agent": "Aino-chan",
+  "host": "cursor",
+  "model": "auto"
+}

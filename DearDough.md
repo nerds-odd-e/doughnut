@@ -548,6 +548,6 @@ A planned removal acceptance sweep grepped deleted symbols and paths and returne
   - Tool: Cursor
   - Model: auto
   - Open Dough release: 0.3.86
-  - Evidence: plan sweep command in `.planning/slice-plans/002-remove-local-proof/PLAN.md` (Outside-in proof / slice 3 Proof); empty product reading outside exclusions; `docs/ci-proof-summary.md:22` still "Local runs, the Cloud VM and proof recording"; source-review.md clauses 6 and 20 marked observed from the empty sweep
+  - Evidence: plan sweep command in before-cleanup `3cb5feabc82bf023905b04c00abbf4dc2c58f5b6:.planning/slice-plans/002-remove-local-proof/PLAN.md` (Outside-in proof / slice 3 Proof); empty product reading outside exclusions; `docs/ci-proof-summary.md:22` still "Local runs, the Cloud VM and proof recording"; source-review.md clauses 6 and 20 marked observed from the empty sweep
   - Observed effect: leave-no-trace docs promise accepted with one remaining historical phrase; retrospective opened SEED-104#clear-ci-docs-of-local-proof
   - Inference: matching only retired identifiers under-covers "describes" / no historical-feature-notes obligations; a short prose pass over maintained docs that still mention the feature name would have caught this before acceptance

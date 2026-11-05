@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-104_remove-local-proof.json",
+      "identity": "SEED-104#remove-local-proof",
+      "completedAt": "2026-11-05T14:10:27.515Z",
+      "blob": "f4f41b43122e7f18e0db1be832b2e851e563edab"
+    },
+    {
       "fileName": "SEED-102_publish-donut-ci-proof.json",
       "identity": "SEED-102#publish-donut-ci-proof",
       "completedAt": "2026-11-05T09:17:47.827Z",
