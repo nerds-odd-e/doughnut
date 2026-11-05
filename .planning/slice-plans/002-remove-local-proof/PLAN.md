@@ -128,8 +128,8 @@ Sizing: about 4 minutes.
 ### 3. Node test runs and CI proof stand without any local proof store
 
 Type: Behavior
-Status: planned
-Proof: Local accepted — `./scripts/run.sh pnpm test:log-utils` (6 pass); `./scripts/run.sh pnpm test:path-routing` (17 pass); `./scripts/run.sh pnpm test:ci-proof` (8 pass). Sweep reading at working tree atop e96ef120f3: `git grep -n -i -E "RECORD_(CUCUMBER|VITEST|NODE_TEST)_PROOF|proofGeneration|proofStore|ProofReporter|cucumberProof|nodeTestProof|e2e_test/proof|tests/proof|scripts/proof|infra/proof|proof\.lock|test:(cucumber|vitest|node-test)-proof|retained proof|deliberate proof" -- ':!.planning/**' ':!.agents/skills/dough-*/**' ':!DearDough.md' ':!DonutRetrospectiveFindings.md'` → empty. Example 5 (G-E5) awaits story-branch CI after publish. Refactor: none — already clean.
+Status: done
+Proof: Local accepted — `./scripts/run.sh pnpm test:log-utils` (6 pass); `./scripts/run.sh pnpm test:path-routing` (17 pass); `./scripts/run.sh pnpm test:ci-proof` (8 pass). Sweep reading at working tree atop e96ef120f3: `git grep -n -i -E "RECORD_(CUCUMBER|VITEST|NODE_TEST)_PROOF|proofGeneration|proofStore|ProofReporter|cucumberProof|nodeTestProof|e2e_test/proof|tests/proof|scripts/proof|infra/proof|proof\.lock|test:(cucumber|vitest|node-test)-proof|retained proof|deliberate proof" -- ':!.planning/**' ':!.agents/skills/dough-*/**' ':!DearDough.md' ':!DonutRetrospectiveFindings.md'` → empty. Example 5 (G-E5) accepted: run 42037897618 `ci-proof-summary-attempt-1` lists e2e_test/features 6/6 and frontend/tests 2/2; Intent → CI status shows those locations with all parts; sweep empty outside exclusions. Refactor: none — already clean.
 
 Behavior: `pnpm test:*` scripts and `donut CI` run → the same results and CI
 proof summary; nothing in the repository records or stores local proof.
@@ -164,5 +164,4 @@ This review found no remaining slice-specific concern.
 ### G-E5. CI proof summary after story-branch publish
 Reported: slice 3 — "Story-branch donut CI must show ci-proof-summary with e2e_test/features and frontend/tests"
 Story clause: "A push runs `donut CI` → `ci-proof-summary-attempt-<n>` lists `e2e_test/features` and `frontend/tests` totals, and the Intent → CI status tab shows them against the locations still listed in `.planning/open-dough.json`."
-Disposition: return
-Commitment: 5, E5
+Disposition: proved by slice 3: run 42037897618 ci-proof-summary-attempt-1 + Intent CI status locations
