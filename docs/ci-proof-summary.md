@@ -19,8 +19,8 @@ did not report.
    absolute path under `${RUNNER_TEMP}`, named by an environment variable that
    only the workflow sets: `CI_PROOF_VITEST_REPORT` (read in
    `frontend/vitest.config.ts`) and `CI_PROOF_CUCUMBER_MESSAGES` (read in
-   `e2e_test/config/ci.ts`). Local runs, the Cloud VM and proof recording
-   write no such report.
+   `e2e_test/config/ci.ts`). Local runs and the Cloud VM write no such
+   report.
 2. The composite action `.github/ci_proof_fragments` converts the report with
    `scripts/ci/ci-proof-outcomes.mjs` into one `<status><TAB><repo-relative
    path>` line per test case. It then writes the part's fragment and uploads

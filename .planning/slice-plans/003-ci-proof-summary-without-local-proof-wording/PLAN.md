@@ -3,6 +3,7 @@
 ## Source
 
 **Source:** [Clear CI proof docs of local-proof wording](../../seeds/SEED-104-remove-local-proof.md#clear-ci-docs-of-local-proof)
+**Source review:** [source-review.md](./source-review.md)
 - **Identity:** SEED-104#clear-ci-docs-of-local-proof
 - **Provenance:** Retrospective of SEED-104#remove-local-proof after planned
   slices 1–3. Related product commits: `fe9092acc6`, `e96ef120f3`, `07044faff7`
@@ -59,8 +60,14 @@ marked the "describes" clause observed from that empty reading.
 ### 1. CI proof summary docs omit removed local proof wording
 
 Type: Behavior
-Status: planned
-Proof: pending — reading of edited `docs/ci-proof-summary.md`; `pnpm test:ci-proof`
+Status: done
+Proof: accepted — `docs/ci-proof-summary.md:22` reads "Local runs and the Cloud
+VM write no such report."; one-time reading found no proof-recording /
+local-proof residue in that file; `./scripts/run.sh pnpm test:ci-proof` 8 pass.
+Consumer-trace: production `ci-proof-summary` script/action hits excluded
+(collector basename, not maintained-doc prose); guidance/planning/DearDough
+hits excluded (managed Open Dough copies or non-product records). Source review
+commitments 1–7.2 observed in `source-review.md`.
 
 Behavior: a developer opens `docs/ci-proof-summary.md` → the runner-report step
 states that local runs and the Cloud VM write no such report, without naming
