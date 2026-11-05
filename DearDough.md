@@ -184,6 +184,15 @@ Former local code: DD-219. Retrospective queues and takes a full correction stor
 
 Former local code: DD-221. A plan without the mandatory Source link passes story-obligation list/check while its record is empty, then the first real obligation unexpectedly blocks delivery. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-243.md).
 
+### Occurrences
+
+- Execution: SEED-103#report-gherkin-syntax-errors / 310ef06ed801330559fc90fbc1815d57cfc36d2c
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: 0.3.79
+  - Evidence: 78cfbc5525, slice plan 002 Source header; 2026-11-05 coordinator tool results for story-obligations list and check.
+  - Observed effect: Listing passed with no entries. Recording the deferred CI summary obligation made check refuse with missing-story-source. Changing the plan’s Story link to the canonical Source link made the check pass.
+
 <a id="odf-244"></a>
 
 ## ODF-244 — Real microphone proof is assigned without an agent access route

@@ -79,6 +79,12 @@ test's CI wiring in `lint:all`.
 Sizing: about 5 minutes of code plus two fixture Cypress runs (about 30
 seconds each).
 
+## Execution complete
+
+Product advice: no change. SEED-102 already owns the downstream CI proof
+summary. The startup check and runner regression address this story without
+adding a dependency or changing the configured tag expression.
+
 ## Concern evidence
 
 Slice-plan refinement was not needed: there is one slice, it owns one outcome,
