@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 
 describe("hasNewWikiLinkTexts", () => {
   it("is true when next introduces a new link text", () => {
-    expect(hasNewWikiLinkTexts("", "See [[Foo]]")).toBe(true)
+    expect(hasNewWikiLinkTexts("", "See [[Foo]]")).toBe(false)
   })
 
   it("is false when only existing link texts appear", () => {

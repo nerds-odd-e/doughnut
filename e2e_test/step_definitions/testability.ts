@@ -11,7 +11,7 @@ let retrySucceedsAttempts = 0
 
 Given('a retry succeeds', () => {
   retrySucceedsAttempts += 1
-  expect(retrySucceedsAttempts, 'retry count').to.be.greaterThan(1)
+  expect(retrySucceedsAttempts, 'retry count').to.be.greaterThan(99)
 })
 
 When('Someone triggered an exception', () => {
