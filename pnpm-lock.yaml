@@ -216,7 +216,7 @@ overrides:
   serialize-javascript: '>=7.0.5'
   shell-quote: '>=1.11.0'
   source-map-js: '>=1.2.2'
-  systeminformation: '>=5.31.6'
+  systeminformation: '>=5.33.16'
   tmp: '>=0.2.6'
   undici: '>=8.10.2'
   uuid: '>=14.0.0'
@@ -5168,9 +5168,9 @@ packages:
     engines: {node: '>=14.17.0'}
     hasBin: true
 
-  systeminformation@5.31.12:
-    resolution: {integrity: sha512-qnTtO5wHrKeKE/MvQ6iIt6XAV+5fgt/kPIQf27DYgjVQQuHUfWkV4Gu6k04ZpEzAMuyQ3ZsovY7Ivhp+E9JyWw==}
-    engines: {node: '>=8.0.0'}
+  systeminformation@5.33.19:
+    resolution: {integrity: sha512-Zm7wGeCG7PqfvzegMJIzrxICopWqYCeLATVmvxOOci1isLcNVKgY4Fr0hhYQzvc7cgtK3377jQVChTFAnznOiA==}
+    engines: {node: '>=10.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
 
@@ -8321,7 +8321,7 @@ snapshots:
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
       supports-color: 8.1.1
-      systeminformation: 5.31.12
+      systeminformation: 5.33.19
       tmp: 0.2.7
       tree-kill: 1.2.2
       untildify: 4.0.0
@@ -10791,7 +10791,7 @@ snapshots:
       syncpack-windows-arm64: 15.3.3
       syncpack-windows-x64: 15.3.3
 
-  systeminformation@5.31.12: {}
+  systeminformation@5.33.19: {}
 
   tagged-tag@1.0.0: {}
 
