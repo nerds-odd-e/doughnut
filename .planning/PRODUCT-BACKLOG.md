@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Clear CI proof docs of local-proof wording](seeds/SEED-104-remove-local-proof.md#clear-ci-docs-of-local-proof) — SEED-104#clear-ci-docs-of-local-proof ([plan](slice-plans/003-ci-proof-summary-without-local-proof-wording/PLAN.md))
-
 ## Backlog list
 
 - [Treat paths-ignored CI as the first non-ignored ancestor](seeds/SEED-105-paths-ignored-ci-ancestor-status.md#paths-ignored-ci-ancestor-status) — SEED-105#paths-ignored-ci-ancestor-status

@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-104_clear-ci-docs-of-local-proof.json",
+      "identity": "SEED-104#clear-ci-docs-of-local-proof",
+      "completedAt": "2026-11-05T23:16:51.707Z",
+      "blob": "6f9978d9bb31184bd00f1685a45c0a24e53e3a49"
+    },
+    {
       "fileName": "SEED-104_remove-local-proof.json",
       "identity": "SEED-104#remove-local-proof",
       "completedAt": "2026-11-05T14:10:27.515Z",
