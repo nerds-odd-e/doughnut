@@ -46,7 +46,7 @@ artifacts and dedicated support while ordinary tests and CI proof remain usable.
 - Preserve ordinary test selection, diagnostics, retries, strict result
   handling and existing runner protections. Preserve the ordinary CI reports,
   conversions, fragments, summary artifact and dashboard contract owned by
-  [Publish Donut CI proof for Intent](SEED-102-publish-donut-ci-proof.md#publish-donut-ci-proof).
+  [CI proof summary](../../docs/ci-proof-summary.md).
   Shared code remains only where a surviving test or CI responsibility needs
   it; the local-proof collection and persistence entry points are deleted.
 - Receive retired shared guidance through Open Dough's released update rather
