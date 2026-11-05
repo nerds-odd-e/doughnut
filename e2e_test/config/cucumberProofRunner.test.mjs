@@ -1,53 +1,15 @@
 import assert from 'node:assert/strict'
-import { spawn } from 'node:child_process'
-import { once } from 'node:events'
-import { createRequire } from 'node:module'
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import { test } from 'node:test'
-import { stripVTControlCharacters } from 'node:util'
+import {
+  reporter,
+  runCypress,
+  writeRunnerFixture,
+} from './cucumberProofRunnerFixture.mjs'
+import './cucumberProofRunnerValidation.cases.mjs'
 import { proofProject } from './cucumberProofTestProject.mjs'
-import { writeRunnerFixture } from './cucumberProofRunnerFixture.mjs'
-
-const require = createRequire(import.meta.url)
-const cypress = join(
-  dirname(require.resolve('cypress/package.json')),
-  'bin/cypress'
-)
-const reporter = (output) => {
-  const specs = new Map()
-  const totals = []
-  let rows
-  for (const line of stripVTControlCharacters(output).split('\n')) {
-    const spec = line.match(/^\s*Running:\s+(.*?)\s+\(\d+ of \d+\)/)?.[1]
-    if (spec) {
-      assert.ok(!specs.has(spec), `Duplicate spec: ${spec}`)
-      rows = []
-      specs.set(spec, rows)
-    }
-    if (/^\s*\(Run Finished\)/.test(line)) rows = totals
-    if (
-      /^\s*([✔✓]|\d+\)|\d+ passing|\d+ failing|\d+ pending)/.test(line) ||
-      line.includes('proof fixture')
-    ) {
-      assert.ok(rows, line)
-      rows.push(
-        line
-          .trim()
-          .replaceAll(/\(\d+(?:ms|s)\)/g, '(duration)')
-          .replaceAll(/\s*\d+(?:ms|s)\b/g, ' duration')
-          .replaceAll(/localhost:\d+/g, 'localhost:port')
-      )
-    }
-  }
-  return {
-    specs: [...specs.entries()].sort(([left], [right]) =>
-      left.localeCompare(right)
-    ),
-    totals,
-  }
-}
 
 test('Cypress summary rows compare equal whatever the width of their durations', () => {
   const summary = (duration) =>
@@ -91,33 +53,7 @@ test('ordinary and explicit full, focused, tagged, dry and reported Cypress runs
     const env = { ...process.env, PROOF_MODE: mode }
     delete env.RECORD_CUCUMBER_PROOF
     if (record) env.RECORD_CUCUMBER_PROOF = '1'
-    const child = spawn(
-      process.execPath,
-      [
-        cypress,
-        'run',
-        '--project',
-        project.root,
-        '--config-file',
-        join(project.root, 'cypress.config.cjs'),
-        '--browser',
-        'electron',
-        ...args,
-      ],
-      {
-        cwd: project.root,
-        env,
-        stdio: ['ignore', 'pipe', 'pipe'],
-      }
-    )
-    let output = ''
-    child.stdout.on('data', (chunk) => {
-      output += chunk
-    })
-    child.stderr.on('data', (chunk) => {
-      output += chunk
-    })
-    const [code] = await once(child, 'exit')
+    const { code, output } = await runCypress(project.root, args, env)
     writeFileSync(join(logs, `${label}.log`), output)
     const owners = readFileSync(join(project.root, 'owners.log'), 'utf8')
       .trim()

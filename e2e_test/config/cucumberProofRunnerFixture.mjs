@@ -1,9 +1,83 @@
+import assert from 'node:assert/strict'
+import { spawn } from 'node:child_process'
+import { once } from 'node:events'
+import { mkdirSync, realpathSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { mkdirSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { stripVTControlCharacters } from 'node:util'
 
 const require = createRequire(import.meta.url)
+const cypress = join(
+  dirname(require.resolve('cypress/package.json')),
+  'bin/cypress'
+)
+
+export async function runCypress(root, args, env) {
+  const projectRoot = realpathSync(root)
+  const child = spawn(
+    process.execPath,
+    [
+      cypress,
+      'run',
+      '--project',
+      projectRoot,
+      '--config-file',
+      join(projectRoot, 'cypress.config.cjs'),
+      '--browser',
+      'electron',
+      ...args,
+    ],
+    {
+      cwd: projectRoot,
+      env,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }
+  )
+  let output = ''
+  child.stdout.on('data', (chunk) => {
+    output += chunk
+  })
+  child.stderr.on('data', (chunk) => {
+    output += chunk
+  })
+  const [code] = await once(child, 'close')
+  return { code, output }
+}
+
+export function reporter(output) {
+  const specs = new Map()
+  const totals = []
+  let rows
+  for (const line of stripVTControlCharacters(output).split('\n')) {
+    const spec = line.match(/^\s*Running:\s+(.*?)\s+\(\d+ of \d+\)/)?.[1]
+    if (spec) {
+      assert.ok(!specs.has(spec), `Duplicate spec: ${spec}`)
+      rows = []
+      specs.set(spec, rows)
+    }
+    if (/^\s*\(Run Finished\)/.test(line)) rows = totals
+    if (
+      /^\s*([✔✓]|\d+\)|\d+ passing|\d+ failing|\d+ pending)/.test(line) ||
+      line.includes('proof fixture')
+    ) {
+      assert.ok(rows, line)
+      rows.push(
+        line
+          .trim()
+          .replaceAll(/\(\d+(?:ms|s)\)/g, '(duration)')
+          .replaceAll(/\s*\d+(?:ms|s)\b/g, ' duration')
+          .replaceAll(/localhost:\d+/g, 'localhost:port')
+      )
+    }
+  }
+  return {
+    specs: [...specs.entries()].sort(([left], [right]) =>
+      left.localeCompare(right)
+    ),
+    totals,
+  }
+}
 
 export function writeRunnerFixture(root) {
   const esbuild = require.resolve(

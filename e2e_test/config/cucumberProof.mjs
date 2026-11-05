@@ -1,6 +1,7 @@
 import { devNull } from 'node:os'
 import { createRequire } from 'node:module'
 import { createCucumberProofRecorder } from './cucumberProofRecorder.mjs'
+import { validateCucumberFeatures } from './validateCucumberFeatures.mjs'
 
 const require = createRequire(import.meta.url)
 const {
@@ -10,6 +11,7 @@ const {
 
 /** Preserve active reports; otherwise consume only the message transport. */
 export async function addCucumberPreprocessorWithProof(on, config, repoRoot) {
+  validateCucumberFeatures(config)
   const recorder = createCucumberProofRecorder({
     repoRoot,
     projectRoot: config.projectRoot,

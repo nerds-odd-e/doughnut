@@ -2,8 +2,11 @@
 
 ## Source
 
-- **Story:** [Report Gherkin syntax errors in Cypress CI](../../seeds/SEED-103-report-gherkin-syntax-errors.md#report-gherkin-syntax-errors)
-- **Identity:** SEED-103#report-gherkin-syntax-errors
+**Source:** [Report Gherkin syntax errors in Cypress CI](../../seeds/SEED-103-report-gherkin-syntax-errors.md#report-gherkin-syntax-errors)
+
+**Identity:** SEED-103#report-gherkin-syntax-errors
+
+**Source review:** [Independent review of the story](source-review.md)
 
 ## Goal and scope
 
@@ -61,7 +64,7 @@ otherwise runnable file; any change to `filterSpecs`, tags, or the CI workflow.
 ### 1. A Cypress run refuses feature files that cannot produce scenarios
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new runner test (examples 1–3), with its first assertion red before the check exists; `pnpm test:cucumber-proof`; the story branch's CI run green.
 
 Behavior: a checkout with a feature file that fails to parse or yields no
@@ -83,3 +86,50 @@ and its proof uses one existing harness pattern. This review found no remaining
 slice-specific concern.
 
 ## Learnings
+
+### Accepted slice proof
+
+- Before the validator, the new Cypress runner assertion failed because the
+  focused valid spec ran and Cypress exited 0 with both invalid features
+  present. With the validator, `cucumberProofRunnerValidation.cases.mjs` proves
+  exit 1, both relative filenames and reasons, Gherkin position `(4:5)`, no
+  running spec and no report. The follow-up proves only the valid spec runs
+  and the `@ignore` feature stays silent.
+- `./scripts/run.sh pnpm test:cucumber-proof` passed 29 tests before the
+  independent fixture extraction. The extraction preserved serial runner
+  tests and moved the same process launch and transcript normalization to
+  `cucumberProofRunnerFixture.mjs`. After extraction, `./scripts/run.sh node
+  --test e2e_test/config/cucumberProofRunner.test.mjs` passed all four tests,
+  including the final regression and ordinary, focused, tagged, dry and
+  reported runner compatibility.
+- The validator accepted all 95 repository features. The existing runner
+  test `nonzero test result: cleans owned work and returns the nonzero result`
+  passed via `./scripts/run.sh node --test --test-name-pattern='nonzero test
+  result: cleans owned work and returns the nonzero result'
+  scripts/e2e-runner-batch-failure.cases.mjs`. CI calls that wrapper directly
+  on each shard with inherited Cypress output. The actual story-branch
+  application shards remain subject to the execution completion CI gate.
+- `test:cucumber-proof` already includes the runner test via its glob and
+  `lint:all` already runs that command. The implementation needed no CI wiring
+  edit. The fixture launcher canonicalizes the project root so Cypress's
+  focused absolute spec and its own project root agree on macOS.
+
+### Execution context
+
+- Established start for Nao-chan (`dashboard-territory.local-doughnut`), Story
+  Branch Mode. Workspace `.worktrees/report-gherkin-syntax-errors-in-cypress-ci`
+  under the default checkout, branch `codex/report-gherkin-syntax-errors-in-cypress-ci`,
+  remote `origin`, trunk `main`. Started from `a9e46f6cefa24893b1b9282d1c820079b6c2550c`.
+  Claim and initial story branch published at `78cfbc552565f362049da91b506fa8cb2b377bbe`.
+- Codex observer for `nerds-odd-e/doughnut` story branch, workflow `ci.yml`
+  (`donut CI`), coordinator `nao-seed-103`, mailbox
+  `/tmp/dough-ci-501/watch-LFCf2J`, PID `7147`, session `87487`, cell `g8:6`.
+
+
+## Story obligations
+
+### G1. CI proof summary belongs to SEED-102
+Reported: slice 1 — "The source review identifies the CI proof-summary display as a separate consumer that does not ship with this story."
+Story clause: "Deferred: naming the broken file in the CI proof summary (SEED-102)."
+Disposition: excluded "Deferred: naming the broken file in the CI proof summary (SEED-102)."
+Commitment: C19
