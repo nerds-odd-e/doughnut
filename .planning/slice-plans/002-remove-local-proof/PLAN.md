@@ -7,6 +7,7 @@
 - **Depends on:** [Publish Donut CI proof for Intent](../../seeds/SEED-102-publish-donut-ci-proof.md#publish-donut-ci-proof)
   (recorded as a waiting dependency in the story). Execution starts on a trunk
   that already has SEED-102's CI reports, converter, collector and tests.
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -83,8 +84,8 @@ Record the reading and its revision in this plan.
 ### 1. Cypress runs validate features without the Cucumber proof recorder
 
 Type: Behavior
-Status: planned
-Proof: `CURSOR_DEV=true nix develop -c node --test e2e_test/config/validateCucumberFeatures.test.mjs`; examples 1 and 2 acceptance runs above.
+Status: done
+Proof: Accepted — `CURSOR_DEV=true nix develop -c node --test e2e_test/config/validateCucumberFeatures.test.mjs` (5 pass); `pnpm test:gherkin-validation`; example 1 `SUT_TIMEOUT_MS=360000 … pnpm cy:run --spec e2e_test/features/testability/cypress_retry.feature` (Attempt 1 of 2 then pass); example 2 scratch invalid feature → `Invalid Gherkin feature files` before `Running:`, scratch reverted. Refactor: agent-map Vitest/Node wording no longer names the Cucumber recorder; biome proof JSON overrides consolidated for remaining stores.
 
 Behavior: a developer runs `pnpm cy:run --spec <feature>` → feature files are
 validated before any spec and scenarios run, retry and report as before, with

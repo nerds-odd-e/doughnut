@@ -198,15 +198,7 @@
   },
   "overrides": [
     {
-      "includes": ["e2e_test/proof/**/*.json"],
-      "formatter": { "enabled": false }
-    },
-    {
-      "includes": ["scripts/proof/**/*.json"],
-      "formatter": { "enabled": false }
-    },
-    {
-      "includes": ["infra/proof/**/*.json"],
+      "includes": ["scripts/proof/**/*.json", "infra/proof/**/*.json"],
       "formatter": { "enabled": false }
     },
     {

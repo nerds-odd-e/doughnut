@@ -13,11 +13,12 @@ import {
   WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK,
   worktreeResetIsolationCypressTasks,
 } from '../../scripts/worktree-reset-isolation-barrier.mjs'
+import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-preprocessor'
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import { composeCypressPluginEvents } from './composeCypressPluginEvents.mjs'
-import { addCucumberPreprocessorWithProof } from './cucumberProof.mjs'
 import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
+import { validateCucumberFeatures } from './validateCucumberFeatures.mjs'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { E2E_APP_BASE_URL } from './constants'
 import { notebookPublicationProfileTasks } from './notebookPublicationProfile'
@@ -40,7 +41,7 @@ const commonConfig = {
   environment: 'ci',
   viewportWidth: 1200,
   viewportHeight: 800,
-  // One runMode retry; deliberate proof retains retry-assisted passes.
+  // One runMode retry so a scenario that fails once can still pass in the same run.
   retries: { runMode: 1, openMode: 0 },
 
   e2e: {
@@ -90,7 +91,8 @@ const commonConfig = {
       if (barrierAt === WORKTREE_RESET_ISOLATION_BARRIER_AT_OPENAI_MOCK) {
         appendCucumberExposeTag(config, 'not @openaiUnavailableWhenPaired')
       }
-      await addCucumberPreprocessorWithProof(on, config, repoRoot)
+      validateCucumberFeatures(config)
+      await addCucumberPreprocessorPlugin(on, config)
       const generatedBackendPath = join(
         repoRoot,
         'packages',

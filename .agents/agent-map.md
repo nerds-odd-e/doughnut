@@ -87,31 +87,6 @@ commands and parsing notes live in the `frontend-testing`,
 `backend-testing`, `cli`, `mcp-server`, or `e2e-authoring` skills.
 Raw profiles are local evidence and must not be committed.
 
-Ordinary Cucumber runs, including CI and test optimization, leave retained proof
-untouched. To deliberately generate proof, run from the repository root:
-
-```bash
-RECORD_CUCUMBER_PROOF=1 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_creation.feature
-```
-
-The Gherkin location in `.planning/open-dough.json` declares this instruction and
-`e2e_test/proof`. Select another supported feature or comma-separated selection
-with `--spec` to record that scope. Only the explicit `RECORD_CUCUMBER_PROOF=1`
-option enables recording through both `cy:run` and terminal Cypress.
-Each completed scenario refreshes `e2e_test/proof/latest.json`, retaining one
-success per identity in stable order, with attempts (including retries), total
-duration and tested source. Refresh reads all nested proof files, reduces each
-identity to its latest observation (unsuccessful timestamp ties win), then keeps
-passes and consumes the files into the snapshot. Original provenance remains;
-if no passes remain, the snapshot is removed. A final executed unsuccessful result clears that identity's earlier
-proof; unexecuted cases and unrelated or newer successes remain. Commit proof
-and cleanup deletions deliberately with the work they observed or in a proof
-checkpoint; the recorder does not commit. Published proof and CI results are
-independent observations. Writer ownership is transient and ignored; mutations
-are serialized and atomic within this checkout. Separate worktree Git
-reconciliation must preserve cleanup. Recorder and real-run compatibility checks:
-`CURSOR_DEV=true nix develop -c pnpm test:cucumber-proof`.
-
 Ordinary frontend Vitest runs, including CI shards and test optimization, also
 leave retained proof untouched. To deliberately generate frontend proof, run
 from the repository root:
@@ -123,12 +98,12 @@ RECORD_VITEST_PROOF=1 ./scripts/run.sh pnpm -C frontend test tests/utils/titlePa
 The `frontend/tests` location in `.planning/open-dough.json` declares this
 instruction and `frontend/tests/proof`; select other spec paths to record that
 scope. The recorder, `frontend/vitestProofReporter.ts`, is a configured
-reporter in `frontend/vitest.config.ts` and shares the Cucumber recorder's
-store (`e2e_test/config/proofStore.mjs`). Each finished case refreshes
+reporter in `frontend/vitest.config.ts` and shares the proof store
+(`e2e_test/config/proofStore.mjs`). Each finished case refreshes
 `frontend/tests/proof/latest.json` with one observation per test and Vitest
 project (`chromium`, `chromium-touch`). Do not pass `--reporter` to a recording
 run: it replaces the configured reporters, so nothing is recorded. Commit proof
-deliberately as for Cucumber. Recorder checks:
+deliberately with the work it observes. Recorder checks:
 `./scripts/run.sh pnpm test:vitest-proof`.
 
 Ordinary `node --test` runs under `scripts` and `infra`, including CI and
@@ -144,9 +119,9 @@ The `scripts` and `infra` locations in `.planning/open-dough.json` declare
 `runner: "node:test"`, their proof directories (`scripts/proof`, `infra/proof`)
 and this instruction shape; select other `*.test.mjs` paths to record that
 scope. The recorder, `e2e_test/config/nodeTestProofReporter.mjs`, shares the
-Cucumber and Vitest store (`e2e_test/config/proofStore.mjs`). Each finished case
-refreshes that file's location `latest.json`. Commit proof deliberately as for
-Cucumber. Recorder checks: `./scripts/run.sh pnpm test:node-test-proof`.
+proof store (`e2e_test/config/proofStore.mjs`). Each finished case refreshes
+that file's location `latest.json`. Commit proof deliberately with the work it
+observes. Recorder checks: `./scripts/run.sh pnpm test:node-test-proof`.
 
 **Development vs E2E:** For manual product feedback from the primary checkout,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
