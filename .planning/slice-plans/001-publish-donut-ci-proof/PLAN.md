@@ -198,3 +198,14 @@ review found no remaining slice-specific concern.
   behavior that this story does not change. It may show up more often once
   `fail-fast: false` lets several shards fail in one run. Slice 3 fails only
   one E2E shard.
+
+## Execution complete
+
+Product advice: queue a small CI story to give the E2E `cypress-screenshots`
+upload a name that is unique per shard and attempt. With `fail-fast: false`,
+two failing shards in one run are now more likely, and `upload-artifact`
+refuses a second artifact with the same name. That would fail the second
+shard's upload and lose its screenshots (Learnings; documented action
+behavior, not observed in this execution). No other product change: the
+deferred `scripts`, `infra` and backend counts stay with a later story as the
+story states, and SEED-104 already builds on this CI proof.

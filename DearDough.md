@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 344. Removed numbers are never reused.
+- Highest allocated local number: 345. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Shared-feedback compaction recovery (2026-11-03): `0373e4129d8dbc29189e08bdcb0075969eee0f2c:DearDough.md`; its rows are retained at the linked Open Dough finding owners.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
@@ -525,3 +525,16 @@ The plan for SEED-101#story-2 slice 4 listed `NotePropertyIndexPlannerTest.chang
   - Evidence: `4b4e3ca939:.planning/slice-plans/004-date-property-values-on-every-web-path/PLAN.md`, "Decisive premises" (the last row) and slice 4; slice 4 implementation return, "Gap"; commit `47794ae3e0`.
   - Observed effect: a learner-visible behavior (reformatting keeps a value's date) briefly lost its only test; it cost one extra focused run.
   - Inference: proving a removal per story example does not cover every observation of each deleted test. Checking each deleted assertion for a surviving owner would have caught this at planning.
+
+## DD-345 — The source-review link form did not fit a plan whose Source section is a list
+The record rule says to link `source-review.md` with "one line under `**Source:**` that starts with `**Source review:**`". This plan's header is a `## Source` heading with list items. The coordinator added the link as another list item (`- **Source review:** …`), and the obligations script refused it as `unlinked-source-review`. Removing the list marker, so the line starts with `**Source review:**`, was accepted. The reference names neither the heading form nor the bare-line requirement.
+
+### Occurrences
+- Execution: SEED-102#publish-donut-ci-proof, plan `.planning/slice-plans/001-publish-donut-ci-proof/PLAN.md`, first implementation commit 549d54a217
+  - Timestamp: unknown (before slice 1 commit 549d54a217, committed 2026-11-05T15:12:44+07:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.86
+  - Evidence: `story-obligations.mjs list --slice 1` returned `unlinked-source-review` for the list-item link, then `ok` after the marker was removed; link line in PLAN.md `## Source`
+  - Observed effect: one refused check and one extra edit before slice 1 acceptance could continue
+  - Inference: the cost was small, but any plan that uses a list under `## Source` would meet the same refusal
