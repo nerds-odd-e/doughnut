@@ -1,9 +1,0 @@
-{
-  "version": 1,
-  "observations": [
-    {"file":"scripts/log-utils.test.mjs","test":["createRotatingLogWriter rotates before a write would exceed the cap"],"outcome":"passed","attempts":1,"durationMs":1.385375,"finishedAt":"2026-11-05T05:09:15.374Z","commit":"af1bfe6496314f1e26d503aa28b4967493bc7dac","fileBlob":"8d05c3bae50cd338c19fd4a14be941b8e92b09b2"},
-    {"file":"scripts/log-utils.test.mjs","test":["rotateLogFile keeps the configured number of backups"],"outcome":"passed","attempts":1,"durationMs":3.079458,"finishedAt":"2026-11-05T05:09:15.366Z","commit":"af1bfe6496314f1e26d503aa28b4967493bc7dac","fileBlob":"8d05c3bae50cd338c19fd4a14be941b8e92b09b2"},
-    {"file":"scripts/log-utils.test.mjs","test":["rotateLogFileIfNeeded rotates only when the file reaches the cap"],"outcome":"passed","attempts":1,"durationMs":0.990958,"finishedAt":"2026-11-05T05:09:15.373Z","commit":"af1bfe6496314f1e26d503aa28b4967493bc7dac","fileBlob":"8d05c3bae50cd338c19fd4a14be941b8e92b09b2"},
-    {"file":"scripts/log-utils.test.mjs","test":["tailLogFile returns the requested final lines and can filter first"],"outcome":"passed","attempts":1,"durationMs":0.779375,"finishedAt":"2026-11-05T05:09:15.374Z","commit":"af1bfe6496314f1e26d503aa28b4967493bc7dac","fileBlob":"8d05c3bae50cd338c19fd4a14be941b8e92b09b2"}
-  ]
-}

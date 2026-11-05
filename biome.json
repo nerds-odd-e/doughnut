@@ -198,10 +198,6 @@
   },
   "overrides": [
     {
-      "includes": ["scripts/proof/**/*.json", "infra/proof/**/*.json"],
-      "formatter": { "enabled": false }
-    },
-    {
       "includes": ["**/e2e_test/**/*.{js,ts,jsx,tsx}"],
       "linter": {
         "rules": {

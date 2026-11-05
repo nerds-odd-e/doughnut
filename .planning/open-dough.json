@@ -16,21 +16,13 @@
         "path": "scripts",
         "kind": "javascript",
         "include": ["**/*.test.mjs"],
-        "runner": "node:test",
-        "proof": "scripts/proof",
-        "proofGeneration": {
-          "command": "RECORD_NODE_TEST_PROOF=1 NODE_OPTIONS='--test-reporter=spec --test-reporter-destination=stdout --test-reporter=./e2e_test/config/nodeTestProofReporter.mjs --test-reporter-destination=stdout' ./scripts/run.sh node --test scripts/log-utils.test.mjs"
-        }
+        "runner": "node:test"
       },
       {
         "path": "infra",
         "kind": "javascript",
         "include": ["**/*.test.mjs"],
-        "runner": "node:test",
-        "proof": "infra/proof",
-        "proofGeneration": {
-          "command": "RECORD_NODE_TEST_PROOF=1 NODE_OPTIONS='--test-reporter=spec --test-reporter-destination=stdout --test-reporter=./e2e_test/config/nodeTestProofReporter.mjs --test-reporter-destination=stdout' ./scripts/run.sh node --test infra/gcp/path-routing/path-routing-validation.test.mjs"
-        }
+        "runner": "node:test"
       }
     ]
   }
