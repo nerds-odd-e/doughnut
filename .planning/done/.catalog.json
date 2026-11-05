@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-103_report-gherkin-syntax-errors.json",
+      "identity": "SEED-103#report-gherkin-syntax-errors",
+      "completedAt": "2026-11-05T03:46:52.712Z",
+      "blob": "deef2939007420fdb59885de46d366803d6a6da9"
+    },
+    {
       "fileName": "SEED-101_story-2.json",
       "identity": "SEED-101#story-2",
       "completedAt": "2026-11-04T08:49:37.805Z",
