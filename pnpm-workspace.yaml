@@ -62,7 +62,7 @@ overrides:
   postcss-selector-parser: '>=7.1.6'
   protobufjs: '>=7.5.5'
   proxy-addr: '>=2.0.8'
-  qs: '>=6.14.2'
+  qs: '>=6.16.1'
   rollup: '>=4.59.0'
   serialize-javascript: '>=7.0.5'
   shell-quote: '>=1.11.0'
