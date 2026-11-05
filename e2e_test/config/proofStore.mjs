@@ -18,6 +18,14 @@ import path from 'node:path'
 export const textOrder = (left, right) =>
   left < right ? -1 : left > right ? 1 : 0
 
+export function namesOrder(left, right) {
+  for (let index = 0; index < Math.min(left.length, right.length); index++) {
+    const order = textOrder(left[index], right[index])
+    if (order) return order
+  }
+  return left.length - right.length
+}
+
 function observationsAt(file) {
   return JSON.parse(readFileSync(file, 'utf8')).observations
 }

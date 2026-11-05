@@ -9,7 +9,11 @@ import { execFileSync } from "node:child_process"
 import { readFileSync, realpathSync } from "node:fs"
 import path from "node:path"
 import type { Reporter, TestCase, Vitest } from "vitest/node"
-import { refreshProof, textOrder } from "../e2e_test/config/proofStore.mjs"
+import {
+  namesOrder,
+  refreshProof,
+  textOrder,
+} from "../e2e_test/config/proofStore.mjs"
 
 type Observation = {
   file: string
@@ -33,14 +37,6 @@ type Run = {
   locations: Location[]
   sources: Map<string, Source>
   executions: Map<string, Observation | "failed">
-}
-
-function namesOrder(left: string[], right: string[]): number {
-  for (let index = 0; index < Math.min(left.length, right.length); index++) {
-    const order = textOrder(left[index], right[index])
-    if (order) return order
-  }
-  return left.length - right.length
 }
 
 // A case without a project comes first.

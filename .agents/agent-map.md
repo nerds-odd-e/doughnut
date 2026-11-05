@@ -131,6 +131,23 @@ run: it replaces the configured reporters, so nothing is recorded. Commit proof
 deliberately as for Cucumber. Recorder checks:
 `./scripts/run.sh pnpm test:vitest-proof`.
 
+Ordinary `node --test` runs under `scripts` and `infra`, including CI and
+`pnpm test:*` scripts, leave retained proof untouched. To deliberately generate
+Node test proof, load the recorder through `NODE_OPTIONS` (ordinary scripts
+pass none) from the repository root:
+
+```bash
+RECORD_NODE_TEST_PROOF=1 NODE_OPTIONS='--test-reporter=spec --test-reporter-destination=stdout --test-reporter=./e2e_test/config/nodeTestProofReporter.mjs --test-reporter-destination=stdout' ./scripts/run.sh node --test scripts/log-utils.test.mjs infra/gcp/path-routing/path-routing-validation.test.mjs
+```
+
+The `scripts` and `infra` locations in `.planning/open-dough.json` declare
+`runner: "node:test"`, their proof directories (`scripts/proof`, `infra/proof`)
+and this instruction shape; select other `*.test.mjs` paths to record that
+scope. The recorder, `e2e_test/config/nodeTestProofReporter.mjs`, shares the
+Cucumber and Vitest store (`e2e_test/config/proofStore.mjs`). Each finished case
+refreshes that file's location `latest.json`. Commit proof deliberately as for
+Cucumber. Recorder checks: `./scripts/run.sh pnpm test:node-test-proof`.
+
 **Development vs E2E:** For manual product feedback from the primary checkout,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
 `doughnut_development`, `dev.log`; restart with `pnpm dev:restart`, stop with `pnpm dev:stop`;

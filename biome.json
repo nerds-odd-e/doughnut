@@ -198,6 +198,14 @@
       "formatter": { "enabled": false }
     },
     {
+      "includes": ["scripts/proof/**/*.json"],
+      "formatter": { "enabled": false }
+    },
+    {
+      "includes": ["infra/proof/**/*.json"],
+      "formatter": { "enabled": false }
+    },
+    {
       "includes": ["**/e2e_test/**/*.{js,ts,jsx,tsx}"],
       "linter": {
         "rules": {
