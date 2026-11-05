@@ -8,7 +8,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 345. Removed numbers are never reused.
+- Highest allocated local number: 346. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Shared-feedback compaction recovery (2026-11-03): `0373e4129d8dbc29189e08bdcb0075969eee0f2c:DearDough.md`; its rows are retained at the linked Open Dough finding owners.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
@@ -538,3 +538,16 @@ The record rule says to link `source-review.md` with "one line under `**Source:*
   - Evidence: `story-obligations.mjs list --slice 1` returned `unlinked-source-review` for the list-item link, then `ok` after the marker was removed; link line in that PLAN.md `## Source`
   - Observed effect: one refused check and one extra edit before slice 1 acceptance could continue
   - Inference: the cost was small, but any plan that uses a list under `## Source` would meet the same refusal
+
+## DD-346 — A token-only removal sweep left natural-language wording that still described the deleted feature
+A planned removal acceptance sweep grepped deleted symbols and paths and returned empty, while maintained product docs still named the removed feature in ordinary prose. Source review treated the empty reading as proof that nothing described local proof.
+
+### Occurrences
+- Execution: SEED-104#remove-local-proof; first related implementation commit fe9092acc6a9d13e89242b6de6bd71b68ec14371
+  - Timestamp: 2026-11-05T20:40:29+07:00
+  - Tool: Cursor
+  - Model: auto
+  - Open Dough release: 0.3.86
+  - Evidence: plan sweep command in `.planning/slice-plans/002-remove-local-proof/PLAN.md` (Outside-in proof / slice 3 Proof); empty product reading outside exclusions; `docs/ci-proof-summary.md:22` still "Local runs, the Cloud VM and proof recording"; source-review.md clauses 6 and 20 marked observed from the empty sweep
+  - Observed effect: leave-no-trace docs promise accepted with one remaining historical phrase; retrospective opened SEED-104#clear-ci-docs-of-local-proof
+  - Inference: matching only retired identifiers under-covers "describes" / no historical-feature-notes obligations; a short prose pass over maintained docs that still mention the feature name would have caught this before acceptance

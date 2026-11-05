@@ -165,3 +165,11 @@ This review found no remaining slice-specific concern.
 Reported: slice 3 — "Story-branch donut CI must show ci-proof-summary with e2e_test/features and frontend/tests"
 Story clause: "A push runs `donut CI` → `ci-proof-summary-attempt-<n>` lists `e2e_test/features` and `frontend/tests` totals, and the Intent → CI status tab shows them against the locations still listed in `.planning/open-dough.json`."
 Disposition: proved by slice 3: run 42037897618 ci-proof-summary-attempt-1 + Intent CI status locations
+
+## Execution complete
+
+Product advice: Queue and execute SEED-104#clear-ci-docs-of-local-proof (plan
+`.planning/slice-plans/003-ci-proof-summary-without-local-proof-wording/PLAN.md`)
+so `docs/ci-proof-summary.md` no longer describes local proof recording; after
+that, no further backlog recommendation from this execution. Open Dough managed
+`dough-*/*-proof.md` copies remain an exclusion for a released Open Dough update.
