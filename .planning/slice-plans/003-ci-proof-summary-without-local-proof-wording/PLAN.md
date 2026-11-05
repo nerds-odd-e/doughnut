@@ -86,3 +86,7 @@ None remaining for this bounded correction.
 
 - A token-only removal sweep can miss natural-language residue that still
   describes the deleted feature (see DearDough DD-346).
+
+## Execution complete
+
+Product advice: no change
