@@ -8,9 +8,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Report Gherkin syntax errors in Cypress CI](seeds/SEED-103-report-gherkin-syntax-errors.md#report-gherkin-syntax-errors) — SEED-103#report-gherkin-syntax-errors ([plan](slice-plans/002-report-gherkin-syntax-errors/PLAN.md))
+
 ## Backlog list
 
-- [Report Gherkin syntax errors in Cypress CI](seeds/SEED-103-report-gherkin-syntax-errors.md#report-gherkin-syntax-errors) — SEED-103#report-gherkin-syntax-errors
 - [Publish Donut CI proof for Intent](seeds/SEED-102-publish-donut-ci-proof.md#publish-donut-ci-proof) — SEED-102#publish-donut-ci-proof
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1

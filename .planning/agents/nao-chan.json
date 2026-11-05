@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nao-chan",
+  "email": "nao-chan@example.org",
+  "identity": "SEED-103#report-gherkin-syntax-errors",
+  "mode": "story-branch",
+  "branch": "codex/report-gherkin-syntax-errors-in-cypress-ci",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
