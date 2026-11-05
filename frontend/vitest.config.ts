@@ -14,7 +14,6 @@ import { VueRouterAutoImports } from "vue-router/unplugin"
 import VueRouter from "vue-router/vite"
 import checker from "vite-plugin-checker"
 import { orchestratorGcReporter } from "./orchestratorGcReporter.ts"
-import VitestProofReporter from "./vitestProofReporter.ts"
 
 // Check if we're running tests - Vitest sets process.env.VITEST
 // This is the official and most reliable way to detect test mode
@@ -98,8 +97,6 @@ const config = defineConfig({
       "default",
       // Force-GC the orchestrator page on CI to avoid Chromium renderer crashes.
       ...(isCI ? [orchestratorGcReporter()] : []),
-      // The proof recorder records only when RECORD_VITEST_PROOF=1.
-      new VitestProofReporter(),
       // CI writes a JSON report for the CI proof summary when this names a file.
       ...(ciProofVitestReport
         ? [["json", { outputFile: ciProofVitestReport }] as const]

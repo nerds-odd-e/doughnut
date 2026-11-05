@@ -87,25 +87,6 @@ commands and parsing notes live in the `frontend-testing`,
 `backend-testing`, `cli`, `mcp-server`, or `e2e-authoring` skills.
 Raw profiles are local evidence and must not be committed.
 
-Ordinary frontend Vitest runs, including CI shards and test optimization, also
-leave retained proof untouched. To deliberately generate frontend proof, run
-from the repository root:
-
-```bash
-RECORD_VITEST_PROOF=1 ./scripts/run.sh pnpm -C frontend test tests/utils/titlePatternRender.spec.ts tests/toolbars/DonutMenu.search.touch.spec.ts
-```
-
-The `frontend/tests` location in `.planning/open-dough.json` declares this
-instruction and `frontend/tests/proof`; select other spec paths to record that
-scope. The recorder, `frontend/vitestProofReporter.ts`, is a configured
-reporter in `frontend/vitest.config.ts` and shares the proof store
-(`e2e_test/config/proofStore.mjs`). Each finished case refreshes
-`frontend/tests/proof/latest.json` with one observation per test and Vitest
-project (`chromium`, `chromium-touch`). Do not pass `--reporter` to a recording
-run: it replaces the configured reporters, so nothing is recorded. Commit proof
-deliberately with the work it observes. Recorder checks:
-`./scripts/run.sh pnpm test:vitest-proof`.
-
 Ordinary `node --test` runs under `scripts` and `infra`, including CI and
 `pnpm test:*` scripts, leave retained proof untouched. To deliberately generate
 Node test proof, load the recorder through `NODE_OPTIONS` (ordinary scripts

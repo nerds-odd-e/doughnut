@@ -110,8 +110,8 @@ Sizing: about 8 minutes of edits plus one SUT boot for the two acceptance runs.
 ### 2. Frontend Vitest runs without the proof reporter
 
 Type: Behavior
-Status: planned
-Proof: `./scripts/run.sh pnpm -C frontend test tests/utils/titlePatternRender.spec.ts`; `env -u NODE_ENV CI=true` shard run of one spec with SEED-102's report variable set, then `node --test scripts/ci/ci-proof-outcomes.test.mjs`.
+Status: done
+Proof: Accepted — `./scripts/run.sh pnpm -C frontend test tests/utils/titlePatternRender.spec.ts` (3 pass); `env -u NODE_ENV CI=true CI_PROOF_VITEST_REPORT=… ./scripts/run.sh pnpm -C frontend test tests/utils/titlePatternRender.spec.ts --shard=1/1` writes JSON; `./scripts/run.sh pnpm test:ci-proof` (8 pass). Refactor: none — already clean.
 
 Behavior: a developer or a CI shard runs Vitest → the same output, retries,
 orchestrator GC reporter and CI JSON report, with no proof reporter configured.

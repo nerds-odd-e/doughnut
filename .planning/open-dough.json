@@ -10,11 +10,7 @@
         "path": "frontend/tests",
         "kind": "typescript",
         "include": ["**/*.spec.ts"],
-        "runner": "vitest",
-        "proof": "frontend/tests/proof",
-        "proofGeneration": {
-          "command": "RECORD_VITEST_PROOF=1 ./scripts/run.sh pnpm -C frontend test"
-        }
+        "runner": "vitest"
       },
       {
         "path": "scripts",

@@ -21,7 +21,7 @@
 | 5 | After the change, the `donut CI` proof summary behaves as before. | slice 3 | |
 | 6 | Nothing records, stores, or describes local proof. | slice 3 | |
 | 7.1 | Delete committed local proof snapshots at `e2e_test/proof`. | slice 1 | observed: deleted e2e_test/proof/latest.json; path absent |
-| 7.2 | Delete committed local proof snapshots at `frontend/tests/proof`. | slice 2 | |
+| 7.2 | Delete committed local proof snapshots at `frontend/tests/proof`. | slice 2 | observed: deleted frontend/tests/proof/latest.json; directory absent |
 | 7.3 | Delete committed local proof snapshots at `scripts/proof`. | slice 3 | |
 | 7.4 | Delete committed local proof snapshots at `infra/proof`. | slice 3 | |
 | 8 | Delete any local-proof-only copies and fixture snapshots. | slice 3 | |
@@ -29,13 +29,13 @@
 | 10.1 | Delete Cucumber local proof recorders/stores including `e2e_test/config/cucumberProof*.mjs`. | slice 1 | observed: deleted e2e_test/config/cucumberProof*.mjs and tests; no cucumberProof* remains |
 | 10.2 | Delete Node test local proof recorders/stores including `e2e_test/config/nodeTestProof*.mjs`. | slice 3 | |
 | 10.3 | Delete `e2e_test/config/proofStore.mjs`. | slice 3 | |
-| 10.4 | Delete `frontend/vitestProofReporter.ts` implementation. | slice 2 | |
+| 10.4 | Delete `frontend/vitestProofReporter.ts` implementation. | slice 2 | observed: deleted frontend/vitestProofReporter.ts and frontend/vitestProofReporter.test.mjs |
 | 11 | Trace and delete exclusive refresh, locking, serialization and helper dependencies. | slice 3 | |
 | 12.1 | Remove `RECORD_CUCUMBER_PROOF` collection paths, commands, configuration, hooks and reporter wiring. | slice 1 | observed: RECORD_CUCUMBER_PROOF removed from agent-map, docs, open-dough gherkin location; common.ts no longer loads cucumberProof |
-| 12.2 | Remove `RECORD_VITEST_PROOF` collection paths, commands, configuration, hooks and reporter wiring. | slice 2 | |
+| 12.2 | Remove `RECORD_VITEST_PROOF` collection paths, commands, configuration, hooks and reporter wiring. | slice 2 | observed: RECORD_VITEST_PROOF removed from vitest.config.ts, open-dough frontend/tests location, agent-map |
 | 12.3 | Remove `RECORD_NODE_TEST_PROOF` collection paths, commands, configuration, hooks and reporter wiring. | slice 3 | |
 | 13.1 | Remove `test:cucumber-proof` and its place in `lint:all`. | slice 1 | observed: package.json: test:cucumber-proof replaced by test:gherkin-validation in scripts and lint:all |
-| 13.2 | Remove `test:vitest-proof` and its place in `lint:all`. | slice 2 | |
+| 13.2 | Remove `test:vitest-proof` and its place in `lint:all`. | slice 2 | observed: test:vitest-proof removed from package.json scripts and lint:all |
 | 13.3 | Remove `test:node-test-proof` and its place in `lint:all`. | slice 3 | |
 | 14 | Remove local `proof` and `proofGeneration` settings from `.planning/open-dough.json`. | slice 3 | |
 | 15 | Preserve the Intent locations (`path`, `kind`, `include`, `runner`) used for source browsing and CI proof entry identities. | slice 3 | |
@@ -70,7 +70,7 @@
 | 40 | Complete deletion, not an opt-out default or a disabled recorder. | slice 3 | |
 | E1 | A developer runs `pnpm cy:run --spec e2e_test/features/testability/cypress_retry.feature` → the scenario retries once and passes as before, with the same Cypress summary and exit code. | slice 1 | observed: SUT_TIMEOUT_MS=360000 cy:run cypress_retry.feature: Attempt 1 of 2 then pass; All specs passed; exit 0 |
 | E2 | A selected Cypress project contains a feature file with a stray line or an `Examples:` block with no rows → the run fails before any spec with `Invalid Gherkin feature files` naming each bad file, as today. | slice 1 | observed: scratch stray line on note_creation.feature; cy:run cypress_retry failed with Invalid Gherkin naming it before Running:; scratch reverted |
-| E3 | A developer runs `./scripts/run.sh pnpm -C frontend test <spec>` locally, and CI runs both Vitest shards → output, retries and the CI-only orchestrator GC reporter are unchanged, and the CI shard still writes the JSON report SEED-102 converts. | slice 2 | |
+| E3 | A developer runs `./scripts/run.sh pnpm -C frontend test <spec>` locally, and CI runs both Vitest shards → output, retries and the CI-only orchestrator GC reporter are unchanged, and the CI shard still writes the JSON report SEED-102 converts. | slice 2 | observed: ./scripts/run.sh pnpm -C frontend test titlePatternRender.spec.ts 3 pass; CI=true CI_PROOF_VITEST_REPORT shard writes JSON; pnpm test:ci-proof 8 pass; orchestratorGcReporter retained in vitest.config.ts |
 | E4 | `pnpm lint:all` runs → the remaining `test:*` scripts, including the CI proof tests, pass; no local proof test script is listed. | slice 3 | |
 | E5 | A push runs `donut CI` → `ci-proof-summary-attempt-<n>` lists `e2e_test/features` and `frontend/tests` totals, and the Intent → CI status tab shows them against the locations still listed in `.planning/open-dough.json`. | slice 3 | |
 | E6 | Boundary: the sweep finds the `frontend` skill's "Frontend proof" rule and the CI proof summary → both stay, because they are not local proof. | slice 3 | |
