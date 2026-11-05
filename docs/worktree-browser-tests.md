@@ -90,6 +90,11 @@ supported features sequentially with one stack. The invocation starts a private
 OpenAI or Wikidata mock if any selected feature needs it, then cleans up once
 at the end.
 
+Cypress validates every feature matched by its configuration before tag
+filtering. A feature with a Gherkin parse error or no scenarios stops even a
+focused run before any spec starts. The error identifies each affected file
+and gives its diagnostic.
+
 Select one or more supported specs; the command owns startup and cleanup. The
 admitted set — application-only active features plus the CLI, MCP,
 OpenAI-mock, and Wikidata-mock focused specs — is declared in the
