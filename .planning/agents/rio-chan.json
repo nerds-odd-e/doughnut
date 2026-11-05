@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Rio-chan",
+  "email": "rio-chan@example.org",
+  "identity": "SEED-104#clear-ci-docs-of-local-proof",
+  "mode": "story-branch",
+  "branch": "cursor/clear-ci-proof-docs-of-local-proof-wording",
+  "host": "cursor",
+  "model": "auto"
+}
