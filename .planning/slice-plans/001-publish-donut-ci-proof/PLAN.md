@@ -4,6 +4,7 @@
 
 - **Story:** [Publish Donut CI proof for Intent](../../seeds/SEED-102-publish-donut-ci-proof.md#publish-donut-ci-proof)
 - **Identity:** SEED-102#publish-donut-ci-proof
+**Source review:** [source-review.md](source-review.md)
 - **Recipe:** [CI proof summary](../../../.agents/skills/dough-test-optimization/references/ci-proof-summary.md)
   (Open Dough guidance 0.3.86)
 
@@ -147,6 +148,16 @@ proof loop, and the sizes are stated with their external-wait exception. This
 review found no remaining slice-specific concern.
 
 ## Learnings
+
+- Slice 1 refactor: the fragment and upload steps live in the composite action
+  `.github/ci_proof_fragments` (inputs `format`, `report`, `entry`, `part`,
+  `parts`), and the collector steps in `.github/ci_proof_summary` (input
+  `expect`, space-separated `<entry>=<parts>`). Slice 2 calls
+  `ci_proof_fragments` from the E2E job, appends `e2e_test/features=6` before
+  `frontend/tests=2` in `expect`, and extends the entry list asserted in
+  `scripts/ci/ci-workflow.test.mjs`. This keeps `ci.yml` at 250 lines.
+- The four collector copies are excluded from Biome in `biome.json`, so
+  they stay byte-identical to the installed guidance.
 
 - A Gherkin syntax error in a selected feature file makes Cypress silently
   skip that spec. The run passes and the messages report has no trace of it

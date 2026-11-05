@@ -1,0 +1,43 @@
+name: "Keep CI proof fragments"
+description: "Convert a test runner's report into this job part's CI proof fragments and keep them for the ci-proof job"
+inputs:
+  format:
+    description: "Report format that scripts/ci/ci-proof-outcomes.mjs converts"
+    required: true
+  report:
+    description: "Absolute path of the runner's report"
+    required: true
+  entry:
+    description: "Intent location the report proves"
+    required: true
+  part:
+    description: "This job part's number, 1 to parts"
+    required: true
+  parts:
+    description: "Number of parts the entry runs in"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Write the CI proof fragments
+      shell: bash
+      env:
+        FORMAT: ${{ inputs.format }}
+        REPORT: ${{ inputs.report }}
+        ENTRY: ${{ inputs.entry }}
+        PART: ${{ inputs.part }}
+        PARTS: ${{ inputs.parts }}
+      run: |
+        node scripts/ci/ci-proof-outcomes.mjs "${FORMAT}" "${REPORT}" > "${RUNNER_TEMP}/ci-proof-outcomes.tsv"
+        node scripts/ci/ci-proof-summary.mjs fragment \
+          --outcomes "${RUNNER_TEMP}/ci-proof-outcomes.tsv" --entry "${ENTRY}" \
+          --part "${PART}" --of "${PARTS}" --attempt "${GITHUB_RUN_ATTEMPT}" \
+          --revision "${CI_PROOF_REVISION}" --out "${RUNNER_TEMP}/ci-proof"
+    - name: Keep the CI proof fragments
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: ci-proof-fragments-${{ github.job }}-${{ inputs.part }}-attempt-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/ci-proof/
+        if-no-files-found: ignore
+        retention-days: 1

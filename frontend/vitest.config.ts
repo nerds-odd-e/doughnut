@@ -20,6 +20,7 @@ import VitestProofReporter from "./vitestProofReporter.ts"
 // This is the official and most reliable way to detect test mode
 const isTest = process.env.VITEST !== undefined
 const isCI = process.env.CI === "true"
+const ciProofVitestReport = process.env.CI_PROOF_VITEST_REPORT
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url))
 
@@ -99,6 +100,10 @@ const config = defineConfig({
       ...(isCI ? [orchestratorGcReporter()] : []),
       // The proof recorder records only when RECORD_VITEST_PROOF=1.
       new VitestProofReporter(),
+      // CI writes a JSON report for the CI proof summary when this names a file.
+      ...(ciProofVitestReport
+        ? [["json", { outputFile: ciProofVitestReport }] as const]
+        : []),
     ],
     setupFiles: ["./tests/setupVitest.ts"],
     include: ["./**/*.spec.{ts,tsx}"],

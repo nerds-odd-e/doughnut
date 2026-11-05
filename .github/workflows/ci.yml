@@ -28,6 +28,7 @@ env:
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  CI_PROOF_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   Lint-N-Backend-Generated-Types-For-Frontend:
@@ -97,7 +98,30 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-      - run: pnpm frontend:test --shard=${{ matrix.shard }}/2
+      - id: frontend-tests
+        run: pnpm frontend:test --shard=${{ matrix.shard }}/2
+        env:
+          CI_PROOF_VITEST_REPORT: ${{ runner.temp }}/vitest-report.json
+      - if: ${{ !cancelled() && steps.frontend-tests.outcome != 'skipped' }}
+        uses: ./.github/ci_proof_fragments
+        with:
+          format: vitest
+          report: ${{ runner.temp }}/vitest-report.json
+          entry: frontend/tests
+          part: ${{ matrix.shard }}
+          parts: ${{ strategy.job-total }}
+
+  ci-proof:
+    name: CI proof summary
+    needs: [Frontend-unit-tests]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/ci_proof_summary
+        with:
+          node_version: ${{ vars.NODE_VERSION }}
+          expect: frontend/tests=2
 
   Other-unit-tests:
     name: Other Unit Tests
