@@ -24,7 +24,7 @@ the exclusion 15x stay with their commitments and have no rows.
 | 2 | The developer can tell from the dashboard what an ordinary CI run actually proved, instead of only the verdict or retained proof | slice 3 | |
 | 3.1 | Copy the recipe's four collector modules into `scripts/ci/` | slice 1 | observed: cmp: scripts/ci/ci-proof-{contract,summary,fragments,collect}.mjs identical to .agents/skills/dough-test-optimization/scripts/ (0.3.86) |
 | 3.2 | Write one fragment per producer part | slice 2 | |
-| 3.3 | Add one collector job that publishes `ci-proof-summary-attempt-<n>` | slice 1 | |
+| 3.3 | Add one collector job that publishes `ci-proof-summary-attempt-<n>` | slice 1 | observed: run 41992761387 at 549d54a217: artifact ci-proof-summary-attempt-1 holds only ci-proof-summary.json naming that run, attempt 1 and revision; frontend/tests 2457 passed = shard logs 1217 + 1240, parts 1 and 2 present |
 | 4 | Entries and parts are listed in `intent.locations` order | slice 2 | |
 | 4.1 | `e2e_test/features` has the six E2E matrix parts | slice 2 | |
 | 4.2 | `frontend/tests` has the two Vitest shard parts | slice 1 | observed: ci.yml ci-proof job: ./.github/ci_proof_summary with expect: frontend/tests=2; scripts/ci/ci-workflow.test.mjs 'CI proof expects each entry in as many parts as its producer matrix runs' |

@@ -87,7 +87,7 @@ planning (see Learnings).
 ### 1. A CI run publishes a summary with frontend unit totals
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `node --test scripts/ci/ci-workflow.test.mjs scripts/ci/ci-proof-outcomes.test.mjs`; a local CI-profile shard run converted, turned into a fragment, and summarized; the real run's summary artifact (example 1, frontend).
 
 Behavior: a push to the story branch → `donut CI` runs both Vitest shards,
@@ -105,6 +105,12 @@ no-fail-fast assertions in `ci-workflow.test.mjs`; `test:ci-proof` in
 
 Sizing: about 10 minutes of local work plus one external CI wait, the stated
 exception to the slice target.
+
+Accepted proof: `pnpm test:ci-proof` 5/5; a local two-shard CI-profile run
+summarized to 20 passed checks, and part 1 alone reported part 2 missing.
+Real run 41992761387 at 549d54a217 (green) published
+`ci-proof-summary-attempt-1` with `frontend/tests` 2457 passed in parts 1
+and 2, equal to the shard logs' 1217 and 1240.
 
 ### 2. The summary adds end-to-end totals from all six shards
 
