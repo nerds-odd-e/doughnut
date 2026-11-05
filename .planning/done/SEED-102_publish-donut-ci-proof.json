@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-102#publish-donut-ci-proof",
+  "title": "Publish Donut CI proof for Intent",
+  "completedAt": "2026-11-05T09:17:47.827Z",
+  "developer": "Terry Yin",
+  "agent": "Maria-chan",
+  "host": "claude"
+}

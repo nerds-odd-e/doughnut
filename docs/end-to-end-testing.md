@@ -60,7 +60,8 @@ is removed. Final executed failures clear earlier proof
 for that identity; unexecuted scenarios keep theirs. Commit deliberately
 generated proof and cleanup with the observed work or in an intentional proof
 checkpoint. Recording never commits automatically. Published proof is the last
-deliberately retained verification; CI results are independent observations.
+deliberately retained verification; CI results are independent observations
+(see [CI proof summary](ci-proof-summary.md)).
 
 ## Structure
 

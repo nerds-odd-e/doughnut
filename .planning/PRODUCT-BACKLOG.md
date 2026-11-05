@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Publish Donut CI proof for Intent](seeds/SEED-102-publish-donut-ci-proof.md#publish-donut-ci-proof) — SEED-102#publish-donut-ci-proof ([plan](slice-plans/001-publish-donut-ci-proof/PLAN.md))
-
 ## Backlog list
 
 - [Remove local proof from Donut](seeds/SEED-104-remove-local-proof.md#remove-local-proof) — SEED-104#remove-local-proof

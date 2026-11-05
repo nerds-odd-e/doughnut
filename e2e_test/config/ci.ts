@@ -21,6 +21,13 @@ export default defineConfig({
       ? excludeTags('@ignore', '@wip', ...publicationProfileTags)
       : excludeTags('@ignore', ...publicationProfileTags),
     RECORD_E2E_TIMING: process.env.RECORD_E2E_TIMING,
+    // The CI workflow names an absolute path for the CI proof summary.
+    ...(process.env.CI_PROOF_CUCUMBER_MESSAGES
+      ? {
+          messagesEnabled: true,
+          messagesOutput: process.env.CI_PROOF_CUCUMBER_MESSAGES,
+        }
+      : {}),
   },
   video: false,
   watchForFileChanges: false,

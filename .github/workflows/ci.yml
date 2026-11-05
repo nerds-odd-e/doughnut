@@ -28,6 +28,7 @@ env:
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  CI_PROOF_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   Lint-N-Backend-Generated-Types-For-Frontend:
@@ -97,7 +98,28 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-      - run: pnpm frontend:test --shard=${{ matrix.shard }}/2
+      - id: frontend-tests
+        run: pnpm frontend:test --shard=${{ matrix.shard }}/2
+        env:
+          CI_PROOF_VITEST_REPORT: ${{ runner.temp }}/vitest-report.json
+      - if: ${{ !cancelled() && steps.frontend-tests.outcome != 'skipped' }}
+        uses: ./.github/ci_proof_fragments
+        with:
+          format: vitest
+          report: ${{ runner.temp }}/vitest-report.json
+          entry: frontend/tests
+
+  ci-proof:
+    name: CI proof summary
+    needs: [E2E-tests, Frontend-unit-tests]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/ci_proof_summary
+        with:
+          node_version: ${{ vars.NODE_VERSION }}
+          expect: e2e_test/features=6 frontend/tests=2
 
   Other-unit-tests:
     name: Other Unit Tests
@@ -145,6 +167,7 @@ jobs:
     name: End-to-End tests with Database
     runs-on: ${{ vars.RUNNER }}
     strategy:
+      fail-fast: false
       matrix:
         spec:
           - |
@@ -200,25 +223,21 @@ jobs:
         uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-      - name: Restore E2E bundled dist cache
-        id: e2e-dist-cache
-        uses: actions/cache@v6
-        with:
-          path: |
-            frontend/dist
-            cli/dist
-          key: ${{ runner.os }}-e2e-dist-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'frontend/package.json', 'frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/index.html', 'frontend/src/**', 'frontend/public/**', 'cli/package.json', 'cli/src/**', 'cli/tsconfig.json', 'packages/generated/donut-backend-api/**', 'packages/donut-api/**') }}
-      - name: Build E2E bundles if needed
-        run: bash scripts/ci/e2e-bundle-if-needed.sh
-        env:
-          E2E_DIST_CACHE_HIT: ${{ steps.e2e-dist-cache.outputs.cache-hit }}
+      - uses: ./.github/e2e_bundles
       - name: Run E2E matrix via owned invocation wrapper
+        id: e2e-tests
         run: |
           SUT_RUNTIME_TARGET='{"built":true}' node scripts/e2e-runner.mjs --spec "${{ matrix.spec }}" --browser chrome
         env:
-          E2E_DIST_CACHE_HIT: ${{ steps.e2e-dist-cache.outputs.cache-hit }}
           GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
           NO_PROXY: 127.0.0.1,localhost
+          CI_PROOF_CUCUMBER_MESSAGES: ${{ runner.temp }}/cucumber-messages.ndjson
+      - if: ${{ !cancelled() && steps.e2e-tests.outcome != 'skipped' }}
+        uses: ./.github/ci_proof_fragments
+        with:
+          format: cucumber
+          report: ${{ runner.temp }}/cucumber-messages.ndjson
+          entry: e2e_test/features
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

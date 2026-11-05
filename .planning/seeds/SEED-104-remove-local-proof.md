@@ -69,7 +69,7 @@ describes local proof.
   that does not use proof fixtures.
 - The ordinary CI reports, conversions, fragments, summary artifact and
   dashboard contract owned by
-  [Publish Donut CI proof for Intent](SEED-102-publish-donut-ci-proof.md#publish-donut-ci-proof)
+  [CI proof summary](../../docs/ci-proof-summary.md)
   stay, with their maintained tests. Shared code remains only where a
   surviving test or CI responsibility needs it.
 

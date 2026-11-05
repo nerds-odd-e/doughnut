@@ -1,0 +1,38 @@
+name: "Summarize CI proof"
+description: "Collect this attempt's CI proof fragments into the ci-proof-summary-attempt-<n> artifact"
+inputs:
+  node_version:
+    description: "NodeJS Version"
+    required: true
+  expect:
+    description: "Space-separated <entry>=<parts>, in intent.locations order"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v7
+      with:
+        node-version: ${{ inputs.node_version }}
+    - uses: actions/download-artifact@v8
+      with:
+        pattern: ci-proof-fragments-*-attempt-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/ci-proof-fragments
+    - name: Summarize CI proof
+      shell: bash
+      env:
+        EXPECT: ${{ inputs.expect }}
+      run: |
+        mkdir -p -- "${RUNNER_TEMP}/ci-proof-fragments"
+        expectations=()
+        for expectation in ${EXPECT}; do expectations+=(--expect "${expectation}"); done
+        node scripts/ci/ci-proof-summary.mjs summarize \
+          --fragments "${RUNNER_TEMP}/ci-proof-fragments" "${expectations[@]}" \
+          --repository "${GITHUB_REPOSITORY}" --run-id "${GITHUB_RUN_ID}" \
+          --attempt "${GITHUB_RUN_ATTEMPT}" --revision "${CI_PROOF_REVISION}" \
+          --out "${RUNNER_TEMP}/ci-proof-summary.json"
+    - uses: actions/upload-artifact@v7
+      with:
+        name: ci-proof-summary-attempt-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/ci-proof-summary.json
+        if-no-files-found: error
+        retention-days: 30
