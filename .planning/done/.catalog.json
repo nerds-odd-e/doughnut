@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-102_publish-donut-ci-proof.json",
+      "identity": "SEED-102#publish-donut-ci-proof",
+      "completedAt": "2026-11-05T09:17:47.827Z",
+      "blob": "087c28753d94d8966cb50aeda5b7bfbe2368ae42"
+    },
+    {
       "fileName": "SEED-103_report-gherkin-syntax-errors.json",
       "identity": "SEED-103#report-gherkin-syntax-errors",
       "completedAt": "2026-11-05T03:46:52.712Z",

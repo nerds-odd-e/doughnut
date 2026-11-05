@@ -530,11 +530,11 @@ The plan for SEED-101#story-2 slice 4 listed `NotePropertyIndexPlannerTest.chang
 The record rule says to link `source-review.md` with "one line under `**Source:**` that starts with `**Source review:**`". This plan's header is a `## Source` heading with list items. The coordinator added the link as another list item (`- **Source review:** …`), and the obligations script refused it as `unlinked-source-review`. Removing the list marker, so the line starts with `**Source review:**`, was accepted. The reference names neither the heading form nor the bare-line requirement.
 
 ### Occurrences
-- Execution: SEED-102#publish-donut-ci-proof, plan `.planning/slice-plans/001-publish-donut-ci-proof/PLAN.md`, first implementation commit 549d54a217
+- Execution: SEED-102#publish-donut-ci-proof, plan `ce02725578:.planning/slice-plans/001-publish-donut-ci-proof/PLAN.md`, first implementation commit 549d54a217
   - Timestamp: unknown (before slice 1 commit 549d54a217, committed 2026-11-05T15:12:44+07:00)
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.86
-  - Evidence: `story-obligations.mjs list --slice 1` returned `unlinked-source-review` for the list-item link, then `ok` after the marker was removed; link line in PLAN.md `## Source`
+  - Evidence: `story-obligations.mjs list --slice 1` returned `unlinked-source-review` for the list-item link, then `ok` after the marker was removed; link line in that PLAN.md `## Source`
   - Observed effect: one refused check and one extra edit before slice 1 acceptance could continue
   - Inference: the cost was small, but any plan that uses a list under `## Source` would meet the same refusal
