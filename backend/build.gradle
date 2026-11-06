@@ -70,8 +70,8 @@ repositories {
 def jdkUnsafeMemoryAccessJvmArgs = ['--sun-misc-unsafe-memory-access=allow']
 
 dependencies {
-  implementation platform('com.google.cloud:libraries-bom:26.91.0')
-  implementation 'com.google.cloud:google-cloud-storage:2.76.0'
+  implementation platform('com.google.cloud:libraries-bom:26.92.0')
+  implementation 'com.google.cloud:google-cloud-storage:2.77.0'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.4'
   implementation 'tools.jackson.datatype:jackson-datatype-hibernate7'
@@ -87,13 +87,13 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springframework.security:spring-security-oauth2-authorization-server'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.2.0'
-  implementation 'com.openai:openai-java:4.96.0'
+  implementation 'com.openai:openai-java:4.101.0'
   implementation 'org.yaml:snakeyaml:2.7'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
   implementation 'net.javacrumbs.shedlock:shedlock-spring:7.10.1'
   implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.10.1'
-  implementation 'org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r'
+  implementation 'org.eclipse.jgit:org.eclipse.jgit:7.8.1.202611041320-r'
   implementation 'org.apache.pdfbox:pdfbox:3.0.8'
   implementation 'io.modelcontextprotocol.sdk:mcp:2.1.0'
   compileOnly 'org.projectlombok:lombok:1.18.48'
