@@ -30,7 +30,7 @@
     "markdansi": "0.3.7",
     "react": "19.3.1",
     "string-width": "8.3.0",
-    "turndown": "^7.2.4",
+    "turndown": "7.2.5",
     "yaml": "2.9.1",
     "yoga-layout": "~3.2.1"
   },

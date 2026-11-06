@@ -25,7 +25,7 @@
     "file-saver": "^2.0.5",
     "mini-debounce": "^1.0.8",
     "quill": "npm:@dotwee/quill@2.0.9",
-    "turndown": "^7.2.4",
+    "turndown": "7.2.5",
     "turndown-plugin-gfm": "^1.0.2",
     "vue-content-loader": "2.0.1",
     "vue-toastification": "2.0.0-rc.5",
