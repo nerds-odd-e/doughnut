@@ -10,14 +10,14 @@ specific files in the journeys illustrate their promises.
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| C01 | Intent shows cumulative recorded Vitest execution time as `durationMs` for the judged attempt. | slice 3 |  |
-| C02 | Intent shows the Vitest per-file breakdown for that attempt. | slice 3 |  |
-| C03 | Intent shows cumulative recorded Cucumber execution time as `durationMs` for the judged attempt. | slice 3 |  |
-| C04 | Intent shows the Cucumber per-file breakdown for that attempt. | slice 3 |  |
-| C05 | Published entry timing totals match the corresponding runner reports. | slice 3 |  |
-| C06 | Published file counts and timings match the corresponding runner reports. | slice 3 |  |
-| C07 | Intent entry timing totals match the downloaded `ci-proof-summary-attempt-<n>` artifact for the same attempt. | slice 3 |  |
-| C08 | Intent file breakdowns match the downloaded artifact for the same attempt. | slice 3 |  |
+| C01 | Intent shows cumulative recorded Vitest execution time as `durationMs` for the judged attempt. | slice 3 | observed: Intent CI status at 7091f30, run 42379804192 attempt 1 showed frontend/tests 1 min 3 s, 2457 passed, 2 of 2 parts. |
+| C02 | Intent shows the Vitest per-file breakdown for that attempt. | slice 3 | observed: Intent Proof tab at Branch 7091f30 showed frontend/tests/DonutApp.loadingThinBar.spec.ts as 1 check, 20 ms, with 2 of 2 parts. |
+| C03 | Intent shows cumulative recorded Cucumber execution time as `durationMs` for the judged attempt. | slice 3 | observed: Intent CI status at 7091f30, run 42379804192 attempt 1 showed e2e_test/features 12 min 17 s, 372 passed, 6 of 6 parts. |
+| C04 | Intent shows the Cucumber per-file breakdown for that attempt. | slice 3 | observed: Intent Proof tab at Branch 7091f30 showed e2e_test/features/bazaar/bazaar_subscription.feature as 3 checks, 7.1 s, with 6 of 6 parts. |
+| C05 | Published entry timing totals match the corresponding runner reports. | slice 3 | observed: All eight CI producer audits independently summed raw runner timing. compare.py matched the projected per-part and cumulative figures to the exact downloaded summary. |
+| C06 | Published file counts and timings match the corresponding runner reports. | slice 3 | observed: All eight producer audits independently compared every raw-report file count and timing to its fragment. compare.py reconciled the full per-file rollup in the summary and the sample from each entry. |
+| C07 | Intent entry timing totals match the downloaded `ci-proof-summary-attempt-<n>` artifact for the same attempt. | slice 3 | observed: Intent and downloaded summary agree for exact run 42379804192 attempt 1 at 7091f30. Rounded durations 12 min 17 s and 1 min 3 s correspond to 737252 ms and 63256.4 ms. |
+| C08 | Intent file breakdowns match the downloaded artifact for the same attempt. | slice 3 | observed: Intent proof and downloaded summary agree for one file per entry at Branch 7091f30. The 7090 ms Cucumber feature appears as 7.1 s and the 20.4 ms Vitest spec as 20 ms. |
 | C09 | Keep Vitest JSON as the input to the existing project conversion. | slice 2 | observed: Vitest producer YAML still reads CI_PROOF_VITEST_REPORT. The real action test supplies its Vitest JSON and asserts its fragment. |
 | C10 | Keep Cucumber messages as the input to the existing project conversion. | slice 2 | observed: Cucumber producer YAML still reads CI_PROOF_CUCUMBER_MESSAGES. The real action test supplies its NDJSON messages and asserts its fragment. |
 | C11 | Keep project conversion feeding timed proof fragments. | slice 2 | observed: The two real fragment-action tests run the shell and assert written timing rows and timed fragments. |
@@ -62,8 +62,8 @@ specific files in the journeys illustrate their promises.
 | R03 | Untimed checks still count. | slice 2 | observed: Real action tests assert skipped mixed-file and load-failed untimed counts. The Cucumber fixture counts its untimed scenario. |
 | R04 | Published labels contain no machine-absolute paths. | slice 2 | observed: Both real action fixtures assert exact relative file labels. The Vitest fixture supplies an absolute runner filename. |
 | R05 | Published labels stay repository-relative inside their entry. | slice 2 | observed: Real action tests assert files only under each expected entry. Collector byte copy retains isPathIn validation. |
-| J01 | Both Vitest shards report assertions with durations, including a failed test. After collector upload, runner reports, summary and Intent agree for the entry and example file. | slice 3 |  |
-| J02 | All six Cucumber shards report final-attempt durations, including a failed scenario. After collector upload, runner messages, summary and Intent agree for the entry and example feature. | slice 3 |  |
+| J01 | Both Vitest shards report assertions with durations, including a failed test. After collector upload, runner reports, summary and Intent agree for the entry and example file. | slice 3 | observed: Both hosted Vitest shards matched raw report totals and sampled file figures in the exact artifact and Intent. The slice 2 real-action fixture and two-part summary separately exercise a recorded failed assertion. |
+| J02 | All six Cucumber shards report final-attempt durations, including a failed scenario. After collector upload, runner messages, summary and Intent agree for the entry and example feature. | slice 3 | observed: All six hosted Cypress shards matched final-attempt report totals and sampled feature figures in the exact artifact and Intent. The slice 2 real-action fixture and summarize probe separately exercise a timed failed retry. |
 | J03 | Summarize five of six Cucumber fragments. Show the gap and include the present counts, durations and breakdown. | slice 2 | observed: probe.mjs passes five Cucumber fragments to the real collector and asserts five counts, 1875 ms, five file rows and missing part 6. |
 | J04 | Fragment and summarize a Vitest or Cucumber part with failed timed checks. Keep their failures and their entry and file times. | slice 2 | observed: Both real action timing tests and probe.mjs keep failure counts and their durations in each file and its summary entry. |
 | J05 | Convert and fragment a Vitest file with failed status and no assertions. Keep one failed check, emit no timing line and mark it untimed. | slice 2 | observed: Real Vitest action fixture asserts a failed, untimed load-failed file and excludes its row from the exact times file assertion. |

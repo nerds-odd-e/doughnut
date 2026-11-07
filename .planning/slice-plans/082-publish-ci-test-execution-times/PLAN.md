@@ -127,7 +127,7 @@ the exact run's logs, artifacts and Intent view.
 
 ### 3. Judged CI attempt shows timed proof in the summary and Intent
 Type: Behavior
-Status: planned
+Status: done
 Proof: Early probe after slices 1–2 are on the judged workflow: download
 `ci-proof-summary-attempt-<n>` for one completed attempt; confirm both entries
 carry `durationMs` and file breakdown for present parts, and that Intent's CI
@@ -140,6 +140,25 @@ Trigger — the attempt finishes and the developer opens that attempt in Intent.
 Result — cumulative times and file breakdown match the artifact and runner
 reports for the checked files; a missing part remains visible if one exists on
 that attempt.
+
+Hosted acceptance on 2026-11-07: story-branch revision
+`7091f30d020a9a82c9b5226f0d00d4abf86e67d9` (suffix base `cd1f1794bd`),
+GitHub Actions run 42379804192 attempt 1, passed. Downloaded the exact
+`ci-proof-summary-attempt-1` and all eight fragments. The shard logs confirm
+direct comparison of every runner-report file with its fragment.
+`/tmp/doughnut-timing-hosted-proof.RqC0f4/compare.py` independently checked the
+summary identity, compared every part with its raw-report audit, and verified
+the rollup of all 486 file rows. The hosted run had no failed or missing
+checks; slice 2's fixture proves the failed, untimed and missing cases.
+
+| Entry | Artifact total | Intent CI status | Sample artifact and Intent file proof |
+| --- | --- | --- | --- |
+| `e2e_test/features` | 372 passed, 737252 ms, 6/6 parts | 12 min 17 s | `bazaar/bazaar_subscription.feature`, 3 checks, 7090 ms → 7.1 s |
+| `frontend/tests` | 2457 passed, 63256.4 ms, 2/2 parts | 1 min 3 s | `DonutApp.loadingThinBar.spec.ts`, 1 check, 20.4 ms → 20 ms |
+
+Intent was checked in Chrome at the selected story. The CI status panel
+named run 42379804192 attempt 1 at `7091f30`. Each file's Proof tab named
+Branch `7091f30` and showed the counts and rounded time in the Branch column.
 
 ## Current decisions
 
@@ -196,4 +215,4 @@ Commitment: R02
 ### G2. Retire the branch-only report audit after observing CI
 Reported: slice 2 — "Slice 3 needs the CI runner inputs for direct report parity. The disposable shard audit reads them before the hosted runners discard them."
 Story clause: "Keep the existing CI proof path"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: Deleted the disposable audit and its invocation. The ten focused CI-proof tests passed through the actual producer shell. The one-time whole-product reading for `ci-proof-runner-audit|CI_PROOF_RUNNER_AUDIT` returned no references outside planning history.
