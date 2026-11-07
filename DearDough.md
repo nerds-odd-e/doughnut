@@ -9,6 +9,7 @@ Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
 - Highest allocated local number: 346. Removed numbers are never reused.
+- Shared-feedback adoption and compaction recovery (2026-11-07): `25d8909505eb8e112cd4ca143279e966f2e94a14:DearDough.md`; its rows are retained at the linked Open Dough finding owners (`483d3a1e8f0ea24b929675b9a195faca48ac8f47:docs/maintainer/findings/`).
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Shared-feedback compaction recovery (2026-11-03): `0373e4129d8dbc29189e08bdcb0075969eee0f2c:DearDough.md`; its rows are retained at the linked Open Dough finding owners.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
@@ -51,14 +52,8 @@ Former local code: DD-126. Former local code: DD-130. Former local code: DD-134.
 The plan recorded tooling and data definitions as settled without exercising them as used: it observed `python3 -c "import pandas"` but prescribed `python3 -I`, which disables the user site where pandas is installed; and it defined session span from `answer.promptCreatedAt`, which the real export shows is generated ahead (90th percentile about 5 days before the answer). The slice 1 implementer found both; the coordinator replaced the commands and the span definition in the plan before slice 2. The early data-inventory slice is what made the data premise cheap to correct.
 
 ### Occurrences
-- Execution: SEED-100#story-2; first implementation 275504cfc10cad5418f9f54f5a70dc26c331b6da
-  - Timestamp: unknown (2026-11-03, slice 1 return before 275504cfc1)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.82
-  - Evidence: da02e73b4a PLAN.md Current decisions "Tooling" and "Day-level measures" and premise table row 3; corrected in 275504cfc1 and 51b2d705fc PLAN.md; slice 2 also changed the answer start to include away and detour time after 4 of 65 days clipped.
-  - Observed effect: one implementer workaround (`-E -B -p no:cacheprovider`) and two definition changes; no published result was wrong.
-  - Inference: running a premise check with the exact command form, and reading a few real rows before fixing a data definition, would likely have avoided both.
+
+SEED-100#story-2, first implementation `275504cfc1`. The 0.3.82 slice 1 return exposed both the `python3 -I` command-form mismatch and the `promptCreatedAt` span definition before slice 2. [Retained evidence](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-074.md) and [original source](https://github.com/nerds-odd-e/doughnut/blob/c4f485b9a8f3f1b0951789141732b55b52b51654/DearDough.md).
 
 <a id="odf-147"></a>
 
@@ -157,14 +152,9 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-206.md).
 
 ### Occurrences
-- Execution: SEED-007#story-3, first implementation `09b54f718a`
-  - Timestamp: 2026-11-04 (both slices; exact times unknown)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: implementer agent durations 1,389 s (slice 1, 27 tool uses) and 1,638 s (slice 2, 22 tool uses); the delegation said ">10 min means stop and report as oversized".
-  - Observed effect: neither implementer stopped at 10 minutes; both returned complete, passing work, which the coordinator accepted without re-sizing.
-  - Inference: most of the time was likely serial Gradle runs (one `--tests` pattern per run, about 4–5 runs per slice); the slices themselves were small, so the bound misfired on test wall-clock rather than on scope.
+
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-206](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-206.md); source recovery remains in this project’s pre-compaction revision.
 
 <a id="odf-217"></a>
 
@@ -186,12 +176,8 @@ Former local code: DD-221. A plan without the mandatory Source link passes story
 
 ### Occurrences
 
-- Execution: SEED-103#report-gherkin-syntax-errors / 310ef06ed801330559fc90fbc1815d57cfc36d2c
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: 0.3.79
-  - Evidence: 78cfbc5525, slice plan 002 Source header; 2026-11-05 coordinator tool results for story-obligations list and check.
-  - Observed effect: Listing passed with no entries. Recording the deferred CI summary obligation made check refuse with missing-story-source. Changing the plan’s Story link to the canonical Source link made the check pass.
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-243](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-243.md); source recovery remains in this project’s pre-compaction revision.
 
 <a id="odf-244"></a>
 
@@ -446,58 +432,49 @@ The plan states execution starts only when the owner's export file is outside th
 
 SEED-100#story-2, first implementation `275504cfc1`. The 0.3.82 launch stopped before slice 1 and required one owner round trip. [Retained evidence](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-252.md) and [original source](https://github.com/nerds-odd-e/doughnut/blob/c4f485b9a8f3f1b0951789141732b55b52b51654/DearDough.md).
 
-## DD-339 — A plan's lettered slice numbers were unreadable to the obligations script
+## ODF-431 — A plan's lettered slice numbers were unreadable to the obligations script
+
+Former local code: DD-339.
 
 The slice plan named slices `3a`, `3b`, `6a` and `6b`. At the first obligations listing the execution script refused the plan with `unreadable-slices` ("An ordered-slices heading is not in the established “### N. name” form") and `unknown-slice`. The coordinator renumbered all slices 1–8 in the plan and re-allocated the source-review table before delegating slice 1.
 
 ### Occurrences
-- Execution: SEED-101#story-1, first implementation `44fb2233e0`
-  - Timestamp: 2026-11-04T00:45:00Z (approximate; before the slice 1 commit)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.82
-  - Evidence: plan `.planning/slice-plans/003-order-property-assimilation-by-change-time/PLAN.md` at `642aa7aace` (lettered headings) versus `44fb2233e0` (renumbered); `story-obligations.mjs list --slice 1` refusal in the coordinator transcript.
-  - Observed effect: one mechanical renumbering of about 25 plan references before any implementation; slice planning had accepted headings that execution cannot read.
 
-## DD-340 — A plan decision chose a costlier mechanism than the story's own one-step case, and existing cost guards rejected it
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-431](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-431.md); source recovery remains in this project’s pre-compaction revision.
+
+## ODF-432 — A plan decision chose a costlier mechanism than the story's own one-step case, and existing cost guards rejected it
+
+Former local code: DD-340.
 
 The story's Architecture names a web save "the one-step case (previous content vs new content)". The plan decided the web save would run the Git commit-range dater over the appended commit. The implementer built that, and four `NotebookGitWebContentSaveCostControllerTest` guards failed (tree fetches 39 against a cap of 13). The implementer switched to the story's previous-versus-saved comparison, which the coordinator accepted and recorded as the plan's revised "Web save" decision.
 
 ### Occurrences
-- Execution: SEED-101#story-1, first implementation `44fb2233e0`
-  - Timestamp: 2026-11-04T03:30:00Z (approximate; slice 5, commit `c66303158d`)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.82
-  - Evidence: slice 5 implementation return (failed guards, then redesign); plan "Web save" decision at `642aa7aace` versus `c66303158d`; story Architecture bullet "One dating mechanism".
-  - Observed effect: one discarded implementation inside a roughly 28-minute slice run; existing save-cost guards were the only check that caught it.
-  - Inference: planning did not consult the save path's existing cost tests when it placed new work on that path.
 
-## DD-341 — A plan's no-op shortcut contradicted a story clause, and the implementer's gap list exposed it
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-432](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-432.md); source recovery remains in this project’s pre-compaction revision.
+
+## ODF-433 — A plan's no-op shortcut contradicted a story clause, and the implementer's gap list exposed it
+
+Former local code: DD-341.
 
 The plan said "A push that changes no note documents runs no dater". Story clause 6.1 requires "an edit followed by a revert inside one push" to be dated at the revert commit. A push containing only that edit and revert has no net change, so it took the publisher's early return and left the old date. The slice 6 implementer named this as an open question in its gaps. The coordinator returned it to the slice under that clause, and two more agent rounds moved dating to the single acceptance point that all three accepting push paths reach. Related to ODF-139 (a plan narrowing a story commitment); here the source review allocated 6.1 to the slice, and the implementer's gap report exposed the contradiction.
 
 ### Occurrences
-- Execution: SEED-101#story-1, first implementation `44fb2233e0`
-  - Timestamp: 2026-11-04T04:20:00Z (approximate; slice 6, commit `82d047703e`)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.82
-  - Evidence: plan "Push" decision at `642aa7aace`; obligation G1 in the plan at `82d047703e`; tests `anEditRevertedInTheSamePushIsDatedAtTheRevert` and `anEditRevertedInAPushThatOnlyMovesAFolderIsDatedAtTheRevert`.
-  - Observed effect: two extra delegated rounds inside slice 6; the final design has one call site instead of three.
 
-## DD-342 — The coordinator sent a shell placeholder to the source-only reviewer
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-433](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-433.md); source recovery remains in this project’s pre-compaction revision.
+
+## ODF-434 — The coordinator sent a shell placeholder to the source-only reviewer
+
+Former local code: DD-342.
 
 The coordinator wrote the source-only reviewer's prompt with `$(placeholder)` where the story text belonged. The prompt was not run through a shell, so nothing was substituted. The coordinator noticed after launch, stopped the reviewer before it returned anything, and relaunched it with the verbatim story text.
 
 ### Occurrences
-- Execution: SEED-101#story-1, first implementation `44fb2233e0`
-  - Timestamp: 2026-11-04T00:40:00Z (approximate; before the slice 1 commit)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.82
-  - Evidence: coordinator transcript (stopped reviewer task, relaunch); `source-review.md` launch note records the stopped first launch.
-  - Observed effect: one wasted agent launch, with no effect on the review's input.
+
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-434](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-434.md); source recovery remains in this project’s pre-compaction revision.
 
 ## DD-343 — Implementers proved discrimination by disabling the new call
 
@@ -512,42 +489,35 @@ In slices 4–7 the implementers showed that the new tests depend on the change.
   - Evidence: slice 4–7 implementation returns (an author-time swap failing 4 of 4; a removed web dating call failing the e2e; a removed push dating call failing 4 of 5; a removed fallback failing the rebuild test).
   - Observed effect: acceptance relied on observed failures rather than test names, at the cost of one extra focused run per probe.
 
-## DD-344 — A test-removal plan checked only the story's examples and dropped a test's other observation
+## ODF-435 — A test-removal plan checked only the story's examples and dropped a test's other observation
+
+Former local code: DD-344.
 
 The plan for SEED-101#story-2 slice 4 listed `NotePropertyIndexPlannerTest.changedValues_ignores_reordering_and_reformatting_of_the_same_parsed_values` for deletion as a repeat of the controller reorder test. Its decisive premise mapped every story-1 key example to a surviving test, but no one checked what else each deleted test observed. That test was also the only observation that quoting a scalar or switching list style does not re-date a value. The slice 4 implementer named the loss in its gaps after deleting it. The coordinator restored a reformat-only case (`changedValues_ignores_reformatting_of_the_same_parsed_values`) before delivery.
 
 ### Occurrences
-- Execution: SEED-101#story-2, first implementation `9cdb6d998d`
-  - Timestamp: 2026-11-04T08:20:00Z (approximate; slice 4 acceptance)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.82
-  - Evidence: `4b4e3ca939:.planning/slice-plans/004-date-property-values-on-every-web-path/PLAN.md`, "Decisive premises" (the last row) and slice 4; slice 4 implementation return, "Gap"; commit `47794ae3e0`.
-  - Observed effect: a learner-visible behavior (reformatting keeps a value's date) briefly lost its only test; it cost one extra focused run.
-  - Inference: proving a removal per story example does not cover every observation of each deleted test. Checking each deleted assertion for a surviving owner would have caught this at planning.
 
-## DD-345 — The source-review link form did not fit a plan whose Source section is a list
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-435](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-435.md); source recovery remains in this project’s pre-compaction revision.
+
+## ODF-436 — The source-review link form did not fit a plan whose Source section is a list
+
+Former local code: DD-345.
+
 The record rule says to link `source-review.md` with "one line under `**Source:**` that starts with `**Source review:**`". This plan's header is a `## Source` heading with list items. The coordinator added the link as another list item (`- **Source review:** …`), and the obligations script refused it as `unlinked-source-review`. Removing the list marker, so the line starts with `**Source review:**`, was accepted. The reference names neither the heading form nor the bare-line requirement.
 
 ### Occurrences
-- Execution: SEED-102#publish-donut-ci-proof, plan `ce02725578:.planning/slice-plans/001-publish-donut-ci-proof/PLAN.md`, first implementation commit 549d54a217
-  - Timestamp: unknown (before slice 1 commit 549d54a217, committed 2026-11-05T15:12:44+07:00)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.86
-  - Evidence: `story-obligations.mjs list --slice 1` returned `unlinked-source-review` for the list-item link, then `ok` after the marker was removed; link line in that PLAN.md `## Source`
-  - Observed effect: one refused check and one extra edit before slice 1 acceptance could continue
-  - Inference: the cost was small, but any plan that uses a list under `## Source` would meet the same refusal
 
-## DD-346 — A token-only removal sweep left natural-language wording that still described the deleted feature
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-436](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-436.md); source recovery remains in this project’s pre-compaction revision.
+
+## ODF-437 — A token-only removal sweep left natural-language wording that still described the deleted feature
+
+Former local code: DD-346.
+
 A planned removal acceptance sweep grepped deleted symbols and paths and returned empty, while maintained product docs still named the removed feature in ordinary prose. Source review treated the empty reading as proof that nothing described local proof.
 
 ### Occurrences
-- Execution: SEED-104#remove-local-proof; first related implementation commit fe9092acc6a9d13e89242b6de6bd71b68ec14371
-  - Timestamp: 2026-11-05T20:40:29+07:00
-  - Tool: Cursor
-  - Model: auto
-  - Open Dough release: 0.3.86
-  - Evidence: plan sweep command in before-cleanup `3cb5feabc82bf023905b04c00abbf4dc2c58f5b6:.planning/slice-plans/002-remove-local-proof/PLAN.md` (Outside-in proof / slice 3 Proof); empty product reading outside exclusions; `docs/ci-proof-summary.md:22` still "Local runs, the Cloud VM and proof recording"; source-review.md clauses 6 and 20 marked observed from the empty sweep
-  - Observed effect: leave-no-trace docs promise accepted with one remaining historical phrase; retrospective opened SEED-104#clear-ci-docs-of-local-proof
-  - Inference: matching only retired identifiers under-covers "describes" / no historical-feature-notes obligations; a short prose pass over maintained docs that still mention the feature name would have caught this before acceptance
+
+Distinct executions, original provenance, observations and qualified inferences are
+[retained at ODF-437](https://github.com/terryyin/open-dough/blob/483d3a1e8f0ea24b929675b9a195faca48ac8f47/docs/maintainer/findings/ODF-437.md); source recovery remains in this project’s pre-compaction revision.
