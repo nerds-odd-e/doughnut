@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-106#publish-ci-test-execution-times",
+  "title": "Publish Doughnut test execution times in Intent",
+  "completedAt": "2026-11-07T14:23:37.386Z",
+  "developer": "Terry Yin",
+  "agent": "Eimi-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
