@@ -1,15 +1,60 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
+import {
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { outcomeLines } from './ci-proof-outcomes.mjs'
+import { action } from './workflow-fixtures.mjs'
 
 const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
 
 const vitestFile = (path, status, ...testStatuses) => ({
   name: `${repoRoot}${path}`,
   status,
-  assertionResults: testStatuses.map((testStatus) => ({ status: testStatus })),
+  assertionResults: testStatuses.map((assertion) =>
+    typeof assertion === 'string' ? { status: assertion } : assertion
+  ),
 })
+
+const writeFragment = (t, format, entry, report) => {
+  const temp = mkdtempSync(join(tmpdir(), 'ci-proof-'))
+  t.after(() => rmSync(temp, { recursive: true, force: true }))
+  const reportFile = join(temp, 'report')
+  writeFileSync(reportFile, report)
+  const step = action('ci_proof_fragments').runs.steps.find(
+    ({ id }) => id === 'fragments'
+  )
+  execFileSync(step.shell, ['-e', '-o', 'pipefail', '-c', step.run], {
+    cwd: repoRoot,
+    env: {
+      ...process.env,
+      FORMAT: format,
+      REPORT: reportFile,
+      ENTRY: entry,
+      JOB_INDEX: '0',
+      PARTS: '2',
+      RUNNER_TEMP: temp,
+      GITHUB_OUTPUT: join(temp, 'github-output'),
+      GITHUB_RUN_ATTEMPT: '1',
+      CI_PROOF_REVISION: 'deadbeef',
+    },
+  })
+  const fragments = join(temp, 'ci-proof')
+  const files = readdirSync(fragments)
+  assert.equal(files.length, 1)
+  return {
+    times: readFileSync(join(temp, 'ci-proof-times.tsv'), 'utf8'),
+    fragment: JSON.parse(readFileSync(join(fragments, files[0]), 'utf8')),
+  }
+}
 
 test('a Vitest report gives one repo-relative line per test', () => {
   const report = {
@@ -57,7 +102,37 @@ test('a Vitest file that failed to load counts as one failed check', () => {
   ])
 })
 
-// One scenario's messages: each attempt is a list of step statuses.
+test('the Vitest producer keeps recorded durations and untimed checks', (t) => {
+  const path = 'frontend/tests/a.spec.ts'
+  const broken = 'frontend/tests/broken.spec.ts'
+  const report = {
+    testResults: [
+      vitestFile(
+        path,
+        'failed',
+        { status: 'failed', duration: 125 },
+        { status: 'passed', duration: 0 },
+        'skipped'
+      ),
+      vitestFile(broken, 'failed'),
+    ],
+  }
+  const { times, fragment } = writeFragment(
+    t,
+    'vitest',
+    'frontend/tests',
+    JSON.stringify(report)
+  )
+
+  assert.equal(times, `0.125\t${path}\n0\t${path}\n`)
+  assert.equal(fragment.durationMs, 125)
+  assert.deepEqual(fragment.files, [
+    { path, passed: 1, failed: 1, other: 1, durationMs: 125, untimed: 1 },
+    { path: broken, passed: 0, failed: 1, other: 0, untimed: 1 },
+  ])
+})
+
+// One scenario's messages: each attempt is a list of step results.
 const cucumberScenario = (uri, ...attempts) => [
   { pickle: { id: `${uri}-pickle`, uri } },
   { testCase: { id: `${uri}-case`, pickleId: `${uri}-pickle` } },
@@ -69,10 +144,10 @@ const cucumberScenario = (uri, ...attempts) => [
         attempt,
       },
     },
-    ...steps.map((status) => ({
+    ...steps.map((step) => ({
       testStepFinished: {
         testCaseStartedId: `${uri}-${attempt}`,
-        testStepResult: { status },
+        testStepResult: typeof step === 'string' ? { status: step } : step,
       },
     })),
   ]),
@@ -101,6 +176,41 @@ test('a retried Cucumber scenario counts once, with its final attempt', () => {
   assert.deepEqual(outcomeLines('cucumber', messages), [
     'passed\te2e_test/features/a.feature',
     'failed\te2e_test/features/b.feature',
+  ])
+})
+
+test('the Cucumber producer sums recorded final-attempt steps for a failed scenario', (t) => {
+  const path = 'e2e_test/features/a.feature'
+  const messages = cucumberMessages(
+    cucumberScenario(
+      path,
+      [{ status: 'FAILED', duration: { seconds: 8, nanos: 0 } }],
+      [
+        { status: 'PASSED', duration: { seconds: 1, nanos: 250_000_000 } },
+        { status: 'FAILED', duration: { seconds: 0, nanos: 125_000_000 } },
+        'SKIPPED',
+      ]
+    ),
+    cucumberScenario('e2e_test/features/b.feature', ['SKIPPED'])
+  )
+  const { times, fragment } = writeFragment(
+    t,
+    'cucumber',
+    'e2e_test/features',
+    messages
+  )
+
+  assert.equal(times, `1.375\t${path}\n`)
+  assert.equal(fragment.durationMs, 1375)
+  assert.deepEqual(fragment.files, [
+    { path, passed: 0, failed: 1, other: 0, durationMs: 1375 },
+    {
+      path: 'e2e_test/features/b.feature',
+      passed: 0,
+      failed: 0,
+      other: 1,
+      untimed: 1,
+    },
   ])
 })
 

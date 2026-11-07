@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-106_publish-ci-test-execution-times.json",
+      "identity": "SEED-106#publish-ci-test-execution-times",
+      "completedAt": "2026-11-07T14:23:37.386Z",
+      "blob": "2d02e85d94d9ef4127e09efb261cba6e7cfdfe87"
+    },
+    {
       "fileName": "SEED-104_clear-ci-docs-of-local-proof.json",
       "identity": "SEED-104#clear-ci-docs-of-local-proof",
       "completedAt": "2026-11-05T23:16:51.707Z",
@@ -438,24 +444,6 @@
       "identity": "SEED-071#e2e-proof-before-final-formatting",
       "completedAt": "2026-10-08T22:54:43.012Z",
       "blob": "316a0b63e8a2f15a47da11a8a11d393f39c9e0aa"
-    },
-    {
-      "fileName": "SEED-070_fast-warning-free-commit-hook.json",
-      "identity": "SEED-070#fast-warning-free-commit-hook",
-      "completedAt": "2026-10-07T20:56:57.472Z",
-      "blob": "71512d898b07b26e2e58e72b0dd4ca0d694cd455"
-    },
-    {
-      "fileName": "SEED-066_create-with-spoken-title.json",
-      "identity": "SEED-066#create-with-spoken-title",
-      "completedAt": "2026-10-07T13:21:33.325Z",
-      "blob": "f626ab62658f2fae0f7f94c533cac528a53d2fa1"
-    },
-    {
-      "fileName": "SEED-066_no-record-while-stopping.json",
-      "identity": "SEED-066#no-record-while-stopping",
-      "completedAt": "2026-10-07T05:00:03.660Z",
-      "blob": "25bc8c4361250fb17001ea125afcee963e69e6de"
     }
   ],
   "unreadable": []

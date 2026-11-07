@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Publish Doughnut test execution times in Intent](seeds/SEED-106-publish-ci-test-execution-times.md#publish-ci-test-execution-times) — SEED-106#publish-ci-test-execution-times ([plan](slice-plans/082-publish-ci-test-execution-times/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
