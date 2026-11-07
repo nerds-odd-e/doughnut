@@ -1,7 +1,9 @@
 # Publish Doughnut test execution times in Intent
 
 Work item: **SEED-106#publish-ci-test-execution-times**.
-Source: [refined story](../../seeds/SEED-106-publish-ci-test-execution-times.md#publish-ci-test-execution-times).
+**Source:** [refined story](../../seeds/SEED-106-publish-ci-test-execution-times.md#publish-ci-test-execution-times).
+
+**Source review:** [Independent source review](source-review.md).
 
 ## Goal and scope
 
@@ -61,7 +63,7 @@ setup time; Intent/dashboard product changes; CI-adapter publishing.
 
 ### 1. Collector copies accept timed by-file fragments
 Type: Structure
-Status: planned
+Status: done
 Proof: After copying the five skill modules into `scripts/ci/`,
 `node scripts/ci/ci-proof-summary.mjs fragment --outcomes <fixture> --times <fixture> --by-file --entry frontend/tests --part 1 --of 2 --attempt 1 --revision deadbeef --out <tmp>`
 writes a fragment whose JSON includes `durationMs` and `files` (and existing
@@ -69,8 +71,19 @@ writes a fragment whose JSON includes `durationMs` and `files` (and existing
 
 Structure: Replace `scripts/ci/ci-proof-{summary,contract,fragments,collect}.mjs`
 with the installed skill copies and add `ci-proof-figures.mjs` beside them,
-unchanged. No workflow or outcomes change yet. Enables slice 2's `--times` /
-`--by-file` wiring.
+unchanged. The root Biome exclusion lists all five copies so the formatter keeps their
+bytes. The workflow and converter still use the counts-only path.
+
+Accepted proof: all five `cmp` comparisons match the installed recipe.
+`./scripts/run.sh pnpm test:ci-proof` passed all eight existing tests.
+Using `/tmp/donut-slice-1.XINsup`, the fragment and summarize CLIs emitted
+schema 1, counts of one passed and one failed, a visible missing part, and
+500 ms on the timed fragment, present part, entry and file. Without the
+optional flags, the same CLIs kept the counts and gap. The real producer
+and collector actions use these same CLI boundaries. The independent
+refactor consolidated the five Biome exclusions in one exact brace pattern.
+The Biome search selected the project converter and tests and skipped all
+five copies. The post-refactor byte comparisons still match.
 
 ### 2. Vitest and Cucumber proof fragments carry durations and file breakdown
 Type: Behavior
@@ -114,6 +127,16 @@ that attempt.
 - Vitest times convert milliseconds → seconds for `--times`; do not invent
   values when `duration` is absent.
 - Wall-clock CI cost stays deferred; published figures are recipe `durationMs`.
+- Slice 1 found that the installed collector groups times by file and clears
+  the whole file's untimed count when any timing is recorded. On the
+  2026-11-07 execution checkout based on `16fda13bd5`, a Vitest JSON probe
+  recorded a duration for a passed assertion and omitted it for a skipped
+  assertion in the same file. The collector CLI probe with that report
+  shape and a known 125 ms timing kept both counts and 125 ms, and emitted
+  `untimed: 0` instead of 1. See G1. The existing counts-only producers
+  do not enable this path. Slice 2 needs a corrected recipe while keeping
+  the story's verbatim-copy constraint, or explicit direction changing
+  that constraint.
 
 ## Concern evidence
 
@@ -123,3 +146,19 @@ that attempt.
 - Remaining slice-specific concerns: none identified. Slice 3 is an authorized
   early probe for live CI/Intent agreement; its failure revises the plan rather
   than blocking preparation readiness.
+
+## Execution resume
+
+- Story Branch Mode in the established checkout `/Users/terryyin/git/doughnut/.worktrees/publish-doughnut-test-execution-times-in-intent` on `codex/publish-doughnut-test-execution-times-in-intent`. Publisher `dashboard-territory.local-doughnut`, agent Eimi-chan. Replanning uses the existing planning authority.
+- Starting revision `f752f369a80a07257d7f56121dd9c995e96105fb`. Published claim `16fda13bd5ed3010ea9cf58b7941d16a04b4f36b` on `origin/main` and the remote story branch. Claim CI is unobserved. Final target is `origin/main`.
+- Checkout setup and baseline `./scripts/run.sh pnpm test:ci-proof` passed (8 tests).
+- GitHub Actions `ci.yml` (5208694, donut CI). Story-branch observer `eimi-chan-f1d68709`, cell `g55:10`, shell session `32014`, directory `/tmp/dough-ci-501/watch-Di0ZCn`, PID 79837.
+
+
+## Story obligations
+
+### G1. A timed check masks untimed checks in the same file
+Reported: slice 1 — "The independent slice 1 refactor review and the collector CLI both observed a file with one timed check and one untimed check publish untimed: 0. The two check counts and the recorded duration are present."
+Story clause: "Do not invent durations the runner did not record; those checks stay untimed and still count."
+Disposition: receiving slice 2
+Commitment: R02
