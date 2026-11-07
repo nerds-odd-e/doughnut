@@ -216,3 +216,24 @@ Commitment: R02
 Reported: slice 2 — "Slice 3 needs the CI runner inputs for direct report parity. The disposable shard audit reads them before the hosted runners discard them."
 Story clause: "Keep the existing CI proof path"
 Disposition: proved by slice 3: Deleted the disposable audit and its invocation. The ten focused CI-proof tests passed through the actual producer shell. The one-time whole-product reading for `ci-proof-runner-audit|CI_PROOF_RUNNER_AUDIT` returned no references outside planning history.
+
+## Execution complete
+
+Product advice: no change. The existing Intent surfaces display the published
+timing fields and per-file results. The Doughnut report conversion owns the
+runner-specific timing rules, the released collector owns aggregation, and the
+maintained CI proof document describes the resulting behavior. The scoped
+tests exercise the real producer action, and the hosted comparison verifies
+the existing workflow and Intent integration.
+
+The retrospective attributed the three delivered increments to this story:
+`cd1f1794bd` refreshes the collector, `7091f30d02` publishes timing with
+hosted parity evidence, and `db9d598329` retires the temporary audit.
+Open Dough's upstream fix and release are supplier changes. Open Dough main
+CI run 42379624879 passed on the later revision containing the release.
+Doughnut trunk commit `ec42d25097` installed the release independently
+and changes no paths in the story's product diff. The process review used
+this execution's observed commands, agent returns and receipts. Its
+in-place update refusal was recovered using the verified isolated release
+install. No unresolved product correction or process finding remains.
+The story-branch completion CI was pending at review.
