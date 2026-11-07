@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Eimi-chan",
+  "email": "eimi-chan@example.org",
+  "identity": "SEED-106#publish-ci-test-execution-times",
+  "mode": "story-branch",
+  "branch": "codex/publish-doughnut-test-execution-times-in-intent",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
