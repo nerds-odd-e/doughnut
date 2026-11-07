@@ -25,11 +25,14 @@ runs:
       run: |
         PART=$((JOB_INDEX + 1))
         echo "part=${PART}" >> "${GITHUB_OUTPUT}"
-        node scripts/ci/ci-proof-outcomes.mjs "${FORMAT}" "${REPORT}" > "${RUNNER_TEMP}/ci-proof-outcomes.tsv"
+        node scripts/ci/ci-proof-outcomes.mjs "${FORMAT}" "${REPORT}" \
+          "${RUNNER_TEMP}/ci-proof-times.tsv" > "${RUNNER_TEMP}/ci-proof-outcomes.tsv"
         node scripts/ci/ci-proof-summary.mjs fragment \
-          --outcomes "${RUNNER_TEMP}/ci-proof-outcomes.tsv" --entry "${ENTRY}" \
+          --outcomes "${RUNNER_TEMP}/ci-proof-outcomes.tsv" \
+          --times "${RUNNER_TEMP}/ci-proof-times.tsv" --by-file --entry "${ENTRY}" \
           --part "${PART}" --of "${PARTS}" --attempt "${GITHUB_RUN_ATTEMPT}" \
           --revision "${CI_PROOF_REVISION}" --out "${RUNNER_TEMP}/ci-proof"
+        node scripts/ci/ci-proof-runner-audit.mjs "${FORMAT}" "${REPORT}" "${RUNNER_TEMP}/ci-proof"
     - name: Keep the CI proof fragments
       if: ${{ !cancelled() }}
       uses: actions/upload-artifact@v7

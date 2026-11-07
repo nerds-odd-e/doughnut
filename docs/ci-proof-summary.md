@@ -2,9 +2,8 @@
 
 Every `donut CI` run attempt publishes the artifact
 `ci-proof-summary-attempt-<n>`. The Open Dough dashboard's **Intent → CI
-status** tab reads it to show, for that run and attempt, how many checks in
-each Intent location passed, failed or did something else, and which CI parts
-did not report.
+status** tab shows counts and recorded test execution time by location and
+file for that attempt. It also shows which CI parts did not report.
 
 | Entry | Producer job | Parts | Unit | Runner report |
 | --- | --- | --- | --- | --- |
@@ -23,8 +22,10 @@ did not report.
    report.
 2. The composite action `.github/ci_proof_fragments` converts the report with
    `scripts/ci/ci-proof-outcomes.mjs` into one `<status><TAB><repo-relative
-   path>` line per test case. It then writes the part's fragment and uploads
-   it, kept for 1 day. The part number is `strategy.job-index` plus 1. It runs
+   path>` line per test case and one `<seconds><TAB><repo-relative path>`
+   line per timed check. It passes both to the collector with `--by-file`,
+   writes the part's fragment and uploads it, kept for 1 day. The part number
+   is `strategy.job-index` plus 1. It runs
    after failing tests too, but not when the test step was skipped, so a part
    whose setup failed shows as missing.
 3. The `ci-proof` job runs after both producers, even when they fail. The
@@ -40,6 +41,13 @@ did not report.
   Cucumber test case is judged by its last attempt, using its worst step
   status: passed is passed; skipped or unknown is other; pending, undefined,
   ambiguous or failed is failed.
+- **Recorded execution time.** Vitest contributes the duration of each
+  assertion that reports one. Cucumber contributes the recorded step
+  durations from each scenario's final attempt. Failed checks contribute
+  their recorded time too. Checks without recorded time, including Vitest
+  load failures, still count and are marked untimed. The summary's
+  `durationMs` is the sum of recorded durations across present parts. It can
+  exceed elapsed CI time when shards run in parallel.
 - **The Vitest JSON report is configured, never passed on the command line.**
   A command-line `--reporter` replaces the configured reporters, dropping
   `orchestratorGcReporter`, which keeps Chromium from crashing on CI.
@@ -53,8 +61,8 @@ did not report.
 - **Fail loudly.** A broken conversion fails its producer step. A failed
   collector fails the run but no producer job. A missing or ambiguous part is
   reported as such, never filled in.
-- **Copied collector.** `scripts/ci/ci-proof-{contract,summary,fragments,collect}.mjs`
-  are unchanged copies of the installed Open Dough `dough-test-optimization`
+- **Copied collector.** `scripts/ci/ci-proof-{contract,summary,fragments,collect,figures}.mjs`
+  are unchanged copies of Open Dough v0.3.89's `dough-test-optimization`
   scripts, excluded from Biome. Copy them again when a guidance update
   changes them.
 

@@ -87,7 +87,7 @@ five copies. The post-refactor byte comparisons still match.
 
 ### 2. Vitest and Cucumber proof fragments carry durations and file breakdown
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `scripts/ci/ci-proof-outcomes.test.mjs` for the five key-example
 conversions; extend `scripts/ci/ci-workflow.test.mjs` (or the fragment action
 fixture) so `.github/ci_proof_fragments` invokes `fragment` with `--times` and
@@ -103,6 +103,27 @@ file breakdown, failed checks' available times, and untimed load-failed Vitest
 files without invented durations. Update `docs/ci-proof-summary.md` to describe
 timing and breakdown. Missing-shard visibility remains the collector's existing
 rule.
+
+Accepted focused proof: the real fragment action shell in
+`scripts/ci/ci-proof-outcomes.test.mjs` verifies the timed Vitest and Cucumber
+producer boundaries, including a skipped check in a timed file, a failed
+load, a zero duration and a failed final Cucumber retry. The actual producer
+and collector shells in `/tmp/donut-timed-producers.wokOfC/probe.mjs`
+retain 1875 ms from five Cucumber parts, flag missing part 6, and retain
+375 ms across two Vitest parts. A malformed report exits before writing a
+fragment. `./scripts/run.sh pnpm test:ci-proof` passes all ten tests.
+The checkout compares all five modules byte for byte with a verified,
+isolated installation of Open Dough v0.3.89.
+
+For slice 3's hosted comparison, this branch runs a disposable, read-only
+audit of each runner report immediately after producing its fragment. It
+compares all local file figures and the shard totals, and logs only aggregate
+figures and one repository-relative sample. GitHub-hosted Ubuntu runs the
+existing two Vitest and six Cypress shards. The previous Doughnut run
+42378134511 succeeded in about six minutes. Remote resource headroom is
+unknown. The coordinator owns the ordinary branch run and will reconsider
+after setup failures or contention. Slice 3 deletes the audit after using
+the exact run's logs, artifacts and Intent view.
 
 ### 3. Judged CI attempt shows timed proof in the summary and Intent
 Type: Behavior
@@ -135,8 +156,12 @@ that attempt.
   shape and a known 125 ms timing kept both counts and 125 ms, and emitted
   `untimed: 0` instead of 1. See G1. The existing counts-only producers
   do not enable this path. Slice 2 needs a corrected recipe while keeping
-  the story's verbatim-copy constraint, or explicit direction changing
-  that constraint.
+  the story's verbatim-copy constraint. The developer authorized the upstream
+  repair. Open Dough source `169b8b8ac` fixes the aggregation and release
+  `v0.3.89` at `611dbad88` supplies the corrected module. The worktree's
+  generated Claude aliases prevented an in-place update. The official
+  installer created a verified isolated installation, from which the five
+  product collector modules were compared and refreshed.
 
 ## Concern evidence
 
@@ -152,7 +177,12 @@ that attempt.
 - Story Branch Mode in the established checkout `/Users/terryyin/git/doughnut/.worktrees/publish-doughnut-test-execution-times-in-intent` on `codex/publish-doughnut-test-execution-times-in-intent`. Publisher `dashboard-territory.local-doughnut`, agent Eimi-chan. Replanning uses the existing planning authority.
 - Starting revision `f752f369a80a07257d7f56121dd9c995e96105fb`. Published claim `16fda13bd5ed3010ea9cf58b7941d16a04b4f36b` on `origin/main` and the remote story branch. Claim CI is unobserved. Final target is `origin/main`.
 - Checkout setup and baseline `./scripts/run.sh pnpm test:ci-proof` passed (8 tests).
-- GitHub Actions `ci.yml` (5208694, donut CI). Story-branch observer `eimi-chan-f1d68709`, cell `g55:10`, shell session `32014`, directory `/tmp/dough-ci-501/watch-Di0ZCn`, PID 79837.
+- GitHub Actions `ci.yml` (5208694, donut CI). Slice 1 published as
+  `cd1f1794bd1343572cd514d1a2d32d5fe0c9f150` on the story branch with
+  suffix base `16fda13bd5`. That run 42378134511 passed. The earlier
+  observer stopped at the approval boundary. The resumed story-branch
+  observer is `eimi-chan-f1d68709`, cell `g70:13`, shell session `54255`,
+  directory `/tmp/dough-ci-501/watch-zl5HVz`, PID 38176.
 
 
 ## Story obligations
@@ -160,5 +190,10 @@ that attempt.
 ### G1. A timed check masks untimed checks in the same file
 Reported: slice 1 — "The independent slice 1 refactor review and the collector CLI both observed a file with one timed check and one untimed check publish untimed: 0. The two check counts and the recorded duration are present."
 Story clause: "Do not invent durations the runner did not record; those checks stay untimed and still count."
-Disposition: receiving slice 2
+Disposition: proved by slice 2: Open Dough v0.3.89 collector in the real Vitest action test reports the mixed file’s 125 ms and 1 untimed; the real summarize probe retains both figures in its entry file.
 Commitment: R02
+
+### G2. Retire the branch-only report audit after observing CI
+Reported: slice 2 — "Slice 3 needs the CI runner inputs for direct report parity. The disposable shard audit reads them before the hosted runners discard them."
+Story clause: "Keep the existing CI proof path"
+Disposition: receiving slice 3
