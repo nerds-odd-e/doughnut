@@ -148,3 +148,9 @@ Reported: slice 1 — "No Intent UI or dashboard product change: Intent already 
 Story clause: "No Intent UI or dashboard product change: Intent already reads the summary artifact for configured locations."
 Disposition: excluded "No Intent UI or dashboard product change: Intent already reads the summary artifact for configured locations."
 Commitment: 8
+
+## Execution complete
+
+Product advice: no change. Backend unit-test CI proof is delivered within the
+story's limits; deferred `scripts`/`infra` proof stays a documented exclusion,
+not a backlog displacement.
