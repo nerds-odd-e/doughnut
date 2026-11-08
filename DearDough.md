@@ -54,6 +54,13 @@ The plan recorded tooling and data definitions as settled without exercising the
 ### Occurrences
 
 SEED-100#story-2, first implementation `275504cfc1`. The 0.3.82 slice 1 return exposed both the `python3 -I` command-form mismatch and the `promptCreatedAt` span definition before slice 2. [Retained evidence](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-074.md) and [original source](https://github.com/nerds-odd-e/doughnut/blob/c4f485b9a8f3f1b0951789141732b55b52b51654/DearDough.md).
+- Execution: SEED-108#spread-out-recall-backlog, first implementation `29266f6ed2`
+  - Timestamp: unknown (slice 2 return, 2026-11-08)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: plan 084 premise P3 settled `stabilityAndNextRecallAt(float)` followed by `.nextRecallAt(...)` from a scratch test that set only `nextRecallAt`; the slice 2 implementer found `MemoryTrackerBuilder.afterCreate` overwrote the due time once `lastRecalledAt` was set; slice 2 refactor changed the builder (`5002ad7856`).
+  - Observed effect: one test-helper workaround plus a refactor edit in shared test support; no plan change or stop.
 
 <a id="odf-147"></a>
 

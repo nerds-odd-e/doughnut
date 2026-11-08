@@ -136,6 +136,14 @@ Behavior: Pre — the learner has a backlog. Trigger — the action on the Recal
 Stats tab. Result — the forecast appears (today, average, per-day counts) and
 the recall count everywhere reflects today's new load.
 
+## Execution complete
+
+Product advice: no change to the queue. Observed during slice 3 (outside
+this story): assimilating a note and removing a tracker from recall refresh
+today's due queue only while the recall page is mounted, so the menu count
+can lag elsewhere; `useRecallCatchUp.replaceDueRecalls` is the existing
+operation a small follow-up could reuse if that lag matters in use.
+
 ## Plan review
 
 Refinement not needed: three slices each own one example group and one proof
