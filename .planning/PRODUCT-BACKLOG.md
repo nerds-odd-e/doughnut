@@ -15,3 +15,4 @@ Make deliberately captured knowledge more useful through learning and refinement
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
 - [Answer a comparison across notes with inspectable supporting evidence](seeds/SEED-073-learning-refinement-and-retrieval.md#story-5) — SEED-073#story-5
 - [Distinguish confusable terms in generated recall questions](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-2) — SEED-007#story-2
+- [See CI results and timings for the remaining script tests in Intent](seeds/SEED-111-run-uncovered-script-tests-in-ci.md#run-uncovered-script-tests-in-ci) — SEED-111#run-uncovered-script-tests-in-ci
