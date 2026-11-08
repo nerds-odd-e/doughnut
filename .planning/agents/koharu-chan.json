@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Koharu-chan",
+  "email": "koharu-chan@example.org",
+  "identity": "SEED-110#restore-ci-native-dependency-installation",
+  "mode": "story-branch",
+  "branch": "codex/restore-ci-native-dependency-installation",
+  "host": "codex"
+}
