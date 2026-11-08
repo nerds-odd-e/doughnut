@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [See CLI tests and timed scripts and infrastructure results in Intent](seeds/SEED-109-complete-test-inventory-and-script-proof.md#complete-test-inventory-and-script-proof) — SEED-109#complete-test-inventory-and-script-proof ([plan](slice-plans/085-unify-tooling-test-proof/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
