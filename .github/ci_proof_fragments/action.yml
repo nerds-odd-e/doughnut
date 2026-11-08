@@ -5,7 +5,7 @@ inputs:
     description: "Report format that scripts/ci/ci-proof-outcomes.mjs converts"
     required: true
   report:
-    description: "Absolute path of the runner's report"
+    description: "Absolute path of the runner's report file, or a directory of TEST-*.xml for junit"
     required: true
   entry:
     description: "Intent location the report proves"

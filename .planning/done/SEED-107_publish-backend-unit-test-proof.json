@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-107#publish-backend-unit-test-proof",
+  "title": "Show backend unit-test results in Intent",
+  "completedAt": "2026-11-08T01:29:54.781Z",
+  "developer": "Terry Yin",
+  "agent": "Hibiki-chan",
+  "host": "cursor",
+  "model": "auto"
+}

@@ -3,9 +3,9 @@
 // is `passed`, `failed` or `other`. An optional times file gets one
 // `<seconds><TAB><repo-relative path>` line per timed check.
 //
-//   node scripts/ci/ci-proof-outcomes.mjs <format> <report file> [times file]
-import { readFileSync, writeFileSync } from 'node:fs'
-import { relative } from 'node:path'
+//   node scripts/ci/ci-proof-outcomes.mjs <format> <report file or dir> [times file]
+import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
@@ -96,7 +96,51 @@ const cucumber = (text) => {
   })
 }
 
-const formats = { vitest, cucumber }
+const attribute = (attrs, name) => {
+  const match = attrs.match(new RegExp(`\\b${name}="([^"]*)"`))
+  return match?.[1]
+}
+
+const junitPath = (classname) => {
+  const outer = classname.split('$', 1)[0]
+  return `backend/src/test/java/${outer.replaceAll('.', '/')}.java`
+}
+
+const junitStatus = (body) => {
+  if (/<(?:failure|error)\b/.test(body)) return 'failed'
+  if (/<skipped\b/.test(body)) return 'other'
+  return 'passed'
+}
+
+// Gradle JUnit XML: one <testcase> per method; nested $ classes share the outer file.
+const junit = (text) =>
+  [...text.matchAll(/<testcase\b([^>/]*)(?:\/>|>([\s\S]*?)<\/testcase>)/g)].map(
+    ([, attrs, body = '']) => {
+      const time = attribute(attrs, 'time')
+      return {
+        status: junitStatus(body),
+        path: junitPath(attribute(attrs, 'classname')),
+        seconds: time === undefined ? undefined : Number(time),
+      }
+    }
+  )
+
+const formats = { vitest, cucumber, junit }
+
+const junitChecksFrom = (reportPath) => {
+  if (!statSync(reportPath).isDirectory()) {
+    return junit(readFileSync(reportPath, 'utf8'))
+  }
+  return readdirSync(reportPath)
+    .filter((name) => name.startsWith('TEST-') && name.endsWith('.xml'))
+    .sort()
+    .flatMap((name) => junit(readFileSync(join(reportPath, name), 'utf8')))
+}
+
+const checksFrom = (format, reportPath) =>
+  format === 'junit'
+    ? junitChecksFrom(reportPath)
+    : formats[format](readFileSync(reportPath, 'utf8'))
 
 const outcomesOf = (checks) =>
   checks.map((check) => `${status(check.status)}\t${check.path}`)
@@ -108,7 +152,7 @@ const textOf = (lines) => lines.map((line) => `${line}\n`).join('')
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [format, reportFile, timesFile] = process.argv.slice(2)
-  const checks = formats[format](readFileSync(reportFile, 'utf8'))
+  const checks = checksFrom(format, reportFile)
   if (timesFile) {
     const times = checks
       .filter(({ seconds }) => seconds !== undefined)
