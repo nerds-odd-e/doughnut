@@ -5,6 +5,10 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
+import {
+  recallStatsSettingsPage,
+  visitRecallStatsSettingsPage,
+} from '../start/pageObjects/recallStatsSettingsPage'
 
 function assertAssimilationDueOnDay(day: number, toAssimilateAndTotal: string) {
   start.testability().backendTimeTravelTo(day, 8)
@@ -193,3 +197,17 @@ Then('I should be back to the current question', () => {
 Then('I should be asked {string}', (expectedQuestionStem: string) => {
   start.assumeQuestionPage(expectedQuestionStem)
 })
+
+When('I return and spread out my recall backlog from my recall stats', () => {
+  visitRecallStatsSettingsPage().spreadOutRecallBacklog()
+})
+
+Then(
+  'the recall forecast should show {int} today and {int} on each of the next {int} days',
+  (today: number, eachDay: number, days: number) => {
+    recallStatsSettingsPage().expectForecast(
+      today,
+      Array.from({ length: days }, () => eachDay)
+    )
+  }
+)

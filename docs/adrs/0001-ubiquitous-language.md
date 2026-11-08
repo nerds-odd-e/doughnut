@@ -175,6 +175,12 @@ More detailed **Spaced repetition glossary** is in
   UI: **Remove** / **Remove from recall**. Not a grade.
 - **Revive** — Re-enable recall for a tracker that was removed from
   recall. Short UI: **Revive**. Not a grade.
+- **Spread out recall backlog** — The learner's one-click action that
+  moves memory trackers due by the end of today onto today and the next 30
+  local days, then shows the **recall forecast**. Changes only due times; not
+  a grade. Policy: **Backlog redistribution** in ADR 0003.
+- **Recall forecast** — Today's remaining recall count, the average per day,
+  and each day's count over the next 30 local days.
 - **Pace**, **Accuracy**, **Consistency**, and **Retrieval lapse** —
   Separate residual readouts of a morning's recall against expectation
   and the learner's own baseline. Not diagnostic of cause. There is no

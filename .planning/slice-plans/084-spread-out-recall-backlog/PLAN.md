@@ -120,7 +120,7 @@ Stability, decide who stays today and who gets earlier days.
 
 ### 3. Spreading the backlog from Settings and seeing the forecast
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E `e2e_test/features/recall/spread_out_recall_backlog.feature`.
 Daily new notes set to 3, Notes 1–3 assimilated on day 1, then day 10: the
 learner spreads the backlog from Settings → Recall Stats. The forecast shows
@@ -164,6 +164,13 @@ slice-specific concerns found in this review.
   after the `MemoryTrackerBuilder.nextRecallAt` change. New trackers have
   Stability 0 (`Fsrs.isNew`), so one stable ascending-Stability sort gives
   New first.
+
+- Slice 3 accepted proof (2026-11-08): `spread_out_recall_backlog.feature`
+  passed locally (isolated worktree stack; spec added to
+  `scripts/isolated-cypress-active-specs.mjs`), `pnpm -C frontend test settings
+  recall` 323 passing, `vue-tsc` clean. The menu count after the action relies
+  on `useRecallCatchUp.replaceDueRecalls`, because `requestDueRecallsRefresh`
+  alone only reloads a mounted recall page.
 
 ## Story obligations
 

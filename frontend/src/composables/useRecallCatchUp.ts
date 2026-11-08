@@ -18,6 +18,7 @@ export function useRecallCatchUp() {
     setDueCommissioned,
     setTotalAssimilatedCount,
     setCurrentRecallWindowEndAt,
+    requestDueRecallsRefresh,
   } = useRecallData()
 
   // Adds newly due trackers after the queue without moving the position; only
@@ -41,5 +42,14 @@ export function useRecallCatchUp() {
     setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
   }
 
-  return { catchUpDueRecalls }
+  // Replaces today's due queue after due times change elsewhere: a kept-alive
+  // recall page reloads on the refresh request; otherwise catching up refills
+  // the emptied queue.
+  const replaceDueRecalls = async () => {
+    setToRepeat(undefined)
+    requestDueRecallsRefresh()
+    await catchUpDueRecalls()
+  }
+
+  return { catchUpDueRecalls, replaceDueRecalls }
 }

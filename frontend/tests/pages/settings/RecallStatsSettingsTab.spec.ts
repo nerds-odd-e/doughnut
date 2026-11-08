@@ -1,9 +1,15 @@
-import { UserController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  RecallsController,
+  UserController,
+} from "@generated/donut-backend-api/sdk.gen"
+import { useRecallData } from "@/composables/useRecallData"
 import RecallStatsSettingsTab from "@/pages/settings/RecallStatsSettingsTab.vue"
 import helper, { mockSdkService } from "@tests/helpers"
+import makeMe from "donut-test-fixtures/makeMe"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { saveAs } from "file-saver"
 import type {
+  RecallBacklogForecast,
   RecallHistoryExport,
   RecallStatsDto,
   DayCount,
@@ -238,5 +244,61 @@ describe("RecallStatsSettingsTab", () => {
       expect(filename).toBe("recall-history-2026-11-03.json")
       expect(JSON.parse(await (blob as Blob).text())).toEqual(exported)
     })
+  })
+
+  it("spreads out the recall backlog, shows the forecast, and refreshes today's recall count", async () => {
+    const forecast: RecallBacklogForecast = {
+      todayCount: 1,
+      averageCount: 0.0667,
+      days: Array.from({ length: 30 }, (_, i) => ({
+        date: `2026-11-${String(i + 1).padStart(2, "0")}`,
+        count: i < 2 ? 1 : 0,
+      })),
+    }
+    const spreadSpy = mockSdkService(
+      RecallsController,
+      "spreadOutBacklog",
+      forecast
+    )
+    mockSdkService(
+      RecallsController,
+      "recalling",
+      makeMe.aDueMemoryTrackersList
+        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+        .please()
+    )
+    useRecallData().setToRepeat([
+      { memoryTrackerId: 1, spelling: false },
+      { memoryTrackerId: 2, spelling: false },
+      { memoryTrackerId: 3, spelling: false },
+    ])
+    mockSdkService(UserController, "getRecallStats", {
+      totals: { totalReviewsAllTime: 0 },
+    })
+    const wrapper = helper
+      .component(RecallStatsSettingsTab)
+      .withRouter()
+      .mount()
+    await flushPromises()
+
+    await wrapper
+      .find('[data-testid="spread-out-recall-backlog"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(spreadSpy).toHaveBeenCalledWith({
+      query: { timezone: timezoneParam() },
+    })
+    expect(wrapper.find('[data-testid="recall-forecast-today"]').text()).toBe(
+      "Today: 1"
+    )
+    expect(wrapper.find('[data-testid="recall-forecast-average"]').text()).toBe(
+      "Average per day: 0.1"
+    )
+    const days = wrapper.findAll('[data-testid="recall-forecast-day"]')
+    expect(days).toHaveLength(30)
+    expect(days[0]!.text()).toBe("2026-11-01: 1")
+    expect(days[2]!.text()).toBe("2026-11-03: 0")
+    expect(useRecallData().toRepeatCount.value).toBe(1)
   })
 })

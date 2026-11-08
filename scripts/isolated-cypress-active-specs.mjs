@@ -66,6 +66,7 @@ export const APPLICATION_ONLY_ACTIVE_SPECS = [
   'e2e_test/features/recall/overlap_try_again.feature',
   'e2e_test/features/recall/recall_quiz_spelling_question.feature',
   'e2e_test/features/recall/spaced_repetition.feature',
+  'e2e_test/features/recall/spread_out_recall_backlog.feature',
   'e2e_test/features/relationships/add_relationship.feature',
   'e2e_test/features/relationships/relationship_edit_and_remove.feature',
   'e2e_test/features/relationships/reify_property.feature',

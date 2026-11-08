@@ -1,6 +1,15 @@
 <template>
   <template v-if="stats">
-  <div class="flex justify-end">
+  <div class="flex justify-end gap-2">
+    <button
+      type="button"
+      class="daisy-btn daisy-btn-sm"
+      data-testid="spread-out-recall-backlog"
+      @click="spreadOutBacklog"
+    >
+      <CalendarRange class="w-4 h-4" />
+      Spread out my recall backlog
+    </button>
     <button
       type="button"
       class="daisy-btn daisy-btn-sm"
@@ -11,6 +20,30 @@
       Download recall history
     </button>
   </div>
+  <section
+    v-if="forecast"
+    data-testid="recall-backlog-forecast"
+    class="mt-3 rounded-box bg-base-200 p-4"
+  >
+    <h3 class="mt-0 mb-2 text-base font-semibold">
+      Recalls for the next 30 days
+    </h3>
+    <p data-testid="recall-forecast-today">
+      Today: {{ forecast.todayCount }}
+    </p>
+    <p data-testid="recall-forecast-average">
+      Average per day: {{ forecast.averageCount.toFixed(1) }}
+    </p>
+    <ol class="mt-2 grid grid-cols-3 md:grid-cols-6 gap-1 text-sm">
+      <li
+        v-for="day in forecast.days"
+        :key="day.date"
+        data-testid="recall-forecast-day"
+      >
+        {{ day.date }}: {{ day.count }}
+      </li>
+    </ol>
+  </section>
   <div v-if="hasReviews || hasVisibleDailyProbe">
     <template v-if="hasReviews">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -132,15 +165,24 @@ import {
   localDayIso,
 } from "@/components/recallStats/dailyProbeWindow"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { UserController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  RecallsController,
+  UserController,
+} from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
-import type { RecallStatsDto } from "@generated/donut-backend-api"
+import type {
+  RecallBacklogForecast,
+  RecallStatsDto,
+} from "@generated/donut-backend-api"
+import { useRecallCatchUp } from "@/composables/useRecallCatchUp"
 import { computed, onMounted, ref } from "vue"
 import { saveAs } from "file-saver"
-import { Download } from "@lucide/vue"
+import { CalendarRange, Download } from "@lucide/vue"
 
 const stats = ref<RecallStatsDto | undefined>()
+const forecast = ref<RecallBacklogForecast | undefined>()
+const { replaceDueRecalls } = useRecallCatchUp()
 const error = ref(false)
 const window = ref<number | "all">(90)
 const windowOptions: (number | "all")[] = [30, 90, "all"]
@@ -198,6 +240,15 @@ const downloadRecallHistory = async () => {
     }),
     `recall-history-${localDayIso(timezone)}.json`
   )
+}
+
+const spreadOutBacklog = async () => {
+  const { data, error: apiError } = await apiCallWithLoading(() =>
+    RecallsController.spreadOutBacklog({ query: { timezone: timezoneParam() } })
+  )
+  if (apiError) return
+  forecast.value = data
+  await replaceDueRecalls()
 }
 
 onMounted(load)
