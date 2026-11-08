@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Hibiki-chan",
+  "email": "hibiki-chan@example.org",
+  "identity": "SEED-107#publish-backend-unit-test-proof",
+  "mode": "story-branch",
+  "branch": "cursor/show-backend-unit-test-results-in-intent",
+  "host": "cursor",
+  "model": "auto"
+}
