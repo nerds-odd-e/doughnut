@@ -85,6 +85,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder nextRecallAt(Timestamp timestamp) {
     entity.setNextRecallAt(timestamp);
+    rescheduleDueFromStability = false;
     return this;
   }
 

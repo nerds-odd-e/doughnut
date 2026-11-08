@@ -33,6 +33,14 @@ class RecallsControllerSpreadBacklogTests extends RecallsControllerTestBase {
     return controller.spreadOutBacklog(SHANGHAI);
   }
 
+  private MemoryTracker dueTrackerWithStability(float stabilityHours, Timestamp nextRecallAt) {
+    return makeMe
+        .aMemoryTrackerBy(currentUser.getUser())
+        .stabilityAndNextRecallAt(stabilityHours)
+        .nextRecallAt(nextRecallAt)
+        .please();
+  }
+
   private static List<Integer> counts(RecallBacklogForecast forecast) {
     return forecast.days().stream().map(DayCount::getCount).toList();
   }
@@ -107,6 +115,23 @@ class RecallsControllerSpreadBacklogTests extends RecallsControllerTestBase {
     assertEquals(shanghai(1, 1), laterToday.getNextRecallAt());
     assertThat(recallListAt(shanghai(0, 18)), contains(overdue.getId()));
     assertThat(recallListAt(shanghai(1, 9)), hasItem(laterToday.getId()));
+  }
+
+  @Test
+  void memoriesThatSufferMostFromWaitingStayFirstInLine() {
+    IntStream.rangeClosed(1, 30).forEach(day -> dueTracker(shanghai(day, 12)));
+    MemoryTracker veryStable = dueTrackerWithStability(4800f, shanghai(-3, 8));
+    MemoryTracker stable = dueTrackerWithStability(480f, shanghai(-2, 8));
+    MemoryTracker fragile = dueTrackerWithStability(24f, shanghai(-1, 8));
+    MemoryTracker fresh = dueTracker(shanghai(0, 8));
+
+    RecallBacklogForecast forecast = spread();
+
+    assertEquals(2, forecast.todayCount());
+    assertEquals(shanghai(0, 8), fresh.getNextRecallAt());
+    assertEquals(shanghai(-1, 8), fragile.getNextRecallAt());
+    assertEquals(shanghai(1, 1), stable.getNextRecallAt());
+    assertEquals(shanghai(2, 1), veryStable.getNextRecallAt());
   }
 
   @Test

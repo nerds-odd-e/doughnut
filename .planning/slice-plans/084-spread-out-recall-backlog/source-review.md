@@ -10,7 +10,7 @@ Exclusions returned (deferred, not rejected): preview/confirm before redistribut
 | --- | --- | --- | --- |
 | G1 | A learner returning to hundreds of due recall items can, with one click in Settings, get back to a manageable recall workload today | slice 3 | |
 | G2 | The learner can see what is due over the next 30 days | slice 3 | |
-| G3 | Items that suffer most from waiting stay first in line | slice 2 | |
+| G3 | Items that suffer most from waiting stay first in line | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java memoriesThatSufferMostFromWaitingStayFirstInLine |
 | 1.1 | One action in Settings redistributes the learner's recall backlog | slice 3 | |
 | 1.2 | Redistribution happens immediately, with no preview step | slice 3 | |
 | 1.3 | After redistributing, the action shows the resulting forecast | slice 3 | |
@@ -24,10 +24,10 @@ Exclusions returned (deferred, not rejected): preview/confirm before redistribut
 | 4.2 | A day already above the level keeps what it has and receives nothing | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java heavyFutureDayKeepsItsLoadAndGetsNothing |
 | 4.3 | When the backlog does not divide evenly, earlier days take the extra item | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java earlierDaysTakeTheExtraWhenTheBacklogDoesNotDivideEvenly |
 | 4.4 | When today's backlog is already at or below the level, nothing moves | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java nothingMovesWhenTodayIsWithinTheLevel |
-| 5.1 | Backlog items are ordered by how much they suffer from waiting: New (never graded) trackers first | slice 2 | |
-| 5.2 | After New trackers, items are ordered by ascending Stability | slice 2 | |
-| 5.3 | Today keeps the highest-priority items at their existing due times | slice 2 | |
-| 5.4 | The remaining items are assigned to days in priority order | slice 2 | |
+| 5.1 | Backlog items are ordered by how much they suffer from waiting: New (never graded) trackers first | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java memoriesThatSufferMostFromWaitingStayFirstInLine |
+| 5.2 | After New trackers, items are ordered by ascending Stability | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java memoriesThatSufferMostFromWaitingStayFirstInLine |
+| 5.3 | Today keeps the highest-priority items at their existing due times | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java memoriesThatSufferMostFromWaitingStayFirstInLine |
+| 5.4 | The remaining items are assigned to days in priority order | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java memoriesThatSufferMostFromWaitingStayFirstInLine |
 | 6.1 | A moved item becomes due just after local midnight starting its assigned day | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java movedItemIsDueInTomorrowMorningsRecallNotTonights (due day 1 01:00 local) |
 | 6.2 | A moved item appears in its assigned day's first recall window, not in the evening window before it | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java movedItemIsDueInTomorrowMorningsRecallNotTonights (recalling at 18:00 excludes, next 09:00 includes) |
 | 6.3 | Each local day counts items due after its start, up to and including the next midnight (an item due exactly at local midnight belongs to the previous day, matching the previous evening's recall) | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java nothingMovesWhenTodayIsWithinTheLevel (item at start of day 2 counted on day 1) |
@@ -50,5 +50,5 @@ Exclusions returned (deferred, not rejected): preview/confirm before redistribut
 | E1 | Example: 520 due today, 100 spread evenly over the next 30 days, no day above 20 -> 20 remain today; forecast shows 20 on each of the 30 days, average 20 | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java backlogFillsTodayAndEveryDayToOneLevel (scaled: 31 backlog -> 1 each, average 1.0) |
 | E2 | Example: 360 due today, 50 already due on day 3, nothing else -> today keeps 12, the other 29 days get 12 each, day 3 stays 50; forecast average 13.3 | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java heavyFutureDayKeepsItsLoadAndGetsNothing (scaled: heavy day keeps load, others level, average 4/30) |
 | E3 | Example: 15 due today, each of the next 30 days already has 20 -> nothing moves; forecast shows 15 today and 20 each day | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java nothingMovesWhenTodayIsWithinTheLevel (scaled) |
-| E4 | Example: backlog has a tracker graded yesterday with Stability about 1 day and one with Stability 200 days, one more slot fits today -> low-Stability tracker stays today; 200-day tracker moves later | slice 2 | |
+| E4 | Example: backlog has a tracker graded yesterday with Stability about 1 day and one with Stability 200 days, one more slot fits today -> low-Stability tracker stays today; 200-day tracker moves later | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java memoriesThatSufferMostFromWaitingStayFirstInLine |
 | E5 | Example: learner in UTC+8 clicks at 09:00 local; an item moved to tomorrow is not in this evening's recall list and is in tomorrow morning's | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java movedItemIsDueInTomorrowMorningsRecallNotTonights |

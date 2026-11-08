@@ -80,7 +80,7 @@ trackers.
 | --- | --- | --- | --- | --- |
 | P1 | An item due exactly at local midnight is already in the previous evening's due list; one due at 01:00 is not | Slice 1 bucket and placement decisions; example 5 | Scratch controller test in this workspace at 35f8a63b43 (2026-11-08), `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --tests '*ScratchLocalMidnightDueTest'`, using `RecallsController.recalling("Asia/Shanghai", 0)` at 18:00 then 09:00 next day; reverted | `eveningCount=1` (00:00 item), `morningCount=2`: settled, decisions above follow it |
 | P2 | The recall queue is `byUserIdFrom` (excludes commissioned, removed, unavailable) and the recall page and menu both read `getDueMemoryTrackers` | Slice 1 selection; slice 3 recall count after the action | Read `MemoryTrackerRepository`, `RecallService.getDueMemoryTrackers`, `UserController` menu data (2026-11-08); slice 1/3 tests observe it end to end | Settled by the same controller path the slices test |
-| P3 | `RecallsControllerTestBase` + `makeMe.aMemoryTrackerBy(user).nextRecallAt(...)` build due trackers, and Stability can be set for example 4 | Slices 1–2 proof setup | P1's scratch test used that base and builder (2026-11-08); `MemoryTrackerBuilder.stabilityAndNextRecallAt(float)` exists, followed by `.nextRecallAt(...)` to set the due time | Settled |
+| P3 | `RecallsControllerTestBase` + `makeMe.aMemoryTrackerBy(user).nextRecallAt(...)` build due trackers, and Stability can be set for example 4 | Slices 1–2 proof setup | P1's scratch test used that base and builder (2026-11-08); `MemoryTrackerBuilder.stabilityAndNextRecallAt(float)` exists; slice 2 found `.nextRecallAt(...)` was overwritten by `afterCreate` when `lastRecalledAt` is set; the builder now lets the later of the two calls decide the due time | Settled (corrected in slice 2) |
 | P4 | Local E2E route with the reused steps (`my daily new notes to assimilate is set to`, `On day {int} I self-review … and assimilate new …`, `It's day {int}`, `the menu should show {int} note to recall`) runs in this workspace | Slice 3 E2E | `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/spaced_repetition.feature` (2026-11-08, this workspace at 35f8a63b43) | 4 passing, 0 failing, exit 0: settled; the reused setup steps run in this workspace |
 
 ## Slices
@@ -109,7 +109,7 @@ glossary.
 
 ### 2. Keeping the memories that suffer most from waiting first
 Type: Behavior
-Status: planned
+Status: done
 Proof: Add example 4 to `RecallsControllerSpreadBacklogTests` (New tracker,
 Stability ≈ 24 h, Stability ≈ 4800 h; today's level leaves room for two) and
 rerun that class.
@@ -158,10 +158,16 @@ slice-specific concerns found in this review.
   `open_api_docs.yaml` were regenerated in slice 1 because
   `RobotsTests.openApiDocsMatchCommittedYaml` requires it; slice 3 regenerates
   only if the API changes again.
+- Slice 2 accepted proof (2026-11-08): `memoriesThatSufferMostFromWaitingStayFirstInLine`
+  plus `RecallsController*`, `RecallPrompt*`, `MemoryTracker*`,
+  `UserRecallHistoryExportControllerTest`, `NoteTrashRecoveryLearningPreferencesTest`
+  after the `MemoryTrackerBuilder.nextRecallAt` change. New trackers have
+  Stability 0 (`Fsrs.isNew`), so one stable ascending-Stability sort gives
+  New first.
 
 ## Story obligations
 
 ### G1. Backlog order is the existing due order (interim)
 Reported: slice 1 — "Backlog order is the existing due order, as the interim rule says. Slice 2 replaces it with priority order."
 Story clause: "backlog items are assigned in order of how much they suffer from waiting: New (never graded) trackers first, then ascending Stability"
-Disposition: interim until slices 2
+Disposition: proved by slice 2: RecallsControllerSpreadBacklogTests memoriesThatSufferMostFromWaitingStayFirstInLine (due order reversed against priority; New and 24h stay today, 480h and 4800h dealt to days 1 and 2; break check without the sort fails)

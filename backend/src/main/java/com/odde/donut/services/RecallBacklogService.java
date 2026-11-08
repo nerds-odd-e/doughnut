@@ -12,6 +12,7 @@ import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,8 @@ public class RecallBacklogService {
           else counts[day]++;
         });
 
+    // New trackers have the lowest Stability, so they come first; ties keep due order.
+    backlog.sort(Comparator.comparing(MemoryTracker::getStability));
     int[] additions = additionsUpToLevel(backlog.size(), counts);
     int next = additions[0];
     for (int day = 1; day <= WINDOW_DAYS; day++) {
