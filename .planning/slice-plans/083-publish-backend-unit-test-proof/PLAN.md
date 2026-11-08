@@ -95,12 +95,16 @@ Work decisions baked in:
 
 ### 2. Judged CI attempt shows backend proof in the summary and Intent
 Type: Behavior
-Status: planned
-Proof: Early probe after slice 1 is on the judged workflow: download
-`ci-proof-summary-attempt-<n>` for one completed attempt; confirm
-`backend/src/test/java` counts agree with that run's JUnit totals (or the part
-is missing if the job produced no report), and that Intent's CI proof for that
-attempt agrees. Failure stops here and revises the plan.
+Status: done
+Proof: Accepted — run `42433463211` attempt 1 at `47ba1d4` (donut CI success).
+Downloaded `ci-proof-summary-attempt-1`: `backend/src/test/java` part 1 present
+with passed=2954 failed=0 other=2, matching fragment
+`ci-proof-fragments-Backend-unit-tests-1-attempt-1` (same totals from JUnit
+conversion); `e2e_test/features` and `frontend/tests` present on the same
+artifact. Intent → CI status for story branch
+`cursor/show-backend-unit-test-results-in-intent` shows the same attempt with
+`backend/src/test/java` “2954 passed and 2 other checks” alongside frontend and
+E2E.
 
 Behavior: Pre — slice 1 published on the revision the attempt builds.
 Trigger — the attempt finishes and the developer opens that attempt in Intent.

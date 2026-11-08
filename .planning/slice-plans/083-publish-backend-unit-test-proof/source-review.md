@@ -12,7 +12,7 @@ only.
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | A Doughnut developer checking what a CI attempt proved for the backend sees the Open Dough dashboard’s Intent CI status show backend unit-test results alongside the frontend and end-to-end results for the same CI attempt. | slice 2 | |
+| 1 | A Doughnut developer checking what a CI attempt proved for the backend sees the Open Dough dashboard’s Intent CI status show backend unit-test results alongside the frontend and end-to-end results for the same CI attempt. | slice 2 | observed: Intent CI status of story branch for run 42433463211 attempt 1 — backend/src/test/java 2954 passed and 2 other alongside e2e_test/features and frontend/tests |
 | 2 | Register `backend/src/test/java` in `intent.locations` in `.planning/open-dough.json` so Intent treats that path as a proof entry. | slice 1 | observed: .planning/open-dough.json intent.locations path backend/src/test/java |
 | 3 | From the existing `Backend-unit-tests` job, convert that run’s JUnit results into one backend proof fragment (one part) and keep it for the attempt. | slice 1 | observed: .github/workflows/ci.yml Backend-unit-tests ci_proof_fragments format junit matrix part [1] |
 | 4 | Include that fragment in the same `ci-proof-summary-attempt-<n>` artifact Intent already reads for the attempt. | slice 1 | observed: ci.yml ci-proof expect includes backend/src/test/java=1; local summarize carries three entries |
@@ -26,7 +26,7 @@ only.
 | 10.1 | Backend entry counts (passed, failed, and other) agree with the JUnit report. | slice 1 | observed: ci-proof-outcomes-junit.test.mjs status/path/dir/times assertions |
 | 10.2 | Frontend and end-to-end entries remain present as today. | slice 1 | observed: local summarize with FE+E2E+backend fixtures; expect still lists e2e and frontend |
 | 11.1 | Backend fragment is present (failed tests still publish). | slice 1 | observed: fragment if outcome != skipped; failure/error→failed in junit converter tests |
-| 11.2 | Intent shows the failed (and other) counts from that report. | slice 2 | |
+| 11.2 | Intent shows the failed (and other) counts from that report. | slice 2 | observed: Intent CI proof for attempt 1 of run 42433463211 — backend “2954 passed and 2 other checks” agreeing with summary failed=0 other=2 (this attempt had no failed tests) |
 | 11.3 | Backend part is not missing when a report exists. | slice 1 | observed: local summarize with backend fragment shows backend counts not missing |
 | 12.1 | Intent shows the backend part as missing when there is no report. | slice 1 | observed: local summarize without backend fragment → part 1 of 1 missing (Intent reads that summary) |
 | 12.2 | Frontend and end-to-end proof for parts that reported are unaffected. | slice 1 | observed: summarize without backend still counts FE/E2E parts |
