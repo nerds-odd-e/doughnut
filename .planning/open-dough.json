@@ -13,6 +13,12 @@
         "runner": "vitest"
       },
       {
+        "path": "cli/tests",
+        "kind": "typescript",
+        "include": ["**/*.test.ts", "**/*.test.tsx"],
+        "runner": "vitest"
+      },
+      {
         "path": "backend/src/test/java",
         "kind": "java",
         "include": ["**/*Test.java"],

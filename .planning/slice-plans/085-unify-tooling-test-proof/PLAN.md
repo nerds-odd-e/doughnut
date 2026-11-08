@@ -2,6 +2,7 @@
 
 **Identity:** SEED-109#complete-test-inventory-and-script-proof
 **Source:** [Refined story](../../seeds/SEED-109-complete-test-inventory-and-script-proof.md#complete-test-inventory-and-script-proof)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -64,7 +65,7 @@ outside scope.
 ### 1. CLI inventory
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Use the pinned Intent locations reader against the candidate settings
 and actual Git tree. Compare its CLI list to both include patterns from
 `cli/vitest.config.ts`; spot-check `version.test.ts` and
@@ -72,6 +73,13 @@ and actual Git tree. Compare its CLI list to both include patterns from
 
 Behavior: A developer opening Intent for a revision with the CLI declaration
 can browse the existing Vitest files under `cli/tests`.
+
+Accepted proof: open-dough `c1923d59f` `performIntentLocationsRead` over the
+candidate settings and tracked tree listed 67 `cli/tests` files (36 TS, 31
+TSX), identical to `git ls-files` of both Vitest include patterns, including
+`version.test.ts` and `InteractiveCliApp.test.tsx`. The CI proof summary's
+`expect` covers only proved entries; CLI CI proof stays out of scope.
+Refactor: none needed.
 
 ### 2. Routing tests under scripts
 
