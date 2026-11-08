@@ -59,7 +59,7 @@ SEED-100#story-2, first implementation `275504cfc1`. The 0.3.82 slice 1 return e
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: unknown
-  - Evidence: plan 084 premise P3 settled `stabilityAndNextRecallAt(float)` followed by `.nextRecallAt(...)` from a scratch test that set only `nextRecallAt`; the slice 2 implementer found `MemoryTrackerBuilder.afterCreate` overwrote the due time once `lastRecalledAt` was set; slice 2 refactor changed the builder (`5002ad7856`).
+  - Evidence: plan `99bcf99e91:.planning/slice-plans/084-spread-out-recall-backlog/PLAN.md` premise P3 settled `stabilityAndNextRecallAt(float)` followed by `.nextRecallAt(...)` from a scratch test that set only `nextRecallAt`; the slice 2 implementer found `MemoryTrackerBuilder.afterCreate` overwrote the due time once `lastRecalledAt` was set; slice 2 refactor changed the builder (`5002ad7856`).
   - Observed effect: one test-helper workaround plus a refactor edit in shared test support; no plan change or stop.
 
 <a id="odf-147"></a>

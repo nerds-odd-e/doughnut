@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-108#spread-out-recall-backlog",
+  "title": "Spread out my recall backlog in one click",
+  "completedAt": "2026-11-08T03:23:02.289Z",
+  "developer": "Terry Yin",
+  "agent": "Nana-chan",
+  "host": "claude",
+  "model": "opus"
+}

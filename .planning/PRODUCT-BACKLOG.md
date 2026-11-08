@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Spread out my recall backlog in one click](seeds/SEED-108-spread-out-recall-backlog.md#spread-out-recall-backlog) — SEED-108#spread-out-recall-backlog ([plan](slice-plans/084-spread-out-recall-backlog/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
