@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Show backend unit-test results in Intent](seeds/SEED-107-publish-backend-unit-test-proof.md#publish-backend-unit-test-proof) — SEED-107#publish-backend-unit-test-proof ([plan](slice-plans/083-publish-backend-unit-test-proof/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1

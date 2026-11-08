@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-107_publish-backend-unit-test-proof.json",
+      "identity": "SEED-107#publish-backend-unit-test-proof",
+      "completedAt": "2026-11-08T01:29:54.781Z",
+      "blob": "1b49e60782c96e1e2caa5f56dfd2cb267a4bf424"
+    },
+    {
       "fileName": "SEED-106_publish-ci-test-execution-times.json",
       "identity": "SEED-106#publish-ci-test-execution-times",
       "completedAt": "2026-11-07T14:23:37.386Z",
@@ -438,12 +444,6 @@
       "identity": "SEED-066#rename-with-spoken-title",
       "completedAt": "2026-10-09T23:39:09.524Z",
       "blob": "f77dee667bd4758feef9fd344162fcaa0473596a"
-    },
-    {
-      "fileName": "SEED-071_e2e-proof-before-final-formatting.json",
-      "identity": "SEED-071#e2e-proof-before-final-formatting",
-      "completedAt": "2026-10-08T22:54:43.012Z",
-      "blob": "316a0b63e8a2f15a47da11a8a11d393f39c9e0aa"
     }
   ],
   "unreadable": []
