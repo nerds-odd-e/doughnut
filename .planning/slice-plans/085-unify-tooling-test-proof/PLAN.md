@@ -262,6 +262,19 @@ files; 31 Node files have no result because no CI job runs them directly
 (13 `scripts/ci/application-release-*` run inside the Bash
 `application-release.test`; the rest have no CI command).
 
+## Execution complete
+
+Product advice: no correction needed; the delivered scripts and CLI inventory
+and the `scripts` CI proof match the story. Consider a follow-up story for the
+18 Node test files under `scripts/` that no CI command selects (for example
+`scripts/isolated-service-mocks.test.mjs`, `scripts/dev-healthcheck.test.mjs`,
+the `worktree-retirement*` and `isolated-cypress-openai-mock*` files): run
+them in CI or remove them. Intent lists them without CI proof. The 13
+`scripts/ci/application-release-*` files run inside the Bash
+`application-release.test` check and are proved there. Open Dough's shared
+CI proof recipe still stages fragments at one fixed path; Doughnut's fragment
+action now stages each part afresh.
+
 ## Concern evidence
 
 - Slice-plan refinement separated Bash and Node publication so matrix and

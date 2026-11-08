@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 346. Removed numbers are never reused.
+- Highest allocated local number: 348. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 
@@ -356,3 +356,31 @@ Former local code: DD-345. The documented Source review link failed when written
 ## ODF-437 — A token-only removal sweep left natural-language wording that still described the deleted feature
 
 Former local code: DD-346. A removal sweep checked deleted symbols and paths, while maintained docs still described local proof in ordinary prose. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-437.md).
+
+## DD-347 — Guarded delivery refused a renamed file's old path listed as owned
+
+A slice that moved files with `git mv` listed both old and new paths in `staging.ownedPaths`. Guarded fresh delivery failed at staging with `pathspec ... did not match any files`, because the deletions were already staged. Listing the old paths in `stagedPaths` succeeded on retry.
+
+### Occurrences
+- Execution: SEED-109#complete-test-inventory-and-script-proof (first implementation commit e2256907b2)
+  - Timestamp: unknown (2026-11-08 Asia/Singapore, slice 2 delivery)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: `execution-increment-delivery.mjs fresh` result `preparation-failed`, operation `staging`; retry published 716cfa4f3d.
+  - Observed effect: one refused attempt; formatting already ran; no work lost.
+  - Inference: the `ownedPaths`/`stagedPaths` split does not say where a rename's removed path belongs; low cost, likely recurring for move slices.
+
+## DD-348 — A consumer trace deferred a stale doc line to an out-of-scope later slice
+
+Slice 1 added an Intent location without CI proof. Its consumer trace found `docs/ci-proof-summary.md`, which lists the locations without proof, and deferred it to "slice 2 CLI CI proof", although CLI CI proof was outside the story. The coordinator accepted the return without checking that doc, and the stale line shipped until slice 3 corrected it. Possibly related to ODF-150.
+
+### Occurrences
+- Execution: SEED-109#complete-test-inventory-and-script-proof (first implementation commit e2256907b2)
+  - Timestamp: unknown (2026-11-08 Asia/Singapore, slices 1 to 3)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: slice 1 return's "deferred to slice 2" disposition; e2256907b2 left `docs/ci-proof-summary.md` naming only `scripts` and `infra`; d122555f9f added `cli/tests`.
+  - Observed effect: an inaccurate doc line for two slice increments; no CI or product effect.
+  - Inference: a disposition naming a later slice was accepted without checking that slice owned the change.
