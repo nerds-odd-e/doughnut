@@ -29,6 +29,13 @@ runs:
       with:
         path: ~/.cache/Cypress/${{ steps.cache-metadata.outputs.cypress-version }}
         key: cypress-v2-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-metadata.outputs.cypress-version }}
+    - name: Install canvas build dependencies
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes --no-install-recommends \
+          libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
     - name: Install dependencies
       shell: bash
       run: pnpm --frozen-lockfile recursive install
