@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.6",
-    "@lucide/vue": "1.69.0",
+    "@lucide/vue": "1.70.0",
     "@storybook/addon-docs": "10.6.6",
     "@storybook/vue3": "10.6.6",
     "@storybook/vue3-vite": "10.6.6",
@@ -59,7 +59,7 @@
     "optionator": "^0.9.4",
     "pdfjs-dist": "6.5.438",
     "playwright": "1.65.0",
-    "sass": "1.107.1",
+    "sass": "1.108.1",
     "storybook": "10.6.6",
     "tailwindcss": "4.3.5",
     "terser": "^5.51.2",
