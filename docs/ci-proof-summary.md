@@ -11,7 +11,7 @@ file for that attempt. It also shows which CI parts did not report.
 | `frontend/tests` | `Frontend-unit-tests` shards | 2 | one Vitest test | Vitest JSON report |
 | `backend/src/test/java` | `Backend-unit-tests` | 1 | one JUnit test method | Gradle JUnit XML under `backend/build/test-results/test/` |
 
-`scripts` and `infra` have no entry. They show no CI proof.
+`cli/tests` and `scripts` have no entry. They show no CI proof.
 
 ## How it is made
 

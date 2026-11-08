@@ -30,11 +30,11 @@ Example file names are illustrations, not a complete list.
 | 4.2 | Put the three infrastructure tests under `scripts/test/path-routing/` | slice 2 | observed: slice 2: git status shows the three routing tests renamed to scripts/test/path-routing/; pnpm test:path-routing 17/17 pass from there |
 | 4.3 | Keep the routing and deployment implementation under `infra/` | slice 2 | observed: slice 2: diff moves only the three *.test.mjs files; infra/gcp/path-routing/*.mjs, doughnut-routing.json, url-maps/renderDoughnutAppServiceUrlMap.mjs and infra/gcp/scripts stay, imported by the moved tests |
 | 4.4 | Keep the routing and deployment configuration under `infra/` | slice 2 | observed: slice 2: diff moves only the three *.test.mjs files; infra/gcp/path-routing/*.mjs, doughnut-routing.json, url-maps/renderDoughnutAppServiceUrlMap.mjs and infra/gcp/scripts stay, imported by the moved tests |
-| 5 | Discover the following in one Scripts and Infrastructure group: | slice 3 | |
-| 5.1 | Bash `scripts/test/*.test` files | slice 3 | |
-| 5.2 | Node.js `*.test.mjs` files beneath the shared parent | slice 3 | |
+| 5 | Discover the following in one Scripts and Infrastructure group: | slice 3 | observed: slice 3 probe3 (open-dough c1923d59f performIntentLocationsRead + pathSelectedByIntentLocations + sourceEntryOfRepositoryPath over candidate settings and tracked tree): one scripts location labelled Scripts and Infrastructure, 101 files (21 shell = git ls-files scripts/test/*.test, 80 javascript = scripts/**/*.test.mjs), no infra location |
+| 5.1 | Bash `scripts/test/*.test` files | slice 3 | observed: slice 3 probe3 (open-dough c1923d59f performIntentLocationsRead + pathSelectedByIntentLocations + sourceEntryOfRepositoryPath over candidate settings and tracked tree): one scripts location labelled Scripts and Infrastructure, 101 files (21 shell = git ls-files scripts/test/*.test, 80 javascript = scripts/**/*.test.mjs), no infra location |
+| 5.2 | Node.js `*.test.mjs` files beneath the shared parent | slice 3 | observed: slice 3 probe3 (open-dough c1923d59f performIntentLocationsRead + pathSelectedByIntentLocations + sourceEntryOfRepositoryPath over candidate settings and tracked tree): one scripts location labelled Scripts and Infrastructure, 101 files (21 shell = git ls-files scripts/test/*.test, 80 javascript = scripts/**/*.test.mjs), no infra location |
 | 6 | Use the actual repository paths after the move: | slice 7 | |
-| 6.1 | for browsing | slice 3 | |
+| 6.1 | for browsing | slice 3 | observed: slice 3 probe3 (open-dough c1923d59f performIntentLocationsRead + pathSelectedByIntentLocations + sourceEntryOfRepositoryPath over candidate settings and tracked tree): one scripts location labelled Scripts and Infrastructure, 101 files (21 shell = git ls-files scripts/test/*.test, 80 javascript = scripts/**/*.test.mjs), no infra location; entries are post-move repository paths e.g. scripts/test/path-routing/path-routing-validation.test.mjs |
 | 6.2 | for CI proof | slice 7 | |
 | 7 | Use the existing attempt-specific CI proof summary as the source for the group's figures: | slice 7 | |
 | 7.1 | counts at group level | slice 7 | |
@@ -49,10 +49,10 @@ Example file names are illustrations, not a complete list.
 | 13 | If a producer report is missing, show the gap | slice 5 | |
 | 13.1 | Show that gap alongside any proof that was reported | slice 5 | |
 | 14 | Example 1: opening Intent lists both `cli/tests/version.test.ts` and `cli/tests/InteractiveCliApp.test.tsx` under the CLI location | slice 1 | observed: slice 1 reader probe (job tmp probe/probe.mts calling open-dough c1923d59f performIntentLocationsRead on working-tree settings + git ls-files tree): cli/tests location, no problem, 67 files (36 .test.ts, 31 .test.tsx) identical to git ls-files of both cli/vitest.config.ts include patterns; list includes cli/tests/version.test.ts and cli/tests/InteractiveCliApp.test.tsx |
-| 15 | Example 2: opening Scripts and Infrastructure shows these files together: | slice 3 | |
-| 15.1 | `scripts/test/worktree_setup.sh.test` | slice 3 | |
-| 15.2 | `scripts/ci/ci-proof-outcomes.test.mjs` | slice 3 | |
-| 15.3 | `scripts/test/path-routing/path-routing-validation.test.mjs` | slice 3 | |
+| 15 | Example 2: opening Scripts and Infrastructure shows these files together: | slice 3 | observed: slice 3 probe3: listed, file-at admitted and read in full with hint: all three example files in the scripts group |
+| 15.1 | `scripts/test/worktree_setup.sh.test` | slice 3 | observed: slice 3 probe3: listed, file-at admitted and read in full with hint shell: scripts/test/worktree_setup.sh.test |
+| 15.2 | `scripts/ci/ci-proof-outcomes.test.mjs` | slice 3 | observed: slice 3 probe3: listed, file-at admitted and read in full with hint javascript: scripts/ci/ci-proof-outcomes.test.mjs |
+| 15.3 | `scripts/test/path-routing/path-routing-validation.test.mjs` | slice 3 | observed: slice 3 probe3: listed, file-at admitted and read in full with hint javascript: scripts/test/path-routing/path-routing-validation.test.mjs |
 | 16 | Example 2 continued: after a CI attempt reports those checks, Intent and that attempt's artifact agree on: | slice 8 | |
 | 16.1 | the group count | slice 8 | |
 | 16.2 | the file counts | slice 8 | |
@@ -64,4 +64,4 @@ Example file names are illustrations, not a complete list.
 | 18.1 | the attempt shows missing proof for that part | slice 7 | |
 | 18.2 | the attempt keeps the results from the reports that are available | slice 7 | |
 | 19 | Discovery contract: the common parent fits the current CI proof contract | slice 5 | |
-| 20 | Discovery contract: declare the `scripts` Intent location with Open Dough 0.3.92 `sources` entries (include + optional syntax) so it lists and opens Bash `.test` and Node.js `.test.mjs` files together | slice 3 | |
+| 20 | Discovery contract: declare the `scripts` Intent location with Open Dough 0.3.92 `sources` entries (include + optional syntax) so it lists and opens Bash `.test` and Node.js `.test.mjs` files together | slice 3 | observed: slice 3 probe3 (open-dough c1923d59f performIntentLocationsRead + pathSelectedByIntentLocations + sourceEntryOfRepositoryPath over candidate settings and tracked tree): one scripts location labelled Scripts and Infrastructure, 101 files (21 shell = git ls-files scripts/test/*.test, 80 javascript = scripts/**/*.test.mjs), no infra location |

@@ -105,7 +105,7 @@ Refactor: one `routingPath` constant in the URL map test; glob test command.
 ### 3. Shared discovery
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Read the candidate's locations through the deployed Intent read and
 open `scripts/test/worktree_setup.sh.test`,
 `scripts/ci/ci-proof-outcomes.test.mjs`, and
@@ -115,6 +115,15 @@ Scripts and Infrastructure group.
 Behavior: Configure one `sources` location rooted at `scripts`, with the
 Bash and Node test selection, and drop the emptied `infra` location. The
 selected file has its real path and syntax hint.
+
+Accepted proof: a probe of open-dough `c1923d59f`'s locations read,
+`file-at` gate and source-entry hint over the candidate settings and tracked
+tree shows one `scripts` location labelled "Scripts and Infrastructure" with
+101 files (21 shell matching `scripts/test/*.test`, 80 JavaScript matching
+`scripts/**/*.test.mjs`); the three example files list and open with shell,
+javascript and javascript hints; no `infra` location; `cli/tests` still 67.
+`docs/ci-proof-summary.md` names `cli/tests` and `scripts` as without CI proof.
+Refactor: removed the unread `runner` key from the other locations.
 
 ### 4. Bash report
 

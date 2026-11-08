@@ -9,32 +9,25 @@
       {
         "path": "frontend/tests",
         "kind": "typescript",
-        "include": ["**/*.spec.ts"],
-        "runner": "vitest"
+        "include": ["**/*.spec.ts"]
       },
       {
         "path": "cli/tests",
         "kind": "typescript",
-        "include": ["**/*.test.ts", "**/*.test.tsx"],
-        "runner": "vitest"
+        "include": ["**/*.test.ts", "**/*.test.tsx"]
       },
       {
         "path": "backend/src/test/java",
         "kind": "java",
-        "include": ["**/*Test.java"],
-        "runner": "junit"
+        "include": ["**/*Test.java"]
       },
       {
         "path": "scripts",
-        "kind": "javascript",
-        "include": ["**/*.test.mjs"],
-        "runner": "node:test"
-      },
-      {
-        "path": "infra",
-        "kind": "javascript",
-        "include": ["**/*.test.mjs"],
-        "runner": "node:test"
+        "label": "Scripts and Infrastructure",
+        "sources": [
+          { "include": ["test/*.test"], "syntax": "shell" },
+          { "include": ["**/*.test.mjs"], "syntax": "javascript" }
+        ]
       }
     ]
   }
