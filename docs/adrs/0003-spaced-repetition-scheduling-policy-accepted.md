@@ -3,7 +3,7 @@
 **Status:** Accepted  
 **Date:** 2026-08-05  
 **Decision makers:** Terry Yin
-**Amended:** 2026-10-28 (interval fuzzing)
+**Amended:** 2026-10-28 (interval fuzzing); 2026-11-08 (backlog redistribution)
 **Consulted:** None
 
 ## Context
@@ -116,6 +116,16 @@ time. The next recall is strictly after the Grade. Scheduling inputs are the
 Grade, current Stability and Difficulty, and elapsed time.
 
 All Grade sources share this model, including Tutor Feedback.
+
+### Backlog redistribution
+
+A learner may redistribute their recall backlog: memory trackers due by the
+end of the local day move to later local days. It changes only due time, never
+Stability or Difficulty, and it is not a RecallLog event. A rebuild after an
+excluded attempt reschedules from memory state; it does not keep the
+redistributed date. Calendar-day placement belongs only to this
+learner-initiated action; Grade scheduling stays free of calendar-day
+boundaries.
 
 ### Commissioned Learning Session
 

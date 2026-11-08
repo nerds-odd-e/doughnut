@@ -2,6 +2,7 @@
 
 Work item: **SEED-108#spread-out-recall-backlog**.
 Source: [refined story](../../seeds/SEED-108-spread-out-recall-backlog.md#spread-out-recall-backlog).
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -86,7 +87,7 @@ trackers.
 
 ### 1. Spreading the backlog evenly over today and the next 30 local days
 Type: Behavior
-Status: planned
+Status: done
 Proof: New `backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java`
 covering examples 1, 2, 3 and 5 plus "only due time changes" (use small
 counts that show the same rule); run with
@@ -150,3 +151,17 @@ slice-specific concerns found in this review.
 - P1: the due query includes items at exactly the half-day window end, so
   local-day boundaries must use `(start, next start]` and placement must sit
   after midnight.
+- Slice 1 accepted proof (2026-11-08): `RecallsControllerSpreadBacklogTests`
+  (6 tests) plus `RecallsController*`, `RobotsTests` after API regeneration;
+  rule in `RecallBacklogService.additionsUpToLevel` (fill to L-1, extras one
+  each to the earliest days below L, today first). The API client and
+  `open_api_docs.yaml` were regenerated in slice 1 because
+  `RobotsTests.openApiDocsMatchCommittedYaml` requires it; slice 3 regenerates
+  only if the API changes again.
+
+## Story obligations
+
+### G1. Backlog order is the existing due order (interim)
+Reported: slice 1 — "Backlog order is the existing due order, as the interim rule says. Slice 2 replaces it with priority order."
+Story clause: "backlog items are assigned in order of how much they suffer from waiting: New (never graded) trackers first, then ascending Stability"
+Disposition: interim until slices 2

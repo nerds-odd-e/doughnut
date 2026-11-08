@@ -90,6 +90,12 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `moveNoteToNotebookRootInNotebook`: POST `/api/relations/move-to-notebook-root/{sourceNote}/{targetNotebook}` -> `MoveNoteToNotebookRootInNotebookResponse` (request: `MoveNoteToNotebookRootInNotebookData`; path: sourceNote, targetNotebook; response body: Array<NoteRealm>)
 - `moveNoteToFolder`: POST `/api/relations/move-to-folder/{sourceNote}/{targetFolder}` -> `MoveNoteToFolderResponse` (request: `MoveNoteToFolderData`; path: sourceNote, targetFolder; response body: Array<NoteRealm>)
 
+## Recalls Controller
+
+- `spreadOutBacklog`: POST `/api/recalls/spread-out-backlog` -> `SpreadOutBacklogResponse` (request: `SpreadOutBacklogData`; query: timezone; response body: RecallBacklogForecast)
+- `recalling`: GET `/api/recalls/recalling` -> `RecallingResponse` (request: `RecallingData`; query: timezone, dueindays; response body: DueMemoryTrackers)
+- `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<AnsweredQuestion>)
+
 ## Recall Prompt Controller
 
 - `regenerate`: POST `/api/recall-prompts/{recallPrompt}/regenerate` -> `RegenerateResponse` (request: `RegenerateData`; path: recallPrompt; body: QuestionContestResult; response body: RecallPrompt)
@@ -275,11 +281,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Current User Info Controller
 
 - `currentUserInfo`: GET `/api/user/current-user-info` -> `CurrentUserInfoResponse` (request: none; response body: CurrentUserInfo)
-
-## Recalls Controller
-
-- `recalling`: GET `/api/recalls/recalling` -> `RecallingResponse` (request: `RecallingData`; query: timezone, dueindays; response body: DueMemoryTrackers)
-- `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<AnsweredQuestion>)
 
 ## Assistant Consent Controller
 

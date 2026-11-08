@@ -739,6 +739,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
+  /api/recalls/spread-out-backlog:
+    post:
+      tags:
+      - recalls-controller
+      operationId: spreadOutBacklog
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecallBacklogForecast"
   /api/recall-prompts/{recallPrompt}/regenerate:
     post:
       tags:
@@ -4459,6 +4477,31 @@ components:
       - displayText
       - resolution
       - target
+    DayCount:
+      type: object
+      properties:
+        date:
+          type: string
+        count:
+          type: integer
+          format: int32
+    RecallBacklogForecast:
+      type: object
+      properties:
+        todayCount:
+          type: integer
+          format: int32
+        averageCount:
+          type: number
+          format: double
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayCount"
+      required:
+      - averageCount
+      - days
+      - todayCount
     QuestionContestResult:
       type: object
       properties:
@@ -5874,14 +5917,6 @@ components:
           type: integer
           format: int64
         sampleSize:
-          type: integer
-          format: int32
-    DayCount:
-      type: object
-      properties:
-        date:
-          type: string
-        count:
           type: integer
           format: int32
     DayRetention:

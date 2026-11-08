@@ -289,6 +289,17 @@ export type WikiLink = {
     destinationNoteId?: number;
 };
 
+export type DayCount = {
+    date?: string;
+    count?: number;
+};
+
+export type RecallBacklogForecast = {
+    todayCount: number;
+    averageCount: number;
+    days: Array<DayCount>;
+};
+
 export type QuestionContestResult = {
     advice?: string;
     rejected?: boolean;
@@ -1050,11 +1061,6 @@ export type DayAvgResponseTime = {
     date?: string;
     avgMs?: number;
     sampleSize?: number;
-};
-
-export type DayCount = {
-    date?: string;
-    count?: number;
 };
 
 export type DayRetention = {
@@ -2148,6 +2154,24 @@ export type MoveNoteToFolderResponses = {
 };
 
 export type MoveNoteToFolderResponse = MoveNoteToFolderResponses[keyof MoveNoteToFolderResponses];
+
+export type SpreadOutBacklogData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/recalls/spread-out-backlog';
+};
+
+export type SpreadOutBacklogResponses = {
+    /**
+     * OK
+     */
+    200: RecallBacklogForecast;
+};
+
+export type SpreadOutBacklogResponse = SpreadOutBacklogResponses[keyof SpreadOutBacklogResponses];
 
 export type RegenerateData = {
     body: QuestionContestResult;

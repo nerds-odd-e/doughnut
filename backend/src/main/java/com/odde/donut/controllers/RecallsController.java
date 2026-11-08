@@ -2,7 +2,9 @@ package com.odde.donut.controllers;
 
 import com.odde.donut.controllers.dto.AnsweredQuestion;
 import com.odde.donut.controllers.dto.DueMemoryTrackers;
+import com.odde.donut.controllers.dto.RecallBacklogForecast;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.RecallBacklogService;
 import com.odde.donut.services.RecallService;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.utils.TimezoneUtils;
@@ -12,6 +14,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,15 +26,18 @@ class RecallsController {
 
   private final AuthorizationService authorizationService;
   private final RecallService recallService;
+  private final RecallBacklogService recallBacklogService;
 
   @Autowired
   public RecallsController(
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
-      RecallService recallService) {
+      RecallService recallService,
+      RecallBacklogService recallBacklogService) {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.recallService = recallService;
+    this.recallBacklogService = recallBacklogService;
   }
 
   @GetMapping(value = {"/recalling"})
@@ -62,5 +68,15 @@ class RecallsController {
         .stream()
         .map(AnsweredQuestion::from)
         .toList();
+  }
+
+  @PostMapping(value = {"/spread-out-backlog"})
+  @Transactional
+  public RecallBacklogForecast spreadOutBacklog(@RequestParam(value = "timezone") String timezone) {
+    authorizationService.assertLoggedIn();
+    return recallBacklogService.spreadOutBacklog(
+        authorizationService.getCurrentUser(),
+        testabilitySettings.getCurrentUTCTimestamp(),
+        TimezoneUtils.parseTimezone(timezone));
   }
 }

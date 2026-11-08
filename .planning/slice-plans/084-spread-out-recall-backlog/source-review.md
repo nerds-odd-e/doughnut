@@ -1,0 +1,54 @@
+# Source review
+
+Launch: fresh general-purpose subagent (no conversation inheritance) on 2026-11-08, given only the story's Goal, Scope, deferred promises, key examples, and Terry's 2026-11-08 ADR 0003 amendment decision from `.planning/seeds/SEED-108-spread-out-recall-backlog.md#spread-out-recall-backlog`; instructed to read no files and change nothing.
+
+Exclusions returned (deferred, not rejected): preview/confirm before redistributing; undo; choice of window or target; recall-page entry or automatic redistribution; forecast predicting follow-ups or assimilation; commissioned trackers.
+
+## Commitments
+
+| Id | Source commitment | Slice | Observation or obligation |
+| --- | --- | --- | --- |
+| G1 | A learner returning to hundreds of due recall items can, with one click in Settings, get back to a manageable recall workload today | slice 3 | |
+| G2 | The learner can see what is due over the next 30 days | slice 3 | |
+| G3 | Items that suffer most from waiting stay first in line | slice 2 | |
+| 1.1 | One action in Settings redistributes the learner's recall backlog | slice 3 | |
+| 1.2 | Redistribution happens immediately, with no preview step | slice 3 | |
+| 1.3 | After redistributing, the action shows the resulting forecast | slice 3 | |
+| 2.1 | Backlog = the learner's recall-queue items, the same items the recall page shows, spelling included | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java nothingMovesWhenTodayIsWithinTheLevel (removed tracker excluded); selection reuses MemoryTrackerRepository byUserIdFrom query (spelling included, commissioned excluded) |
+| 2.2 | Backlog includes only items whose due time is before the end of today in the learner's local time zone | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java movedItemIsDueInTomorrowMorningsRecallNotTonights (overdue and later-today items are backlog) |
+| 2.3 | Items due later today count as backlog; "today" means the whole local day, not the current half-day recall window | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java movedItemIsDueInTomorrowMorningsRecallNotTonights (item due 20:00 today moved) |
+| 3.1 | Window = today plus the next 30 local calendar days | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java backlogFillsTodayAndEveryDayToOneLevel (30 days from 1989-01-02) |
+| 3.2 | Items already due on those 30 days keep their dates | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java heavyFutureDayKeepsItsLoadAndGetsNothing (heavy tracker keeps due time) |
+| 3.3 | Items already due on those 30 days count toward each day's load | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java heavyFutureDayKeepsItsLoadAndGetsNothing (day 1 count 2) |
+| 4.1 | Fill rule: one daily level is chosen; today keeps up to that level and each of the next 30 days is filled up to it from the backlog | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java backlogFillsTodayAndEveryDayToOneLevel |
+| 4.2 | A day already above the level keeps what it has and receives nothing | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java heavyFutureDayKeepsItsLoadAndGetsNothing |
+| 4.3 | When the backlog does not divide evenly, earlier days take the extra item | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java earlierDaysTakeTheExtraWhenTheBacklogDoesNotDivideEvenly |
+| 4.4 | When today's backlog is already at or below the level, nothing moves | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java nothingMovesWhenTodayIsWithinTheLevel |
+| 5.1 | Backlog items are ordered by how much they suffer from waiting: New (never graded) trackers first | slice 2 | |
+| 5.2 | After New trackers, items are ordered by ascending Stability | slice 2 | |
+| 5.3 | Today keeps the highest-priority items at their existing due times | slice 2 | |
+| 5.4 | The remaining items are assigned to days in priority order | slice 2 | |
+| 6.1 | A moved item becomes due just after local midnight starting its assigned day | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java movedItemIsDueInTomorrowMorningsRecallNotTonights (due day 1 01:00 local) |
+| 6.2 | A moved item appears in its assigned day's first recall window, not in the evening window before it | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java movedItemIsDueInTomorrowMorningsRecallNotTonights (recalling at 18:00 excludes, next 09:00 includes) |
+| 6.3 | Each local day counts items due after its start, up to and including the next midnight (an item due exactly at local midnight belongs to the previous day, matching the previous evening's recall) | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java nothingMovesWhenTodayIsWithinTheLevel (item at start of day 2 counted on day 1) |
+| 7.1 | Only due time changes | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java onlyTheDueTimeChanges |
+| 7.2 | Stability is untouched | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java onlyTheDueTimeChanges |
+| 7.3 | Difficulty is untouched | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java onlyTheDueTimeChanges |
+| 7.4 | RecallLog is untouched | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java onlyTheDueTimeChanges |
+| 7.5 | A later Grade schedules from the actual elapsed time as usual (an overdue success may gain more Stability) | slice 1 | observed: existing MemoryTrackerCorrectRecallSchedulingTest and MemoryTrackerRebuildFromRecallHistoryTest pass unchanged; RecallBacklogService sets only nextRecallAt |
+| 8.1 | Forecast shows today's remaining count | slice 3 | |
+| 8.2 | Forecast shows the average per day over the next 30 days | slice 3 | |
+| 8.3 | Forecast shows the count for each of those 30 days | slice 3 | |
+| 8.4 | Forecast counts reflect the schedule at the moment of redistribution | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java forecast assertions in every test |
+| 9.1 | Amend Accepted ADR 0003 in this story to name a learner-initiated backlog redistribution | slice 1 | observed: docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md Backlog redistribution subsection and Amended line |
+| 9.2 | ADR 0003: the redistribution changes only due time, never Stability or Difficulty | slice 1 | observed: docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md Backlog redistribution subsection and Amended line |
+| 9.3 | ADR 0003: the redistribution is not a RecallLog event | slice 1 | observed: docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md Backlog redistribution subsection and Amended line |
+| 9.4 | ADR 0003: a rebuild after an excluded attempt reschedules the tracker from its memory state, not keeping the redistributed date | slice 1 | observed: docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md Backlog redistribution subsection and Amended line |
+| 9.5 | ADR 0003: calendar-day placement belongs to this action only | slice 1 | observed: docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md Backlog redistribution subsection and Amended line |
+| 9.6 | ADR 0003: Grade scheduling stays free of calendar-day boundaries | slice 1 | observed: docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md Backlog redistribution subsection and Amended line |
+| 9.7 | Add the term to ADR 0001 if it becomes product language (conditional) | slice 3 | |
+| E1 | Example: 520 due today, 100 spread evenly over the next 30 days, no day above 20 -> 20 remain today; forecast shows 20 on each of the 30 days, average 20 | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java backlogFillsTodayAndEveryDayToOneLevel (scaled: 31 backlog -> 1 each, average 1.0) |
+| E2 | Example: 360 due today, 50 already due on day 3, nothing else -> today keeps 12, the other 29 days get 12 each, day 3 stays 50; forecast average 13.3 | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java heavyFutureDayKeepsItsLoadAndGetsNothing (scaled: heavy day keeps load, others level, average 4/30) |
+| E3 | Example: 15 due today, each of the next 30 days already has 20 -> nothing moves; forecast shows 15 today and 20 each day | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java nothingMovesWhenTodayIsWithinTheLevel (scaled) |
+| E4 | Example: backlog has a tracker graded yesterday with Stability about 1 day and one with Stability 200 days, one more slot fits today -> low-Stability tracker stays today; 200-day tracker moves later | slice 2 | |
+| E5 | Example: learner in UTC+8 clicks at 09:00 local; an item moved to tomorrow is not in this evening's recall list and is in tomorrow morning's | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/RecallsControllerSpreadBacklogTests.java movedItemIsDueInTomorrowMorningsRecallNotTonights |
