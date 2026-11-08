@@ -42,7 +42,7 @@ Example file names are illustrations, not a complete list.
 | 7.3 | cumulative recorded test execution time at group level | slice 7 | |
 | 7.4 | cumulative recorded test execution time at file level | slice 7 | |
 | 8 | Report the checks run by the existing CI jobs | slice 7 | |
-| 9 | Count each Bash file invocation as one check, including the work it delegates | slice 4 | |
+| 9 | Count each Bash file invocation as one check, including the work it delegates | slice 4 | observed: slice 4 scripts/test/run_all_script_tests.sh.test: real runner over a fixture tree with CI_PROOF_BASH_REPORT reports one passed/failed row per .test file invocation (a passes, b fails, c passes after failure) with repo-relative path and elapsed seconds covering the whole bash call; exit 1 |
 | 10 | Use per-case outcomes from the directly selected Node.js suites | slice 6 | |
 | 11 | Include the failure results that are available | slice 7 | |
 | 12 | Include the durations that are available | slice 7 | |

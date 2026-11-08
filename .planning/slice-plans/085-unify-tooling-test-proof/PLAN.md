@@ -128,7 +128,7 @@ Refactor: removed the unread `runner` key from the other locations.
 ### 4. Bash report
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Exercise `bash scripts/test/run_all_script_tests.sh` through an isolated
 fixture tree with a passing file, a failing file, and a file that runs after
 failure. Check repository-relative outcomes, corresponding recorded times, and
@@ -136,6 +136,14 @@ exit 1. Confirm the ordinary invocation keeps its current output and verdict.
 
 Behavior: When reporting is requested for CI, the normal Bash runner records
 each completed file check, including failures, for the collector.
+
+Accepted proof: `scripts/test/run_all_script_tests.sh.test` copies the real
+runner beside passing, failing and later-passing fixtures. Without
+`CI_PROOF_BASH_REPORT` output and exit 1 are unchanged; with it the report
+holds `<passed|failed>\t<seconds>\t<repo-relative path>` per file, the
+failing file's time covering its run. The full runner passes 22/22 plain and
+with reporting. Slice 5 converts this shape with a `bash` format in
+`scripts/ci/ci-proof-outcomes.mjs`. Refactor: none needed.
 
 ### 5. Bash CI proof
 

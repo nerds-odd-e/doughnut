@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# Runs the real runner from a fixture repository whose scripts/test holds a
+# passing file, a failing file and a file sorted after the failure.
+
+set -euo pipefail
+
+RUNNER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/run_all_script_tests.sh"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+mkdir -p "$work/repo/scripts/test"
+cp "$RUNNER" "$work/repo/scripts/test/"
+printf 'exit 0\n' >"$work/repo/scripts/test/a_passes.test"
+printf 'sleep 0.2\nexit 1\n' >"$work/repo/scripts/test/b_fails.test"
+printf 'exit 0\n' >"$work/repo/scripts/test/c_passes_after_failure.test"
+
+test_reports_each_file_outcome_and_time() {
+	local report="$work/report.tsv" status=0
+	CI_PROOF_BASH_REPORT="$report" bash "$work/repo/scripts/test/run_all_script_tests.sh" \
+		>/dev/null || status=$?
+	[ "$status" -eq 1 ] || fail "expected exit 1, got $status"
+
+	local outcomes
+	outcomes=$(cut -f1,3 "$report")
+	[ "$outcomes" = "$(printf 'passed\tscripts/test/a_passes.test\nfailed\tscripts/test/b_fails.test\npassed\tscripts/test/c_passes_after_failure.test')" ] ||
+		fail "unexpected outcomes: $outcomes"
+	cut -f2 "$report" | grep -qvE '^[0-9]+\.[0-9]{6}$' && fail "unexpected times: $(cat "$report")"
+	awk -F'\t' '$3 == "scripts/test/b_fails.test" && $2 >= 0.2 { found = 1 } END { exit !found }' "$report" ||
+		fail "failing file time is not its elapsed time: $(cat "$report")"
+}
+
+test_ordinary_run_writes_no_report_and_keeps_verdict() {
+	local output status=0
+	output=$(cd "$work" && env -u CI_PROOF_BASH_REPORT bash repo/scripts/test/run_all_script_tests.sh) || status=$?
+	[ "$status" -eq 1 ] || fail "expected exit 1, got $status"
+	[ "$(printf '%s\n' "$output" | grep -c '^✓ Passed: ')" -eq 2 ] || fail "unexpected output: $output"
+	[ "$(printf '%s\n' "$output" | grep -c '^✗ Failed: ')" -eq 1 ] || fail "unexpected output: $output"
+	printf '%s\n' "$output" | grep -q '^  Failed: 1$' || fail "unexpected summary: $output"
+	[ "$(ls "$work")" = repo ] || fail "unexpected files: $(ls "$work")"
+}
+
+test_ordinary_run_writes_no_report_and_keeps_verdict
+test_reports_each_file_outcome_and_time
+echo "ok run_all_script_tests.sh tests"
