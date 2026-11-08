@@ -29,7 +29,7 @@ test('CI proof expects each entry in as many parts as its producer matrix runs',
 
   assert.deepEqual(
     expectations.map(([, entry]) => entry),
-    ['e2e_test/features', 'frontend/tests']
+    ['e2e_test/features', 'frontend/tests', 'backend/src/test/java']
   )
   for (const [, entry, parts] of expectations) {
     const producer = producerOf(ci, entry)

@@ -54,6 +54,7 @@ jobs:
   Backend-unit-tests:
     name: Backend Unit tests
     runs-on: ${{ vars.RUNNER }}
+    strategy: { fail-fast: false, matrix: { part: [1] } } # job-index for fragments
     steps:
       - uses: actions/checkout@v7
       - name: Setup MySQL DB Server
@@ -74,17 +75,21 @@ jobs:
         with:
           java_version: ${{ vars.JAVA_VERSION }}
       - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
-      - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
-      # Fat jar does not embed SPA/CLI (deploy workflow uploads them to GCS). Jar repro is Gradle-only.
+      - id: backend-tests
+        run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
+      - if: ${{ !cancelled() && steps.backend-tests.outcome != 'skipped' }}
+        uses: ./.github/ci_proof_fragments
+        with:
+          format: junit
+          report: ${{ github.workspace }}/backend/build/test-results/test
+          entry: backend/src/test/java
+      # Jar repro is Gradle-only (SPA/CLI uploaded separately at deploy).
       - name: Boot jar reproducibility
         run: bash backend/scripts/boot-jar-reproducible.sh
 
   Frontend-unit-tests:
-    # Sharded to keep each browser session short: the Vitest browser-mode
-    # orchestrator leaks frame state and Chromium eventually crashes mid-run
-    # ("Browser connection was closed"). 2 shards keeps each session under
-    # ~100 spec files. Increase the shard count when the frontend spec count
-    # grows past ~250 (i.e. when a single shard nears ~125 files again).
+    # 2 shards: Vitest browser-mode leaks frame state; keep each session under
+    # ~100 specs (raise when a shard nears ~125 files / ~250 total).
     name: Frontend Unit Tests (${{ matrix.shard }}/2)
     runs-on: ${{ vars.RUNNER }}
     strategy:
@@ -111,7 +116,7 @@ jobs:
 
   ci-proof:
     name: CI proof summary
-    needs: [E2E-tests, Frontend-unit-tests]
+    needs: [E2E-tests, Frontend-unit-tests, Backend-unit-tests]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
@@ -119,7 +124,7 @@ jobs:
       - uses: ./.github/ci_proof_summary
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          expect: e2e_test/features=6 frontend/tests=2
+          expect: e2e_test/features=6 frontend/tests=2 backend/src/test/java=1
 
   Other-unit-tests:
     name: Other Unit Tests

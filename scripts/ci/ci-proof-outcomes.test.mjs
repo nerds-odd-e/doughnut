@@ -1,20 +1,7 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
-import {
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
 import { test } from 'node:test'
-import { fileURLToPath } from 'node:url'
 import { outcomeLines } from './ci-proof-outcomes.mjs'
-import { action } from './workflow-fixtures.mjs'
-
-const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
+import { repoRoot, writeFragment } from './ci-proof-outcomes-fixtures.mjs'
 
 const vitestFile = (path, status, ...testStatuses) => ({
   name: `${repoRoot}${path}`,
@@ -23,38 +10,6 @@ const vitestFile = (path, status, ...testStatuses) => ({
     typeof assertion === 'string' ? { status: assertion } : assertion
   ),
 })
-
-const writeFragment = (t, format, entry, report) => {
-  const temp = mkdtempSync(join(tmpdir(), 'ci-proof-'))
-  t.after(() => rmSync(temp, { recursive: true, force: true }))
-  const reportFile = join(temp, 'report')
-  writeFileSync(reportFile, report)
-  const step = action('ci_proof_fragments').runs.steps.find(
-    ({ id }) => id === 'fragments'
-  )
-  execFileSync(step.shell, ['-e', '-o', 'pipefail', '-c', step.run], {
-    cwd: repoRoot,
-    env: {
-      ...process.env,
-      FORMAT: format,
-      REPORT: reportFile,
-      ENTRY: entry,
-      JOB_INDEX: '0',
-      PARTS: '2',
-      RUNNER_TEMP: temp,
-      GITHUB_OUTPUT: join(temp, 'github-output'),
-      GITHUB_RUN_ATTEMPT: '1',
-      CI_PROOF_REVISION: 'deadbeef',
-    },
-  })
-  const fragments = join(temp, 'ci-proof')
-  const files = readdirSync(fragments)
-  assert.equal(files.length, 1)
-  return {
-    times: readFileSync(join(temp, 'ci-proof-times.tsv'), 'utf8'),
-    fragment: JSON.parse(readFileSync(join(fragments, files[0]), 'utf8')),
-  }
-}
 
 test('a Vitest report gives one repo-relative line per test', () => {
   const report = {

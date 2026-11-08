@@ -9,17 +9,19 @@ file for that attempt. It also shows which CI parts did not report.
 | --- | --- | --- | --- | --- |
 | `e2e_test/features` | `E2E-tests` matrix | 6 | one Cucumber scenario (test case) | Cucumber preprocessor messages (NDJSON) |
 | `frontend/tests` | `Frontend-unit-tests` shards | 2 | one Vitest test | Vitest JSON report |
+| `backend/src/test/java` | `Backend-unit-tests` | 1 | one JUnit test method | Gradle JUnit XML under `backend/build/test-results/test/` |
 
-`scripts`, `infra` and backend tests have no entry. They show no CI proof.
+`scripts` and `infra` have no entry. They show no CI proof.
 
 ## How it is made
 
-1. The test step of each producer part writes its runner's own report to an
-   absolute path under `${RUNNER_TEMP}`, named by an environment variable that
-   only the workflow sets: `CI_PROOF_VITEST_REPORT` (read in
-   `frontend/vitest.config.ts`) and `CI_PROOF_CUCUMBER_MESSAGES` (read in
-   `e2e_test/config/ci.ts`). Local runs and the Cloud VM write no such
-   report.
+1. The test step of each producer part writes its runner's own report. Frontend
+   and E2E write to an absolute path under `${RUNNER_TEMP}`, named by an
+   environment variable that only the workflow sets: `CI_PROOF_VITEST_REPORT`
+   (read in `frontend/vitest.config.ts`) and `CI_PROOF_CUCUMBER_MESSAGES`
+   (read in `e2e_test/config/ci.ts`). Local runs and the Cloud VM write no
+   such report. Backend uses Gradle's default JUnit XML directory
+   `backend/build/test-results/test/` (one `TEST-*.xml` file per class).
 2. The composite action `.github/ci_proof_fragments` converts the report with
    `scripts/ci/ci-proof-outcomes.mjs` into one `<status><TAB><repo-relative
    path>` line per test case and one `<seconds><TAB><repo-relative path>`
@@ -28,10 +30,11 @@ file for that attempt. It also shows which CI parts did not report.
    is `strategy.job-index` plus 1. It runs
    after failing tests too, but not when the test step was skipped, so a part
    whose setup failed shows as missing.
-3. The `ci-proof` job runs after both producers, even when they fail. The
+3. The `ci-proof` job runs after the producers, even when they fail. The
    composite action `.github/ci_proof_summary` collects this attempt's
-   fragments against `expect` (`e2e_test/features=6 frontend/tests=2`, in
-   `intent.locations` order) and uploads the summary, kept for 30 days.
+   fragments against `expect` (`e2e_test/features=6 frontend/tests=2
+   backend/src/test/java=1`, in `intent.locations` order among proved
+   entries) and uploads the summary, kept for 30 days.
 
 ## Rules
 
@@ -40,10 +43,13 @@ file for that attempt. It also shows which CI parts did not report.
   results, such as one that failed to load, counts as one failed check. A
   Cucumber test case is judged by its last attempt, using its worst step
   status: passed is passed; skipped or unknown is other; pending, undefined,
-  ambiguous or failed is failed.
+  ambiguous or failed is failed. A JUnit `testcase` with a `failure` or
+  `error` child is failed; with `skipped` is other; otherwise passed. Nested
+  `$` classnames map to the outer class file under `backend/src/test/java`.
 - **Recorded execution time.** Vitest contributes the duration of each
   assertion that reports one. Cucumber contributes the recorded step
-  durations from each scenario's final attempt. Failed checks contribute
+  durations from each scenario's final attempt. JUnit contributes each
+  testcase's `time` attribute (seconds). Failed checks contribute
   their recorded time too. Checks without recorded time, including Vitest
   load failures, still count and are marked untimed. The summary's
   `durationMs` is the sum of recorded durations across present parts. It can

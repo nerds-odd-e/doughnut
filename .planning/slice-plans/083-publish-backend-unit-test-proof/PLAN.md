@@ -2,6 +2,7 @@
 
 Work item: **SEED-107#publish-backend-unit-test-proof**.
 Source: [refined story](../../seeds/SEED-107-publish-backend-unit-test-proof.md#publish-backend-unit-test-proof).
+**Source review:** [source-review.md](./source-review.md).
 
 ## Goal and scope
 
@@ -63,14 +64,13 @@ judged beyond extending `expect` and collector `needs`.
 
 ### 1. A CI attempt summary includes backend unit-test proof from JUnit
 Type: Behavior
-Status: planned
-Proof: Extend `scripts/ci/ci-proof-outcomes.test.mjs` for JUnit → outcomes/times
-(passed, failed, skipped→other, classname→`backend/src/test/java/.../*.java`,
-multi-file directory); extend `scripts/ci/ci-workflow.test.mjs` so expect lists
-`e2e_test/features=6 frontend/tests=2 backend/src/test/java=1` with matching
-producer matrix length and `fail-fast: false`; run `pnpm test:ci-proof`.
-Optional local `fragment`+`summarize` on fixtures shows the backend entry with
-frontend/E2E fixtures still present.
+Status: done
+Proof: Accepted — `CURSOR_DEV=true nix develop -c pnpm test:ci-proof` (14 pass):
+`scripts/ci/ci-proof-outcomes-junit.test.mjs` (JUnit path/status/nested/dir+times),
+`scripts/ci/ci-workflow.test.mjs` expect
+`e2e_test/features=6 frontend/tests=2 backend/src/test/java=1` with matrix length 1
+and `fail-fast: false`. Local `fragment`+`summarize` on fixtures: three entries
+present; without backend fragment, backend part missing while FE/E2E remain.
 
 Behavior: Pre — frontend and E2E producers already publish fragments.
 Trigger — `Backend-unit-tests` finishes (pass or fail with a report), converts
@@ -130,3 +130,17 @@ artifact (example 4).
 - Remaining slice-specific concerns: none identified. Slice 2 is an authorized
   early probe for live artifact/Intent agreement; its failure revises the plan
   and does not block recording `ready`.
+
+## Story obligations
+
+### G1. scripts and infra without CI proof
+Reported: slice 1 — "`scripts` and `infra` stay without CI proof in this story."
+Story clause: "`scripts` and `infra` stay without CI proof in this story."
+Disposition: excluded "`scripts` and `infra` stay without CI proof in this story."
+Commitment: 6
+
+### G2. No Intent UI or dashboard product change
+Reported: slice 1 — "No Intent UI or dashboard product change: Intent already reads the summary artifact for configured locations."
+Story clause: "No Intent UI or dashboard product change: Intent already reads the summary artifact for configured locations."
+Disposition: excluded "No Intent UI or dashboard product change: Intent already reads the summary artifact for configured locations."
+Commitment: 8
