@@ -1,3 +1,4 @@
+import { isEqual } from 'es-toolkit'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import {
@@ -16,8 +17,8 @@ export const relationshipTargetNoteTitleSelector =
 function expectExactRelationshipTargetsWithRetry(targets: string[]) {
   const tryMatch = (attempt: number) => {
     cy.get(relationshipTargetNoteTitleSelector).then((elms) => {
-      const actual = Cypress._.map(elms, (e) => e.textContent?.trim() ?? '')
-      if (Cypress._.isEqual(actual, targets)) {
+      const actual = Array.from(elms, (e) => e.textContent?.trim() ?? '')
+      if (isEqual(actual, targets)) {
         return
       }
       if (attempt >= relationshipTargetListMaxAttempts - 1) {
@@ -99,7 +100,7 @@ export const assumeNoteTargetSearchDialog = () => {
         return
       }
       cy.get('.dropdown-list a:not(.notebook-hit-title)').should(($elms) => {
-        const actual = Cypress._.map($elms, (e) => e.textContent?.trim() ?? '')
+        const actual = Array.from($elms, (e) => e.textContent?.trim() ?? '')
         expect(
           actual,
           `Expected duplicate suggestions ${JSON.stringify(targets)}, but found ${JSON.stringify(actual)}`

@@ -106,6 +106,7 @@
     "@types/node": "26.6.6",
     "cypress": "16.2.1",
     "cypress-file-upload": "^5.0.8",
+    "es-toolkit": "1.53.2",
     "github_action_sound": "^1.1.0",
     "got": "16.2.0",
     "hono": "4.13.17",

@@ -284,6 +284,9 @@ importers:
       cypress-file-upload:
         specifier: ^5.0.8
         version: 5.0.8(cypress@16.2.1)
+      es-toolkit:
+        specifier: 1.53.2
+        version: 1.53.2
       github_action_sound:
         specifier: ^1.1.0
         version: 1.1.0(canvas@3.2.3)(supports-color@8.1.1)
