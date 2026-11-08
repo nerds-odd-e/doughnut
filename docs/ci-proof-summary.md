@@ -10,7 +10,7 @@ file for that attempt. It also shows which CI parts did not report.
 | `e2e_test/features` | `E2E-tests` matrix | 6 | one Cucumber scenario (test case) | Cucumber preprocessor messages (NDJSON) |
 | `frontend/tests` | `Frontend-unit-tests` shards | 2 | one Vitest test | Vitest JSON report |
 | `backend/src/test/java` | `Backend-unit-tests` | 1 | one JUnit test method | Gradle JUnit XML under `backend/build/test-results/test/` |
-| `scripts` | `Other-unit-tests` (part 1: Bash script runner) | 1 | one `scripts/test/*.test` file run | Bash runner's tab-separated report |
+| `scripts` | `Other-unit-tests` (part 1: Bash script runner); `Lint-N-Backend-Generated-Types-For-Frontend` (parts 2–11: each `lint:all` command that runs `scripts/ci/node-test.mjs`, in `lint:all` order) | 11 | Bash: one `scripts/test/*.test` file run; Node: one test case | Bash runner's tab-separated report; Node: `scripts/ci/node-test-report.mjs` JSON lines |
 
 `cli/tests` has no entry. It shows no CI proof.
 
@@ -21,7 +21,10 @@ file for that attempt. It also shows which CI parts did not report.
    environment variable that only the workflow sets: `CI_PROOF_VITEST_REPORT`
    (read in `frontend/vitest.config.ts`), `CI_PROOF_CUCUMBER_MESSAGES`
    (read in `e2e_test/config/ci.ts`) and `CI_PROOF_BASH_REPORT` (read in
-   `scripts/test/run_all_script_tests.sh`). Local runs and the Cloud VM write
+   `scripts/test/run_all_script_tests.sh`). `CI_PROOF_NODE_REPORT_DIR`, set
+   on the `pnpm lint:all` step and read in `scripts/ci/node-test.mjs`, names a
+   directory where each Node test command writes
+   `<package script>.ndjson`. Local runs and the Cloud VM write
    no such report. Backend uses Gradle's default JUnit XML directory
    `backend/build/test-results/test/` (one `TEST-*.xml` file per class).
 2. The composite action `.github/ci_proof_fragments` converts the report with
@@ -33,11 +36,18 @@ file for that attempt. It also shows which CI parts did not report.
    otherwise the part number is `strategy.job-index` plus 1, of
    `strategy.job-total`. It runs
    after failing tests too, but not when the test step was skipped, so a part
-   whose setup failed shows as missing.
+   whose setup failed shows as missing. Each call stages its fragment afresh,
+   so a job with several parts uploads each part once. Within `lint:all`, a
+   failing command stops the later ones; their reports are absent, their
+   conversions fail, and their parts show as missing while earlier parts
+   publish. A command's checks outside `scripts/` (such as `e2e_test/`
+   files in `test:browser-worktree-isolation`) still decide its verdict but
+   prove no entry. Commands with no Node wrapper, such as
+   `test:gherkin-validation` and the linters, publish nothing.
 3. The `ci-proof` job runs after the producers, even when they fail. The
    composite action `.github/ci_proof_summary` collects this attempt's
    fragments against `expect` (`e2e_test/features=6 frontend/tests=2
-   backend/src/test/java=1 scripts=1`, in `intent.locations` order among proved
+   backend/src/test/java=1 scripts=11`, in `intent.locations` order among proved
    entries) and uploads the summary, kept for 30 days.
 
 ## Rules
@@ -52,12 +62,17 @@ file for that attempt. It also shows which CI parts did not report.
   `$` classnames map to the outer class file under `backend/src/test/java`.
   A Bash test file run is passed or failed by its exit status; the whole
   invocation, including work it delegates, is one check. Each report line is
-  `<passed|failed><TAB><seconds><TAB><repo-relative path>`.
+  `<passed|failed><TAB><seconds><TAB><repo-relative path>`. A Node test case
+  (leaf test) is one check on its selected file's path: skip and todo are
+  other. A suite or parent test is a check only when it fails for its own
+  reason, and is untimed because its duration covers its subtests. A file
+  that fails to load is one failed check. Tests launched by a test's own
+  child run stay out of the report.
 - **Recorded execution time.** Vitest contributes the duration of each
   assertion that reports one. Cucumber contributes the recorded step
   durations from each scenario's final attempt. JUnit contributes each
   testcase's `time` attribute (seconds). Bash contributes each test file's
-  elapsed run time. Failed checks contribute
+  elapsed run time. Node contributes each test case's reported duration. Failed checks contribute
   their recorded time too. Checks without recorded time, including Vitest
   load failures, still count and are marked untimed. The summary's
   `durationMs` is the sum of recorded durations across present parts. It can
@@ -67,7 +82,8 @@ file for that attempt. It also shows which CI parts did not report.
   `orchestratorGcReporter`, which keeps Chromium from crashing on CI.
 - **Part counts equal producer parts.** `scripts/ci/ci-workflow.test.mjs`
   checks this: a matrix producer's matrix length, or an explicit producer's
-  `part` inputs numbered 1 to `of`. It also checks that every producer
+  `part` inputs numbered 1 to `of`, and that each Node test command in
+  `lint:all` has its own `scripts` part in `lint:all` order. It also checks that every producer
   matrix has `fail-fast: false`, so that one failing part does not cancel
   the others' proof, and that `ci-proof` needs every producer job. It runs
   in CI through `pnpm test:ci-proof` in `lint:all`.

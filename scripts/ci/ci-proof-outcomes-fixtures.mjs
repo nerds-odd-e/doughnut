@@ -29,10 +29,17 @@ const runStep = (step, env) =>
   })
 
 // Runs the fragment action's conversion for one part; `identity` overrides
-// the matrix-derived part (inputs `part` and `of` set PART and PARTS).
-export const writeFragment = (t, format, entry, report, identity = {}) => {
-  const temp = tempDir(t)
-  const reportPath = join(temp, 'report')
+// the matrix-derived part (inputs `part` and `of` set PART and PARTS). Parts
+// of one job share its `temp` (RUNNER_TEMP).
+export const writeFragment = (
+  t,
+  format,
+  entry,
+  report,
+  identity = {},
+  temp = tempDir(t)
+) => {
+  const reportPath = join(mkdtempSync(join(temp, 'report-')), 'report')
   // An undefined report means the runner wrote none.
   if (typeof report === 'object') {
     mkdirSync(reportPath)

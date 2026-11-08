@@ -205,7 +205,7 @@ Refactor: none needed.
 ### 7. Node CI proof
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `pnpm test:ci-proof` at the workflow and summary boundaries.
 Run the repository's `fragment --by-file` and `summarize` with Bash proof,
 an earlier successful Node part, a failed Node part with a report, and a
@@ -220,6 +220,19 @@ staging. Keep existing command order and verdicts. In a mixed command such as
 `scripts/` and still judge all its tests. Commands with no files in scope
 keep their CI role. Preserve the other proof entries and document the report
 units and producers in `docs/ci-proof-summary.md`.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm test:ci-proof` 25/25,
+including "Bash and Node parts of one job publish once each into the scripts
+entry, a skipped later part missing" (real fragment action and summary: Bash
+part 1, Node parts 2 and 3 with a failed case and an own-failure parent, part
+4 missing; group 4 passed, 2 failed, 830 ms, 1 untimed; per-file counts and
+times; an `e2e_test/` row excluded) and "each Node test command in lint:all
+reports its own scripts part after the Bash part" (parts derived from
+`package.json`). The Bash runner passes 22/22. A local end-to-end run of all
+producers summarized `scripts` at 390 passed, 73 files, 11 parts present.
+The wrapper's request became `CI_PROOF_NODE_REPORT_DIR`, one
+`<package script>.ndjson` per command; the fragment action stages each call
+fresh; `expect` is `scripts=11`. Refactor: none needed.
 
 ### 8. Selected CI attempt
 

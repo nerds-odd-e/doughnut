@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { workflow } from './workflow-fixtures.mjs'
 
@@ -50,7 +51,9 @@ test('CI proof expects each entry in as many parts as its producers report', () 
     const explicit = producers.filter(({ step }) => step.with.part)
     if (explicit.length > 0) {
       assert.deepEqual(
-        explicit.map(({ step }) => [Number(step.with.part), step.with.of]),
+        explicit
+          .map(({ step }) => [Number(step.with.part), step.with.of])
+          .sort(([a], [b]) => a - b),
         [...Array(parts).keys()].map((index) => [index + 1, parts]),
         entry
       )
@@ -67,7 +70,9 @@ test('CI proof expects each entry in as many parts as its producers report', () 
 
 test('the Bash script runner reports its file checks as the scripts part', () => {
   const ci = workflow('ci')
-  const [{ job, step }] = producersOf(ci, 'scripts')
+  const { job, step } = producersOf(ci, 'scripts').find(
+    ({ step }) => step.with.format === 'bash'
+  )
   const runner = job.steps.find(
     ({ run }) => run === 'bash scripts/test/run_all_script_tests.sh'
   )
@@ -83,6 +88,44 @@ test('the Bash script runner reports its file checks as the scripts part', () =>
     report,
     entry: 'scripts',
     part: 1,
-    of: 1,
+    of: 11,
   })
+})
+
+const packageScripts = JSON.parse(
+  readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
+).scripts
+
+// lint:all's commands that run the Node test wrapper, in lint:all order.
+const nodeTestCommands = packageScripts['lint:all']
+  .split(' && ')
+  .map((command) => command.replace(/^pnpm /, ''))
+  .filter((name) =>
+    packageScripts[name]?.startsWith('node scripts/ci/node-test.mjs ')
+  )
+
+test('each Node test command in lint:all reports its own scripts part after the Bash part', () => {
+  const ci = workflow('ci')
+  const nodeProducers = producersOf(ci, 'scripts').filter(
+    ({ step }) => step.with.format === 'node'
+  )
+  const [{ name: lintJob, job }] = nodeProducers
+  const lintAll = job.steps.find(({ run }) => run === 'pnpm lint:all')
+  const reports = '${{ runner.temp }}/node-reports'
+
+  assert.deepEqual(lintAll.env, { CI_PROOF_NODE_REPORT_DIR: reports })
+  assert.deepEqual(
+    nodeProducers.map(({ name, step }) => [name, step.if, step.with]),
+    nodeTestCommands.map((command, index) => [
+      lintJob,
+      `\${{ !cancelled() && steps.${lintAll.id}.outcome != 'skipped' }}`,
+      {
+        format: 'node',
+        report: `${reports}/${command}.ndjson`,
+        entry: 'scripts',
+        part: index + 2,
+        of: nodeTestCommands.length + 1,
+      },
+    ])
+  )
 })

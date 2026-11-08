@@ -34,6 +34,8 @@ runs:
         PART="${PART:-$((JOB_INDEX + 1))}"
         PARTS="${PARTS:-${JOB_TOTAL}}"
         echo "part=${PART}" >> "${GITHUB_OUTPUT}"
+        # Fresh staging, so a job's later part never uploads an earlier one.
+        rm -rf "${RUNNER_TEMP}/ci-proof"
         node scripts/ci/ci-proof-outcomes.mjs "${FORMAT}" "${REPORT}" \
           "${RUNNER_TEMP}/ci-proof-times.tsv" > "${RUNNER_TEMP}/ci-proof-outcomes.tsv"
         node scripts/ci/ci-proof-summary.mjs fragment \
