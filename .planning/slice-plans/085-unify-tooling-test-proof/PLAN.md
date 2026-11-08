@@ -32,11 +32,11 @@ outside scope.
   A skipped or unavailable report leaves an expected part missing, and
   available parts still publish. Leave the production route owner under
   `infra/gcp/`, consistent with [ADR 0005](../../../docs/adrs/0005-web-routes-accepted.md).
-- Before Take, obtain the deployed Open Dough selection contract and verify
-  that one physical location lists and opens both Bash `.test` and Node
-  `.test.mjs` sources. Open Dough owns that capability. It does not require
-  multi-root locations or CI summary changes. The Doughnut registration slice
-  consumes the delivered contract.
+- Declare the `scripts` location with Open Dough's `sources` contract
+  (0.3.92, `dashboard/PROJECT-CONFIGURATION.md`): a `shell` entry for the Bash
+  runner's `test/*.test` and a `javascript` entry for `**/*.test.mjs`. Keep the
+  `scripts` path as the CI proof entry identity. Remove the separate `infra`
+  location once its tests have moved, since it then selects nothing.
 
 ## Outside-in proof
 
@@ -57,7 +57,7 @@ outside scope.
 | The current routing test command can consume the relocation | In this worktree at `c85490c85c`, `CURSOR_DEV=true nix develop -c pnpm test:path-routing` passed 17 cases before and after a scratch copy to `scripts/test/path-routing/` with adjusted imports and package command. Reverted the scratch changes. |
 | The existing collector assigns proof by physical path | Exercised `fragmentsFromOutcomes` at `c85490c85c` with Bash and Node timed rows. Entry `scripts` retained both rows beneath it and summed 20 ms. It did not attribute the row still under `infra/`. The relocation puts that row within the same tested prefix. |
 | Node can expose real failure metadata and time without turning failures into successes | At `c85490c85c`, `CURSOR_DEV=true nix develop -c env NODE_OPTIONS=--test-reporter=<scratch reporter> node --test <fixture files>` returned structured file paths and durations, a skip marker, a parent assertion failure, a load failure, and exit 1. Scratch files were removed. Preserve the actual test command and verify its published report format during the Node report slice. |
-| A single real parent suffices for mixed discovery | False on deployed Open Dough v0.3.91. The actual settings parser and selector admit one kind for a location and filter extensions before include globs. Shell selection excluded Bash `.test`; JavaScript selection admitted only the Node files. A same-path duplicate declaration does not create one group. The deployed mixed-source contract is outstanding. |
+| A single real parent suffices for mixed discovery | True on the production dashboard, Open Dough v0.3.92 (`7425dd16f752`), on 2026-11-08. Its `declaredLocations` parsed candidate settings with a `scripts` location of `sources` `[{include:["test/*.test"],syntax:"shell"},{include:["**/*.test.mjs"],syntax:"javascript"}]`, and its shared `sourceEntryOfRepositoryPath` rule (listing, `file-at`, story overlay, syntax) ran over Doughnut `e341627d13`'s tree with the three routing tests at their `scripts/test/path-routing/` paths. It selected 101 files (21 shell, 80 JavaScript), including `scripts/test/worktree_setup.sh.test` (shell), `scripts/ci/ci-proof-outcomes.test.mjs` and `scripts/test/path-routing/path-routing-validation.test.mjs` (JavaScript). The same run's `cli/tests` declaration still selected 67 files. Scratch probe removed. |
 
 ## Slices
 
@@ -96,9 +96,9 @@ open `scripts/test/worktree_setup.sh.test`,
 `scripts/test/path-routing/path-routing-validation.test.mjs` from a single
 Scripts and Infrastructure group.
 
-Behavior: Once the documented Open Dough contract is deployed, configure one
-mixed-source location rooted at `scripts`, with the Bash and Node test
-selection. The selected file has its real path and source kind.
+Behavior: Configure one `sources` location rooted at `scripts`, with the
+Bash and Node test selection, and drop the emptied `infra` location. The
+selected file has its real path and syntax hint.
 
 ### 4. Bash report
 
@@ -182,7 +182,7 @@ file proof in Intent with the published summary.
 - Slice-plan refinement separated Bash and Node publication so matrix and
   nonmatrix fragment ownership and skipped Node commands have independent
   proof. Hosted wait time is external to the final comparison.
-- Shared discovery and the selected CI attempt depend on Open Dough's deployed
-  mixed-source contract for a single physical path, including Bash `.test`
-  admission. The current deployment rejects this combination. Until the
-  capability is delivered and verified, preparation is not ready for Take.
+- Shared discovery depended on Open Dough's mixed-source contract for a
+  single physical path. Open Dough 0.3.92 delivered it as `sources` entries,
+  and the production dashboard's selection rule was observed admitting the
+  representative Bash and Node files (see Decisive premises).

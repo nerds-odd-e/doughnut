@@ -13,7 +13,7 @@ scope: story
 
 **Identity:** SEED-109#complete-test-inventory-and-script-proof
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/085-unify-tooling-test-proof/PLAN.md","assessment":"not-ready","reasons":["The deployed Open Dough Intent reader cannot yet list and open Bash .test and Node .test.mjs sources under one physical location. The shared-discovery and hosted-proof slices need that capability before Take."],"basis":{"document":"2b1cb8c9db0081fcfed04e34f31ed17f13c453a7fd06549f6c9cd9033764a9d3","plan":"e9f1458041e188d88736c25a38cac07744fbf82b4329f6d2f4ab1abbb4c049ef"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/085-unify-tooling-test-proof/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6f8c04d1b9b4a01a1d35daba8e390ef10dd9000150a71cc66288ca6ff557e9eb","plan":"a0fe1507a0a6a0ab21d605485a016253d5f37c28464cd6a5181cc37d7e4cc80f"}}
 ```
 
 **Goal** A Doughnut developer can find the CLI Vitest suite in Intent and use
@@ -58,7 +58,9 @@ selected CI attempt ran, how they ended, and how much test time they recorded.
    expected report is unavailable, the attempt shows missing proof for that
    part and keeps the results from available reports.
 
-**Prerequisite for discovery** The common parent fits the current CI proof
-contract. Intent needs to support listing and opening Bash `.test` and
-Node.js `.test.mjs` files in one physical location. That capability belongs
-to Open Dough.
+**Discovery contract** The common parent fits the current CI proof
+contract. Open Dough 0.3.92 lets one Intent location declare `sources`
+entries, each with `include` patterns and an optional `syntax` hint, so the
+`scripts` location lists and opens Bash `.test` and Node.js `.test.mjs`
+files together. That capability belongs to Open Dough; this story only
+declares the location.

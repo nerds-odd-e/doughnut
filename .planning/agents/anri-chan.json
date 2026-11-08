@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Anri-chan",
-  "email": "anri-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-109#complete-test-inventory-and-script-proof",
-  "host": "claude",
-  "model": "opus"
-}
