@@ -1,144 +1,70 @@
 # Donut Retrospective Findings
 
-Findings specific to Donut’s product, repository tooling, or local conventions.
-Findings about shared Open Dough skills, supporting guidelines, and skill scripts
-remain in [DearDough.md](DearDough.md), including those observed in this project.
-Existing finding identifiers and occurrence evidence are preserved when moved.
-Resolved problems are removed; Git history keeps their evidence.
-
-A finding is Donut’s when the remaining problem concerns Donut’s product,
-scripts, or Donut-authored guidance. A repaired product incident alone does not
-establish a defect in published Open Dough guidance. Shared planning, proof
-acceptance, and delivery failures remain in DearDough when the observation
-concerns those responsibilities, even after their product symptom is repaired.
+Donut owns findings about its product, repository tooling and local conventions.
+[DearDough](DearDough.md) covers shared planning, proof acceptance and delivery,
+even when the product symptom was repaired. Keep the original identity and
+evidence when moving a finding. Retire only with attributable repair and outcome
+evidence or a satisfied observation criterion. Reopen the same lineage when new
+evidence contradicts an adopted repair, and link any bounded follow-up.
 
 ## Ownership and priority assessment
 
-Reviewed 2026-10-12 against Donut `8ac439b16b` and published Open Dough
-`v0.3.60` (`e72ed2aaea475c7fbe8427a5c66bc877dda51275`). The installed
-[execution wrap-up](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-execute-plan/references/wrap-up.md)
+The 2026-10-12 review (Donut `8ac439b16b`, Open Dough `v0.3.60`) verified that
+[shared execution wrap-up](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-execute-plan/references/wrap-up.md)
 and [refactor checks](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-post-change-refactor/references/refactor-checks.md)
-match that release. Public refactor guidance retains negative assertions when
-absence is the actual promise and defers to project test style. Donut’s
-principle 7 and `unit-testing` skill supply the stricter removal convention.
+allow a negative assertion when absence is the promise and defer to project
+test style. Donut's principle 7 and `unit-testing` skill supply the stricter
+removal convention. The 2026-11-03 review (Donut `afc47ea75c`, Open Dough
+`0.3.82`) separated the shared acceptance decision (former DD-334) from the
+local OpenAPI collision (DD-335).
 
-| Group | Distinct recorded executions | Impact and disposition |
-| --- | --- | --- |
-| MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
-| Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
-| OpenAPI schema-name collision | One | One slice published a wrong contract, caught and repaired within the story; unqueued. |
-
-DD-317 and DD-318 (recall answer and question-load recovery) are retired:
-their responses, SEED-081#story-1 and SEED-081#story-2, completed on 2026-10-21.
-For DD-318, `bae8f72e04` and `8ee3143db6` keep pending, failed and loaded
-question state per tracker with a same-tracker Retry and explicit Self-review,
-proved by `RecallPage.questionRecovery.spec.ts`; current
-[recall question loading](docs/recall-question-loading.md) describes that
-behavior. Both were source-backed assessments without live occurrence counts.
-Full records remain at `1348cea71a:DonutRetrospectiveFindings.md` (DD-318) and
-`eae596d487:DonutRetrospectiveFindings.md` (DD-317). The formal
-contest candidate
-[SEED-073#story-6](.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#story-6)
+DD-317 and DD-318 retired after SEED-081#story-1 and SEED-081#story-2 completed
+2026-10-21. Both were source-backed assessments without live occurrence
+counts. For DD-318, `bae8f72e04` and `8ee3143db6` preserve per-tracker pending,
+failed and loaded state with same-tracker Retry and explicit Self-review
+(`RecallPage.questionRecovery.spec.ts`, [current behavior](docs/recall-question-loading.md)).
+Recover the full DD-317 and DD-318 records at
+`eae596d487:DonutRetrospectiveFindings.md` and
+`1348cea71a:DonutRetrospectiveFindings.md`, respectively. The
+[formal contest candidate](.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#story-6)
 remains unqueued with its policy decisions intact.
 
-The single MinerU recovery remains below the current learning/refinement
-direction. The stale Development-class cause remains unestablished after the
-healthy probes below, so no specific remedy is selected for either older
-finding. Their original evidence and uncertainty remain available.
+The 2026-11-08 review at `5f2be9874c` queues zero stories. MinerU setup and
+the single repaired OpenAPI collision rank below current learning/refinement
+work, and the Development failure still has no established cause. In the new
+SEED-108#spread-out-recall-backlog report, `5002ad7856` repaired the test
+builder's due-time override. The remaining unverified-premise observation
+belongs with ODF-074 in [DearDough](DearDough.md#odf-074).
 
-Rereviewed 2026-11-03 against Donut `afc47ea75c` and installed Open Dough
-`0.3.82`. Of the DearDough entries added since 2026-11-01, DD-333, DD-334's
-recording facet and the two ODF-141 occurrences concern shared guidance and stay
-there. DD-334's schema-name collision is Donut's own OpenAPI generation and is
-recorded below as DD-335. One repaired occurrence with no escaped defect stays
-below the current direction, so no story is queued. DD-159 and DD-161 have no
-new occurrence or repair.
-
-Shared findings retained in DearDough include changed-boundary proof acceptance
-(DD-218; public wrap-up step 2), decisive planning premises (DD-224; public
-`dough-slice-planning`), proof-table coverage, sizing, file-size rules, and CI
-observation/delivery. Their remaining claims concern the shared workflow, not
-an unrepaired Donut helper or voice-control defect. Successful local practice
-is separated below from open problems and has no backlog entry.
-
-## Open, not queued: Rebuilding a stale MinerU virtual environment
-
-One retained execution; no repeat or automatic venv-recovery correction is
-confirmed. Kept unqueued below the recurring groups. The pinned version and
-held-stack parts were delivered (`f70984790f`, `ee414fbdf1` through `1ae39ec64f`)
-and are outside this remaining finding.
+## Open, not queued
 
 ### DD-161 — A `.venv-mineru` whose Python was garbage-collected had to be rebuilt by hand
 
-A `.venv-mineru` whose Python lived in a garbage-collected Nix store path must
-be rebuilt by hand. The plan's manual slice needed real MinerU to `/attach` real
-PDFs through the CLI.
-
-#### Occurrences
-
-- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`.
-  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
-  - Inference: a supported way to rebuild the pinned MinerU environment after its Python disappears could reduce this remaining setup cost. The recorded 28 minutes also includes stack scaffolding, so it is not a measurement of venv recovery alone.
-
-## Open, not queued: Development startup on stale compiled classes
+- SEED-059#story-3 / slice plan 051 / `946e2a70e3`, 2026-09-29 (slice 6 after `6f36cb2952`), Claude Code/claude-opus-5-5, Open Dough 0.3.46. The real PDF CLI `/attach` proof needed MinerU, but `.venv-mineru/bin` had no Python. The agent rebuilt it with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six` (slice 6 report, 1,692 seconds, about 197k tokens and 96 tool uses).
+- The roughly 28 minutes includes stack scaffolding and is not the rebuild cost alone. Pinned-version and held-stack changes shipped in `f70984790f` and `ee414fbdf1` through `1ae39ec64f`. No repeat or automatic venv-recovery repair is confirmed.
 
 ### DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
 
-`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed. Its cause is unknown.
-
-#### Occurrences
-
-- Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:25:42+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: `dev.log` "APPLICATION FAILED TO START" with the missing-bean message; `git grep NotebookGitCutoverService -- backend/src` found nothing; the next `pnpm dev` was healthy.
-  - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
-  - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
-- Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Linked-worktree probes also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
-
-## Open, not queued: OpenAPI schema-name collision
+- SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / `681768a71b`, 2026-09-29T07:25:42+08:00, Claude Code/claude-opus-5-5, Open Dough 0.3.46. `pnpm dev` logged `No qualifying bean of type NotebookGitCutoverService`. The source was absent; deleting `backend/build/classes` let the next start succeed after one failed start and short UAT setup delay. Incremental compilation was suspected, with no cause established.
+- SEED-067#stacks-survive-other-builds slice 2, 2026-10-03: after deleting a compiled service and its consumer with the stack stopped, subsequent builds removed the stale class and startup succeeded. The concurrent `classes --rerun-tasks`, build-cache restore and linked-worktree probes also succeeded. No writer was identified.
 
 <a id="dd-335"></a>
 
 ### DD-335 — A nested DTO record silently reused an existing entity's OpenAPI schema
 
-Springdoc names a schema after the simple class name. The nested export record
-`RecallHistoryExport.Answer` was therefore published as the existing entity
-`Answer` schema, without three of its fields. Nothing in Donut's generation,
-checks or backend guidance reports the collision. The product repair gave the
-export's nested records explicit `@Schema(name = ...)` names; other nested
-records with a common simple name stay unguarded. The shared facet, recording
-an observation before reading its output, remains DD-334 in
-[DearDough](DearDough.md).
+- SEED-100#story-1 / `cede42a579`, 2026-11-03 (exact time unknown, between slice 1 acceptance and push), Claude Code/claude-opus-5-5, Open Dough 0.3.82. Springdoc mapped nested `RecallHistoryExport.Answer` to entity `Answer`, losing three fields in a published increment (`cede42a579:open_api_docs.yaml`, `Event.answer`; `1e5c2b8e1b:.planning/slice-plans/001-recall-history-export/source-review.md` row 2a.3 and PLAN.md G1).
+- `6932a70eb6` repaired the export with explicit schema names `RecallHistoryAnswer`, `RecallHistoryEvent` and `RecallHistoryDailyProbe`, still present at `5f2be9874c`. The repair cost one implementer round trip and regeneration. A generation-time collision check could protect other nested records with common simple names. No wider collision search was done. The shared proof facet is [ODF-413, formerly DD-334](DearDough.md#odf-413--a-commitment-was-recorded-as-observed-before-its-output-was-inspected).
 
-#### Occurrences
-
-- Execution: SEED-100#story-1; first implementation cede42a579; Timestamp: unknown (2026-11-03, between slice 1 acceptance and the slice 1 push); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.82.
-  - Evidence: `cede42a579:open_api_docs.yaml` `Event.answer: $ref Answer`; `1e5c2b8e1b:.planning/slice-plans/001-recall-history-export/source-review.md` row 2a.3 and PLAN.md G1; repaired in `6932a70eb6` (`RecallHistoryAnswer`, `RecallHistoryEvent`, `RecallHistoryDailyProbe`).
-  - Observed effect: one published increment carried a wrong OpenAPI contract; the correction cost one implementer round trip and one regeneration.
-  - Inference: a generation-time check for distinct classes that resolve to one schema name would catch this without relying on review. Qualified: one occurrence; no other current collision was searched for.
-
-## Useful project practice (not an open problem)
-
-The following is a successful Donut-specific observation technique. It is not
-an unresolved defect and contributes neither to issue frequency nor priority.
+## Useful project practice
 
 ### DD-230 — An environment-only Flyway callback with a MySQL named lock held a real startup migration open for full-stack proof
 
-To observe the runner during a migration, the execution supplied `beforeMigrate.sql` through `SPRING_FLYWAY_LOCATIONS` from a directory outside the checkout; the file waited on a named lock that a separate session held and released. No product or test code and no delay option was added.
-
-#### Occurrences
-- Execution: SEED-067#start-e2e-after-migrations (first implementation commit f297a916c5)
-  - Timestamp: 2026-10-11T09:18:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.58
-  - Evidence: plan 066 Learnings "Slice 3" and "Slice 4" at `af62c7cd0a`; `sut.log` lines 148 to 234 in the execution worktree (`Executing SQL callback: beforeMigrate`, `Successfully applied 41 migrations`)
-  - Observed effect: both `pnpm e2e:hold` and `pnpm cy:run` were observed returning 503 during the held migration and resetting test data only after the first 200; each slice took about five minutes including startup
-  - Inference: useful practice: a timing fault was proved at the real boundary with a release barrier instead of a sleep or a stand-in response; it depends on the runner passing its environment to the backend, which was confirmed with `ps eww`
-
-## Reopening
-
-Reopen a project finding when a new occurrence contradicts its actual correction,
-link that evidence to the existing story or correction if still active, and
-otherwise queue a bounded recurrence story. A previously recorded resolution
-without supporting correction evidence is insufficient to close a finding.
+SEED-067#start-e2e-after-migrations / `f297a916c5`, 2026-10-11T09:18:00+09:00,
+Claude Code/claude-opus-5-5, Open Dough 0.3.58. An external `beforeMigrate.sql`
+on `SPRING_FLYWAY_LOCATIONS` waited for a lock held by a separate session, which
+released it. Both `pnpm e2e:hold` and `pnpm cy:run` returned 503 while held and
+reset test data only after the first 200. Each slice took about five minutes
+including startup. See plan 066 Learnings for slices 3–4 at `af62c7cd0a` and
+`sut.log` lines 148–234, including 41 applied migrations. `ps eww` confirmed
+environment forwarding. The observation required no product/test changes or
+delay option.
