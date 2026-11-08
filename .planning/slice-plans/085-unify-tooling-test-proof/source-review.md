@@ -25,11 +25,11 @@ Example file names are illustrations, not a complete list.
 | 3 | Register the existing CLI Vitest suite in `.planning/open-dough.json` | slice 1 | observed: slice 1 reader probe (job tmp probe/probe.mts calling open-dough c1923d59f performIntentLocationsRead on working-tree settings + git ls-files tree): cli/tests location, no problem, 67 files (36 .test.ts, 31 .test.tsx) identical to git ls-files of both cli/vitest.config.ts include patterns |
 | 3.1 | The registration covers TypeScript test files | slice 1 | observed: slice 1 reader probe (job tmp probe/probe.mts calling open-dough c1923d59f performIntentLocationsRead on working-tree settings + git ls-files tree): cli/tests location, no problem, 67 files (36 .test.ts, 31 .test.tsx) identical to git ls-files of both cli/vitest.config.ts include patterns |
 | 3.2 | The registration covers TSX test files | slice 1 | observed: slice 1 reader probe (job tmp probe/probe.mts calling open-dough c1923d59f performIntentLocationsRead on working-tree settings + git ls-files tree): cli/tests location, no problem, 67 files (36 .test.ts, 31 .test.tsx) identical to git ls-files of both cli/vitest.config.ts include patterns |
-| 4 | Place the infrastructure test files under the same physical parent as the scripts tests | slice 2 | |
-| 4.1 | Use `scripts/` as that shared parent | slice 2 | |
-| 4.2 | Put the three infrastructure tests under `scripts/test/path-routing/` | slice 2 | |
-| 4.3 | Keep the routing and deployment implementation under `infra/` | slice 2 | |
-| 4.4 | Keep the routing and deployment configuration under `infra/` | slice 2 | |
+| 4 | Place the infrastructure test files under the same physical parent as the scripts tests | slice 2 | observed: slice 2: git status shows the three routing tests renamed to scripts/test/path-routing/; pnpm test:path-routing 17/17 pass from there |
+| 4.1 | Use `scripts/` as that shared parent | slice 2 | observed: slice 2: git status shows the three routing tests renamed to scripts/test/path-routing/; pnpm test:path-routing 17/17 pass from there |
+| 4.2 | Put the three infrastructure tests under `scripts/test/path-routing/` | slice 2 | observed: slice 2: git status shows the three routing tests renamed to scripts/test/path-routing/; pnpm test:path-routing 17/17 pass from there |
+| 4.3 | Keep the routing and deployment implementation under `infra/` | slice 2 | observed: slice 2: diff moves only the three *.test.mjs files; infra/gcp/path-routing/*.mjs, doughnut-routing.json, url-maps/renderDoughnutAppServiceUrlMap.mjs and infra/gcp/scripts stay, imported by the moved tests |
+| 4.4 | Keep the routing and deployment configuration under `infra/` | slice 2 | observed: slice 2: diff moves only the three *.test.mjs files; infra/gcp/path-routing/*.mjs, doughnut-routing.json, url-maps/renderDoughnutAppServiceUrlMap.mjs and infra/gcp/scripts stay, imported by the moved tests |
 | 5 | Discover the following in one Scripts and Infrastructure group: | slice 3 | |
 | 5.1 | Bash `scripts/test/*.test` files | slice 3 | |
 | 5.2 | Node.js `*.test.mjs` files beneath the shared parent | slice 3 | |

@@ -84,7 +84,7 @@ Refactor: none needed.
 ### 2. Routing tests under scripts
 
 Type: Structure
-Status: planned
+Status: done
 Proof: Run `CURSOR_DEV=true nix develop -c pnpm test:path-routing` after moving
 all three files. Trace consumers of the old test paths and update the
 package command and test-relative imports and fixture paths. Acceptance reading
@@ -93,6 +93,14 @@ checks that direct references to the old test paths have been updated.
 Structure: Move only the three test files to `scripts/test/path-routing/`,
 enabling shared discovery in the next slice. Existing Bash runner selection
 and production paths keep their current owners.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm test:path-routing`
+(now `node --test 'scripts/test/path-routing/*.test.mjs'`) passes 17/17 from
+the new paths; `node --test scripts/ci/application-release-publication.test.mjs`
+passes 8/8 with its fixture still copying the `infra/gcp` directories. Sweep
+reading: `git grep` for the three old test paths outside `.planning` returns
+nothing. The Bash runner's depth-1 `*.test` selection skips the subfolder.
+Refactor: one `routingPath` constant in the URL map test; glob test command.
 
 ### 3. Shared discovery
 

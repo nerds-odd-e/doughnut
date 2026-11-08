@@ -3,21 +3,24 @@ import path from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import YAML from 'yaml'
-import { loadBackendPathHints, pathGoesToBackend } from './pathGoesToBackend.mjs'
+import {
+  loadBackendPathHints,
+  pathGoesToBackend,
+} from '../../../infra/gcp/path-routing/pathGoesToBackend.mjs'
 import {
   extractRootAbsolutePathsFromHtml,
   collectRequiredStaticPathsFromFrontend,
-} from './requiredStaticPathsFromFrontend.mjs'
+} from '../../../infra/gcp/path-routing/requiredStaticPathsFromFrontend.mjs'
 import {
   gcpPathPatternMatches,
   gcpRoutesToStaticBucket,
   normalizePathRules,
-} from './urlMapStaticRouting.mjs'
+} from '../../../infra/gcp/path-routing/urlMapStaticRouting.mjs'
 import {
   pathRulesFromUrlMapDoc,
   runRepoPathRoutingValidation,
   validateUrlMapAgainstHintsAndStaticPaths,
-} from './validateUrlMapPathRouting.mjs'
+} from '../../../infra/gcp/path-routing/validateUrlMapPathRouting.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '../../..')
@@ -138,7 +141,9 @@ test('fixture: backend path must not match static bucket rule', () => {
     requiredStaticPaths: [],
   })
   assert.ok(
-    failures.some((f) => f.includes('/api/') || f.includes('backend-classified')),
+    failures.some(
+      (f) => f.includes('/api/') || f.includes('backend-classified')
+    ),
     failures.join('\n')
   )
 })

@@ -7,15 +7,14 @@ import {
   loadDoughnutRouting,
   renderDoughnutAppServiceUrlMapTemplate,
   renderDoughnutAppServiceUrlMapYamlFromRouting,
-} from '../path-routing/doughnutRouting.mjs'
+} from '../../../infra/gcp/path-routing/doughnutRouting.mjs'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const routingPath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../../infra/gcp/path-routing/doughnut-routing.json'
+)
 
 test('render from routing JSON substitutes SHA in static rewrites', () => {
-  const routingPath = path.join(
-    __dirname,
-    '../path-routing/doughnut-routing.json'
-  )
   const routing = loadDoughnutRouting(routingPath)
   const sha = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
   const out = renderDoughnutAppServiceUrlMapYamlFromRouting(routing, sha)
@@ -31,17 +30,13 @@ test('render from routing JSON substitutes SHA in static rewrites', () => {
 test('render rejects non-hex or wrong length', () => {
   assert.throws(() =>
     renderDoughnutAppServiceUrlMapYamlFromRouting(
-      loadDoughnutRouting(
-        path.join(__dirname, '../path-routing/doughnut-routing.json')
-      ),
+      loadDoughnutRouting(routingPath),
       'short'
     )
   )
   assert.throws(() =>
     renderDoughnutAppServiceUrlMapYamlFromRouting(
-      loadDoughnutRouting(
-        path.join(__dirname, '../path-routing/doughnut-routing.json')
-      ),
+      loadDoughnutRouting(routingPath),
       'g'.repeat(40)
     )
   )
@@ -52,5 +47,7 @@ test('template string substitution still works for ad-hoc YAML', () => {
     `pathPrefixRewrite: /frontend/${FRONTEND_GITHUB_SHA_PLACEHOLDER}/x`,
     'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
   )
-  assert.ok(out.includes('/frontend/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/x'))
+  assert.ok(
+    out.includes('/frontend/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/x')
+  )
 })

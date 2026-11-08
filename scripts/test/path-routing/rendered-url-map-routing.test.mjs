@@ -3,15 +3,15 @@ import path from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import YAML from 'yaml'
-import { gcpRoutesToStaticBucket } from './urlMapStaticRouting.mjs'
+import { gcpRoutesToStaticBucket } from '../../../infra/gcp/path-routing/urlMapStaticRouting.mjs'
 import {
   loadDoughnutRouting,
   renderDoughnutAppServiceUrlMapYamlFromRouting,
-} from './doughnutRouting.mjs'
+} from '../../../infra/gcp/path-routing/doughnutRouting.mjs'
 import {
   PATH_ROUTING_VALIDATION_DUMMY_SHA,
   routingRulesFromUrlMapDoc,
-} from './validateUrlMapPathRouting.mjs'
+} from '../../../infra/gcp/path-routing/validateUrlMapPathRouting.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '../../..')
@@ -37,9 +37,7 @@ test('rendered URL map routeRules: MIG, then static, then pathTemplateRewrite ca
     'SPA fallback is rewrite-based; no custom error policy'
   )
 
-  const sorted = [...matcher.routeRules].sort(
-    (a, b) => a.priority - b.priority
-  )
+  const sorted = [...matcher.routeRules].sort((a, b) => a.priority - b.priority)
   const last = sorted[sorted.length - 1]
   assert.deepEqual(last.matchRules, [{ pathTemplateMatch: '/**' }])
   assert.equal(
@@ -60,11 +58,7 @@ test('rendered URL map: backend-classified paths are not routed to the bucket', 
   const { doc } = renderRepoUrlMap()
   const rr = routingRulesFromUrlMapDoc(doc)
   assert.ok(!('error' in rr))
-  for (const urlPath of [
-    '/api/foo',
-    '/logout',
-    '/login/continue',
-  ]) {
+  for (const urlPath of ['/api/foo', '/logout', '/login/continue']) {
     assert.ok(
       !gcpRoutesToStaticBucket(urlPath, rr.routingRules),
       `${urlPath} should not route to the static bucket`
@@ -96,5 +90,8 @@ test('rendered URL map: defaultService is the backend bucket (backend paths are 
   const { routing, doc } = renderRepoUrlMap()
   assert.equal(doc.defaultService, routing.gcpUrlMap.staticBackendBucketService)
   const matcher = doc.pathMatchers.find((m) => m.name === 'doughnut-paths')
-  assert.equal(matcher.defaultService, routing.gcpUrlMap.staticBackendBucketService)
+  assert.equal(
+    matcher.defaultService,
+    routing.gcpUrlMap.staticBackendBucketService
+  )
 })
