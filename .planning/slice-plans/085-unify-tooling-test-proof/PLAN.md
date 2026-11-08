@@ -173,7 +173,7 @@ several parts in one job need fresh staging.
 ### 6. Node report
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Run the real `node --test` reporting path against pass, fail, skip,
 nested-failure, and load-error cases, and run the focused routing command
 with reporting enabled. Inspect file paths, statuses, recorded time, and
@@ -186,6 +186,21 @@ available timing for the directly selected in-scope tests, including the
 relocated routing suite. Use structured runner events as the source.
 Attach the reporter to the selected invocations and preserve the ordinary
 human-readable diagnostics.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm test:ci-proof` 23/23,
+including `scripts/ci/ci-proof-outcomes-node.test.mjs`: the real
+`scripts/ci/node-test.mjs` wrapper with `scripts/ci/node-test-report.mjs`
+gives per-case passed, failed and other rows on each selected file's path
+(imported cases on their `entryFile`, a load error as one failed check, a
+parent failing after its subtests untimed), keeps a launched child run's
+cases out, and leaves output and exit status unchanged without a request.
+`test:path-routing` with `CI_PROOF_NODE_REPORT` writes 17 timed rows;
+`test:browser-worktree-isolation` writes 117, three under `e2e_test/`.
+Learnings for slice 7: the wrapper strips the variable from its child, and
+each run truncates its destination, so every command needs its own report
+path; out-of-scope paths must be filtered. `test:backend-test-worktree` has
+lock-timeout failures locally that HEAD's plain command shares.
+Refactor: none needed.
 
 ### 7. Node CI proof
 

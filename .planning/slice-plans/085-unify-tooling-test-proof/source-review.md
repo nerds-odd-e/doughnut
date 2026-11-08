@@ -43,7 +43,7 @@ Example file names are illustrations, not a complete list.
 | 7.4 | cumulative recorded test execution time at file level | slice 7 | |
 | 8 | Report the checks run by the existing CI jobs | slice 7 | |
 | 9 | Count each Bash file invocation as one check, including the work it delegates | slice 4 | observed: slice 4 scripts/test/run_all_script_tests.sh.test: real runner over a fixture tree with CI_PROOF_BASH_REPORT reports one passed/failed row per .test file invocation (a passes, b fails, c passes after failure) with repo-relative path and elapsed seconds covering the whole bash call; exit 1 |
-| 10 | Use per-case outcomes from the directly selected Node.js suites | slice 6 | |
+| 10 | Use per-case outcomes from the directly selected Node.js suites | slice 6 | observed: slice 6 scripts/ci/ci-proof-outcomes-node.test.mjs "a Node report gives one check per test case from the directly selected files": real node-test.mjs wrapper + node-test-report.mjs give per-case passed/failed/other rows on the selected file paths (imported cases on entryFile, load error one failed, parent failing after subtests untimed, child-run cases absent); test:path-routing with CI_PROOF_NODE_REPORT gives 17 timed rows |
 | 11 | Include the failure results that are available | slice 7 | |
 | 12 | Include the durations that are available | slice 7 | |
 | 13 | If a producer report is missing, show the gap | slice 5 | observed: slice 5 scripts/ci/ci-proof-outcomes-bash.test.mjs "a missing Bash report fails its conversion and leaves the scripts part missing beside other proof": real fragment and summary action scripts give scripts part 1 missing |

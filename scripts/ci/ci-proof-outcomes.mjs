@@ -138,7 +138,24 @@ const bash = (text) =>
       return { status, path, seconds: Number(seconds) }
     })
 
-const formats = { vitest, cucumber, junit, bash }
+// scripts/ci/node-test-report.mjs: one JSON check per line, seconds optional.
+const node = (text) =>
+  text
+    .split('\n')
+    .filter((line) => line !== '')
+    .map((line) => {
+      const { status, path, seconds } = JSON.parse(line)
+      if (
+        !['passed', 'failed', 'other'].includes(status) ||
+        typeof path !== 'string' ||
+        !['number', 'undefined'].includes(typeof seconds)
+      ) {
+        throw new Error(`malformed Node report line: ${line}`)
+      }
+      return { status, path, seconds }
+    })
+
+const formats = { vitest, cucumber, junit, bash, node }
 
 const junitChecksFrom = (reportPath) => {
   if (!statSync(reportPath).isDirectory()) {
