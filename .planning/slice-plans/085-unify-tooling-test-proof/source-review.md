@@ -46,8 +46,8 @@ Example file names are illustrations, not a complete list.
 | 10 | Use per-case outcomes from the directly selected Node.js suites | slice 6 | |
 | 11 | Include the failure results that are available | slice 7 | |
 | 12 | Include the durations that are available | slice 7 | |
-| 13 | If a producer report is missing, show the gap | slice 5 | |
-| 13.1 | Show that gap alongside any proof that was reported | slice 5 | |
+| 13 | If a producer report is missing, show the gap | slice 5 | observed: slice 5 scripts/ci/ci-proof-outcomes-bash.test.mjs "a missing Bash report fails its conversion and leaves the scripts part missing beside other proof": real fragment and summary action scripts give scripts part 1 missing |
+| 13.1 | Show that gap alongside any proof that was reported | slice 5 | observed: slice 5 scripts/ci/ci-proof-outcomes-bash.test.mjs "a missing Bash report fails its conversion and leaves the scripts part missing beside other proof": real fragment and summary action scripts give scripts part 1 missing while frontend/tests stays present with its counts |
 | 14 | Example 1: opening Intent lists both `cli/tests/version.test.ts` and `cli/tests/InteractiveCliApp.test.tsx` under the CLI location | slice 1 | observed: slice 1 reader probe (job tmp probe/probe.mts calling open-dough c1923d59f performIntentLocationsRead on working-tree settings + git ls-files tree): cli/tests location, no problem, 67 files (36 .test.ts, 31 .test.tsx) identical to git ls-files of both cli/vitest.config.ts include patterns; list includes cli/tests/version.test.ts and cli/tests/InteractiveCliApp.test.tsx |
 | 15 | Example 2: opening Scripts and Infrastructure shows these files together: | slice 3 | observed: slice 3 probe3: listed, file-at admitted and read in full with hint: all three example files in the scripts group |
 | 15.1 | `scripts/test/worktree_setup.sh.test` | slice 3 | observed: slice 3 probe3: listed, file-at admitted and read in full with hint shell: scripts/test/worktree_setup.sh.test |
@@ -63,5 +63,5 @@ Example file names are illustrations, not a complete list.
 | 18 | Example 3 continued: when an expected report is unavailable: | slice 7 | |
 | 18.1 | the attempt shows missing proof for that part | slice 7 | |
 | 18.2 | the attempt keeps the results from the reports that are available | slice 7 | |
-| 19 | Discovery contract: the common parent fits the current CI proof contract | slice 5 | |
+| 19 | Discovery contract: the common parent fits the current CI proof contract | slice 5 | observed: slice 5 ci-proof-outcomes-bash.test.mjs "a failed Bash check and its time count toward its file and the scripts entry": unchanged collector assigns scripts/test/*.test rows to the scripts entry; ci.yml expect adds scripts=1 in intent.locations order (ci-workflow.test.mjs) |
 | 20 | Discovery contract: declare the `scripts` Intent location with Open Dough 0.3.92 `sources` entries (include + optional syntax) so it lists and opens Bash `.test` and Node.js `.test.mjs` files together | slice 3 | observed: slice 3 probe3 (open-dough c1923d59f performIntentLocationsRead + pathSelectedByIntentLocations + sourceEntryOfRepositoryPath over candidate settings and tracked tree): one scripts location labelled Scripts and Infrastructure, 101 files (21 shell = git ls-files scripts/test/*.test, 80 javascript = scripts/**/*.test.mjs), no infra location |

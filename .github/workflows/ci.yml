@@ -116,7 +116,7 @@ jobs:
 
   ci-proof:
     name: CI proof summary
-    needs: [E2E-tests, Frontend-unit-tests, Backend-unit-tests]
+    needs: [E2E-tests, Frontend-unit-tests, Backend-unit-tests, Other-unit-tests]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
@@ -124,7 +124,7 @@ jobs:
       - uses: ./.github/ci_proof_summary
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          expect: e2e_test/features=6 frontend/tests=2 backend/src/test/java=1
+          expect: e2e_test/features=6 frontend/tests=2 backend/src/test/java=1 scripts=1
 
   Other-unit-tests:
     name: Other Unit Tests
@@ -136,7 +136,18 @@ jobs:
           node_version: ${{ vars.NODE_VERSION }}
       - run: pnpm cli:test
       - name: Run script unit tests
+        id: script-tests
         run: bash scripts/test/run_all_script_tests.sh
+        env:
+          CI_PROOF_BASH_REPORT: ${{ runner.temp }}/bash-report.tsv
+      - if: ${{ !cancelled() && steps.script-tests.outcome != 'skipped' }}
+        uses: ./.github/ci_proof_fragments
+        with:
+          format: bash
+          report: ${{ runner.temp }}/bash-report.tsv
+          entry: scripts
+          part: 1
+          of: 1
 
   Package-artifacts:
     name: Package backend & frontend artifacts for deployment

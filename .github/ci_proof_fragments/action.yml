@@ -1,5 +1,5 @@
 name: "Keep CI proof fragments"
-description: "Convert a test runner's report into this matrix job's CI proof fragments, as one part of its entry, and keep them for the ci-proof job"
+description: "Convert a test runner's report into CI proof fragments, as one part of its entry, and keep them for the ci-proof job"
 inputs:
   format:
     description: "Report format that scripts/ci/ci-proof-outcomes.mjs converts"
@@ -10,6 +10,12 @@ inputs:
   entry:
     description: "Intent location the report proves"
     required: true
+  part:
+    description: "This report's part of the entry, from 1; defaults to the matrix job's strategy.job-index plus 1"
+    required: false
+  of:
+    description: "The entry's number of parts; defaults to the matrix's strategy.job-total"
+    required: false
 runs:
   using: "composite"
   steps:
@@ -20,10 +26,13 @@ runs:
         FORMAT: ${{ inputs.format }}
         REPORT: ${{ inputs.report }}
         ENTRY: ${{ inputs.entry }}
+        PART: ${{ inputs.part }}
+        PARTS: ${{ inputs.of }}
         JOB_INDEX: ${{ strategy.job-index }}
-        PARTS: ${{ strategy.job-total }}
+        JOB_TOTAL: ${{ strategy.job-total }}
       run: |
-        PART=$((JOB_INDEX + 1))
+        PART="${PART:-$((JOB_INDEX + 1))}"
+        PARTS="${PARTS:-${JOB_TOTAL}}"
         echo "part=${PART}" >> "${GITHUB_OUTPUT}"
         node scripts/ci/ci-proof-outcomes.mjs "${FORMAT}" "${REPORT}" \
           "${RUNNER_TEMP}/ci-proof-times.tsv" > "${RUNNER_TEMP}/ci-proof-outcomes.tsv"

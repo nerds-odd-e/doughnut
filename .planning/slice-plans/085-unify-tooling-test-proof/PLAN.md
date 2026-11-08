@@ -148,7 +148,7 @@ with reporting. Slice 5 converts this shape with a `bash` format in
 ### 5. Bash CI proof
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `pnpm test:ci-proof` at the workflow and summary boundaries.
 Run the repository's `fragment --by-file` and `summarize` with the real
 Bash report shape. Check the published breakdown after a failed Bash check,
@@ -159,6 +159,16 @@ one part of the `scripts` entry and still judges the runner exit. Reuse the
 fragment action and summary, with an explicit part identity for the
 nonmatrix producer. At this stop the group carries Bash proof. Node CI proof
 extends it with the Node producers and their expected parts.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm test:ci-proof` 20/20,
+including `scripts/ci/ci-proof-outcomes-bash.test.mjs` (real fragment and
+summary action scripts: a failed Bash check and its time count toward its file
+and the `scripts` entry; a missing Bash report leaves `scripts` part 1 missing
+beside present `frontend/tests` proof) and `ci-workflow.test.mjs` (Bash
+producer wiring, `needs`, `expect` `scripts=1`). The fragment action takes
+optional `part`/`of`, falling back to the matrix index. Learning for slice 7:
+the action stages every call in the same `${RUNNER_TEMP}/ci-proof` paths, so
+several parts in one job need fresh staging.
 
 ### 6. Node report
 

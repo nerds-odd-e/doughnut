@@ -125,7 +125,20 @@ const junit = (text) =>
     }
   )
 
-const formats = { vitest, cucumber, junit }
+// The Bash script runner's CI_PROOF_BASH_REPORT: one
+// `<passed|failed><TAB><seconds><TAB><repo-relative path>` line per test file.
+const bash = (text) =>
+  text
+    .split('\n')
+    .filter((line) => line !== '')
+    .map((line) => {
+      const match = line.match(/^(passed|failed)\t(\d+\.\d+)\t(\S.*)$/)
+      if (!match) throw new Error(`malformed Bash report line: ${line}`)
+      const [, status, seconds, path] = match
+      return { status, path, seconds: Number(seconds) }
+    })
+
+const formats = { vitest, cucumber, junit, bash }
 
 const junitChecksFrom = (reportPath) => {
   if (!statSync(reportPath).isDirectory()) {

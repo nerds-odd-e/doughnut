@@ -10,30 +10,34 @@ file for that attempt. It also shows which CI parts did not report.
 | `e2e_test/features` | `E2E-tests` matrix | 6 | one Cucumber scenario (test case) | Cucumber preprocessor messages (NDJSON) |
 | `frontend/tests` | `Frontend-unit-tests` shards | 2 | one Vitest test | Vitest JSON report |
 | `backend/src/test/java` | `Backend-unit-tests` | 1 | one JUnit test method | Gradle JUnit XML under `backend/build/test-results/test/` |
+| `scripts` | `Other-unit-tests` (part 1: Bash script runner) | 1 | one `scripts/test/*.test` file run | Bash runner's tab-separated report |
 
-`cli/tests` and `scripts` have no entry. They show no CI proof.
+`cli/tests` has no entry. It shows no CI proof.
 
 ## How it is made
 
 1. The test step of each producer part writes its runner's own report. Frontend
    and E2E write to an absolute path under `${RUNNER_TEMP}`, named by an
    environment variable that only the workflow sets: `CI_PROOF_VITEST_REPORT`
-   (read in `frontend/vitest.config.ts`) and `CI_PROOF_CUCUMBER_MESSAGES`
-   (read in `e2e_test/config/ci.ts`). Local runs and the Cloud VM write no
-   such report. Backend uses Gradle's default JUnit XML directory
+   (read in `frontend/vitest.config.ts`), `CI_PROOF_CUCUMBER_MESSAGES`
+   (read in `e2e_test/config/ci.ts`) and `CI_PROOF_BASH_REPORT` (read in
+   `scripts/test/run_all_script_tests.sh`). Local runs and the Cloud VM write
+   no such report. Backend uses Gradle's default JUnit XML directory
    `backend/build/test-results/test/` (one `TEST-*.xml` file per class).
 2. The composite action `.github/ci_proof_fragments` converts the report with
    `scripts/ci/ci-proof-outcomes.mjs` into one `<status><TAB><repo-relative
    path>` line per test case and one `<seconds><TAB><repo-relative path>`
    line per timed check. It passes both to the collector with `--by-file`,
-   writes the part's fragment and uploads it, kept for 1 day. The part number
-   is `strategy.job-index` plus 1. It runs
+   writes the part's fragment and uploads it, kept for 1 day. A producer
+   outside a matrix names its part with the action's `part` and `of` inputs;
+   otherwise the part number is `strategy.job-index` plus 1, of
+   `strategy.job-total`. It runs
    after failing tests too, but not when the test step was skipped, so a part
    whose setup failed shows as missing.
 3. The `ci-proof` job runs after the producers, even when they fail. The
    composite action `.github/ci_proof_summary` collects this attempt's
    fragments against `expect` (`e2e_test/features=6 frontend/tests=2
-   backend/src/test/java=1`, in `intent.locations` order among proved
+   backend/src/test/java=1 scripts=1`, in `intent.locations` order among proved
    entries) and uploads the summary, kept for 30 days.
 
 ## Rules
@@ -46,10 +50,14 @@ file for that attempt. It also shows which CI parts did not report.
   ambiguous or failed is failed. A JUnit `testcase` with a `failure` or
   `error` child is failed; with `skipped` is other; otherwise passed. Nested
   `$` classnames map to the outer class file under `backend/src/test/java`.
+  A Bash test file run is passed or failed by its exit status; the whole
+  invocation, including work it delegates, is one check. Each report line is
+  `<passed|failed><TAB><seconds><TAB><repo-relative path>`.
 - **Recorded execution time.** Vitest contributes the duration of each
   assertion that reports one. Cucumber contributes the recorded step
   durations from each scenario's final attempt. JUnit contributes each
-  testcase's `time` attribute (seconds). Failed checks contribute
+  testcase's `time` attribute (seconds). Bash contributes each test file's
+  elapsed run time. Failed checks contribute
   their recorded time too. Checks without recorded time, including Vitest
   load failures, still count and are marked untimed. The summary's
   `durationMs` is the sum of recorded durations across present parts. It can
@@ -57,10 +65,12 @@ file for that attempt. It also shows which CI parts did not report.
 - **The Vitest JSON report is configured, never passed on the command line.**
   A command-line `--reporter` replaces the configured reporters, dropping
   `orchestratorGcReporter`, which keeps Chromium from crashing on CI.
-- **Part counts equal matrix lengths.** `scripts/ci/ci-workflow.test.mjs`
-  checks this. It also checks that every producer matrix has
-  `fail-fast: false`, so that one failing part does not cancel the others'
-  proof. It runs in CI through `pnpm test:ci-proof` in `lint:all`.
+- **Part counts equal producer parts.** `scripts/ci/ci-workflow.test.mjs`
+  checks this: a matrix producer's matrix length, or an explicit producer's
+  `part` inputs numbered 1 to `of`. It also checks that every producer
+  matrix has `fail-fast: false`, so that one failing part does not cancel
+  the others' proof, and that `ci-proof` needs every producer job. It runs
+  in CI through `pnpm test:ci-proof` in `lint:all`.
 - **Per attempt.** After "re-run failed jobs", the new attempt's summary
   holds only the parts that ran again, and the others show as missing.
   Earlier attempts keep their own summaries.
