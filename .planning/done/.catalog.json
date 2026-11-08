@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-110_restore-ci-native-dependency-installation.json",
+      "identity": "SEED-110#restore-ci-native-dependency-installation",
+      "completedAt": "2026-11-08T12:12:20.820Z",
+      "blob": "ca954d1573ad069cdf6f94f0d8fb2f138f03c04a"
+    },
+    {
       "fileName": "SEED-108_spread-out-recall-backlog.json",
       "identity": "SEED-108#spread-out-recall-backlog",
       "completedAt": "2026-11-08T03:23:02.289Z",

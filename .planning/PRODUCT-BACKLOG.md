@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Restore CI native dependency installation](seeds/SEED-110-restore-ci-native-dependency-installation.md#restore-ci-native-dependency-installation) — SEED-110#restore-ci-native-dependency-installation
-
 ## Backlog list
 
 - [See CLI tests and timed scripts and infrastructure results in Intent](seeds/SEED-109-complete-test-inventory-and-script-proof.md#complete-test-inventory-and-script-proof) — SEED-109#complete-test-inventory-and-script-proof
