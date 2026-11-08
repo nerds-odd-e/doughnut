@@ -237,7 +237,7 @@ fresh; `expect` is `scripts=11`. Refactor: none needed.
 ### 8. Selected CI attempt
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Use the [artifact read](../../../docs/ci-proof-summary.md#check-a-run)
 and Intent CI status on the same completed judged `donut CI` attempt for the
 published candidate. Match attempt and revision, then compare counts and
@@ -247,6 +247,20 @@ only successful reports. A mismatch holds completion.
 
 Behavior: A developer inspecting that attempt can reconcile the group and
 file proof in Intent with the published summary.
+
+Accepted proof: `donut CI` run 42496893982, attempt 1, at `4a1f1fce41`
+(success). Its `ci-proof-summary-attempt-1` artifact equals the summary the
+dashboard's `/__authenticated-read?intent=ci-proof` route returns for that
+attempt. The dashboard's `src/ciScopeProof.ts` figures for the "Scripts and
+Infrastructure" location give 390 passed, 0 failed, 0 other, 0 untimed, 73
+files and 91233.43 ms, matching the `scripts` entry (11 parts present).
+`scripts/test/worktree_setup.sh.test` (1 check, 5742.364 ms),
+`scripts/test/path-routing/path-routing-validation.test.mjs` (9, 51.19 ms)
+and `scripts/ci/ci-proof-outcomes.test.mjs` (8, 243.35 ms) match. Failure and
+missing-part behavior reuses the slice 5 and 7 proof. The inventory lists 104
+files; 31 Node files have no result because no CI job runs them directly
+(13 `scripts/ci/application-release-*` run inside the Bash
+`application-release.test`; the rest have no CI command).
 
 ## Concern evidence
 
