@@ -5,11 +5,7 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
   useMemoryTrackerActionHandlers,
   type MemoryTrackerActionHandlers,
-  type MemoryTrackerActionRequest,
-  type MemoryTrackerActionResult,
 } from "@/composables/useMemoryTrackerActionHandlers"
-
-export type { MemoryTrackerActionRequest, MemoryTrackerActionResult }
 
 export type MemoryTrackerActions = MemoryTrackerActionHandlers & {
   noteInfoLoaded: Ref<boolean>

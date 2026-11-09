@@ -38,9 +38,7 @@
                   <template #after-title>
                     <AssimilationPanel
                       v-if="assimilating(noteRealm) && !readFirst"
-                      :key="assimilationPanelKey"
                       :note="noteRealm.note"
-                      @reload-needed="onAssimilationReloadNeeded"
                     />
                   </template>
                 </NoteTextContent>
@@ -58,10 +56,8 @@
               class="sticky bottom-0 z-10"
             >
               <AssimilationPanel
-                :key="assimilationPanelKey"
                 read-first
                 :note="noteRealm.note"
-                @reload-needed="onAssimilationReloadNeeded"
               />
             </div>
           </template>
@@ -105,7 +101,6 @@ import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNarrowerThan } from "@/composables/useNarrowerThan"
-import { useNoteStore } from "@/store/noteStore"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
@@ -123,12 +118,6 @@ const props = defineProps({
 provideMemoryTrackerActions(toRef(() => props.noteId))
 
 const { isOpenForNote } = useAssimilationView()
-const noteStore = useNoteStore()
-const assimilationPanelKey = ref(0)
-const onAssimilationReloadNeeded = async () => {
-  await noteStore.loadNoteRealm(props.noteId)
-  assimilationPanelKey.value += 1
-}
 
 const root = ref<HTMLElement | null>(null)
 /**

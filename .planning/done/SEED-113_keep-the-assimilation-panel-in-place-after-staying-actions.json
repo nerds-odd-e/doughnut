@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions",
+  "title": "Keep the assimilation panel in place after actions that stay on the note",
+  "completedAt": "2026-11-09T09:43:20.150Z",
+  "developer": "Terry Yin",
+  "agent": "Mana-chan",
+  "host": "cursor",
+  "model": "auto",
+  "intentCoverage": {
+    "unavailable": "Correction story; wrap-up skips Intent Coverage for corrections."
+  }
+}

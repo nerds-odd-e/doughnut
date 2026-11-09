@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-113_keep-the-assimilation-panel-in-place-after-staying-actions.json",
+      "identity": "SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions",
+      "completedAt": "2026-11-09T09:43:20.150Z",
+      "blob": "0aa014747b0c2f887778227190c323c51fa8f9ae"
+    },
+    {
       "fileName": "SEED-111_run-uncovered-script-tests-in-ci.json",
       "identity": "SEED-111#run-uncovered-script-tests-in-ci",
       "completedAt": "2026-11-09T09:41:42.063Z",

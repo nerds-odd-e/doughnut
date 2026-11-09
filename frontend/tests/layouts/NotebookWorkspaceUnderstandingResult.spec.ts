@@ -29,9 +29,11 @@ import {
   expectUnderstandingResult,
   inPanel,
   nextRecallAt,
+  openNoteAssimilation,
   panelSelector,
   propertyNote,
   serveNoteTrackers,
+  showNoteCallCount,
   visibleText,
 } from "./notebookWorkspaceAssimilationTestSupport"
 
@@ -58,18 +60,25 @@ it("keeps this visit's Understanding result on the note through an optional addi
     [earlier.id]: [makeMe.aMemoryTracker.nextRecallAt(nextRecallAt).please()],
   })
 
-  await assimilateUnderstanding()
+  await openNoteAssimilation()
+  const panel = document.querySelector(panelSelector)!
+  const showNoteCount = showNoteCallCount()
+
+  await clickInPanel("assimilate-UNDERSTANDING")
+  await expectUnderstandingResult()
+  expect(panel.isConnected).toBe(true)
+  expect(showNoteCallCount()).toBe(showNoteCount)
 
   expect(visibleText('[data-test="note-title"]')).toBe("かた と ほう")
   expect(mounted.router.currentRoute.value).toMatchObject(
     noteShowLocation(realm.id)
   )
-  const panel = document.querySelector(panelSelector)!
 
   await clickInPanel("assimilate-COMMISSIONED")
   await expectTrackerStatus("COMMISSIONED")
 
-  expect(panel.isConnected).toBe(false)
+  expect(panel.isConnected).toBe(true)
+  expect(showNoteCallCount()).toBe(showNoteCount)
   await expectUnderstandingResult()
   expect(mounted.router.currentRoute.value).toMatchObject(
     noteShowLocation(realm.id)

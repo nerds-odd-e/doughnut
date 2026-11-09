@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Keep the assimilation panel in place after actions that stay on the note](seeds/SEED-113-note-assimilation-experience.md#keep-the-assimilation-panel-in-place-after-staying-actions) — SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions ([plan](slice-plans/004-keep-assimilation-panel-in-place/PLAN.md))
-
 ## Backlog list
 
 - [Trust learning-session and assimilation E2E feedback](seeds/SEED-115-reliable-learning-e2e-feedback.md#trust-learning-session-and-assimilation-e2e-feedback) — SEED-115#trust-learning-session-and-assimilation-e2e-feedback

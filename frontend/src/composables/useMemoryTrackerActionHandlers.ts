@@ -11,28 +11,14 @@ import {
 
 export type MemoryTrackerActionRequest = { propertyKey?: string }
 
-export type MemoryTrackerActionResult = {
-  completed: boolean
-  navigated: boolean
-}
-
-const notCompleted: MemoryTrackerActionResult = {
-  completed: false,
-  navigated: false,
-}
-
 export type MemoryTrackerActionHandlers = {
   assimilatingPropertyKey: Ref<string | null>
   understandingAdded: Ref<boolean>
   showSpellingPopup: ComputedRef<boolean>
-  assimilate: (event: AssimilateEvent) => Promise<MemoryTrackerActionResult>
-  skip: (
-    request?: MemoryTrackerActionRequest
-  ) => Promise<MemoryTrackerActionResult>
-  returnToSequence: (
-    request?: MemoryTrackerActionRequest
-  ) => Promise<MemoryTrackerActionResult>
-  handleSpellingVerified: () => Promise<MemoryTrackerActionResult>
+  assimilate: (event: AssimilateEvent) => Promise<void>
+  skip: (request?: MemoryTrackerActionRequest) => Promise<void>
+  returnToSequence: (request?: MemoryTrackerActionRequest) => Promise<void>
+  handleSpellingVerified: () => Promise<void>
   handleSpellingCancel: () => void
 }
 
@@ -63,81 +49,71 @@ export function useMemoryTrackerActionHandlers(
     () => pendingAssimilateAfterSpelling.value !== null
   )
 
-  const doAssimilate = async (
-    event: AssimilateEvent
-  ): Promise<MemoryTrackerActionResult> => {
+  const doAssimilate = async (event: AssimilateEvent) => {
     assimilatingPropertyKey.value = event.propertyKey ?? null
     try {
       const result = await assimilateUnit({ noteId: noteId.value, ...event })
       if (!result.success) {
-        return notCompleted
+        return
       }
       await reloadNoteInfo()
       if (result.understandingAdded) {
         understandingAdded.value = true
       }
-      return { completed: true, navigated: result.navigated }
     } finally {
       assimilatingPropertyKey.value = null
     }
   }
 
-  const assimilate = async (
-    event: AssimilateEvent
-  ): Promise<MemoryTrackerActionResult> => {
+  const assimilate = async (event: AssimilateEvent) => {
     if (event.assimilateAsSpelling) {
       pendingAssimilateAfterSpelling.value = event
-      return notCompleted
+      return
     }
-    return doAssimilate(event)
+    await doAssimilate(event)
   }
 
-  const handleSpellingVerified =
-    async (): Promise<MemoryTrackerActionResult> => {
-      const pending = pendingAssimilateAfterSpelling.value
-      pendingAssimilateAfterSpelling.value = null
-      if (!pending) {
-        return notCompleted
-      }
-      return doAssimilate(pending)
+  const handleSpellingVerified = async () => {
+    const pending = pendingAssimilateAfterSpelling.value
+    pendingAssimilateAfterSpelling.value = null
+    if (!pending) {
+      return
     }
+    await doAssimilate(pending)
+  }
 
   const handleSpellingCancel = () => {
     pendingAssimilateAfterSpelling.value = null
   }
 
-  const skip = async ({
-    propertyKey,
-  }: MemoryTrackerActionRequest = {}): Promise<MemoryTrackerActionResult> => {
+  const skip = async ({ propertyKey }: MemoryTrackerActionRequest = {}) => {
     const confirmed = await popups.confirm(
       sequenceSkipConfirmation(propertyKey)
     )
     if (!confirmed) {
-      return notCompleted
+      return
     }
 
     const result = await skipFromAssimilationSequence(noteId.value, propertyKey)
     if (!result.success) {
-      return notCompleted
+      return
     }
 
     await reloadNoteInfo()
-    return { completed: true, navigated: result.navigated }
   }
 
   const returnToSequence = async ({
     propertyKey,
-  }: MemoryTrackerActionRequest = {}): Promise<MemoryTrackerActionResult> => {
+  }: MemoryTrackerActionRequest = {}) => {
     const success = await returnToAssimilationSequence(
       noteId.value,
       propertyKey
     )
     if (!success) {
-      return notCompleted
+      return
     }
 
     await reloadNoteInfo()
-    return { completed: true, navigated: false }
   }
 
   return {

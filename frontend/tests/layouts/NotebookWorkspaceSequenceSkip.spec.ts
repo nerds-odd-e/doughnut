@@ -5,9 +5,15 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import Popups from "@/components/commons/Popups/Popups.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import { NO_MORE_TOAST } from "@/composables/useGoToNextAssimilation"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { mockSdkService } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
+import {
+  showToastsOnPage,
+  toastMessagesOnPage,
+} from "@tests/helpers/toastTestSupport"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mount, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
@@ -17,12 +23,17 @@ import {
 } from "./notebookWorkspaceHeaderTestSupport"
 import {
   clickInPanel,
+  expectActivity,
   expectPropertyLearningOpen,
   inPanel,
   isVisible,
   openNoteAssimilation,
   propertyNote,
+  showNoteCallCount,
+  visibleText,
 } from "./notebookWorkspaceAssimilationTestSupport"
+
+showToastsOnPage()
 
 let wrappers: VueWrapper[] = []
 let skipSpy: ReturnType<typeof mockSdkService>
@@ -93,5 +104,21 @@ it("confirming from the bottom bar skips only the note's Understanding and opens
   await answerConfirmation("OK")
 
   await expectPropertyLearningOpen(router, realm.id, "topic")
+  expect(skipSpy).toHaveBeenCalledWith({ body: { noteId: realm.id } })
+})
+
+it("confirming Skip with nothing next keeps the note without reloading it", async () => {
+  const realm = makeMe.aNoteRealm.title("Last").please()
+  mockSdkService(AssimilationController, "next", {})
+  const router = await openSkipConfirmation(realm)
+  const showNoteCount = showNoteCallCount()
+
+  await answerConfirmation("OK")
+
+  await vi.waitFor(() => expect(toastMessagesOnPage()).toEqual([NO_MORE_TOAST]))
+  await expectActivity("Note")
+  expect(showNoteCallCount()).toBe(showNoteCount)
+  expect(router.currentRoute.value).toMatchObject(noteShowLocation(realm.id))
+  expect(visibleText('[data-test="note-title"]')).toBe("Last")
   expect(skipSpy).toHaveBeenCalledWith({ body: { noteId: realm.id } })
 })

@@ -131,6 +131,7 @@ it("adding Commissioned from Optional modes keeps the note and its Understanding
   await clickInPanel("assimilate-COMMISSIONED")
 
   await expectUnderstandingResult()
+  await expectClosedAtTrigger()
   expect(mounted.router.currentRoute.value).toMatchObject(
     noteShowLocation(realm.id)
   )

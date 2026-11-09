@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 445. Removed numbers are never reused.
+- Highest allocated local number: 446. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 
@@ -514,3 +514,16 @@ A required source-freshness command returned amended, but the coordinator's next
   - Evidence: the source-freshness result at trunk 9a33d32751 exited 1 with result amended. The same functions.exec orchestration then invoked execution-increment-delivery.mjs fresh. Publication accepted a84e1ee292. The coordinator subsequently absorbed the source and plan amendment, obtained a fresh source-only review, and published them in fd73a191fc before accepting the first slice. The accepted plan retains the order defect in its slice-1 evidence.
   - Observed effect: one progress publication carried the earlier source wording. The source, review and all 85 commitment observations were reconciled before slice acceptance, with no functional product defect established.
   - Inference: awaiting dependent tool calls sequentially did not enforce the gate because the caller ignored the first command's terminal exit and result. The freshness result needs inspection before the commit-and-push operation is launched.
+
+## DD-446 — Implementation claimed no gaps while waiving a listed source commitment's distinguishing observation
+
+The first Slice 1 return reported gaps none for the three plan proof rows, while stating that confirmed-skip-with-nothing-next stayed covered by existing SequenceSkip / walkthrough E2E without a new no-reload observation. Source commitments 3 and 4, the plan Behavior, and the delegation's allocated commitment list already required that stay-on-note case. Related to ODF-314 (omitted named proof), without a product defect this time. Possibly aided by the plan proof table naming only Understanding and Add to sessions as examples for the in-place row.
+
+### Occurrences
+- Execution: SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions (first implementation commit da94d6ea36)
+  - Timestamp: 2026-11-09T17:21:00+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.92
+  - Evidence: implementer return Gaps (agent `5f0ded43-2d7e-495a-bb36-250188735671`); coordinator acceptance bounce for commitments 3/4; delta `NotebookWorkspaceSequenceSkip.spec.ts` "confirming Skip with nothing next keeps the note without reloading it"; plan proof table row 1 vs Behavior/source commitments 3–4.
+  - Observed effect: one implementer resume and a focused SequenceSkip rerun before acceptance; the added test passed with no product change.
+  - Inference: treating proof-table examples as the full stay-on-note set can waive a source commitment the brief already listed to observe.
