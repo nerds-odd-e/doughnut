@@ -2,6 +2,7 @@
 
 **Identity:** SEED-111#run-uncovered-script-tests-in-ci
 **Source:** [Refined story](../../seeds/SEED-111-run-uncovered-script-tests-in-ci.md#run-uncovered-script-tests-in-ci)
+**Source review:** [Source-only commitments](source-review.md)
 
 ## Goal and scope
 
@@ -34,8 +35,8 @@ the runner without changing what it checks goes to the story owner.
   `test:browser-worktree-isolation` and `dev-healthcheck` to
   `test:development-stack`. Add a capability-named command only where no
   command shares the concern, as for the five `worktree-retirement*` files and
-  the profiling receiver check. The command names appear only in
-  `package.json`, `.github/workflows/ci.yml` and `docs/ci-proof-summary.md`.
+  the profiling receiver check. The command names appear in
+  `package.json`, the Lint CI action and `docs/ci-proof-summary.md`.
 - **MySQL 8.4 binaries on CI.** `startDisposableMysql` needs local MySQL 8.4
   server binaries (`MYSQL_BASEDIR`, or the directory above `mysqld` on
   `PATH`), and the e2e mutation test checks the version. CI's MySQL
@@ -158,3 +159,63 @@ summary publishes.
   the gate rule bounds that. Slices 1 and 2 wait on CI, an external-wait
   exception to the slice time target.
 - This review found no other slice-specific concern.
+
+
+## Execution context
+
+On 2026-11-09 the developer declined an exception to the mandatory 250-line
+refactor check. Continue the same refactor boundary with a cohesive split of
+CI configuration; retain all jobs, producer observations and failure semantics.
+The initial independent pass stopped on the 351-line existing workflow (460
+with the temporary probe). No hosted gate or slice completion is claimed.
+
+The initial observer below stopped cleanly at that decision boundary, with no
+unread records and its PID gone. After the developer's answer, root verified
+that terminal identity and rearmed: cell `g151:3`, coordinator
+`seed111-ai-chan`, directory `/tmp/dough-ci-501/watch-Th0z5b`, PID 5120,
+session 39826, same branch target. GitHub's directed API wait ends at
+2026-11-09T07:11:00.142Z; the live observer retains it. The execution branch
+fast-forwarded to supplier revision 03fc16245a15ef12ced590dfea751cfc25187f1b;
+that revision adds the cleanup regression and leaves its helper unchanged.
+The story branch's last accepted revision remains the established claim
+dc1372e73effdcc1d646bf5733675ea99828813c.
+
+- Established execution: `SEED-111#run-uncovered-script-tests-in-ci`, publisher
+  `dashboard-territory.local-doughnut`, agent Ai-chan. The accepted claim is
+  `dc1372e73effdcc1d646bf5733675ea99828813c`; it is the first increment's
+  previously published base. Starting revision:
+  `6a25ee9b5dd69f1bacc7cec41ea931c62813623f`. No start command is repeated.
+- Mode: story-branch. Owned execution checkout:
+  `/Users/terryyin/git/doughnut/.worktrees/see-ci-results-and-timings-for-the-remaining-scr`;
+  branch `codex/see-ci-results-and-timings-for-the-remaining-scr`. Increments
+  target that branch on `origin`; closure targets `origin/main`. Default
+  checkout: `/Users/terryyin/git/doughnut`.
+- Checkout preparation: `./scripts/run.sh bash scripts/worktree_setup.sh`
+  succeeded with the workspace installation fingerprint current;
+  `./scripts/run.sh pnpm test:ci-proof` passed 25/25 tests. Existing plan
+  authority allows replanning within the understood story scope.
+- CI source: GitHub Actions `ci.yml`, locally named `donut CI`. Codex observer
+  cell `g141:11`, coordinator `seed111-ai-chan`, directory
+  `/tmp/dough-ci-501/watch-ywFEsC`, PID 7673, session 31911, target
+  `origin/refs/heads/codex/see-ci-results-and-timings-for-the-remaining-scr`.
+  Shared request owner directed a wait until
+  `2026-11-09T07:11:00.334Z`; the armed observer retains that wait. The claim's
+  trunk CI is unobserved.
+
+
+## Story obligations
+
+### G1. Hosted runner gate awaits the published probe
+Reported: slice 1 — "Hosted MySQL execution, Java/process inspection, and all 30 repetitions remain uncovered; root owns those observations after progress publication."
+Story clause: "Record the CI attempts and outcomes, and resolve any recurring failure in the group before making its tests required."
+Disposition: return
+
+## Slice 1 progress evidence
+
+- Temporary probe infrastructure is locally validated; the hosted gate remains open as G1. Three fresh ubuntu-latest matrix jobs each run the same Lint setup, generated-types check and pnpm lint:all, then ten sequential full-group invocations. Every TAP log, status/count/duration result and runner/tool/install metadata is uploaded. The required test commands are unchanged pending the gate.
+- Local proof: ./scripts/run.sh pnpm test:ci-proof passed all 25 tests; the workflow tests observe unchanged producer parts, command order and push trigger. The implementation parsed YAML and checked exact seed file selection, matching setup steps, matrix size 3, loop size 10 and embedded Node/Bash syntax. scripts/check_diff_whitespace.sh passed. Official minimal archive returned HTTP 200, 61,378,984 bytes. Linux runtime capabilities are unobserved until G1.
+- Consumer trace: /tmp/seed111-probe-consumers.md. The workflow proof suite is reused unchanged. The new action feeds MYSQL_BASEDIR to the disposable helper; its two file consumers are included in every hosted repetition. Root inspected the helper stop ordering, named idle test, probe selection and result retention. Explicit ciWorkflow selects the already-used ci.yml for the retained observer.
+- Source freshness at pinned trunk 03fc16245a15ef12ced590dfea751cfc25187f1b was unchanged. The sole incoming supplier change adds a cleanup-waits-for-exit regression to worktree-retirement-mutation.test.mjs; the execution branch fast-forwarded to that revision before this probe, preserving published history. The supplier helper is unchanged. This adds one reported leaf check; later report acceptance uses the current file contents alongside the dated baseline. SEED-112 remains unimplemented on pinned trunk.
+- Expensive-proof decision: actual target is three fresh independent GitHub runners, ten sequential Node invocations each. Local 35.6 s was a busy-host proxy, not runner headroom evidence. The probe captures runner CPU/memory/load before repetitions and has a 20-minute job bound. Root owns hosted observation; reconsider on timeout, contention or failures before another series. No local repeated suite was launched.
+- Refactor: independent probe_refactor return completed after the developer declined the size exception; main workflow is 249 lines. Cohesive local actions own lint_environment, lint_and_generated_types, package_application_artifacts and the temporary script_runner_probe. ./scripts/run.sh pnpm test:ci-proof passed 25/25; ./scripts/run.sh node /tmp/seed111-validate-ci-refactor.mjs preserved all eight job graphs, matrices, commands, environments, failure conditions, proof/artifact contracts and step order against the pre-extraction probe YAML. scripts/check_diff_whitespace.sh passed. All changed files are at most 250 lines. Root inspected action inputs, Bash shells, fragment conditions, shared setup and package upload paths; no behavior beyond the temporary probe and MySQL binaries installation is asserted complete.
+- The installed hook is check-only. Fresh delivery inherits pnpm_config_verify_deps_before_run=false to preserve that contract with the installed hook version.

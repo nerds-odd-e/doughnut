@@ -1,0 +1,23 @@
+name: "Install MySQL 8.4 binaries"
+description: "Provide local binaries for disposable MySQL test servers"
+outputs:
+  elapsed-seconds:
+    description: "Seconds spent installing the binaries"
+    value: ${{ steps.install.outputs.elapsed-seconds }}
+runs:
+  using: "composite"
+  steps:
+    - id: install
+      shell: bash
+      run: |
+        started=$SECONDS
+        sudo apt-get install --yes --no-install-recommends libaio-dev libaio1t64 libnuma1 libncurses6 libtinfo6
+        if [ ! -e /usr/lib/x86_64-linux-gnu/libaio.so.1 ]; then
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
+        fi
+        mysql_archive=mysql-8.4.3-linux-glibc2.17-x86_64-minimal
+        curl --fail --location --retry 3 "https://cdn.mysql.com/archives/mysql-8.4/$mysql_archive.tar.xz" -o "$RUNNER_TEMP/mysql.tar.xz"
+        tar -xJf "$RUNNER_TEMP/mysql.tar.xz" -C "$RUNNER_TEMP"
+        "$RUNNER_TEMP/$mysql_archive/bin/mysqld" --version
+        echo "MYSQL_BASEDIR=$RUNNER_TEMP/$mysql_archive" >> "$GITHUB_ENV"
+        echo "elapsed-seconds=$((SECONDS - started))" >> "$GITHUB_OUTPUT"

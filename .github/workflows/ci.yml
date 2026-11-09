@@ -36,105 +36,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Check for @focus tags in e2e test feature files
-        run: ./scripts/check_focus_tags.sh
-      - name: Check E2E cy.visit is only in the SPA visit gate
-        run: ./scripts/check_e2e_spa_visit_gate.sh
-      - name: Check @wip scenario count limit
-        run: ./scripts/check_wip_tags.sh
-      - uses: ./.github/setup_jdk_with_cache
+      - uses: ./.github/lint_and_generated_types
         with:
           java_version: ${{ vars.JAVA_VERSION }}
-      - uses: ./.github/setup_nodejs_with_cache
-        with:
           node_version: ${{ vars.NODE_VERSION }}
-      - run: bash -c ./assert_generated_type_script_up_to_date.sh
-      # Each Node test command in lint:all publishes its own scripts part, in
-      # lint:all order; one that did not run leaves its part missing.
-      - id: lint-all
-        run: pnpm lint:all
-        env:
-          CI_PROOF_NODE_REPORT_DIR: ${{ runner.temp }}/node-reports
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
+
+  Script-runner-probe:
+    name: Script runner probe (${{ matrix.runner }})
+    if: github.ref == 'refs/heads/codex/see-ci-results-and-timings-for-the-remaining-scr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy: { fail-fast: false, matrix: { runner: [1, 2, 3] } }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/script_runner_probe
         with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:path-routing.ndjson
-          entry: scripts
-          part: 2
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:api-summary.ndjson
-          entry: scripts
-          part: 3
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:workspace-syncpack-lifecycle.ndjson
-          entry: scripts
-          part: 4
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:log-utils.ndjson
-          entry: scripts
-          part: 5
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:sut-healthcheck.ndjson
-          entry: scripts
-          part: 6
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:sut-start.ndjson
-          entry: scripts
-          part: 7
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:browser-worktree-isolation.ndjson
-          entry: scripts
-          part: 8
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:ci-proof.ndjson
-          entry: scripts
-          part: 9
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:backend-test-worktree.ndjson
-          entry: scripts
-          part: 10
-          of: 11
-      - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
-        uses: ./.github/ci_proof_fragments
-        with:
-          format: node
-          report: ${{ runner.temp }}/node-reports/test:development-stack.ndjson
-          entry: scripts
-          part: 11
-          of: 11
+          java_version: ${{ vars.JAVA_VERSION }}
+          node_version: ${{ vars.NODE_VERSION }}
+          probe_runner: ${{ matrix.runner }}
 
   Backend-unit-tests:
     name: Backend Unit tests
@@ -177,10 +96,7 @@ jobs:
     # ~100 specs (raise when a shard nears ~125 files / ~250 total).
     name: Frontend Unit Tests (${{ matrix.shard }}/2)
     runs-on: ${{ vars.RUNNER }}
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2]
+    strategy: { fail-fast: false, matrix: { shard: [1, 2] } }
     env:
       FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
     steps:
@@ -244,28 +160,10 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/setup_jdk_with_cache
+      - uses: ./.github/package_application_artifacts
         with:
           java_version: ${{ vars.JAVA_VERSION }}
-      - uses: ./.github/setup_nodejs_with_cache
-        with:
           node_version: ${{ vars.NODE_VERSION }}
-      - name: Build SPA, CLI, and backend jar for deployment
-        run: pnpm cli:bundle && pnpm frontend:build
-      - name: Build application jar artifact
-        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-          path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-      - uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.FRONTEND_DIST_ARTIFACT }}
-          path: frontend/dist
-      - uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.CLI_DIST_ARTIFACT }}
-          path: cli/dist
 
   E2E-tests:
     # Explicit feature dirs (not letter globs) keep Cypress load ~even across

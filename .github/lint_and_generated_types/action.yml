@@ -1,0 +1,103 @@
+name: "Check lint and generated types"
+description: "Run the Lint job and keep its Node proof parts"
+inputs:
+  java_version:
+    description: "JDK version"
+    required: true
+  node_version:
+    description: "Node.js version"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: ./.github/lint_environment
+      with:
+        java_version: ${{ inputs.java_version }}
+        node_version: ${{ inputs.node_version }}
+    # Each Node test command in lint:all publishes its own scripts part, in
+    # lint:all order; one that did not run leaves its part missing.
+    - id: lint-all
+      shell: bash
+      run: pnpm lint:all
+      env:
+        CI_PROOF_NODE_REPORT_DIR: ${{ runner.temp }}/node-reports
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:path-routing.ndjson
+        entry: scripts
+        part: 2
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:api-summary.ndjson
+        entry: scripts
+        part: 3
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:workspace-syncpack-lifecycle.ndjson
+        entry: scripts
+        part: 4
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:log-utils.ndjson
+        entry: scripts
+        part: 5
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:sut-healthcheck.ndjson
+        entry: scripts
+        part: 6
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:sut-start.ndjson
+        entry: scripts
+        part: 7
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:browser-worktree-isolation.ndjson
+        entry: scripts
+        part: 8
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:ci-proof.ndjson
+        entry: scripts
+        part: 9
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:backend-test-worktree.ndjson
+        entry: scripts
+        part: 10
+        of: 11
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:development-stack.ndjson
+        entry: scripts
+        part: 11
+        of: 11

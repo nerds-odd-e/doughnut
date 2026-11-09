@@ -1,4 +1,5 @@
 {
+  "ciWorkflow": "ci.yml",
   "skipProcessRetrospective": false,
   "intent": {
     "locations": [
