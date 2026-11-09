@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
+import path from 'node:path'
 import { test } from 'node:test'
 import { makeLinkedWorktreeCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import { writeIsolatedConfig } from './sut-isolated-fixtures.mjs'
@@ -214,4 +215,16 @@ test('uncertain supported JVM cwd refuses mutation before marker and DROP', asyn
   assert.equal(existsSync(retirementMarkerPath(checkout.root)), false)
   assert.equal(existsSync(retirementAdmissionGatePath(checkout.root)), false)
   assert.equal(mysqlCalled, false)
+})
+
+test('disposable MySQL cleanup returns only after its server has exited', async (t) => {
+  let pid
+  let home
+  await t.test('use a disposable server', async (st) => {
+    const mysql = await startDisposableMysql(st)
+    home = mysql.home
+    pid = Number(readFileSync(path.join(home, 'mysql.pid'), 'utf8'))
+  })
+  assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' })
+  assert.equal(existsSync(home), false)
 })
