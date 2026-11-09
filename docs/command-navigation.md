@@ -11,7 +11,7 @@ or progress beyond the first item away from recall with work remaining. Resume
 returns to the preserved question and progress through `useResumeRecall`.
 
 Assimilate identifies a learning presentation visible for the current note.
-Both note assimilation and a property's learning panel register their actual
+Both [note assimilation](note-assimilation.md) and a property's learning panel register their actual
 presentation lifetime through `useAssimilationView`. Property entry can be
 direct or through the next-unit sequence. Hidden details, another note,
 missing/read-only properties and panels without learning retain ordinary
