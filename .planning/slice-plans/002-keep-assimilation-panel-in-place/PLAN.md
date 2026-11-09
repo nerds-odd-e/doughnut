@@ -6,8 +6,9 @@
 ## Correction input
 
 **Provenance.** Found by the execution retrospective of
-[SEED-113#assimilate-notes-with-a-clear-default-and-result](../../seeds/SEED-113-note-assimilation-experience.md#assimilate-notes-with-a-clear-default-and-result),
-reviewing its published commits `9868d40b3c`, `356995da2d`, `52d49395dc`,
+SEED-113#assimilate-notes-with-a-clear-default-and-result (`.planning/seeds/SEED-113-note-assimilation-experience.md` at `ef93df2e5d`; its plan
+`.planning/slice-plans/001-note-assimilation-experience/PLAN.md` at
+`ef93df2e5d`), reviewing its published commits `9868d40b3c`, `356995da2d`, `52d49395dc`,
 `e61af632d9` and `0d97720312` (net diff `8f91daebcd..0d97720312`). The reload
 mechanism is older: `737287a333` (2026-08-12) added the reload-and-rekey after
 optional additions; `ca68e7c554` (2026-08-24) later moved tracker state into

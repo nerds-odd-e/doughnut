@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Choose how to assimilate a note and when to move on](seeds/SEED-113-note-assimilation-experience.md#assimilate-notes-with-a-clear-default-and-result) — SEED-113#assimilate-notes-with-a-clear-default-and-result ([plan](slice-plans/001-note-assimilation-experience/PLAN.md))
-
 ## Backlog list
 
 - [Keep the assimilation panel in place after actions that stay on the note](seeds/SEED-113-note-assimilation-experience.md#keep-the-assimilation-panel-in-place-after-staying-actions) — SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions
