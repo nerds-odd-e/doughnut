@@ -144,7 +144,7 @@ Accepted proof (2026-11-09 execution):
 
 ### 3. Scope note interactions to the note panel beside property controls
 Type: Structure
-Status: planned
+Status: done
 Proof: Last three proof rows; Command C.
 
 Unify note action, tracker, success/Next and secondary-action queries under the
@@ -158,6 +158,13 @@ two competing note-query strategies around controls shared with property rows.
 Sizing: about 5 minutes plus the nine-feature E2E startup/runtime exception
 (the preparation probe measured 1m41s spec time). Safe stop: all consumers
 observe the correct note/property outcomes through one note scope.
+
+Accepted proof (2026-11-09 execution):
+- Base: `6fa428411733da9ab23fa6832857e1ff44bac09c`
+- Command C (OPENAI_API_TOKEN=placeholder): nine features / **32/32 pass** on reused allocation `wt_4f7964e31e60485b9df2ba07535b8181`, origin `http://127.0.0.1:57721` (~2m07s spec)
+- Removal sweep: `isNoteLevelAssimilationControl` has no remaining product/test/docs/guidance matches
+- Consumer-trace: Command C features run; readiness-only features excluded; property scopes unchanged
+- Refactor: route `understandingResultSelector` through `noteLevelSelector` (`## REFACTOR COMPLETE`); Command C reused
 
 ## Verification and delivery
 

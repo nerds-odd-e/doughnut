@@ -38,6 +38,8 @@ Feature: Property memory tracker
     When I choose answer "micronutrients"
     And I visit note "Vitamins"
     And I open the assimilation panel
+    When I open the property panel for property "topic"
+    And the rich note property "topic" should be focused with its property panel open
     Then the note memory tracker should have recall count 0
     And the property memory tracker for "topic" should have recall count 1
 
