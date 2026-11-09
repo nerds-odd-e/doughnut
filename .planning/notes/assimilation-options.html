@@ -2979,7 +2979,7 @@ html&gt;body{padding:0}&lt;/style&gt;
       }
       if (height <= 10_000) {
         const width = isShare && storage != null ? frame.clientWidth : null;
-        frame.style.height = Math.ceil(height) + "px";
+        frame.style.height = `${Math.ceil(height)}px`;
         if (isShare && storage != null) {
           const size = JSON.stringify({
             fingerprint: sizeFingerprint,
@@ -3115,7 +3115,7 @@ html&gt;body{padding:0}&lt;/style&gt;
         size.height >= 0 &&
         size.height <= 10_000
       ) {
-        frame.style.height = size.height + "px";
+        frame.style.height = `${size.height}px`;
       }
     } catch {
       // Ignore missing or invalid cache entries and measure the live frame.
