@@ -9,7 +9,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Choose how to assimilate a note and when to move on](seeds/SEED-113-note-assimilation-experience.md#assimilate-notes-with-a-clear-default-and-result) — SEED-113#assimilate-notes-with-a-clear-default-and-result ([plan](slice-plans/001-note-assimilation-experience/PLAN.md))
-- [See CI results and timings for the remaining script tests in Intent](seeds/SEED-111-run-uncovered-script-tests-in-ci.md#run-uncovered-script-tests-in-ci) — SEED-111#run-uncovered-script-tests-in-ci ([plan](slice-plans/002-run-uncovered-script-tests-in-ci/PLAN.md))
 
 ## Backlog list
 
