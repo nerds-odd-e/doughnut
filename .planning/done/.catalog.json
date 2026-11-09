@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-114_disposable-mysql-stops-before-cleanup.json",
+      "identity": "SEED-114#disposable-mysql-stops-before-cleanup",
+      "completedAt": "2026-11-09T05:49:57.323Z",
+      "blob": "ba1f6f4d7bc865d65523c092d06a2c7a742dae20"
+    },
+    {
       "fileName": "SEED-109_complete-test-inventory-and-script-proof.json",
       "identity": "SEED-109#complete-test-inventory-and-script-proof",
       "completedAt": "2026-11-08T16:14:16.854Z",
@@ -444,24 +450,6 @@
       "identity": "SEED-072#title-search-layout",
       "completedAt": "2026-10-10T09:20:38.099Z",
       "blob": "7ba702fd96b73adf7a83c02bb0f1971b5d6a647a"
-    },
-    {
-      "fileName": "SEED-071_removals-follow-project-rule.json",
-      "identity": "SEED-071#removals-follow-project-rule",
-      "completedAt": "2026-10-10T05:43:06.122Z",
-      "blob": "f57783d0e50210c131b0832fb230a1b68ae7e737"
-    },
-    {
-      "fileName": "SEED-066_restore-typed-referenced-title-save.json",
-      "identity": "SEED-066#restore-typed-referenced-title-save",
-      "completedAt": "2026-10-10T04:46:54.915Z",
-      "blob": "48d650eea66752970732c43957bcb8f28938becf"
-    },
-    {
-      "fileName": "SEED-066_rename-with-spoken-title.json",
-      "identity": "SEED-066#rename-with-spoken-title",
-      "completedAt": "2026-10-09T23:39:09.524Z",
-      "blob": "f77dee667bd4758feef9fd344162fcaa0473596a"
     }
   ],
   "unreadable": []

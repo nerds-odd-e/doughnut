@@ -395,6 +395,6 @@ The plan's final observation looked for leftover `doughnut-retire-mysql-*` folde
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.92
-  - Evidence: plan 003 slice 1 proof row "no `doughnut-retire-mysql-*` folder is left under `os.tmpdir()`"; probe output `tmpdir: /tmp/nix-shell.dEfSFU`; final reading listed four folders under `/private/tmp/nix-shell.*` dated 12:19 to 12:20.
+  - Evidence: plan 003 slice 1 proof row "no `doughnut-retire-mysql-*` folder is left under `os.tmpdir()`" (`git show 37253a42cc:.planning/slice-plans/003-disposable-mysql-stops-before-cleanup/PLAN.md`); probe output `tmpdir: /tmp/nix-shell.dEfSFU`; final reading listed four folders under `/private/tmp/nix-shell.*` dated 12:19 to 12:20.
   - Observed effect: no false reading; the implementer widened the check without being asked.
   - Inference: a proof location derived from the environment can point somewhere different when each command starts a new environment; low cost here only because the implementer noticed.

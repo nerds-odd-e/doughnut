@@ -9,7 +9,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Choose how to assimilate a note and when to move on](seeds/SEED-113-note-assimilation-experience.md#assimilate-notes-with-a-clear-default-and-result) — SEED-113#assimilate-notes-with-a-clear-default-and-result ([plan](slice-plans/001-note-assimilation-experience/PLAN.md))
-- [Retirement tests leave no running MySQL server behind](seeds/SEED-114-disposable-mysql-cleanup.md#disposable-mysql-stops-before-cleanup) — SEED-114#disposable-mysql-stops-before-cleanup ([plan](slice-plans/003-disposable-mysql-stops-before-cleanup/PLAN.md))
 
 ## Backlog list
 
