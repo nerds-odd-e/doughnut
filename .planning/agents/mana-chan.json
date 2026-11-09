@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Mana-chan",
+  "email": "mana-chan@example.org",
+  "identity": "SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions",
+  "mode": "story-branch",
+  "branch": "cursor/keep-the-assimilation-panel-in-place-after-actio",
+  "host": "cursor",
+  "model": "auto"
+}
