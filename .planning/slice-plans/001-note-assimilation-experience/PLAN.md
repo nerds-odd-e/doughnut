@@ -2,6 +2,7 @@
 
 **Identity:** SEED-113#assimilate-notes-with-a-clear-default-and-result
 **Source:** [refined story](../../seeds/SEED-113-note-assimilation-experience.md#assimilate-notes-with-a-clear-default-and-result)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -36,11 +37,13 @@ Implementation is separately authorized through Execute Plan, not this preparati
   preserving property auto-advance. Reuse `useGoToNextAssimilation`, skip and
   restoration owners; add no duplicate backend sequence, next-item cache, schema,
   persistence or public API responsibility.
-- PFE: `NoteShow` / `NoteTextContent` own the reading content and editable title;
-  `NoteToolbar` currently hosts the note panel. Place the existing note-level
-  action surface in that reading context rather than rendering a second note or
-  moving property actions into a new domain owner. `AssimilationModes` is shared
-  with property rows: preserve its property purpose when changing note presentation.
+- PFE: `NoteShow` / `NoteTextContent` own the reading content and editable title.
+  Since slice 1, `NoteShow` renders `AssimilationPanel` in `NoteTextContent`'s
+  `#after-title` slot and owns its remount key after optional additions;
+  `NoteToolbar` no longer hosts it. The note-level markup lives in
+  `NoteAssimilationModes`; property rows use the property-only
+  `PropertyAssimilationModes`; both share `AssimilationModeAction` for the
+  loading/tracker-link/action switch. Keep property presentation unchanged.
 - PFE: `AutoCollapseDropdown` and its portal/collapse support already solve
   anchored disclosure and nested-modal/outside clicks. Reuse them for compact
   Optional modes, adding local keyboard/focus handling where needed. `PopButton`
@@ -104,7 +107,7 @@ learning benefit.
 
 ### 1. Read the note and choose a clear default on a wide screen
 Type: Behavior
-Status: planned
+Status: done
 Proof: The first two proof rows, through mounted notebook workspace/panel tests;
 run the recall-panel tests and affected NoteToolbar/NoteTextContent tests.
 
@@ -139,7 +142,7 @@ recall refresh. Empty next response keeps the note and uses existing exhaustion
 feedback/dismissal; reaching the daily target still permits the next unit.
 
 Own the result at a same-note lifetime surviving optional refresh, not merely in
-the panel keyed by NoteToolbar. Do not infer this visit's success from any
+the panel keyed by NoteShow. Do not infer this visit's success from any
 pre-existing tracker. The mounted proof continues by opening a different note
 with pre-existing Understanding and observing its ordinary tracker link/date,
 establishing the result belongs to the successful visit. Keep mutations and
@@ -206,6 +209,42 @@ spacing and notebook chrome. Select the threshold from measured available space;
 exercise width changes as well as both static presentations. Replace slice 4's
 above-content compact placement. Keep wide layout from slice 1 green.
 Sizing: target 5 minutes, scrutinized 5–8 minutes for scroll/placement integration.
+
+## Story obligations
+
+### O1. Understanding still advances automatically
+Reported: slice 1 — "Understanding still advances automatically (slice 2)."
+Story clause: "The sequence waits at the result until the learner chooses to advance."
+Disposition: interim until slices 2
+
+### O2. Skip from sequence… keeps the existing skip confirmation
+Reported: slice 1 — "\"Skip from sequence…\" still opens the old confirmation text (slice 3)."
+Story clause: "Skip from sequence… opens a confirmation explaining that only this note's Understanding entry stays out of the sequence until restored"
+Disposition: interim until slices 3
+
+### O3. Compact widths stack the wide layout after the title
+Reported: slice 1 — "At compact widths the panel now sits after the title with stacked columns, not above the title as before. Slices 4–5 replace this"
+Story clause: "Around iPad portrait width and below, use Read first."
+Disposition: interim until slices 4, 5
+
+## Execution notes
+
+- Execution: story-branch on `claude/choose-how-to-assimilate-a-note-and-when-to-move`
+  in this worktree; published claim `8f91daebcd` on `origin/main`.
+- Local E2E from a non-interactive shell needs `OPENAI_API_TOKEN` set to any
+  non-empty placeholder; the backend OpenAI client reads only that variable,
+  and without it mocked-OpenAI features fail with `This request requires apiKey`.
+  Nix commands also need `NIX_CONFIG="extra-experimental-features = nix-command flakes"`.
+- Slice 1 diagnosis: `e2e_test/features/learning_session/commissioned_learning_session.feature`
+  "Recording the tutor's report closes the session and reschedules each tracker"
+  fails locally only at its last step (`199 hours between last and next recall`,
+  observed 240). Cause: the Grade interval fuzz is seeded by memory tracker id
+  (`MemoryTrackerRecallIntervalFuzz.intervalHoursForGrade`), and the reused
+  worktree E2E database allocates different ids than CI's fresh database. It
+  failed identically on an untouched checkout of `8f91daebcd`; main CI is green.
+  Every earlier step, including those using this slice's page objects, passed.
+  Disposition: outside this story's changed boundary; branch CI observes the
+  scenario. Remaining defect: the scenario asserts an id-seeded fuzzed value.
 
 ## Verification and delivery
 

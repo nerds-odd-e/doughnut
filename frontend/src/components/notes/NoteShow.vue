@@ -34,7 +34,18 @@
                     trashed: isNoteRealmInTrash(noteRealm),
                   }"
                   @dead-wiki-link-click="onDeadWikiLinkClick"
-                />
+                >
+                  <template #after-title>
+                    <AssimilationPanel
+                      v-if="
+                        !readonly(noteRealm) && isOpenForNote(noteRealm.note.id)
+                      "
+                      :key="assimilationPanelKey"
+                      :note="noteRealm.note"
+                      @reload-needed="onAssimilationReloadNeeded"
+                    />
+                  </template>
+                </NoteTextContent>
                 <ShowImage :note="noteRealm.note" />
                 <NoteTimestamps :note-topology="noteRealm.note.noteTopology" />
                 <NoteReferences
@@ -81,6 +92,9 @@ import ShowImage from "./widgets/ShowImage.vue"
 import NoteTimestamps from "./NoteTimestamps.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
+import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
+import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useNoteStore } from "@/store/noteStore"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
@@ -96,6 +110,14 @@ const props = defineProps({
 })
 
 provideMemoryTrackerActions(toRef(() => props.noteId))
+
+const { isOpenForNote } = useAssimilationView()
+const noteStore = useNoteStore()
+const assimilationPanelKey = ref(0)
+const onAssimilationReloadNeeded = async () => {
+  await noteStore.loadNoteRealm(props.noteId)
+  assimilationPanelKey.value += 1
+}
 
 const root = ref<HTMLElement | null>(null)
 const noteTextContent = ref<InstanceType<typeof NoteTextContent> | null>(null)

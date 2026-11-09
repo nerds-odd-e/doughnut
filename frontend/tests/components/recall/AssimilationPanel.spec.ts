@@ -32,19 +32,43 @@ import {
 setupAssimilationPanelTests()
 
 describe("AssimilationPanel", () => {
-  it("renders Recall modes without progress summary, Level radios, or Refine note trigger", async () => {
+  it("offers Understanding as the one primary action and each optional mode with its icon, description and own action", async () => {
     const wrapper = await mountAssimilationPanelReady()
 
-    const modes = wrapper.find('[data-testid="note-assimilation-modes"]')
-    expect(modes.find("h2").text()).toBe("Recall modes")
-    expect(
-      modes.find('[data-test="assimilation-progress-summary"]').exists()
-    ).toBe(false)
-    expect(modes.find('[role="radiogroup"]').exists()).toBe(false)
-    expect(wrapper.find('[data-test="open-refine-note-modal"]').exists()).toBe(
-      false
-    )
-    expect(document.querySelector('[data-test="refine-note-modal"]')).toBeNull()
+    const texts = (mode: string, selector: string) =>
+      wrapper
+        .findAll(`[data-test="assimilation-mode-row-${mode}"] :is(${selector})`)
+        .map((el) => el.text())
+    expect(wrapper.findAll(".daisy-btn-primary").map((b) => b.text())).toEqual([
+      "Assimilate understanding",
+    ])
+    expect(wrapper.text()).toMatch(/Default mode.*Optional modes/)
+    expect(texts("UNDERSTANDING", "h4, p, button")).toEqual([
+      "Understanding",
+      "Recall what this note means.",
+      "Assimilate understanding",
+      "Skip from sequence…",
+    ])
+    expect(texts("SPELLING", "strong, p, button")).toEqual([
+      "Spelling",
+      "Recall the title or an alias from memory.",
+      "Verify spelling",
+    ])
+    expect(texts("COMMISSIONED", "strong, p, button")).toEqual([
+      "Commissioned",
+      "Review in future learning sessions with a human or AI tutor.",
+      "Add to sessions",
+    ])
+    for (const [mode, icon] of [
+      ["SPELLING", "lucide-spell-check"],
+      ["COMMISSIONED", "lucide-graduation-cap"],
+    ]) {
+      expect(
+        wrapper
+          .find(`[data-test="assimilation-mode-row-${mode}"] svg`)
+          .classes()
+      ).toContain(icon)
+    }
   })
 
   it("advances via next assimilation and increments counts when assimilating", async () => {

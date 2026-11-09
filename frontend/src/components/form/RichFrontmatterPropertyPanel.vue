@@ -33,11 +33,9 @@
         {{ reifyRefusal }}
       </span>
     </template>
-    <AssimilationModes
+    <PropertyAssimilationModes
       v-if="showAssimilationModes"
       class="min-w-0 flex-1"
-      size="sm"
-      :allowed-modes="allowedModes"
       :trackers="hasSavedNote ? noteRecallInfo?.memoryTrackers : undefined"
       :property-key="propertyKey"
       :property-values="assimilableListValues(propertyValue)"
@@ -63,11 +61,8 @@ import { Minus } from "@lucide/vue"
 import { computed, toRef, useId } from "vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useRouter } from "vue-router"
-import AssimilationModes from "@/components/recall/AssimilationModes.vue"
-import {
-  assimilableListValues,
-  type MemoryTrackerType,
-} from "@/components/recall/assimilationMemoryTrackers"
+import PropertyAssimilationModes from "@/components/recall/PropertyAssimilationModes.vue"
+import { assimilableListValues } from "@/components/recall/assimilationMemoryTrackers"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import {
@@ -134,6 +129,4 @@ useAssimilationView().trackPresentation(
   () => props.noteId,
   () => showAssimilationModes.value && hasSavedNote.value
 )
-
-const allowedModes: MemoryTrackerType[] = ["UNDERSTANDING"]
 </script>

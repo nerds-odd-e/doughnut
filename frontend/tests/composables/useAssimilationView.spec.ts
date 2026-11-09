@@ -6,62 +6,50 @@ describe("useAssimilationView", () => {
     useAssimilationView().dismiss()
   })
 
-  it("openForNote turns settings on for the given note", () => {
-    const { openForNote, showAssimilationPanel, targetNoteId } =
-      useAssimilationView()
-
-    openForNote(5)
-
-    expect(showAssimilationPanel.value).toBe(true)
-    expect(targetNoteId.value).toBe(5)
-  })
-
-  it("resetForNote shows settings only for the target note", () => {
-    const { openForNote, resetForNote, showAssimilationPanel } =
-      useAssimilationView()
-
-    openForNote(5)
-    resetForNote(5)
-    expect(showAssimilationPanel.value).toBe(true)
-
-    resetForNote(7)
-    expect(showAssimilationPanel.value).toBe(false)
-  })
-
-  it("resetForNote hides settings when there is no target note", () => {
-    const { resetForNote, showAssimilationPanel } = useAssimilationView()
-
-    resetForNote(5)
-    expect(showAssimilationPanel.value).toBe(false)
-  })
-
-  it("toggle turns settings on for a note when off", () => {
-    const { toggle, showAssimilationPanel, targetNoteId } =
-      useAssimilationView()
-
-    toggle(3)
-
-    expect(showAssimilationPanel.value).toBe(true)
-    expect(targetNoteId.value).toBe(3)
-  })
-
-  it("toggle turns settings off when already on for the same note", () => {
-    const { openForNote, toggle, showAssimilationPanel, targetNoteId } =
-      useAssimilationView()
-
-    openForNote(3)
-    toggle(3)
-
-    expect(showAssimilationPanel.value).toBe(false)
-    expect(targetNoteId.value).toBe(null)
-  })
-
-  it("isOpenForNote is true only when settings are on for that note", () => {
+  it("openForNote opens settings for that note only", () => {
     const { openForNote, isOpenForNote } = useAssimilationView()
 
     openForNote(5)
 
     expect(isOpenForNote(5)).toBe(true)
     expect(isOpenForNote(7)).toBe(false)
+  })
+
+  it("resetForNote shows settings only for the target note", () => {
+    const { openForNote, resetForNote, isOpenForNote } = useAssimilationView()
+
+    openForNote(5)
+    resetForNote(5)
+    expect(isOpenForNote(5)).toBe(true)
+
+    resetForNote(7)
+    expect(isOpenForNote(5)).toBe(false)
+  })
+
+  it("resetForNote hides settings when there is no target note", () => {
+    const { resetForNote, isOpenForNote } = useAssimilationView()
+
+    resetForNote(5)
+    expect(isOpenForNote(5)).toBe(false)
+  })
+
+  it("toggle turns settings on for a note when off", () => {
+    const { toggle, isOpenForNote } = useAssimilationView()
+
+    toggle(3)
+
+    expect(isOpenForNote(3)).toBe(true)
+  })
+
+  it("toggle turns settings off when already on for the same note, forgetting the note", () => {
+    const { openForNote, toggle, resetForNote, isOpenForNote } =
+      useAssimilationView()
+
+    openForNote(3)
+    toggle(3)
+    expect(isOpenForNote(3)).toBe(false)
+
+    resetForNote(3)
+    expect(isOpenForNote(3)).toBe(false)
   })
 })

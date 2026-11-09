@@ -62,6 +62,47 @@ it("identifies an opened note panel, closes it, and restores Note when switching
   await expectActivity("Note")
 })
 
+it("reads the note title first, then the default Understanding action beside the optional modes", async () => {
+  const realm = makeMe.aNoteRealm.title("かた と ほう").please()
+  ;({ wrapper } = await mountNotebookWorkspace([realm]))
+  await clickPageBarCommand(noteMoreOptionsTitles.assimilation)
+  const el = (selector: string) =>
+    document.querySelector<HTMLElement>(selector)!
+  await vi.waitFor(() =>
+    expect(
+      el('[data-test="assimilate-UNDERSTANDING"]')?.checkVisibility()
+    ).toBe(true)
+  )
+  const rect = (selector: string) => el(selector).getBoundingClientRect()
+  const background = (selector: string) =>
+    getComputedStyle(el(selector)).backgroundColor
+  const understanding = rect('[data-test="assimilate-UNDERSTANDING"]')
+  const optional = ["SPELLING", "COMMISSIONED"].map((mode) => ({
+    action: rect(`[data-test="assimilate-${mode}"]`),
+    icon: rect(`[data-test="assimilation-mode-row-${mode}"] svg`),
+    label: rect(`[data-test="assimilation-mode-row-${mode}"] strong`),
+  }))
+
+  expect(rect('[data-test="note-title"]').bottom).toBeLessThanOrEqual(
+    Math.min(understanding.top, ...optional.map((o) => o.icon.top))
+  )
+  expect(rect('[aria-label="Note content"]').top).toBeGreaterThanOrEqual(
+    Math.max(understanding.bottom, ...optional.map((o) => o.action.bottom))
+  )
+  expect(optional[0]!.icon.top).toBeLessThan(understanding.bottom)
+  for (const { icon, label } of optional) {
+    expect(icon.left).toBeGreaterThanOrEqual(understanding.right)
+    expect(icon.width).toBeGreaterThan(0)
+    expect(icon.right).toBeLessThanOrEqual(label.left)
+  }
+  expect(background('[data-test="assimilate-UNDERSTANDING"]')).not.toBe(
+    background('[data-test="assimilate-SPELLING"]')
+  )
+  expect(background('[data-test="assimilate-SPELLING"]')).toBe(
+    background('[data-test="assimilate-COMMISSIONED"]')
+  )
+})
+
 it("follows direct property learning, close, note identity and route lifetime", async () => {
   const realm = propertyNote()
   const second = makeMe.aNoteRealm.title("Other").please()

@@ -94,6 +94,34 @@ describe("AssimilationPanel actions offered for existing memory trackers", () =>
   })
 })
 
+describe("AssimilationPanel active optional mode", () => {
+  it("shows its tracker link and next recall date in place of its action", async () => {
+    const nextRecallAt = "2026-09-12T10:00:00.000Z"
+    mockSdkService(NoteController, "getNoteInfo", {
+      memoryTrackers: [
+        tracker().id(7).spelling().nextRecallAt(nextRecallAt).please(),
+      ],
+    })
+    const wrapper = await mountAssimilationPanelReady()
+
+    const spellingRow = wrapper.find(
+      '[data-test="assimilation-mode-row-SPELLING"]'
+    )
+    expect(spellingRow.find(spellingStatusSelector).attributes("to")).toBe(
+      JSON.stringify({
+        name: "memoryTrackerShow",
+        params: { memoryTrackerId: 7 },
+      })
+    )
+    expect(spellingRow.text()).toContain(
+      `Next ${new Date(nextRecallAt).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+      })}`
+    )
+  })
+})
+
 describe("AssimilationPanel commissioned assimilation", () => {
   it("posts assimilateAsCommissioned and stays on note without navigating", async () => {
     assimilateSpy.mockResolvedValue(

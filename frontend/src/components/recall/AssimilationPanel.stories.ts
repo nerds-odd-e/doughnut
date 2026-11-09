@@ -13,13 +13,12 @@ import {
   memoryTrackerActionsKey,
   type MemoryTrackerActions,
 } from "@/composables/useMemoryTrackerActions"
-import NoteToolbarPanelShell from "@/components/notes/core/NoteToolbarPanelShell.vue"
 import AssimilationPanel from "./AssimilationPanel.vue"
 
 const idleActionResult = { completed: false, navigated: false }
 
 const AssimilationPanelStory = defineComponent({
-  components: { AssimilationPanel, NoteToolbarPanelShell },
+  components: { AssimilationPanel },
   props: {
     note: {
       type: Object as PropType<Note>,
@@ -47,10 +46,8 @@ const AssimilationPanelStory = defineComponent({
     provide(memoryTrackerActionsKey, memoryTrackerActions)
   },
   template: `
-    <div class="w-[calc(100vw-2rem)] max-w-2xl">
-      <NoteToolbarPanelShell>
-        <AssimilationPanel :note="note" />
-      </NoteToolbarPanelShell>
+    <div class="w-[calc(100vw-2rem)] max-w-3xl">
+      <AssimilationPanel :note="note" />
     </div>
   `,
 })
