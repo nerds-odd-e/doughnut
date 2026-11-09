@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Ai-chan",
+  "email": "ai-chan@example.org",
+  "identity": "SEED-111#run-uncovered-script-tests-in-ci",
+  "mode": "story-branch",
+  "branch": "codex/see-ci-results-and-timings-for-the-remaining-scr",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
