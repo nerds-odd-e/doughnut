@@ -137,7 +137,7 @@ to match.
 ### 3. Intent agrees with the summary for a selected attempt
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: For the final candidate's completed `donut CI` attempt, compare the
 published artifact with the dashboard's figures for the same attempt and
 revision, as plan 085 slice 8 did: the Scripts and Infrastructure group and
@@ -212,3 +212,9 @@ Disposition: proved by slice 2: ci-proof-observation.md. Exact CI success and ar
 - [Hosted proof](ci-proof-observation.md) records exact native CI success for e63aa60bb81f93549c747cc52c913171542cd3c3, run42588658999 attempt1. All13 scripts parts are present. The18 files contribute75 passed leaf checks with recorded durations and zero failed/other/untimed. Group totals are465 passed and145707.03825999997 ms. Root independently parsed and matched the artifact to local counts, including one application-release Bash check.
 - Lint ran369seconds (6m09), below the slowest E2E448seconds (7m28). Acquisition and both realMySQL mutation files passed on Ubuntu. All13 expanded jobs succeeded.
 - G2 is proved and every slice2 source commitment is observed. Refactor disposition for this acceptance increment is records-only. No implementation or proof boundary changed after the accepted script_wiring_refactor return.
+
+## Slice 3 accepted
+
+- [Intent comparison](ci-proof-observation.md#intent-comparison-for-the-selected-attempt) observed the live selected attempt e63aa60bb81f93549c747cc52c913171542cd3c3/run42588658999/attempt1. Canonical summary equality includes all91script file rows and13parts. The group and18requiredfiles have95equal numeric fields, preserving full recorded precision and normalizing omitted untimed values tozero.
+- Current observed figures are465 passed, zero failed/other/untimed and145707.03825999997ms for Scripts and Infrastructure. The18 scoped files contribute75 passes. Failed-file attribution and recorded duration reuse the unchanged positive reporter/collector assertions in ci-proof-outcomes-node.test.mjs, composed with the observed same summary projection. The new live observation uses all-pass data.
+- Every source commitment is observed and G1/G2 are proved. This delivery is records-only and reuses accepted implementation/refactor proof. Implementation is complete and ready for required retrospective and completion observation.

@@ -126,3 +126,66 @@ The artifact proves the normal CI commands publish the 18 files with matching
 counts, recorded durations and all 13 parts. Root owns the source-commitment
 records, G2 disposition and slice completion. Slice 3 still owns comparison with
 Intent for the same attempt and revision.
+
+## Intent comparison for the selected attempt
+
+Observed on 2026-11-09. The dashboard response records
+`checkedAt=2026-11-09T09:10:21.535Z`, run `42588658999`, attempt `1`, and full
+revision `e63aa60bb81f93549c747cc52c913171542cd3c3`.
+The project configuration labels the `scripts` location
+`Scripts and Infrastructure`.
+
+```sh
+curl --fail --silent --show-error --max-time 60 \
+  -H 'Origin: http://127.0.0.1:4173' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  'http://127.0.0.1:4173/__authenticated-read?source=doughnut&intent=ci-proof&run=42588658999&attempt=1&revision=e63aa60bb81f93549c747cc52c913171542cd3c3' \
+  -o /tmp/seed111-intent-e63.json
+./scripts/run.sh python3 /tmp/seed111-compare-intent.py
+```
+
+The one-time comparison reads the downloaded artifact and dashboard response as
+JSON, verifies both selected-attempt identities, and compares the complete
+`proof.summary` with the artifact. It also compares the entire `scripts` entry
+and each scoped file's `passed`, `failed`, `other`, normalized `untimed`, and
+`durationMs` values. Parsed numeric values retain their full precision.
+The comparison script and its result are retained at
+`/tmp/seed111-compare-intent.py` and `/tmp/seed111-intent-comparison.json`.
+
+The canonical summary and complete Scripts entry are equal. All 91 script-file
+rows and all 13 parts are equal. The requested group and 18 file rows give
+19 metric rows and 95 equal numeric fields. The 18 files contribute 75 passed
+checks. Intent gives the group exactly 465 passed, 0 failed, 0 other, 0 untimed,
+and `145707.03825999997` ms, matching the accepted table above.
+
+The artifact SHA256 is
+`9d34709634c38ff660ef55c75f91490fc3d154c27bcb15fd2fd2359c255c1830`.
+The raw dashboard response SHA256 is
+`3ff63c4ab02e3e60cc8696dc97dcd08ab6a6a91629b1472ffb7e73c3fef258cc`.
+These hashes identify the saved inputs for this observation.
+
+### Reused failure attribution and duration boundary
+
+The selected attempt contains zero failed checks. Positive failure attribution
+and duration proof reuse the existing passing CI proof tests, as the plan
+specifies. `scripts/ci/ci-proof-outcomes-node.test.mjs` at line 88 drives real
+failing and broken-import fixtures through the wrapper. Its assertions retain
+selected-file attribution, failed outcomes, recorded seconds and exit status 1.
+The mixed-parts test at line 149 feeds one path a passed 100 ms check, a failed
+200 ms check and a failed untimed check. Lines 218–225 assert that file's
+1 passed, 2 failed, 300 ms and 1 untimed figures. Lines 199–215 assert the group
+figures and the missing fourth part. Those tests passed among this attempt's
+25 checks in CI part 9 and the accepted local proof.
+
+`scripts/ci/node-test-report.mjs` at lines 29–37 assigns each outcome's selected
+`entryFile` or `file` path to the common status/seconds record. The Intent
+summary contract preserves the collector JSON and its per-file breakdown for
+the selected identity, as documented in
+`.agents/skills/dough-execute-plan/manuals/custom-ci-proof.md` at lines 33–53
+and 68–77. The newly observed route forwards that canonical summary exactly.
+This composes the existing positive failed-file/duration proof with the current
+Intent projection equality for J06c and J06d. The new observation is the
+all-passing attempt comparison. Positive failure behavior is covered by the
+reused test observations above.
+
+Root owns source-commitment acceptance and the slice 3 completion transition.
