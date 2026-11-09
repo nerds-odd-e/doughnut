@@ -99,7 +99,7 @@ test('the Bash script runner reports its file checks as the scripts part', () =>
     report,
     entry: 'scripts',
     part: 1,
-    of: 11,
+    of: 13,
   })
 })
 

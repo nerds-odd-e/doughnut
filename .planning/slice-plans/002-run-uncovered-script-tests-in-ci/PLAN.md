@@ -170,6 +170,11 @@ Story clause: "Record the CI attempts and outcomes, and resolve any recurring fa
 Disposition: proved by slice 1: runner-series-clean.md. Exact CI success at a84e1ee292, run42583951600 attempt1, with all30 full-group repetitions passed.
 
 
+### G2. Hosted command and summary proof awaits publication
+Reported: slice 2 — "The five changed commands and all 18 gained files passed locally. Hosted 13-part summary contents, Linux command results and Lint/E2E duration remain unobserved and owned by root after progress publication."
+Story clause: "each file’s test outcomes and cumulative recorded test time under the `scripts` entry"
+Disposition: return
+
 ## Current execution context
 
 - Established story-branch identity, claim, checkout preparation and prior proof are retained in [execution-history.md](execution-history.md). First failed series is [runner-series.md](runner-series.md).
@@ -193,3 +198,11 @@ Disposition: proved by slice 1: runner-series-clean.md. Exact CI success at a84e
 - Refactor disposition is already-traced removal within the accepted probe_refactor and runner_repairs_refactor paths/consumer traces, plus records-only source/review/evidence changes. No new helper, dependency or representation was added in this increment.
 - Human source amendment at trunk9a33d32751 was absorbed. It retains existing CI counting rules and removes a redundant scope sentence referring to the sibling counts story. A fresh source-only review was retained before gate acceptance. The repair publication began before absorption, an execution-order defect corrected here before any slice acceptance. Source freshness now matches trunk.
 - Raw passing Node tests are78 per repetition. The CI reporter counts75 leaf checks across the18 files. The dated73-check baseline gains one cleanup leaf and one ambient-defaults leaf in worktree-retirement-mutation.test.mjs. Slice2 must observe its current report counts rather than copy the dated baseline.
+
+## Slice 2 local proof
+
+- All18 files are wired through five concern commands and13 scripts producer parts. Local report evidence is /tmp/seed111-slice2-local-proof.json, with actual75 passed leaf checks for the gained files and zero failed/other/untimed checks. Literal commands set CI_PROOF_NODE_REPORT_DIR=/tmp/seed111-slice2-node-reports through ./scripts/run.sh and pnpm. Changed command totals are sut-start85, browser-worktree-isolation140, development-stack23, worktree-retirement39 and publication-receiver4. All passed.
+- ./scripts/run.sh pnpm test:ci-proof passed25/25, covering producer ordering/part totals and reused failed outcomes, duration, load-failure and missing-part semantics. Root inspected package command selection, all13 fragment counts/conditions, Bash total, summary expect and documentation. Consumer dispositions /tmp/seed111-slice2-consumers.md cover unchanged collectors and affected fixture callers.
+- The newly combined SUT command exposed inherited npm_execpath selecting pnpm as the stand-in run-p executor. Controlled ./scripts/run.sh env npm_execpath=pnpm node --test --test-name-pattern='live owner control exposes' scripts/sut-owner-application-group.test.mjs failed0/1 before and passed1/1 after explicit --npm-path npm. The original fixture passed with npm_execpath removed. The normal pnpm command then passed85/85, including owned restart cases. Other helper consumers import unchanged waitUntil.
+- This executor correction preserves the direct-Node gate conditions, where run-p already selects npm by default. The accepted30-run gate remains applicable, and the five-command proof covers the added pnpm execution context.
+- Independent script_wiring_refactor completed before guarded progress delivery. It polished the changed documentation table only, preserving code/proof boundaries. Hosted artifact and timing observations remain open as G2.

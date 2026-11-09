@@ -101,7 +101,11 @@ await startOwnedSutSupervisor({
   serviceArgs: sutServiceArgs({}, process.env.SUT_BACKEND_RELOAD !== 'false'),
   spawnFn: (_cmd, args, opts) => {
     const runP = args.indexOf('run-p')
-    return spawn(${JSON.stringify(runPBin)}, args.slice(runP + 1), opts)
+    return spawn(
+      ${JSON.stringify(runPBin)},
+      ['--npm-path', 'npm', ...args.slice(runP + 1)],
+      opts
+    )
   },
 })
 `
