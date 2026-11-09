@@ -112,6 +112,7 @@ export async function startDisposableMysql(t) {
   const init = spawnSync(
     path.join(basedir, 'bin', 'mysqld'),
     [
+      '--no-defaults',
       '--initialize-insecure',
       `--basedir=${basedir}`,
       `--datadir=${datadir}`,
@@ -132,6 +133,7 @@ export async function startDisposableMysql(t) {
   const child = spawn(
     path.join(basedir, 'bin', 'mysqld'),
     [
+      '--no-defaults',
       `--basedir=${basedir}`,
       `--datadir=${datadir}`,
       `--port=${port}`,

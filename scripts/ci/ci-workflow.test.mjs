@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { workflow } from './workflow-fixtures.mjs'
+import { action, workflow } from './workflow-fixtures.mjs'
 
 test('CI skips documentation-only pushes on every branch', () => {
   const ci = workflow('ci')
@@ -17,6 +17,17 @@ test('CI skips documentation-only pushes on every branch', () => {
 
 const stepUsing = (job, action) =>
   job.steps.find((step) => step.uses === `./.github/${action}`)
+
+const ciWithLintSteps = () => {
+  const ci = workflow('ci')
+  const lint = ci.jobs['Lint-N-Backend-Generated-Types-For-Frontend']
+  const execution = stepUsing(lint, 'lint_and_generated_types')
+  assert.ok(execution, 'the Lint job calls its execution action')
+  lint.steps = lint.steps.flatMap((step) =>
+    step === execution ? action('lint_and_generated_types').runs.steps : [step]
+  )
+  return ci
+}
 
 const producersOf = (ci, entry) =>
   Object.entries(ci.jobs).flatMap(([name, job]) =>
@@ -38,13 +49,13 @@ const expectationsOf = (ci) =>
 
 test('CI proof expects each entry in intent.locations order among proved entries', () => {
   assert.deepEqual(
-    expectationsOf(workflow('ci')).map(({ entry }) => entry),
+    expectationsOf(ciWithLintSteps()).map(({ entry }) => entry),
     ['e2e_test/features', 'frontend/tests', 'backend/src/test/java', 'scripts']
   )
 })
 
 test('CI proof expects each entry in as many parts as its producers report', () => {
-  const ci = workflow('ci')
+  const ci = ciWithLintSteps()
 
   for (const { entry, parts } of expectationsOf(ci)) {
     const producers = producersOf(ci, entry)
@@ -69,7 +80,7 @@ test('CI proof expects each entry in as many parts as its producers report', () 
 })
 
 test('the Bash script runner reports its file checks as the scripts part', () => {
-  const ci = workflow('ci')
+  const ci = ciWithLintSteps()
   const { job, step } = producersOf(ci, 'scripts').find(
     ({ step }) => step.with.format === 'bash'
   )
@@ -88,7 +99,7 @@ test('the Bash script runner reports its file checks as the scripts part', () =>
     report,
     entry: 'scripts',
     part: 1,
-    of: 11,
+    of: 13,
   })
 })
 
@@ -105,7 +116,7 @@ const nodeTestCommands = packageScripts['lint:all']
   )
 
 test('each Node test command in lint:all reports its own scripts part after the Bash part', () => {
-  const ci = workflow('ci')
+  const ci = ciWithLintSteps()
   const nodeProducers = producersOf(ci, 'scripts').filter(
     ({ step }) => step.with.format === 'node'
   )

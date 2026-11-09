@@ -178,7 +178,7 @@ test('verified idle fixture reports idle snapshot not a reservation', async (t) 
   const checkout = makeLinkedWorktreeCheckout(t)
   writeIsolatedConfig(checkout.root, { id: 'wt_a7c2' })
 
-  const result = await runCheck(checkout.root, clearSessionDeps)
+  const result = await runCheck(checkout.root)
   assert.equal(result.code, 0, result.err)
   assert.match(result.out, /idle snapshot/i)
   assert.match(result.out, /not a deletion reservation/i)

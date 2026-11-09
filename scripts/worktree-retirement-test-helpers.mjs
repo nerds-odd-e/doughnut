@@ -16,7 +16,7 @@ export function makeWritable() {
   }
 }
 
-/** Stub sessions and process inspection (isolates recorded-evidence tests). */
+/** Empty sessions and process evidence for idle-checkout fixtures. */
 export const clearEvidenceDeps = {
   listDatabaseSessionsFn: async () => [],
   listProcessTableFn: async () => [],

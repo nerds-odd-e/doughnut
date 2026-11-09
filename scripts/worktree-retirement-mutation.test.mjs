@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import { makeLinkedWorktreeCheckout } from './backend-test-worktree-linked-fixtures.mjs'
@@ -227,4 +227,20 @@ test('disposable MySQL cleanup returns only after its server has exited', async 
   })
   assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' })
   assert.equal(existsSync(home), false)
+})
+
+test('disposable MySQL serves queries with ambient server defaults', async (t) => {
+  const { root } = makeLinkedWorktreeCheckout(t)
+  writeFileSync(
+    path.join(root, 'my.cnf'),
+    `[mysqld]\nlog-error=${root}/missing/mysql.log\n`
+  )
+  const previous = process.env.MYSQL_HOME
+  process.env.MYSQL_HOME = root
+  t.after(() => {
+    if (previous === undefined) delete process.env.MYSQL_HOME
+    else process.env.MYSQL_HOME = previous
+  })
+  const mysql = await startDisposableMysql(t)
+  assert.equal(mysql.query('SELECT 42'), '42')
 })

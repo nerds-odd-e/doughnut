@@ -1,0 +1,30 @@
+name: "Prepare the lint environment"
+description: "Check repository constraints and prepare Java, Node and disposable MySQL tooling"
+inputs:
+  java_version:
+    description: "JDK version"
+    required: true
+  node_version:
+    description: "Node.js version"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Check for @focus tags in e2e test feature files
+      shell: bash
+      run: ./scripts/check_focus_tags.sh
+    - name: Check E2E cy.visit is only in the SPA visit gate
+      shell: bash
+      run: ./scripts/check_e2e_spa_visit_gate.sh
+    - name: Check @wip scenario count limit
+      shell: bash
+      run: ./scripts/check_wip_tags.sh
+    - uses: ./.github/setup_jdk_with_cache
+      with:
+        java_version: ${{ inputs.java_version }}
+    - uses: ./.github/setup_nodejs_with_cache
+      with:
+        node_version: ${{ inputs.node_version }}
+    - uses: ./.github/mysql_binaries
+    - shell: bash
+      run: bash -c ./assert_generated_type_script_up_to_date.sh

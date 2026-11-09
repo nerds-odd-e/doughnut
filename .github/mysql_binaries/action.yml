@@ -1,0 +1,22 @@
+name: "Install MySQL 8.4 binaries"
+description: "Provide local binaries for disposable MySQL test servers"
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        ncurses_version=6.3-2ubuntu0.3
+        for package in libncurses5 libtinfo5; do
+          curl --fail --location --retry 3 "https://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/${package}_${ncurses_version}_amd64.deb" -o "$RUNNER_TEMP/$package.deb"
+        done
+        sudo apt-get install --yes --no-install-recommends libaio-dev libaio1t64 libnuma1 \
+          "$RUNNER_TEMP/libncurses5.deb" "$RUNNER_TEMP/libtinfo5.deb"
+        if [ ! -e /usr/lib/x86_64-linux-gnu/libaio.so.1 ]; then
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
+        fi
+        mysql_archive=mysql-8.4.3-linux-glibc2.17-x86_64-minimal
+        curl --fail --location --retry 3 "https://cdn.mysql.com/archives/mysql-8.4/$mysql_archive.tar.xz" -o "$RUNNER_TEMP/mysql.tar.xz"
+        tar -xJf "$RUNNER_TEMP/mysql.tar.xz" -C "$RUNNER_TEMP"
+        "$RUNNER_TEMP/$mysql_archive/bin/mysqld" --version
+        "$RUNNER_TEMP/$mysql_archive/bin/mysql" --version
+        echo "MYSQL_BASEDIR=$RUNNER_TEMP/$mysql_archive" >> "$GITHUB_ENV"

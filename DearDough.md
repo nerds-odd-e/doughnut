@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 443. Removed numbers are never reused.
+- Highest allocated local number: 445. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 
@@ -57,6 +57,16 @@ Former local code: DD-138. An absolute changed-file size check conflicts with an
 ## ODF-189 — Small additions force unrelated size extractions
 
 Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-189.md).
+
+
+### Occurrences
+- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, initial probe refactor)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: the initial refactor return measured ci.yml at 351 pre-existing lines and 460 with the temporary probe. It reported no other semantic issue. The developer declined an exception. The subsequent return extracted Lint, shared setup, probe and package-artifact actions, with structural equivalence proof. The result is recorded in 2d4d52f066 and the execution history retained at fd73a191fc.
+  - Observed effect: the ceiling added relocation and re-proof of the pre-existing package-artifact responsibility, plus one developer decision stop before the cohesive CI split proceeded.
+  - Inference: this repeats the size-driven extraction mechanism on an already oversized caller. The developer's decision governed the final structure and remains in force.
 
 <a id="odf-190"></a>
 
@@ -478,3 +488,29 @@ Implementers temporarily broke the product behavior each new mounted assertion c
   - Evidence: slice 1: slot before the title → title bottom 526 vs action top 256; slice 2: removing the `watch(noteId)` reset failed exactly the two reset tests; slice 4: four checks (focus return, Escape, close-on-action, row CSS); slice 5: eight checks (sticky, overlay, popover direction, heading size, read-only guard, threshold 720, bar above blocker, no bar).
   - Observed effect: each new geometry or state assertion was shown to discriminate its defect before acceptance.
   - Inference: useful practice; it cost a few focused test runs per slice and was not required by the briefs.
+
+## DD-444 — CI observation was armed before CLI authentication was verified
+
+The coordinator launched native CI observation and waited on GitHub API holds before checking whether the CLI could obtain its authenticated credential. The required setup check was performed after a published probe and a read-only wait had remained undiscovered.
+
+### Occurrences
+- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, execution startup through the authentication handoff)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: the first workflow diagnostic returned a 2,927-second directed wait. A ten-minute await-revision for 2d4d52f066 ended with state undiscovered. Later GH_TOKEN and GITHUB_TOKEN were unset and gh auth token returned status 1. Native job logs returned 403 and artifact download returned 401, while the connected GitHub app recovered the saved data. The authentication gap is retained in b691bba300's PLAN. After the developer ran gh auth login and reported the account was already logged in, CLI status and the workflow diagnostic succeeded, as recorded at a84e1ee292.
+  - Observed effect: native observation was delayed, one read-only wait expired without a discovered attempt, and the developer received an authentication request after the repair had been published. The final normal CI attempt and Intent comparison were subsequently observed successfully.
+  - Inference: the execution did not establish the authenticated-gh prerequisite before arming. The record does not establish why the earlier keyring lookup failed. Checking the prerequisite before interpreting provider throttling would expose the setup gap sooner.
+
+## DD-445 — A repair publication started before a source amendment was handled
+
+A required source-freshness command returned amended, but the coordinator's next tool operation still launched guarded progress delivery. The publisher accepted that repair before the coordinator absorbed the changed source wording.
+
+### Occurrences
+- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, progress publication a84e1ee292)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: the source-freshness result at trunk 9a33d32751 exited 1 with result amended. The same functions.exec orchestration then invoked execution-increment-delivery.mjs fresh. Publication accepted a84e1ee292. The coordinator subsequently absorbed the source and plan amendment, obtained a fresh source-only review, and published them in fd73a191fc before accepting the first slice. The accepted plan retains the order defect in its slice-1 evidence.
+  - Observed effect: one progress publication carried the earlier source wording. The source, review and all 85 commitment observations were reconciled before slice acceptance, with no functional product defect established.
+  - Inference: awaiting dependent tool calls sequentially did not enforce the gate because the caller ignored the first command's terminal exit and result. The freshness result needs inspection before the commit-and-push operation is launched.
