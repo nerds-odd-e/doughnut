@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsubomi-chan",
+  "email": "tsubomi-chan@example.org",
+  "identity": "SEED-115#trust-learning-session-and-assimilation-e2e-feedback",
+  "mode": "story-branch",
+  "branch": "cursor/trust-learning-session-and-assimilation-e2e-feed",
+  "host": "cursor",
+  "model": "auto"
+}
