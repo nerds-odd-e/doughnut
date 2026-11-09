@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Sola-chan",
-  "email": "sola-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-114#disposable-mysql-stops-before-cleanup",
-  "host": "claude",
-  "model": "opus"
-}
