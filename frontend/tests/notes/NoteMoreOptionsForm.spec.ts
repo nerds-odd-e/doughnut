@@ -122,9 +122,7 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       expect(router.currentRoute.value.path).toBe("/")
-      const { showAssimilationPanel, targetNoteId } = useAssimilationView()
-      expect(showAssimilationPanel.value).toBe(true)
-      expect(targetNoteId.value).toBe(note.id)
+      expect(useAssimilationView().isOpenForNote(note.id)).toBe(true)
       expect(wrapper.emitted()).toHaveProperty("close-dialog")
     })
 

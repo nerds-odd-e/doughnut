@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-113_assimilate-notes-with-a-clear-default-and-result.json",
+      "identity": "SEED-113#assimilate-notes-with-a-clear-default-and-result",
+      "completedAt": "2026-11-09T08:19:58.816Z",
+      "blob": "db11279d89fcc5bf5742c1c97040970e6085788d"
+    },
+    {
       "fileName": "SEED-114_disposable-mysql-stops-before-cleanup.json",
       "identity": "SEED-114#disposable-mysql-stops-before-cleanup",
       "completedAt": "2026-11-09T05:49:57.323Z",

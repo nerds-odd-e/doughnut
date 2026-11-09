@@ -2,9 +2,11 @@
   <NoteAssimilationModes
     :note="note"
     :note-info-loaded="noteInfoLoaded"
+    :read-first="readFirst"
     @assimilate="onAssimilate"
     @skip="onSkip"
     @return-to-sequence="onReturnToSequence"
+    @next="goToNextAssimilation"
   />
   <Teleport to="body">
     <div
@@ -29,6 +31,7 @@ import NoteAssimilationModes from "./NoteAssimilationModes.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { provide, toRef } from "vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import {
   memoryTrackerActionsKey,
@@ -37,11 +40,13 @@ import {
   type MemoryTrackerActionResult,
 } from "@/composables/useMemoryTrackerActions"
 
-const { note } = defineProps<{
+const { note, readFirst = false } = defineProps<{
   note: Note
+  readFirst?: boolean
 }>()
 
 useAssimilationView().trackPresentation(() => note.id)
+const { goToNextAssimilation } = useGoToNextAssimilation()
 
 const emit = defineEmits<{
   (e: "reloadNeeded"): void

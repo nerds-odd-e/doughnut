@@ -14,6 +14,8 @@ import {
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilate,
+  clickAssimilateAsCommissioned,
+  clickNextItem,
   clickReturnToSequence,
   clickSkipAndConfirm,
   dueRecallsRefreshRequested,
@@ -26,28 +28,51 @@ import {
   setupAssimilationPanelTests,
   skipButtonEl,
   skipSequenceSpy,
-  understandingStatusSelector,
 } from "./assimilationPanelTestSupport"
 
 setupAssimilationPanelTests()
 
 describe("AssimilationPanel", () => {
-  it("renders Recall modes without progress summary, Level radios, or Refine note trigger", async () => {
+  it("offers Understanding as the one primary action and each optional mode with its icon, description and own action", async () => {
     const wrapper = await mountAssimilationPanelReady()
 
-    const modes = wrapper.find('[data-testid="note-assimilation-modes"]')
-    expect(modes.find("h2").text()).toBe("Recall modes")
-    expect(
-      modes.find('[data-test="assimilation-progress-summary"]').exists()
-    ).toBe(false)
-    expect(modes.find('[role="radiogroup"]').exists()).toBe(false)
-    expect(wrapper.find('[data-test="open-refine-note-modal"]').exists()).toBe(
-      false
-    )
-    expect(document.querySelector('[data-test="refine-note-modal"]')).toBeNull()
+    const texts = (mode: string, selector: string) =>
+      wrapper
+        .findAll(`[data-test="assimilation-mode-row-${mode}"] :is(${selector})`)
+        .map((el) => el.text())
+    expect(wrapper.findAll(".daisy-btn-primary").map((b) => b.text())).toEqual([
+      "Assimilate understanding",
+    ])
+    expect(wrapper.text()).toMatch(/Default mode.*Optional modes/)
+    expect(texts("UNDERSTANDING", "h4, p, button")).toEqual([
+      "Understanding",
+      "Recall what this note means.",
+      "Assimilate understanding",
+      "Skip from sequence…",
+    ])
+    expect(texts("SPELLING", "strong, p, button")).toEqual([
+      "Spelling",
+      "Recall the title or an alias from memory.",
+      "Verify spelling",
+    ])
+    expect(texts("COMMISSIONED", "strong, p, button")).toEqual([
+      "Commissioned",
+      "Review in future learning sessions with a human or AI tutor.",
+      "Add to sessions",
+    ])
+    for (const [mode, icon] of [
+      ["SPELLING", "lucide-spell-check"],
+      ["COMMISSIONED", "lucide-graduation-cap"],
+    ]) {
+      expect(
+        wrapper
+          .find(`[data-test="assimilation-mode-row-${mode}"] svg`)
+          .classes()
+      ).toContain(icon)
+    }
   })
 
-  it("advances via next assimilation and increments counts when assimilating", async () => {
+  it("waits on the note at the Understanding result until Next item requests the next unit", async () => {
     assimilateSpy.mockResolvedValue(
       wrapSdkResponse([makeMe.aMemoryTracker.id(1).please()])
     )
@@ -58,7 +83,31 @@ describe("AssimilationPanel", () => {
     expect(assimilateSpy).toHaveBeenCalledWith({
       body: { noteId: note.id },
     })
+    const result = wrapper.find('[data-test="understanding-result"]')
+    expect(result.find('[role="status"]').text()).toBe(
+      "Understanding added to recall"
+    )
+    expect(result.find('[role="status"] svg').classes()).toContain(
+      "lucide-check"
+    )
+    expect(wrapper.findAll(".daisy-btn-primary").map((b) => b.text())).toEqual([
+      "Next item",
+    ])
+    expectAtNoteOf(note.id)
+
+    await clickNextItem(wrapper)
+
     expectAtNoteOf(nextNoteId)
+  })
+
+  it("counts the assimilated Understanding and requests a recall refresh", async () => {
+    assimilateSpy.mockResolvedValue(
+      wrapSdkResponse([makeMe.aMemoryTracker.id(1).please()])
+    )
+    const wrapper = await mountAssimilationPanelReady()
+
+    await clickAssimilate(wrapper)
+
     expect(totalAssimilatedCount.value).toBe(1)
     expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(dueRecallsRefreshRequested()).toBe(true)
@@ -79,7 +128,7 @@ describe("AssimilationPanel", () => {
     expect(dueRecallsRefreshRequested()).toBe(false)
   })
 
-  it("shows Return to sequence instead of Skip when the note is sequence-skipped", async () => {
+  it("offers a sequence-skipped note Assimilate understanding and Return to sequence, also after an optional addition", async () => {
     mockSdkService(
       NoteController,
       "getNoteInfo",
@@ -87,8 +136,13 @@ describe("AssimilationPanel", () => {
     )
     const wrapper = await mountAssimilationPanelReady()
 
+    expect(assimilateButtonEl(wrapper)).not.toBeNull()
     expect(returnToSequenceButtonEl(wrapper)).not.toBeNull()
     expect(skipButtonEl(wrapper)).toBeNull()
+
+    await clickAssimilateAsCommissioned(wrapper)
+
+    expect(returnToSequenceButtonEl(wrapper)).not.toBeNull()
   })
 
   it("returns the note to the sequence without creating a tracker", async () => {
@@ -116,33 +170,5 @@ describe("AssimilationPanel", () => {
     expectAtNoteOf(note.id)
     expect(skipButtonEl(wrapper)).not.toBeNull()
     expect(returnToSequenceButtonEl(wrapper)).toBeNull()
-  })
-
-  it("shows the tracker status instead of Assimilate after a note-level assimilate creates an understanding tracker", async () => {
-    let getNoteInfoCallCount = 0
-    mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () => {
-      getNoteInfoCallCount += 1
-      if (getNoteInfoCallCount === 1) {
-        return { memoryTrackers: [] }
-      }
-      return {
-        memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
-      }
-    })
-    assimilateSpy.mockResolvedValue(
-      wrapSdkResponse([makeMe.aMemoryTracker.id(1).please()])
-    )
-
-    const wrapper = await mountAssimilationPanelReady()
-
-    expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(false)
-
-    await clickAssimilate(wrapper)
-
-    expectAtNoteOf(nextNoteId)
-    expect(assimilateButtonEl(wrapper)).toBeNull()
-    expect(
-      wrapper.element.querySelector(understandingStatusSelector)
-    ).not.toBeNull()
   })
 })

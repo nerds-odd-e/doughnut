@@ -1,11 +1,11 @@
-import { computed, ref, type ComputedRef, type Ref } from "vue"
+import { computed, ref, watch, type ComputedRef, type Ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
   useAssimilateUnit,
   type AssimilateEvent,
 } from "@/composables/useAssimilateUnit"
 import {
-  SEQUENCE_SKIP_CONFIRM,
+  sequenceSkipConfirmation,
   useAssimilationSequenceSkip,
 } from "@/composables/useAssimilationSequenceSkip"
 
@@ -23,6 +23,7 @@ const notCompleted: MemoryTrackerActionResult = {
 
 export type MemoryTrackerActionHandlers = {
   assimilatingPropertyKey: Ref<string | null>
+  understandingAdded: Ref<boolean>
   showSpellingPopup: ComputedRef<boolean>
   assimilate: (event: AssimilateEvent) => Promise<MemoryTrackerActionResult>
   skip: (
@@ -39,7 +40,9 @@ export type MemoryTrackerActionHandlers = {
  * Builds the memory-tracker action handlers (assimilate incl. the
  * spelling-verification flow, skip, return-to-sequence) for a single note.
  * `reloadNoteInfo` refreshes the shared `noteRecallInfo` owned by the caller
- * after each successful action.
+ * after each successful action. `understandingAdded` is this visit's
+ * Understanding result: it lasts while the note stays the same, through
+ * optional-mode additions, and resets when the note changes.
  */
 export function useMemoryTrackerActionHandlers(
   noteId: Ref<number>,
@@ -51,6 +54,10 @@ export function useMemoryTrackerActionHandlers(
     useAssimilationSequenceSkip()
 
   const assimilatingPropertyKey = ref<string | null>(null)
+  const understandingAdded = ref(false)
+  watch(noteId, () => {
+    understandingAdded.value = false
+  })
   const pendingAssimilateAfterSpelling = ref<AssimilateEvent | null>(null)
   const showSpellingPopup = computed(
     () => pendingAssimilateAfterSpelling.value !== null
@@ -66,6 +73,9 @@ export function useMemoryTrackerActionHandlers(
         return notCompleted
       }
       await reloadNoteInfo()
+      if (result.understandingAdded) {
+        understandingAdded.value = true
+      }
       return { completed: true, navigated: result.navigated }
     } finally {
       assimilatingPropertyKey.value = null
@@ -99,7 +109,9 @@ export function useMemoryTrackerActionHandlers(
   const skip = async ({
     propertyKey,
   }: MemoryTrackerActionRequest = {}): Promise<MemoryTrackerActionResult> => {
-    const confirmed = await popups.confirm(SEQUENCE_SKIP_CONFIRM)
+    const confirmed = await popups.confirm(
+      sequenceSkipConfirmation(propertyKey)
+    )
     if (!confirmed) {
       return notCompleted
     }
@@ -130,6 +142,7 @@ export function useMemoryTrackerActionHandlers(
 
   return {
     assimilatingPropertyKey,
+    understandingAdded,
     showSpellingPopup,
     assimilate,
     skip,

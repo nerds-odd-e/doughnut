@@ -57,8 +57,6 @@ export function useAssimilationView() {
   return {
     trackPresentation,
     isPresentedForNote,
-    showAssimilationPanel,
-    targetNoteId,
     isOpenForNote,
     openForNote,
     resetForNote,

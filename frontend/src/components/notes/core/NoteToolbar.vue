@@ -79,14 +79,6 @@
     </div>
   </nav>
   </Teleport>
-  <NoteToolbarPanelShell v-if="!readonly && showAssimilationPanel">
-    <AssimilationPanel
-      v-if="isOpenForNote(note.id)"
-      :key="assimilationPanelKey"
-      :note="note"
-      @reload-needed="onAssimilationReloadNeeded"
-    />
-  </NoteToolbarPanelShell>
 </template>
 
 <script setup lang="ts">
@@ -100,10 +92,6 @@ import SvgSearchForWikiLinkOrRelationship from "../../svgs/SvgSearchForWikiLinkO
 import SearchForm from "../../wiki-link-or-relationship/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import { FileCode, LayoutTemplate, MessageCircle } from "@lucide/vue"
-import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
-import NoteToolbarPanelShell from "./NoteToolbarPanelShell.vue"
-import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useNoteStore } from "@/store/noteStore"
 import { useRoute, useRouter } from "vue-router"
 import NoteToolbarMoreOptions from "../widgets/NoteToolbarMoreOptions.vue"
 import { pageBarTargetKey } from "@/composables/pageBarTarget"
@@ -138,14 +126,6 @@ const showRelocatedNewNote = computed(
   () => !sidebarOpened.value && props.readonly !== true
 )
 
-const { showAssimilationPanel, isOpenForNote } = useAssimilationView()
-const noteStore = useNoteStore()
-const assimilationPanelKey = ref(0)
-
-const onAssimilationReloadNeeded = async () => {
-  await noteStore.loadNoteRealm(props.note.id)
-  assimilationPanelKey.value += 1
-}
 const toolbarNavRef = ref<HTMLElement | null>(null)
 const buttonRowRef = ref<HTMLElement | null>(null)
 const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<

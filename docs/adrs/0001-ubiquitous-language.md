@@ -131,7 +131,8 @@ Amend domain terms here in place; do not supersede this ADR.
 - **Spelling memory tracker** — Note-level tracker for recalling the note
   title by spelling. The learner creates it.
 - **Remember spelling** — Learner action at assimilation: verify the note
-  title (or alias), then create a spelling memory tracker
+  title (or alias), then create a spelling memory tracker. Short UI:
+  **Verify spelling**
 - **Property memory tracker** — Understanding memory tracker keyed by a
   **property** name (the frontmatter key) and, for a list property, one of
   its values.

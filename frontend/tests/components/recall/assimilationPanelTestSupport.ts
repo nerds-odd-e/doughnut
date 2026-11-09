@@ -49,6 +49,8 @@ async function clickAndSettle(button: HTMLElement | null) {
 
 export const clickAssimilate = (wrapper: VueWrapper) =>
   clickAndSettle(assimilateButtonEl(wrapper))
+export const clickNextItem = (wrapper: VueWrapper) =>
+  clickAndSettle(buttonEl(wrapper, '[data-test="next-item"]'))
 export const clickReturnToSequence = (wrapper: VueWrapper) =>
   clickAndSettle(returnToSequenceButtonEl(wrapper))
 export const clickAssimilateAsCommissioned = (wrapper: VueWrapper) =>

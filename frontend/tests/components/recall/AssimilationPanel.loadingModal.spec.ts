@@ -93,44 +93,20 @@ describe("AssimilationPanel loading modal", () => {
 
   const loadingModal = () => document.querySelector(".loading-modal-mask")
 
-  const expectGlobalModalThroughNextUnit = async (
-    startAction: (
-      wrapper: ReturnType<typeof mountPanelWithGlobalLoadingModal>
-    ) => Promise<void>,
-    delayMutation: () => { resolve: () => void },
-    mutationMessage: string
-  ) => {
-    const mutation = delayMutation()
-    const nextAssimilation = delayNextAssimilation()
-    const wrapper = mountPanelWithGlobalLoadingModal()
+  it("shows the global modal while assimilating and hides it on success or error", async () => {
+    const assimilation = delaySuccessfulAssimilation()
+    const succeeding = mountPanelWithGlobalLoadingModal()
     await flushPromises()
 
-    await startAction(wrapper)
+    assimilateButtonEl(succeeding)!.click()
+    await succeeding.vm.$nextTick()
 
     expect(loadingModal()).toBeTruthy()
-    expect(document.body.textContent).toContain(mutationMessage)
-
-    mutation.resolve()
-    await flushPromises()
-
-    expect(loadingModal()).toBeTruthy()
-    expect(document.body.textContent).toContain("Loading next note...")
-
-    nextAssimilation.resolve()
+    expect(document.body.textContent).toContain("Assimilating...")
+    assimilation.resolve()
     await flushPromises()
     expect(loadingModal()).toBeNull()
-    wrapper.unmount()
-  }
-
-  it("keeps the global modal open from assimilate through next unit and hides on assimilate error", async () => {
-    await expectGlobalModalThroughNextUnit(
-      async (wrapper) => {
-        assimilateButtonEl(wrapper)!.click()
-        await wrapper.vm.$nextTick()
-      },
-      delaySuccessfulAssimilation,
-      "Assimilating..."
-    )
+    succeeding.unmount()
 
     let resolveApi: () => void = () => undefined
     assimilateSpy.mockImplementation(async () => {
@@ -156,14 +132,24 @@ describe("AssimilationPanel loading modal", () => {
   })
 
   it("keeps the global modal open from skip through loading the next unit", async () => {
-    await expectGlobalModalThroughNextUnit(
-      async (wrapper) => {
-        skipButtonEl(wrapper)!.click()
-        usePopups().popups.done(true)
-        await flushPromises()
-      },
-      delaySuccessfulSkip,
-      "Skipping..."
-    )
+    const skipping = delaySuccessfulSkip()
+    const nextAssimilation = delayNextAssimilation()
+    const wrapper = mountPanelWithGlobalLoadingModal()
+    await flushPromises()
+
+    skipButtonEl(wrapper)!.click()
+    usePopups().popups.done(true)
+    await flushPromises()
+
+    expect(loadingModal()).toBeTruthy()
+    expect(document.body.textContent).toContain("Skipping...")
+    skipping.resolve()
+    await flushPromises()
+    expect(loadingModal()).toBeTruthy()
+    expect(document.body.textContent).toContain("Loading next note...")
+    nextAssimilation.resolve()
+    await flushPromises()
+    expect(loadingModal()).toBeNull()
+    wrapper.unmount()
   })
 })

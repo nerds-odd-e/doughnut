@@ -2,30 +2,26 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { clickToolbarOverflowAction } from '../noteToolbarOverflow'
 import { clickPropertyPanelAction } from '../noteRichPropertyAssimilationMethods'
 
-// Note-level trigger row markup: `AssimilationModes.vue` (`data-testid`
-// "assimilation-modes"). Each mode gets its own direct trigger — no more
-// dropdown/caret. `assimilateButtonSelector` targets the UNDERSTANDING row,
-// the "plain" assimilate action historically referred to by that name.
-export const assimilationModesSelector = '[data-testid="assimilation-modes"]'
+// Note-level panel markup: `NoteAssimilationModes.vue`. Each mode has its own
+// direct action; `assimilateButtonSelector` targets the default Understanding
+// action. Property rows reuse the action hooks, so controls are filtered to the
+// note level below.
+export const assimilationModesSelector =
+  '[data-testid="note-assimilation-modes"]'
 export const assimilateButtonSelector = '[data-test="assimilate-UNDERSTANDING"]'
 export const assimilateCommissionedSelector =
   '[data-test="assimilate-COMMISSIONED"]'
 export const assimilateSpellingSelector = '[data-test="assimilate-SPELLING"]'
 export const skipButtonSelector = '[data-test="skip"]'
 export const returnToSequenceButtonSelector = '[data-test="return-to-sequence"]'
+export const understandingResultSelector = `${assimilationModesSelector} [data-test="understanding-result"]`
 
 export const isNoteLevelAssimilationControl = (el: Element) =>
   el.closest('[data-testid="rich-note-property-row"]') === null
 
-const noteLevelControl =
-  (selector: string) => (options?: { timeout?: number }) =>
-    cy
-      .get(selector, options ?? {})
-      .filter((_, el) => isNoteLevelAssimilationControl(el))
+const noteLevelControl = (selector: string) => () =>
+  cy.get(selector).filter((_, el) => isNoteLevelAssimilationControl(el))
 
-export const noteLevelAssimilationModesPanel = noteLevelControl(
-  assimilationModesSelector
-)
 export const assimilateButton = noteLevelControl(assimilateButtonSelector)
 export const assimilateCommissionedButton = noteLevelControl(
   assimilateCommissionedSelector
@@ -38,7 +34,7 @@ export const returnToSequenceButton = noteLevelControl(
   returnToSequenceButtonSelector
 )
 
-export function noteLevelControlElements(
+function noteLevelControlElements(
   doc: Document | ParentNode,
   selector: string
 ): Element[] {
@@ -115,9 +111,8 @@ export function expectSuccessToast(message: string) {
   }).should('be.visible')
 }
 
-// Note-level tracker rows now come from `AssimilationModes.vue`
-// (`[data-test="assimilation-mode-row-<MODE>"]`, `[data-test="assimilation-status-<MODE>"]`)
-// instead of the removed Memory Trackers table.
+// Note-level tracker status: `[data-test="assimilation-status-<MODE>"]` in
+// `NoteAssimilationModes.vue`.
 export type NoteLevelTrackerKind = 'understanding' | 'spelling' | 'commissioned'
 
 const noteLevelTrackerKindToMode: Record<NoteLevelTrackerKind, string> = {
@@ -136,14 +131,13 @@ export function noteLevelTrackerStatusElement(kind: NoteLevelTrackerKind) {
     .filter((_, el) => isNoteLevelAssimilationControl(el))
 }
 
-// Property-level tracker status link: `AssimilationModes.vue`'s row for a
-// note property lives inside that property's own collapsible panel, so it
-// is scoped with `clickPropertyPanelAction` (the same scoping convention
+// Property-level tracker status link: `PropertyAssimilationModes.vue`'s row
+// for a note property lives inside that property's own collapsible panel, so
+// it is scoped with `clickPropertyPanelAction` (the same scoping convention
 // `noteRichPropertyAssimilationMethods.ts` uses for its other property-row
 // actions) rather than filtered out of the note-level selector the way
-// `noteLevelTrackerStatusElement` is. Properties only ever offer the
-// UNDERSTANDING mode (see `RichFrontmatterPropertyPanel.vue`), so there is
-// no per-mode parameter to take.
+// `noteLevelTrackerStatusElement` is. Properties only offer the UNDERSTANDING
+// mode, so there is no per-mode parameter to take.
 export function clickPropertyTrackerStatusLink(propertyKey: string) {
   clickPropertyPanelAction(propertyKey, 'assimilation-status-UNDERSTANDING')
 }

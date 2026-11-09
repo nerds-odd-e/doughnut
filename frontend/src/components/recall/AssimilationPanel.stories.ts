@@ -13,13 +13,12 @@ import {
   memoryTrackerActionsKey,
   type MemoryTrackerActions,
 } from "@/composables/useMemoryTrackerActions"
-import NoteToolbarPanelShell from "@/components/notes/core/NoteToolbarPanelShell.vue"
 import AssimilationPanel from "./AssimilationPanel.vue"
 
 const idleActionResult = { completed: false, navigated: false }
 
 const AssimilationPanelStory = defineComponent({
-  components: { AssimilationPanel, NoteToolbarPanelShell },
+  components: { AssimilationPanel },
   props: {
     note: {
       type: Object as PropType<Note>,
@@ -29,12 +28,15 @@ const AssimilationPanelStory = defineComponent({
       type: Object as PropType<NoteRecallInfo>,
       required: true,
     },
+    understandingAdded: { type: Boolean, default: false },
+    readFirst: { type: Boolean, default: false },
   },
   setup(props) {
     const memoryTrackerActions: MemoryTrackerActions = {
       noteInfoLoaded: ref(true),
       noteRecallInfo: toRef(props, "noteRecallInfo"),
       assimilatingPropertyKey: ref(null),
+      understandingAdded: toRef(props, "understandingAdded"),
       showSpellingPopup: computed(() => false),
       reloadNoteInfo: async () => undefined,
       assimilate: async () => idleActionResult,
@@ -47,10 +49,8 @@ const AssimilationPanelStory = defineComponent({
     provide(memoryTrackerActionsKey, memoryTrackerActions)
   },
   template: `
-    <div class="w-[calc(100vw-2rem)] max-w-2xl">
-      <NoteToolbarPanelShell>
-        <AssimilationPanel :note="note" />
-      </NoteToolbarPanelShell>
+    <div class="w-[calc(100vw-2rem)]" :class="readFirst ? 'max-w-sm' : 'max-w-3xl'">
+      <AssimilationPanel :note="note" :read-first="readFirst" />
     </div>
   `,
 })
@@ -90,5 +90,21 @@ export const SpellingAlreadyAssimilated: Story = {
           .please(),
       ])
       .please(),
+  },
+}
+
+export const UnderstandingAdded: Story = {
+  args: {
+    note: noteRealm.note,
+    noteRecallInfo: makeMe.aNoteRecallInfo.please(),
+    understandingAdded: true,
+  },
+}
+
+export const ReadFirst: Story = {
+  args: {
+    note: noteRealm.note,
+    noteRecallInfo: makeMe.aNoteRecallInfo.please(),
+    readFirst: true,
   },
 }

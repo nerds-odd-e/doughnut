@@ -1,4 +1,3 @@
-import type { MemoryTracker } from "@generated/donut-backend-api"
 import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
@@ -24,7 +23,7 @@ export type AssimilateEvent = Pick<
 export type AssimilateUnitResult = {
   success: boolean
   navigated: boolean
-  memoryTrackers?: MemoryTracker[]
+  understandingAdded?: boolean
 }
 
 export function useAssimilateUnit() {
@@ -63,10 +62,10 @@ export function useAssimilateUnit() {
 
     requestDueRecallsRefresh()
 
-    const staysOnNote =
+    const addsOptionalMode =
       request.assimilateAsCommissioned || request.assimilateAsSpelling
-    if (staysOnNote) {
-      return { success: true, navigated: false, memoryTrackers }
+    if (addsOptionalMode) {
+      return { success: true, navigated: false }
     }
 
     const newTrackerCount = memoryTrackers.length
@@ -75,8 +74,12 @@ export function useAssimilateUnit() {
     }
     incrementAssimilatedCount(newTrackerCount)
 
+    if (!request.propertyKey) {
+      return { success: true, navigated: false, understandingAdded: true }
+    }
+
     const navigated = await goToNextAssimilation()
-    return { success: true, navigated, memoryTrackers }
+    return { success: true, navigated }
   }
 
   return { assimilateUnit }

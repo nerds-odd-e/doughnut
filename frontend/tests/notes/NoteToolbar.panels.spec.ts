@@ -22,7 +22,6 @@ import {
   noteToolbarProps,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
-import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteStore } from "@/store/noteStore"
 import {
   notePropertyLocation,
@@ -59,8 +58,6 @@ describe("NoteToolbar panels", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
   const noteRealm = makeMe.aNoteRealm.please()
-  const panelShell = () =>
-    wrapper.find('[data-testid="note-toolbar-panel-shell"]')
 
   afterEach(() => {
     wrapper?.unmount()
@@ -115,7 +112,6 @@ describe("NoteToolbar panels", () => {
     expect(stopButton.classes()).toEqual(
       expect.arrayContaining(["daisy-btn-soft", "daisy-btn-primary"])
     )
-    expect(panelShell().exists()).toBe(false)
 
     await stopButton.trigger("click")
     await flushPromises()
@@ -153,23 +149,6 @@ describe("NoteToolbar panels", () => {
       path: { note: destination.note.id },
       body: { content: "Destination. hello" },
     })
-  })
-
-  it("shows assimilation settings in the shared panel shell without a max-height cage", async () => {
-    wrapper = await mountNoteToolbar(noteRealm)
-    useAssimilationView().openForNote(noteRealm.note.id)
-    await flushPromises()
-
-    const modes = panelShell().find('[data-testid="note-assimilation-modes"]')
-    expect(modes.exists()).toBe(true)
-    expect(modes.find(".max-h-\\[min\\(40vh\\,22rem\\)\\]").exists()).toBe(
-      false
-    )
-
-    useAssimilationView().dismiss()
-    await flushPromises()
-
-    expect(panelShell().exists()).toBe(false)
   })
 
   describe("conversation", () => {

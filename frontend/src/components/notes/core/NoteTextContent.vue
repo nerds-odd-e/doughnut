@@ -16,6 +16,7 @@
       hasInboundReferences,
     }"
   />
+  <slot name="after-title" />
   <div
     role="region"
     aria-label="Note content"
