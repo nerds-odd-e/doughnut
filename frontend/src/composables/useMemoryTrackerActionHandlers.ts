@@ -5,7 +5,7 @@ import {
   type AssimilateEvent,
 } from "@/composables/useAssimilateUnit"
 import {
-  SEQUENCE_SKIP_CONFIRM,
+  sequenceSkipConfirmation,
   useAssimilationSequenceSkip,
 } from "@/composables/useAssimilationSequenceSkip"
 
@@ -109,7 +109,9 @@ export function useMemoryTrackerActionHandlers(
   const skip = async ({
     propertyKey,
   }: MemoryTrackerActionRequest = {}): Promise<MemoryTrackerActionResult> => {
-    const confirmed = await popups.confirm(SEQUENCE_SKIP_CONFIRM)
+    const confirmed = await popups.confirm(
+      sequenceSkipConfirmation(propertyKey)
+    )
     if (!confirmed) {
       return notCompleted
     }

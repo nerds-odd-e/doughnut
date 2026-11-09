@@ -10,9 +10,11 @@ import {
   wrapSdkResponse,
 } from "@tests/helpers"
 import {
+  assimilateButtonEl,
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilate,
+  clickAssimilateAsCommissioned,
   clickNextItem,
   clickReturnToSequence,
   clickSkipAndConfirm,
@@ -126,7 +128,7 @@ describe("AssimilationPanel", () => {
     expect(dueRecallsRefreshRequested()).toBe(false)
   })
 
-  it("shows Return to sequence instead of Skip when the note is sequence-skipped", async () => {
+  it("offers a sequence-skipped note Assimilate understanding and Return to sequence, also after an optional addition", async () => {
     mockSdkService(
       NoteController,
       "getNoteInfo",
@@ -134,8 +136,13 @@ describe("AssimilationPanel", () => {
     )
     const wrapper = await mountAssimilationPanelReady()
 
+    expect(assimilateButtonEl(wrapper)).not.toBeNull()
     expect(returnToSequenceButtonEl(wrapper)).not.toBeNull()
     expect(skipButtonEl(wrapper)).toBeNull()
+
+    await clickAssimilateAsCommissioned(wrapper)
+
+    expect(returnToSequenceButtonEl(wrapper)).not.toBeNull()
   })
 
   it("returns the note to the sequence without creating a tracker", async () => {

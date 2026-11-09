@@ -8,10 +8,7 @@ import {
   DAILY_GOAL_TOAST,
   NO_MORE_TOAST,
 } from "@/composables/useGoToNextAssimilation"
-import {
-  notePropertyLocation,
-  noteShowLocation,
-} from "@/routes/noteShowLocation"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
   mockSdkService,
@@ -31,8 +28,11 @@ import {
   mountNotebookWorkspace,
 } from "./notebookWorkspaceHeaderTestSupport"
 import {
-  click,
+  clickInPanel,
   expectActivity,
+  expectPropertyLearningOpen,
+  inPanel,
+  panelSelector,
   propertyNote,
 } from "./notebookWorkspaceAssimilationTestSupport"
 
@@ -63,34 +63,29 @@ const serveNoteTrackers = (trackers: Record<number, MemoryTracker[]> = {}) => {
     }
   )
 }
-const panelSelector = '[data-testid="note-assimilation-modes"]'
-const clickInPanel = (dataTest: string) =>
-  click(`${panelSelector} [data-test="${dataTest}"]`)
 const visibleText = (selector: string) => {
   const el = document.querySelector<HTMLElement>(selector)
   return el?.checkVisibility() ? el.textContent?.trim() : undefined
 }
 const expectUnderstandingResult = () =>
   vi.waitFor(() =>
-    expect(
-      visibleText(`${panelSelector} [data-test="understanding-result"] p`)
-    ).toBe("Understanding added to recall")
+    expect(visibleText(`${inPanel("understanding-result")} p`)).toBe(
+      "Understanding added to recall"
+    )
   )
 const expectTrackerStatus = (mode: string) =>
   vi.waitFor(() =>
     expect(
-      visibleText(
-        `${panelSelector} [data-test="assimilation-status-${mode}"] + span`
-      )
+      visibleText(`${inPanel(`assimilation-status-${mode}`)} + span`)
     ).toBe(nextRecallText)
   )
 /** Opens the note's assimilation and leaves it at the Understanding result. */
 const assimilateUnderstanding = async () => {
   await clickPageBarCommand(noteMoreOptionsTitles.assimilation)
   await vi.waitFor(() =>
-    expect(
-      visibleText(`${panelSelector} [data-test="assimilate-UNDERSTANDING"]`)
-    ).toBe("Assimilate understanding")
+    expect(visibleText(inPanel("assimilate-UNDERSTANDING"))).toBe(
+      "Assimilate understanding"
+    )
   )
   await clickInPanel("assimilate-UNDERSTANDING")
   await expectUnderstandingResult()
@@ -157,9 +152,9 @@ it("Next item opens the next note, also once the daily goal is reached", async (
   await clickInPanel("next-item")
 
   await vi.waitFor(() =>
-    expect(
-      visibleText(`${panelSelector} [data-test="assimilate-UNDERSTANDING"]`)
-    ).toBe("Assimilate understanding")
+    expect(visibleText(inPanel("assimilate-UNDERSTANDING"))).toBe(
+      "Assimilate understanding"
+    )
   )
   expect(mounted.router.currentRoute.value).toMatchObject(
     noteShowLocation(next.id)
@@ -180,20 +175,7 @@ it("Next item opens the next unit when it is a property of the same note", async
 
   await clickInPanel("next-item")
 
-  await vi.waitFor(() =>
-    expect(mounted.router.currentRoute.value).toMatchObject(
-      notePropertyLocation(realm.id, "topic")
-    )
-  )
-  await vi.waitFor(() =>
-    expect(
-      document
-        .querySelector<HTMLElement>(
-          '[data-property-key="topic"] [data-testid="rich-note-property-panel"]'
-        )
-        ?.checkVisibility()
-    ).toBe(true)
-  )
+  await expectPropertyLearningOpen(mounted.router, realm.id, "topic")
 })
 
 it("Next item with nothing left keeps the note, says so and closes assimilation", async () => {

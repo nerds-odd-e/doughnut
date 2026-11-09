@@ -18,10 +18,6 @@ import {
   type NoteLevelTrackerKind,
 } from './shared'
 
-function expectNoteLevelTrackerStatus(kind: NoteLevelTrackerKind) {
-  noteLevelTrackerStatusElement(kind).should('exist')
-}
-
 export const assumeAssimilationPage = () => ({
   ...assimilationPropertyMemoryTrackerExpectations(),
   ...assimilationRefinementLayoutExpectations(),
@@ -72,13 +68,8 @@ export const assumeAssimilationPage = () => ({
     cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
     return this
   },
-  expectOrdinaryAndCommissionedMemoryTrackers() {
-    expectNoteLevelTrackerStatus('understanding')
-    expectNoteLevelTrackerStatus('commissioned')
-    return this
-  },
-  expectSpellingMemoryTracker() {
-    expectNoteLevelTrackerStatus('spelling')
+  expectNoteLevelMemoryTracker(kind: NoteLevelTrackerKind) {
+    noteLevelTrackerStatusElement(kind).should('exist')
     return this
   },
   skipOnPanel() {
@@ -193,8 +184,7 @@ export const assumeAssimilationPage = () => ({
   expectAssimilateDisabled() {
     // An understanding tracker already exists: the row shows its status link
     // in place of the Assimilate action.
-    expectNoteLevelTrackerStatus('understanding')
-    return this
+    return this.expectNoteLevelMemoryTracker('understanding')
   },
   expectAssimilateEnabled() {
     assimilateButton().should('be.visible').and('not.be.disabled')

@@ -4,6 +4,7 @@
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
+import type { NoteLevelTrackerKind } from '../start/pageObjects/assimilationPage/shared'
 import {
   expectNoteUnderQuestionFocusedProperty,
   followNoteUnderQuestion,
@@ -37,12 +38,15 @@ Then(
 Then(
   'I should see ordinary and commissioned memory trackers for {string}',
   (_noteTitle: string) => {
-    start.assumeAssimilationPage().expectOrdinaryAndCommissionedMemoryTrackers()
+    start
+      .assumeAssimilationPage()
+      .expectNoteLevelMemoryTracker('understanding')
+      .expectNoteLevelMemoryTracker('commissioned')
   }
 )
 
-Then('I should see a spelling memory tracker', () => {
-  start.assumeAssimilationPage().expectSpellingMemoryTracker()
+Then('I should see a {word} memory tracker', (kind: NoteLevelTrackerKind) => {
+  start.assumeAssimilationPage().expectNoteLevelMemoryTracker(kind)
 })
 
 Then(

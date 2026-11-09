@@ -3,8 +3,11 @@ import { AssimilationSequenceSkipController } from "@generated/donut-backend-api
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 
-export const SEQUENCE_SKIP_CONFIRM =
-  "Leave this note out of the assimilation sequence?"
+/** What skipping leaves out of the sequence: a property, or only the note's Understanding. */
+export const sequenceSkipConfirmation = (propertyKey?: string) =>
+  propertyKey
+    ? "Leave this property out of the assimilation sequence?"
+    : "Only this note's Understanding will stay out of the assimilation sequence, until you choose Return to sequence. Its properties and optional modes are not affected, so a property of this note may come next."
 
 export function isSkippedFromAssimilationSequence(
   noteRecallInfo: NoteRecallInfo | null | undefined,

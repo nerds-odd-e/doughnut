@@ -156,7 +156,7 @@ consumer alignment belongs here, not an unowned follow-up.
 
 ### 3. Explain and restore note-level sequence participation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Proof row 6. Mounted confirmation and walkthrough use a note with a
 property and independent optional modes; include cancel, confirm and restoration.
 
@@ -225,12 +225,17 @@ Disposition: no user cost "decide when to advance after seeing what was added to
 ### O2. Skip from sequence… keeps the existing skip confirmation
 Reported: slice 1 — "\"Skip from sequence…\" still opens the old confirmation text (slice 3)."
 Story clause: "Skip from sequence… opens a confirmation explaining that only this note's Understanding entry stays out of the sequence until restored"
-Disposition: interim until slices 3
+Disposition: proved by slice 3: frontend/tests/layouts/NotebookWorkspaceSequenceSkip.spec.ts 'Skip from sequence… explains that only the note's Understanding stays out, and Cancel keeps the note offered' (exact confirmation text, cancel posts nothing)
 
 ### O3. Compact widths stack the wide layout after the title
 Reported: slice 1 — "At compact widths the panel now sits after the title with stacked columns, not above the title as before. Slices 4–5 replace this"
 Story clause: "Around iPad portrait width and below, use Read first."
 Disposition: interim until slices 4, 5
+
+### O5. A confirmed skip that finds no next item is not separately tested
+Reported: slice 3 — "Confirmed skip with no next item: not tested."
+Story clause: "When an explicit advance finds no next item, keep the current note page, show the existing No more notes to assimilate feedback, and close the assimilation presentation."
+Disposition: no user cost "decide when to advance after seeing what was added to recall": inspected useAssimilationSequenceSkip (a confirmed skip calls the same unchanged useGoToNextAssimilation as Next item), useGoToNextAssimilation (empty next shows No more notes to assimilate and dismisses the presentation) and AssimilationPanel (a non-navigating completed skip reloads the same note). That shared empty-next result is proved for Next item by NotebookWorkspaceUnderstandingResult.spec.ts 'Next item with nothing left keeps the note, says so and closes assimilation'; the skip path's outcome is the same pre-existing behavior.
 
 ## Execution notes
 
@@ -258,6 +263,14 @@ Disposition: interim until slices 4, 5
 - Slice 2 test support: `frontend/tests/helpers/toastTestSupport.ts` now
   re-appends the toast container before each test, because the workspace spec
   empties `document.body` between tests.
+
+- Slice 3: note-level skip uses `sequenceSkipConfirmation()` copy; a property-row
+  skip now asks "Leave this property out of the assimilation sequence?" so it no
+  longer claims to leave the note out. Workspace tests that need the
+  confirmation mount the Popups host beside the workspace
+  (`NotebookWorkspaceSequenceSkip.spec.ts`); its selectors assume Skip from
+  sequence… stays inside `note-assimilation-modes` — slice 5 must retarget them
+  if the bottom bar moves the control.
 
 ## Verification and delivery
 

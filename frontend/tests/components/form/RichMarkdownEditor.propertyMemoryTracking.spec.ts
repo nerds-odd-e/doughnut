@@ -149,6 +149,7 @@ Workshop body.`
         .trigger("click")
       expect(await answerOnlyPendingPopup(true)).toMatchObject({
         type: "confirm",
+        message: "Leave this property out of the assimilation sequence?",
       })
 
       expect(skipSpy).toHaveBeenCalledWith({

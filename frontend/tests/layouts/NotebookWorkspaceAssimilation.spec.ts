@@ -22,6 +22,7 @@ import {
   activity,
   click,
   expectActivity,
+  expectPropertyLearningOpen,
   propertyNote,
 } from "./notebookWorkspaceAssimilationTestSupport"
 
@@ -170,17 +171,6 @@ it("follows next-unit note to property destinations through the compact direct a
   )
   await page.elementLocator(activity()).click()
   await expectActivity("Assimilate")
-  await vi.waitFor(() =>
-    expect(mounted.router.currentRoute.value).toMatchObject(
-      notePropertyLocation(second.id, "topic")
-    )
-  )
-  expect(
-    document
-      .querySelector<HTMLElement>(
-        '[data-property-key="topic"] [data-testid="rich-note-property-panel"]'
-      )
-      ?.checkVisibility()
-  ).toBe(true)
+  await expectPropertyLearningOpen(mounted.router, second.id, "topic")
   expect(activity().querySelector(".due-count")?.textContent?.trim()).toBe("6")
 })
