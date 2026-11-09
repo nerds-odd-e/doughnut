@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Kirara-chan",
-  "email": "kirara-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-115#trust-learning-session-and-assimilation-e2e-feedback",
-  "host": "codex",
-  "model": "gpt-6.1-sol"
-}
