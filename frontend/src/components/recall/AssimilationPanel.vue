@@ -3,9 +3,9 @@
     :note="note"
     :note-info-loaded="noteInfoLoaded"
     :read-first="readFirst"
-    @assimilate="onAssimilate"
-    @skip="onSkip"
-    @return-to-sequence="onReturnToSequence"
+    @assimilate="memoryTrackerActions.assimilate"
+    @skip="memoryTrackerActions.skip"
+    @return-to-sequence="memoryTrackerActions.returnToSequence"
     @next="goToNextAssimilation"
   />
   <Teleport to="body">
@@ -21,7 +21,7 @@
     :show="showSpellingPopup"
     :note-id="note.id"
     @cancel="handleSpellingCancel"
-    @verified="onSpellingVerified"
+    @verified="memoryTrackerActions.handleSpellingVerified"
   />
 </template>
 
@@ -32,12 +32,9 @@ import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { provide, toRef } from "vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
-import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import {
   memoryTrackerActionsKey,
   useInjectedMemoryTrackerActions,
-  type MemoryTrackerActionRequest,
-  type MemoryTrackerActionResult,
 } from "@/composables/useMemoryTrackerActions"
 
 const { note, readFirst = false } = defineProps<{
@@ -47,10 +44,6 @@ const { note, readFirst = false } = defineProps<{
 
 useAssimilationView().trackPresentation(() => note.id)
 const { goToNextAssimilation } = useGoToNextAssimilation()
-
-const emit = defineEmits<{
-  (e: "reloadNeeded"): void
-}>()
 
 // Re-provide the resolved instance so `NoteAssimilationModes.vue` (our own
 // child) always shares it, even in isolated mounts (tests) that render
@@ -62,37 +55,4 @@ provide(memoryTrackerActionsKey, memoryTrackerActions)
 
 const { noteInfoLoaded, showSpellingPopup, handleSpellingCancel } =
   memoryTrackerActions
-
-const afterAction = (
-  result: MemoryTrackerActionResult,
-  { emitReloadOnStay = false }: { emitReloadOnStay?: boolean } = {}
-) => {
-  if (!result.completed) {
-    return
-  }
-
-  if (emitReloadOnStay && !result.navigated) {
-    emit("reloadNeeded")
-  }
-}
-
-const onAssimilate = async (event: AssimilateEvent) => {
-  const result = await memoryTrackerActions.assimilate(event)
-  afterAction(result, { emitReloadOnStay: true })
-}
-
-const onSpellingVerified = async () => {
-  const result = await memoryTrackerActions.handleSpellingVerified()
-  afterAction(result, { emitReloadOnStay: true })
-}
-
-const onSkip = async (request: MemoryTrackerActionRequest = {}) => {
-  const result = await memoryTrackerActions.skip(request)
-  afterAction(result, { emitReloadOnStay: true })
-}
-
-const onReturnToSequence = async (request: MemoryTrackerActionRequest = {}) => {
-  const result = await memoryTrackerActions.returnToSequence(request)
-  afterAction(result)
-}
 </script>

@@ -32,6 +32,9 @@ export const isVisible = (selector: string) =>
 export const rect = (selector: string) =>
   document.querySelector(selector)!.getBoundingClientRect()
 export const panelSelector = '[data-testid="note-assimilation-modes"]'
+/** How many times the workspace has fetched the note realm so far. */
+export const showNoteCallCount = () =>
+  vi.mocked(NoteController.showNote).mock.calls.length
 export const inPanel = (dataTest: string) =>
   `${panelSelector} [data-test="${dataTest}"]`
 export const clickInPanel = (dataTest: string) => click(inPanel(dataTest))

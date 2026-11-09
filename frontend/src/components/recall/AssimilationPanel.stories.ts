@@ -15,8 +15,6 @@ import {
 } from "@/composables/useMemoryTrackerActions"
 import AssimilationPanel from "./AssimilationPanel.vue"
 
-const idleActionResult = { completed: false, navigated: false }
-
 const AssimilationPanelStory = defineComponent({
   components: { AssimilationPanel },
   props: {
@@ -39,10 +37,10 @@ const AssimilationPanelStory = defineComponent({
       understandingAdded: toRef(props, "understandingAdded"),
       showSpellingPopup: computed(() => false),
       reloadNoteInfo: async () => undefined,
-      assimilate: async () => idleActionResult,
-      skip: async () => idleActionResult,
-      returnToSequence: async () => idleActionResult,
-      handleSpellingVerified: async () => idleActionResult,
+      assimilate: async () => undefined,
+      skip: async () => undefined,
+      returnToSequence: async () => undefined,
+      handleSpellingVerified: async () => undefined,
       handleSpellingCancel: () => undefined,
     }
 

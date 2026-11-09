@@ -2,6 +2,7 @@
 
 **Identity:** SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions
 **Source:** [correction story](../../seeds/SEED-113-note-assimilation-experience.md#keep-the-assimilation-panel-in-place-after-staying-actions)
+**Source review:** [source-review.md](./source-review.md)
 
 ## Correction input
 
@@ -69,7 +70,7 @@ the note. ADRs 0001, 0005 and 0006 apply unchanged.
 
 ### 1. Update the panel in place after actions that stay on the note
 Type: Behavior
-Status: planned
+Status: done
 Proof: All three proof rows.
 
 Behavior: Understanding succeeds, an optional mode is added, or a confirmed skip
@@ -87,6 +88,21 @@ the product for `reloadNeeded`, `onAssimilationReloadNeeded` and
 `assimilationPanelKey`.
 Sizing: target 5 minutes; one component path and two spec edits, plus runner
 wait for the focused E2E family.
+
+**Accepted proof (pre-commit).** Focused Vitest assimilation family green
+(UnderstandingResult in-place/`showNote`, CompactOptionalModes
+`expectClosedAtTrigger` after Commissioned, SequenceSkip nothing-next no
+reload + note kept, plus ReadFirst / Assimilation / AssimilationPanel*);
+`vue-tsc`/`tsc --noEmit` green; full frontend suite 2469 passed; E2E
+assimilation walkthrough + spelling + page_types 15 passed. Removal reading:
+product search for `reloadNeeded`, `onAssimilationReloadNeeded`,
+`assimilationPanelKey` clean (excl. planning / DearDough). Refactor dropped
+`MemoryTrackerActionResult` and panel pass-throughs; focused Vitest +
+typechecks re-verified.
+
+**Learnings.** Removing the rebuild alone restores Optional modes focus; no
+focus-handling change was required. `MemoryTrackerActionResult` existed only
+so `afterAction` could emit `reloadNeeded`.
 
 ## Verification and delivery
 
