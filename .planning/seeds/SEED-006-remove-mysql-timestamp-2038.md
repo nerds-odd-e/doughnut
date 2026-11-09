@@ -13,7 +13,9 @@ scope: large
 
 MySQL `TIMESTAMP` cannot store instants after `2038-01-19 03:14:07` UTC. Open FSRS `S_MAX` is 36500 days (876000 whole hours). `last_recalled_at + I(S)` at that cap is ~100 years later and cannot persist on `TIMESTAMP`. JDBC already writes UTC (`connectionTimeZone=UTC`). `DATETIME` is timezone-naive and can hold that due if the session TZ stays UTC.
 
-Only `memory_tracker.last_recalled_at` and `next_recall_at` are `DATETIME`. Other `TIMESTAMP` columns (including `assimilated_at`, created/updated/deleted, job locks) still hit 2038.
+Recall scheduling uses `DATETIME` for `memory_tracker.last_recalled_at` and
+`next_recall_at`. Columns that still use `TIMESTAMP`, including
+`memory_tracker.assimilated_at`, retain the 2038 limit.
 
 ## When to Surface
 
@@ -40,4 +42,8 @@ Its fractional-second precision has been corrected separately. Preserve null/fro
 eligibility, UTC round-tripping, and the exact ten-minute comparison when
 changing the type; that correction does not complete this 2038 work.
 
-Captured during maximum-interval execution when slice 3 could not write `last + 876000 hours` on `TIMESTAMP NOT NULL`. `last_recalled_at` is also `NOT NULL`; a null-last clamp case is unrepresentable.
+During the maximum-interval work on 2026-08-18 (`219a739497`), slice 3 could
+not store `last + 876000 hours` in a `TIMESTAMP NOT NULL` column. At that
+revision `last_recalled_at` also required a value, so the null-last clamp case
+could not be represented. Commit `5f34010e45` made `last_recalled_at` nullable
+on 2026-08-19.

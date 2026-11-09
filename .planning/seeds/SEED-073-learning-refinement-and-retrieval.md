@@ -188,5 +188,4 @@ concrete evaluation cases.
 - [Focus-context design](../../docs/focus-context/focus_context_retrieval_design.md)
   and [domain vocabulary](../../docs/adrs/0001-ubiquitous-language.md).
 - [Hosted assistant setup guide](../../docs/assistant-oauth.md).
-- SEED-055 concerns file-serving API cleanup and SEED-001 concerns a different
-  fuzzy spelling-match behavior; neither is duplicated or reprioritized here.
+- [File-serving API cleanup](SEED-055-public-api-cleanup.md) has its own seed.

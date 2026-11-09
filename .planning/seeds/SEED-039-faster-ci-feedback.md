@@ -61,9 +61,9 @@ authorizes no implementation, profiling run, or executable slice plan.
 
 - **For / why:** Contributors get substantially faster trustworthy local test
   feedback and shorter CI E2E execution by removing recurring test costs.
-- **Scope:** Conduct a measured test-optimization round using the CLI-containing
-  shard as the initial evidence, while considering related tests and shared
-  responsibilities globally across files, shards, and test layers. Include fast
+- **Scope:** Use fresh, comparable CI timings to choose where to start a measured
+  test-optimization round. Consider related tests and shared responsibilities
+  globally across files, shards, and test layers. Include fast
   siblings, fixtures, setup/teardown, synchronization, shared helpers, and affected
   consumers where they explain or share the cost. Global consideration does not
   authorize unrelated product work or an unbounded rewrite of every test.
