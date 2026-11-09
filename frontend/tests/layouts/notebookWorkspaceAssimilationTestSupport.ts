@@ -29,6 +29,8 @@ export const click = async (selector: string) => {
 }
 export const isVisible = (selector: string) =>
   document.querySelector<HTMLElement>(selector)?.checkVisibility() === true
+export const rect = (selector: string) =>
+  document.querySelector(selector)!.getBoundingClientRect()
 export const panelSelector = '[data-testid="note-assimilation-modes"]'
 export const inPanel = (dataTest: string) =>
   `${panelSelector} [data-test="${dataTest}"]`
@@ -99,14 +101,20 @@ export const expectTrackerStatus = (mode: string) =>
       visibleText(`${inPanel(`assimilation-status-${mode}`)} + span`)
     ).toBe(nextRecallText)
   )
-/** Opens the note's assimilation and leaves it at the Understanding result. */
-export const assimilateUnderstanding = async () => {
-  await clickPageBarCommand(noteMoreOptionsTitles.assimilation)
+/** Opens the note's assimilation and waits for its default action. */
+export const openNoteAssimilation = async (
+  choose: (title: string) => Promise<void> = clickPageBarCommand
+) => {
+  await choose(noteMoreOptionsTitles.assimilation)
   await vi.waitFor(() =>
     expect(visibleText(inPanel("assimilate-UNDERSTANDING"))).toBe(
       "Assimilate understanding"
     )
   )
+}
+/** Opens the note's assimilation and leaves it at the Understanding result. */
+export const assimilateUnderstanding = async () => {
+  await openNoteAssimilation()
   await clickInPanel("assimilate-UNDERSTANDING")
   await expectUnderstandingResult()
 }

@@ -1,17 +1,20 @@
 <template>
   <section
-    ref="section"
     aria-label="Assimilate this note"
     data-testid="note-assimilation-modes"
-    class="rounded-box border-base-300 mb-4 border p-4"
+    :class="
+      readFirst
+        ? 'border-base-300 bg-base-100 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+        : 'rounded-box border-base-300 mb-4 border p-4'
+    "
   >
-    <div class="flex items-center justify-between gap-2">
-      <h3 class="mb-3 text-base font-semibold">Assimilate this note</h3>
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <h3 class="!m-0 !text-base font-semibold">Assimilate this note</h3>
       <AutoCollapseDropdown
-        v-if="compact"
+        v-if="readFirst"
         v-slot="{ closeDropdown }"
         ref="optionalModesDisclosure"
-        class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
+        class="daisy-dropdown daisy-dropdown-end daisy-dropdown-top"
         @keydown.esc="optionalModesDisclosure?.closeDropdown()"
         @toggle="keepFocusAtTrigger"
       >
@@ -20,10 +23,10 @@
           data-test="optional-modes"
         >
           Optional modes
-          <ChevronDown class="size-4" aria-hidden="true" />
+          <ChevronUp class="size-4" aria-hidden="true" />
         </summary>
         <div
-          class="daisy-dropdown-content bg-base-100 rounded-box mt-2 flex w-[min(26rem,calc(100vw-4rem))] flex-col gap-3 p-4 shadow"
+          class="daisy-dropdown-content bg-base-100 rounded-box mb-2 flex w-[min(26rem,calc(100vw-4rem))] flex-col gap-3 p-4 shadow"
         >
           <h4 class="font-semibold">Optional modes</h4>
           <OptionalAssimilationModes
@@ -34,21 +37,25 @@
         </div>
       </AutoCollapseDropdown>
     </div>
-    <div :class="{ 'grid grid-cols-2 gap-6': !compact }">
+    <div :class="{ 'grid grid-cols-2 gap-6': !readFirst }">
       <div
         class="flex flex-col items-start gap-1"
         data-test="assimilation-mode-row-UNDERSTANDING"
       >
-        <div
-          class="text-base-content/60 text-xs font-semibold tracking-wide uppercase"
-        >
-          Default mode
-        </div>
-        <h4 class="text-lg font-semibold">Understanding</h4>
-        <p class="text-base-content/70 text-sm">Recall what this note means.</p>
+        <template v-if="!readFirst">
+          <div
+            class="text-base-content/60 text-xs font-semibold tracking-wide uppercase"
+          >
+            Default mode
+          </div>
+          <h4 class="text-lg font-semibold">Understanding</h4>
+          <p class="text-base-content/70 mb-2 text-sm">
+            Recall what this note means.
+          </p>
+        </template>
         <div
           v-if="understandingAdded"
-          class="mt-2 flex flex-col items-start gap-2"
+          class="flex flex-col items-start gap-2"
           data-test="understanding-result"
         >
           <p role="status" class="text-success flex items-center gap-2 font-medium">
@@ -65,7 +72,7 @@
             <ArrowRight class="size-4" aria-hidden="true" />
           </button>
         </div>
-        <div v-else class="mt-2 flex flex-wrap items-center gap-2">
+        <div v-else class="flex flex-wrap items-center gap-2">
           <AssimilationModeAction
             mode="UNDERSTANDING"
             :tracker="understandingTracker"
@@ -101,7 +108,7 @@
           </AssimilationModeAction>
         </div>
       </div>
-      <div v-if="!compact" class="flex flex-col gap-3">
+      <div v-if="!readFirst" class="flex flex-col gap-3">
         <div
           class="text-base-content/60 text-xs font-semibold tracking-wide uppercase"
         >
@@ -119,7 +126,7 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
-import { ArrowRight, Check, ChevronDown } from "@lucide/vue"
+import { ArrowRight, Check, ChevronUp } from "@lucide/vue"
 import { computed, ref, toRef } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import AssimilationModeAction from "./AssimilationModeAction.vue"
@@ -127,12 +134,13 @@ import OptionalAssimilationModes from "./OptionalAssimilationModes.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
-import { useNarrowerThan } from "@/composables/useNarrowerThan"
 import { noteLevelTrackerOfType } from "./assimilationMemoryTrackers"
 
 const { note, noteInfoLoaded } = defineProps<{
   note: Note
   noteInfoLoaded: boolean
+  /** A bottom action bar under the note instead of the panel after its title. */
+  readFirst: boolean
 }>()
 
 const emit = defineEmits<{
@@ -153,15 +161,6 @@ const understandingTracker = computed(() =>
 const skipped = computed(() =>
   isSkippedFromAssimilationSequence(noteRecallInfo.value)
 )
-
-/**
- * Below this panel width the optional modes move behind a disclosure. The
- * panel gets 736px at the full reading measure and 704px on an iPad in
- * portrait.
- */
-const INLINE_OPTIONAL_MODES_MIN_WIDTH_PX = 720
-const section = ref<HTMLElement | null>(null)
-const compact = useNarrowerThan(section, INLINE_OPTIONAL_MODES_MIN_WIDTH_PX)
 
 const optionalModesDisclosure = ref<InstanceType<
   typeof AutoCollapseDropdown

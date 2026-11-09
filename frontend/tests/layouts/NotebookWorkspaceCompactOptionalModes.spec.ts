@@ -1,17 +1,15 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import { mockSdkService } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import makeMe from "donut-test-fixtures/makeMe"
 import type { VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
-import { userEvent } from "vitest/browser"
+import { page, userEvent } from "vitest/browser"
 import {
   atViewportWidth,
   chooseFromMore,
-  clickPageBarCommand,
   mountNotebookWorkspace,
   toggleWorkspaceContents,
 } from "./notebookWorkspaceHeaderTestSupport"
@@ -24,7 +22,9 @@ import {
   inPanel,
   isVisible,
   nextRecallAt,
+  openNoteAssimilation,
   panelSelector,
+  rect,
   serveNoteTrackers,
   visibleText,
 } from "./notebookWorkspaceAssimilationTestSupport"
@@ -46,11 +46,18 @@ const expectClosedAtTrigger = () =>
     expect(optionalModesShown()).toBe(false)
     expect(document.activeElement).toBe(trigger())
   })
-const openNoteAssimilation = async (
-  choose: (title: string) => Promise<void> = clickPageBarCommand
-) => {
-  await choose(noteMoreOptionsTitles.assimilation)
-  await vi.waitFor(() => expect(trigger()?.checkVisibility()).toBe(true))
+/** The colour the learner sees at a point of the viewport. */
+const colourOnScreenAt = async (x: number, y: number) => {
+  const image = new Image()
+  image.src = `data:image/png;base64,${await page.screenshot({ save: false })}`
+  await image.decode()
+  const canvas = document.createElement("canvas")
+  canvas.width = image.width
+  canvas.height = image.height
+  const context = canvas.getContext("2d")!
+  context.drawImage(image, 0, 0)
+  const scale = image.width / window.innerWidth
+  return [...context.getImageData(x * scale, y * scale, 1, 1).data.slice(0, 3)]
 }
 
 beforeEach(async () => {
@@ -94,8 +101,6 @@ it("on a phone, one tap on Optional modes shows each optional mode's action or t
   )
   expect(visibleText(inPanel("assimilate-SPELLING"))).toBe("Verify spelling")
   await expectTrackerStatus("COMMISSIONED")
-  const rect = (selector: string) =>
-    document.querySelector(selector)!.getBoundingClientRect()
   const popover = rect(`${panelSelector} .daisy-dropdown-content`)
   expect(popover.left).toBeGreaterThanOrEqual(0)
   expect(popover.right).toBeLessThanOrEqual(window.innerWidth)
@@ -158,6 +163,13 @@ it("Verify spelling from Optional modes closes the popover and covers the note u
     window.innerWidth,
     window.innerHeight,
   ])
+  const understanding = rect(inPanel("assimilate-UNDERSTANDING"))
+  expect(
+    await colourOnScreenAt(
+      (understanding.left + understanding.right) / 2,
+      (understanding.top + understanding.bottom) / 2
+    )
+  ).toEqual([0, 0, 0])
   await click(".close-button")
   await vi.waitFor(() => expect(blocker()).toBeNull())
   expect(visibleText('[data-test="note-title"]')).toBe("かた と ほう")

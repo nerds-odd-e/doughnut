@@ -6,7 +6,6 @@ import {
 import Popups from "@/components/commons/Popups/Popups.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import { mockSdkService } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import { mount, type VueWrapper } from "@vue/test-utils"
@@ -14,7 +13,6 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
 import {
   atViewportWidth,
-  clickPageBarCommand,
   mountNotebookWorkspace,
 } from "./notebookWorkspaceHeaderTestSupport"
 import {
@@ -22,6 +20,7 @@ import {
   expectPropertyLearningOpen,
   inPanel,
   isVisible,
+  openNoteAssimilation,
   propertyNote,
 } from "./notebookWorkspaceAssimilationTestSupport"
 
@@ -47,8 +46,7 @@ const openSkipConfirmation = async (realm: NoteRealm) => {
       attachTo: document.body,
     })
   )
-  await clickPageBarCommand(noteMoreOptionsTitles.assimilation)
-  await vi.waitFor(() => expect(isVisible(inPanel("skip"))).toBe(true))
+  await openNoteAssimilation()
   await clickInPanel("skip")
   await vi.waitFor(() => expect(confirmation()?.checkVisibility()).toBe(true))
   return mounted.router
@@ -84,7 +82,8 @@ it("Skip from sequence… explains that only the note's Understanding stays out,
   expect(isVisible(inPanel("skip"))).toBe(true)
 })
 
-it("confirming skips only the note's Understanding and opens its property when that comes next", async () => {
+it("confirming from the bottom bar skips only the note's Understanding and opens its property when that comes next", async () => {
+  await atViewportWidth(768)
   const realm = propertyNote()
   mockSdkService(AssimilationController, "next", {
     nextUnit: { noteId: realm.id, propertyKey: "topic" },

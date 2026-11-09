@@ -2,6 +2,7 @@
   <NoteAssimilationModes
     :note="note"
     :note-info-loaded="noteInfoLoaded"
+    :read-first="readFirst"
     @assimilate="onAssimilate"
     @skip="onSkip"
     @return-to-sequence="onReturnToSequence"
@@ -39,8 +40,9 @@ import {
   type MemoryTrackerActionResult,
 } from "@/composables/useMemoryTrackerActions"
 
-const { note } = defineProps<{
+const { note, readFirst = false } = defineProps<{
   note: Note
+  readFirst?: boolean
 }>()
 
 useAssimilationView().trackPresentation(() => note.id)

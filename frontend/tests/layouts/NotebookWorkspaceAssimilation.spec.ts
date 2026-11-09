@@ -11,7 +11,7 @@ import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import { memoryTrackerLitesStub } from "@tests/toolbars/menuDataMocks"
 import makeMe from "donut-test-fixtures/makeMe"
 import type { VueWrapper } from "@vue/test-utils"
-import { afterEach, beforeEach, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, expect, it } from "vitest"
 import { page } from "vitest/browser"
 import {
   atViewportWidth,
@@ -23,7 +23,9 @@ import {
   click,
   expectActivity,
   expectPropertyLearningOpen,
+  openNoteAssimilation,
   propertyNote,
+  rect,
 } from "./notebookWorkspaceAssimilationTestSupport"
 
 let wrapper: VueWrapper
@@ -55,17 +57,9 @@ it("identifies an opened note panel, closes it, and restores Note when switching
 it("reads the note title first, then the default Understanding action beside the optional modes", async () => {
   const realm = makeMe.aNoteRealm.title("かた と ほう").please()
   ;({ wrapper } = await mountNotebookWorkspace([realm]))
-  await clickPageBarCommand(noteMoreOptionsTitles.assimilation)
-  const el = (selector: string) =>
-    document.querySelector<HTMLElement>(selector)!
-  await vi.waitFor(() =>
-    expect(
-      el('[data-test="assimilate-UNDERSTANDING"]')?.checkVisibility()
-    ).toBe(true)
-  )
-  const rect = (selector: string) => el(selector).getBoundingClientRect()
+  await openNoteAssimilation()
   const background = (selector: string) =>
-    getComputedStyle(el(selector)).backgroundColor
+    getComputedStyle(document.querySelector(selector)!).backgroundColor
   const understanding = rect('[data-test="assimilate-UNDERSTANDING"]')
   const optional = ["SPELLING", "COMMISSIONED"].map((mode) => ({
     action: rect(`[data-test="assimilate-${mode}"]`),

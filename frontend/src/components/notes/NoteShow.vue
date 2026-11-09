@@ -37,9 +37,7 @@
                 >
                   <template #after-title>
                     <AssimilationPanel
-                      v-if="
-                        !readonly(noteRealm) && isOpenForNote(noteRealm.note.id)
-                      "
+                      v-if="assimilating(noteRealm) && !readFirst"
                       :key="assimilationPanelKey"
                       :note="noteRealm.note"
                       @reload-needed="onAssimilationReloadNeeded"
@@ -53,6 +51,18 @@
                   :note-topologies="noteRealm.references ?? []"
                 />
               </div>
+            </div>
+            <!-- Sticky, because the notebook column can scroll this page past its bottom edge. -->
+            <div
+              v-if="assimilating(noteRealm) && readFirst"
+              class="sticky bottom-0 z-10"
+            >
+              <AssimilationPanel
+                :key="assimilationPanelKey"
+                read-first
+                :note="noteRealm.note"
+                @reload-needed="onAssimilationReloadNeeded"
+              />
             </div>
           </template>
 
@@ -94,6 +104,7 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useNarrowerThan } from "@/composables/useNarrowerThan"
 import { useNoteStore } from "@/store/noteStore"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
@@ -120,6 +131,13 @@ const onAssimilationReloadNeeded = async () => {
 }
 
 const root = ref<HTMLElement | null>(null)
+/**
+ * A note column narrower than the full reading measure (48rem), as on a phone,
+ * an iPad in portrait or a window narrowed by the notebook sidebar, puts the
+ * note first and docks its assimilation in a bottom bar.
+ */
+const READ_FIRST_BELOW_WIDTH_PX = 768
+const readFirst = useNarrowerThan(root, READ_FIRST_BELOW_WIDTH_PX)
 const noteTextContent = ref<InstanceType<typeof NoteTextContent> | null>(null)
 const titleDictation = useTitleDictation(() =>
   noteTextContent.value!.beginTitleDictation()
@@ -160,6 +178,8 @@ watch(
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>
   !currentUser?.value || noteRealm.notebookRealm.readonly === true
+const assimilating = (noteRealm: NoteRealm) =>
+  !readonly(noteRealm) && isOpenForNote(noteRealm.note.id)
 
 const isReadmeTitle = (noteRealm: NoteRealm) =>
   isReservedReadmeNoteTitle(noteRealm.note.noteTopology.title)

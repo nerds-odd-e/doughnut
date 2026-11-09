@@ -192,7 +192,7 @@ Sizing: target 5 minutes; bounded to disclosure/overlay behavior, not bottom doc
 
 ### 5. Read first with accessible bottom actions
 Type: Behavior
-Status: planned
+Status: done
 Proof: Proof row 8 plus the slice 4 disclosure interaction in its final position.
 Browser geometry uses production CSS at 375px, 768px and narrowed workspace,
 with long content and a long title; run focused layout tests and final checks.
@@ -230,7 +230,7 @@ Disposition: proved by slice 3: frontend/tests/layouts/NotebookWorkspaceSequence
 ### O3. Compact widths stack the wide layout after the title
 Reported: slice 1 — "At compact widths the panel now sits after the title with stacked columns, not above the title as before. Slices 4–5 replace this"
 Story clause: "Around iPad portrait width and below, use Read first."
-Disposition: interim until slices 4, 5
+Disposition: proved by slice 5: frontend/tests/layouts/NotebookWorkspaceReadFirst.spec.ts geometry test at 375 and 768 (title, properties and content before the bottom bar; actions operable after scrolling to the last line)
 
 ### O5. A confirmed skip that finds no next item is not separately tested
 Reported: slice 3 — "Confirmed skip with no next item: not tested."
@@ -240,12 +240,22 @@ Disposition: no user cost "decide when to advance after seeing what was added to
 ### O6. The panel heading takes the global h3 size and margins
 Reported: slice 4 — "A global unlayered `h3 { font-size:1.5rem; margin-top:2rem; margin-bottom:1rem }` in `frontend/src/assets/daisyui.css` overrides the panel heading's `text-base` and `mb-3`. That was already true in the slice-1 wide layout."
 Story clause: "Combine the two selected mockups into one responsive note-level assimilation experience."
-Disposition: receiving slice 5
+Disposition: proved by slice 5: frontend/tests/layouts/NotebookWorkspaceReadFirst.spec.ts headingSize() reads 16px in the bar and in the wide layout; the global h3 rule is unchanged
 
 ### O7. Choosing an optional mode closes the compact popover
 Reported: slice 4 — "after adding, the learner reopens Optional modes to see the new tracker"
 Story clause: "Already active modes show their tracker and next recall date."
 Disposition: proved by slice 4: frontend/tests/layouts/NotebookWorkspaceCompactOptionalModes.spec.ts 'adding Commissioned from Optional modes keeps the note and its Understanding result' and 'Verify spelling from Optional modes closes the popover and covers the note until it is cancelled or verified' (reopening shows the added tracker's Next <date>; the panel remount after an addition closes the popover in any case)
+
+### O8. With the sidebar hidden, the last 44px of the note area wait for the notebook column to scroll
+Reported: slice 5 — "Until the column has scrolled those 44px, the bar covers the bottom 44px of the note area." and "Keyboard End or PageDown inside the note area does not carry on into the column, so the last ~44px stay under the bar until the column scrolls."
+Story clause: "Keep Assimilate understanding, Skip from sequence…, and Optional modes accessible in a bottom action bar."
+Disposition: no user cost "A learner can see which note they are assimilating": inspected NoteShow (sticky bar after the note scroll area) and the existing notebook layout (`<main>` scrolls a 44px location strip above an `h-full` note page). That bottom 44px is already below the screen without the bar until the column scrolls; wheel and touch scrolling chain into the column and reveal the last line above the bar (NotebookWorkspaceReadFirst.spec scrolls both owners to their ends). The bar itself stays on screen and operable throughout.
+
+### O9. A width change remounts the panel
+Reported: slice 5 — "switching presentation remounts the panel, so an open Optional modes popover closes. The result survives (observed)."
+Story clause: "Choose the breakpoint by the space available to the panel and use iPad portrait as a layout check."
+Disposition: no user cost "decide when to advance after seeing what was added to recall": NotebookWorkspaceReadFirst.spec 'moves the same Understanding result between Visible options after the title and the bottom bar…' observes the result, Next item and optional modes after each switch; only an open popover closes, and reopening it is one tap.
 
 ## Execution notes
 
@@ -290,8 +300,25 @@ Disposition: proved by slice 4: frontend/tests/layouts/NotebookWorkspaceCompactO
   32px — slice 5 should measure the reading area or workspace column when
   choosing the final threshold. Docking at the bottom needs
   `daisy-dropdown-top`, no clipping ancestors, and a bar below the spelling
-  blocker's z-index 9989. Cypress (1200×800) sees the 736px wide layout. Panel
-  component specs mount attached at 1280px (`assimilationPanelTestSupport.ts`).
+  blocker's z-index 9989. Cypress (1200×800) sees the 736px wide layout.
+
+- Slice 5: `NoteShow` measures its note column with
+  `useNarrowerThan(root, 768)` (the full 48rem reading width) and below it
+  renders the same `AssimilationPanel` with `read-first` in a `sticky bottom-0
+  z-10` bar after the note scroll area; above it the panel stays after the
+  title. Measured note columns: 375 → 343; 768 → 448 (sidebar) / 736; 1024 →
+  704 / 992; Cypress 1200 → 880 / 992; 1280 → 960 / 1248. Spelling blocker
+  order above the bar is observed by on-screen colour, because the open Modal
+  makes the page inert to hit testing.
+
+- Removal reading (2026-11-09, at slice 5 acceptance, working tree over
+  `e61af632d9`): `git grep` outside `.planning` for NoteToolbarPanelShell,
+  note-toolbar-panel-shell, the old `AssimilationModes.vue` and its test
+  support, SEQUENCE_SKIP_CONFIRM, "Recall modes", "Leave this note out",
+  assimilateCurrentNote, VISIBLE_OPTIONS, INLINE_OPTIONAL_MODES,
+  expectGlobalModalThroughNextUnit, staysOnNote,
+  noteLevelAssimilationModesPanel and `data-testid="assimilation-modes"`
+  returned no matches.
 
 ## Verification and delivery
 

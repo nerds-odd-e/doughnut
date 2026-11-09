@@ -18,7 +18,6 @@ import { refinementLayoutItems } from "./noteRefinementTestSupport"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import type { Router } from "vue-router"
-import { atViewportWidth } from "@tests/layouts/notebookWorkspaceHeaderTestSupport"
 
 export const assimilateButtonSelector =
   '[data-test="assimilate-UNDERSTANDING"]' as const
@@ -76,7 +75,6 @@ export const expectAtNoteOf = (noteId: number) =>
   expect(router.currentRoute.value).toMatchObject(noteShowLocation(noteId))
 
 let renderer: RenderingHelper<typeof AssimilationPanel>
-let mounted: VueWrapper | undefined
 export let assimilateSpy: ReturnType<typeof mockSdkService>
 export let skipSequenceSpy: ReturnType<typeof mockSdkService>
 
@@ -91,15 +89,11 @@ export const { assimilatedCountOfTheDay } = assimilationCount
 
 export function setupAssimilationPanelTests() {
   afterEach(() => {
-    mounted?.unmount()
-    mounted = undefined
     document.body.innerHTML = ""
     vi.clearAllMocks()
   })
 
-  beforeEach(async () => {
-    // Mounted on a page this wide, the panel shows every mode at once.
-    await atViewportWidth(1280)
+  beforeEach(() => {
     resetRecallData()
     recallData.setTotalAssimilatedCount(0)
     refreshNonceAtStart = recallData.dueRecallsRefreshNonce.value
@@ -139,13 +133,13 @@ export function spellingVerificationPopupEl() {
 
 export async function mountAssimilationPanelReady() {
   router = await productionRouterAt(noteShowLocation(note.id))
-  mounted = renderer
+  const wrapper = renderer
     .withCleanStorage()
     .withProps({ note })
     .withRouter(router)
-    .mount({ attachTo: document.body })
+    .mount()
   await flushPromises()
-  return mounted
+  return wrapper
 }
 
 export async function closeSpellingVerificationPopup() {
