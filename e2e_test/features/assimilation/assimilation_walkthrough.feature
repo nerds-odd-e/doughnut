@@ -54,11 +54,11 @@ Feature: Assimilation walkthrough
     Then I should see the no more notes to assimilate toast
     And I should still be on the note page for "Note 5"
 
-  Scenario: Already assimilated note cannot be assimilated again
+  Scenario: Reopening an assimilated note shows its Understanding tracker
     Given the note "Note 1" was assimilated on day 1
     When I jump to the note page of "Note 1"
     And I open the assimilation panel
-    Then assimilate should be disabled
+    Then I should see a understanding memory tracker
 
   Scenario: Skip leaves only the note's Understanding out until Return to sequence
     Given It's day 1
@@ -79,7 +79,6 @@ Feature: Assimilation walkthrough
     And I assimilate it as commissioned
     Then I should see a commissioned memory tracker
     And I should see Return to sequence on the assimilation panel
-    And assimilate should be enabled
     When I return to sequence on the assimilation panel
     Then I should see Skip on the assimilation panel
     When I start assimilation from the menu
@@ -93,7 +92,6 @@ Feature: Assimilation walkthrough
     Then I should be assimilating the note "Note 2"
     When I jump to the note page of "Note 1"
     And I open the assimilation panel
-    Then assimilate should be enabled
     When I assimilate on the assimilation panel
     Then I should see Understanding added to recall for "Note 1"
     When I choose Next item
@@ -101,7 +99,7 @@ Feature: Assimilation walkthrough
     And I should see assimilation progress "1/4"
     When I jump to the note page of "Note 1"
     And I open the assimilation panel
-    Then assimilate should be disabled
+    Then I should see a understanding memory tracker
 
   Scenario: Walkthrough does not offer notes from a Skip Memory Tracking notebook
     Given It's day 1

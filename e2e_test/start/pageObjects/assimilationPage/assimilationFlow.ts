@@ -181,12 +181,7 @@ export const assumeAssimilationPage = () => ({
       message
     )
   },
-  expectAssimilateDisabled() {
-    // An understanding tracker already exists: the row shows its status link
-    // in place of the Assimilate action.
-    return this.expectNoteLevelMemoryTracker('understanding')
-  },
-  expectAssimilateEnabled() {
+  expectUnderstandingAssimilationAvailable() {
     assimilateButton().should('be.visible').and('not.be.disabled')
     return this
   },

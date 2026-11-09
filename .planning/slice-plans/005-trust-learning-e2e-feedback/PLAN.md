@@ -120,7 +120,7 @@ Accepted proof (2026-11-09 execution):
 
 ### 2. Name the assimilation outcomes the scenarios actually establish
 Type: Structure
-Status: planned
+Status: done
 Proof: Second and Skip/Return proof rows; Command B.
 
 Use the existing Understanding tracker step for reopening, name that scenario
@@ -134,6 +134,13 @@ eligibility rule changes.
 
 Sizing: about 5 minutes plus the focused E2E startup/runtime exception.
 Safe stop: the two affected features express the actual outcomes and stay green.
+
+Accepted proof (2026-11-09 execution):
+- Base: `e5057fb86b1c7933ad4be8aa8500a8fc40b277d1`
+- Command B: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature,e2e_test/features/assimilation/assimilate_with_remembering_spelling.feature`
+- Result: 14/14 pass (walkthrough 8 + spelling 6) on allocation `wt_4f7964e31e60485b9df2ba07535b8181`
+- Removal sweep: retired enabled/disabled step phrases/helpers have no remaining product/test consumers
+- Refactor: none — already clean (`## REFACTOR COMPLETE`)
 
 ### 3. Scope note interactions to the note panel beside property controls
 Type: Structure
