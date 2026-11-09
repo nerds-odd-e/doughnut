@@ -419,20 +419,6 @@ The plan's final observation looked for leftover `doughnut-retire-mysql-*` folde
   - Observed effect: no false reading; the implementer widened the check without being asked.
   - Inference: a proof location derived from the environment can point somewhere different when each command starts a new environment; low cost here only because the implementer noticed.
 
-## DD-439 — Agent shells lacked the environment that repository commands rely on
-
-The coordinator's and agents' non-interactive shells do not load `~/.zshrc`, which exports `NIX_CONFIG` (flakes) and `OPENAI_API_TOKEN`. `./scripts/run.sh` refused to start Nix, and mocked-OpenAI E2E features failed because the backend reads its key only from `OPENAI_API_TOKEN`.
-
-### Occurrences
-- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, execution start and slice 1 E2E)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: `./scripts/run.sh bash scripts/worktree_setup.sh` → "experimental Nix feature 'flakes' is disabled"; slice 1 E2E `sut.log`: `IllegalStateException: This request requires apiKey` (8 refinement, 10 question-generation errors); reruns with an exported placeholder passed.
-  - Observed effect: one refused setup command and a diagnosis at startup; two E2E features failed and were rerun; every later brief had to carry both exports.
-  - Inference: the wrappers depend on interactive-shell environment; a wrapper-supplied flag and mock token would remove the dependency.
-
 ## DD-440 — The coordinator required the full frontend suite in every slice
 
 The plan asked for the full frontend suite on the final implementation. The coordinator's briefs required it once per slice, beyond the focused-check time the delegation rule names for the changed surface's suite.

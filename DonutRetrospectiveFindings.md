@@ -34,6 +34,38 @@ SEED-108#spread-out-recall-backlog report, `5002ad7856` repaired the test
 builder's due-time override. The remaining unverified-premise observation
 belongs with ODF-074 in [DearDough](DearDough.md#odf-074).
 
+The 2026-11-10 review at `f61aeafdf4` read the DearDough
+additions DD-347, DD-348 and DD-438 to DD-447. DD-439 moved here: the failed
+responsibility is Donut's command wrappers, and the briefs' repeated exports
+show recurring cost, so it queues
+[SEED-116](.planning/seeds/SEED-116-agent-shell-independent-commands.md#run-repository-commands-without-interactive-shell-setup).
+DD-438's leftover check failed through a Nix-shell temporary folder, but no
+false reading occurred and its finding is about deriving a proof location from
+the environment, so it stays shared. The other additions concern shared
+planning, delegation, proof and delivery. DD-161, DD-159 and DD-335 have no
+new occurrences.
+
+## Open, queued
+
+<a id="dd-439"></a>
+
+### DD-439 — Agent shells lacked the environment that repository commands rely on
+
+The coordinator's and agents' non-interactive shells do not load `~/.zshrc`, which exports `NIX_CONFIG` (flakes) and `OPENAI_API_TOKEN`. `./scripts/run.sh` refused to start Nix, and mocked-OpenAI E2E features failed because the backend reads its key only from `OPENAI_API_TOKEN`.
+
+Moved from [DearDough](DearDough.md) on 2026-11-10; the source entry is recoverable at `f61aeafdf4:DearDough.md`. Ownership: Donut's `./scripts/run.sh` and mocked-OpenAI E2E stack depend on interactive-shell exports; no shared Open Dough contract failed.
+
+#### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, execution start and slice 1 E2E)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: `./scripts/run.sh bash scripts/worktree_setup.sh` → "experimental Nix feature 'flakes' is disabled"; slice 1 E2E `sut.log`: `IllegalStateException: This request requires apiKey` (8 refinement, 10 question-generation errors); reruns with an exported placeholder passed.
+  - Observed effect: one refused setup command and a diagnosis at startup; two E2E features failed and were rerun; every later brief had to carry both exports.
+  - Inference: the wrappers depend on interactive-shell environment; a wrapper-supplied flag and mock token would remove the dependency.
+- Queued response: [SEED-116#run-repository-commands-without-interactive-shell-setup](.planning/seeds/SEED-116-agent-shell-independent-commands.md#run-repository-commands-without-interactive-shell-setup) — queued, not resolved.
+
 ## Open, not queued
 
 ### DD-161 — A `.venv-mineru` whose Python was garbage-collected had to be rebuilt by hand
