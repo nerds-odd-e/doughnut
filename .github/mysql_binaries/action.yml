@@ -1,16 +1,10 @@
 name: "Install MySQL 8.4 binaries"
 description: "Provide local binaries for disposable MySQL test servers"
-outputs:
-  elapsed-seconds:
-    description: "Seconds spent installing the binaries"
-    value: ${{ steps.install.outputs.elapsed-seconds }}
 runs:
   using: "composite"
   steps:
-    - id: install
-      shell: bash
+    - shell: bash
       run: |
-        started=$SECONDS
         ncurses_version=6.3-2ubuntu0.3
         for package in libncurses5 libtinfo5; do
           curl --fail --location --retry 3 "https://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/${package}_${ncurses_version}_amd64.deb" -o "$RUNNER_TEMP/$package.deb"
@@ -26,4 +20,3 @@ runs:
         "$RUNNER_TEMP/$mysql_archive/bin/mysqld" --version
         "$RUNNER_TEMP/$mysql_archive/bin/mysql" --version
         echo "MYSQL_BASEDIR=$RUNNER_TEMP/$mysql_archive" >> "$GITHUB_ENV"
-        echo "elapsed-seconds=$((SECONDS - started))" >> "$GITHUB_OUTPUT"

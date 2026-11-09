@@ -41,20 +41,6 @@ jobs:
           java_version: ${{ vars.JAVA_VERSION }}
           node_version: ${{ vars.NODE_VERSION }}
 
-  Script-runner-probe:
-    name: Script runner probe (${{ matrix.runner }})
-    if: github.ref == 'refs/heads/codex/see-ci-results-and-timings-for-the-remaining-scr'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy: { fail-fast: false, matrix: { runner: [1, 2, 3] } }
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/script_runner_probe
-        with:
-          java_version: ${{ vars.JAVA_VERSION }}
-          node_version: ${{ vars.NODE_VERSION }}
-          probe_runner: ${{ matrix.runner }}
-
   Backend-unit-tests:
     name: Backend Unit tests
     runs-on: ${{ vars.RUNNER }}

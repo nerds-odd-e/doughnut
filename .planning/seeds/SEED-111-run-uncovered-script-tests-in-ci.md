@@ -56,9 +56,7 @@ Scope limits:
 - The 13 `scripts/ci/application-release-*.test.mjs` files keep running
   inside the Bash `scripts/test/application-release.test` check, which counts
   them as one check.
-- Node test files outside `scripts/`, CLI CI proof, and the test counts of
-  [SEED-112](SEED-112-publish-explicit-ci-test-counts.md#publish-explicit-ci-test-counts)
-  are other work.
+- Node test files outside `scripts/` and CLI CI proof are outside scope.
 - Removing or merging any of the 18 files is not part of this story.
 
 Boundary assumption: the intended CI runner is GitHub’s `ubuntu-latest`, which

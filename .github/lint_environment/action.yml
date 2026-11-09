@@ -7,10 +7,6 @@ inputs:
   node_version:
     description: "Node.js version"
     required: true
-outputs:
-  mysql-install-seconds:
-    description: "Seconds spent installing MySQL binaries"
-    value: ${{ steps.mysql-binaries.outputs.elapsed-seconds }}
 runs:
   using: "composite"
   steps:
@@ -29,7 +25,6 @@ runs:
     - uses: ./.github/setup_nodejs_with_cache
       with:
         node_version: ${{ inputs.node_version }}
-    - id: mysql-binaries
-      uses: ./.github/mysql_binaries
+    - uses: ./.github/mysql_binaries
     - shell: bash
       run: bash -c ./assert_generated_type_script_up_to_date.sh

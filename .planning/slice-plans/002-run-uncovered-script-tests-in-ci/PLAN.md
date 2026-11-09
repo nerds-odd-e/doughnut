@@ -14,11 +14,12 @@ shows the same figures for that attempt. Before the retirement tests become
 required, the full group runs repeatedly on the CI runner, and recurring
 failures are resolved first.
 
-Not included: the 13 `scripts/ci/application-release-*.test.mjs` files, Node
-tests outside `scripts/`, CLI CI proof, SEED-112's test counts, changes to
-the Cloud VM setup, and removing or merging any of the 18 files. No test is
-skipped or left out on CI to make an attempt pass. A file that cannot run on
-the runner without changing what it checks goes to the story owner.
+The existing CI proof counting rules apply. Scope excludes the 13
+`scripts/ci/application-release-*.test.mjs` files, Node tests outside `scripts/`,
+CLI CI proof, changes to the Cloud VM setup, and removing or merging any of the
+18 files. No test is skipped or left out on CI to make an attempt pass. A file
+that cannot run on the runner without changing what it checks goes to the story
+owner.
 
 ## Current decisions
 
@@ -96,7 +97,7 @@ the runner without changing what it checks goes to the story owner.
 ### 1. The full group passes repeatedly on the CI runner
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: The plan records the series: run IDs, attempts, runners, each
 repetition's passed and failed counts with failing tests and errors, the
 group's time per repetition, the MySQL install time, and the runner's
@@ -166,13 +167,13 @@ summary publishes.
 ### G1. Hosted runner gate awaits the published probe
 Reported: slice 1 — "Hosted MySQL execution, Java/process inspection, and all 30 repetitions remain uncovered; root owns those observations after progress publication."
 Story clause: "Record the CI attempts and outcomes, and resolve any recurring failure in the group before making its tests required."
-Disposition: return
+Disposition: proved by slice 1: runner-series-clean.md. Exact CI success at a84e1ee292, run42583951600 attempt1, with all30 full-group repetitions passed.
 
 
 ## Current execution context
 
 - Established story-branch identity, claim, checkout preparation and prior proof are retained in [execution-history.md](execution-history.md). First failed series is [runner-series.md](runner-series.md).
-- Current published revision is `b691bba3009d776a9c295931bf452fb65e1d4dec` on origin/refs/heads/codex/see-ci-results-and-timings-for-the-remaining-scr, with suffix base `2d4d52f06680eb94a8d5f55e4eb1fe256ea14960`. Work remains in the established checkout and branch.
+- Current published revision before this delivery is `a84e1ee2928e2db1d2418ec8b2023bdf1bb09bbf` on origin/refs/heads/codex/see-ci-results-and-timings-for-the-remaining-scr, with suffix base `2d4d52f06680eb94a8d5f55e4eb1fe256ea14960`. Work remains in the established checkout and branch.
 - The developer authenticated gh as terryyin. Workflow selector ci.yml (5208694) resolves to donut CI. The checkout readiness command ./scripts/run.sh pnpm test:ci-proof passed 25/25 again.
 - Old observer /tmp/dough-ci-501/watch-Th0z5b is stopped with no unread records and its PID gone. Current observer is cell g48:4, coordinator seed111-ai-chan, directory /tmp/dough-ci-501/watch-VZyjTJ, PID78934, session31456, same story-branch target. Managed resume recovered observation of the already-published repair without pushing.
 - Second series run42579425249 attempt1 failed. All30 repetitions hit the missing MySQL client libncurses.so.5 dependency. Runner3 repetitions1 and5 also hit the named idle fixture's unavailable peer JVM cwd. These are owned recurring failures, with installer and fixture-isolation repairs locally accepted for progress publication. G1 stays open and a fresh series follows the repairs.
@@ -184,3 +185,11 @@ Disposition: return
 - Installer resolution supplies genuine Ubuntu security libncurses5/libtinfo5 6.3-2ubuntu0.3 packages (206,870 bytes). Published checksums and package dependency metadata matched. Both MySQL server and client --version are checked during acquisition. Official glibc2.28 minimal archive was unavailable (404), while the full archive was 908 MB. Retaining the 61 MB minimal build plus ABI5 packages keeps the measured setup small. ./scripts/run.sh node /tmp/seed111-validate-mysql-action.mjs passed action/Bash/input validation and ./scripts/run.sh pnpm test:ci-proof passed25/25. Actual Ubuntu acquisition remains owned by root in the fresh series.
 - Idle fixture resolution reuses runCheck default clearEvidenceDeps, which supplies empty process/session evidence. The existing idle assertions observe snapshot and non-reservation output. With controlled external ps/lsof evidence via /tmp/seed111-idle-host-preload.mjs, the exact idle case failed0/1 before and passed1/1 after using ./scripts/run.sh node --import /tmp/seed111-idle-host-preload.mjs --test --test-name-pattern='verified idle fixture' scripts/worktree-retirement-checkout-processes.test.mjs. ./scripts/run.sh node --test scripts/worktree-retirement-checkout-processes.test.mjs scripts/worktree-retirement.test.mjs scripts/worktree-retirement-evidence.test.mjs passed28/28 in4.2s, including real JVM and unavailable-cwd refusals.
 - Consumer traces /tmp/seed111-client-consumers.md and /tmp/seed111-idle-repair-consumers.md were inspected. Independent runner_repairs_refactor completed before publication. Accepted local proof remains valid. The fresh three-runner, ten-repetitions-each series is required before acceptance.
+
+## Slice 1 accepted
+
+- [Clean series](runner-series-clean.md) records run42583951600 attempt1 at a84e1ee2928e2db1d2418ec8b2023bdf1bb09bbf. Root independently reconciled18 files and30 repetitions with2340 raw passes, zero failures/cancellations/skips/todos. Native await-revision returned exact success. G1 is proved and all slice1 source commitments were observed.
+- Removed the temporary probe and its exclusive timing outputs transitively. Retained Lint environment and MySQL installation/client/server checks passed ./scripts/run.sh pnpm test:ci-proof25/25 and ./scripts/run.sh node /tmp/seed111-validate-probe-removal.mjs. Consumer trace /tmp/seed111-clean-series-consumers.md covers every affected live caller. The one-time sweep is recorded separately as a reading with dated planning evidence classified.
+- Refactor disposition is already-traced removal within the accepted probe_refactor and runner_repairs_refactor paths/consumer traces, plus records-only source/review/evidence changes. No new helper, dependency or representation was added in this increment.
+- Human source amendment at trunk9a33d32751 was absorbed. It retains existing CI counting rules and removes a redundant scope sentence referring to the sibling counts story. A fresh source-only review was retained before gate acceptance. The repair publication began before absorption, an execution-order defect corrected here before any slice acceptance. Source freshness now matches trunk.
+- Raw passing Node tests are78 per repetition. The CI reporter counts75 leaf checks across the18 files. The dated73-check baseline gains one cleanup leaf and one ambient-defaults leaf in worktree-retirement-mutation.test.mjs. Slice2 must observe its current report counts rather than copy the dated baseline.
