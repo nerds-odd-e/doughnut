@@ -29,6 +29,7 @@ const AssimilationPanelStory = defineComponent({
       required: true,
     },
     understandingAdded: { type: Boolean, default: false },
+    compact: { type: Boolean, default: false },
   },
   setup(props) {
     const memoryTrackerActions: MemoryTrackerActions = {
@@ -48,7 +49,7 @@ const AssimilationPanelStory = defineComponent({
     provide(memoryTrackerActionsKey, memoryTrackerActions)
   },
   template: `
-    <div class="w-[calc(100vw-2rem)] max-w-3xl">
+    <div class="w-[calc(100vw-2rem)]" :class="compact ? 'max-w-sm' : 'max-w-3xl'">
       <AssimilationPanel :note="note" />
     </div>
   `,
@@ -97,5 +98,13 @@ export const UnderstandingAdded: Story = {
     note: noteRealm.note,
     noteRecallInfo: makeMe.aNoteRecallInfo.please(),
     understandingAdded: true,
+  },
+}
+
+export const Compact: Story = {
+  args: {
+    note: noteRealm.note,
+    noteRecallInfo: makeMe.aNoteRecallInfo.please(),
+    compact: true,
   },
 }

@@ -1,10 +1,20 @@
+import type { MemoryTracker } from "@generated/donut-backend-api"
+import {
+  AssimilationController,
+  NoteController,
+} from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
+import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
+import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, vi } from "vitest"
 import { page } from "vitest/browser"
 import type { Router } from "vue-router"
-import { pageBarEl } from "./notebookWorkspaceHeaderTestSupport"
+import {
+  clickPageBarCommand,
+  pageBarEl,
+} from "./notebookWorkspaceHeaderTestSupport"
 
 export const activity = () =>
   pageBarEl().querySelector<HTMLButtonElement>(".nav-item button")!
@@ -46,4 +56,57 @@ export const expectPropertyLearningOpen = async (
       )
     ).toBe(true)
   )
+}
+
+export const nextRecallAt = "2026-11-20T08:00:00.000Z"
+const nextRecallText = `Next ${new Date(nextRecallAt).toLocaleDateString(
+  undefined,
+  { day: "numeric", month: "short" }
+)}`
+/** Backend trackers per note: assimilating adds to them, note info reads them. */
+export const serveNoteTrackers = (
+  trackers: Record<number, MemoryTracker[]> = {}
+) => {
+  mockSdkServiceWithImplementation(NoteController, "getNoteInfo", ({ path }) =>
+    makeMe.aNoteRecallInfo.memoryTrackers(trackers[path.note] ?? []).please()
+  )
+  mockSdkServiceWithImplementation(
+    AssimilationController,
+    "assimilate",
+    ({ body: { noteId, assimilateAsCommissioned, assimilateAsSpelling } }) => {
+      const tracker = makeMe.aMemoryTracker.nextRecallAt(nextRecallAt)
+      if (assimilateAsCommissioned) tracker.commissioned()
+      if (assimilateAsSpelling) tracker.spelling()
+      const created = [tracker.please()]
+      trackers[noteId!] = [...(trackers[noteId!] ?? []), ...created]
+      return created
+    }
+  )
+}
+export const visibleText = (selector: string) => {
+  const el = document.querySelector<HTMLElement>(selector)
+  return el?.checkVisibility() ? el.textContent?.trim() : undefined
+}
+export const expectUnderstandingResult = () =>
+  vi.waitFor(() =>
+    expect(visibleText(`${inPanel("understanding-result")} p`)).toBe(
+      "Understanding added to recall"
+    )
+  )
+export const expectTrackerStatus = (mode: string) =>
+  vi.waitFor(() =>
+    expect(
+      visibleText(`${inPanel(`assimilation-status-${mode}`)} + span`)
+    ).toBe(nextRecallText)
+  )
+/** Opens the note's assimilation and leaves it at the Understanding result. */
+export const assimilateUnderstanding = async () => {
+  await clickPageBarCommand(noteMoreOptionsTitles.assimilation)
+  await vi.waitFor(() =>
+    expect(visibleText(inPanel("assimilate-UNDERSTANDING"))).toBe(
+      "Assimilate understanding"
+    )
+  )
+  await clickInPanel("assimilate-UNDERSTANDING")
+  await expectUnderstandingResult()
 }

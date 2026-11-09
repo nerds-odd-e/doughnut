@@ -1,8 +1,4 @@
-import type { MemoryTracker } from "@generated/donut-backend-api"
-import {
-  AssimilationController,
-  NoteController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import {
   DAILY_GOAL_TOAST,
@@ -10,10 +6,7 @@ import {
 } from "@/composables/useGoToNextAssimilation"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
-import {
-  mockSdkService,
-  mockSdkServiceWithImplementation,
-} from "@tests/helpers"
+import { mockSdkService } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import {
   showToastsOnPage,
@@ -28,68 +21,21 @@ import {
   mountNotebookWorkspace,
 } from "./notebookWorkspaceHeaderTestSupport"
 import {
+  assimilateUnderstanding,
   clickInPanel,
   expectActivity,
   expectPropertyLearningOpen,
+  expectTrackerStatus,
+  expectUnderstandingResult,
   inPanel,
+  nextRecallAt,
   panelSelector,
   propertyNote,
+  serveNoteTrackers,
+  visibleText,
 } from "./notebookWorkspaceAssimilationTestSupport"
 
 let wrapper: VueWrapper
-
-const nextRecallAt = "2026-11-20T08:00:00.000Z"
-const nextRecallText = `Next ${new Date(nextRecallAt).toLocaleDateString(
-  undefined,
-  { day: "numeric", month: "short" }
-)}`
-/** Backend trackers per note: assimilating adds to them, note info reads them. */
-const serveNoteTrackers = (trackers: Record<number, MemoryTracker[]> = {}) => {
-  mockSdkServiceWithImplementation(NoteController, "getNoteInfo", ({ path }) =>
-    makeMe.aNoteRecallInfo.memoryTrackers(trackers[path.note] ?? []).please()
-  )
-  mockSdkServiceWithImplementation(
-    AssimilationController,
-    "assimilate",
-    ({ body: { noteId, assimilateAsCommissioned } }) => {
-      const tracker = makeMe.aMemoryTracker.nextRecallAt(nextRecallAt)
-      const created = [
-        assimilateAsCommissioned
-          ? tracker.commissioned().please()
-          : tracker.please(),
-      ]
-      trackers[noteId!] = [...(trackers[noteId!] ?? []), ...created]
-      return created
-    }
-  )
-}
-const visibleText = (selector: string) => {
-  const el = document.querySelector<HTMLElement>(selector)
-  return el?.checkVisibility() ? el.textContent?.trim() : undefined
-}
-const expectUnderstandingResult = () =>
-  vi.waitFor(() =>
-    expect(visibleText(`${inPanel("understanding-result")} p`)).toBe(
-      "Understanding added to recall"
-    )
-  )
-const expectTrackerStatus = (mode: string) =>
-  vi.waitFor(() =>
-    expect(
-      visibleText(`${inPanel(`assimilation-status-${mode}`)} + span`)
-    ).toBe(nextRecallText)
-  )
-/** Opens the note's assimilation and leaves it at the Understanding result. */
-const assimilateUnderstanding = async () => {
-  await clickPageBarCommand(noteMoreOptionsTitles.assimilation)
-  await vi.waitFor(() =>
-    expect(visibleText(inPanel("assimilate-UNDERSTANDING"))).toBe(
-      "Assimilate understanding"
-    )
-  )
-  await clickInPanel("assimilate-UNDERSTANDING")
-  await expectUnderstandingResult()
-}
 
 showToastsOnPage()
 

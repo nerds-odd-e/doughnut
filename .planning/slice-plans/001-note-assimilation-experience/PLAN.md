@@ -174,7 +174,7 @@ rule unchanged.
 
 ### 4. Reach optional modes from compact disclosure
 Type: Behavior
-Status: planned
+Status: done
 Proof: Proof row 7. Mounted workspace at compact width opens Optional modes,
 operates both modes/statuses, closes with keyboard/outside interaction and
 returns focus; spelling verification remains the opaque top interaction.
@@ -237,6 +237,16 @@ Reported: slice 3 — "Confirmed skip with no next item: not tested."
 Story clause: "When an explicit advance finds no next item, keep the current note page, show the existing No more notes to assimilate feedback, and close the assimilation presentation."
 Disposition: no user cost "decide when to advance after seeing what was added to recall": inspected useAssimilationSequenceSkip (a confirmed skip calls the same unchanged useGoToNextAssimilation as Next item), useGoToNextAssimilation (empty next shows No more notes to assimilate and dismisses the presentation) and AssimilationPanel (a non-navigating completed skip reloads the same note). That shared empty-next result is proved for Next item by NotebookWorkspaceUnderstandingResult.spec.ts 'Next item with nothing left keeps the note, says so and closes assimilation'; the skip path's outcome is the same pre-existing behavior.
 
+### O6. The panel heading takes the global h3 size and margins
+Reported: slice 4 — "A global unlayered `h3 { font-size:1.5rem; margin-top:2rem; margin-bottom:1rem }` in `frontend/src/assets/daisyui.css` overrides the panel heading's `text-base` and `mb-3`. That was already true in the slice-1 wide layout."
+Story clause: "Combine the two selected mockups into one responsive note-level assimilation experience."
+Disposition: receiving slice 5
+
+### O7. Choosing an optional mode closes the compact popover
+Reported: slice 4 — "after adding, the learner reopens Optional modes to see the new tracker"
+Story clause: "Already active modes show their tracker and next recall date."
+Disposition: proved by slice 4: frontend/tests/layouts/NotebookWorkspaceCompactOptionalModes.spec.ts 'adding Commissioned from Optional modes keeps the note and its Understanding result' and 'Verify spelling from Optional modes closes the popover and covers the note until it is cancelled or verified' (reopening shows the added tracker's Next <date>; the panel remount after an addition closes the popover in any case)
+
 ## Execution notes
 
 - Execution: story-branch on `claude/choose-how-to-assimilate-a-note-and-when-to-move`
@@ -271,6 +281,17 @@ Disposition: no user cost "decide when to advance after seeing what was added to
   (`NotebookWorkspaceSequenceSkip.spec.ts`); its selectors assume Skip from
   sequence… stays inside `note-assimilation-modes` — slice 5 must retarget them
   if the bottom bar moves the control.
+
+- Slice 4: compact optional modes use `AutoCollapseDropdown` (inline
+  `.daisy-dropdown-content`, z-index 999) inside `NoteAssimilationModes`, with
+  `useNarrowerThan(section, 720)` measuring the panel. Measured panel widths:
+  768 → 416 (sidebar) / 704; 1024 → 672 / 736; ≥1100 → 736 (capped by the 48rem
+  reading column), so the panel separates iPad portrait from desktop by only
+  32px — slice 5 should measure the reading area or workspace column when
+  choosing the final threshold. Docking at the bottom needs
+  `daisy-dropdown-top`, no clipping ancestors, and a bar below the spelling
+  blocker's z-index 9989. Cypress (1200×800) sees the 736px wide layout. Panel
+  component specs mount attached at 1280px (`assimilationPanelTestSupport.ts`).
 
 ## Verification and delivery
 

@@ -1,11 +1,40 @@
 <template>
   <section
+    ref="section"
     aria-label="Assimilate this note"
     data-testid="note-assimilation-modes"
-    class="@container rounded-box border-base-300 mb-4 border p-4"
+    class="rounded-box border-base-300 mb-4 border p-4"
   >
-    <h3 class="mb-3 text-base font-semibold">Assimilate this note</h3>
-    <div class="grid gap-6 @lg:grid-cols-2">
+    <div class="flex items-center justify-between gap-2">
+      <h3 class="mb-3 text-base font-semibold">Assimilate this note</h3>
+      <AutoCollapseDropdown
+        v-if="compact"
+        v-slot="{ closeDropdown }"
+        ref="optionalModesDisclosure"
+        class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
+        @keydown.esc="optionalModesDisclosure?.closeDropdown()"
+        @toggle="keepFocusAtTrigger"
+      >
+        <summary
+          class="daisy-btn daisy-btn-sm list-none"
+          data-test="optional-modes"
+        >
+          Optional modes
+          <ChevronDown class="size-4" aria-hidden="true" />
+        </summary>
+        <div
+          class="daisy-dropdown-content bg-base-100 rounded-box mt-2 flex w-[min(26rem,calc(100vw-4rem))] flex-col gap-3 p-4 shadow"
+        >
+          <h4 class="font-semibold">Optional modes</h4>
+          <OptionalAssimilationModes
+            :trackers="noteRecallInfo?.memoryTrackers"
+            :loading="!noteInfoLoaded"
+            @assimilate="closeDropdown(); emit('assimilate', $event)"
+          />
+        </div>
+      </AutoCollapseDropdown>
+    </div>
+    <div :class="{ 'grid grid-cols-2 gap-6': !compact }">
       <div
         class="flex flex-col items-start gap-1"
         data-test="assimilation-mode-row-UNDERSTANDING"
@@ -39,7 +68,7 @@
         <div v-else class="mt-2 flex flex-wrap items-center gap-2">
           <AssimilationModeAction
             mode="UNDERSTANDING"
-            :tracker="trackerOf('UNDERSTANDING')"
+            :tracker="understandingTracker"
             :loading="!noteInfoLoaded"
           >
             <button
@@ -72,48 +101,17 @@
           </AssimilationModeAction>
         </div>
       </div>
-      <div class="flex flex-col gap-3">
+      <div v-if="!compact" class="flex flex-col gap-3">
         <div
           class="text-base-content/60 text-xs font-semibold tracking-wide uppercase"
         >
           Optional modes
         </div>
-        <div
-          v-for="option in optionalModes"
-          :key="option.mode"
-          class="flex flex-wrap items-center justify-between gap-2"
-          :data-test="`assimilation-mode-row-${option.mode}`"
-        >
-          <div class="flex min-w-0 flex-1 items-start gap-2">
-            <component
-              :is="option.icon"
-              class="mt-0.5 size-5 shrink-0"
-              aria-hidden="true"
-            />
-            <div class="min-w-48">
-              <strong>{{ option.label }}</strong>
-              <p class="text-base-content/70 text-sm">
-                {{ option.description }}
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <AssimilationModeAction
-              :mode="option.mode"
-              :tracker="trackerOf(option.mode)"
-              :loading="!noteInfoLoaded"
-            >
-              <button
-                type="button"
-                class="daisy-btn daisy-btn-outline"
-                :data-test="`assimilate-${option.mode}`"
-                @click="emit('assimilate', option.request)"
-              >
-                {{ option.action }}
-              </button>
-            </AssimilationModeAction>
-          </div>
-        </div>
+        <OptionalAssimilationModes
+          :trackers="noteRecallInfo?.memoryTrackers"
+          :loading="!noteInfoLoaded"
+          @assimilate="emit('assimilate', $event)"
+        />
       </div>
     </div>
   </section>
@@ -121,16 +119,16 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
-import { ArrowRight, Check, GraduationCap, SpellCheck } from "@lucide/vue"
-import { computed, toRef } from "vue"
+import { ArrowRight, Check, ChevronDown } from "@lucide/vue"
+import { computed, ref, toRef } from "vue"
+import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import AssimilationModeAction from "./AssimilationModeAction.vue"
+import OptionalAssimilationModes from "./OptionalAssimilationModes.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
-import {
-  noteLevelTrackerOfType,
-  type MemoryTrackerType,
-} from "./assimilationMemoryTrackers"
+import { useNarrowerThan } from "@/composables/useNarrowerThan"
+import { noteLevelTrackerOfType } from "./assimilationMemoryTrackers"
 
 const { note, noteInfoLoaded } = defineProps<{
   note: Note
@@ -148,29 +146,36 @@ const { noteRecallInfo, understandingAdded } = useInjectedMemoryTrackerActions(
   toRef(() => note.id)
 )
 
-const trackerOf = (mode: MemoryTrackerType) =>
-  noteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, mode)
+const understandingTracker = computed(() =>
+  noteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "UNDERSTANDING")
+)
 
 const skipped = computed(() =>
   isSkippedFromAssimilationSequence(noteRecallInfo.value)
 )
 
-const optionalModes = [
-  {
-    mode: "SPELLING",
-    icon: SpellCheck,
-    label: "Spelling",
-    description: "Recall the title or an alias from memory.",
-    action: "Verify spelling",
-    request: { assimilateAsSpelling: true },
-  },
-  {
-    mode: "COMMISSIONED",
-    icon: GraduationCap,
-    label: "Commissioned",
-    description: "Review in future learning sessions with a human or AI tutor.",
-    action: "Add to sessions",
-    request: { assimilateAsCommissioned: true },
-  },
-] as const
+/**
+ * Below this panel width the optional modes move behind a disclosure. The
+ * panel gets 736px at the full reading measure and 704px on an iPad in
+ * portrait.
+ */
+const INLINE_OPTIONAL_MODES_MIN_WIDTH_PX = 720
+const section = ref<HTMLElement | null>(null)
+const compact = useNarrowerThan(section, INLINE_OPTIONAL_MODES_MIN_WIDTH_PX)
+
+const optionalModesDisclosure = ref<InstanceType<
+  typeof AutoCollapseDropdown
+> | null>(null)
+
+/** Closing must not strand focus inside the hidden popover or on the page. */
+const keepFocusAtTrigger = (event: Event) => {
+  const disclosure = event.target as HTMLDetailsElement
+  const focused = document.activeElement
+  if (
+    !disclosure.open &&
+    (focused === document.body || disclosure.contains(focused))
+  ) {
+    disclosure.querySelector("summary")!.focus()
+  }
+}
 </script>
