@@ -210,6 +210,27 @@ exercise width changes as well as both static presentations. Replace slice 4's
 above-content compact placement. Keep wide layout from slice 1 green.
 Sizing: target 5 minutes, scrutinized 5–8 minutes for scroll/placement integration.
 
+## Execution complete
+
+Product advice: no change to backlog priorities. For Story Wrap Up:
+- The retrospective planned one correction,
+  [SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions](../../seeds/SEED-113-note-assimilation-experience.md#keep-the-assimilation-panel-in-place-after-staying-actions)
+  ([plan](../002-keep-assimilation-panel-in-place/PLAN.md), assessed ready, not
+  queued): stay-on-note actions reload the note and rebuild the panel for no
+  purpose, costing a request, an unhandled failure path and compact focus.
+- `e2e_test/features/learning_session/commissioned_learning_session.feature`
+  asserts a tracker-id-seeded "199 hours" interval and fails on reused local
+  E2E databases (Execution notes, slice 1 diagnosis); a small bug story would
+  keep that evidence after this plan is removed.
+- ADR 0001 names the short labels **Skip** and **Remember spelling**; the
+  note-level panel now says **Skip from sequence…** and **Verify spelling**, as
+  the story approved. Whether ADR 0001 follows is the owner's decision.
+- Learner comprehension and real phone or iPad fit of Read first remain
+  hypotheses; a short manual look on a device would test them.
+- Low-impact, unplanned: E2E steps "assimilate should be disabled/enabled" no
+  longer say what they check, and `assimilationPage/shared.ts` keeps two rules
+  for finding note-level controls.
+
 ## Story obligations
 
 ### O1. Understanding still advances automatically

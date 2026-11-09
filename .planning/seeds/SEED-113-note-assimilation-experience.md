@@ -160,3 +160,24 @@ preserve all three explored layouts. **Visible options** and **Read first** supp
 the responsive layouts. The result and advance behavior above supersedes the
 mockups’ simulated next screen. Remove this temporary reference and the mockups
 when the story is wrapped up.
+
+<a id="keep-the-assimilation-panel-in-place-after-staying-actions"></a>
+
+### Keep the assimilation panel in place after actions that stay on the note
+
+**Identity:** SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-keep-assimilation-panel-in-place/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9f39e644070fd005323d5f10e61af491fa8b2bbba0b0b9b91632795df16d4612","plan":"ca56816637cb960488aebe522f1b496ada38d1bea5ec06d81fa4f7c7d778b793"}}
+```
+
+**Goal.** A learner who assimilates Understanding, adds an optional mode, or
+skips with nothing left to assimilate stays on the same note panel without an
+extra note reload or a rebuilt panel, so keyboard focus the panel placed stays
+where it was.
+
+**Scope.** Correct the note-level assimilation panel's completion of actions
+that stay on the note, in both the Visible options and Read first placements.
+Keep every promise of
+[Choose how to assimilate a note and when to move on](#assimilate-notes-with-a-clear-default-and-result)
+unchanged. This correction adds no product promise; its findings, provenance
+and proof live in its [plan](../slice-plans/002-keep-assimilation-panel-in-place/PLAN.md).

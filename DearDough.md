@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 348. Removed numbers are never reused.
+- Highest allocated local number: 353. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 
@@ -117,6 +117,16 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 ## ODF-206 — Over-budget slice not stopped
 
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-206.md).
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: plan slices targeted 5 minutes (scrutinized 5–8, hard 10); implementer agent runs took 1,749 s, 1,554 s, 934 s, 1,857 s and 2,093 s including runner waits; slice 2 return: "roughly 15–20 minutes, above the 5–8 minute window"; slice 4 return: "Over the 5-minute target … not oversized".
+  - Observed effect: every slice overran at hand-back and was accepted with the implementer's stated reasons; none was re-sized.
+  - Inference: runner and full-suite waits are part of the overrun, so the budget's runner exception left the active-work time unmeasured.
 
 <a id="odf-217"></a>
 
@@ -384,3 +394,73 @@ Slice 1 added an Intent location without CI proof. Its consumer trace found `doc
   - Evidence: slice 1 return's "deferred to slice 2" disposition; e2256907b2 left `docs/ci-proof-summary.md` naming only `scripts` and `infra`; d122555f9f added `cli/tests`.
   - Observed effect: an inaccurate doc line for two slice increments; no CI or product effect.
   - Inference: a disposition naming a later slice was accepted without checking that slice owned the change.
+
+## DD-349 — Agent shells lacked the environment that repository commands rely on
+
+The coordinator's and agents' non-interactive shells do not load `~/.zshrc`, which exports `NIX_CONFIG` (flakes) and `OPENAI_API_TOKEN`. `./scripts/run.sh` refused to start Nix, and mocked-OpenAI E2E features failed because the backend reads its key only from `OPENAI_API_TOKEN`.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, execution start and slice 1 E2E)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: `./scripts/run.sh bash scripts/worktree_setup.sh` → "experimental Nix feature 'flakes' is disabled"; slice 1 E2E `sut.log`: `IllegalStateException: This request requires apiKey` (8 refinement, 10 question-generation errors); reruns with an exported placeholder passed.
+  - Observed effect: one refused setup command and a diagnosis at startup; two E2E features failed and were rerun; every later brief had to carry both exports.
+  - Inference: the wrappers depend on interactive-shell environment; a wrapper-supplied flag and mock token would remove the dependency.
+
+## DD-350 — The coordinator required the full frontend suite in every slice
+
+The plan asked for the full frontend suite on the final implementation. The coordinator's briefs required it once per slice, beyond the focused-check time the delegation rule names for the changed surface's suite.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: slice briefs: "Run the full frontend suite … once on your final implementation"; returns report full-suite runs of 140 s (slice 2), 143 s (slice 4) and 262 s (slice 5), plus slices 1 and 3; slice 2 return: load peaked at 34.9 after its full frontend run, delaying its E2E launch.
+  - Observed effect: five full-suite runs on a shared, loaded host; no recorded failure was caught only by a full-suite run.
+  - Inference: per-slice focused specs plus one final full run would likely have given the same evidence at lower cost.
+
+## DD-351 — A disclosure slice built a width rule that the docking slice replaced
+
+The plan split the compact optional-modes disclosure (slice 4) from the bottom-bar docking (slice 5) and left the final threshold to slice 5. Slice 4 therefore built its own panel-width measurement and test setup, and slice 5 replaced both.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 4 and 5)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: `e61af632d9` added `useNarrowerThan` inside `NoteAssimilationModes` with a 720 px panel threshold and attached 1280 px panel test mounts; `0d97720312` moved measurement to `NoteShow` (768 px note column), deleted the constant and restored `assimilationPanelTestSupport.ts` to its slice-3 bytes.
+  - Observed effect: part of a 1,857 s slice-4 run and its proof were discarded one slice later; the delivered result is correct.
+  - Inference: a slice that needs a provisional rule owned by a later slice may need the measurement owner decided in the plan.
+
+## DD-352 — Successive slices extended an inherited reload mechanism that an aggregate review found unnecessary
+
+Slices 1, 2 and 5 moved, extended and duplicated the panel's reload-and-rebuild after stay-on-note actions. Each slice's acceptance treated the rebuild as given. The retrospective's independent outcome review found that the reloaded data holds nothing the panel shows. Possibly related to ODF-271.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5 and retrospective)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: `NoteShow.vue` `onAssimilationReloadNeeded`/`assimilationPanelKey` (slices 1, 5); Understanding success emits `reloadNeeded` (slice 2 learning); retrospective probe with a no-op handler passed 39 tests and failed only `isConnected === false`; correction planned as SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions.
+  - Observed effect: an extra note request per stay-on-note action, an unhandled reload rejection path, and focus lost after a compact optional addition shipped across five increments.
+  - Inference: the plan's Architecture designed the result's lifetime around the rebuild, so acceptance had no prompt to question it.
+
+## DD-353 — Disposable break checks confirmed that each new assertion catches its defect
+
+Implementers temporarily broke the product behavior each new mounted assertion claimed to observe, confirmed the expected test failed, and restored the source before returning.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1, 2, 4 and 5)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: slice 1: slot before the title → title bottom 526 vs action top 256; slice 2: removing the `watch(noteId)` reset failed exactly the two reset tests; slice 4: four checks (focus return, Escape, close-on-action, row CSS); slice 5: eight checks (sticky, overlay, popover direction, heading size, read-only guard, threshold 720, bar above blocker, no bar).
+  - Observed effect: each new geometry or state assertion was shown to discriminate its defect before acceptance.
+  - Inference: useful practice; it cost a few focused test runs per slice and was not required by the briefs.
