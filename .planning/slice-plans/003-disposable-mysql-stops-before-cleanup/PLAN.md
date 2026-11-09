@@ -131,6 +131,17 @@ test.
   `port` and `version` from the returned object. No CI command or `package.json` script runs these
   files yet, so the commit's check-only lint hook is the only other gate.
 
+## Execution complete
+
+Product advice: no change to backlog order. The cleanup failure that blocked
+repeated runs of SEED-111's script test group is resolved. SEED-111's
+retirement gate still owns `verified idle fixture reports idle snapshot not a
+reservation` (`scripts/worktree-retirement-checkout-processes.test.mjs:177`),
+which failed in 2 of the 10 local group runs here (G2). A possible later
+cleanup, not queued: `scripts/` holds eight separate "is this process alive"
+checks with three different error rules; this execution added one that
+matches `scripts/development-stack-processes.mjs`.
+
 ## Concern evidence
 
 - Slice-plan refinement was not needed: one Behavior slice with one proof

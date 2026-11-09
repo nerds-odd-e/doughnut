@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 348. Removed numbers are never reused.
+- Highest allocated local number: 438. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 
@@ -384,3 +384,17 @@ Slice 1 added an Intent location without CI proof. Its consumer trace found `doc
   - Evidence: slice 1 return's "deferred to slice 2" disposition; e2256907b2 left `docs/ci-proof-summary.md` naming only `scripts` and `infra`; d122555f9f added `cli/tests`.
   - Observed effect: an inaccurate doc line for two slice increments; no CI or product effect.
   - Inference: a disposition naming a later slice was accepted without checking that slice owned the change.
+
+## DD-438 — A plan's leftover check named a temporary folder that changes with every Nix shell
+
+The plan's final observation looked for leftover `doughnut-retire-mysql-*` folders "under `os.tmpdir()`". Inside `nix develop`, `os.tmpdir()` is a new `/tmp/nix-shell.*` folder for each shell, and that folder outlives the shell. Each test run started its own `nix develop -c`, so the same check from a later shell would read an empty folder and report clean. The implementer also searched `/private/tmp/nix-shell.*` and found four leftovers from the earlier premise runs.
+
+### Occurrences
+- Execution: SEED-114#disposable-mysql-stops-before-cleanup (first implementation commit 07eda49981)
+  - Timestamp: 2026-11-09T13:19:58+08:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: plan 003 slice 1 proof row "no `doughnut-retire-mysql-*` folder is left under `os.tmpdir()`"; probe output `tmpdir: /tmp/nix-shell.dEfSFU`; final reading listed four folders under `/private/tmp/nix-shell.*` dated 12:19 to 12:20.
+  - Observed effect: no false reading; the implementer widened the check without being asked.
+  - Inference: a proof location derived from the environment can point somewhere different when each command starts a new environment; low cost here only because the implementer noticed.
