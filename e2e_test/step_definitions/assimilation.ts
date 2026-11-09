@@ -166,12 +166,8 @@ When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
 })
 
-Then('assimilate should be disabled', () => {
-  start.assumeAssimilationPage().expectAssimilateDisabled()
-})
-
-Then('assimilate should be enabled', () => {
-  start.assumeAssimilationPage().expectAssimilateEnabled()
+Then('Understanding assimilation should be available', () => {
+  start.assumeAssimilationPage().expectUnderstandingAssimilationAvailable()
 })
 
 When('I jump to the note page of {string}', (noteTitle: string) => {

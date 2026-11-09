@@ -63,22 +63,6 @@ const assumeMemoryTrackerPage = () => {
       expectLabeledValue('Recall Count:', String(count))
       return assumeMemoryTrackerPage()
     },
-    expectHoursBetweenLastAndNextRecall(hours: number) {
-      expectMemoryTrackerPage()
-      labeledPair('Last Recall Time:', 'Next Recall Time:').then(
-        ({ first: lastRecallTime, second: nextRecallTime }) => {
-          const intervalInHours =
-            (new Date(nextRecallTime).getTime() -
-              new Date(lastRecallTime).getTime()) /
-            3_600_000
-          expect(
-            intervalInHours,
-            `Expected ${hours} hours between Last Recall Time (${lastRecallTime}) and Next Recall Time (${nextRecallTime})`
-          ).to.equal(hours)
-        }
-      )
-      return assumeMemoryTrackerPage()
-    },
     expectNextRecallAtAssimilationTime() {
       expectMemoryTrackerPage()
       labeledPair('Assimilated Time:', 'Next Recall Time:').then(

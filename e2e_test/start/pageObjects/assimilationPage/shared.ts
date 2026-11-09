@@ -4,8 +4,8 @@ import { clickPropertyPanelAction } from '../noteRichPropertyAssimilationMethods
 
 // Note-level panel markup: `NoteAssimilationModes.vue`. Each mode has its own
 // direct action; `assimilateButtonSelector` targets the default Understanding
-// action. Property rows reuse the action hooks, so controls are filtered to the
-// note level below.
+// action. Property rows reuse the action hooks under their own property panel,
+// so note-level queries are scoped under `assimilationModesSelector`.
 export const assimilationModesSelector =
   '[data-testid="note-assimilation-modes"]'
 export const assimilateButtonSelector = '[data-test="assimilate-UNDERSTANDING"]'
@@ -14,13 +14,16 @@ export const assimilateCommissionedSelector =
 export const assimilateSpellingSelector = '[data-test="assimilate-SPELLING"]'
 export const skipButtonSelector = '[data-test="skip"]'
 export const returnToSequenceButtonSelector = '[data-test="return-to-sequence"]'
-export const understandingResultSelector = `${assimilationModesSelector} [data-test="understanding-result"]`
 
-export const isNoteLevelAssimilationControl = (el: Element) =>
-  el.closest('[data-testid="rich-note-property-row"]') === null
+const noteLevelSelector = (selector: string) =>
+  `${assimilationModesSelector} ${selector}`
+
+export const understandingResultSelector = noteLevelSelector(
+  '[data-test="understanding-result"]'
+)
 
 const noteLevelControl = (selector: string) => () =>
-  cy.get(selector).filter((_, el) => isNoteLevelAssimilationControl(el))
+  cy.get(noteLevelSelector(selector))
 
 export const assimilateButton = noteLevelControl(assimilateButtonSelector)
 export const assimilateCommissionedButton = noteLevelControl(
@@ -38,9 +41,7 @@ function noteLevelControlElements(
   doc: Document | ParentNode,
   selector: string
 ): Element[] {
-  return [...doc.querySelectorAll(selector)].filter(
-    isNoteLevelAssimilationControl
-  )
+  return [...doc.querySelectorAll(noteLevelSelector(selector))]
 }
 
 export const secondaryActionSelectors = {
@@ -126,16 +127,14 @@ export function assimilationStatusSelector(kind: NoteLevelTrackerKind): string {
 }
 
 export function noteLevelTrackerStatusElement(kind: NoteLevelTrackerKind) {
-  return cy
-    .get(assimilationStatusSelector(kind))
-    .filter((_, el) => isNoteLevelAssimilationControl(el))
+  return cy.get(noteLevelSelector(assimilationStatusSelector(kind)))
 }
 
 // Property-level tracker status link: `PropertyAssimilationModes.vue`'s row
 // for a note property lives inside that property's own collapsible panel, so
 // it is scoped with `clickPropertyPanelAction` (the same scoping convention
 // `noteRichPropertyAssimilationMethods.ts` uses for its other property-row
-// actions) rather than filtered out of the note-level selector the way
+// actions) rather than under `assimilationModesSelector` the way
 // `noteLevelTrackerStatusElement` is. Properties only offer the UNDERSTANDING
 // mode, so there is no per-mode parameter to take.
 export function clickPropertyTrackerStatusLink(propertyKey: string) {

@@ -1,5 +1,9 @@
 import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import testability from '../testability'
+
+const LEARNING_SESSION_REPORT_RECORDED_AT_ALIAS =
+  'learningSessionReportRecordedAt'
 
 function learningSessionRequestEntryLabel(notebookTitle: string) {
   return `${notebookTitle} — Request`
@@ -119,13 +123,59 @@ export const recallLearningSessionMethods = () => ({
     return this
   },
   recordLearningSessionReport(reportMarkdown: string) {
+    cy.intercept('POST', '**/api/learning-sessions/record**').as(
+      'recordLearningSessionReport'
+    )
     cy.get('[data-test="commission-learning-session-dialog"]')
       .find('[data-test="learning-session-report"]')
       .clear()
       .invoke('val', reportMarkdown)
       .trigger('input')
     cy.get('[data-test="record-learning-session-report-submit"]').click()
+    cy.wait('@recordLearningSessionReport').then((interception) => {
+      const recordedAt = interception.response?.body?.recordedAt
+      expect(recordedAt, 'learning session report response recordedAt')
+        .to.be.a('string')
+        .and.not.equal('')
+      cy.wrap(recordedAt as string).as(
+        LEARNING_SESSION_REPORT_RECORDED_AT_ALIAS
+      )
+      cy.log(`learning session report recordedAt=${recordedAt}`)
+    })
     waitUntilAppIsNotBusy()
+    return this
+  },
+  expectCommissionedTrackersScheduledAfterReport(noteTitles: string) {
+    cy.get<string>(`@${LEARNING_SESSION_REPORT_RECORDED_AT_ALIAS}`).then(
+      (recordedAt) => {
+        const reportTime = new Date(recordedAt).getTime()
+        expect(
+          Number.isFinite(reportTime),
+          `report recordedAt (${recordedAt}) should parse as a time`
+        ).to.equal(true)
+        commonSenseSplit(noteTitles, ',').forEach((noteTitle) => {
+          testability()
+            .memoryTrackerForNote(noteTitle, 'COMMISSIONED')
+            .then((tracker) => {
+              const nextRecallAt = tracker.nextRecallAt
+              expect(
+                nextRecallAt,
+                `commissioned tracker for "${noteTitle}" (id=${tracker.id}) should have Next Recall Time`
+              )
+                .to.be.a('string')
+                .and.not.equal('')
+              const nextTime = new Date(nextRecallAt).getTime()
+              cy.log(
+                `commissioned "${noteTitle}" id=${tracker.id} nextRecallAt=${nextRecallAt} report recordedAt=${recordedAt}`
+              )
+              expect(
+                nextTime,
+                `commissioned tracker for "${noteTitle}" (id=${tracker.id}) nextRecallAt (${nextRecallAt}) should be after report recordedAt (${recordedAt})`
+              ).to.be.greaterThan(reportTime)
+            })
+        })
+      }
+    )
     return this
   },
   expectLearningSessionReportRecorded() {

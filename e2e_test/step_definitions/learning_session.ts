@@ -23,6 +23,16 @@ Then(
   }
 )
 
+Then(
+  'the commissioned memory trackers for {string} should be scheduled after the report time',
+  (noteTitles: string) => {
+    start
+      .recall()
+      .assumeRecallPage()
+      .expectCommissionedTrackersScheduledAfterReport(noteTitles)
+  }
+)
+
 function commissionedMemoryTracker(noteTitle: string) {
   return start.testability().memoryTrackerForNote(noteTitle, 'COMMISSIONED')
 }

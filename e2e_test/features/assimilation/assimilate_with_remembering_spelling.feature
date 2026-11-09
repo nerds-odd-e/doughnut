@@ -51,5 +51,5 @@ Feature: Assimilate with remembering spelling
     And I remember spelling
     And I verify spelling with "Word"
     Then I should see a spelling memory tracker
-    And assimilate should be enabled
+    And Understanding assimilation should be available
     And I should be assimilating the note "Word"

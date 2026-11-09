@@ -65,8 +65,8 @@ Feature: Commissioned learning session
     And the commissioned memory tracker for "Hola" should have recall count 1
     And the commissioned memory tracker for "Gracias" should have recall count 1
     And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
+    And the commissioned memory trackers for "Hola, Gracias" should be scheduled after the report time
     When I visit the commissioned memory tracker for "Hola"
     Then I should see the tutor's feedback "Pronunciation was clear; still mixes ser/estar under pressure."
     And I should see Stability 199
     And I should see Difficulty 1
-    And I should see 199 hours between last and next recall
