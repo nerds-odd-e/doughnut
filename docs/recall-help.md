@@ -77,10 +77,9 @@ excluded result and the corrected schedule at once. The assistant sees the
 exclusion in the attempt record on later requests and does not propose it
 again.
 
-Deferred: invalidating the question for other learners, regenerating or
-editing the question, undoing a confirmed exclusion, excluding several
-attempts together, spelling attempts, and changes to the note. A formal
-contest verdict is a separate decision.
+The exclusion leaves the question available to other learners. Deferred:
+regenerating or editing the question, undoing a confirmed exclusion, excluding
+several attempts together, spelling attempts, and changes to the note.
 
 ## Reading and returning
 

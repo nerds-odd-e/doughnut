@@ -25,9 +25,7 @@ failed and loaded state with same-tracker Retry and explicit Self-review
 (`RecallPage.questionRecovery.spec.ts`, [current behavior](docs/recall-question-loading.md)).
 Recover the full DD-317 and DD-318 records at
 `eae596d487:DonutRetrospectiveFindings.md` and
-`1348cea71a:DonutRetrospectiveFindings.md`, respectively. The
-[formal contest candidate](.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#story-6)
-remains unqueued with its policy decisions intact.
+`1348cea71a:DonutRetrospectiveFindings.md`, respectively.
 
 The 2026-11-08 review at `5f2be9874c` queues zero stories. MinerU setup and
 the single repaired OpenAPI collision rank below current learning/refinement

@@ -14,4 +14,3 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Backlog list
 
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
-- [See Doughnut test cases and test files in Intent](seeds/SEED-112-publish-explicit-ci-test-counts.md#publish-explicit-ci-test-counts) — SEED-112#publish-explicit-ci-test-counts

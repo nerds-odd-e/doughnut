@@ -76,7 +76,8 @@ These are starting observations, not promises that the current UI works in every
 
 ## Story Decomposition
 
-S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery, following [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition). Estimates are hypotheses. Refine or resplit work likely to exceed L before execution. Each story records its preparation state below.
+Effort bands include delivery. S = 30–60 minutes, M = 1–2 hours, and L = 2–4
+hours. Refine or resplit work likely to exceed L before execution.
 
 <a id="story-3"></a>
 
@@ -89,67 +90,27 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery, follo
 
 - **For / why:** A learner who remembers a useful passage but not its note
   title can find the note through ordinary Donut search.
-- **Scope:** Extend the existing search journey to body-text evidence, with
-  a matching excerpt and a link to the note. Preserve fast title/alias search
-  and its scope controls. The existing search API serves the same behavior.
-- **Evaluation:** A phrase occurs only in a note's body. Searching it shows
-  that note and the matching passage; opening the result reaches the note.
-  Exact title/alias searches remain useful, and unavailable notes do not appear.
-- **Value / learning:** Learn how often body matches recover notes missed by
-  title and alias search.
-- **Effort hypothesis:** L, medium confidence; ranking, representative corpus
-  size, and response-time expectations need refinement.
+- **Before refinement:** Capture one real search that missed a note the learner
+  could read. Record the literal phrase and expected note, then verify that the
+  wording occurs in its body and that existing search misses it.
+- **Proposed first increment:** Through ordinary search, match literal wording
+  in note bodies in the current notebook the learner can read. Show a matching
+  excerpt and let the learner open the result. Keep existing title and alias
+  ranking, speed, scope controls, and access rules. The relationship picker
+  and MCP `list_note_candidates` keep their existing contracts. Wider
+  body-search scopes and semantic matching can be considered separately.
+- **Evaluation:** Reproduce the observed miss. The search shows the expected
+  note and its matching excerpt, and opening the result reaches that note.
+  Compare title and alias ranking and response times with the current behavior
+  in a representative notebook. Check that body results honor existing
+  permissions and note availability.
+- **Value / learning:** Recover a note the learner knows by its wording and
+  learn whether this first increment addresses the observed miss.
+- **Effort hypothesis:** L, medium confidence until the case and response-time
+  expectations are established.
 - **Depends on:** Existing note search and access controls.
 - **Safe stopping point:** Learners can find and inspect body-text matches
-  through the existing search interaction.
-
-<a id="story-6"></a>
-
-### Contest an answered question with a reason and an inspectable decision
-
-**Identity:** SEED-073#story-6
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-- **For / why:** A learner who believes an answered MCQ was ambiguous or wrong
-  can have the actual objection considered and later see what was decided.
-- **Scope:** Extend the existing contest responsibility with the original
-  attempt and learner's reason, an explanation of the verdict, and durable
-  attribution to the attempt. Distinguish a conversational hypothesis from a
-  formal upheld contest. State the actual effect on the question and recorded
-  Grade; a learner-confirmed ambiguity exclusion repairs grade and schedule
-  ([recall help](../../docs/recall-help.md#learner-confirmed-ambiguity-exclusion)).
-  Learner reasoning remains private
-  unless deliberately shared. Existing author permission still governs notes.
-- **Evaluation:** After choosing an option defensible under the wording, the
-  learner contests with that interpretation. The result addresses the objection,
-  can be reopened, and states whether the question was invalidated and whether
-  the attempt's learning effects were corrected. A declined contest gives an
-  inspectable reason, not instructions to answer an already answered question.
-- **Value / learning:** Restore trust through a meaningful challenge and learn
-  whether disagreements concern wording, evidence, or the marked answer.
-- **Effort hypothesis:** M–L, low confidence until verdict authority, persistence,
-  and shared-MCQ effects are refined. Separate from explanation/practice by
-  the owner's accepted 2026-10-12 decision.
-- **Depends on:** Existing contest and recall identities. Private recall help
-  can supply context when present but is not a hard implementation prerequisite.
-- **Safe stopping point:** The learner can inspect the decision and its actual
-  consequences without any implied repair of the recorded Grade.
-- **Open decisions:** Who finalizes a verdict, what an accepted alternative
-  answer means, and whether one MCQ's invalidation affects other learners.
-  Refine before execution planning; this candidate is not queued.
-
-**Preparation observation:** On 2026-10-12 at `e1bbd1d2727fced534f473bcba709407a46d91c9`
-in story 1's owned workspace, a disposable controller probe answered an MCQ incorrectly, reloaded persisted state, then contested with a mocked infeasibility
-result. Reload showed a contested MCQ, the original incorrect Answer and AGAIN
-event, and unchanged Stability, Difficulty, last recall and due time.
-`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed with 2738 tests,
-zero failures/errors and two skipped in 51s. An initial timestamp comparison
-mixed in-memory milliseconds with MySQL rounding; comparing persisted before/after
-values corrected the probe without changing product code. Scratch files were
-removed. This establishes the existing API mechanism, not a working user-facing
-post-answer journey, model adjudication quality, or scoring repair.
+  within the current notebook through ordinary search.
 
 ## Open Decisions
 
@@ -158,8 +119,7 @@ post-answer journey, model adjudication quality, or scoring repair.
 - Define how long proposal decisions and their private conversation evidence
   should remain available, using existing deletion/ownership rules.
 - Agree practical latency expectations for body search.
-- Automatic repeat-failure triggers remain a later decision. Story 6 owns
-  detailed contest and invalid-question correction policies.
+- Automatic repeat-failure triggers remain a later decision.
 
 **Learner-confirmed ambiguity exclusion (owner decisions, deferred):**
 
@@ -188,4 +148,3 @@ concrete evaluation cases.
 - [Focus-context design](../../docs/focus-context/focus_context_retrieval_design.md)
   and [domain vocabulary](../../docs/adrs/0001-ubiquitous-language.md).
 - [Hosted assistant setup guide](../../docs/assistant-oauth.md).
-- [File-serving API cleanup](SEED-055-public-api-cleanup.md) has its own seed.

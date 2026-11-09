@@ -13,11 +13,12 @@ shows the same figures for that attempt. Before the retirement tests become
 required, the full group runs repeatedly on the CI runner, and recurring
 failures are resolved first.
 
-Not included: the 13 `scripts/ci/application-release-*.test.mjs` files, Node
-tests outside `scripts/`, CLI CI proof, SEED-112's test counts, changes to
-the Cloud VM setup, and removing or merging any of the 18 files. No test is
-skipped or left out on CI to make an attempt pass. A file that cannot run on
-the runner without changing what it checks goes to the story owner.
+The existing CI proof counting rules apply. Scope excludes the 13
+`scripts/ci/application-release-*.test.mjs` files, Node tests outside `scripts/`,
+CLI CI proof, changes to the Cloud VM setup, and removing or merging any of the
+18 files. No test is skipped or left out on CI to make an attempt pass. A file
+that cannot run on the runner without changing what it checks goes to the story
+owner.
 
 ## Current decisions
 

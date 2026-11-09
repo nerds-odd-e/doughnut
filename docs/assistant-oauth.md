@@ -122,6 +122,14 @@ are configurable with `donut.oauth.access-token-time-to-live` and
 `donut.oauth.refresh-token-time-to-live`; the disposable browser fixture's short
 lifetime is test configuration.
 
+Assistant expiry fields use MySQL `TIMESTAMP(6)`, which has an upper limit of
+2038-01-19 03:14:07 UTC. With the default 30-day refresh lifetime, renewal can
+calculate an expiry outside that range starting on 2037-12-20 UTC. Configured
+lifetimes change that date. Include these fields in a database date-range
+review by 2036, preserving UTC round-tripping and fractional precision in any
+migration. [Authorization schema](../backend/src/main/resources/db/migration/V300000355__create_assistant_authorization.sql) ·
+[MySQL date and time conversion](https://dev.mysql.com/doc/refman/8.4/en/date-and-time-type-conversion.html)
+
 Every call checks the current user/client/resource/read grant and current
 notebook permissions. The assistant can search candidates, read attributed notes
 and request bounded graph context. With `learning_session:record`, it can also
