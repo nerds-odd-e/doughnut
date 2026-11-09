@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 443. Removed numbers are never reused.
+- Highest allocated local number: 444. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 
@@ -478,3 +478,16 @@ Implementers temporarily broke the product behavior each new mounted assertion c
   - Evidence: slice 1: slot before the title → title bottom 526 vs action top 256; slice 2: removing the `watch(noteId)` reset failed exactly the two reset tests; slice 4: four checks (focus return, Escape, close-on-action, row CSS); slice 5: eight checks (sticky, overlay, popover direction, heading size, read-only guard, threshold 720, bar above blocker, no bar).
   - Observed effect: each new geometry or state assertion was shown to discriminate its defect before acceptance.
   - Inference: useful practice; it cost a few focused test runs per slice and was not required by the briefs.
+
+## DD-444 — Implementation claimed no gaps while waiving a listed source commitment's distinguishing observation
+
+The first Slice 1 return reported gaps none for the three plan proof rows, while stating that confirmed-skip-with-nothing-next stayed covered by existing SequenceSkip / walkthrough E2E without a new no-reload observation. Source commitments 3 and 4, the plan Behavior, and the delegation's allocated commitment list already required that stay-on-note case. Related to ODF-314 (omitted named proof), without a product defect this time. Possibly aided by the plan proof table naming only Understanding and Add to sessions as examples for the in-place row.
+
+### Occurrences
+- Execution: SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions (first implementation commit da94d6ea36)
+  - Timestamp: 2026-11-09T17:21:00+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.92
+  - Evidence: implementer return Gaps (agent `5f0ded43-2d7e-495a-bb36-250188735671`); coordinator acceptance bounce for commitments 3/4; delta `NotebookWorkspaceSequenceSkip.spec.ts` "confirming Skip with nothing next keeps the note without reloading it"; plan proof table row 1 vs Behavior/source commitments 3–4.
+  - Observed effect: one implementer resume and a focused SequenceSkip rerun before acceptance; the added test passed with no product change.
+  - Inference: treating proof-table examples as the full stay-on-note set can waive a source commitment the brief already listed to observe.
