@@ -13,7 +13,7 @@ scope: large
 
 For people learning from deliberately authored Donut notes, a confusing recall answer or conversation should lead to better understanding or a reviewed note correction, and later questions should find and use the relevant evidence. Preserve the learner's history and the author's control over knowledge changes.
 
-This epic brings together learning and refinement, chat, and evidence discovery. The backlog lists its child stories individually.
+This epic brings together learning and refinement, chat, and evidence discovery.
 
 ## Why This Matters
 
@@ -52,7 +52,7 @@ These are starting observations, not promises that the current UI works in every
 - **Build a general review queue or new chat system:** Premature. Start from
   an explicit confusing MCQ and the existing conversation/refinement surfaces.
 - **Selected direction:** Diagnose learning difficulties before changing
-  knowledge. Improve evidence discovery through ordinary note search.
+  knowledge.
 
 ## Shared Constraints
 
@@ -74,51 +74,12 @@ These are starting observations, not promises that the current UI works in every
   rewrites are outside this epic. Direct MCP and ChatGPT access follows the
   [hosted assistant setup guide](../../docs/assistant-oauth.md).
 
-## Story Decomposition
-
-Effort bands include delivery. S = 30–60 minutes, M = 1–2 hours, and L = 2–4
-hours. Refine or resplit work likely to exceed L before execution.
-
-<a id="story-3"></a>
-
-### Find a note from wording remembered in its body
-
-**Identity:** SEED-073#story-3
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-- **For / why:** A learner who remembers a useful passage but not its note
-  title can find the note through ordinary Donut search.
-- **Before refinement:** Capture one real search that missed a note the learner
-  could read. Record the literal phrase and expected note, then verify that the
-  wording occurs in its body and that existing search misses it.
-- **Proposed first increment:** Through ordinary search, match literal wording
-  in note bodies in the current notebook the learner can read. Show a matching
-  excerpt and let the learner open the result. Keep existing title and alias
-  ranking, speed, scope controls, and access rules. The relationship picker
-  and MCP `list_note_candidates` keep their existing contracts. Wider
-  body-search scopes and semantic matching can be considered separately.
-- **Evaluation:** Reproduce the observed miss. The search shows the expected
-  note and its matching excerpt, and opening the result reaches that note.
-  Compare title and alias ranking and response times with the current behavior
-  in a representative notebook. Check that body results honor existing
-  permissions and note availability.
-- **Value / learning:** Recover a note the learner knows by its wording and
-  learn whether this first increment addresses the observed miss.
-- **Effort hypothesis:** L, medium confidence until the case and response-time
-  expectations are established.
-- **Depends on:** Existing note search and access controls.
-- **Safe stopping point:** Learners can find and inspect body-text matches
-  within the current notebook through ordinary search.
-
 ## Open Decisions
 
 - Select real learner cases during evaluation; human comprehension,
   retention, and retrieval-quality gains remain unmeasured.
 - Define how long proposal decisions and their private conversation evidence
   should remain available, using existing deletion/ownership rules.
-- Agree practical latency expectations for body search.
 - Automatic repeat-failure triggers remain a later decision.
 
 **Learner-confirmed ambiguity exclusion (owner decisions, deferred):**
