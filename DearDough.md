@@ -1,12 +1,13 @@
 # DearDough Process Findings
 
-Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
+Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
 - Highest allocated local number: 447. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
+- [Source before the 2026-11-10 compaction](https://github.com/nerds-odd-e/doughnut/blob/d3eb0ef73aca13a5ed229738f92dbe44ee12bf95/DearDough.md); its rows are retained at the [Open Dough catalog](https://github.com/terryyin/open-dough/tree/5afe6fee8fe34322752e9e44911d72eb31dd4991/docs/maintainer/findings). DD-443 (disposable break checks) was pruned as successful practice, not a problem.
 
 <a id="odf-110"></a>
 
@@ -57,16 +58,6 @@ Former local code: DD-138. An absolute changed-file size check conflicts with an
 ## ODF-189 — Small additions force unrelated size extractions
 
 Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-189.md).
-
-
-### Occurrences
-- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, initial probe refactor)
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: the initial refactor return measured ci.yml at 351 pre-existing lines and 460 with the temporary probe. It reported no other semantic issue. The developer declined an exception. The subsequent return extracted Lint, shared setup, probe and package-artifact actions, with structural equivalence proof. The result is recorded in 2d4d52f066 and the execution history retained at fd73a191fc.
-  - Observed effect: the ceiling added relocation and re-proof of the pre-existing package-artifact responsibility, plus one developer decision stop before the cohesive CI split proceeded.
-  - Inference: this repeats the size-driven extraction mechanism on an already oversized caller. The developer's decision governed the final structure and remains in force.
 
 <a id="odf-190"></a>
 
@@ -127,16 +118,6 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 ## ODF-206 — Over-budget slice not stopped
 
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-206.md).
-
-### Occurrences
-- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: plan slices targeted 5 minutes (scrutinized 5–8, hard 10); implementer agent runs took 1,749 s, 1,554 s, 934 s, 1,857 s and 2,093 s including runner waits; slice 2 return: "roughly 15–20 minutes, above the 5–8 minute window"; slice 4 return: "Over the 5-minute target … not oversized".
-  - Observed effect: every slice overran at hand-back and was accepted with the implementer's stated reasons; none was re-sized.
-  - Inference: runner and full-suite waits are part of the overrun, so the budget's runner exception left the active-work time unmeasured.
 
 <a id="odf-217"></a>
 
@@ -290,10 +271,11 @@ Former local code: DD-256. A planned empty removal sweep used a pattern that alr
 
 <a id="odf-314"></a>
 <a id="dd-257"></a>
+<a id="dd-446"></a>
 
 ## ODF-314 — An implementation return omitted plan-owned proof rows listed in its delegation, and the returned rows found a defect
 
-Former local code: DD-257. An implementation return omitted proof rows already named by both plan and delegation. Coordinator comparison returned the gap; missing proof then caught header overflow before delivery, adding about six implementation minutes. One SEED-078#story-3 execution on 0.3.66, shared with ODF-206. Distinct from ODF-247’s omission in the plan itself. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-314.md).
+Former local code: DD-257. Former local code: DD-446 (SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions only). An implementation return omitted proof rows already named by both plan and delegation. Coordinator comparison returned the gap; missing proof then caught header overflow before delivery, adding about six implementation minutes. One SEED-078#story-3 execution on 0.3.66, shared with ODF-206. Distinct from ODF-247’s omission in the plan itself. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-314.md).
 
 <a id="odf-315"></a>
 <a id="dd-258"></a>
@@ -377,152 +359,65 @@ Former local code: DD-345. The documented Source review link failed when written
 
 Former local code: DD-346. A removal sweep checked deleted symbols and paths, while maintained docs still described local proof in ordinary prose. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-437.md).
 
-## DD-347 — Guarded delivery refused a renamed file's old path listed as owned
+<a id="odf-337"></a>
+<a id="dd-347"></a>
 
-A slice that moved files with `git mv` listed both old and new paths in `staging.ownedPaths`. Guarded fresh delivery failed at staging with `pathspec ... did not match any files`, because the deletions were already staged. Listing the old paths in `stagedPaths` succeeded on retry.
+## ODF-337 — Guarded delivery refused a renamed file's old path listed as owned
 
-### Occurrences
-- Execution: SEED-109#complete-test-inventory-and-script-proof (first implementation commit e2256907b2)
-  - Timestamp: unknown (2026-11-08 Asia/Singapore, slice 2 delivery)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: `execution-increment-delivery.mjs fresh` result `preparation-failed`, operation `staging`; retry published 716cfa4f3d.
-  - Observed effect: one refused attempt; formatting already ran; no work lost.
-  - Inference: the `ownedPaths`/`stagedPaths` split does not say where a rename's removed path belongs; low cost, likely recurring for move slices.
+Former local code: DD-347. Guarded delivery refused a `git mv` source listed in `ownedPaths`; `stagedPaths` succeeded. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-337.md).
 
-## DD-348 — A consumer trace deferred a stale doc line to an out-of-scope later slice
+<a id="odf-471"></a>
+<a id="dd-348"></a>
 
-Slice 1 added an Intent location without CI proof. Its consumer trace found `docs/ci-proof-summary.md`, which lists the locations without proof, and deferred it to "slice 2 CLI CI proof", although CLI CI proof was outside the story. The coordinator accepted the return without checking that doc, and the stale line shipped until slice 3 corrected it. Possibly related to ODF-150.
+## ODF-471 — A consumer trace deferred a stale doc line to an out-of-scope later slice
 
-### Occurrences
-- Execution: SEED-109#complete-test-inventory-and-script-proof (first implementation commit e2256907b2)
-  - Timestamp: unknown (2026-11-08 Asia/Singapore, slices 1 to 3)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: slice 1 return's "deferred to slice 2" disposition; e2256907b2 left `docs/ci-proof-summary.md` naming only `scripts` and `infra`; d122555f9f added `cli/tests`.
-  - Observed effect: an inaccurate doc line for two slice increments; no CI or product effect.
-  - Inference: a disposition naming a later slice was accepted without checking that slice owned the change.
+Former local code: DD-348. A consumer-trace disposition deferred a stale doc to a later slice that did not own it. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-471.md).
 
-## DD-438 — A plan's leftover check named a temporary folder that changes with every Nix shell
+<a id="odf-472"></a>
+<a id="dd-438"></a>
 
-The plan's final observation looked for leftover `doughnut-retire-mysql-*` folders "under `os.tmpdir()`". Inside `nix develop`, `os.tmpdir()` is a new `/tmp/nix-shell.*` folder for each shell, and that folder outlives the shell. Each test run started its own `nix develop -c`, so the same check from a later shell would read an empty folder and report clean. The implementer also searched `/private/tmp/nix-shell.*` and found four leftovers from the earlier premise runs.
+## ODF-472 — A plan's leftover check named a temporary folder that changes with every Nix shell
 
-### Occurrences
-- Execution: SEED-114#disposable-mysql-stops-before-cleanup (first implementation commit 07eda49981)
-  - Timestamp: 2026-11-09T13:19:58+08:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: plan 003 slice 1 proof row "no `doughnut-retire-mysql-*` folder is left under `os.tmpdir()`" (`git show 37253a42cc:.planning/slice-plans/003-disposable-mysql-stops-before-cleanup/PLAN.md`); probe output `tmpdir: /tmp/nix-shell.dEfSFU`; final reading listed four folders under `/private/tmp/nix-shell.*` dated 12:19 to 12:20.
-  - Observed effect: no false reading; the implementer widened the check without being asked.
-  - Inference: a proof location derived from the environment can point somewhere different when each command starts a new environment; low cost here only because the implementer noticed.
+Former local code: DD-438. A plan’s leftover check named a per-shell temporary folder. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-472.md).
 
-## DD-440 — The coordinator required the full frontend suite in every slice
+<a id="odf-473"></a>
+<a id="dd-440"></a>
 
-The plan asked for the full frontend suite on the final implementation. The coordinator's briefs required it once per slice, beyond the focused-check time the delegation rule names for the changed surface's suite.
+## ODF-473 — The coordinator required the full frontend suite in every slice
 
-### Occurrences
-- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: slice briefs: "Run the full frontend suite … once on your final implementation"; returns report full-suite runs of 140 s (slice 2), 143 s (slice 4) and 262 s (slice 5), plus slices 1 and 3; slice 2 return: load peaked at 34.9 after its full frontend run, delaying its E2E launch.
-  - Observed effect: five full-suite runs on a shared, loaded host; no recorded failure was caught only by a full-suite run.
-  - Inference: per-slice focused specs plus one final full run would likely have given the same evidence at lower cost.
+Former local code: DD-440. Coordinator briefs required the full frontend suite in every slice. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-473.md).
 
-## DD-441 — A disclosure slice built a width rule that the docking slice replaced
+<a id="odf-474"></a>
+<a id="dd-441"></a>
 
-The plan split the compact optional-modes disclosure (slice 4) from the bottom-bar docking (slice 5) and left the final threshold to slice 5. Slice 4 therefore built its own panel-width measurement and test setup, and slice 5 replaced both.
+## ODF-474 — A disclosure slice built a width rule that the docking slice replaced
 
-### Occurrences
-- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 4 and 5)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: `e61af632d9` added `useNarrowerThan` inside `NoteAssimilationModes` with a 720 px panel threshold and attached 1280 px panel test mounts; `0d97720312` moved measurement to `NoteShow` (768 px note column), deleted the constant and restored `assimilationPanelTestSupport.ts` to its slice-3 bytes.
-  - Observed effect: part of a 1,857 s slice-4 run and its proof were discarded one slice later; the delivered result is correct.
-  - Inference: a slice that needs a provisional rule owned by a later slice may need the measurement owner decided in the plan.
+Former local code: DD-441. A slice built a provisional width rule that the owning later slice replaced. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-474.md).
 
-## DD-442 — Successive slices extended an inherited reload mechanism that an aggregate review found unnecessary
+<a id="odf-475"></a>
+<a id="dd-442"></a>
 
-Slices 1, 2 and 5 moved, extended and duplicated the panel's reload-and-rebuild after stay-on-note actions. Each slice's acceptance treated the rebuild as given. The retrospective's independent outcome review found that the reloaded data holds nothing the panel shows. Possibly related to ODF-271.
+## ODF-475 — Successive slices extended an inherited reload mechanism that an aggregate review found unnecessary
 
-### Occurrences
-- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5 and retrospective)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: `NoteShow.vue` `onAssimilationReloadNeeded`/`assimilationPanelKey` (slices 1, 5); Understanding success emits `reloadNeeded` (slice 2 learning); retrospective probe with a no-op handler passed 39 tests and failed only `isConnected === false`; correction planned as SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions.
-  - Observed effect: an extra note request per stay-on-note action, an unhandled reload rejection path, and focus lost after a compact optional addition shipped across five increments.
-  - Inference: the plan's Architecture designed the result's lifetime around the rebuild, so acceptance had no prompt to question it.
+Former local code: DD-442. Successive slices extended an inherited reload mechanism that an aggregate review found unnecessary. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-475.md).
 
-## DD-443 — Disposable break checks confirmed that each new assertion catches its defect
+<a id="odf-476"></a>
+<a id="dd-444"></a>
 
-Implementers temporarily broke the product behavior each new mounted assertion claimed to observe, confirmed the expected test failed, and restored the source before returning.
+## ODF-476 — CI observation was armed before CLI authentication was verified
 
-### Occurrences
-- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1, 2, 4 and 5)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: slice 1: slot before the title → title bottom 526 vs action top 256; slice 2: removing the `watch(noteId)` reset failed exactly the two reset tests; slice 4: four checks (focus return, Escape, close-on-action, row CSS); slice 5: eight checks (sticky, overlay, popover direction, heading size, read-only guard, threshold 720, bar above blocker, no bar).
-  - Observed effect: each new geometry or state assertion was shown to discriminate its defect before acceptance.
-  - Inference: useful practice; it cost a few focused test runs per slice and was not required by the briefs.
+Former local code: DD-444. CI observation was armed before CLI authentication was verified. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-476.md).
 
-## DD-444 — CI observation was armed before CLI authentication was verified
+<a id="odf-477"></a>
+<a id="dd-445"></a>
 
-The coordinator launched native CI observation and waited on GitHub API holds before checking whether the CLI could obtain its authenticated credential. The required setup check was performed after a published probe and a read-only wait had remained undiscovered.
+## ODF-477 — A repair publication started before a source amendment was handled
 
-### Occurrences
-- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, execution startup through the authentication handoff)
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: the first workflow diagnostic returned a 2,927-second directed wait. A ten-minute await-revision for 2d4d52f066 ended with state undiscovered. Later GH_TOKEN and GITHUB_TOKEN were unset and gh auth token returned status 1. Native job logs returned 403 and artifact download returned 401, while the connected GitHub app recovered the saved data. The authentication gap is retained in b691bba300's PLAN. After the developer ran gh auth login and reported the account was already logged in, CLI status and the workflow diagnostic succeeded, as recorded at a84e1ee292.
-  - Observed effect: native observation was delayed, one read-only wait expired without a discovered attempt, and the developer received an authentication request after the repair had been published. The final normal CI attempt and Intent comparison were subsequently observed successfully.
-  - Inference: the execution did not establish the authenticated-gh prerequisite before arming. The record does not establish why the earlier keyring lookup failed. Checking the prerequisite before interpreting provider throttling would expose the setup gap sooner.
+Former local code: DD-445. A repair publication started before an `amended` freshness result was handled. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-477.md).
 
-## DD-445 — A repair publication started before a source amendment was handled
+<a id="odf-478"></a>
+<a id="dd-447"></a>
 
-A required source-freshness command returned amended, but the coordinator's next tool operation still launched guarded progress delivery. The publisher accepted that repair before the coordinator absorbed the changed source wording.
+## ODF-478 — Slice delivery published without that slice's source-review observations
 
-### Occurrences
-- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, progress publication a84e1ee292)
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: the source-freshness result at trunk 9a33d32751 exited 1 with result amended. The same functions.exec orchestration then invoked execution-increment-delivery.mjs fresh. Publication accepted a84e1ee292. The coordinator subsequently absorbed the source and plan amendment, obtained a fresh source-only review, and published them in fd73a191fc before accepting the first slice. The accepted plan retains the order defect in its slice-1 evidence.
-  - Observed effect: one progress publication carried the earlier source wording. The source, review and all 85 commitment observations were reconciled before slice acceptance, with no functional product defect established.
-  - Inference: awaiting dependent tool calls sequentially did not enforce the gate because the caller ignored the first command's terminal exit and result. The freshness result needs inspection before the commit-and-push operation is launched.
-
-## DD-446 — Implementation claimed no gaps while waiving a listed source commitment's distinguishing observation
-
-The first Slice 1 return reported gaps none for the three plan proof rows, while stating that confirmed-skip-with-nothing-next stayed covered by existing SequenceSkip / walkthrough E2E without a new no-reload observation. Source commitments 3 and 4, the plan Behavior, and the delegation's allocated commitment list already required that stay-on-note case. Related to ODF-314 (omitted named proof), without a product defect this time. Possibly aided by the plan proof table naming only Understanding and Add to sessions as examples for the in-place row.
-
-### Occurrences
-- Execution: SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions (first implementation commit da94d6ea36)
-  - Timestamp: 2026-11-09T17:21:00+08:00
-  - Tool: Cursor
-  - Open Dough release: 0.3.92
-  - Evidence: implementer return Gaps (agent `5f0ded43-2d7e-495a-bb36-250188735671`); coordinator acceptance bounce for commitments 3/4; delta `NotebookWorkspaceSequenceSkip.spec.ts` "confirming Skip with nothing next keeps the note without reloading it"; plan proof table row 1 vs Behavior/source commitments 3–4.
-  - Observed effect: one implementer resume and a focused SequenceSkip rerun before acceptance; the added test passed with no product change.
-  - Inference: treating proof-table examples as the full stay-on-note set can waive a source commitment the brief already listed to observe.
-
-## DD-447 — Slice delivery published without that slice's source-review observations
-
-A completed slice was published while its allocated source-review commitment rows stayed blank. The missing observations were filled only with a later slice's delivery, after the coordinator noticed the gap.
-
-### Occurrences
-- Execution: SEED-115#trust-learning-session-and-assimilation-e2e-feedback (first implementation commit e5057fb86b)
-  - Timestamp: 2026-11-09T18:19:52+08:00
-  - Tool: Cursor
-  - Open Dough release: 0.3.92
-  - Evidence: slice 2 publish `6fa4284117` does not touch `source-review.md`; after that commit, rows 7.1–8 and 22–26 remain empty. Slice 3 publish `86b15ddb29` fills those slice-2 rows together with slice-3 observations. Coordinator transcript notes "missed slice 2 source-review updates" before the slice-3 delivery. Distinct from DD-446: Command B proof was accepted; only the retained observation table lagged.
-  - Observed effect: slice-2 commitment provenance was absent from the published increment and caught only while accepting the next slice; final review rows were complete before story finish.
-  - Inference: acceptance/delivery treated focused proof as sufficient without checking that this slice's source-review observation cells were written before publish.
+Former local code: DD-447. A slice was published without its source-review observations. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-478.md).
