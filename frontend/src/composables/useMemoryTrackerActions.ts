@@ -1,39 +1,20 @@
 import type { NoteRecallInfo } from "@generated/donut-backend-api"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
-import {
-  inject,
-  provide,
-  ref,
-  watch,
-  type ComputedRef,
-  type InjectionKey,
-  type Ref,
-} from "vue"
+import { inject, provide, ref, watch, type InjectionKey, type Ref } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import {
   useMemoryTrackerActionHandlers,
+  type MemoryTrackerActionHandlers,
   type MemoryTrackerActionRequest,
   type MemoryTrackerActionResult,
 } from "@/composables/useMemoryTrackerActionHandlers"
 
 export type { MemoryTrackerActionRequest, MemoryTrackerActionResult }
 
-export type MemoryTrackerActions = {
+export type MemoryTrackerActions = MemoryTrackerActionHandlers & {
   noteInfoLoaded: Ref<boolean>
   noteRecallInfo: Ref<NoteRecallInfo | null>
-  assimilatingPropertyKey: Ref<string | null>
-  showSpellingPopup: ComputedRef<boolean>
   reloadNoteInfo: () => Promise<void>
-  assimilate: (event: AssimilateEvent) => Promise<MemoryTrackerActionResult>
-  skip: (
-    request?: MemoryTrackerActionRequest
-  ) => Promise<MemoryTrackerActionResult>
-  returnToSequence: (
-    request?: MemoryTrackerActionRequest
-  ) => Promise<MemoryTrackerActionResult>
-  handleSpellingVerified: () => Promise<MemoryTrackerActionResult>
-  handleSpellingCancel: () => void
 }
 
 export const memoryTrackerActionsKey: InjectionKey<MemoryTrackerActions> =

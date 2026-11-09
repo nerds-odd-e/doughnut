@@ -14,6 +14,7 @@ export const assimilateCommissionedSelector =
 export const assimilateSpellingSelector = '[data-test="assimilate-SPELLING"]'
 export const skipButtonSelector = '[data-test="skip"]'
 export const returnToSequenceButtonSelector = '[data-test="return-to-sequence"]'
+export const understandingResultSelector = `${assimilationModesSelector} [data-test="understanding-result"]`
 
 export const isNoteLevelAssimilationControl = (el: Element) =>
   el.closest('[data-testid="rich-note-property-row"]') === null
@@ -33,7 +34,7 @@ export const returnToSequenceButton = noteLevelControl(
   returnToSequenceButtonSelector
 )
 
-export function noteLevelControlElements(
+function noteLevelControlElements(
   doc: Document | ParentNode,
   selector: string
 ): Element[] {

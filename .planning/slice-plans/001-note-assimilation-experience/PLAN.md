@@ -129,7 +129,7 @@ and focused proof; do not begin a >10-minute implementation without finer cuts.
 
 ### 2. See the Understanding result and deliberately continue
 Type: Behavior
-Status: planned
+Status: done
 Proof: Proof rows 3–5. Mounted workspace covers optional reload/remount and
 same-note property; panel tests preserve count/refresh; walkthrough covers the
 persisted result/advance journey and exhaustion.
@@ -215,7 +215,12 @@ Sizing: target 5 minutes, scrutinized 5–8 minutes for scroll/placement integra
 ### O1. Understanding still advances automatically
 Reported: slice 1 — "Understanding still advances automatically (slice 2)."
 Story clause: "The sequence waits at the result until the learner chooses to advance."
-Disposition: interim until slices 2
+Disposition: proved by slice 2: frontend/tests/components/recall/AssimilationPanel.spec.ts 'waits on the note at the Understanding result until Next item requests the next unit' (stays at the note until clickNextItem); NotebookWorkspaceUnderstandingResult.spec.ts result tests; assimilation_walkthrough.feature 'Assimilating waits at its result until Next item…'
+
+### O4. The result stays for the rest of that note visit after Next item opens a same-note property
+Reported: slice 2 — "When Next item goes to a property on the same note, the panel closes but the result stays set for that note. Reopening the panel during that visit shows the result and Next item again."
+Story clause: "After Understanding succeeds, keep the current note and title visible in a temporary result state."
+Disposition: no user cost "decide when to advance after seeing what was added to recall": inspected useMemoryTrackerActionHandlers (set only on this visit's Understanding success, reset on noteId change), NoteAssimilationModes (renders the result for that note) and AssimilationPanel (Next item calls the unchanged useGoToNextAssimilation). Reopening the note-level panel on the same note page shows what this visit added and Next item still requests the next unit in existing order; opening another note resets it (NotebookWorkspaceUnderstandingResult.spec.ts reset observations).
 
 ### O2. Skip from sequence… keeps the existing skip confirmation
 Reported: slice 1 — "\"Skip from sequence…\" still opens the old confirmation text (slice 3)."
@@ -245,6 +250,14 @@ Disposition: interim until slices 4, 5
   Every earlier step, including those using this slice's page objects, passed.
   Disposition: outside this story's changed boundary; branch CI observes the
   scenario. Remaining defect: the scenario asserts an id-seeded fuzzed value.
+
+- Slice 2 learning: note-level Understanding success now emits `reloadNeeded`,
+  so `NoteShow` reloads the realm and remounts the panel (as optional additions
+  already did) and focus falls back to the page. Slice 5's bottom bar should
+  keep the result and Next item reachable after that remount.
+- Slice 2 test support: `frontend/tests/helpers/toastTestSupport.ts` now
+  re-appends the toast container before each test, because the workspace spec
+  empties `document.body` between tests.
 
 ## Verification and delivery
 

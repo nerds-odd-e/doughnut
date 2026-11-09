@@ -4,18 +4,17 @@ import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryT
 import { assimilationRefinementLayoutExpectations } from './refinementLayoutExpectations'
 import {
   assimilateButton,
-  assimilateButtonSelector,
   assimilateCommissionedButton,
   assimilateSpellingButton,
   assimilationModesSelector,
   mainNoteHeadingTitleSelector,
   expectOtherNoteLevelSecondaryActionsAbsent,
-  noteLevelControlElements,
   noteLevelTrackerStatusElement,
   openRefineNoteModalIfNeeded,
   skipButton,
   returnToSequenceButton,
   waitForAssimilationNoteTitle,
+  understandingResultSelector,
   type NoteLevelTrackerKind,
 } from './shared'
 
@@ -47,6 +46,19 @@ export const assumeAssimilationPage = () => ({
   },
   assimilateOnPanel() {
     this.clickAssimilate()
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  expectUnderstandingAdded(title?: string) {
+    waitForAssimilationNoteTitle(title)
+    cy.get(understandingResultSelector).should(
+      'contain.text',
+      'Understanding added to recall'
+    )
+    return this
+  },
+  nextItem() {
+    cy.get(`${understandingResultSelector} [data-test="next-item"]`).click()
     waitUntilAppIsNotBusy()
     return this
   },
@@ -149,8 +161,7 @@ export const assumeAssimilationPage = () => ({
     if (skip === 'yes') {
       this.skipOnPanel()
     } else {
-      this.clickAssimilate()
-      waitUntilAppIsNotBusy()
+      this.assimilateOnPanel().expectUnderstandingAdded(title).nextItem()
     }
     return this
   },
@@ -158,11 +169,6 @@ export const assumeAssimilationPage = () => ({
     assimilations.forEach((assimilation) => {
       this.assimilateOneNote(assimilation)
     })
-  },
-  assimilateCurrentNote() {
-    waitUntilAppIsNotBusy()
-    this.clickAssimilate()
-    return this
   },
   verifySpellingWith(text: string) {
     cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
@@ -185,16 +191,9 @@ export const assumeAssimilationPage = () => ({
     )
   },
   expectAssimilateDisabled() {
-    // An understanding tracker already exists: the row shows a status link
-    // instead of the Assimilate action, so the button is absent rather than
-    // merely disabled. `cy.get(selector).filter(...)` throws instead of
-    // resolving to an empty set once the raw selector matches nothing
-    // anywhere in the DOM, so check element count via the document instead.
-    cy.document().then((doc) => {
-      expect(
-        noteLevelControlElements(doc, assimilateButtonSelector)
-      ).to.have.length(0)
-    })
+    // An understanding tracker already exists: the row shows its status link
+    // in place of the Assimilate action.
+    expectNoteLevelTrackerStatus('understanding')
     return this
   },
   expectAssimilateEnabled() {

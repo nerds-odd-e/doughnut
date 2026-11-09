@@ -24,6 +24,17 @@ When('I assimilate on the assimilation panel', () => {
   start.assumeAssimilationPage().assimilateOnPanel()
 })
 
+Then(
+  'I should see Understanding added to recall for {string}',
+  (noteTitle: string) => {
+    start.assumeAssimilationPage().expectUnderstandingAdded(noteTitle)
+  }
+)
+
+When('I choose Next item', () => {
+  start.assumeAssimilationPage().nextItem()
+})
+
 When('I assimilate it as commissioned', () => {
   start.assumeAssimilationPage().assimilateAsCommissioned()
 })

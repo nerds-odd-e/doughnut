@@ -10,33 +10,22 @@ import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import { memoryTrackerLitesStub } from "@tests/toolbars/menuDataMocks"
 import makeMe from "donut-test-fixtures/makeMe"
-import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import type { VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
 import {
   atViewportWidth,
   clickPageBarCommand,
   mountNotebookWorkspace,
-  pageBarEl,
 } from "./notebookWorkspaceHeaderTestSupport"
+import {
+  activity,
+  click,
+  expectActivity,
+  propertyNote,
+} from "./notebookWorkspaceAssimilationTestSupport"
 
 let wrapper: VueWrapper
-const activity = () =>
-  pageBarEl().querySelector<HTMLButtonElement>(".nav-item button")!
-const expectActivity = async (label: string) =>
-  vi.waitFor(() => {
-    expect(activity().getAttribute("aria-label")).toBe(label)
-    expect(activity().checkVisibility()).toBe(true)
-  })
-const click = async (selector: string) => {
-  await page.elementLocator(document.querySelector(selector)!).click()
-  await flushPromises()
-}
-const propertyNote = (readonly = false) =>
-  makeMe.aNoteRealm
-    .content("---\ntopic: training\nnote_level: 1\n---\n\nBody.")
-    .readonly(readonly)
-    .please()
 
 beforeEach(async () => {
   useAssimilationView().dismiss()

@@ -28,12 +28,14 @@ const AssimilationPanelStory = defineComponent({
       type: Object as PropType<NoteRecallInfo>,
       required: true,
     },
+    understandingAdded: { type: Boolean, default: false },
   },
   setup(props) {
     const memoryTrackerActions: MemoryTrackerActions = {
       noteInfoLoaded: ref(true),
       noteRecallInfo: toRef(props, "noteRecallInfo"),
       assimilatingPropertyKey: ref(null),
+      understandingAdded: toRef(props, "understandingAdded"),
       showSpellingPopup: computed(() => false),
       reloadNoteInfo: async () => undefined,
       assimilate: async () => idleActionResult,
@@ -87,5 +89,13 @@ export const SpellingAlreadyAssimilated: Story = {
           .please(),
       ])
       .please(),
+  },
+}
+
+export const UnderstandingAdded: Story = {
+  args: {
+    note: noteRealm.note,
+    noteRecallInfo: makeMe.aNoteRecallInfo.please(),
+    understandingAdded: true,
   },
 }

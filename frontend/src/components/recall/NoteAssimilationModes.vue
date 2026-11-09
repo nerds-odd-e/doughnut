@@ -17,7 +17,26 @@
         </div>
         <h4 class="text-lg font-semibold">Understanding</h4>
         <p class="text-base-content/70 text-sm">Recall what this note means.</p>
-        <div class="mt-2 flex flex-wrap items-center gap-2">
+        <div
+          v-if="understandingAdded"
+          class="mt-2 flex flex-col items-start gap-2"
+          data-test="understanding-result"
+        >
+          <p role="status" class="text-success flex items-center gap-2 font-medium">
+            <Check class="size-5" aria-hidden="true" />
+            Understanding added to recall
+          </p>
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-primary"
+            data-test="next-item"
+            @click="emit('next')"
+          >
+            Next item
+            <ArrowRight class="size-4" aria-hidden="true" />
+          </button>
+        </div>
+        <div v-else class="mt-2 flex flex-wrap items-center gap-2">
           <AssimilationModeAction
             mode="UNDERSTANDING"
             :tracker="trackerOf('UNDERSTANDING')"
@@ -102,7 +121,7 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
-import { ArrowRight, GraduationCap, SpellCheck } from "@lucide/vue"
+import { ArrowRight, Check, GraduationCap, SpellCheck } from "@lucide/vue"
 import { computed, toRef } from "vue"
 import AssimilationModeAction from "./AssimilationModeAction.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
@@ -122,9 +141,12 @@ const emit = defineEmits<{
   (e: "assimilate", request: AssimilateEvent): void
   (e: "skip", request: { propertyKey?: string }): void
   (e: "returnToSequence", request: { propertyKey?: string }): void
+  (e: "next"): void
 }>()
 
-const { noteRecallInfo } = useInjectedMemoryTrackerActions(toRef(() => note.id))
+const { noteRecallInfo, understandingAdded } = useInjectedMemoryTrackerActions(
+  toRef(() => note.id)
+)
 
 const trackerOf = (mode: MemoryTrackerType) =>
   noteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, mode)

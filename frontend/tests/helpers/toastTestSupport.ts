@@ -1,19 +1,20 @@
-import { createApp, nextTick } from "vue"
+import { createApp } from "vue"
 import Toast, { useToast } from "vue-toastification"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, expect, vi } from "vitest"
 
-let toastContainerMounted: Promise<void> | undefined
+let toastContainer: Promise<Element> | undefined
 
 // Each install of the plugin mounts another container on the page, one tick
 // later, all listening to the same global event bus. So the container is
 // mounted once per spec file, and a toast shown before it is mounted is lost.
 function mountToastContainerOnce() {
-  toastContainerMounted ??= (async () => {
-    createApp({ render: () => null }).use(Toast)
-    await nextTick()
-  })()
-  return toastContainerMounted
+  toastContainer ??= new Promise((resolve) => {
+    createApp({ render: () => null }).use(Toast, {
+      onMounted: (container) => resolve(container.$el),
+    })
+  })
+  return toastContainer
 }
 
 const toastSelector = ".Vue-Toastification__toast"
@@ -54,7 +55,8 @@ export const toastTimeout = (toast: HTMLElement) =>
  */
 export function showToastsOnPage() {
   beforeEach(async () => {
-    await mountToastContainerOnce()
+    // Specs that empty the page between tests detach the container.
+    document.body.append(await mountToastContainerOnce())
     useToast().clear()
     await vi.waitFor(() => expect(toastOnPage()).toBeNull())
   })
