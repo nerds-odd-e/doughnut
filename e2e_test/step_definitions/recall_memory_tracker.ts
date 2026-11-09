@@ -26,13 +26,6 @@ Then('I should see Difficulty {float}', (difficulty: number) => {
   assumeMemoryTrackerPage().expectDifficulty(difficulty)
 })
 
-Then(
-  'I should see {int} hours between last and next recall',
-  (hours: number) => {
-    assumeMemoryTrackerPage().expectHoursBetweenLastAndNextRecall(hours)
-  }
-)
-
 When(
   'I visit the commissioned memory tracker for {string}',
   (noteTitle: string) => {

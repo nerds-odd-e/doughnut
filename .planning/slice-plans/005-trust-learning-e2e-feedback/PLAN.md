@@ -1,6 +1,7 @@
 # Trust learning-session and assimilation E2E feedback
 
 **Source:** [selected story](../../seeds/SEED-115-reliable-learning-e2e-feedback.md#trust-learning-session-and-assimilation-e2e-feedback)
+**Source review:** [source-review.md](./source-review.md)
 **Identity:** SEED-115#trust-learning-session-and-assimilation-e2e-feedback
 
 ## Goal and scope
@@ -93,7 +94,7 @@ free memory pages. One standalone feature was run sequentially on the same host.
 
 ### 1. Prove commissioned report scheduling for every graded tracker
 Type: Structure
-Status: planned
+Status: done
 Proof: First proof row; Command A with corrected ordinary fixture, then its
 ID-varied replay and inclusion in Command C.
 
@@ -108,6 +109,14 @@ tracker. Product behavior stays unchanged.
 Sizing: about 5 minutes of edits/cleanup plus the focused E2E startup/runtime
 exception. Safe stop: the commissioned feature passes with meaningful scheduling
 feedback, independently of the other two corrections.
+
+Accepted proof (2026-11-09 execution):
+- Revision under test: `d1b04b777ba1bb65bccb0291155bcf797b3525dc`
+- Command A: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/learning_session/commissioned_learning_session.feature`
+- Ordinary fixture (fresh allocation `wt_4f7964e31e60485b9df2ba07535b8181`, origin `http://127.0.0.1:57721`): 4/4 pass. Report clock `1976-06-03 01:30:00`; Hola id 1 next `1976-06-13 01:30:00`; Gracias id 2 next `1976-06-03 06:30:00`.
+- Disposable Saludos ID variation on same allocation (restored): 4/4 pass. Hola id 2 next `1976-06-10 14:30:00`; Gracias id 3 next `1976-06-03 06:30:00`.
+- Removal sweep: no product/test/docs/guidance matches for retired exact-hour step/helper (plan text only). Stability 199 retained.
+- Refactor: none — already clean (`## REFACTOR COMPLETE`).
 
 ### 2. Name the assimilation outcomes the scenarios actually establish
 Type: Structure
@@ -204,6 +213,26 @@ them. Apply AGENTS.md's execution wrap-up per slice: Jidoka → fresh independen
 post-change refactor → API generation when needed → coordinator runs
 `./scripts/run.sh pnpm format:changed` once → update this plan → agent commit
 with check-only lint hook → push. Keep this plan for retrospective/Story Wrap Up.
+
+## Story obligations
+
+### G1. Runner changes outside scope
+Reported: slice 1 — "Runner changes are outside scope."
+Story clause: "Runner changes, database-reset changes and device usability observation are outside scope."
+Disposition: excluded "Runner changes, database-reset changes and device usability observation are outside scope."
+Commitment: 30
+
+### G2. Database-reset changes outside scope
+Reported: slice 1 — "Database-reset changes are outside scope."
+Story clause: "Runner changes, database-reset changes and device usability observation are outside scope."
+Disposition: excluded "Runner changes, database-reset changes and device usability observation are outside scope."
+Commitment: 31
+
+### G3. Device usability observation outside scope
+Reported: slice 1 — "Device usability observation is outside scope."
+Story clause: "Runner changes, database-reset changes and device usability observation are outside scope."
+Disposition: excluded "Runner changes, database-reset changes and device usability observation are outside scope."
+Commitment: 32
 
 ## Plan review
 
