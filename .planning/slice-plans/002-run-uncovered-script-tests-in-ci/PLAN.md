@@ -116,7 +116,7 @@ branch and keep the MySQL install for slice 2.
 ### 2. Every CI attempt runs the 18 files and publishes their proof
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `pnpm test:ci-proof` passes with the new parts and `expect`. Run each
 changed `lint:all` command locally with `CI_PROOF_NODE_REPORT_DIR` set and
 check its report covers the files it gained. On the story-branch attempt,
@@ -173,7 +173,7 @@ Disposition: proved by slice 1: runner-series-clean.md. Exact CI success at a84e
 ### G2. Hosted command and summary proof awaits publication
 Reported: slice 2 — "The five changed commands and all 18 gained files passed locally. Hosted 13-part summary contents, Linux command results and Lint/E2E duration remain unobserved and owned by root after progress publication."
 Story clause: "each file’s test outcomes and cumulative recorded test time under the `scripts` entry"
-Disposition: return
+Disposition: proved by slice 2: ci-proof-observation.md. Exact CI success and artifact465 passed across13 present parts, with all18 scoped file counts/times observed.
 
 ## Current execution context
 
@@ -206,3 +206,9 @@ Disposition: return
 - The newly combined SUT command exposed inherited npm_execpath selecting pnpm as the stand-in run-p executor. Controlled ./scripts/run.sh env npm_execpath=pnpm node --test --test-name-pattern='live owner control exposes' scripts/sut-owner-application-group.test.mjs failed0/1 before and passed1/1 after explicit --npm-path npm. The original fixture passed with npm_execpath removed. The normal pnpm command then passed85/85, including owned restart cases. Other helper consumers import unchanged waitUntil.
 - This executor correction preserves the direct-Node gate conditions, where run-p already selects npm by default. The accepted30-run gate remains applicable, and the five-command proof covers the added pnpm execution context.
 - Independent script_wiring_refactor completed before guarded progress delivery. It polished the changed documentation table only, preserving code/proof boundaries. Hosted artifact and timing observations remain open as G2.
+
+## Slice 2 accepted
+
+- [Hosted proof](ci-proof-observation.md) records exact native CI success for e63aa60bb81f93549c747cc52c913171542cd3c3, run42588658999 attempt1. All13 scripts parts are present. The18 files contribute75 passed leaf checks with recorded durations and zero failed/other/untimed. Group totals are465 passed and145707.03825999997 ms. Root independently parsed and matched the artifact to local counts, including one application-release Bash check.
+- Lint ran369seconds (6m09), below the slowest E2E448seconds (7m28). Acquisition and both realMySQL mutation files passed on Ubuntu. All13 expanded jobs succeeded.
+- G2 is proved and every slice2 source commitment is observed. Refactor disposition for this acceptance increment is records-only. No implementation or proof boundary changed after the accepted script_wiring_refactor return.
