@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 446. Removed numbers are never reused.
+- Highest allocated local number: 447. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 
@@ -527,3 +527,16 @@ The first Slice 1 return reported gaps none for the three plan proof rows, while
   - Evidence: implementer return Gaps (agent `5f0ded43-2d7e-495a-bb36-250188735671`); coordinator acceptance bounce for commitments 3/4; delta `NotebookWorkspaceSequenceSkip.spec.ts` "confirming Skip with nothing next keeps the note without reloading it"; plan proof table row 1 vs Behavior/source commitments 3–4.
   - Observed effect: one implementer resume and a focused SequenceSkip rerun before acceptance; the added test passed with no product change.
   - Inference: treating proof-table examples as the full stay-on-note set can waive a source commitment the brief already listed to observe.
+
+## DD-447 — Slice delivery published without that slice's source-review observations
+
+A completed slice was published while its allocated source-review commitment rows stayed blank. The missing observations were filled only with a later slice's delivery, after the coordinator noticed the gap.
+
+### Occurrences
+- Execution: SEED-115#trust-learning-session-and-assimilation-e2e-feedback (first implementation commit e5057fb86b)
+  - Timestamp: 2026-11-09T18:19:52+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.92
+  - Evidence: slice 2 publish `6fa4284117` does not touch `source-review.md`; after that commit, rows 7.1–8 and 22–26 remain empty. Slice 3 publish `86b15ddb29` fills those slice-2 rows together with slice-3 observations. Coordinator transcript notes "missed slice 2 source-review updates" before the slice-3 delivery. Distinct from DD-446: Command B proof was accepted; only the retained observation table lagged.
+  - Observed effect: slice-2 commitment provenance was absent from the published increment and caught only while accepting the next slice; final review rows were complete before story finish.
+  - Inference: acceptance/delivery treated focused proof as sufficient without checking that this slice's source-review observation cells were written before publish.

@@ -166,6 +166,13 @@ Accepted proof (2026-11-09 execution):
 - Consumer-trace: Command C features run; readiness-only features excluded; property scopes unchanged
 - Refactor: route `understandingResultSelector` through `noteLevelSelector` (`## REFACTOR COMPLETE`); Command C reused
 
+## Execution complete
+
+Product advice:
+- Close this story as the bounded E2E-feedback correction; do not queue runner/DB-reset/device-usability work from this review alone (still out of scope, no new beneficiary evidence).
+- No new product backlog item; keep near-future direction (ChatGPT plugin / learning–refinement) unchanged.
+- After CI settles green, wrap-up can assimilate: report `recordedAt` as E2E scheduling authority; note-root scoping under `note-assimilation-modes` vs property ancestry filters.
+
 ## Verification and delivery
 
 Run from the execution checkout through Nix. Non-interactive shells used
