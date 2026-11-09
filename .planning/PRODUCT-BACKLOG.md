@@ -9,7 +9,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [See CI results and timings for the remaining script tests in Intent](seeds/SEED-111-run-uncovered-script-tests-in-ci.md#run-uncovered-script-tests-in-ci) — SEED-111#run-uncovered-script-tests-in-ci ([plan](slice-plans/002-run-uncovered-script-tests-in-ci/PLAN.md))
-- [Keep the assimilation panel in place after actions that stay on the note](seeds/SEED-113-note-assimilation-experience.md#keep-the-assimilation-panel-in-place-after-staying-actions) — SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions ([plan](slice-plans/004-keep-assimilation-panel-in-place/PLAN.md))
 
 ## Backlog list
 

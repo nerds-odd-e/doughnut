@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-113_keep-the-assimilation-panel-in-place-after-staying-actions.json",
+      "identity": "SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions",
+      "completedAt": "2026-11-09T09:43:20.150Z",
+      "blob": "0aa014747b0c2f887778227190c323c51fa8f9ae"
+    },
+    {
       "fileName": "SEED-113_assimilate-notes-with-a-clear-default-and-result.json",
       "identity": "SEED-113#assimilate-notes-with-a-clear-default-and-result",
       "completedAt": "2026-11-09T08:19:58.816Z",
@@ -450,12 +456,6 @@
       "identity": "SEED-066#simplify-voice-input-feedback",
       "completedAt": "2026-10-10T12:02:51.430Z",
       "blob": "bb654abf15c3f2f5f8f378785f39e3dad94722c1"
-    },
-    {
-      "fileName": "SEED-072_title-search-layout.json",
-      "identity": "SEED-072#title-search-layout",
-      "completedAt": "2026-10-10T09:20:38.099Z",
-      "blob": "7ba702fd96b73adf7a83c02bb0f1971b5d6a647a"
     }
   ],
   "unreadable": []
