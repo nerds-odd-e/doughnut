@@ -166,6 +166,12 @@ Use page objects with a fluent interface: methods perform an action and return t
 - Prefer fluent chaining over one-off helpers that do not return a navigable object.
 - Keep page objects focused on a single responsibility.
 - Use meaningful method names that reflect user actions.
+- Note-level assimilation actions, tracker status, Understanding success, and
+  sequence controls live under `[data-testid="note-assimilation-modes"]`
+  (`assimilationPage/shared.ts`). Scope those queries to that root. Property-row
+  assimilation stays under property-panel helpers
+  (`noteRichPropertyAssimilationMethods` / `clickPropertyPanelAction`), not a
+  note-level ancestry filter.
 
 ```typescript
 const notePage = {
@@ -218,6 +224,12 @@ Error messages must be immediately actionable:
 3. Include relevant context, such as page content or API response, when helpful.
 4. Given, When, and Then steps should be assertive and fail early.
 5. Put assertions inside page objects where that keeps step definitions simple.
+6. For commissioned learning-session report scheduling, use the UI report
+   response's `recordedAt` (`POST /api/learning-sessions/record`) as the time
+   authority and assert each graded tracker’s next recall is after that time.
+   Do not pin an exact hour spread in E2E; backend tests own scheduling
+   arithmetic. Browser `Date.now()` is not that authority when
+   `@mockBrowserTime` and day/hour steps move backend time separately.
 
 ```typescript
 expectQuizScore(expectedScore?: string) {
