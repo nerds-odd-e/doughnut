@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yua-chan",
+  "email": "yua-chan@example.org",
+  "identity": "SEED-114#disposable-mysql-stops-before-cleanup",
+  "mode": "story-branch",
+  "branch": "claude/retirement-tests-leave-no-running-mysql-server-b",
+  "host": "claude",
+  "model": "opus"
+}
