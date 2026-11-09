@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-08 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 438. Removed numbers are never reused.
+- Highest allocated local number: 445. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 
@@ -57,6 +57,16 @@ Former local code: DD-138. An absolute changed-file size check conflicts with an
 ## ODF-189 — Small additions force unrelated size extractions
 
 Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-189.md).
+
+
+### Occurrences
+- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, initial probe refactor)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: the initial refactor return measured ci.yml at 351 pre-existing lines and 460 with the temporary probe. It reported no other semantic issue. The developer declined an exception. The subsequent return extracted Lint, shared setup, probe and package-artifact actions, with structural equivalence proof. The result is recorded in 2d4d52f066 and the execution history retained at fd73a191fc.
+  - Observed effect: the ceiling added relocation and re-proof of the pre-existing package-artifact responsibility, plus one developer decision stop before the cohesive CI split proceeded.
+  - Inference: this repeats the size-driven extraction mechanism on an already oversized caller. The developer's decision governed the final structure and remains in force.
 
 <a id="odf-190"></a>
 
@@ -117,6 +127,16 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 ## ODF-206 — Over-budget slice not stopped
 
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-206.md).
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: plan slices targeted 5 minutes (scrutinized 5–8, hard 10); implementer agent runs took 1,749 s, 1,554 s, 934 s, 1,857 s and 2,093 s including runner waits; slice 2 return: "roughly 15–20 minutes, above the 5–8 minute window"; slice 4 return: "Over the 5-minute target … not oversized".
+  - Observed effect: every slice overran at hand-back and was accepted with the implementer's stated reasons; none was re-sized.
+  - Inference: runner and full-suite waits are part of the overrun, so the budget's runner exception left the active-work time unmeasured.
 
 <a id="odf-217"></a>
 
@@ -398,3 +418,99 @@ The plan's final observation looked for leftover `doughnut-retire-mysql-*` folde
   - Evidence: plan 003 slice 1 proof row "no `doughnut-retire-mysql-*` folder is left under `os.tmpdir()`" (`git show 37253a42cc:.planning/slice-plans/003-disposable-mysql-stops-before-cleanup/PLAN.md`); probe output `tmpdir: /tmp/nix-shell.dEfSFU`; final reading listed four folders under `/private/tmp/nix-shell.*` dated 12:19 to 12:20.
   - Observed effect: no false reading; the implementer widened the check without being asked.
   - Inference: a proof location derived from the environment can point somewhere different when each command starts a new environment; low cost here only because the implementer noticed.
+
+## DD-439 — Agent shells lacked the environment that repository commands rely on
+
+The coordinator's and agents' non-interactive shells do not load `~/.zshrc`, which exports `NIX_CONFIG` (flakes) and `OPENAI_API_TOKEN`. `./scripts/run.sh` refused to start Nix, and mocked-OpenAI E2E features failed because the backend reads its key only from `OPENAI_API_TOKEN`.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, execution start and slice 1 E2E)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: `./scripts/run.sh bash scripts/worktree_setup.sh` → "experimental Nix feature 'flakes' is disabled"; slice 1 E2E `sut.log`: `IllegalStateException: This request requires apiKey` (8 refinement, 10 question-generation errors); reruns with an exported placeholder passed.
+  - Observed effect: one refused setup command and a diagnosis at startup; two E2E features failed and were rerun; every later brief had to carry both exports.
+  - Inference: the wrappers depend on interactive-shell environment; a wrapper-supplied flag and mock token would remove the dependency.
+
+## DD-440 — The coordinator required the full frontend suite in every slice
+
+The plan asked for the full frontend suite on the final implementation. The coordinator's briefs required it once per slice, beyond the focused-check time the delegation rule names for the changed surface's suite.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: slice briefs: "Run the full frontend suite … once on your final implementation"; returns report full-suite runs of 140 s (slice 2), 143 s (slice 4) and 262 s (slice 5), plus slices 1 and 3; slice 2 return: load peaked at 34.9 after its full frontend run, delaying its E2E launch.
+  - Observed effect: five full-suite runs on a shared, loaded host; no recorded failure was caught only by a full-suite run.
+  - Inference: per-slice focused specs plus one final full run would likely have given the same evidence at lower cost.
+
+## DD-441 — A disclosure slice built a width rule that the docking slice replaced
+
+The plan split the compact optional-modes disclosure (slice 4) from the bottom-bar docking (slice 5) and left the final threshold to slice 5. Slice 4 therefore built its own panel-width measurement and test setup, and slice 5 replaced both.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 4 and 5)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: `e61af632d9` added `useNarrowerThan` inside `NoteAssimilationModes` with a 720 px panel threshold and attached 1280 px panel test mounts; `0d97720312` moved measurement to `NoteShow` (768 px note column), deleted the constant and restored `assimilationPanelTestSupport.ts` to its slice-3 bytes.
+  - Observed effect: part of a 1,857 s slice-4 run and its proof were discarded one slice later; the delivered result is correct.
+  - Inference: a slice that needs a provisional rule owned by a later slice may need the measurement owner decided in the plan.
+
+## DD-442 — Successive slices extended an inherited reload mechanism that an aggregate review found unnecessary
+
+Slices 1, 2 and 5 moved, extended and duplicated the panel's reload-and-rebuild after stay-on-note actions. Each slice's acceptance treated the rebuild as given. The retrospective's independent outcome review found that the reloaded data holds nothing the panel shows. Possibly related to ODF-271.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1 to 5 and retrospective)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: `NoteShow.vue` `onAssimilationReloadNeeded`/`assimilationPanelKey` (slices 1, 5); Understanding success emits `reloadNeeded` (slice 2 learning); retrospective probe with a no-op handler passed 39 tests and failed only `isConnected === false`; correction planned as SEED-113#keep-the-assimilation-panel-in-place-after-staying-actions.
+  - Observed effect: an extra note request per stay-on-note action, an unhandled reload rejection path, and focus lost after a compact optional addition shipped across five increments.
+  - Inference: the plan's Architecture designed the result's lifetime around the rebuild, so acceptance had no prompt to question it.
+
+## DD-443 — Disposable break checks confirmed that each new assertion catches its defect
+
+Implementers temporarily broke the product behavior each new mounted assertion claimed to observe, confirmed the expected test failed, and restored the source before returning.
+
+### Occurrences
+- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, slices 1, 2, 4 and 5)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.92
+  - Evidence: slice 1: slot before the title → title bottom 526 vs action top 256; slice 2: removing the `watch(noteId)` reset failed exactly the two reset tests; slice 4: four checks (focus return, Escape, close-on-action, row CSS); slice 5: eight checks (sticky, overlay, popover direction, heading size, read-only guard, threshold 720, bar above blocker, no bar).
+  - Observed effect: each new geometry or state assertion was shown to discriminate its defect before acceptance.
+  - Inference: useful practice; it cost a few focused test runs per slice and was not required by the briefs.
+
+## DD-444 — CI observation was armed before CLI authentication was verified
+
+The coordinator launched native CI observation and waited on GitHub API holds before checking whether the CLI could obtain its authenticated credential. The required setup check was performed after a published probe and a read-only wait had remained undiscovered.
+
+### Occurrences
+- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, execution startup through the authentication handoff)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: the first workflow diagnostic returned a 2,927-second directed wait. A ten-minute await-revision for 2d4d52f066 ended with state undiscovered. Later GH_TOKEN and GITHUB_TOKEN were unset and gh auth token returned status 1. Native job logs returned 403 and artifact download returned 401, while the connected GitHub app recovered the saved data. The authentication gap is retained in b691bba300's PLAN. After the developer ran gh auth login and reported the account was already logged in, CLI status and the workflow diagnostic succeeded, as recorded at a84e1ee292.
+  - Observed effect: native observation was delayed, one read-only wait expired without a discovered attempt, and the developer received an authentication request after the repair had been published. The final normal CI attempt and Intent comparison were subsequently observed successfully.
+  - Inference: the execution did not establish the authenticated-gh prerequisite before arming. The record does not establish why the earlier keyring lookup failed. Checking the prerequisite before interpreting provider throttling would expose the setup gap sooner.
+
+## DD-445 — A repair publication started before a source amendment was handled
+
+A required source-freshness command returned amended, but the coordinator's next tool operation still launched guarded progress delivery. The publisher accepted that repair before the coordinator absorbed the changed source wording.
+
+### Occurrences
+- Execution: SEED-111#run-uncovered-script-tests-in-ci (first implementation commit 2d4d52f066)
+  - Timestamp: unknown (2026-11-09 Asia/Singapore, progress publication a84e1ee292)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: the source-freshness result at trunk 9a33d32751 exited 1 with result amended. The same functions.exec orchestration then invoked execution-increment-delivery.mjs fresh. Publication accepted a84e1ee292. The coordinator subsequently absorbed the source and plan amendment, obtained a fresh source-only review, and published them in fd73a191fc before accepting the first slice. The accepted plan retains the order defect in its slice-1 evidence.
+  - Observed effect: one progress publication carried the earlier source wording. The source, review and all 85 commitment observations were reconciled before slice acceptance, with no functional product defect established.
+  - Inference: awaiting dependent tool calls sequentially did not enforce the gate because the caller ignored the first command's terminal exit and result. The freshness result needs inspection before the commit-and-push operation is launched.
