@@ -13,9 +13,5 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
-- [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
-- [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
-- [Answer a comparison across notes with inspectable supporting evidence](seeds/SEED-073-learning-refinement-and-retrieval.md#story-5) — SEED-073#story-5
-- [Distinguish confusable terms in generated recall questions](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-2) — SEED-007#story-2
 - [See Doughnut test cases and test files in Intent](seeds/SEED-112-publish-explicit-ci-test-counts.md#publish-explicit-ci-test-counts) — SEED-112#publish-explicit-ci-test-counts

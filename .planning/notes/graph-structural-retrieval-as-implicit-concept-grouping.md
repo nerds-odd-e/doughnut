@@ -16,7 +16,7 @@ Research into how PKM tools structure retrieval for AI consumption (Smart Connec
 
 The key insight for Donut: **in a zettelkasten, wiki links ARE concept anchors.** Each linked note is an atomic concept node with a descriptive title — that's the zettelkasten convention. So Savaal's "extract concepts → retrieve per concept" *collapses* in Donut: the focus note's linked notes already *are* the concept groups.
 
-**Donut's BFS-over-wiki-links retrieval is already doing implicit concept-grouped retrieval.** The question was never "should we switch to concept-grouped" — we're already there. The real design choices are two different ones (see the companion note on summarization, and SEED-007 on prompt splitting).
+**Donut's BFS-over-wiki-links retrieval is already doing implicit concept-grouped retrieval.**
 
 ## What this means for the retrieval structure
 

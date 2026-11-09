@@ -13,7 +13,7 @@ scope: large
 
 For people learning from deliberately authored Donut notes, a confusing recall answer or conversation should lead to better understanding or a reviewed note correction, and later questions should find and use the relevant evidence. Preserve the learner's history and the author's control over knowledge changes.
 
-This is the parent epic for the combined learning/refinement and chat work, question-context quality, evidence discovery, and cited answers. It is not one executable story and is not queued in addition to its children. The independent [knowledge-to-capability experiment](SEED-074-knowledge-to-capability.md#story-1) is outside this epic. Its outcome is useful even if this epic stops.
+This epic brings together learning and refinement, chat, and evidence discovery. The backlog lists its child stories individually.
 
 ## Why This Matters
 
@@ -51,9 +51,8 @@ These are starting observations, not promises that the current UI works in every
   make an accepted correction and its origin inspectable.
 - **Build a general review queue or new chat system:** Premature. Start from
   an explicit confusing MCQ and the existing conversation/refinement surfaces.
-- **Selected direction:** Deliver the useful child outcomes below. Diagnose
-  before changing knowledge; use measured question-quality cases to choose
-  retrieval improvements. Preserve simple search alongside richer answering.
+- **Selected direction:** Diagnose learning difficulties before changing
+  knowledge. Improve evidence discovery through ordinary note search.
 
 ## Shared Constraints
 
@@ -71,18 +70,13 @@ These are starting observations, not promises that the current UI works in every
   note does not gain permission to edit it through these flows.
 - Retrieved content is evidence, distinct from application instructions.
   Search, expansion, citations, and later reads respect the viewer's access.
-- Bulk ingestion, embeddings, a universal review inbox, automatic knowledge
-  rewrites and skill factories are deferred promises. These deferrals do not
-  prescribe runtime rejection of naturally supported behavior. Direct MCP and
-  ChatGPT access follows the [hosted assistant setup guide](../../docs/assistant-oauth.md).
+- Bulk ingestion, embeddings, a universal review inbox, and automatic knowledge
+  rewrites are outside this epic. Direct MCP and ChatGPT access follows the
+  [hosted assistant setup guide](../../docs/assistant-oauth.md).
 
 ## Story Decomposition
 
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery, following [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition). Estimates are hypotheses. Refine or resplit work likely to exceed L before execution. Each story records its preparation state below.
-
-### Generate focus-note questions with relevant supporting passages
-
-The canonical story is [SEED-007#story-1](SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1). It is the next epic increment after the two learning-loop stories. Keep its scope, examples, preparation state, and identity in that existing seed only.
 
 <a id="story-3"></a>
 
@@ -97,54 +91,17 @@ The canonical story is [SEED-007#story-1](SEED-007-per-concept-prompt-splitting-
   title can find the note through ordinary Donut search.
 - **Scope:** Extend the existing search journey to body-text evidence, with
   a matching excerpt and a link to the note. Preserve fast title/alias search
-  and its scope controls. Search remains evidence discovery, with no generated
-  answer required. The existing search API serves the same behavior.
+  and its scope controls. The existing search API serves the same behavior.
 - **Evaluation:** A phrase occurs only in a note's body. Searching it shows
   that note and the matching passage; opening the result reaches the note.
   Exact title/alias searches remain useful, and unavailable notes do not appear.
-- **Value / learning:** Discover how much missing knowledge is actually a
-  title-only search limitation before investing in richer query orchestration.
+- **Value / learning:** Learn how often body matches recover notes missed by
+  title and alias search.
 - **Effort hypothesis:** L, medium confidence; ranking, representative corpus
   size, and response-time expectations need refinement.
-- **Depends on:** No new story. Search and graph expansion have different
-  responsibilities, so question-context changes do not block this outcome.
-- **Safe stopping point:** Learners can find and inspect additional evidence
-  with the existing search interaction even if synthesized answers are deferred.
-
-<a id="story-5"></a>
-
-### Answer a comparison across notes with inspectable supporting evidence
-
-**Identity:** SEED-073#story-5
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-- **For / why:** A learner comparing two concepts can obtain an answer grounded
-  in their notes and examine what supports it.
-- **Scope:** Start with a comparison naming two concepts in one accessible
-  notebook. Find candidate notes through existing search, read relevant
-  evidence with bounded expansion, and answer with attributable references.
-  State uncertainty when the notebook does not support a conclusion. A
-  conversational follow-up can request another relevant note as the question
-  changes; reuse the current conversation surface and common evidence access.
-  This is the first richer query journey, not a commitment to arbitrary
-  research across the entire catalog.
-- **Evaluation:** Two notes separately explain concepts and a third supplies
-  a qualification. A comparison cites the supporting passages, and a follow-up
-  about the qualification retrieves that evidence. If the qualification is
-  missing or sources disagree, the answer exposes that limit instead of inventing
-  agreement. Simple search remains available.
-- **Value / learning:** Test whether bounded synthesis helps users apply their
-  knowledge and whether conversationally chosen context improves that answer.
-- **Effort hypothesis:** L, low confidence; refine the entry interaction and
-  comparison cases, and resplit if one end-to-end comparison exceeds L.
-- **Depends on:** No hard story block established. Current HTTP search and
-  focus context support a bounded comparison; reuse earlier evidence improvements
-  when delivered. Shared code and preferred delivery order alone impose no wait.
-- **Safe stopping point:** One useful, cited comparison journey with honest
-  evidence limits; broader chat, catalog-wide research, and new-note proposals
-  can remain deferred.
+- **Depends on:** Existing note search and access controls.
+- **Safe stopping point:** Learners can find and inspect body-text matches
+  through the existing search interaction.
 
 <a id="story-6"></a>
 
@@ -194,29 +151,15 @@ values corrected the probe without changing product code. Scratch files were
 removed. This establishes the existing API mechanism, not a working user-facing
 post-answer journey, model adjudication quality, or scoring repair.
 
-## Ordering and Scope Reduction
-
-The backlog owns global priority. Within this epic: resolve an actual learning
-difficulty, retain a useful note correction, improve question evidence through
-SEED-007, then improve body search, external-agent evidence access, and cited
-comparison. This order favors immediate learning value before broader query
-machinery; it does not impose serial technical dependencies.
-
-Drop or defer broader comparison first if capacity is tight, then expanded
-external-agent access. Keep the existing workflows usable at every stopping
-point. The separately queued capability experiment can use a current notebook
-checkout and is neither a supplier nor a consumer blocking this epic.
-
 ## Open Decisions
 
 - Select real learner cases during evaluation; human comprehension,
   retention, and retrieval-quality gains remain unmeasured.
 - Define how long proposal decisions and their private conversation evidence
   should remain available, using existing deletion/ownership rules.
-- Agree practical latency and cost expectations for retrieval/query evaluation.
-- Agent-reported gaps, automatic repeat-failure triggers, and claim-level
-  provenance remain later decisions. Detailed contest and invalid-question
-  correction policies are owned by story 6.
+- Agree practical latency expectations for body search.
+- Automatic repeat-failure triggers remain a later decision. Story 6 owns
+  detailed contest and invalid-question correction policies.
 
 **Learner-confirmed ambiguity exclusion (owner decisions, deferred):**
 
@@ -238,13 +181,12 @@ concrete evaluation cases.
 ## Breadcrumbs
 
 - Owner's 2026-10-12 assessment and backlog request in this chat: combine the
-  learning and chat work, reuse seeds, keep the capability experiment independent,
-  group the remaining work as an epic, and commit/sync planning on main only.
+  learning and chat work, reuse seeds, group the remaining work as an epic, and
+  commit/sync planning on main only.
 - [Shared OpenKB discussion](https://chatgpt.com/share/6acc428e-cd14-83ec-8412-3b5e7d6826c6).
   Its review loop is a proposal for Donut, not a verified OpenKB feature.
 - [Focus-context design](../../docs/focus-context/focus_context_retrieval_design.md)
   and [domain vocabulary](../../docs/adrs/0001-ubiquitous-language.md).
-- [Existing question-context hypothesis](SEED-007-per-concept-prompt-splitting-single-note-qg.md)
-  and the [hosted assistant setup guide](../../docs/assistant-oauth.md).
+- [Hosted assistant setup guide](../../docs/assistant-oauth.md).
 - SEED-055 concerns file-serving API cleanup and SEED-001 concerns a different
   fuzzy spelling-match behavior; neither is duplicated or reprioritized here.
