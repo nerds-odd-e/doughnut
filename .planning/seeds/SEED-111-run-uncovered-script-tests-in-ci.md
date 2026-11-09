@@ -12,8 +12,11 @@ scope: story
 ### See CI results and timings for the remaining script tests in Intent
 
 **Identity:** SEED-111#run-uncovered-script-tests-in-ci
+```json dough-story-dependencies
+{"schemaVersion":1,"identity":"SEED-111#run-uncovered-script-tests-in-ci","dependencies":[{"supplier":{"identity":"SEED-114#disposable-mysql-stops-before-cleanup","href":"seeds/SEED-114-disposable-mysql-cleanup.md#disposable-mysql-stops-before-cleanup"},"implementation":"SEED-111's first slice repeats the full 18-file group at least 30 times on the CI runner and treats any recurring failure as blocking.","rationale":"The disposable MySQL helper currently fails the retirement mutation tests with ENOTEMPTY on a busy host and can leave mysqld running; a series run before that is fixed would fail on cleanup rather than measure the runner. Reordering alone does not stop SEED-111 from starting first.","condition":"The disposable MySQL helper removes its temporary folder only after its mysqld has exited, so repeated full-group runs show no ENOTEMPTY and leave no helper mysqld or doughnut-retire-mysql-* folder.","state":"waiting"}]}
+```
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-run-uncovered-script-tests-in-ci/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b6b99d5197e3214e2652ea4b66fb1a13a199274a06568f3669716e37b53b2afb","plan":"b9a7c39b3fb158eb12233bfc066cce3ed5e23c43dfa177aca1a7a0842a63c9d3"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-run-uncovered-script-tests-in-ci/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"69a29bc4c8261f2b89ecd4c2cc1140faecb9ff270a041b78eeffd15479b38a42","plan":"c079bdadeb5ebfb4f03395b10cdf36cda22d9aca35dbe21ecf2c233aac024ed8"}}
 ```
 
 **Goal** Doughnut contributors can see, in Intent’s Scripts and
