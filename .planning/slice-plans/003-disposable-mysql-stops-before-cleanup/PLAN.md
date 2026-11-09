@@ -2,6 +2,7 @@
 
 **Identity:** SEED-114#disposable-mysql-stops-before-cleanup
 **Source:** [Refined story](../../seeds/SEED-114-disposable-mysql-cleanup.md#disposable-mysql-stops-before-cleanup)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -59,9 +60,49 @@ full group, which SEED-111's gate rule owns.
 ### 1. Retirement tests stop their disposable MySQL before removing its folder
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: The probe cases and the ten-run series below, each with the revision,
 load average and result recorded here.
+
+Results, 2026-11-09, this macOS host (16 cores, shared with other sessions),
+working tree on `c5d89eb82f` plus the slice's change to
+`scripts/worktree-retirement-disposable-mysql.mjs`:
+
+- **Probe cases 1 and 2**, 13:14, load 3.22 / 7.59 / 13.36, in the Nix shell
+  (`os.tmpdir()` there is a per-shell `/tmp/nix-shell.*` folder). Case 1:
+  right after the cleanup resolved, pid 77952 gave `ESRCH`, the folder was
+  gone, no error, 749 ms. Case 2 (server paused with `SIGSTOP`): pid 78955
+  gave `ESRCH`, the folder was gone, no error, 5,061 ms.
+- **Probe case 3, not-ready path**, 13:18, load 5.25 / 7.86 / 12.04: a
+  stand-in `mysqld` (via `MYSQL_BASEDIR`) that ignores `SIGTERM` and a
+  `mysqladmin` that always fails. The start rejected with
+  `disposable mysqld on port 56345 not ready`; at that moment pid 65079 gave
+  `ESRCH` and no new folder existed; the later `t.after` hook ran without
+  error. This covers the spawned-child pid and the `SIGKILL` path on that
+  route.
+- **Ten runs**, 13:15 to 13:17, 1-minute load before each run 2.50, 3.46,
+  7.33, 9.74, 10.63, 14.05, 14.60, 15.91, 13.11, 11.53; each run took 10 to
+  15 s. Every run: 75 tests, none skipped, no `ENOTEMPTY` in the test output,
+  `scripts/worktree-retirement-mutation.test.mjs` 6 of 6 and
+  `scripts/worktree-retirement-e2e-mutation.test.mjs` 3 of 3 passed, and no
+  new `doughnut-retire-mysql-*` folder or helper `mysqld` after the run.
+  Runs 1 and 3 each failed one other test (G2).
+- **After the series**, 13:19: `pgrep -fl doughnut-retire-mysql-` printed
+  nothing; `os.tmpdir()` outside the Nix shell held no
+  `doughnut-retire-mysql-*` folder; under `/private/tmp/nix-shell.*` only four
+  such folders remained, all dated 12:19 to 12:20, before this execution
+  started, left by the old cleanup.
+- **Consumers:** the two test files call `startDisposableMysql(t)` and use
+  only `execSql`, `query`, `port` and `version`; both ran in all ten runs.
+  `scripts/owned-process-tree-termination.mjs` is reused unchanged; its other
+  callers are not reached by this change.
+- **Refactor:** the helper's returned object no longer carries `stop`, so the
+  cleanup runs only through `t.after` and the not-ready path, and a test
+  cannot start an unawaited cleanup that the hook then skips. Afterwards, at
+  load 4.48, `node --test` on the two helper users passed 6 of 6 and 3 of 3,
+  none skipped; at load 6.83 probe cases 1 and 2 passed again (pids 80003
+  and 84619 `ESRCH`, folders gone, 887 ms and 5,051 ms) and `pgrep` found no
+  helper `mysqld`.
 
 Behavior: A retirement test that started a disposable server finishes, or
 its server does not become ready → the helper's cleanup runs → it returns
@@ -86,8 +127,8 @@ test.
   this slice. A cleanup failure, or a leftover server or folder, stops the
   slice for diagnosis.
 - **Consumers.** `stop` becoming async reaches `t.after` and the not-ready
-  path in the same file. The returned `stop` and `home` have no caller in
-  the two test files. No CI command or `package.json` script runs these
+  path in the same file. The two test files use only `execSql`, `query`,
+  `port` and `version` from the returned object. No CI command or `package.json` script runs these
   files yet, so the commit's check-only lint hook is the only other gate.
 
 ## Concern evidence
@@ -97,3 +138,15 @@ test.
 - The ten-run series is a focused-test exception to the slice time target
   (see slice 1).
 - This review found no other slice-specific concern.
+
+## Story obligations
+
+### G1. The ten runs ran below the load of the failing premise runs
+Reported: slice 1 — "The ten runs were at lower load than the failing premise runs: 1-minute load 2.5 to 15.9, against 21 to 25 when four of five runs failed."
+Story clause: "On a host shared with other sessions, ten full-group runs one after another"
+Disposition: proved by slice 1: slice 1 Proof, probe case 1 (`ESRCH` and no folder right after the cleanup resolves) and the helper's `stop`, which calls `rmSync` only after `terminateOwnedProcessTree` has seen the server gone; the only writers into the folder (`mysqld --initialize-insecure` and the `mysql` client, both run with `spawnSync`, and the server) have exited by then, so the removal cannot race a writer at any load; the ten runs on the shared host had no `ENOTEMPTY`
+
+### G2. Another test in the group failed in two of the ten runs
+Reported: slice 1 — "`scripts/worktree-retirement-checkout-processes.test.mjs:177` 'verified idle fixture reports idle snapshot not a reservation' failed in runs 1 and 3 with uncertain checkout backend JVM evidence (pid 17180; working directory unavailable)."
+Story clause: "Other tests' failures in the group stay with SEED-111's gate rule."
+Disposition: excluded "Other tests' failures in the group stay with SEED-111's gate rule."

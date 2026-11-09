@@ -14,6 +14,7 @@ import net from 'node:net'
 import os from 'node:os'
 import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
+import { terminateOwnedProcessTree } from './owned-process-tree-termination.mjs'
 import { listenEphemeralPort } from './sut-e2e-port-listen.mjs'
 
 function resolveMysqlBasedir() {
@@ -76,6 +77,24 @@ async function waitForMysql(basedir, port, timeoutMs = 60_000) {
   throw new Error(`disposable mysqld on port ${port} not ready: ${lastError}`)
 }
 
+function isServerRunning(pid) {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch (error) {
+    if (error.code === 'ESRCH') return false
+    throw error
+  }
+}
+
+function signalServer(pid, name) {
+  try {
+    process.kill(pid, name)
+  } catch (error) {
+    if (error.code !== 'ESRCH') throw error
+  }
+}
+
 /**
  * Boot an isolated mysqld matching the Nix mysql84 tooling version.
  */
@@ -132,29 +151,19 @@ export async function startDisposableMysql(t) {
   child.unref()
 
   let stopped = false
-  const stop = () => {
+  const stop = async () => {
     if (stopped) return
     stopped = true
-    try {
-      if (existsSync(pidFile)) {
-        const pid = Number(readFileSync(pidFile, 'utf8').trim())
-        if (Number.isInteger(pid) && pid > 0) {
-          try {
-            process.kill(pid, 'SIGTERM')
-          } catch {
-            // already gone
-          }
-        }
-      } else if (child.pid) {
-        try {
-          process.kill(child.pid, 'SIGTERM')
-        } catch {
-          // already gone
-        }
-      }
-    } finally {
-      rmSync(home, { recursive: true, force: true })
-    }
+    const recordedPid =
+      existsSync(pidFile) && Number(readFileSync(pidFile, 'utf8'))
+    const pid = recordedPid || child.pid
+    await terminateOwnedProcessTree({
+      captureDescendants: () => [],
+      signalOwnedTree: (_descendants, name) => signalServer(pid, name),
+      isOwnedTreeRunning: () => isServerRunning(pid),
+      failureMessage: `disposable mysqld ${pid} did not exit after SIGKILL within the bounded wait`,
+    })
+    rmSync(home, { recursive: true, force: true })
   }
   t.after(stop)
 
@@ -162,7 +171,7 @@ export async function startDisposableMysql(t) {
     await waitForMysql(basedir, port)
   } catch (error) {
     const log = existsSync(logFile) ? readFileSync(logFile, 'utf8') : ''
-    stop()
+    await stop()
     throw new Error(
       `${error instanceof Error ? error.message : String(error)}${
         log ? `\n${log}` : ''
@@ -186,6 +195,5 @@ export async function startDisposableMysql(t) {
     query(sql) {
       return mysqlCli(basedir, port, sql, ['-N', '-B']).trim()
     },
-    stop,
   }
 }
