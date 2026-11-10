@@ -76,3 +76,14 @@ together. Six Behavior slices share one model; no consolidation/Escalate/resplit
 Only focused-check/external-stack waits justify >10 minutes. Slice 2's early
 probe bounds its state-changing prerequisite; no other blocking concern remains.
 The coordinator records readiness; this plan grants no Take/execution authority.
+
+## Execution context
+
+- Established start resumed 2026-11-10 by Nao-chan; source kind planned, story-branch mode.
+- Owned execution checkout: `/Users/terryyin/git/doughnut/.worktrees/highlight-and-link-to-a-specific-property-item`; branch `codex/highlight-and-link-to-a-specific-property-item`. Existing dashboard-created linked worktree; no second claim.
+- Remote `origin`, trunk `main`; increments target `refs/heads/codex/highlight-and-link-to-a-specific-property-item` in `nerds-odd-e/doughnut`.
+- Starting revision `99ba3b9ac61db0bd3bc8ac58fe4d4c7ceed493e7`; accepted claim and initial candidate `add1cf80f5ef58b668ea31fe6b1aa6b183b4fd57`. Claim trunk CI is unobserved.
+- Checkout setup: `./scripts/run.sh bash scripts/worktree_setup.sh` passed against current lockfile; applicable command `./scripts/run.sh pnpm -C frontend exec vue-tsc --version` passed (6.0.3).
+- Observer: GitHub Actions selector `ci.yml`, verified active workflow `donut CI`, push covers all branches. Coordinator `nao-seed119`, directory `/tmp/dough-ci-501/watch-HpTDpK`, PID 69392, session 83266, yielded cell `g824:9`; runtime and launch rooted in this checkout. Target is the remote execution branch.
+- Replanning remains authorized by the selected planned workflow; target about 5 minutes, hard scrutiny beyond 10 active minutes, with focused-check and external-stack waits excepted as stated above.
+- Delivery hook is the common Git `pre-commit`, invoking check-only `./scripts/run.sh pnpm lint:changed`; coordinator fresh delivery owns selective formatting once. No API generation for existing endpoints; component inventory regeneration only on component addition/deletion.

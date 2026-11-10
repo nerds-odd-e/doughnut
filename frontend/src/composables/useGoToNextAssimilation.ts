@@ -50,7 +50,7 @@ export function useGoToNextAssimilation() {
     if (propertyKey) {
       dismiss()
       await router.push(
-        propertyValue !== undefined
+        propertyValue
           ? notePropertyItemLocation(noteId, propertyKey, {
               value: propertyValue,
               occurrence: 1,

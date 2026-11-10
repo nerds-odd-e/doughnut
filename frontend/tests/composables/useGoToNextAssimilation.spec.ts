@@ -113,7 +113,19 @@ describe("useGoToNextAssimilation", () => {
     )
   })
 
-  it.each(["run", "", " [[Run|跑]] "])(
+  it("opens the property for a scalar next unit with an empty propertyValue", async () => {
+    mockSdkService(AssimilationController, "next", {
+      nextUnit: { noteId: 42, propertyKey: "topic", propertyValue: "" },
+      counts: { dueCount: 1 },
+    })
+    const { router, goToNextAssimilation } = await mountGoToNextAssimilation()
+    await goToNextAssimilation()
+    expect(router.currentRoute.value).toMatchObject(
+      notePropertyLocation(42, "topic")
+    )
+  })
+
+  it.each(["run", " [[Run|跑]] "])(
     "pushes the first exact occurrence of returned value %j",
     async (propertyValue) => {
       mockSdkService(AssimilationController, "next", {

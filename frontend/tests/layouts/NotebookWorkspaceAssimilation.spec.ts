@@ -160,7 +160,7 @@ it("follows next-unit note to property destinations through the compact direct a
   expect(activity().querySelector(".due-count")?.textContent?.trim()).toBe("7")
   next.mockResolvedValue(
     wrapSdkResponse({
-      nextUnit: { noteId: second.id, propertyKey: "topic" },
+      nextUnit: { noteId: second.id, propertyKey: "topic", propertyValue: "" },
       counts: { ...counts, dueCount: 6 },
     })
   )
