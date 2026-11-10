@@ -238,3 +238,9 @@ permitted probe 3; deployed observations stay with 10/11. No other blocking conc
 Reported: slice 2 — "The optional CLI tsc --noEmit diagnostic reports 113 errors in existing configuration/imports and unchanged CLI typing sites."
 Story clause: "A notebook owner can publish small committed Markdown edits to an existing large notebook with the supported Donut CLI."
 Disposition: no user cost "A notebook owner can publish small committed Markdown edits to an existing large notebook with the supported Donut CLI.": package build uses esbuild, test uses Vitest/Python and lint uses Biome; none invokes this unsupported standalone tsc command. Inspected unchanged Node16/rootDir/generated imports and existing Key.name sites at f3bb7162. The one new SDK envelope issue was corrected with existing runDefaultBackendJson; the required CLI command passed 442 tests after that correction. No observed CLI behavior defect remains; the optional diagnostic is explicitly failed, not accepted proof. Evidence: /tmp/seed121-slice2-tsc-diagnostic.log and consumer-trace-cli.md.
+
+### G2. Historical action provenance
+Reported: slice 3 — "Independent origin review found a precise pre-fix extraction mechanism and matching paired content/timestamps, but the historical action itself remains unconfirmed."
+Story clause: "Establish the cause before selecting a repair"
+Disposition: return
+Commitment: C20, D04, D05

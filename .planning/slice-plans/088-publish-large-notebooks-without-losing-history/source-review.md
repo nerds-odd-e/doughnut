@@ -20,16 +20,16 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | C10 | Deliver an accurately versioned build. | slice 10 |  |
 | C11 | Keep the normal update target usable across CLI publication. | slice 10 |  |
 | C12 | Keep the normal update target usable across application publication. | slice 9 |  |
-| C13 | Diagnose the reported live/accepted mismatch using the canonical Portable representation. | slice 3 |  |
+| C13 | Diagnose the reported live/accepted mismatch using the canonical Portable representation. | slice 3 | observed: Private drift-report.json and drift-report-metadata.json: one locked production comparison at9464923e, all4paths exactbytes/nativeGitIDs |
 | C14 | Identify differing paths. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | C15 | Identify entries that are live-only. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | C16 | Identify entries that are accepted-only. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | C17 | Identify entries whose content differs. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | C18 | Include attachment pointers when they differ. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | C19 | Include structural entries when they differ. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
-| C20 | Establish the cause before selecting a repair. | slice 3 |  |
+| C20 | Establish the cause before selecting a repair. |  | G2 |
 | C21 | Correct the confirmed cause. | slice 3 |  |
-| C22 | Provide supported diagnosis for the affected notebook. | slice 3 |  |
+| C22 | Provide supported diagnosis for the affected notebook. | slice 3 | observed: Production GET /api/notebooks/15/git-diagnosis HTTP200 at2026-11-10T07:36:43–07:37:01Z; private report retained |
 | C23 | Provide supported recovery for the affected notebook. | slice 11 |  |
 | C24 | Enable the owner to retry publication after recovery. | slice 11 |  |
 | C25 | Preserve genuine live-only edits through a forward recovery commit. | slice 4 |  |
@@ -53,8 +53,8 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | C43 | Existing file policies continue to govern admission. | slice 4 |  |
 | C44 | Existing upload-size policies continue to govern admission. | slice 4 |  |
 | Q01 | The publication scope concerns **small committed Markdown edits**; the large-size example concerns the **full accepted Git tree listing**. | slice 6 |  |
-| Q02 | Sampled note equality is insufficient to establish the cause of the mismatch. | slice 3 |  |
-| Q03 | Sampled attachment-payload equality is insufficient to establish the cause of the mismatch. | slice 3 |  |
+| Q02 | Sampled note equality is insufficient to establish the cause of the mismatch. | slice 3 | observed: Private exact-drift-review.diff reconstructs entire locked live tree from accepted history and all4differences; no sampled-note substitution |
+| Q03 | Sampled attachment-payload equality is insufficient to establish the cause of the mismatch. | slice 3 | observed: Locked report complete path/blob comparison; unchanged pointer/marker/README entries remain exact accepted context, no hydrated-payload substitution |
 | Q04 | Identity preservation is qualified by “soundly identified” Note/Folder identities. | slice 4 |  |
 | Q05 | Git content cannot recover already-deleted private identities. | slice 4 |  |
 | Q06 | Git content cannot recover already-deleted learning history. | slice 4 |  |
@@ -102,7 +102,7 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | J05.8 | **Conditional next step:** The owner Pulls if recovery advanced accepted head. | slice 11 |  |
 | J05.9 | **Conflict step:** The owner resolves any real conflict. | slice 11 |  |
 | J05.10 | **Continuation:** The owner publishes the pending changes. | slice 11 |  |
-| J06.1 | **Trigger:** Diagnosis shows genuine live-only authored edits. | slice 3 |  |
+| J06.1 | **Trigger:** Diagnosis shows genuine live-only authored edits. | slice 3 | observed: Private exact-drift-review.diff: two rewritten original notes and two live-only authored extracted notes; historical action confirmation remainsG2 |
 | J06.2 | **Review:** The owner reviews the exact differences. | slice 11 |  |
 | J06.3 | **Authorization:** The owner explicitly requests recovery. | slice 11 |  |
 | J06.4 | **Authorization context:** That request is against the observed accepted/live state. | slice 11 |  |
@@ -120,6 +120,6 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | D01 | The developer accepted preservation of genuine live-only edits through an owner-reviewed forward commit. | slice 4 |  |
 | D02 | Encoding defects are repaired against accepted Git content. | slice 3 |  |
 | D03 | Projection defects are repaired against accepted Git content. | slice 3 |  |
-| D04 | The exact diff determines the diagnosed cause. | slice 3 |  |
-| D05 | The exact diff determines the narrow repair. | slice 3 |  |
-| D06 | No policy question remains. | slice 3 |  |
+| D04 | The exact diff determines the diagnosed cause. |  | G2 |
+| D05 | The exact diff determines the narrow repair. |  | G2 |
+| D06 | No policy question remains. | slice 3 | observed: Original2026-11-10 owner decision preserved; pending question concerns historical provenance, not the accepted forward-preservation policy |
