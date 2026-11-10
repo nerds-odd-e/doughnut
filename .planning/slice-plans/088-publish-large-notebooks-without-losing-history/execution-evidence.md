@@ -59,7 +59,7 @@ exceed 250. TreeShape is 251: prefer direct reuse; if editing is required, 3 mus
 inspection/classification versus correspondence/admission reorganization, callers and retained controller
 proof before implementation.
 
-9's separate one-time whole-product reading sweeps `CLI_DIST_ARTIFACT`, `CLI_BUNDLE_SOURCE`, `CAPTURED_CLI`,
+10's separate one-time whole-product reading sweeps `CLI_DIST_ARTIFACT`, `CLI_BUNDLE_SOURCE`, `CAPTURED_CLI`,
 `captured-cli` and app CLI artifact/publication references. Delete exclusive dependents transitively; classify
 surviving shared CLI/LB/E2E uses. Preserve dated provenance; delete obsolete synthetic fixture branches rather
 than renaming their actions. No permanent absence test.
@@ -120,3 +120,15 @@ Recovery implementation reading: reuse NotebookGitProposalTreeInspection/TreeSha
 ## Slice 4 acceptance
 
 Existing correction9cdb6d998d is reused. The extraction controller proof now supplies explicit typed authored bytes and observes those exact accepted bytes for original and new note, plus accepted/live native tree IDs equal the fetched Git tip. Parent/path/time/property-date observations remain. Full backend:test_only passed3055 tests,0 failures/errors,2 skipped (1m39s); changed XML case passed at2026-11-10T08:33:57Z on Territory.local. Coordinator inspected the literal setup and observing assertions, native-tree oracle and XML. Consumer dispositions are retained in consumer-trace-extraction.md; independent refactor completed and sufficient proof retained. No production/API edit or generation trigger; no remaining slice4 gap. Coordinator selective formatter and file-size check passed.
+
+## Candidate-admission refinement
+
+PFE responsibility: immutable Git candidate bytes must obey one path/Markdown/marker/attachment/book policy before either ordinary Publish or reviewed live acceptance can advertise them. Whole backend call-site search found the cohesive rule sequence solely in NotebookGitProposalPublisher; format helpers and attachment policy already own their actual rules. Authored save preparation may insert/canonicalize content and is not a substitute for immutable candidate admission. Choose modularization of that existing sequence, preserving its normal caller, rather than a parallel recovery validator. The common owner is immediately used by normal Publish and then by the next recovery Behavior; no speculative abstraction or second synchronization model.
+
+Insert Structure5 before recovery6 because this small shared admission outcome isolates unchanged-policy proof and keeps the new atomic recovery leaf credible within its active target. Existing helpers remain authoritative; ancestry, drift refusal, identity correspondence and projection stay with their operation owners. Completed slices and proof are unchanged. All later allocations move together; thirteen leaves with no resplit recommendation. Active shared-policy candidates are below250 lines; TreeShape251 is reused without edits. No attempted recovery code exists to park or revert.
+
+Slice4 published4d135fd1c8775fd360ad3ee24be0cf8f431fb257, prior basee7f811f43833b6e28ac88f2e15accc9555866892, no reconciliation; same branch observer reused. This is the next published base. The first fresh request refused before preparation because its ownedPaths omitted the unchanged plan that delivery marks done; ownership declaration corrected, then the single formatting/commit/publication attempt succeeded. No behavioral proof invalidated.
+
+## Slice 5 acceptance
+
+The existing immutable candidate sequence now has one NotebookGitCandidateAdmission owner, called by ordinary Publish. Inspection, miscase, marker, typed Markdown, attachment durability/size and book-source policies retain their order and errors; ancestry, drift, identity/projection and transaction ownership are unchanged. Root inspected the moved block and controller Markdown/attachment/rollback assertions; full backend:test_only passed3055 tests,0failures/errors,2skipped in1m49s, XML begins2026-11-10T08:53:35.974Z on Territory.local. All reached consumers are disposed in consumer-trace-admission.md. Independent refactor complete; unchanged accepted proof retained. No API contract/generation trigger or slice5 gap. Coordinator selective formatter and size check passed.

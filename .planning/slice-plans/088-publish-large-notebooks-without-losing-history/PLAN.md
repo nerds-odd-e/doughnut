@@ -42,11 +42,11 @@ authorizes no implementation, release or production repair.
 | --- | --- |
 | Consistent exact drift and reviewable content | 1 controller, 2 CLI; real incident 3 |
 | Distinct stale-base/drift guidance and retained local work | 2 plus retained backend/CLI refusal and Pull variations |
-| Actual cause corrected without data/history loss | 3 diagnoses; 4 verifies existing source correction; 5/6 preserve historical live data |
-| Reviewed forward adoption, stale-review refusal, atomicity | 5 controller; 6 installed CLI/backend continuation |
-| Pending work survives recovery, rebase/conflicts and Publish | 6 isolated journey; 12 incident observation |
-| Small commit publishes above 1 MiB accepted listing | 7 CLI subprocess regression; 8 installed CLI/backend acceptance and receiver |
-| Accurately versioned normal update remains usable across application publication | 9 retained application release; 10 actual updater sequence; 11 public delivery |
+| Actual cause corrected without data/history loss | 3 diagnoses; 4 verifies existing source correction; 6/7 preserve historical live data |
+| Reviewed forward adoption, stale-review refusal, atomicity | 6 controller; 7 installed CLI/backend continuation |
+| Pending work survives recovery, rebase/conflicts and Publish | 7 isolated journey; 13 incident observation |
+| Small commit publishes above 1 MiB accepted listing | 8 CLI subprocess regression; 9 installed CLI/backend acceptance and receiver |
+| Accurately versioned normal update remains usable across application publication | 10 retained application release; 11 actual updater sequence; 12 public delivery |
 
 ## Decisive premises and limits
 
@@ -93,7 +93,14 @@ Proof: strengthen `NotebookGitWebContentExtractedNoteDatingControllerTest.extrac
 
 Behavior: extract a note through the current supported operation → both authored results are accepted together. Reuse `9cdb6d998d`, raw Git fixtures and the diagnostic/full-assembly comparison. No new production correction is expected. Target ~5 minutes edits/cleanup; full backend runtime is excepted.
 
-### 5. Preserve explicitly reviewed live edits in accepted history
+### 5. Share immutable Git candidate admission
+Type: Structure
+Status: done
+Proof: complete backend controller suite retains normal proposal acceptance/refusal, Markdown, marker, attachment-size/durability and book-source policy results. No controller/API contract change.
+
+Structure: modularize the cohesive existing inspection/typed-Markdown/attachment/book-policy block from NotebookGitProposalPublisher into one notebook-Git admission owner returning existing inspected files. Keep its order, errors and normal caller behavior; do not move ancestry, drift refusal, correspondence or projection into it. This directly enables reviewed recovery in 6 to reuse the identical immutable candidate checks. No TreeShape edit or new rule. Target ~5 minutes active plus full backend runtime.
+
+### 6. Preserve explicitly reviewed live edits in accepted history
 Type: Behavior
 Status: planned
 Proof: controller acceptance retains A/ancestors, appends one parent-A commit whose tree equals reviewed L,
@@ -103,7 +110,7 @@ candidate/derived writes of head/projection/required state.
 
 Behavior: explicit owner request supplies reviewed A/L → lock/reload, refuse stale review, construct one parent-A native commit with exact current L, validate safe typed files/correspondence and existing attachment/book policies, then accept atomically. Reuse current live rows rather than replaying proposal additions. `NotebookGitProposalAcceptance` can retain current rows/attachments/folders and date required property values after admission; verify required reference/property indexes through their existing owners. Refuse invalid or ambiguous identity changes. No generic restore, ID reconstruction, schema change or Git-only-write constraint. Target ~5–8 minutes active work plus generation/backend runtime; stop/refine at ten minutes. Reuse TreeShape/inspection without editing its already-oversized class.
 
-### 6. Recover through the CLI and publish retained pending work
+### 7. Recover through the CLI and publish retained pending work
 Type: Behavior
 Status: planned
 Proof: installed CLI/isolated backend: inspect, explicitly recover reviewed live edits, Pull/rebase retained
@@ -115,7 +122,7 @@ Behavior: explicit CLI recovery names reviewed A/L and reports accepted head →
 completes. Reuse existing CLI notebook feature, page-object/task seams and help/docs. ~5–8 minutes edits plus
 integrated proof.
 
-### 7. Submit a small commit over an oversized accepted tree
+### 8. Submit a small commit over an oversized accepted tree
 Type: Behavior
 Status: planned
 Proof: dedicated real-Git CLI `run` regression measures accepted listing above 1 MiB and submits three
@@ -124,9 +131,9 @@ observation.
 
 Behavior: existing changed-file selection submits the small proposal and retains local main/work/history.
 Reuse the observed synthetic workload; avoid gratuitous production changes. ~5 minutes. This isolates the
-original subprocess failure; 8 separately owns backend workload/materialization risk and actual acceptance.
+original subprocess failure; 9 separately owns backend workload/materialization risk and actual acceptance.
 
-### 8. Receive the large-notebook publication through a real backend
+### 9. Receive the large-notebook publication through a real backend
 Type: Behavior
 Status: planned
 Proof: installed CLI/isolated backend with independently measured accepted-tree listing above 1 MiB → Publish
@@ -139,7 +146,7 @@ E2E fixture/domain builders and accepted-tree seeding, with no production contro
 fixture/scenario edits; stop/refine before implementation if that seam cannot meet ten minutes. Measure
 runtime/resources before the focused E2E launch.
 
-### 9. Publish the application with its SPA and backend artifacts
+### 10. Publish the application with its SPA and backend artifacts
 Type: Behavior
 Status: planned
 Proof: retain selected-source SPA/jar/routing, valid/missing payload admission, partial failure,
@@ -154,15 +161,15 @@ artifact contract across producer/admission/consumer. A partial delivery either 
 exclusive obsolete machinery; there is no coherent file-based subdivision. Stated good-reason sizing
 exception: ~12–15 minutes edits plus quick retained proof for this complete removal only. One bounded attempt;
 if closure cannot finish, park/revert only owned work and refine before delivering. New combined update
-fixture belongs solely to 10.
+fixture belongs solely to 11.
 
-### 10. Update the authentic affected installation after application publication
+### 11. Update the authentic affected installation after application publication
 Type: Behavior
 Status: planned
 Proof: new isolated shared-store fixture drives tag-versioned CLI build/uploader, application publication,
 actual normal Update from authentic 0.5.9, and execution of fixed replacement/version and the large-tree CLI
 path. Existing call-log shell fixtures do not supply this integration. This one sequence owns updater
-replacement proof; 9 owns application release semantics.
+replacement proof; 10 owns application release semantics.
 
 Behavior: retain selected correctly versioned CLI across application publication and install/run it normally.
 Predecessor: isolated copy of incident binary SHA-256
@@ -171,7 +178,7 @@ current source merely relabeled. No host installation/config mutation. Include n
 estimate; if transport/store composition cannot fit ten minutes, refine before starting. Select unused release
 version above affected/published versions at checkpoint.
 
-### 11. Deliver fixed builds through supported release/update paths
+### 12. Deliver fixed builds through supported release/update paths
 Type: Behavior
 Status: planned
 Proof: receipts name tested main SHA, immutable app/CLI tags, actual publication, public download
@@ -181,7 +188,7 @@ response alone is insufficient.
 Behavior: through checkpoint publish required app correction and strictly newer CLI, then observe public
 updater input and executed replacement. External waits.
 
-### 12. Complete the affected owner's pending publication
+### 13. Complete the affected owner's pending publication
 Type: Behavior
 Status: planned
 Proof: dated private before/after evidence of cause correction, accepted ancestry/content, and current
@@ -195,7 +202,7 @@ Policy agreement is not approval of unseen live content. Owner/operator waits.
 
 ## Execution checkpoints and proof commands
 
-Before trunk releases in 3/11, Story Branch Mode needs one human checkpoint naming tested candidate,
+Before trunk releases in 3/12, Story Branch Mode needs one human checkpoint naming tested candidate,
 `dough-land --keep-worktree` landing, exact main SHA, needed unused immutable app `vMAJOR.MINOR.PATCH` and/or
 `cli-vVERSION` tags and production action. That go-ahead covers landing and named release; ask once. Apply
 release-application/current runbook for app; CLI Release is independent. Recheck current CI/artifacts/release
@@ -219,7 +226,7 @@ and push. Full backend/E2E runtime and release/operator waits are explicit wait 
 [Execution context, observer identity and accepted proof](execution-evidence.md).
 
 Developer accepted reviewed forward preservation on 2026-11-10; no source/ADR question remains.
-Resume refinement retains completed observations 1–3, inserts 4 to verify the existing extraction correction, and retains 5–12 with proof owners shifted together. Twelve leaves; application removal in 9 retains its 12–15-minute exception and updater continuity belongs to 10. One canonical comparison, native forward acceptance and independent CLI publisher remain the cumulative design. Other leaves retain five-to-eight-minute active targets and the ten-minute stop; full backend/E2E and external waits are excepted. Actual live adoption remains reviewed.
+Current refinement retains completed 1–4, adds shared admission Structure 5 immediately before recovery Behavior 6, and retains 7–13 with proof owners shifted together. Thirteen leaves; application removal in 10 retains its 12–15-minute exception, updater continuity belongs to 11, and final deployment/owner observations to 12/13. Other active targets remain five to eight minutes with a ten-minute stop; full backend/E2E and external waits are excepted. One canonical comparison, shared candidate rules and native forward acceptance remain the cumulative design.
 
 ## Story obligations
 
