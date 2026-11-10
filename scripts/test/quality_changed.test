@@ -80,6 +80,21 @@ case "$DONUT_TEST_SCENARIO" in
     git -C "$work" add cli/example.ts \
       packages/donut-test-fixtures/example.ts
     ;;
+  staged-assignment)
+    git -C "$work" commit --allow-empty -qm initial
+    mkdir -p "$work/.planning/agents"
+    cat >"$work/.planning/agents/julia-chan.json" <<'ASSIGNMENT'
+{
+  "schemaVersion": 1,
+  "agent": "Julia-chan",
+  "email": "julia-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-001#example",
+  "host": "codex"
+}
+ASSIGNMENT
+    git -C "$work" add .planning/agents/julia-chan.json
+    ;;
   staged-frontend)
     mkdir -p "$work/frontend"
     printf 'const original = true\n' >"$work/frontend/example.ts"
@@ -146,6 +161,13 @@ test-lint-selects-only-staged-components() {
   @assert-equals \
     $'pnpm --frozen-lockfile recursive install\npnpm -C cli lint\npnpm -C packages/donut-test-fixtures lint' \
     "$output"
+}
+
+test-lint-selects-no-code-checks-for-a-staged-assignment() {
+  local output
+  output="$(run-in-temporary-repository lint staged-assignment && printf 'lint complete')"
+
+  @assert-equals 'lint complete' "$output"
 }
 
 test-lint-checks-frontend-in-a-removed-copy-of-the-index() {

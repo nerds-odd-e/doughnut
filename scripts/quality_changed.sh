@@ -53,6 +53,9 @@ select_components_for_file() {
     biome.json)
       select_biome_components
       ;;
+    .planning/agents/*.json)
+      # Open Dough writes these coordination records without changing product code.
+      ;;
     *.js|*.mjs|*.cjs|*.ts|*.tsx|*.json)
       select_component root
       ;;

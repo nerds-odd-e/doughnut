@@ -28,6 +28,7 @@
       "!**/*.yml",
       "!**/.eslintrc.cjs",
       "!**/index.html",
+      "!.planning/notes/*.html",
       "!**/backend",
       "!**/docs",
       "!**/infra",
