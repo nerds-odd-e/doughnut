@@ -80,15 +80,7 @@ no new scalar rendering or editing model.
 ### 2. Establish exact occurrence identity
 Type: Structure
 Status: done
-Internal change: Add the shared exact-text/one-based-occurrence type and pure
-index/selector conversion in the existing property-value owner. Preserve all
-external rendering, routes and editing behavior; register no item URL yet.
-Enables immediately following Behavior 3, which consumes this single identity.
-Proof: Stable domain algorithm examples cover ordered distinct values, duplicate
-occurrences, blank/exact whitespace text and an unresolved selector; existing
-scalar property-location proof and both typechecks preserve external behavior.
-Sizing: about 3–5 minutes using the parked implementation's compatible utility;
-no routing, rendering, new selection state or generic identity framework.
+Accepted implementation and proof: [retained evidence](source-review.md#structure-2-acceptance).
 
 ### 3. Return to an exact list occurrence from its URL
 Type: Behavior
@@ -248,3 +240,7 @@ Reported: slice 9 — "After the initially completed review, an isolated mounted
 Story clause: "Confirm removes the selected content and this learner's matching trackers through existing tracker-deletion semantics."
 Disposition: proved by slice 9: three real mounted regressions delete current22 with exact note99 save, withhold delayed prior-note history and warn/delete newly added same-note33 after Cancel; both defects reproduced red, pending-only read lifetime corrected;45 focused tests, both types and complete retryOFF408files2517tests pass; unchanged18native E2E boundaries retained
 Commitment: 50
+
+## Execution complete
+
+Product advice: no change; original matching-history outcome is proved after the note/action read-lifetime correction.
