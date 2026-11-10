@@ -215,6 +215,15 @@ Former local code: DD-239. The required obligation vocabulary could not keep a g
 
 Former local code: DD-240. Acceptance reasoned that a repeat confirmation stayed stable despite the return naming two exclusions on one tracker as untested. Their interaction restored an earlier excluded attempt’s effect. An independent aggregate review found the branch defect and the owner authorized slice 11’s repair. One SEED-073#story-7 execution, release unknown; relationship to ODF-223 remains uncertain. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-271.md).
 
+### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: modified; review snapshot88061832511d83ae3b7cc0197c827bfd57d145de; base release unknown
+  - Evidence: 2026-11-10, isolated cached-note review `/tmp/seed119-cache-review-result.log`, G8/refinement1eab56a4becd601c665bcbd05cdc113058177325, maintained NoteTextContent.propertyHistoryNoteChange.spec.ts.
+  - Observed effect: original eight slices,407files/2514 tests and exact branch CI passed, then a mounted Cancel/note-reuse check deleted prior-note11 instead of current22. Related same-note history after Cancel also bypassed a new warning. The inherited guard memoization had no correct note/action lifetime; this execution exposed it through item removal. The original completion judgment was withdrawn and one bounded same-story leaf restored the matching-history promise with pending-only reads and three regressions;408files/2517 tests and both types passed.
+  - Inference: the prior per-slice proof omitted reused-editor/current-history continuation. This establishes an inherited weakness reached by the feature, not that this execution introduced the original cache.
+
 <a id="odf-272"></a>
 
 ## ODF-272 — Shared accessible-name consumers were missed before delivery

@@ -174,14 +174,15 @@ and named note navigation supply the special final-entry rule.
 
 ### 9. Keep removal history bound to the edited note
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Cancel item removal, then reuse the editor for another note → its
-history guard fetches and targets the current note's matching trackers.
-Keep the single guard/cache; associate cached and pending reads with note
-identity so prior-note history cannot satisfy a current-note removal or rename.
+history guard fetches current matching trackers for each action. Share only
+pending reads for the same note; completed or prior-note data cannot satisfy
+a later removal or rename after history changes.
 Preserve exact key/value and whole-key matching, cancellation and shared errors.
 Proof: Mounted NoteTextContent switches notes after Cancel; current tracker22
-is deleted while prior-note tracker11 remains. Run reached guard/edit/save
+is deleted while prior-note tracker11 remains; new same-note history after
+Cancel is warned/deleted too. Run reached guard/edit/save
 consumers and both types; renew complete retryOFF frontend shards after this
 cache-contract correction. Keep the accepted18E2E boundaries when unchanged.
 Sizing: about3–5 active minutes; one cache-identity correction, no new API/state
@@ -245,5 +246,5 @@ Commitment: 44
 ### G8. History cache follows the edited note
 Reported: slice 9 — "After the initially completed review, an isolated mounted editor check canceled removal on note1, reused the editor for note99 and confirmed removal; expected current-note tracker22 but the guard deleted cached prior-note tracker11. The matching-history outcome is therefore unfinished despite the earlier completion marker."
 Story clause: "Confirm removes the selected content and this learner's matching trackers through existing tracker-deletion semantics."
-Disposition: return
+Disposition: proved by slice 9: three real mounted regressions delete current22 with exact note99 save, withhold delayed prior-note history and warn/delete newly added same-note33 after Cancel; both defects reproduced red, pending-only read lifetime corrected;45 focused tests, both types and complete retryOFF408files2517tests pass; unchanged18native E2E boundaries retained
 Commitment: 50
