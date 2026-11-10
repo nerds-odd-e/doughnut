@@ -118,3 +118,17 @@ helpers. Preserve scalar remove/reify/edit and replace focus proof at the value 
 - Developer on 2026-11-10 explicitly requested fixing the recovery failure and retrying. Fresh implementation and independent refactor corrected exact-content false-none classification and added explicit operator-reviewed resolution, preserving ordinary no-apply refusal. Root inspected the complete saved diff against resolved planning content: all eight-leaf draft edits survive with accepted G4/repair evidence and context relocation. `resolve --record /var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/dough-ci-repair-stash-UxPGxe/record.json --reviewed-oid 266306cfa8064e45118b76c6581083a63bbcb2fd` returned resolved/reviewed; subsequent helper drop returned exact OID266306cfa8064e45118b76c6581083a63bbcb2fd, stash@{0}. Unrelated entries remain preserved. No second apply or manual record edit occurred.
 - Recovery regression: `./scripts/run.sh pnpm test:ci-repair-stash`3/3 real disposable Git CLI cases, including both merged contents, legacy review, refusal gates and unrelated stash preservation. `./scripts/run.sh pnpm test:ci-proof`25/25 reads actual command/YAML/report inventory and preserves14-part completeness. Independent refactor extracted coherent resolution validation and restoration guidance; current CI summary docs and producer inventory follow the new retained regression. All affected files under250, whitespace passes; traces `/tmp/seed119-stash-recovery-consumers.md` and `/tmp/seed119-refactor-stash-recovery-consumers.md`. App proof unchanged.
 - Previous observer's stopped receipt and PID exit permit rearm: current GitHub ci.yml execution-branch observer coordinatornao-seed119, directory `/tmp/dough-ci-501/watch-WW45zC`, PID6914, session96533, cell `g916:5`. c371659ac7121d1e83128c616fa1c0b391ac0867 registered. Re-delivered fa51/run42762324814/1 is the same known scalar failure already repaired/proved in c371; no nested repair. Source freshness unchanged at adc9f4ed41ac06af34c037851c8dce7682461b04; new SEED121 preparation only, no app/named-sibling overlap.
+
+## Eight-leaf refinement
+
+Retained verbatim from the plan concern review after Behavior7 publication
+`8ab86f53f02c4cdb243ff0a2b34567d3a7f6c8a8`, 2026-11-10.
+
+## Concern review
+Original URL slice 2's overrun and parked work remain in the evidence. Before
+remaining removal work, a read of the 248-line editing owner exposed necessary
+structural preparation: extract its existing removal command without splitting
+warning from mutation. Add Structure 6 immediately before Behavior 7; final-entry
+policy becomes 8. Completed 1–5 and all accepted proof remain unchanged. Eight
+leaves use one focus/history model; no scope, PFE, ADR or North Star change.
+Ready after reassessment; no further story split or overrun reset is implied.

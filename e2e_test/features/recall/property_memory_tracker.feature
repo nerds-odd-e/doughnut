@@ -121,3 +121,23 @@ Feature: Property memory tracker
       | walk |
       | jog  |
     And the value "walk" of property "activity" should be tracked
+
+  Scenario: Removing the final item removes its property entry and returns to the note
+    Given I have a note "Final activity" under notebook "Property recall" with content:
+      """
+      ---
+      activity: [run]
+      source: local
+      ---
+      Activity notes.
+      """
+    When I visit note "Final activity"
+    And I assimilate the value "run" of property "activity"
+    And I visit note "Final activity"
+    And I request removal of the final item of property "activity"
+    And I confirm the property item removal
+    Then I should be at note "Final activity"
+    When I reload the current page for note "Final activity"
+    Then I should be at note "Final activity"
+    And I should see rich note property "source" with value "local"
+    And I should not see rich note property "activity"

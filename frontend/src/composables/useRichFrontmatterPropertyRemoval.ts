@@ -19,7 +19,7 @@ export function useRichFrontmatterPropertyRemoval(options: {
 }) {
   function removeRow(idx: number) {
     return runWithBlockingApiLoading(async () => {
-      const key = options.propertyRows.value[idx]?.key.trim() ?? ""
+      const key = options.propertyRows.value[idx]?.key ?? ""
       if (!(await options.confirmAndApplyRemoval(key))) return
 
       options.propertyRows.value = removePropertyRowAt(
@@ -32,10 +32,11 @@ export function useRichFrontmatterPropertyRemoval(options: {
   }
 
   function removeItem(idx: number, itemIndex: number) {
+    const row = options.propertyRows.value[idx]!
+    if (row.value.kind !== "list") return
+    const previousItems = row.value.items
+    if (previousItems.length === 1) return removeRow(idx)
     return runWithBlockingApiLoading(async () => {
-      const row = options.propertyRows.value[idx]!
-      if (row.value.kind !== "list") return
-      const previousItems = row.value.items
       if (
         !(await options.confirmAndApplyRemoval(
           row.key,

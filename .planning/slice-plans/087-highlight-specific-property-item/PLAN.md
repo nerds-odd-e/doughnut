@@ -5,6 +5,7 @@
 **Identity:** SEED-119#highlight-and-link-to-a-specific-property-item
 **Execution context:** [established context](proof-context.md#execution-context)
 **Proof context:** [premises and observations](proof-context.md#premises-and-observations)
+**Trace and seams:** [contract](proof-context.md#consumer-trace-and-structural-seams)
 
 ## Goal and scope
 
@@ -63,12 +64,6 @@ SEED-120 export. Ordinary authoring retains empty lists; final-item minus delete
 | Warn/cancel preserves content/history/focus; confirm removes exact item/history and preserves distinct siblings | 7 | Mounted note save boundary plus real persisted reload/tracker E2E |
 | Selected removal clears focus; other removal preserves selected occurrence | 7 | Mounted editor route/content, including earlier equal occurrence removal |
 | Final removal deletes entry and its key's history, then goes to note | 8 | Mounted note save boundary and real persisted final-entry save/reload journey |
-
-## Consumer trace and structural seams
-
-[Trace and seam contract](proof-context.md#consumer-trace-and-structural-seams)
-remains unchanged. Current editing/row owners are248/247 lines; Structure 6
-prepares the required cohesive removal owner before item behavior is added.
 
 ## Ordered slices
 
@@ -184,7 +179,7 @@ Final-entry policy and its separate proof loop move to slice 8.
 
 ### 8. Remove the final item as a property entry
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Final-item minus → warn/cancel using the existing whole-key history
 guard; confirm removes the key and its matching history, then replaces location
 with the whole note. Reuse slice 7's operation, changing the empty-result rule;
@@ -201,13 +196,9 @@ and named note navigation supply the special final-entry rule.
 remain the proof/delivery contract; use their focused forms for each slice.
 
 ## Concern review
-Original URL slice 2's overrun and parked work remain in the evidence. Before
-remaining removal work, a read of the 248-line editing owner exposed necessary
-structural preparation: extract its existing removal command without splitting
-warning from mutation. Add Structure 6 immediately before Behavior 7; final-entry
-policy becomes 8. Completed 1–5 and all accepted proof remain unchanged. Eight
-leaves use one focus/history model; no scope, PFE, ADR or North Star change.
-Ready after reassessment; no further story split or overrun reset is implied.
+
+[Retained refinement rationale](proof-context.md#eight-leaf-refinement) records
+the eight-leaf design and completed readiness reassessment.
 
 ## Story obligations
 
@@ -247,3 +238,9 @@ Reported: slice 7 — "CI run 42770072237 attempt 1 at 8ab failed the autosave-a
 Story clause: "Reuse authored list rendering and ordinary content saving"
 Disposition: proved by slice 7: deterministic red on 8ab; real mounted NoteShowPage uses known-empty-history HTTP fixture for frontmatter removal and retains three-save/one-trash expectations plus exact third Second edit payload; five current autosave/trash suites17 tests and both typechecks pass, no production or timing workaround
 Commitment: 67
+
+### G7. Final-entry browser journey proof
+Reported: slice 8 — "The initial final integrated browser batch passed 17 of 18 scenarios; the new final-item journey used an item-warning helper that expected learning history wording while the correctly reused whole-key guard displayed its existing property memory-tracker warning."
+Story clause: "When that is the final item, remove the entire property entry and return to the whole-note location."
+Disposition: proved by slice 8: explicit final-item helper observes existing whole-key warning with unforced confirmation; final integrated batch18/18 reaches whole note, reloads retained source and deleted entry; quoted authored-key mounted case proves Cancel, targets11/12/13, exact save and noteShow/query; both combined types and final disjoint retryOFF frontend shards407files2514tests pass
+Commitment: 44

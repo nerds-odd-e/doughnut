@@ -41,6 +41,16 @@ const propertyValueRow = (value: string) =>
   cy.get(`[data-property-value="${value}"]`)
 
 export const noteRichPropertyAssimilationMethods = () => ({
+  requestFinalRichNotePropertyItemRemoval(key: string) {
+    withPropertyPanel(key, () => {
+      cy.findByRole('button', { name: `Remove ${key} item 1` }).click()
+    })
+    cy.get('dialog')
+      .filter(':visible')
+      .contains(`Property "${key}" has a memory tracker.`)
+      .should('be.visible')
+    return this
+  },
   expectExpandedRichNotePropertyValues(key: string, values: string[]) {
     withPropertyPanel(key, () => {
       cy.get('[data-test="assimilation-mode-row-UNDERSTANDING"]').should(

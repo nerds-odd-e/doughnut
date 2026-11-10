@@ -102,6 +102,12 @@ When(
     start.assumeNotePage().requestRichNotePropertyItemRemoval(key, index)
   }
 )
+When(
+  'I request removal of the final item of property {string}',
+  (key: string) => {
+    start.assumeNotePage().requestFinalRichNotePropertyItemRemoval(key)
+  }
+)
 When('I cancel the property item removal', () => {
   start.assumeNotePage().cancelRichNotePropertyItemRemoval()
 })
