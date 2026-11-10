@@ -1,11 +1,6 @@
 <template>
   <div
-    :class="[
-      readOnly
-        ? 'grid grid-cols-[minmax(6rem,40%)_minmax(0,1fr)] gap-x-4 gap-y-1'
-        : 'flex flex-col gap-1',
-      { 'rounded bg-primary/10 ring-1 ring-primary/30': isFocused },
-    ]"
+    :class="readOnly ? 'grid grid-cols-[minmax(6rem,40%)_minmax(0,1fr)] gap-x-4 gap-y-1' : 'flex flex-col gap-1'"
     data-testid="rich-note-property-row"
     :data-row-index="draft ? undefined : idx"
     :data-property-draft="draft ? 'true' : undefined"
@@ -17,7 +12,7 @@
       <dt class="break-words font-medium text-base-content/80">
         {{ modelValue.key }}
       </dt>
-      <dd class="m-0 break-words">
+      <dd class="m-0 break-words" v-bind="valueFrameAttributes">
         <RichFrontmatterReadOnlyPropertyValue
           :row="modelValue"
           :wiki-links="wikiLinks"
@@ -56,7 +51,7 @@
         @enter="draft && focusValue()"
         @select="focusValue"
       />
-      <div ref="valueAreaRef" :class="draft ? 'min-w-0 flex-[999_1_12rem]' : 'property-value-area min-w-0'">
+      <div ref="valueAreaRef" :class="draft ? 'min-w-0 flex-[999_1_12rem]' : 'property-value-area min-w-0'" v-bind="valueFrameAttributes">
         <RichFrontmatterScalarPropertyValue
           v-if="isTextCapablePropertyRow(modelValue) || (draft && !isImagePropertyKey(modelValue.key) && !isWikidataIdPropertyKey(modelValue.key))"
           :model-value="scalarValue"
@@ -180,6 +175,15 @@ const emit = defineEmits<{
 }>()
 
 const valueAreaRef = ref<HTMLElement | null>(null)
+const valueFrameAttributes = computed(() => {
+  const scalar = !props.draft && props.modelValue.value.kind === "scalar"
+  return {
+    class: scalar ? "property-value-frame" : undefined,
+    "data-testid": "rich-note-property-value-frame",
+    "data-property-value-focused":
+      scalar && props.isFocused ? "true" : undefined,
+  }
+})
 
 const scalarValue = computed(
   () => scalarStringFromPropertyValue(props.modelValue.value) ?? ""
@@ -216,6 +220,8 @@ function focusValue() {
 </script>
 
 <style scoped lang="scss">
+@use "./propertyValueFocus.scss";
+
 .property-row-fields {
   display: grid;
   grid-template-columns: auto minmax(0, min(28%, 8rem)) minmax(0, 1fr);

@@ -21,7 +21,11 @@ import {
   propertyRowSelector,
 } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
-import { focusedFlag, spyOnRouter } from "./propertyLocationTestSupport"
+import {
+  expectFocusedPropertyValue,
+  focusedFlag,
+  spyOnRouter,
+} from "./propertyLocationTestSupport"
 
 describe("RichMarkdownEditor property location", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -55,7 +59,7 @@ Body.`
       const topic = wrapper.find(topicRow)
       expect((topic.element as HTMLElement).checkVisibility()).toBe(true)
       expect(focusedFlag(wrapper, "topic")).toBe("true")
-      expect(topic.classes()).toContain("bg-primary/10")
+      expectFocusedPropertyValue(topic.element)
       expectPropertyPanelOpen(topic.element)
       expect(focusedFlag(wrapper, "venue")).toBeUndefined()
       expectPropertyPanelClosed(
@@ -65,6 +69,11 @@ Body.`
         behavior: "smooth",
         block: "center",
       })
+      expect(
+        topic.findAll('[data-testid="rich-note-property-row-value-input"]')
+      ).toHaveLength(1)
+      await topic.find(PROPERTY_VALUE_DIALOG_OPEN_SELECTOR).trigger("click")
+      expect(propertyValueDialogEl()).not.toBeNull()
     })
 
     it("on a read-only property focuses the row, scrolls it into view, and shows the value", async () => {
@@ -78,7 +87,7 @@ Body.`
       const topic = wrapper.find(topicRow)
       expect((topic.element as HTMLElement).checkVisibility()).toBe(true)
       expect(focusedFlag(wrapper, "topic")).toBe("true")
-      expect(topic.classes()).toContain("bg-primary/10")
+      expectFocusedPropertyValue(topic.element)
       expect(topic.text()).toContain("training")
       expect(focusedFlag(wrapper, "venue")).toBeUndefined()
       expect(scrollSpy).toHaveBeenCalledWith({
@@ -101,11 +110,12 @@ Workshop body.`
 
       const imageRow = wrapper.find(propertyRowSelector("image"))
       expect(imageRow.attributes("data-property-focused")).toBe("true")
+      const imageValue = expectFocusedPropertyValue(imageRow.element)
       expectPropertyPanelOpen(imageRow.element)
       expect(
-        imageRow
-          .find('[data-testid="rich-note-image-property-choose"]')
-          .exists()
+        imageValue.querySelector(
+          '[data-testid="rich-note-image-property-choose"]'
+        ) !== null
       ).toBe(true)
     })
 

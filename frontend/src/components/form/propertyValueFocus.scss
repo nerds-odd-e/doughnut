@@ -1,0 +1,14 @@
+.property-value-frame {
+  border-inline-start: 3px solid transparent;
+  border-radius: 0.25rem;
+  padding-inline-start: 0.375rem;
+
+  &[data-property-value-focused="true"] {
+    background-color: color-mix(
+      in oklab,
+      var(--color-primary) 10%,
+      transparent
+    );
+    border-inline-start-color: var(--color-primary);
+  }
+}

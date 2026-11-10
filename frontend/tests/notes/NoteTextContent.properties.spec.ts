@@ -3,6 +3,7 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { afterEach, expect, it } from "vitest"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import { expectFocusedPropertyValue } from "../components/form/propertyLocationTestSupport"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
 import {
   mockSdkService,
@@ -121,6 +122,7 @@ it("focuses the property at a property location", async () => {
   const row = await openPropertyLocation("topic")
   expect((row.element as HTMLElement).checkVisibility()).toBe(true)
   expect(row.attributes("data-property-focused")).toBe("true")
+  expectFocusedPropertyValue(row.element)
 })
 
 it("shows the explicit missing-property notice beside the existing rows", async () => {
@@ -140,4 +142,5 @@ it("focuses the property location on the next note", async () => {
   const row = wrapper.get('[data-property-key="topic"]')
   expect((row.element as HTMLElement).checkVisibility()).toBe(true)
   expect(row.attributes("data-property-focused")).toBe("true")
+  expectFocusedPropertyValue(row.element)
 })
