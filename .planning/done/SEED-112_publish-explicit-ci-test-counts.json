@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-112#publish-explicit-ci-test-counts",
+  "title": "See Doughnut test cases and test files in Intent",
+  "completedAt": "2026-11-10T04:40:36.372Z",
+  "developer": "Terry Yin",
+  "agent": "Maria-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol",
+  "intentCoverage": {
+    "report": "# Dough Intent Coverage\n\n**Caught.** The existing real-runner test detects a Node file-load failure being counted as a test case.\n\nStory: `SEED-112#publish-explicit-ci-test-counts`, completed revision `71f9a40b0448aa76cbe088d2258a0c694bd2bed5`.\nPromise: a file that fails before producing cases contributes one failed test file, with available timing, while actual cases remain cases.\n\nThe isolated scratch checkout started clean at that revision. Its locked dependency setup succeeded without copying or linking another checkout's installation. The temporary fault changed `scripts/ci/node-test-report.mjs` from `unit: entryFile ? 'case' : 'file'` to `unit: 'case'`, leaving fixtures and assertions unchanged.\n\nAll three runs used:\n`./scripts/run.sh node scripts/ci/node-test.mjs --test-name-pattern='a Node report gives' scripts/ci/ci-proof-outcomes-node.test.mjs`\n\n- Baseline: one selected test passed, exit 0.\n- Fault: one selected test failed, exit 1. The fixture's real `broken.test.mjs` imports a missing module. The maintained assertion at `scripts/ci/ci-proof-outcomes-node.test.mjs:122` received `[['failed', 'case', true]]` instead of `[['failed', 'file', true]]`. This confirms the fault changed the intended load-failure report and reached its unit assertion. Raw failure evidence is `/tmp/seed112-intent-coverage-fault.log`.\n- Restoration: the reporter was restored byte for byte; the scratch Git state matched its clean starting state and revision. The same selected test passed again, exit 0. The owned scratch worktree and branch were removed safely. The shared execution checkout was not changed.\n\nCosts:\n- Test runtime — measured runner durations: baseline 304.770 ms, fault 411.351 ms, restored 515.023 ms; total 1,231.144 ms.\n- Human effort — unavailable: no separate human effort measurement was recorded.\n- Agent effort — unavailable: no independent effort meter was available; wall-clock elapsed is reported separately.\n\n\n- **Invocation-to-report elapsed.** 127427 ms (measured), from 1794285467000 to 1794285594427 in Unix epoch ms. The end clock was sampled after writing the prepared report body.\n"
+  }
+}
