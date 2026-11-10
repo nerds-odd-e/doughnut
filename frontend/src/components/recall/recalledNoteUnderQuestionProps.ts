@@ -6,6 +6,6 @@ export function recalledNoteUnderQuestionProps(recalledNote: RecalledNote) {
     ancestorFolders: recalledNote.ancestorFolders ?? [],
     breadcrumbNotebookId: recalledNote.notebookId,
     focusedPropertyKey: recalledNote.propertyKey,
-    focusedPropertyValue: recalledNote.propertyValue,
+    focusedPropertyValue: recalledNote.propertyValue ?? undefined,
   }
 }

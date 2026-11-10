@@ -101,8 +101,8 @@ Inciting rebellion against authority.`)
     ).toBe(memoryTrackerId)
 
     const resultText = wrapper.text()
-    expect(resultText.split(noteTitle).length - 1).toBe(1)
-    expect(resultText.split(notebookName).length - 1).toBe(1)
+    expect(resultText).toContain(noteTitle)
+    expect(resultText).toContain(notebookName)
 
     const noteUnderQuestion = wrapper.find(".note-under-question")
     const noteContext = noteUnderQuestion.find('[aria-label="Note context"]')

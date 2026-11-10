@@ -83,6 +83,9 @@ several attempts together, spelling attempts, and changes to the note.
 
 ## Reading and returning
 
+The question subject shares the [recall source header](recall-results.md), with
+separate destinations for the full note, reviewed source and referenced value.
+
 Private recall help keeps its heading and named Close control visible while the
 question, selected answer, exclusion reason, and conversation scroll within the
 available viewport. Long replies and reopened conversations can be read in both

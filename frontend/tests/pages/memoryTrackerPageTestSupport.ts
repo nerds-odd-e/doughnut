@@ -5,7 +5,11 @@ import type {
 } from "@generated/donut-backend-api"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockShowNote,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 
@@ -21,6 +25,12 @@ export function mockMemoryTrackerPageApis(options?: {
       .please(),
   ]
   const memoryTracker = options?.memoryTracker ?? makeMe.aMemoryTracker.please()
+  mockShowNote(
+    makeMe.aNoteRealm
+      .id(memoryTracker.note.id)
+      .title(memoryTracker.note.noteTopology.title)
+      .please()
+  )
   const getRecallHistorySpy = mockSdkService(
     MemoryTrackerController,
     "getRecallHistory",

@@ -1,11 +1,36 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import makeMe from "donut-test-fixtures/makeMe"
+import { useNoteStore } from "@/store/noteStore"
+import type {
+  NoteTopology,
+  FolderTrailSegment,
+} from "@generated/donut-backend-api"
 
 const meta = {
   title: "Recall/NoteUnderQuestion",
   component: NoteUnderQuestion,
   tags: ["autodocs"],
+  decorators: [
+    (_story, context) => {
+      const { noteTopology, ancestorFolders, breadcrumbNotebookId } =
+        context.args as {
+          noteTopology: NoteTopology
+          ancestorFolders?: FolderTrailSegment[]
+          breadcrumbNotebookId?: number
+        }
+      useNoteStore().refreshNoteRealm(
+        makeMe.aNoteRealm
+          .id(noteTopology.id)
+          .title(noteTopology.title)
+          .notebookName("Learning notebook")
+          .inNotebook(breadcrumbNotebookId ?? 1)
+          .ancestorFolders(ancestorFolders ?? [])
+          .please()
+      )
+      return { template: "<story />" }
+    },
+  ],
   argTypes: {
     noteTopology: {
       control: "object",
@@ -42,7 +67,7 @@ export const WithFocusedProperty: Story = {
   },
 }
 
-// Long folder trail (testing horizontal scroll)
+// Long folder trail wraps within the recall card
 export const WithManyAncestors: Story = {
   args: {
     noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,

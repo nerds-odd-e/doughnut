@@ -38,19 +38,7 @@ describe("MemoryTrackerPageView tracker", () => {
       })
 
       expect(focusedPropertyIndicator(wrapper).exists()).toBe(true)
-      expect(wrapper.text()).toContain("Focused property: a part of")
-    })
-
-    it("names the tracked value of a list property in the focused property indicator", async () => {
-      const wrapper = await mountMemoryTrackerPageViewReady({
-        memoryTracker: makeMe.aMemoryTracker
-          .withPropertyKey("example of", "[[run]]")
-          .please(),
-      })
-
-      expect(focusedPropertyIndicator(wrapper).text()).toBe(
-        "Focused property: example of: [[run]]"
-      )
+      expect(wrapper.text()).toContain("Reviewed property: a part of")
     })
 
     it("hides focused property indicator for note-level memory trackers", async () => {
@@ -59,7 +47,7 @@ describe("MemoryTrackerPageView tracker", () => {
       })
 
       expect(focusedPropertyIndicator(wrapper).exists()).toBe(false)
-      expect(wrapper.text()).not.toContain("Focused property:")
+      expect(wrapper.text()).not.toContain("Reviewed property:")
     })
 
     it.each([

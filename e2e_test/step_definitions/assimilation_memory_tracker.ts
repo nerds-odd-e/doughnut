@@ -6,7 +6,10 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import type { NoteLevelTrackerKind } from '../start/pageObjects/assimilationPage/shared'
 import {
-  expectNoteUnderQuestionFocusedProperty,
+  expectReviewedPropertyItem,
+  followReviewedProperty,
+  followReviewedValue,
+  returnToRecallAnswer,
   followNoteUnderQuestion,
 } from '../start/pageObjects/noteUnderQuestion'
 
@@ -50,11 +53,15 @@ Then('I should see a {word} memory tracker', (kind: NoteLevelTrackerKind) => {
 })
 
 Then(
-  'the note under question should focus on property {string} with value {string}',
-  (propertyKey: string, propertyValue: string) => {
-    expectNoteUnderQuestionFocusedProperty(propertyKey, propertyValue)
+  'the reviewed property {string} of note {string} should address value {string}',
+  (propertyKey: string, noteTitle: string, propertyValue: string) => {
+    expectReviewedPropertyItem(noteTitle, propertyKey, propertyValue)
   }
 )
+
+When('I follow the reviewed property {string}', (propertyKey: string) => {
+  followReviewedProperty(propertyKey)
+})
 
 When('I follow the note under question {string}', (noteTitle: string) => {
   followNoteUnderQuestion(noteTitle)
@@ -76,3 +83,11 @@ Then(
     }
   }
 )
+
+When('I follow the reviewed value {string}', (label: string) => {
+  followReviewedValue(label)
+})
+
+When('I return to the recall answer', () => {
+  returnToRecallAnswer()
+})

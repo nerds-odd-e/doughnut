@@ -44,7 +44,7 @@ Feature: Property memory tracker
     And the property memory tracker for "topic" should have recall count 1
 
   @usingMockedOpenAiService
-  Scenario: Following the note from a property recall answer opens that property
+  Scenario: Following the title from a property recall answer opens the full note
     And OpenAI generates this question:
       | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
       | What does the topic property mean? | micronutrients | vitamins           | minerals           | proteins           |
@@ -54,8 +54,7 @@ Feature: Property memory tracker
     When I choose answer "vitamins"
     Then I should see that my MCQ answer "vitamins" is incorrect
     When I follow the note under question "Vitamins"
-    Then I should be at property "topic" of note "Vitamins"
-    And the rich note property "topic" should be focused with its property panel open
+    Then I should be at note "Vitamins"
 
   @usingMockedOpenAiService
   Scenario: Recalling one value of a list property leaves the other value to assimilate
@@ -92,7 +91,13 @@ Feature: Property memory tracker
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "Which verb is this an example of?"
     When I choose answer "walk"
-    Then the note under question should focus on property "example of" with value "[[run]]"
+    Then the reviewed property "example of" of note "Sentence" should address value "[[run]]"
+    When I follow the reviewed value "run"
+    Then I should be at note "run"
+    When I return to the recall answer
+    And I follow the reviewed property "example of"
+    Then the rich note property "example of" should be focused with its property panel open
+    And occurrence 1 of item "[[run]]" in property "example of" should be highlighted
 
   Scenario: Removing an item confirms history loss and preserves its sibling after reload
     Given I have a note "Activities" under notebook "Property recall" with content:
