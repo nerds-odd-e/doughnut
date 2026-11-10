@@ -14,7 +14,6 @@ import com.odde.donut.services.NoteTrashService;
 import com.odde.donut.services.NoteTrashUndoService;
 import com.odde.donut.services.PortablePathAuthoring;
 import com.odde.donut.services.UserService;
-import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.donut.services.focusContext.FocusContextResult;
 import com.odde.donut.services.focusContext.FocusContextRetrievalService;
 import com.odde.donut.services.focusContext.RetrievalConfig;
@@ -40,7 +39,6 @@ class NoteController {
   private final AuthorizationService authorizationService;
   private final UserService userService;
   private final FocusContextRetrievalService focusContextRetrievalService;
-  private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final NoteRealmService noteRealmService;
   private final RecallLogRepository recallLogRepository;
   private final AssimilationSequenceSkipRepository skipRepository;
@@ -58,7 +56,6 @@ class NoteController {
       AuthorizationService authorizationService,
       UserService userService,
       FocusContextRetrievalService focusContextRetrievalService,
-      FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       NoteRealmService noteRealmService,
       RecallLogRepository recallLogRepository,
       AssimilationSequenceSkipRepository skipRepository,
@@ -74,7 +71,6 @@ class NoteController {
     this.authorizationService = authorizationService;
     this.userService = userService;
     this.focusContextRetrievalService = focusContextRetrievalService;
-    this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.noteRealmService = noteRealmService;
     this.recallLogRepository = recallLogRepository;
     this.skipRepository = skipRepository;
@@ -198,29 +194,6 @@ class NoteController {
 
     return focusContextRetrievalService.retrieve(
         note, user, RetrievalConfig.forGraphApi(tokenLimit));
-  }
-
-  /**
-   * Focus-context markdown for this note (same render as {@link
-   * com.odde.donut.services.focusContext.FocusContextMarkdownRenderer}). {@code tokenLimit} is the
-   * combined focus-plus-related content budget, matching {@link #getGraph(Note, int)}.
-   */
-  @GetMapping("/{note}/ai-context-markdown")
-  public NoteAiContextMarkdown getAiContextMarkdown(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @Parameter(
-              description =
-                  "Approximate token budget for focus note content plus related note content combined (bodies).")
-          @RequestParam
-          int tokenLimit)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(note);
-    User user = authorizationService.getCurrentUser();
-    RetrievalConfig config = RetrievalConfig.forGraphApi(tokenLimit);
-    FocusContextResult focusContextResult =
-        focusContextRetrievalService.retrieve(note, user, config);
-    String markdown = focusContextMarkdownRenderer.render(focusContextResult, config);
-    return new NoteAiContextMarkdown(markdown);
   }
 
   @PostMapping(value = "/{note}/reify-property")

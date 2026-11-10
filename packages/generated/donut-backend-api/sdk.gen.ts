@@ -649,10 +649,6 @@ export class NoteController {
         return (options.client ?? client).get<AuthoredPortablePathResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/authored-portable-path', ...options });
     }
     
-    public static getAiContextMarkdown<ThrowOnError extends boolean = false>(options: Options<GetAiContextMarkdownData, ThrowOnError>): RequestResult<GetAiContextMarkdownResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).get<GetAiContextMarkdownResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/ai-context-markdown', ...options });
-    }
-    
     public static getRecentNotes<ThrowOnError extends boolean = false>(options?: Options<GetRecentNotesData, ThrowOnError>): RequestResult<GetRecentNotesResponses, unknown, ThrowOnError> {
         return (options?.client ?? client).get<GetRecentNotesResponses, unknown, ThrowOnError>({ url: '/api/notes/recent', ...options });
     }
@@ -1488,6 +1484,12 @@ export class NoteImageController {
 export class AttributedNoteContentController {
     public static getAttributedContent<ThrowOnError extends boolean = false>(options: Options<GetAttributedContentData, ThrowOnError>): RequestResult<GetAttributedContentResponses, unknown, ThrowOnError> {
         return (options.client ?? client).get<GetAttributedContentResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/attributed-content', ...options });
+    }
+}
+
+export class NoteExportController {
+    public static getAiContextMarkdown<ThrowOnError extends boolean = false>(options: Options<GetAiContextMarkdownData, ThrowOnError>): RequestResult<GetAiContextMarkdownResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).get<GetAiContextMarkdownResponses, unknown, ThrowOnError>({ url: '/api/notes/{note}/ai-context-markdown', ...options });
     }
 }
 

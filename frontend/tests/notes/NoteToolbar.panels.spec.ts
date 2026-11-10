@@ -1,6 +1,6 @@
 import {
   AiAudioController,
-  NoteController,
+  NoteExportController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -72,7 +72,7 @@ describe("NoteToolbar panels", () => {
   })
 
   it("copies export markdown while keeping the export dialog open", async () => {
-    mockSdkService(NoteController, "getAiContextMarkdown", {
+    mockSdkService(NoteExportController, "getAiContextMarkdown", {
       markdown: "# AI context\n\nHello **world**.",
     })
     const writeText = vi.fn().mockResolvedValue(undefined)
@@ -81,9 +81,17 @@ describe("NoteToolbar panels", () => {
     wrapper = await mountNoteToolbar(noteRealm)
     await layoutNoteToolbar(wrapper, allMoreOptionsFitNavWidth())
     await wrapper.find(`button[title="${titles.export}"]`).trigger("click")
+    await flushPromises()
 
     const dialog = document.querySelector("dialog") as HTMLDialogElement
     expect(dialog?.open).toBe(true)
+    expect(
+      (
+        document.querySelector(
+          '[data-testid="ai-context-markdown-textarea"]'
+        ) as HTMLTextAreaElement
+      ).value
+    ).toContain("AI context")
 
     document
       .querySelector<HTMLButtonElement>(

@@ -2999,7 +2999,7 @@ paths:
   /api/notes/{note}/ai-context-markdown:
     get:
       tags:
-      - note-controller
+      - note-export-controller
       operationId: getAiContextMarkdown
       parameters:
       - name: note
@@ -3015,6 +3015,15 @@ paths:
         schema:
           type: integer
           format: int32
+      - name: includeRecentQuestions
+        in: query
+        description: "When true, append up to ten newest distinct focus-note multiple-choice\
+          \ questions with Donut answer keys and the current learner's latest own\
+          \ selection when present."
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         "200":
           description: OK

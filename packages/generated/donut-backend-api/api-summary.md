@@ -116,7 +116,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getNoteInfo`: GET `/api/notes/{note}/note-info` -> `GetNoteInfoResponse` (request: `GetNoteInfoData`; path: note; response body: NoteRecallInfo)
 - `getGraph`: GET `/api/notes/{note}/graph` -> `GetGraphResponse` (request: `GetGraphData`; path: note; query: tokenLimit; response body: FocusContextResult)
 - `authoredPortablePath`: GET `/api/notes/{note}/authored-portable-path` -> `AuthoredPortablePathResponse` (request: `AuthoredPortablePathData`; path: note; query: destinationNote, portablePath; response body: AuthoredPortablePath)
-- `getAiContextMarkdown`: GET `/api/notes/{note}/ai-context-markdown` -> `GetAiContextMarkdownResponse` (request: `GetAiContextMarkdownData`; path: note; query: tokenLimit; response body: NoteAiContextMarkdown)
 - `getRecentNotes`: GET `/api/notes/recent` -> `GetRecentNotesResponse` (request: none; response body: Array<NoteSearchResult>)
 
 ## Search Controller
@@ -299,6 +298,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Attributed Note Content Controller
 
 - `getAttributedContent`: GET `/api/notes/{note}/attributed-content` -> `GetAttributedContentResponse` (request: `GetAttributedContentData`; path: note; response body: AttributedNoteContent)
+
+## Note Export Controller
+
+- `getAiContextMarkdown`: GET `/api/notes/{note}/ai-context-markdown` -> `GetAiContextMarkdownResponse` (request: `GetAiContextMarkdownData`; path: note; query: tokenLimit, includeRecentQuestions; response body: NoteAiContextMarkdown)
 
 ## Notebook Attachment Controller
 

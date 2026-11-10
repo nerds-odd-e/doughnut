@@ -1,4 +1,7 @@
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NoteController,
+  NoteExportController,
+} from "@generated/donut-backend-api/sdk.gen"
 import NoteMoreOptionsActions from "@/components/notes/widgets/NoteMoreOptionsActions.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -36,7 +39,7 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
   let wrapper: VueWrapper<any> | undefined
 
   beforeEach(() => {
-    mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
+    mockSdkService(NoteExportController, "getAiContextMarkdown", aiMarkdownStub)
     mockSdkService(NoteController, "trashNote", undefined)
   })
 
