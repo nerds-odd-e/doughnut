@@ -202,3 +202,17 @@ Disposition: proved by slice 2: DonutRetrospectiveFindings.md DD-439 records acc
 Slice 1 accepted publication: `12e1f925a5e6199a27bbefcaf298f0b8c948045f` on the recorded remote story branch, suffix base `de3ec5af37e0a03538c17daa410b10af5252073c`, same observer reused. Slice 2 proof: [execution evidence](execution-evidence.md#slice-2-mocked-openai-credential-default) and [consumer trace](consumer-trace-credential.md); full backend, held cases and clean-shell seven-scenario batch passed. G1 keeps exact delivery attribution owned until its progress publication.
 
 Slice 2 code progress publication accepted `be62cc90a427fc7663fb481a06e1f15a582fe99b`, suffix base `12e1f925a5e6199a27bbefcaf298f0b8c948045f`, same observer reused. G1 is proved by the exact delivered revision now recorded in DD-439; this final attribution increment is records-only.
+
+## Retrospective
+
+Reviewed original ready story/plan at the established claim against the uncontaminated published set: `12e1f925a5e6199a27bbefcaf298f0b8c948045f` (Nix entry), `be62cc90a427fc7663fb481a06e1f15a582fe99b` (E2E credential contract) and `135d708fa6c914ff229dfa1095e05f7c3d2fdb08` (delivery attribution). The claim is provenance, not a product change; no unrelated commits enter this manifest. All 54 source commitments and G1 are observed/disposed, both slices done.
+
+Outcome/architecture: both existing owners satisfy the original non-interactive examples. ADR 0006 and ADR 0007 remain satisfied; no new domain, environment or endpoint-selection responsibility. Aggregate diff has no refactor residue. Existing real E2E journeys supply integration proof; the small profile-resolution variations use ConfigData without another application context. No added E2E detail or whole-suite cleanup justified. The preparation's real failing journeys informed the fix; new behavior is proved by the retained real-runner and real-mock journeys.
+
+Process review enabled by project preference and based on this conversation/tool results. Settled loader setup and malformed planning-record repairs retained their failed verdicts; the profiling fixture's committed-HEAD limitation was explicitly classified, not accepted as changed-runner proof. Additional compatibility execution was avoidable; no unresolved shared-process correction is established. No process-log write or correction plan. Near-future direction remains unchanged; this maintenance improves reliable agent commands without expanding product scope. Product advice: no change.
+
+Review complete; applicable story-branch CI remains pending on the existing coordinator observer. No final CI or trunk-integration success is inferred here.
+
+## Execution complete
+
+Product advice: no change.
