@@ -2,6 +2,7 @@
   <div class="note-under-question bg-base-200 border-base-300">
     <div class="note-label bg-base-200 text-base-content">Note under question</div>
     <FocusedPropertyIndicator
+      :note-id="noteTopology.id"
       :property-key="focusedPropertyKey"
       :property-value="focusedPropertyValue"
     />
@@ -18,7 +19,7 @@
             </li>
           </template>
           <template #additional>
-            <NoteTitleWithLink v-bind="{ noteTopology, focusedPropertyKey }" />
+            <NoteTitleWithLink v-bind="{ noteTopology }" />
           </template>
         </Breadcrumb>
     </div>

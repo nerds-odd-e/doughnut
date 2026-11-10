@@ -38,7 +38,7 @@ describe("MemoryTrackerPageView tracker", () => {
       })
 
       expect(focusedPropertyIndicator(wrapper).exists()).toBe(true)
-      expect(wrapper.text()).toContain("Focused property: a part of")
+      expect(wrapper.text()).toContain("Reviewed property: a part of")
     })
 
     it("names the tracked value of a list property in the focused property indicator", async () => {
@@ -49,7 +49,7 @@ describe("MemoryTrackerPageView tracker", () => {
       })
 
       expect(focusedPropertyIndicator(wrapper).text()).toBe(
-        "Focused property: example of: [[run]]"
+        "Reviewed property: example of: [[run]]"
       )
     })
 
@@ -59,7 +59,7 @@ describe("MemoryTrackerPageView tracker", () => {
       })
 
       expect(focusedPropertyIndicator(wrapper).exists()).toBe(false)
-      expect(wrapper.text()).not.toContain("Focused property:")
+      expect(wrapper.text()).not.toContain("Reviewed property:")
     })
 
     it.each([

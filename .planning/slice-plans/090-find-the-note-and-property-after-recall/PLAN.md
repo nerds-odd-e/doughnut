@@ -88,7 +88,7 @@ and focused-property navigation retain their current behavior until slice 2.
 
 ### 2. Open the reviewed source independently of the whole note
 Type: Behavior
-Status: planned
+Status: done
 Proof: source-destination rows above; real-router clicks and note-page selection,
 duplicate first match, exact raw alias, stale value and result switching.
 
@@ -219,7 +219,7 @@ CI: GitHub nerds-odd-e/doughnut, execution branch codex/find-the-note-and-proper
 ### G1. Distinct title destination awaits reviewed-source slice
 Reported: slice 1 — "Existing title-to-focused-property navigation remains for slice 2"
 Story clause: "The note-title link opens the full note."
-Disposition: interim until slices 2
+Disposition: proved by slice 2: NoteUnderQuestion.spec.ts distinct real-router title/key clicks, sourceNavigation.spec.ts and property_memory_tracker.feature title/item journey; slice2-return.md
 
 ### G2. Readable reviewed values await reference presentation
 Reported: slice 1 — "raw reviewed-value presentation remains for slice 3"
@@ -228,4 +228,6 @@ Disposition: interim until slices 3
 
 ## Accepted execution evidence
 
-Slice 1: [return and promise observations](slice1-return.md), [actual consumer trace](consumer-trace-slice1.md). Coordinator inspected the header, all five location tests, preview setup/assertions and reached E2E helpers. Q passed 35 files/155 tests; both typechecks passed. Independent refactor1 returned REFACTOR COMPLETE with no product edits; supplemental helper-to-feature trace was records-only, proof unchanged. Early freshness unchanged at d17580ea6cee; no incoming named-sibling change.
+Slice 1: [return and promise observations](slice1-return.md), [actual consumer trace](consumer-trace-slice1.md). Coordinator inspected the header, all five location tests, preview setup/assertions and reached E2E helpers. Q passed 35 files/155 tests; both typechecks passed. Independent refactor1 returned REFACTOR COMPLETE with no product edits; supplemental helper-to-feature trace was records-only, proof unchanged. Early and delivery freshness unchanged at d17580ea6cee; no incoming named-sibling change. Guarded delivery accepted 8b9e70d9fb0f6ec7f11b30595278c29c6709f2c4 on the execution branch from suffix base d17580ea6cee7f8eb3d348728721fdb9633e2f95; observer registration reused the retained stream.
+
+Slice 2: [return, actual commands and source comparison](slice2-return.md), [consumer trace](consumer-trace-slice2.md). Coordinator inspected real-router source/title clicks, real NoteShowPage duplicate/alias/reordered/stale/key-only focus and result switching, plus integrated feature changes. Q passed 36 files/158 tests; strengthened final six cases, both typechecks and Cypress 5/5 passed. The retired focused-title contract/label sweep is the one-time reading in that return. G1 is proved; G2 remains with slice 3. Independent refactor2 returned REFACTOR COMPLETE without edits; proof unchanged. Early/delivery freshness unchanged at d17580ea6cee, no incoming named-sibling change.
