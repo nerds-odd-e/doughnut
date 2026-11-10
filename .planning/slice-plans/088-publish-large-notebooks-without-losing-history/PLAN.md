@@ -1,6 +1,7 @@
 # Publish large notebooks without losing history
 
 **Source:** [selected story](../../seeds/SEED-121-publish-large-notebooks.md#publish-large-notebooks-without-losing-history)
+**Source review:** [independent commitments](source-review.md)
 **Identity:** SEED-121#publish-large-notebooks-without-losing-history
 
 ## Goal and scope
@@ -49,19 +50,13 @@ authorizes no implementation, release or production repair.
 
 ## Decisive premises and limits
 
-| Consuming premise | Observation / remainder |
-| --- | --- |
-| Current CLI small-change selection works above 1 MiB | At `8c0f3a25d2`, `2026-11-10T05:35:26.794Z`: `CURSOR_DEV=true nix develop -c pnpm -C cli exec tsx --input-type=module - < /tmp/seed-121-cli-large-publish-probe.mjs`; 11,000 accepted files/1,529,000 bytes, old scan ENOBUFS, three edits/555-byte change listing, one successful 31,995-byte submission and clean main. Backend fetch mocked; 6/7 own permanent discrimination and actual acceptance. Probe hash and limits are in the seed; temporary script may expire. |
-| Affected updater cannot install advertised fixed input | Public object at `2026-11-10 05:31:34 UTC` embedded fixed scan/version 0.5.5; installed binary embedded old scan/0.5.9. Seed retains public digest. `update.ts` admits strictly newer versions. This observes input, not completed update; 9/10 own actual replacement/execution. |
-| App overwrite mechanism and retained proof routes | Source shows two callers of one uploader; existing publication tests expect app upload. At `8c0f3a25d2`, `CURSOR_DEV=true nix develop -c node --test scripts/ci/application-release-payload.test.mjs scripts/ci/application-release-publication.test.mjs` passed 19 in 4.43s; workflow/retry pair passed 11 in 3.39s. Route/cost proxies only; 8/9 prove changed behavior. Observed public object's publishing actor remains unknown. |
-| Actual discrepancy, origin, safe correspondence/derived state | No consistent production diff or confirmed cause. Only credentialed deployed comparison can settle it. Permitted early probe 3 must capture evidence and refine correction/recovery leaves before implementation. No-drift, unstable or unexplained evidence stops dependents. |
-| Integrated fixture and deployed journeys | The two named CLI specs passed executable `assertSupportedIsolatedCypressSpecs` admission with both mock requirements false. No E2E stack or large backend fixture was run in preparation. 7 owns new large-workload fixture/proof; live release/update/recovery are owner-held/state-changing observations in 3/10/11, not established by source inspection. |
+[Retained observations and unverified remainders](execution-evidence.md#decisive-premises-and-limits).
 
 ## Ordered slices
 
 ### 1. Obtain a consistent owner-authorized drift report
 Type: Behavior
-Status: planned
+Status: done
 Proof: real controller/DB/Git fixtures cover matching tree, changed note/README, added/removed path, marker
 and LFS pointer; report exact A/L and bytes. Existing concurrent-controller support races sanctioned web
 publication with diagnosis: A/tree/bytes positively describe one complete committed state. Non-owner denied.
@@ -80,6 +75,7 @@ with correct advice.
 Behavior: diagnose bound checkout → inspect exact differences and explicit recovery route. Drift points here;
 stale base points to Pull. Reuse auth/binding and ordinary Git diff where useful; require no tracked Donut
 files. ~5–8 minutes.
+Documentation structure: before editing the 328-line synchronization contract, move its domain-operation ownership and identity-correspondence sections to `docs/notebook-git-projection.md`, retaining precise links from the contract and updating the North Star's ownership link. This cohesive projection contract keeps both documents below 250 lines; preserve all decisions and examples while updating diagnosis guidance. Backend/CLI refusal and Pull tests retain the behavior proof.
 
 ### 3. Observe the incident and refine cause-dependent repair
 Type: Behavior
@@ -240,6 +236,8 @@ surviving shared CLI/LB/E2E uses. Preserve dated provenance; delete obsolete syn
 than renaming their actions. No permanent absence test.
 
 ## Current decisions and concern evidence
+
+[Execution context, observer identity and accepted proof](execution-evidence.md).
 
 Developer accepted reviewed forward preservation on 2026-11-10; no source/ADR question remains.
 Refinement ran: Retain 1–6; Split large-tree regression/acceptance and delivery/incident observation;

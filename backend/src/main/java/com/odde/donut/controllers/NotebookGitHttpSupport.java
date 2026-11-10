@@ -4,6 +4,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
+import com.odde.donut.services.notebookGit.NotebookGitDiagnosis;
 import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
@@ -27,18 +28,31 @@ abstract class NotebookGitHttpSupport {
   private final NotebookGitBundleDownloadService notebookGitBundleDownloadService;
   private final NotebookGitProposalPublisher notebookGitProposalPublisher;
   private final NotebookGitHistoryService notebookGitHistoryService;
+  private final NotebookGitDiagnosis notebookGitDiagnosis;
 
   NotebookGitHttpSupport(
       AuthorizationService authorizationService,
       TestabilitySettings testabilitySettings,
       NotebookGitBundleDownloadService notebookGitBundleDownloadService,
       NotebookGitProposalPublisher notebookGitProposalPublisher,
-      NotebookGitHistoryService notebookGitHistoryService) {
+      NotebookGitHistoryService notebookGitHistoryService,
+      NotebookGitDiagnosis notebookGitDiagnosis) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.notebookGitBundleDownloadService = notebookGitBundleDownloadService;
     this.notebookGitProposalPublisher = notebookGitProposalPublisher;
     this.notebookGitHistoryService = notebookGitHistoryService;
+    this.notebookGitDiagnosis = notebookGitDiagnosis;
+  }
+
+  @Operation(
+      operationId = "diagnoseNotebookGit",
+      summary = "Compare live Portable content with accepted Git")
+  @GetMapping("/{notebook}/git-diagnosis")
+  public NotebookGitDiagnosis.Report diagnoseNotebookGit(
+      @PathVariable("notebook") @Schema(type = "integer") Integer notebookId)
+      throws UnexpectedNoAccessRightException {
+    return notebookGitDiagnosis.inspect(notebookId);
   }
 
   @Operation(

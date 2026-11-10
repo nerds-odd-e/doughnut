@@ -3048,6 +3048,25 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
+  /api/notebooks/{notebook}/git-diagnosis:
+    get:
+      tags:
+      - notebook-controller
+      summary: Compare live Portable content with accepted Git
+      operationId: diagnoseNotebookGit
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Report"
   /api/notebooks/{notebook}/folders/index:
     get:
       tags:
@@ -6516,6 +6535,44 @@ components:
       - dailyTargetOfNewNotes
       - id
       - notebook
+    Difference:
+      type: object
+      properties:
+        path:
+          type: string
+        acceptedBlobId:
+          type:
+          - string
+          - "null"
+        liveBlobId:
+          type:
+          - string
+          - "null"
+        acceptedContent:
+          type:
+          - string
+          - "null"
+          format: byte
+          description: "Exact Git blob bytes, base64 encoded"
+        liveContent:
+          type:
+          - string
+          - "null"
+          format: byte
+          description: "Exact Git blob bytes, base64 encoded"
+    Report:
+      type: object
+      properties:
+        acceptedHead:
+          type: string
+        acceptedTree:
+          type: string
+        liveTree:
+          type: string
+        differences:
+          type: array
+          items:
+            $ref: "#/components/schemas/Difference"
     FolderListing:
       type: object
       description: "Note topologies, child folders, and files in a structural listing\

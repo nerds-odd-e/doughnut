@@ -1309,6 +1309,27 @@ export type SubscriptionForNotebooksListing = {
     name?: string;
 };
 
+export type Difference = {
+    path?: string;
+    acceptedBlobId?: string | null;
+    liveBlobId?: string | null;
+    /**
+     * Exact Git blob bytes, base64 encoded
+     */
+    acceptedContent?: string | null;
+    /**
+     * Exact Git blob bytes, base64 encoded
+     */
+    liveContent?: string | null;
+};
+
+export type Report = {
+    acceptedHead?: string;
+    acceptedTree?: string;
+    liveTree?: string;
+    differences?: Array<Difference>;
+};
+
 /**
  * Note topologies, child folders, and files in a structural listing scope (e.g. notebook root or a folder).
  */
@@ -4075,6 +4096,24 @@ export type MyNotebooksResponses = {
 };
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
+
+export type DiagnoseNotebookGitData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/git-diagnosis';
+};
+
+export type DiagnoseNotebookGitResponses = {
+    /**
+     * OK
+     */
+    200: Report;
+};
+
+export type DiagnoseNotebookGitResponse = DiagnoseNotebookGitResponses[keyof DiagnoseNotebookGitResponses];
 
 export type ListNotebookFolderIndexData = {
     body?: never;

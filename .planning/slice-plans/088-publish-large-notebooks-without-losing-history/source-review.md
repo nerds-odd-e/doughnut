@@ -1,0 +1,125 @@
+# Source review
+
+Source: `SEED-121#publish-large-notebooks-without-losing-history`, including the explicit human amendment dated 2026-11-10. This review uses only the supplied source text.
+
+Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied only the original Goal, Scope, restrictions, exclusions, key examples, and 2026-11-10 amendment. No plan, product, or proof was supplied, and no files were read. The completed review is retained below without new analysis or ownership decisions. Example conditions and journeys do not introduce additional rejection rules. D01–D06 record the explicit human amendment/current decision dated 2026-11-10.
+
+## Commitments
+
+| Id | Source commitment | Slice | Observation or obligation |
+| --- | --- | --- | --- |
+| C01 | A notebook owner can publish small committed Markdown edits. | slice 11 |  |
+| C02 | Publication works for an existing large notebook. | slice 11 |  |
+| C03 | Publication uses the supported Donut CLI. | slice 11 |  |
+| C04 | When live notebook content and the accepted Git tree disagree, the owner gets a useful recovery path. | slice 11 |  |
+| C05 | That recovery path preserves accepted commits. | slice 11 |  |
+| C06 | That recovery path preserves learning data. | slice 11 |  |
+| C07 | That recovery path preserves unpublished work. | slice 11 |  |
+| C08 | Verify publication of small committed Markdown edits when the full accepted Git tree listing exceeds 1 MiB. | slice 7 |  |
+| C09 | Deliver the existing scan fix through `donut update` from the affected installed version. | slice 10 |  |
+| C10 | Deliver an accurately versioned build. | slice 10 |  |
+| C11 | Keep the normal update target usable across CLI publication. | slice 10 |  |
+| C12 | Keep the normal update target usable across application publication. | slice 9 |  |
+| C13 | Diagnose the reported live/accepted mismatch using the canonical Portable representation. | slice 3 |  |
+| C14 | Identify differing paths. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
+| C15 | Identify entries that are live-only. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
+| C16 | Identify entries that are accepted-only. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
+| C17 | Identify entries whose content differs. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
+| C18 | Include attachment pointers when they differ. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
+| C19 | Include structural entries when they differ. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
+| C20 | Establish the cause before selecting a repair. | slice 3 |  |
+| C21 | Correct the confirmed cause. | slice 3 |  |
+| C22 | Provide supported diagnosis for the affected notebook. | slice 3 |  |
+| C23 | Provide supported recovery for the affected notebook. | slice 11 |  |
+| C24 | Enable the owner to retry publication after recovery. | slice 11 |  |
+| C25 | Preserve genuine live-only edits through a forward recovery commit. | slice 4 |  |
+| C26 | Make that forward recovery commit owner-reviewed. | slice 4 |  |
+| C27 | Repair encoding defects against accepted Git content. | slice 3 |  |
+| C28 | Repair projection defects against accepted Git content. | slice 3 |  |
+| C29 | Preserve accepted commit IDs during repair. | slice 4 |  |
+| C30 | Preserve accepted ancestry during repair. | slice 4 |  |
+| C31 | Preserve soundly identified Note identities. | slice 4 |  |
+| C32 | Preserve soundly identified Folder identities. | slice 4 |  |
+| C33 | Preserve those identities’ dependent learning data. | slice 4 |  |
+| C34 | Preserve pending local work. | slice 5 |  |
+| C35 | Distinguish a stale local base from server projection drift. | slice 2 |  |
+| C36 | Use the existing Pull/rebase/conflict workflow for a stale local base. | slice 2 |  |
+| C37 | Ordinary Publish continues to refuse drift until supported recovery settles it. | slice 2 |  |
+| C38 | Accepted content cannot be silently adopted. | slice 4 |  |
+| C39 | Accepted content cannot be silently rewritten. | slice 4 |  |
+| C40 | Publication remains atomic. | slice 4 |  |
+| C41 | Publication remains serialized per notebook. | slice 4 |  |
+| C42 | Ambiguous identity changes are refused. | slice 4 |  |
+| C43 | Existing file policies continue to govern admission. | slice 4 |  |
+| C44 | Existing upload-size policies continue to govern admission. | slice 4 |  |
+| Q01 | The publication scope concerns **small committed Markdown edits**; the large-size example concerns the **full accepted Git tree listing**. | slice 6 |  |
+| Q02 | Sampled note equality is insufficient to establish the cause of the mismatch. | slice 3 |  |
+| Q03 | Sampled attachment-payload equality is insufficient to establish the cause of the mismatch. | slice 3 |  |
+| Q04 | Identity preservation is qualified by “soundly identified” Note/Folder identities. | slice 4 |  |
+| Q05 | Git content cannot recover already-deleted private identities. | slice 4 |  |
+| Q06 | Git content cannot recover already-deleted learning history. | slice 4 |  |
+| Q07 | Pull alone cannot fix server projection drift. | slice 2 |  |
+| Q08 | The required restrictions preserve content correctness independently of the story’s size example. | slice 4 |  |
+| Q09 | The required restrictions preserve identity correctness independently of the story’s size example. | slice 4 |  |
+| Q10 | The required restrictions preserve storage correctness independently of the story’s size example. | slice 4 |  |
+| Q11 | Deferred promises are delivery limits, not new rejection rules. | slice 7 |  |
+| Q12 | The observed mismatch’s cause remains this story’s work. | slice 11 |  |
+| Q13 | The observed mismatch’s recovery remains this story’s work. | slice 11 |  |
+| J01.1 | **Starting condition:** The owner has the affected installed CLI; `0.5.9` is the incident version. | slice 9 |  |
+| J01.2 | **Action:** The owner runs `donut update`. | slice 9 |  |
+| J01.3 | **Result:** The owner receives a strictly newer build. | slice 10 |  |
+| J01.4 | **Result:** The received build is correctly versioned. | slice 10 |  |
+| J01.5 | **Result:** The received build contains the fix. | slice 10 |  |
+| J01.6 | **Later journey:** A later application publication keeps that supported update path usable. | slice 9 |  |
+| J02.1 | **Starting condition:** The notebook is healthy. | slice 7 |  |
+| J02.2 | **Starting condition:** Its complete accepted tree listing exceeds 1 MiB. | slice 7 |  |
+| J02.3 | **Local change:** Three Markdown files change in a local commit. | slice 7 |  |
+| J02.4 | **Base condition:** The local commit is based on accepted head. | slice 7 |  |
+| J02.5 | **Result:** Publish succeeds. | slice 7 |  |
+| J02.6 | **Result:** Publish retains submitted commit IDs. | slice 7 |  |
+| J02.7 | **Result:** Publish retains unchanged accepted ancestry. | slice 7 |  |
+| J02.8 | **Result:** Publish applies the edits. | slice 7 |  |
+| J02.9 | **Qualification:** Notebook size alone does not impose an edit limit. | slice 7 |  |
+| J03.1 | **Trigger:** Accepted head advances after local work. | slice 2 |  |
+| J03.2 | **Publish response:** Publish explains the stale base. | slice 2 |  |
+| J03.3 | **Recovery step:** Pull rebases unpublished commits. | slice 2 |  |
+| J03.4 | **Conflict behavior:** Pull pauses for real conflicts. | slice 2 |  |
+| J03.5 | **Continuation:** After resolution, Publish can accept the resulting fast-forward proposal. | slice 2 |  |
+| J04.1 | **Starting condition:** Local work is already based on current accepted head. | slice 2 |  |
+| J04.2 | **Trigger:** The server’s live canonical tree differs. | slice 2 |  |
+| J04.3 | **Publish response:** Publish refuses. | slice 2 |  |
+| J04.4 | **Publication effect:** Publish does not apply that proposal. | slice 2 |  |
+| J04.5 | **Diagnosis:** Diagnosis identifies the differing paths. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
+| J04.6 | **Diagnosis:** Diagnosis identifies the current accepted revision. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsMatchingNativeTreesAtTheAcceptedHead; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
+| J04.7 | **Guidance:** Guidance points to server recovery rather than a Pull/retry loop. | slice 2 |  |
+| J05.1 | **Starting condition:** The discrepancy has been confirmed. | slice 11 |  |
+| J05.2 | **Repair condition:** There is an evidence-supported repair. | slice 11 |  |
+| J05.3 | **Identity condition:** Identity correspondence is sound. | slice 11 |  |
+| J05.4 | **Recovery result:** Supported recovery preserves accepted history. | slice 11 |  |
+| J05.5 | **Recovery result:** Supported recovery preserves private identity associations. | slice 11 |  |
+| J05.6 | **Recovery result:** Supported recovery preserves learning associations. | slice 11 |  |
+| J05.7 | **Recovery result:** Supported recovery preserves local work. | slice 11 |  |
+| J05.8 | **Conditional next step:** The owner Pulls if recovery advanced accepted head. | slice 11 |  |
+| J05.9 | **Conflict step:** The owner resolves any real conflict. | slice 11 |  |
+| J05.10 | **Continuation:** The owner publishes the pending changes. | slice 11 |  |
+| J06.1 | **Trigger:** Diagnosis shows genuine live-only authored edits. | slice 3 |  |
+| J06.2 | **Review:** The owner reviews the exact differences. | slice 11 |  |
+| J06.3 | **Authorization:** The owner explicitly requests recovery. | slice 11 |  |
+| J06.4 | **Authorization context:** That request is against the observed accepted/live state. | slice 11 |  |
+| J06.5 | **Recovery result:** Recovery appends a validated forward commit. | slice 4 |  |
+| J06.6 | **Content preservation:** The forward commit preserves those edits. | slice 4 |  |
+| J06.7 | **Identity preservation:** Recovery preserves existing identity associations. | slice 4 |  |
+| J06.8 | **Learning preservation:** Recovery preserves existing learning associations. | slice 4 |  |
+| J06.9 | **Changed-state alternative:** If either the accepted state or the live state has changed, recovery asks for a fresh review. | slice 4 |  |
+| J06.10 | **Changed-state behavior:** Recovery does not apply a stale decision. | slice 4 |  |
+| J06.11 | **Ordinary publication restriction:** Ordinary Publish does not perform this adoption implicitly. | slice 2 |  |
+| X01 | A general repair policy for arbitrary corruption is deferred. | slice 11 |  |
+| X02 | Recovery of already-deleted identities is deferred. | slice 11 |  |
+| X03 | Recovery of already-deleted learning data is deferred. | slice 11 |  |
+| X04 | A performance commitment for large unpublished change ranges is deferred. | slice 11 |  |
+| D01 | The developer accepted preservation of genuine live-only edits through an owner-reviewed forward commit. | slice 4 |  |
+| D02 | Encoding defects are repaired against accepted Git content. | slice 3 |  |
+| D03 | Projection defects are repaired against accepted Git content. | slice 3 |  |
+| D04 | The exact diff determines the diagnosed cause. | slice 3 |  |
+| D05 | The exact diff determines the narrow repair. | slice 3 |  |
+| D06 | No policy question remains. | slice 3 |  |
