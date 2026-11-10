@@ -2,6 +2,7 @@ import { computed, nextTick, toRef, type Ref } from "vue"
 import { useFollowFocusedPropertyLocation } from "@/composables/useFollowFocusedPropertyLocation"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
+import { useRichFrontmatterPropertyRemoval } from "@/composables/useRichFrontmatterPropertyRemoval"
 import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
@@ -15,7 +16,6 @@ import {
   propertyRowForInsertedKey,
   propertyRowWithScalar,
   propertyRowsAfterAppendingValueToExactKey,
-  removePropertyRowAt,
   scalarStringFromPropertyRow,
   propertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
@@ -45,6 +45,12 @@ export function useRichFrontmatterPropertyEditing(options: {
     usePropertyMemoryTrackerGuard(options.noteId, reloadNoteInfo)
   const { followFocusedPropertyRename, followFocusedPropertyDelete } =
     useFollowFocusedPropertyLocation(options.propertyRows)
+  const { removeRow } = useRichFrontmatterPropertyRemoval({
+    propertyRows: options.propertyRows,
+    confirmAndApplyRemoval,
+    followFocusedPropertyDelete,
+    emitProperties,
+  })
 
   function filterForEmit(rows: PropertyRow[]): PropertyRow[] {
     if (!options.isReadmeContext()) return rows
@@ -113,20 +119,6 @@ export function useRichFrontmatterPropertyEditing(options: {
     if (row) {
       options.rowSnapshots.value[idx] = { ...row }
     }
-  }
-
-  function removeRow(idx: number) {
-    return runWithBlockingApiLoading(async () => {
-      const key = options.propertyRows.value[idx]?.key.trim() ?? ""
-      if (!(await confirmAndApplyRemoval(key))) return
-
-      options.propertyRows.value = removePropertyRowAt(
-        options.propertyRows.value,
-        idx
-      )
-      await followFocusedPropertyDelete(key)
-      emitProperties(options.propertyRows.value)
-    }, "Updating property…")
   }
 
   async function commitRow(idx: number) {

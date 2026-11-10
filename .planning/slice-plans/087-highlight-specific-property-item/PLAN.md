@@ -154,7 +154,7 @@ Sizing: about 5 minutes including the focused existing suite.
 
 ### 6. Keep removal coordination in one editing owner
 Type: Structure
-Status: planned
+Status: done
 Internal change: Extract the existing whole-property removal orchestration into
 a cohesive editing collaborator, preserving the same guard/cache instance,
 loading, emit and focus-following callbacks. Keep every current public removal,
