@@ -16,7 +16,7 @@
       "!**/.idea",
       "!**/.agents/skills/dough-*/**",
       "!**/.claude/skills/dough-*/**",
-      "!**/scripts/ci/ci-proof-{collect,contract,figures,fragments,summary}.mjs",
+      "!**/scripts/ci/ci-proof-{collect,contract,evidence,figures,fragments,options,summary}.mjs",
       "!**/.vscode",
       "!**/.repowise",
       "!**/dist",

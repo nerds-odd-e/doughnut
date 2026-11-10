@@ -40,10 +40,11 @@ test('a failed Bash check and its time count toward its file and the scripts ent
   const bash = writeFragment(t, 'bash', 'scripts', bashReport, onlyPart)
   const { summary } = summarizeFragments(t, [bash.fragmentText], 'scripts=1')
 
-  assert.deepEqual(summary.entries, [
+  assert.equal(summary.entries[0].path, 'scripts')
+  assert.deepEqual(summary.entries[0].evidence, [
     {
-      path: 'scripts',
-      unit: 'checks',
+      unit: 'legacy',
+      label: 'checks',
       passed: 1,
       failed: 1,
       other: 0,
@@ -84,7 +85,14 @@ test('a missing Bash report fails its conversion and leaves the scripts part mis
     'frontend/tests=1 scripts=1'
   )
 
-  const [frontendEntry, scripts] = summary.entries
+  const [
+    {
+      evidence: [frontendEntry],
+    },
+    {
+      evidence: [scripts],
+    },
+  ] = summary.entries
   assert.equal(frontendEntry.passed, 1)
   assert.deepEqual(
     frontendEntry.parts.map(({ status }) => status),

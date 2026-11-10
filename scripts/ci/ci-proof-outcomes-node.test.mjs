@@ -196,7 +196,11 @@ test('Bash and Node parts of one job publish once each into the scripts entry, a
     [bash, passingNode, failedNode].map(({ fragmentText }) => fragmentText),
     'scripts=4'
   )
-  const [scripts] = summary.entries
+  const [
+    {
+      evidence: [scripts],
+    },
+  ] = summary.entries
   assert.deepEqual(
     [scripts.passed, scripts.failed, scripts.durationMs, scripts.untimed],
     [4, 2, 830, 1]
@@ -235,6 +239,6 @@ test('Bash and Node parts of one job publish once each into the scripts entry, a
   ])
   assert.match(
     log,
-    /scripts: 4 passed, 2 failed, 0 other checks; part 4 of 4 missing/
+    /scripts: 4 passed, 2 failed, 0 other legacy test results \(checks\); part 4 of 4 missing/
   )
 })

@@ -100,8 +100,8 @@ time through the shared Node reporter.
 - **Fail loudly.** A broken conversion fails its producer step. A failed
   collector fails the run but no producer job. A missing or ambiguous part is
   reported as such, never filled in.
-- **Copied collector.** `scripts/ci/ci-proof-{contract,summary,fragments,collect,figures}.mjs`
-  are unchanged copies of Open Dough v0.3.89's `dough-test-optimization`
+- **Copied collector.** `scripts/ci/ci-proof-{contract,summary,fragments,collect,figures,options,evidence}.mjs`
+  are unchanged copies of Open Dough v0.3.94's `dough-test-optimization`
   scripts, excluded from Biome. Copy them again when a guidance update
   changes them.
 
