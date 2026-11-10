@@ -28,7 +28,7 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | C18 | Include attachment pointers when they differ. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | C19 | Include structural entries when they differ. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | C20 | Establish the cause before selecting a repair. |  | G2 |
-| C21 | Correct the confirmed cause. | slice 4 |  |
+| C21 | Correct the confirmed cause. | slice 4 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitWebContentExtractedNoteDatingControllerTest.java#extractionCommitsBothNotesAndDatesTheValuesItAddsAtThatCommit: exact accepted bytes for both notes and native accepted/live equality at fetched tip, retained parents/property dates; full backend:test_only passed3055 tests at2026-11-10T08:33:57Z |
 | C22 | Provide supported diagnosis for the affected notebook. | slice 3 | observed: Production GET /api/notebooks/15/git-diagnosis HTTP200 at2026-11-10T07:36:43–07:37:01Z; private report retained |
 | C23 | Provide supported recovery for the affected notebook. | slice 12 |  |
 | C24 | Enable the owner to retry publication after recovery. | slice 12 |  |

@@ -88,7 +88,7 @@ The original origin gate is settled for implementation by this continuation judg
 
 ### 4. Verify extraction publishes its complete live result
 Type: Behavior
-Status: planned
+Status: done
 Proof: strengthen `NotebookGitWebContentExtractedNoteDatingControllerTest.extractionCommitsBothNotesAndDatesTheValuesItAddsAtThatCommit` through the controller: accepted/live native tree equality and exact rewritten original/new-note bytes after extraction, retaining existing parent, path and property-date assertions. Full backend suite owns the proof.
 
 Behavior: extract a note through the current supported operation → both authored results are accepted together. Reuse `9cdb6d998d`, raw Git fixtures and the diagnostic/full-assembly comparison. No new production correction is expected. Target ~5 minutes edits/cleanup; full backend runtime is excepted.
