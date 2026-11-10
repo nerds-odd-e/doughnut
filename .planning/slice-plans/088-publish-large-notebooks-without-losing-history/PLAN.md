@@ -102,16 +102,12 @@ candidate/derived writes of head/projection/required state.
 
 Behavior: explicit owner request supplies reviewed A/L → lock/reload, refuse stale review, construct one parent-A native commit with exact current L, validate safe typed files/correspondence and existing attachment/book policies, then accept atomically. Reuse current live rows rather than replaying proposal additions. `NotebookGitProposalAcceptance` can retain current rows/attachments/folders and date required property values after admission; verify required reference/property indexes through their existing owners. Refuse invalid or ambiguous identity changes. No generic restore, ID reconstruction, schema change or Git-only-write constraint. Target ~5–8 minutes active work plus generation/backend runtime; stop/refine at ten minutes. Reuse TreeShape/inspection without editing its already-oversized class.
 
-Remainder after ten-minute attempt: restore the exact parked implementation, correct the recall fixture baseline, then close complete backend, generated-client/frontend and consumer proof. Preserve the first attempt and compatible evidence; a fresh continuation targets ~3–5 active minutes plus required runtime. See execution-evidence.md#recovery-attempt-and-validation-remainder.
-
 ### 7. Request reviewed recovery through the CLI
 Type: Behavior
 Status: done
 Proof: CLI run with real bound Git checkout and only backend mocked sends explicit A/L, reports accepted head and Pull continuation, and preserves pending commits plus dirty/untracked work on success/refusal. Full CLI suite retains existing routing and Pull/Publish behavior.
 
 Behavior: owner explicitly names reviewed A/L through notebook recover. Reuse binding/auth/generated API and help/docs. Before extending the 218-line nonInteractiveCli.ts, move its cohesive notebook routing/clone/publish/pull handlers into one notebook command owner with the existing global router as caller; retain errors and workflows. Target ~5 active minutes; integrated journey belongs to 8.
-
-Focused-proof exception for 7: one complete CLI repeat with VITEST_MAX_WORKERS=2 under observed host load26.8–29.17 is runtime-excepted; active edit/diagnosis/trace work retains the ten-minute stop. Retain first failures and require a terminal result; no automatic further repeat or timeout change.
 
 ### 8. Continue retained local work after reviewed recovery
 Type: Behavior
@@ -143,8 +139,6 @@ receive them. New workload fixture implementation is part of this leaf, not assu
 E2E fixture/domain builders and accepted-tree seeding, with no production controls. ~5–8 minutes
 fixture/scenario edits; stop/refine before implementation if that seam cannot meet ten minutes. Measure
 runtime/resources before the focused E2E launch.
-
-Remainder: restore the exact parked attempt, retain every assertion, and give the observed full-notebook diagnosis its own bounded wait instead of the generic six-second client deadline. Keep250-note batches until evidence warrants another change. Fresh validation targets ~3–5 active minutes plus E2E runtime; preserve the ten-minute first attempt and unresolved retry-batch cause. See execution-evidence.md#large-backend-validation-remainder.
 
 ### 11. Publish the application with its SPA and backend artifacts
 Type: Behavior
@@ -246,3 +240,9 @@ Reported: slice 10 — "The large-backend attempt stopped at ten active minutes 
 Story clause: "A notebook owner can publish small committed Markdown edits to an existing large notebook with the supported Donut CLI."
 Disposition: proved by slice 10: consumer-trace-large-backend.md; installed CLI/backend final E2E1pass at2026-11-10T11:11:51Z,1760068-byte listing, submitted/received C, A ancestry, exact3bytes and backend bodies at original Note IDs. Earlier failures remain dated evidence.
 Commitment: C08, J02.5
+
+
+### G6. CLI verification deadlines during landing
+Reported: slice 13 — "The combined landing CLI run timed out the large-tree regression at five seconds; the first repaired two-worker run passed that case but timed out two unchanged Pull cases under observed host load."
+Story clause: "Verify publication of small committed Markdown edits when the full accepted Git tree listing exceeds 1 MiB."
+Disposition: proved by slice 9: consumer-trace-release-fixture-repair.md; retained all assertions and deadline, reduced filesystem work while measuring1113000bytes, renewed exact-input historical ENOBUFS/current-positive proof and passed69files447tests with one worker. Prior failures remain dated; serial calibration does not establish external load as the sole cause.

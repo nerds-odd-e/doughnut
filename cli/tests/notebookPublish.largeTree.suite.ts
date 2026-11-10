@@ -49,10 +49,16 @@ export function describeNotebookPublishLargeTree() {
       runGit(['init', '--quiet', '-b', 'main'], directory)
       configureTestGitIdentity(directory)
       bindNotebookCheckout(directory, getApiConfig().apiBaseUrl)
+      const folder = [
+        'accepted-folder-',
+        'retained-folder-',
+        'notebook-folder-',
+      ]
+        .map((name) => name.repeat(14))
+        .join('/')
       const paths = Array.from(
-        { length: 4200 },
-        (_, index) =>
-          `${'folder-'.repeat(30)}${String(index).padStart(5, '0')}.md`
+        { length: 1500 },
+        (_, index) => `${folder}/note-${String(index).padStart(5, '0')}.md`
       )
       const accepted = appendNotes(
         directory,
