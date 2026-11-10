@@ -2,6 +2,7 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import { assumeNotePage } from './notePage'
 import { notePropertyItemHref } from '@/routes/noteShowLocation'
 import testability from '../testability'
+import { assumeAnsweredQuestionPage } from './AnsweredQuestionPage'
 
 export function followNoteUnderQuestion(noteTitle: string) {
   cy.findByText('Note under question').should('be.visible')
@@ -37,4 +38,19 @@ export function expectReviewedPropertyItem(
         })
       )
     })
+}
+
+export function followReviewedValue(label: string) {
+  cy.findByTestId('reviewed-property-value')
+    .contains('a.donut-wiki-link', label)
+    .should('be.visible')
+    .click()
+  waitUntilAppIsNotBusy()
+  return assumeNotePage(label)
+}
+
+export function returnToRecallAnswer() {
+  cy.go('back')
+  waitUntilAppIsNotBusy()
+  return assumeAnsweredQuestionPage().goToLastAnsweredQuestion()
 }

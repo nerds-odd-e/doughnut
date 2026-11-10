@@ -8,6 +8,8 @@ import type { NoteLevelTrackerKind } from '../start/pageObjects/assimilationPage
 import {
   expectReviewedPropertyItem,
   followReviewedProperty,
+  followReviewedValue,
+  returnToRecallAnswer,
   followNoteUnderQuestion,
 } from '../start/pageObjects/noteUnderQuestion'
 
@@ -81,3 +83,11 @@ Then(
     }
   }
 )
+
+When('I follow the reviewed value {string}', (label: string) => {
+  followReviewedValue(label)
+})
+
+When('I return to the recall answer', () => {
+  returnToRecallAnswer()
+})

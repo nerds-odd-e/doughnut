@@ -1,11 +1,6 @@
 <template>
   <div class="note-under-question bg-base-200 border-base-300">
     <div class="note-label bg-base-200 text-base-content">Note under question</div>
-    <FocusedPropertyIndicator
-      :note-id="noteTopology.id"
-      :property-key="focusedPropertyKey"
-      :property-value="focusedPropertyValue"
-    />
     <div class="breadcrumb-wrapper">
         <Breadcrumb
           :ancestor-folders="noteRealm?.ancestorFolders ?? ancestorFolders ?? []"
@@ -23,6 +18,13 @@
           </template>
         </Breadcrumb>
     </div>
+    <FocusedPropertyIndicator
+      :note-id="noteTopology.id"
+      :property-key="focusedPropertyKey"
+      :property-value="focusedPropertyValue"
+      :wiki-links="noteRealm?.wikiLinks ?? []"
+      :last-saved-markdown="noteRealm?.note.content"
+    />
     <slot />
   </div>
 </template>

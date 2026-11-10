@@ -113,7 +113,7 @@ reviewed value text remains raw until slice 3, while destinations are usable.
 
 ### 3. Read and follow the reviewed value
 Type: Behavior
-Status: planned
+Status: done
 Proof: reviewed-value row; existing source-navigation proof stays green, and
 the focused Cypress feature asserts the readable linked value's destination.
 
@@ -224,10 +224,17 @@ Disposition: proved by slice 2: NoteUnderQuestion.spec.ts distinct real-router t
 ### G2. Readable reviewed values await reference presentation
 Reported: slice 1 — "raw reviewed-value presentation remains for slice 3"
 Story clause: "Render a resolved wiki value with its ordinary display label and destination, using the source note's viewer-scoped resolution."
-Disposition: interim until slices 3
+Disposition: proved by slice 3: NoteUnderQuestion.reviewedValue.spec.ts real-token labels/reference destinations/unresolved behavior, integrated reference-to-source Cypress journey; slice3-return.md
+
+### G3. Scalar recall wire null must preserve key-only navigation
+Reported: slice 3 — "Cypress failed 2/5: scalar property recall arrives from real backend with propertyValue:null; WikiLinkToken.trim fails and the source route uses an item destination."
+Story clause: "property-only recall uses property-level focus."
+Disposition: proved by slice 3: failing wire-null regression repaired at recalledNoteUnderQuestionProps; final mounted key-only route and Cypress 5/5; slice3-return.md
 
 ## Accepted execution evidence
 
 Slice 1: [return and promise observations](slice1-return.md), [actual consumer trace](consumer-trace-slice1.md). Coordinator inspected the header, all five location tests, preview setup/assertions and reached E2E helpers. Q passed 35 files/155 tests; both typechecks passed. Independent refactor1 returned REFACTOR COMPLETE with no product edits; supplemental helper-to-feature trace was records-only, proof unchanged. Early and delivery freshness unchanged at d17580ea6cee; no incoming named-sibling change. Guarded delivery accepted 8b9e70d9fb0f6ec7f11b30595278c29c6709f2c4 on the execution branch from suffix base d17580ea6cee7f8eb3d348728721fdb9633e2f95; observer registration reused the retained stream.
 
-Slice 2: [return, actual commands and source comparison](slice2-return.md), [consumer trace](consumer-trace-slice2.md). Coordinator inspected real-router source/title clicks, real NoteShowPage duplicate/alias/reordered/stale/key-only focus and result switching, plus integrated feature changes. Q passed 36 files/158 tests; strengthened final six cases, both typechecks and Cypress 5/5 passed. The retired focused-title contract/label sweep is the one-time reading in that return. G1 is proved; G2 remains with slice 3. Independent refactor2 returned REFACTOR COMPLETE without edits; proof unchanged. Early/delivery freshness unchanged at d17580ea6cee, no incoming named-sibling change.
+Slice 2: [return, actual commands and source comparison](slice2-return.md), [consumer trace](consumer-trace-slice2.md). Coordinator inspected real-router source/title clicks, real NoteShowPage duplicate/alias/reordered/stale/key-only focus and result switching, plus integrated feature changes. Q passed 36 files/158 tests; strengthened final six cases, both typechecks and Cypress 5/5 passed. The retired focused-title contract/label sweep is the one-time reading in that return. G1 is proved; G2 remains with slice 3. Independent refactor2 returned REFACTOR COMPLETE without edits; proof unchanged. Early/delivery freshness unchanged at d17580ea6cee, no incoming named-sibling change. Guarded delivery accepted 02fef57554a5c6e894c25f34479b14348e9be44c on the execution branch from suffix base 8b9e70d9fb0f6ec7f11b30595278c29c6709f2c4; retained stream registration reused.
+
+Slice 3: [return, source comparison and causal wire-null repair](slice3-return.md), [consumer trace](consumer-trace-slice3.md), [wikiLinks trace](consumer-trace-slice3-wikiLinks.md). Coordinator inspected seven real-token/adapter cases and final E2E journey. Final Q passed 37 files/164 tests, both typechecks and Cypress 5/5 passed. Independent refactor3 consolidated canonical DOM ordering in the plain-value case; seven-case spec and both typechecks passed afterward, unchanged Q/Cypress reused. Refactor trace /tmp/seed117-slice3-refactor-consumer-trace.md disposes five evidence consumers. G2/G3 proved. Early freshness unchanged at d17580ea6cee, no incoming named-sibling change.

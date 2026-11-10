@@ -92,7 +92,10 @@ Feature: Property memory tracker
     Then I should be asked "Which verb is this an example of?"
     When I choose answer "walk"
     Then the reviewed property "example of" of note "Sentence" should address value "[[run]]"
-    When I follow the reviewed property "example of"
+    When I follow the reviewed value "run"
+    Then I should be at note "run"
+    When I return to the recall answer
+    And I follow the reviewed property "example of"
     Then the rich note property "example of" should be focused with its property panel open
     And occurrence 1 of item "[[run]]" in property "example of" should be highlighted
 
