@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsukasa-chan",
+  "email": "tsukasa-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-119#highlight-and-link-to-a-specific-property-item",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
