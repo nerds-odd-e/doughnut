@@ -73,6 +73,7 @@ jobs:
           format: junit
           report: ${{ github.workspace }}/backend/build/test-results/test
           entry: backend/src/test/java
+          unit: case
       # Jar repro is Gradle-only (SPA/CLI uploaded separately at deploy).
       - name: Boot jar reproducibility
         run: bash backend/scripts/boot-jar-reproducible.sh
@@ -100,6 +101,14 @@ jobs:
           format: vitest
           report: ${{ runner.temp }}/vitest-report.json
           entry: frontend/tests
+          unit: case
+      - if: ${{ !cancelled() && steps.frontend-tests.outcome != 'skipped' }}
+        uses: ./.github/ci_proof_fragments
+        with:
+          format: vitest
+          report: ${{ runner.temp }}/vitest-report.json
+          entry: frontend/tests
+          unit: file
 
   ci-proof:
     name: CI proof summary
@@ -116,7 +125,7 @@ jobs:
       - uses: ./.github/ci_proof_summary
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          expect: e2e_test/features=6 frontend/tests=2 backend/src/test/java=1 scripts=12:case scripts=13:file
+          expect: e2e_test/features=6:case frontend/tests=2:case frontend/tests=2:file backend/src/test/java=1:case scripts=12:case scripts=13:file
 
   Other-unit-tests:
     name: Other Unit Tests
@@ -229,6 +238,7 @@ jobs:
           format: cucumber
           report: ${{ runner.temp }}/cucumber-messages.ndjson
           entry: e2e_test/features
+          unit: case
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

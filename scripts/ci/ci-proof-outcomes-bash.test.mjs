@@ -38,13 +38,16 @@ test('a malformed Bash report line fails the conversion', () => {
 
 test('a failed Bash check and its time count toward its file and the scripts entry', (t) => {
   const bash = writeFragment(t, 'bash', 'scripts', bashReport, onlyPart)
-  const { summary } = summarizeFragments(t, [bash.fragmentText], 'scripts=1')
+  const { summary } = summarizeFragments(
+    t,
+    [bash.fragmentText],
+    'scripts=1:file'
+  )
 
   assert.equal(summary.entries[0].path, 'scripts')
   assert.deepEqual(summary.entries[0].evidence, [
     {
-      unit: 'legacy',
-      label: 'checks',
+      unit: 'file',
       passed: 1,
       failed: 1,
       other: 0,
@@ -82,7 +85,7 @@ test('a missing Bash report fails its conversion and leaves the scripts part mis
   const { summary, log } = summarizeFragments(
     t,
     [frontend.fragmentText],
-    'frontend/tests=1 scripts=1'
+    'frontend/tests=1:case scripts=1:file'
   )
 
   const [

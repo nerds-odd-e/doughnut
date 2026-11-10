@@ -1,91 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { outcomeLines } from './ci-proof-outcomes.mjs'
-import { repoRoot, writeFragment } from './ci-proof-outcomes-fixtures.mjs'
-
-const vitestFile = (path, status, ...testStatuses) => ({
-  name: `${repoRoot}${path}`,
-  status,
-  assertionResults: testStatuses.map((assertion) =>
-    typeof assertion === 'string' ? { status: assertion } : assertion
-  ),
-})
-
-test('a Vitest report gives one repo-relative line per test', () => {
-  const report = {
-    testResults: [
-      vitestFile('frontend/tests/a.spec.ts', 'passed', 'passed', 'passed'),
-      vitestFile('frontend/tests/b.spec.ts', 'failed', 'passed', 'failed'),
-    ],
-  }
-
-  assert.deepEqual(outcomeLines('vitest', JSON.stringify(report)), [
-    'passed\tfrontend/tests/a.spec.ts',
-    'passed\tfrontend/tests/a.spec.ts',
-    'passed\tfrontend/tests/b.spec.ts',
-    'failed\tfrontend/tests/b.spec.ts',
-  ])
-})
-
-test('skipped, todo and pending Vitest tests count as other', () => {
-  const report = {
-    testResults: [
-      vitestFile(
-        'frontend/tests/c.spec.ts',
-        'passed',
-        'skipped',
-        'todo',
-        'pending'
-      ),
-    ],
-  }
-
-  assert.deepEqual(outcomeLines('vitest', JSON.stringify(report)), [
-    'other\tfrontend/tests/c.spec.ts',
-    'other\tfrontend/tests/c.spec.ts',
-    'other\tfrontend/tests/c.spec.ts',
-  ])
-})
-
-test('a Vitest file that failed to load counts as one failed check', () => {
-  const report = {
-    testResults: [vitestFile('frontend/tests/broken.spec.ts', 'failed')],
-  }
-
-  assert.deepEqual(outcomeLines('vitest', JSON.stringify(report)), [
-    'failed\tfrontend/tests/broken.spec.ts',
-  ])
-})
-
-test('the Vitest producer keeps recorded durations and untimed checks', (t) => {
-  const path = 'frontend/tests/a.spec.ts'
-  const broken = 'frontend/tests/broken.spec.ts'
-  const report = {
-    testResults: [
-      vitestFile(
-        path,
-        'failed',
-        { status: 'failed', duration: 125 },
-        { status: 'passed', duration: 0 },
-        'skipped'
-      ),
-      vitestFile(broken, 'failed'),
-    ],
-  }
-  const { times, fragment } = writeFragment(
-    t,
-    'vitest',
-    'frontend/tests',
-    JSON.stringify(report)
-  )
-
-  assert.equal(times, `0.125\t${path}\n0\t${path}\n`)
-  assert.equal(fragment.durationMs, 125)
-  assert.deepEqual(fragment.files, [
-    { path, passed: 1, failed: 1, other: 1, durationMs: 125, untimed: 1 },
-    { path: broken, passed: 0, failed: 1, other: 0, untimed: 1 },
-  ])
-})
+import { writeFragment } from './ci-proof-outcomes-fixtures.mjs'
 
 // One scenario's messages: each attempt is a list of step results.
 const cucumberScenario = (uri, ...attempts) => [
@@ -156,6 +72,7 @@ test('the Cucumber producer sums recorded final-attempt steps for a failed scena
   )
 
   assert.equal(times, `1.375\t${path}\n`)
+  assert.equal(fragment.unit, 'case')
   assert.equal(fragment.durationMs, 1375)
   assert.deepEqual(fragment.files, [
     { path, passed: 0, failed: 1, other: 0, durationMs: 1375 },

@@ -92,6 +92,7 @@ test('a directory of JUnit XML yields one fragment line per testcase', (t) => {
   )
 
   assert.equal(times, `1.25\t${timed}\n0.5\t${timed}\n`)
+  assert.equal(fragment.unit, 'case')
   assert.equal(fragment.durationMs, 1750)
   assert.deepEqual(fragment.files, [
     { path: timed, passed: 1, failed: 1, other: 0, durationMs: 1750 },

@@ -50,9 +50,10 @@ const expectationsOf = (ci) =>
 
 test('CI proof expects each entry in intent.locations order among proved entries', () => {
   assert.deepEqual(expectationsOf(ciWithLintSteps()), [
-    { entry: 'e2e_test/features', parts: 6, unit: undefined },
-    { entry: 'frontend/tests', parts: 2, unit: undefined },
-    { entry: 'backend/src/test/java', parts: 1, unit: undefined },
+    { entry: 'e2e_test/features', parts: 6, unit: 'case' },
+    { entry: 'frontend/tests', parts: 2, unit: 'case' },
+    { entry: 'frontend/tests', parts: 2, unit: 'file' },
+    { entry: 'backend/src/test/java', parts: 1, unit: 'case' },
     { entry: 'scripts', parts: 12, unit: 'case' },
     { entry: 'scripts', parts: 13, unit: 'file' },
   ])
@@ -73,6 +74,7 @@ test('CI proof expects each entry in as many parts as its producers report', () 
         entry
       )
     } else {
+      assert.equal(producers.length, 1, `${entry}:${unit}`)
       const [{ job }] = producers
       assert.equal(Object.values(job.strategy.matrix)[0].length, parts, entry)
       assert.equal(job.strategy['fail-fast'], false, entry)
@@ -154,6 +156,23 @@ test('fragment uploads distinguish units for the same job and part', () => {
   assert.equal(fragments.runs.steps[0].env.UNIT, '${{ inputs.unit }}')
   assert.equal(
     fragments.runs.steps[1].with.name,
-    "ci-proof-fragments-${{ github.job }}-${{ inputs.unit || 'legacy' }}-${{ steps.fragments.outputs.part }}-attempt-${{ github.run_attempt }}"
+    'ci-proof-fragments-${{ github.job }}-${{ inputs.unit }}-${{ steps.fragments.outputs.part }}-attempt-${{ github.run_attempt }}'
+  )
+})
+
+test('frontend shards publish both units from the same report after the test step', () => {
+  const ci = ciWithLintSteps()
+  const producers = producersOf(ci, 'frontend/tests')
+  assert.deepEqual(
+    producers.map(({ step }) => [step.if, step.with]),
+    ['case', 'file'].map((unit) => [
+      "${{ !cancelled() && steps.frontend-tests.outcome != 'skipped' }}",
+      {
+        format: 'vitest',
+        report: '${{ runner.temp }}/vitest-report.json',
+        entry: 'frontend/tests',
+        unit,
+      },
+    ])
   )
 })

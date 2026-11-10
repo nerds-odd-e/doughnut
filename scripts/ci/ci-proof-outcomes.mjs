@@ -20,7 +20,18 @@ const vitest = (text) =>
   JSON.parse(text).testResults.flatMap((file) => {
     const path = relative(repoRoot, file.name)
     return file.assertionResults.length === 0 && file.status === 'failed'
-      ? [{ status: 'failed', path }]
+      ? [
+          {
+            status: 'failed',
+            path,
+            unit: 'file',
+            seconds:
+              typeof file.startTime === 'number' &&
+              typeof file.endTime === 'number'
+                ? (file.endTime - file.startTime) / 1000
+                : undefined,
+          },
+        ]
       : file.assertionResults.map((test) => ({
           status: test.status,
           path,

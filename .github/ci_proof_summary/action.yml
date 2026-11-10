@@ -5,7 +5,7 @@ inputs:
     description: "NodeJS Version"
     required: true
   expect:
-    description: "Space-separated <entry>=<parts>, in intent.locations order"
+    description: "Space-separated <entry>=<parts>:<unit>, in intent.locations order"
     required: true
 runs:
   using: "composite"

@@ -53,7 +53,7 @@ export const writeFragment = (
     ({ id }) => id === 'fragments'
   )
   runStep(step, {
-    UNIT: '',
+    UNIT: format === 'bash' ? 'file' : 'case',
     FORMAT: format,
     REPORT: reportPath,
     ENTRY: entry,

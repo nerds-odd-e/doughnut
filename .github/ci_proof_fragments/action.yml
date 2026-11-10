@@ -12,7 +12,7 @@ inputs:
     required: true
   unit:
     description: "Reported result unit: case or file"
-    required: false
+    required: true
   part:
     description: "This report's part of the entry, from 1; defaults to the matrix job's strategy.job-index plus 1"
     required: false
@@ -40,12 +40,10 @@ runs:
         echo "part=${PART}" >> "${GITHUB_OUTPUT}"
         # Fresh staging, so a job's later part never uploads an earlier one.
         rm -rf "${RUNNER_TEMP}/ci-proof"
-        unit=()
-        if [ -n "${UNIT}" ]; then unit=(--unit "${UNIT}"); fi
         node scripts/ci/ci-proof-outcomes.mjs "${FORMAT}" "${REPORT}" \
           "${RUNNER_TEMP}/ci-proof-times.tsv" "${UNIT}" > "${RUNNER_TEMP}/ci-proof-outcomes.tsv"
         node scripts/ci/ci-proof-summary.mjs fragment \
-          "${unit[@]}" --outcomes "${RUNNER_TEMP}/ci-proof-outcomes.tsv" \
+          --unit "${UNIT}" --outcomes "${RUNNER_TEMP}/ci-proof-outcomes.tsv" \
           --times "${RUNNER_TEMP}/ci-proof-times.tsv" --by-file --entry "${ENTRY}" \
           --part "${PART}" --of "${PARTS}" --attempt "${GITHUB_RUN_ATTEMPT}" \
           --revision "${CI_PROOF_REVISION}" --out "${RUNNER_TEMP}/ci-proof"
@@ -53,7 +51,7 @@ runs:
       if: ${{ !cancelled() }}
       uses: actions/upload-artifact@v7
       with:
-        name: ci-proof-fragments-${{ github.job }}-${{ inputs.unit || 'legacy' }}-${{ steps.fragments.outputs.part }}-attempt-${{ github.run_attempt }}
+        name: ci-proof-fragments-${{ github.job }}-${{ inputs.unit }}-${{ steps.fragments.outputs.part }}-attempt-${{ github.run_attempt }}
         path: ${{ runner.temp }}/ci-proof/
         if-no-files-found: ignore
         retention-days: 1
