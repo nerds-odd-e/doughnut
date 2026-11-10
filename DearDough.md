@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 447. Removed numbers are never reused.
+- Highest allocated local number: 482. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 - [Source before the 2026-11-10 compaction](https://github.com/nerds-odd-e/doughnut/blob/d3eb0ef73aca13a5ed229738f92dbe44ee12bf95/DearDough.md); its rows are retained at the [Open Dough catalog](https://github.com/terryyin/open-dough/tree/5afe6fee8fe34322752e9e44911d72eb31dd4991/docs/maintainer/findings). DD-443 (disposable break checks) was pruned as successful practice, not a problem.
@@ -76,6 +76,15 @@ Former local code: DD-160. Two refactor passes within one story treat barely tou
 ## ODF-141 — Fixed refactor cost on small accepted slices
 
 Former local code: DD-176. Every small slice launches a fresh full refactor agent even when the accepted diff needs no further changes, creating substantial repeated cost. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-141.md).
+
+### Occurrences
+- Execution: SEED-118#export-a-note-with-recent-quiz-questions (first implementation `7089269e2e`)
+  - Timestamp: 2026-11-10T15:48:00+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.94
+  - Evidence: plan `089-export-recent-note-questions` slices 1–4; published SHAs `7089269e2e`, `1c6d3e9945`, `011385133d`, `52e74feaa5`; refactor agents `0ae1c0d1` (slice 1, 15:48), `7fe03ae0` (slice 2, 16:03), `56d8503d` (slice 3, 16:15), `c7d4aaa4` (slice 4, 16:28) under parent `75e2007b-148e-453a-91c5-435dd0684d36`
+  - Observed effect: four consecutive post-slice refactor agents. Slices 1–2 returned `none — already clean` / no edits. Slice 3 collocated latest-selection folding into `RecallPromptRepository` and synced OpenAPI description. Slice 4 trimmed sibling test assertions only (production unchanged).
+  - Inference: same fixed per-slice refactor launch cost as ODF-141; two empty passes and one test-doc-only pass paid the full agent cost. Slice 3’s cohesion edit shows the pass is not always empty. Token/time cost of the empty passes was not separately measured here.
 
 <a id="odf-208"></a>
 
@@ -173,6 +182,24 @@ Former local code: DD-231. A slice proof table omits explicit story end conditio
 
 Former local code: DD-233. Broad whole-reference and metadata batches exceeded the response budget and truncated required context before delegation, forcing repeated retrieval despite existing targeted-reading guidance. Execution provenance and counts remain with the linked evidence owner; savings are unmeasured. This agent deviation is distinct from ODF-158’s required-reference cost. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-264.md).
 
+### Occurrences
+- Execution: SEED-117#find-the-note-and-property-after-recall; first implementation 8b9e70d9fb0f6ec7f11b30595278c29c6709f2c4
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: launch 5a2c1855-2aed-40c0-bd75-6e21ae06957b conversation, 2026-11-10; startup combined unit-testing/agent-map/plan/package read returned original token count 11774 with truncation; subsequent combined plan/seed/trace/backlog read returned 12465 with truncation. Retrospective combined full ADR read repeated the problem (12411 tokens).
+  - Observed effect: coordinator retrieved missing source/guidance again; targeted passages were sufficient when used.
+  - Inference: avoidable agent retrieval deviation recurred despite targeted-reading guidance; token/time savings are unmeasured.
+
+### Occurrences
+- Execution: SEED-121#publish-large-notebooks-without-losing-history
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-11-10 resumed execution; coordinator tool results combined whole Execute Plan finish/CI/source/obligation references, then aggregate retrospective traces, exceeding output budgets and requiring targeted retrieval. Git recovery:59db9d970d2be39e5d7825e26118bbc455e52a0f retains the reviewed source/proof homes.
+  - Observed effect: multiple truncated responses and repeated reads during an otherwise settled owner journey; no measured token/time saving is claimed.
+  - Inference: coordinator batching repeated this known deviation despite targeted-reading guidance; the product outcome remained independently verified.
+
 <a id="odf-265"></a>
 
 ## ODF-265 — A comparison of empty captures was printed as a match
@@ -214,6 +241,15 @@ Former local code: DD-239. The required obligation vocabulary could not keep a g
 ## ODF-271 — A cross-slice defect passed every slice acceptance and was found by an aggregate review
 
 Former local code: DD-240. Acceptance reasoned that a repeat confirmation stayed stable despite the return naming two exclusions on one tracker as untested. Their interaction restored an earlier excluded attempt’s effect. An independent aggregate review found the branch defect and the owner authorized slice 11’s repair. One SEED-073#story-7 execution, release unknown; relationship to ODF-223 remains uncertain. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-271.md).
+
+### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: modified; review snapshot88061832511d83ae3b7cc0197c827bfd57d145de; base release unknown
+  - Evidence: 2026-11-10, isolated cached-note review `/tmp/seed119-cache-review-result.log`, G8/refinement1eab56a4becd601c665bcbd05cdc113058177325, maintained NoteTextContent.propertyHistoryNoteChange.spec.ts.
+  - Observed effect: original eight slices,407files/2514 tests and exact branch CI passed, then a mounted Cancel/note-reuse check deleted prior-note11 instead of current22. Related same-note history after Cancel also bypassed a new warning. The inherited guard memoization had no correct note/action lifetime; this execution exposed it through item removal. The original completion judgment was withdrawn and one bounded same-story leaf restored the matching-history promise with pending-only reads and three regressions;408files/2517 tests and both types passed.
+  - Inference: the prior per-slice proof omitted reused-editor/current-history continuation. This establishes an inherited weakness reached by the feature, not that this execution introduced the original cache.
 
 <a id="odf-272"></a>
 
@@ -296,6 +332,15 @@ Former local code: DD-274. Consumer discovery treated execution-evidence Identit
 ## ODF-150 — Implementation proof misses indirect consumers
 
 Former local code: DD-319. Acceptance traced the unchanged transport API but not the existing E2E journeys whose preconditions the explicit question-load recovery changed; seven failures reached CI in SEED-081#story-2 and were repaired in the execution. Distinct from ODF-272 and ODF-310. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-150.md).
+
+### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: modified; execution revision 8ab86f53f02c4cdb243ff0a2b34567d3a7f6c8a8; base release unknown
+  - Evidence: 2026-11-10; CI run42770072237/attempt1 frontend job129675536405, autosaveTrash expected3 saves/got2; local deterministic red and repair c5134729baf5379be70bb458200128998793efd8.
+  - Observed effect: stricter unknown-history refusal reached ordinary Markdown frontmatter removal in an existing mounted autosave/trash case omitted from slice7's indirect-consumer proof. Missing getNoteInfo data blocked its third save. Known-empty-history HTTP setup repaired the test; original expectations and exact third payload passed, with no production workaround.
+  - Inference: symbol-based tracing did not expose the indirect edit-to-property-removal path. The owned CI repair restored proof; shared prevention remains unestablished.
 
 <a id="odf-323"></a>
 
@@ -421,3 +466,55 @@ Former local code: DD-445. A repair publication started before an `amended` fres
 ## ODF-478 — Slice delivery published without that slice's source-review observations
 
 Former local code: DD-447. A slice was published without its source-review observations. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-478.md).
+
+## DD-479 — Merged repair restores were misclassified as wholly unapplied
+
+Exact equality with the saved tree classified every merged file as unapplied when each also contained accepted repair edits. The restore had actually auto-merged draft content and reported a conflict. Its stored false-none then blocked exact stash cleanup and required a user-triggered resume.
+
+### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-11-10; affected snapshot c371659ac7121d1e83128c616fa1c0b391ac0867; ci-repair-stash restore/drop for OID266306cfa8064e45118b76c6581083a63bbcb2fd; unfinished dashboard receipt57246283-fdda-482d-8908-b608c63f8e4b; user requested fixing and retrying; repair b3ed6f70ea538888919593b2a13fb9a14b0e9c4f.
+  - Observed effect: all draft edits were preserved, but the helper returned applied:none and then unapplied. New real-Git regression reproduced it. The local fix identifies actual unmerged paths as partial and supplies an explicit reviewed-OID resolution with checkout/index/conflict guards; ordinary no-apply refusal remains. Three recovery tests and25 CI-proof tests passed, and the retained real entry resolved/dropped by exact OID. A later CI pause restored its five saved paths and dropped only its own entry automatically.
+  - Inference: tree inequality proves a merge differs, not that nothing applied. The local repair is delivered; propagation through the shared guidance release remains outside this product execution.
+
+## DD-480 — An HTTP fixture invented the meaning of an empty assimilation value
+
+The frontend treated any supplied propertyValue, including empty string, as a list item and wrote a passing blank-item fixture. The existing backend explicitly uses empty string for scalar units.
+
+### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown; execution-time snapshot fa51f486fca13f9f3c85eaebbec2ed93be8e8522
+  - Evidence: 2026-11-10; CI run42762324814/attempt1 E2E job129650701015, Skip expected /n6/p/topic but received /n6/p/topic/i/1/~; backend PropertyFocus/AssimilationUnit documentation; repair c371659ac7121d1e83128c616fa1c0b391ac0867.
+  - Observed effect: selected mocked proof and list continuation E2E passed before the existing scalar walkthrough failed. Positive scalar-empty red reproduced the defect; nonempty raw values retain item routing and manual blank selection remains a separate input path. The corrected workspace fixture,37 focused tests, both types and10 real E2E scenarios passed.
+  - Inference: reuse of the key/value shape did not establish the wire sentinel. Read the producing contract before choosing a branch or manufacturing fixture variants; one observed execution does not establish recurrence.
+
+## DD-481 — Full local frontend proof lost the browser connection despite fewer workers
+
+A two-worker full frontend run ended before all files loaded. The existing CI configuration already serializes file imports and uses an orchestrator GC reporter; selecting that configuration completed the full required proof without assertion retries.
+
+### Occurrences
+- Execution: SEED-120#export-a-note-from-the-highlighted-property / 401bc9ff4a2bf02f4c4e922f2b87b1fb8b4e030f
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown; execution guidance snapshot 884a4fe8e463a1ea32120c7589cf808a82162285
+  - Evidence: 2026-11-10 execution conversation; `/tmp/export-property-frontend-tests.log` (start18:17:41 Asia/Singapore), `/tmp/export-property-frontend-tests-serial.log`, `/tmp/export-ui-frontend.log`; retained acceptance at `7df14ec0c6:.planning/slice-plans/089-export-a-note-from-the-highlighted-property/source-review.md`; `frontend/vitest.config.ts` fileParallelism/orchestratorGcReporter.
+  - Observed effect: `./scripts/run.sh pnpm frontend:test --maxWorkers=2` ended after259/408 files and1,950 passing tests with VITEST_BROWSER_CONNECTION_CLOSED (114.11s), without an assertion failure. `CI=true ./scripts/run.sh pnpm frontend:test --maxWorkers=2 --retry=0` then passed408files/2,521tests in262.65s and the next slice passed409files/2,528tests in245.98s. All runs were headless on the shared16CPU/48GiB local host; no production or test behavior was changed to obtain those passes.
+  - Inference: worker reduction alone did not prevent this documented orchestrator failure mode. The existing serialized-import/GC mode is a supported bounded alternative for full local proof on a busy host. One failed run does not establish recurrence or a universal memory threshold; consider documenting the invocation in project testing guidance.
+
+## DD-482 — An unterminated landed plan tail made appended evidence resemble a source conflict
+
+Source freshness's three-way containment check treated coordinator-owned observations appended after an identical landed, unterminated final disposition as overlapping source edits. No new human story/plan amendment existed. Keep the substantive conflict gate; assess newline-aware comparison or clearer record-edit diagnostics without weakening it.
+
+### Occurrences
+- Execution: SEED-121#publish-large-notebooks-without-losing-history
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-11-10 slice14 acceptance; Take0715d7d1b2b25d0ca224a3909e14cdf43fad0d42, landed plan0019fa5e4ada4cc630b90131580dadd83fb84d8a, accepted record59db9d970d2be39e5d7825e26118bbc455e52a0f; source-freshness-comparison.mjs compareThreeWay/compareRecord and source-freshness.mjs fromContainedBase. Raw coordinator results retained three conflict refusals; read-only git merge-file localized the conflict to the same G6 disposition's EOF plus appended G7–G9.
+  - Observed effect: extra source checks/inspection and record relayout. Preserving landed bytes and placing new obligations before existing G1 produced an unchanged comparison; no source scope, accepted proof or product behavior changed.
+  - Inference: the unterminated tail and same-EOF additions explain this instance; other source-conflict behavior was not investigated. Coordinator condensation also complicated the first comparison and was partly reversed; exact cost is unmeasured.

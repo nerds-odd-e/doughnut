@@ -90,8 +90,6 @@ Type: Structure
 Status: done
 Proof: complete backend controller suite retains normal proposal acceptance/refusal, Markdown, marker, attachment-size/durability and book-source policy results. No controller/API contract change.
 
-Structure: shared immutable candidate admission owns inspection, typed Markdown, attachment and book policies for normal publication and recovery; existing policy order/errors remain. Ancestry, drift, correspondence and projection retain their owners.
-
 ### 6. Preserve explicitly reviewed live edits in accepted history
 Type: Behavior
 Status: done
@@ -155,8 +153,6 @@ actual normal Update from authentic 0.5.9, and execution of fixed replacement/ve
 path. Existing call-log shell fixtures do not supply this integration. This one sequence owns updater
 replacement proof; 11 owns application release semantics.
 
-Behavior: authentic isolated0.5.9 SHA-256`5b868908f33576604389ad9b41f26a21eaa6efef982c570e2a60488d3365525c` updates normally to the selected fixed build across application publication; no host mutation. consumer-trace-updater-sequence.md retains composition and proof.
-
 ### 13. Deliver fixed builds through supported release/update paths
 Type: Behavior
 Status: done
@@ -179,6 +175,10 @@ explicit A/L-bound forward recovery; pure projection/encoding drift requires cor
 invented adoption commit. Pull/resolve only if accepted head advanced, then Publish retained local work.
 Policy agreement is not approval of unseen live content. Owner/operator waits.
 
+## Execution complete
+
+Product advice: no change. All six story journeys are covered by controller/native-Git/CLI/E2E and actual public release/owner observations, with qualified G2/G8 limits retained. The aggregate follows ADRs0002/0004/0006/0007 and the North Star: one accepted Portable boundary, private identity/learning retained, shared admission and explicit state-bound recovery. Existing recovery/large-tree integration tests remain valuable; detailed variations stay at stable controller/CLI boundaries. No supported product defect, refactoring residue or test consolidation correction was found. Process review used the actual coordinator record and retained evidence; ODF-264 recurrence and newDD-482 are recorded in DearDough.md, preserving incoming479–481. Nineteen published first-parent revisions from Takeb1713646 through59db9d97 are attributable by their agent/story messages and patches; planning-only transitions are provenance, and incoming trunk sibling work is excluded. The implementation/release main0019already passed exact CI; current branch CI remains pending until its completion receipt.
+
 ## Execution checkpoints and proof commands
 
 [Trunk release checkpoints and literal proof commands](execution-evidence.md#execution-checkpoints-and-proof-commands).
@@ -192,7 +192,7 @@ Policy agreement is not approval of unseen live content. Owner/operator waits.
 [Execution context, observer identity and accepted proof](execution-evidence.md).
 
 Developer accepted reviewed forward preservation on 2026-11-10; no source/ADR question remains.
-Completed1–13 stand;14owns the actual owner continuation. Earlier failed attempts remain dated in execution-evidence.md and release-recovery-evidence.md. Fourteen leaves; application11 retained its12–15-minute exception. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Evidence consolidation does not renew readiness or change source scope.
+Completed1–14 stand; the actual owner continuation is verified. Earlier failed attempts remain dated in execution-evidence.md and release-recovery-evidence.md. Fourteen leaves; application11 retained its12–15-minute exception. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Evidence consolidation does not renew readiness or change source scope.
 
 ## Story obligations
 
