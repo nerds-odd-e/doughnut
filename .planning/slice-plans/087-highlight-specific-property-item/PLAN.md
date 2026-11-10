@@ -4,6 +4,7 @@
 **Source review:** [source review](source-review.md)
 **Identity:** SEED-119#highlight-and-link-to-a-specific-property-item
 **Execution context:** [established context](proof-context.md#execution-context)
+**Proof context:** [premises and observations](proof-context.md#premises-and-observations)
 
 ## Goal and scope
 
@@ -62,13 +63,6 @@ SEED-120 export. Ordinary authoring retains empty lists; final-item minus delete
 | Warn/cancel preserves content/history/focus; confirm removes exact item/history and preserves distinct siblings | 7 | Mounted note save boundary plus real persisted reload/tracker E2E |
 | Selected removal clears focus; other removal preserves selected occurrence | 7 | Mounted editor route/content, including earlier equal occurrence removal |
 | Final removal deletes entry and its key's history, then goes to note | 8 | Mounted note save boundary and real persisted final-entry save/reload journey |
-
-## Premises and observations
-
-[Dated preparation observations and decisive premises](proof-context.md#premises-and-observations)
-are retained verbatim in the acceptance evidence. The bounded existing
-`note_property.feature` probe passed before the parked URL implementation; reuse
-that matching observation before restoring Behavior 3.
 
 ## Consumer trace and structural seams
 
@@ -246,3 +240,10 @@ Reported: slice 7 — "The initial Behavior 7 browser batch passed three scenari
 Story clause: "Cancel keeps content, learning history, focus and URL intact."
 Disposition: proved by slice 7: actual confirmation-root Cancel succeeds unforced; canonical mounted save boundary preserves DELETE/save/URL/selected run, then Confirm deletes11 and saves ordered siblings; final property_memory_tracker.feature 4/4 passes actual Cancel/Confirm and persisted reload walk/jog with retained walk history after correcting dialog and expanded-row fixture queries
 Commitment: 49
+
+
+### G6. Ordinary content-save continuation proof
+Reported: slice 7 — "CI run 42770072237 attempt 1 at 8ab failed the autosave-after-trash-failure case: expected three updateNoteContent calls, observed two; focused reproduction found missing getNoteInfo data when the edit removes relation frontmatter and the history guard correctly refuses unknown history."
+Story clause: "Reuse authored list rendering and ordinary content saving"
+Disposition: proved by slice 7: deterministic red on 8ab; real mounted NoteShowPage uses known-empty-history HTTP fixture for frontmatter removal and retains three-save/one-trash expectations plus exact third Second edit payload; five current autosave/trash suites17 tests and both typechecks pass, no production or timing workaround
+Commitment: 67

@@ -83,6 +83,11 @@ describe("note show autosave before trashing", () => {
     const { relationRealm } = qualifyingRelationRealmForTrash()
     const router = await productionRouterAt(noteShowLocation(relationRealm.id))
     mockSdkService(NoteController, "showNote", relationRealm)
+    mockSdkService(
+      NoteController,
+      "getNoteInfo",
+      makeMe.aNoteRecallInfo.memoryTrackers([]).please()
+    )
     mockNotebookGetForNoteRealm(relationRealm)
     const firstSave = deferred()
     const secondSave = deferred()
@@ -170,6 +175,10 @@ describe("note show autosave before trashing", () => {
     await startTrash("REDUCE")
 
     expect(updateSpy).toHaveBeenCalledTimes(3)
+    expect(updateSpy).toHaveBeenNthCalledWith(3, {
+      path: { note: relationRealm.id },
+      body: { content: "Second edit" },
+    })
     expect(trashSpy).toHaveBeenCalledTimes(1)
   })
 })
