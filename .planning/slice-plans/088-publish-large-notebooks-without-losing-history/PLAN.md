@@ -148,7 +148,7 @@ Remainder: restore the exact parked attempt, retain every assertion, and give th
 
 ### 11. Publish the application with its SPA and backend artifacts
 Type: Behavior
-Status: planned
+Status: done
 Proof: retain selected-source SPA/jar/routing, valid/missing payload admission, partial failure,
 fresh-artifact retry and completed-release replay observations. Run the complete application-release consumer
 suite and retained uploader proof.
@@ -213,7 +213,7 @@ Policy agreement is not approval of unseen live content. Owner/operator waits.
 [Execution context, observer identity and accepted proof](execution-evidence.md).
 
 Developer accepted reviewed forward preservation on 2026-11-10; no source/ADR question remains.
-Completed1–10 stand. Slice10 continuation proved real large-notebook acceptance and receiving; earlier failed attempts remain dated evidence in execution-evidence.md. Fourteen leaves; application11 keeps its stated12–15-minute exception, updater12 and final delivery/owner13/14 remain. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Whole remaining scope was reassessed and stays supported; no source or story change.
+Completed1–11 stand. Slice10 continuation proved real large-notebook acceptance and receiving; earlier failed attempts remain dated evidence in execution-evidence.md. Fourteen leaves; application11 keeps its stated12–15-minute exception, updater12 and final delivery/owner13/14 remain. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Whole remaining scope was reassessed and stays supported; no source or story change.
 
 ## Story obligations
 

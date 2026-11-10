@@ -73,7 +73,7 @@ test('an interrupted release retries the same identity with freshly selected CI 
   const interrupted = fixture.publish(
     release,
     { runId: 42, runAttempt: 3 },
-    { failStorageMatch: 'doughnut-cli-latest' }
+    { failStorageMatch: 'backend_app_jar' }
   )
 
   assert.notEqual(interrupted.status, 0)
@@ -115,10 +115,6 @@ test('an interrupted release retries the same identity with freshly selected CI 
   assert.equal(
     readFileSync(`${fixture.root}/captured-spa`, 'utf8'),
     'fresh SPA'
-  )
-  assert.equal(
-    readFileSync(`${fixture.root}/captured-cli`, 'utf8'),
-    'fresh CLI'
   )
   assert.equal(
     JSON.parse(readFileSync(`${fixture.root}/saved-record`, 'utf8')).sha256,

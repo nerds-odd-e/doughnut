@@ -20,7 +20,6 @@ export async function makeSelectedReleaseWithUnavailableArtifacts(
   const unavailable = runPayloadAdmission({
     backend: `${missingArtifacts}/backend/donut.jar`,
     frontend: `${missingArtifacts}/frontend`,
-    cli: `${missingArtifacts}/cli/donut-cli.bundle.mjs`,
     publicationTrace,
   })
 

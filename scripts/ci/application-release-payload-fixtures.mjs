@@ -6,12 +6,7 @@ const payloadCommand = fileURLToPath(
   new URL('./application-release-payload.mjs', import.meta.url)
 )
 
-export function runPayloadAdmission({
-  backend,
-  frontend,
-  cli,
-  publicationTrace,
-}) {
+export function runPayloadAdmission({ backend, frontend, publicationTrace }) {
   const result = spawnSync(
     'bash',
     [
@@ -27,7 +22,6 @@ export function runPayloadAdmission({
         ...process.env,
         DEPLOY_JAR_PATH: backend,
         FRONTEND_STATIC_DIR: frontend,
-        CLI_BUNDLE_SOURCE: cli,
       },
     }
   )

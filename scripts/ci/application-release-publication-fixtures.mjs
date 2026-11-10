@@ -81,7 +81,6 @@ export function makePublication(t, scenario = 'skip') {
   mkdirSync(bin)
   const artifacts = (runId) => ({
     frontend: join(root, `artifacts-${runId}/frontend`),
-    cli: join(root, `artifacts-${runId}/bundle.mjs`),
     jar: join(root, `artifacts-${runId}/donut.jar`),
   })
   for (const runId of [42, 99]) {
@@ -89,10 +88,9 @@ export function makePublication(t, scenario = 'skip') {
     mkdirSync(payload.frontend, { recursive: true })
     const label = runId === 42 ? 'selected' : 'fresh'
     writeFileSync(join(payload.frontend, 'index.html'), `${label} SPA`)
-    writeFileSync(payload.cli, `${label} CLI`)
     writeFileSync(payload.jar, `${label} jar`)
   }
-  const { frontend, cli, jar } = artifacts(42)
+  const { frontend, jar } = artifacts(42)
   const backendRecord = join(root, 'record.json')
   writeFileSync(
     backendRecord,
@@ -114,7 +112,6 @@ if [[ "$1" == storage ]]; then
   shift
   if [[ "$1" == cat ]]; then cat "$RECORD"; fi
   if [[ "$1" == rsync ]]; then cp "$3/index.html" "$CAPTURED_SPA"; fi
-  if [[ "$1" == cp && "$2" == --predefined-acl=* ]]; then cp "$3" "$CAPTURED_CLI"; fi
   if [[ -n "\${FAIL_STORAGE_MATCH:-}" && "$*" == *"$FAIL_STORAGE_MATCH"* ]]; then exit 37; fi
   if [[ "$1" == cp && "$2" == - && "$3" == */application-release.json ]]; then
     cat >> "$APP_RECORDS"
@@ -154,7 +151,6 @@ printf 200`
         APP_RECORDS: join(root, 'application-records'),
         SAVED_RECORD: join(root, 'saved-record'),
         CAPTURED_SPA: join(root, 'captured-spa'),
-        CAPTURED_CLI: join(root, 'captured-cli'),
         GITHUB_SHA: 'f'.repeat(40),
         RELEASE_SHA: release.sha,
         RELEASE_SOURCE_ROOT: root,
@@ -171,7 +167,6 @@ printf 200`
         ARTIFACT: 'donut',
         VERSION: '0.0.1-SNAPSHOT',
         FRONTEND_STATIC_DIR: artifacts(ci.runId).frontend,
-        CLI_BUNDLE_SOURCE: artifacts(ci.runId).cli,
         DEPLOY_JAR_PATH: artifacts(ci.runId).jar,
         FORCE_FULL_DEPLOY: '',
         HEALTHCHECK_RETRY_SLEEP_SECONDS: '0',
@@ -189,7 +184,6 @@ printf 200`
     applicationRecords: join(root, 'application-records'),
     backendRecord,
     frontend,
-    cli,
     jar,
     startup,
   }

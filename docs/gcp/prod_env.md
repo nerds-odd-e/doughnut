@@ -91,11 +91,11 @@ A selected release may **skip** GCS jar upload and MIG rollout when the jar hash
 
 ## 6. Frontend static in GCS (CI publish + prod LB)
 
-Each green `main` CI run builds the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) and CLI bundle as GitHub Actions artifacts. A qualifying application tag admits its applicable CI run; the deploy workflow uploads those artifacts under the tagged release SHA, even when the build SHA is an equivalent ancestor:
+Each green `main` CI run builds the SPA tree (Vite output under `frontend/dist/` after `pnpm frontend:build`) and backend jar as GitHub Actions artifacts. A qualifying application tag admits its applicable CI run; the deploy workflow uploads those artifacts under the tagged release SHA, even when the build SHA is an equivalent ancestor:
 
 `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`
 
-The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut`. Deploy artifacts (fat jar, `deploy/last-successful-deploy.json`) use **`GCS_BUCKET`** only. Upload scripts: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`, `infra/gcp/scripts/upload-cli-binary-to-gcs.sh`.
+Independent `cli-*` releases build with a tag-derived version and publish the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut`. Deploy artifacts (fat jar, `deploy/last-successful-deploy.json`) use **`GCS_BUCKET`** only. Upload scripts: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`, `infra/gcp/scripts/upload-cli-binary-to-gcs.sh`.
 
 **Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/logout`, `/install`, etc. stay on the MIG. Full runbook (including a one-page release checklist): [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
 

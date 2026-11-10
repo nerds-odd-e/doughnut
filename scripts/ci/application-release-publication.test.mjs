@@ -27,7 +27,6 @@ for (const scenario of [
       refOid,
       trace,
       frontend,
-      cli,
       jar,
       startup,
       applicationRecords,
@@ -58,12 +57,11 @@ for (const scenario of [
       calls[0],
       'gcloud storage cp - gs://private-backend/deploy/application-release.json'
     )
-    assert.deepEqual(calls.slice(1, 4), [
+    assert.deepEqual(calls.slice(1, 3), [
       `gcloud storage rsync -r ${frontend} gs://public-frontend/frontend/${sha}/`,
       `gcloud storage cp --cache-control=public,max-age=60 ${frontend}/index.html gs://public-frontend/frontend/${sha}/index.html`,
-      `gcloud storage cp --predefined-acl=publicRead ${cli} gs://public-frontend/doughnut-cli-latest/doughnut`,
     ])
-    assert.match(calls[4], /^gcloud compute url-maps import /)
+    assert.match(calls[3], /^gcloud compute url-maps import /)
     if (forced) {
       assert.ok(
         calls.includes(
@@ -86,7 +84,7 @@ for (const scenario of [
       )
     } else {
       assert.match(result.stdout, /Deploy skipped/)
-      assert.equal(calls.length, 8)
+      assert.equal(calls.length, 7)
       assert.deepEqual(readApplicationRecords(applicationRecords), [
         {
           tag: 'v1.2.3',
@@ -138,7 +136,7 @@ test('failed publication leaves the admitted application publishing', (t) => {
   )
 })
 
-test('workflows share publication commands and retain independent CLI build version', () => {
+test('workflows retain selected application publication and tag-versioned CLI release', () => {
   const workflow = (name) =>
     parse(
       readFileSync(

@@ -12,7 +12,6 @@ env:
   ARTIFACT: "donut"
   VERSION: "0.0.1-SNAPSHOT"
   FRONTEND_DIST_ARTIFACT: frontend-dist
-  CLI_DIST_ARTIFACT: cli-dist
   MYSQL_UT_DB: "doughnut_test"
   MYSQL_E2E_DB: "doughnut_e2e_test"
   MYSQL_DB_USER: ${{ secrets.DBUSER }}
@@ -74,7 +73,7 @@ jobs:
           report: ${{ github.workspace }}/backend/build/test-results/test
           entry: backend/src/test/java
           unit: case
-      # Jar repro is Gradle-only (SPA/CLI uploaded separately at deploy).
+      # Jar repro is Gradle-only (SPA uploaded separately at deploy).
       - name: Boot jar reproducibility
         run: bash backend/scripts/boot-jar-reproducible.sh
 

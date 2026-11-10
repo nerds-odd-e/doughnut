@@ -158,11 +158,7 @@ test('release pins orchestration separately from source and preserves deployment
   )
   assert.deepEqual(
     artifactDownloads.map((step) => step.with.path),
-    [
-      'release-artifacts/backend',
-      'release-artifacts/frontend',
-      'release-artifacts/cli',
-    ]
+    ['release-artifacts/backend', 'release-artifacts/frontend']
   )
   assert.equal(deploy.env.GCP_CREDENTIALS, '${{ secrets.GCP_CREDENTIALS }}')
   assert.equal(
@@ -191,11 +187,7 @@ test('terminal release outcomes bypass CI and every publication operation', () =
   )
   assert.deepEqual(
     downloads.map((step) => step.with.path),
-    [
-      'release-artifacts/backend',
-      'release-artifacts/frontend',
-      'release-artifacts/cli',
-    ]
+    ['release-artifacts/backend', 'release-artifacts/frontend']
   )
   assert.ok(publication.steps.some((step) => step.id === 'publish'))
 })

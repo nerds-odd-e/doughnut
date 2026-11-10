@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, rmSync } from 'node:fs'
 import { test } from 'node:test'
 import { querySelectedCi } from './application-release-ci.mjs'
 import { ciRun, repository } from './application-release-ci-fixtures.mjs'
@@ -58,16 +58,11 @@ test('ready release entry publishes the exact tagged main payload', async (t) =>
   )
   const trace = readFileSync(fixture.trace, 'utf8')
   assert.match(trace, new RegExp(`frontend/${fixture.sha}/`))
-  assert.match(trace, /artifacts-42\/bundle.mjs/)
   assert.match(trace, /artifacts-42\/donut.jar/)
   assert.doesNotMatch(trace, /artifacts-99/)
   assert.equal(
     readFileSync(`${fixture.root}/captured-spa`, 'utf8'),
     'selected SPA'
-  )
-  assert.equal(
-    readFileSync(`${fixture.root}/captured-cli`, 'utf8'),
-    'selected CLI'
   )
   const record = JSON.parse(readFileSync(`${fixture.root}/saved-record`))
   assert.equal(record.git_sha, fixture.sha)
@@ -86,7 +81,6 @@ test('a completed release replay succeeds after artifacts expire without any pro
     outcome: 'succeeded',
   }
   rmSync(`${fixture.root}/artifacts-42`, { recursive: true })
-  writeFileSync(`${fixture.root}/captured-cli`, 'independent CLI')
 
   const replay = await runStateCommand(t, {
     args: ['--check-release'],
@@ -104,10 +98,6 @@ test('a completed release replay succeeds after artifacts expire without any pro
   assert.equal(existsSync(fixture.trace), false)
   assert.equal(existsSync(fixture.applicationRecords), false)
   assert.equal(existsSync(`${fixture.root}/captured-spa`), false)
-  assert.equal(
-    readFileSync(`${fixture.root}/captured-cli`, 'utf8'),
-    'independent CLI'
-  )
   assert.equal(existsSync(`${fixture.root}/saved-record`), false)
   assert.equal(existsSync(`${fixture.root}/captured-map`), false)
 })

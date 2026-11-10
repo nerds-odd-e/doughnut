@@ -47,8 +47,8 @@ admission requirements below. Release operators own target migration verificatio
    concurrency group lets the active publication finish; a surviving queued tag
    or explicit workflow rerun then re-evaluates all current tags and selects the
    highest numeric pending version.
-2. Confirm successful applicable main CI and available backend, frontend and
-   CLI artifacts before pushing the tag. A premature tag with missing or
+2. Confirm successful applicable main CI and available backend and frontend
+   artifacts before pushing the tag. A premature tag with missing or
    unfinished CI reports `waiting`; failed or cancelled CI reports `blocked`.
    Both release the runner without publication. CI completion does not start
    Application Release. Once the selected artifact-source CI succeeds and artifacts are
@@ -75,7 +75,7 @@ admission requirements below. Release operators own target migration verificatio
 
 5. Inspect **Application Release** admission outputs for the chosen tag, release
    SHA (`sha`), build SHA (`ciSha`), and CI run/
-   attempt, then the publication result. All three artifacts must be available
+   attempt, then the publication result. Both artifacts must be available
    from that run before any production upload. The tag ref is checked again before
    writes. The selected source supplies routing, startup script and force token;
    publication runs the current main orchestration pinned at admission.
@@ -83,7 +83,7 @@ admission requirements below. Release operators own target migration verificatio
    provenance records the build SHA separately as `ci_sha`. Backend health and
    the deploy record's `git_sha` identify the build SHA, which can differ from
    the tag after ignored-only changes.
-6. Confirm the SPA/CLI and backend health as described in the
+6. Confirm the SPA and backend health as described in the
    [frontend runbook](prod-frontend-static-lb.md#smoke-checks-after-a-change).
    Local tests do not prove GitHub scheduling, artifact service or GCP credentials;
    the first actual release confirms those platform paths.
@@ -94,21 +94,20 @@ selection instead of allowing an older ready version to publish. A newer
 `publishing` or `succeeded` application record also makes every older attempt
 `superseded`, even if the newer tag is later absent from the remote tag listing.
 
-Publication uploads the frontend, then the bundled CLI, then applies routing and
-conditionally deploys the backend. Independent `cli-*` releases retain their own
-tag-derived CLI version. Application tags do not change the validated CLI bundle's
-embedded version or the jar's `donut-0.0.1-SNAPSHOT.jar` name and GCS destinations.
+Publication uploads the frontend, applies routing and conditionally deploys the
+backend. Independent `cli-*` releases publish the CLI with their tag-derived version.
+The jar uses the `donut-0.0.1-SNAPSHOT.jar` name and its existing GCS destination.
 
 The backend script compares the fat jar's SHA-256 and selected MIG startup script's
 SHA-256 to `gs://<bucket>/deploy/last-successful-deploy.json`. Matching hashes skip
-jar upload and MIG rolling replace and leave the record unchanged. Frontend and
-CLI publication and URL-map application still run.
+jar upload and MIG rolling replace and leave the record unchanged. Frontend
+publication and URL-map application still run.
 
 ## Failed release and correction
 
 Inspect the reported tag, release SHA, build SHA, CI run/attempt and failure stage. Missing/expired
 artifacts or failed validation stop before uploads. Later publication failure can
-leave a partial frontend/CLI/backend change. The application release record stays
+leave a partial frontend/backend change. The application release record stays
 `publishing`; retry that workflow without moving or deleting its immutable tag.
 The non-canceling concurrency group lets an active release finish before a queued
 retry reconciles current state:

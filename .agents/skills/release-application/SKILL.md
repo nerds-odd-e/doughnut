@@ -15,7 +15,7 @@ this skill.
 
 ## Route the request
 
-- An application release publishes the SPA, bundled CLI, routing, and any
+- An application release publishes the SPA, routing, and any
   required backend rollout through the Application Release workflow. A `cli-*`
   release and PR delivery are independent.
 - A status-only request is read-only. Inspect existing tags, workflow runs,
