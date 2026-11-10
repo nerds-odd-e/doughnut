@@ -1,6 +1,7 @@
 # Run repository commands without interactive-shell setup
 
 **Source:** [selected story](../../seeds/SEED-116-agent-shell-independent-commands.md#run-repository-commands-without-interactive-shell-setup)
+**Source review:** [source-only review](source-review.md)
 **Identity:** SEED-116#run-repository-commands-without-interactive-shell-setup
 
 ## Goal and scope
@@ -90,7 +91,7 @@ these measurements do not describe a remote runner.
 ### 1. Launch repository commands with the required Nix features
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: The feature-enforcing real-runner Bach cases pass for population and
 reuse; the real wrapper exits 0 with disabled host features and no enabling
 export. Existing forwarding/direct-execution cases stay green.
@@ -175,3 +176,15 @@ case accumulation. The credential variations share Spring's existing default
 resolution rule. No remaining scope, proof-route, decisive-premise, ADR or
 slice-specific concern was found in this review. No pre-Take human decision
 or early probe is required.
+
+## Execution context
+
+Established story-branch execution in `/Users/terryyin/git/doughnut/.worktrees/run-donut-s-repository-commands-without-interact`, branch `codex/run-donut-s-repository-commands-without-interact`; origin trunk `main`, repository `nerds-odd-e/doughnut`. Publisher `dashboard-territory.local-doughnut`; agent Nana-chan. Starting revision `ea63f143f9ae3893eaa8674910b2924a7842577d`; accepted claim and first previously published base `de3ec5af37e0a03538c17daa410b10af5252073c`. Workspace reused from established start. Replanning authority retained under ordinary planned execution.
+
+Checkout setup: `CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh` passed frozen locked dependency setup; `CURSOR_DEV=true nix develop -c node --version` passed (v26.13.0). No installation copied from another checkout. Selective formatter `./scripts/run.sh pnpm format:changed`; installed hook delegates check-only lint; use `pnpm_config_verify_deps_before_run=false` at delivery to preserve the current checked-in dependency-verification contract with the older installed hook.
+
+CI: GitHub Actions `ci.yml`, verified active workflow 5208694, name `donut CI`; push-triggered on story branches. Observer coordinator `nana-seed116`, directory `/tmp/dough-ci-501/watch-PMpxGh`, PID 30043, session 58202, yielded cell `g1098:9`, checkout as above, target `codex/run-donut-s-repository-commands-without-interact`. The initial trunk claim is unobserved by this story-branch observer.
+
+## Accepted execution evidence
+
+Slice 1 proof and consumer dispositions: [execution evidence](execution-evidence.md#slice-1-required-nix-features), [consumer trace](consumer-trace-nix.md). The six current-runner cases, real disabled-feature cold/reuse and public setup pass. Hook checks pass; profiling clone is compatibility-only evidence. No gaps.

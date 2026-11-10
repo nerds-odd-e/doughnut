@@ -18,6 +18,7 @@ set -e
 if command -v nix >/dev/null 2>&1; then
     # Check if we're currently in a nix shell
     if [ -z "${IN_NIX_SHELL:-}" ]; then
+        nix_develop=(nix develop --extra-experimental-features "nix-command flakes")
         export CURSOR_DEV=true
         root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
         definition=(flake.nix flake.lock)
@@ -32,9 +33,9 @@ if command -v nix >/dev/null 2>&1; then
                 cp "$root/$file" "$state/flake/.$file.$$"
                 mv -f "$state/flake/.$file.$$" "$state/flake/$file"
             done
-            nix develop "path:$state/flake" --no-write-lock-file --profile "$state/profile" -c true >&2
+            "${nix_develop[@]}" "path:$state/flake" --no-write-lock-file --profile "$state/profile" -c true >&2
         fi
-        exec nix develop "$state/profile" --inputs-from "path:$state/flake" --option flake-registry "" -c "$@"
+        exec "${nix_develop[@]}" "$state/profile" --inputs-from "path:$state/flake" --option flake-registry "" -c "$@"
     else
         # Already in a nix shell, run command directly
         exec "$@"

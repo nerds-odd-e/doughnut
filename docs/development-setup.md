@@ -41,6 +41,11 @@ Use [the manual Nix setup](./nix.md) only when the quick start fails.
 With `direnv` configured, entering the repository loads Nix automatically.
 Otherwise run `nix develop`.
 
+For commands from a non-interactive shell, use `./scripts/run.sh <command>`.
+The runner enables its required Nix features during environment preparation
+and cached launches. For example, prepare a fresh worktree with
+`./scripts/run.sh bash scripts/worktree_setup.sh`.
+
 ### Persistent Development (manual feedback)
 
 From the **primary checkout** (configured or unconfigured):
