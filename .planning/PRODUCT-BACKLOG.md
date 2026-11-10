@@ -9,7 +9,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Publish large notebooks without losing history](seeds/SEED-121-publish-large-notebooks.md#publish-large-notebooks-without-losing-history) — SEED-121#publish-large-notebooks-without-losing-history ([plan](slice-plans/088-publish-large-notebooks-without-losing-history/PLAN.md))
-- [Run Donut's repository commands without interactive-shell setup](seeds/SEED-116-agent-shell-independent-commands.md#run-repository-commands-without-interactive-shell-setup) — SEED-116#run-repository-commands-without-interactive-shell-setup ([plan](slice-plans/091-run-repository-commands-without-shell-setup/PLAN.md))
 
 ## Backlog list
 
