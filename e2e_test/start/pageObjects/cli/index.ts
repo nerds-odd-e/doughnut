@@ -6,6 +6,8 @@ import { useNotebook } from './notebookInteractiveCliSession'
 import { notebookClone } from './notebookClone'
 import { notebookCloneCheckout } from './notebookCloneCheckout'
 import { notebookLfs } from './notebookLfs'
+import { notebookRecovery } from './notebookRecovery'
+import { notebookLargePublication } from './notebookLargePublication'
 import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 /**
@@ -25,6 +27,8 @@ export const cli = {
   notebookClone,
   notebookCloneCheckout,
   notebookLfs,
+  notebookRecovery,
+  notebookLargePublication,
   installation,
   backend,
 }

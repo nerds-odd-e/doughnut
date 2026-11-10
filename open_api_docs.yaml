@@ -1164,6 +1164,31 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/git-recovery:
+    post:
+      tags:
+      - notebook-controller
+      summary: Preserve explicitly reviewed live notebook edits
+      operationId: recoverNotebookGit
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Review"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/notebooks/{notebook}/git-bundle:
     get:
       tags:
@@ -4919,6 +4944,13 @@ components:
           description: Must be true to bulk-purge fully empty folder trees
       required:
       - removeEmptyFolders
+    Review:
+      type: object
+      properties:
+        acceptedHead:
+          type: string
+        liveTree:
+          type: string
     FolderCreationRequest:
       type: object
       description: "Create a folder under notebook root, nested under an explicit\

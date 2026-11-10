@@ -1,7 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
-import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -10,7 +9,6 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.NoteFactory;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
-import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +23,7 @@ import org.springframework.stereotype.Service;
 class NotebookGitProposalNoteAddition {
 
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
-  private final CanonicalDonutOrigin canonicalDonutOrigin;
+  private final NotebookGitNoteDocuments noteDocuments;
   private final EntityPersister entityPersister;
   private final NotebookGitProposalFilenameTitle filenameTitle;
   private final NoteFactory noteFactory;
@@ -33,13 +31,13 @@ class NotebookGitProposalNoteAddition {
 
   NotebookGitProposalNoteAddition(
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
-      CanonicalDonutOrigin canonicalDonutOrigin,
+      NotebookGitNoteDocuments noteDocuments,
       EntityPersister entityPersister,
       NotebookGitProposalFilenameTitle filenameTitle,
       NoteFactory noteFactory,
       NotebookGitProjection projection) {
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
-    this.canonicalDonutOrigin = canonicalDonutOrigin;
+    this.noteDocuments = noteDocuments;
     this.entityPersister = entityPersister;
     this.filenameTitle = filenameTitle;
     this.noteFactory = noteFactory;
@@ -81,7 +79,7 @@ class NotebookGitProposalNoteAddition {
       String path,
       Timestamp publishedAt,
       Folder destinationFolder) {
-    AuthoredNoteDocument document = readValidatedDocument(proposal, path);
+    AuthoredNoteDocument document = noteDocuments.readValidatedDocument(proposal, path);
     String title = filenameTitle.requireValid(path);
     Note addedNote;
     try {
@@ -116,17 +114,5 @@ class NotebookGitProposalNoteAddition {
     return destinationFolderId == null
         ? null
         : entityPersister.find(Folder.class, destinationFolderId);
-  }
-
-  AuthoredNoteDocument readValidatedDocument(
-      NotebookGitProposalImporter.ImportedProposal proposal, String path) {
-    String content =
-        NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), path);
-    try {
-      AuthoredNoteContent.assertValidForSave(content);
-    } catch (ApiException exception) {
-      throw exception.withContext("Invalid authored property at path \"" + path + "\"");
-    }
-    return AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin);
   }
 }

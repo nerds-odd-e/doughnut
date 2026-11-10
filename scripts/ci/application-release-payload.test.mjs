@@ -18,7 +18,6 @@ function makePayload(t) {
   const files = {
     backend: join(root, 'backend/donut-0.0.1-SNAPSHOT.jar'),
     frontend: join(root, 'frontend/index.html'),
-    cli: join(root, 'cli/donut-cli.bundle.mjs'),
   }
   for (const [name, path] of Object.entries(files)) {
     mkdirSync(join(root, name), { recursive: true })
@@ -32,7 +31,6 @@ function makePayload(t) {
       return runPayloadAdmission({
         backend: files.backend,
         frontend: join(root, 'frontend'),
-        cli: files.cli,
         publicationTrace: join(root, 'production-writes'),
       })
     },
@@ -45,7 +43,7 @@ test('complete selected payload permits the publication boundary', (t) => {
   assert.equal(result.publicationReached, true)
 })
 
-for (const component of ['backend', 'frontend', 'cli']) {
+for (const component of ['backend', 'frontend']) {
   for (const invalid of ['missing', 'empty', 'directory']) {
     test(`${invalid} ${component} stops before any production write`, (t) => {
       const payload = makePayload(t)
@@ -89,18 +87,13 @@ test('all admitted-run downloads and preflight precede the first production step
   )
   assert.deepEqual(
     downloads.map((step) => step.with.path),
-    [
-      'release-artifacts/backend',
-      'release-artifacts/frontend',
-      'release-artifacts/cli',
-    ]
+    ['release-artifacts/backend', 'release-artifacts/frontend']
   )
   assert.deepEqual(
     downloads.map((step) => step.with.name),
     [
       '${{ env.ARTIFACT }}-${{ env.VERSION }}.jar',
       '${{ env.FRONTEND_DIST_ARTIFACT }}',
-      '${{ env.CLI_DIST_ARTIFACT }}',
     ]
   )
   const preflight = steps.findIndex(
@@ -120,8 +113,4 @@ test('all admitted-run downloads and preflight precede the first production step
     'release-artifacts/backend/donut-0.0.1-SNAPSHOT.jar'
   )
   assert.equal(env.FRONTEND_STATIC_DIR, 'release-artifacts/frontend')
-  assert.equal(
-    env.CLI_BUNDLE_SOURCE,
-    'release-artifacts/cli/donut-cli.bundle.mjs'
-  )
 })

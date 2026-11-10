@@ -168,6 +168,16 @@ requires establishing the cause: genuine live-only edits need explicit owner rev
 and a validated forward commit; encoding/projection defects are corrected against
 accepted content.
 
+After reviewing genuine live edits, run
+`donut notebook recover <directory> <accepted-head> <live-tree>` with the exact
+accepted head and live tree reported by diagnosis. Recovery rechecks both under
+the notebook lock, validates existing file/upload policies and sound identity
+correspondence, and appends one commit with that accepted parent and exact live
+tree. It retains existing Note/Folder and learning associations. A stale review
+requires a fresh diagnosis and review. Recovery leaves local commits, staged,
+dirty and untracked work unchanged. When the checkout is ready, Pull/rebase,
+resolve any real conflicts, review the result, then Publish pending work.
+
 Every accepted web editing batch that changes Portable content appends exactly
 one commit; never amend or coalesce accepted or advertised commits. V1 authors
 directly on `main`. For a future project binding, repository policy determines

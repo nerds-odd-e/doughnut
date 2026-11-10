@@ -24,6 +24,7 @@ import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
 import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
 import com.odde.donut.services.notebookGit.NotebookGitDiagnosis;
 import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
+import com.odde.donut.services.notebookGit.NotebookGitLiveRecovery;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
 import com.odde.donut.services.notebookGit.WebNoteCreationService;
 import com.odde.donut.testability.TestabilitySettings;
@@ -67,6 +68,7 @@ class NotebookController extends NotebookGitHttpSupport {
       NotebookGitProposalPublisher notebookGitProposalPublisher,
       NotebookGitHistoryService notebookGitHistoryService,
       NotebookGitDiagnosis notebookGitDiagnosis,
+      NotebookGitLiveRecovery notebookGitLiveRecovery,
       AcceptedWebChangeService acceptedWebChangeService) {
     super(
         authorizationService,
@@ -74,7 +76,8 @@ class NotebookController extends NotebookGitHttpSupport {
         notebookGitBundleDownloadService,
         notebookGitProposalPublisher,
         notebookGitHistoryService,
-        notebookGitDiagnosis);
+        notebookGitDiagnosis,
+        notebookGitLiveRecovery);
     this.entityPersister = entityPersister;
     this.bazaarService = bazaarService;
     this.notebookService = notebookService;

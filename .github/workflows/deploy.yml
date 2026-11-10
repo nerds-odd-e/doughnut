@@ -12,7 +12,6 @@ env:
   ARTIFACT: "donut"
   VERSION: "0.0.1-SNAPSHOT"
   FRONTEND_DIST_ARTIFACT: frontend-dist
-  CLI_DIST_ARTIFACT: cli-dist
   GCS_BUCKET: "dough-01"
   # Public SPA + CLI only; LB backend bucket must point here (see docs/gcp/prod-frontend-static-lb.md).
   GCS_FRONTEND_BUCKET: "dough-frontend-01"
@@ -91,7 +90,6 @@ jobs:
       RELEASE_CI_RUN_ATTEMPT: ${{ needs.release-admission.outputs.run_attempt }}
       DEPLOY_JAR_PATH: release-artifacts/backend/donut-0.0.1-SNAPSHOT.jar
       FRONTEND_STATIC_DIR: release-artifacts/frontend
-      CLI_BUNDLE_SOURCE: release-artifacts/cli/donut-cli.bundle.mjs
     steps:
       - uses: actions/checkout@v7
         with:
@@ -124,13 +122,6 @@ jobs:
           run-id: ${{ needs.release-admission.outputs.run_id }}
           name: ${{ env.FRONTEND_DIST_ARTIFACT }}
           path: release-artifacts/frontend
-      - name: Download CLI bundle artifact
-        uses: actions/download-artifact@v8
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ needs.release-admission.outputs.run_id }}
-          name: ${{ env.CLI_DIST_ARTIFACT }}
-          path: release-artifacts/cli
       - name: Validate complete application payload
         run: node scripts/ci/application-release-payload.mjs
       - uses: ./.github/gcloud_auth_n_sdk

@@ -72,17 +72,6 @@ for (const [scenario, jobs] of [
       },
     ],
   ],
-  [
-    'CLI-only success',
-    [
-      {
-        id: 502,
-        run_attempt: 2,
-        name: 'GCP deploy (GCS + MIG + health probe)',
-        steps: [{ name: 'Upload CLI bundle', conclusion: 'success' }],
-      },
-    ],
-  ],
   ['whole-workflow success without publication', releaseJobs('skipped')],
   ['unsuccessful publication', releaseJobs('failure')],
 ]) {

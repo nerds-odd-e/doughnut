@@ -1,5 +1,5 @@
 name: "Package application artifacts"
-description: "Build and keep backend, frontend and CLI deployment artifacts"
+description: "Build and keep backend and frontend deployment artifacts"
 inputs:
   java_version:
     description: "JDK version"
@@ -16,9 +16,9 @@ runs:
     - uses: ./.github/setup_nodejs_with_cache
       with:
         node_version: ${{ inputs.node_version }}
-    - name: Build SPA, CLI, and backend jar for deployment
+    - name: Build SPA for deployment
       shell: bash
-      run: pnpm cli:bundle && pnpm frontend:build
+      run: pnpm frontend:build
     - name: Build application jar artifact
       shell: bash
       run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
@@ -30,7 +30,3 @@ runs:
       with:
         name: ${{ env.FRONTEND_DIST_ARTIFACT }}
         path: frontend/dist
-    - uses: actions/upload-artifact@v7
-      with:
-        name: ${{ env.CLI_DIST_ARTIFACT }}
-        path: cli/dist

@@ -2,14 +2,14 @@
 
 Runbook for production static hosting: one browser-facing hostname, HTTPS load balancer path rules, backend bucket (and optional Cloud CDN) for the Vue build, managed instance group (MIG) for Spring Boot.
 
-**Related:** For a qualifying `vMAJOR.MINOR.PATCH` release with successful applicable main CI, the [deploy workflow](../../.github/workflows/deploy.yml) uploads the selected build’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` and the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh), [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh)). `GITHUB_SHA` identifies the tagged release; the build SHA may identify an equivalent ancestor when changes are entirely ignored by CI. The [release runbook](conditional-backend-deploy.md) defines selection and recovery. In [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
+**Related:** For a qualifying `vMAJOR.MINOR.PATCH` release with successful applicable main CI, the [deploy workflow](../../.github/workflows/deploy.yml) uploads the selected build’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh)). `GITHUB_SHA` identifies the tagged release; the build SHA may identify an equivalent ancestor when changes are entirely ignored by CI. The [release runbook](conditional-backend-deploy.md) defines selection and recovery. In [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
 
 ## Release at a glance
 
 | Step | What happens |
 |------|----------------|
-| Green `main` **Package-artifacts** (CI) | Builds SPA, CLI, and fat jar; uploads GitHub Actions artifacts for deploy. |
-| Admitted application tag **Deploy** ([deploy workflow](../../.github/workflows/deploy.yml)) | Downloads CI artifacts; SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET`. Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves the selected release’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
+| Green `main` **Package-artifacts** (CI) | Builds SPA and fat jar; uploads GitHub Actions artifacts for deploy. |
+| Admitted application tag **Deploy** ([deploy workflow](../../.github/workflows/deploy.yml)) | Downloads CI artifacts; SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET`. Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves the selected release’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
 | Backend MIG | Jar upload + rolling replace when the jar hash or startup script hash differs from the record — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
 | Routing edits | Change [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI must pass `pnpm validate:path-routing`. |
 | **Release correction** | Retry an immutable interrupted release when its selected CI/artifacts remain recoverable. Otherwise test a correction/revert on main and issue the next patch version; overlapping tags reconcile the highest pending version. Never move tags. No automatic schema rollback. See the [release runbook](conditional-backend-deploy.md). |
@@ -119,7 +119,7 @@ Minimum to send to the **backend bucket** (with prefix rewrite to `frontend/<ACT
 - `/assets/*` — hashed JS/CSS/media
 - `/` and `/index.html` — SPA entry
 - Any other **real files** present at bucket root for that build (e.g. favicon if present)
-- `/doughnut-cli-latest/*` — CLI install binary at bucket prefix `doughnut-cli-latest/` (CI: [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh); not embedded in the Spring jar)
+- `/doughnut-cli-latest/*` — CLI install binary at bucket prefix `doughnut-cli-latest/` (independent `cli-*` release: [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh); not embedded in the Spring jar)
 
 ---
 
@@ -197,4 +197,4 @@ Confirm: **HTML/JS** responses are from the **expected** build (e.g. unique hash
 
 ## Spring Boot jar (no SPA or CLI inside)
 
-The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** compares the **jar** and committed **startup script** hashes to `deploy/last-successful-deploy.json`. Each admitted application release uploads **frontend** and **CLI** to **`GCS_FRONTEND_BUCKET`**; jars and the deploy record stay on **`GCS_BUCKET`**.
+The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** compares the **jar** and committed **startup script** hashes to `deploy/last-successful-deploy.json`. Each admitted application release uploads **frontend** to **`GCS_FRONTEND_BUCKET`**; independent `cli-*` releases publish the CLI to its `doughnut-cli-latest/` prefix; jars and the deploy record stay on **`GCS_BUCKET`**.

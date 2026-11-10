@@ -11,6 +11,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -36,21 +37,29 @@ class NotebookGitWebContentExtractedNoteDatingControllerTest
     snapshotCurrentPortableTree(notebook);
     testabilitySettings.timeTravelTo(T1);
     textContentController.updateNoteContent(
-        reload(atom), contentDto("---\ntopic: physics\n---\nbody"));
+        reload(atom), contentDto("---\ntype: Note\ntopic: physics\n---\nbody"));
     AcceptedHistory before = acceptedHistory(notebook);
     testabilitySettings.timeTravelTo(T2);
+    String extractedContent = "---\ntype: Note\norigin: lab\n---\nextracted body";
+    String rewrittenContent =
+        "---\ntype: Note\ntopic: physics\nexample of: \"[[Matter]]\"\n---\nbody";
 
     NoteRealm extracted =
         aiController.createExtractedNote(
-            reload(atom),
-            extractionResult(
-                "Electron",
-                "---\norigin: lab\n---\nextracted body",
-                "---\ntopic: physics\nexample of: \"[[Matter]]\"\n---\nbody"));
+            reload(atom), extractionResult("Electron", extractedContent, rewrittenContent));
 
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(before.commits()));
     assertThat(after.tipPaths(), hasItems("Atom.md", "Electron.md"));
+    assertThat(
+        acceptedBytesAt(notebook, "Atom.md"),
+        equalTo(rewrittenContent.getBytes(StandardCharsets.UTF_8)));
+    assertThat(
+        acceptedBytesAt(notebook, "Electron.md"),
+        equalTo(extractedContent.getBytes(StandardCharsets.UTF_8)));
+    var diagnosis = controller.diagnoseNotebookGit(notebook.getId());
+    assertThat(diagnosis.acceptedTree(), equalTo(after.tipTreeId().name()));
+    assertThat(diagnosis.liveTree(), equalTo(after.tipTreeId().name()));
     assertThat(acceptedTipCommitTime(notebook), equalTo(T2.toInstant()));
     assertThat(changedAt(atom.getId(), "example of"), equalTo(T2));
     assertThat(changedAt(extracted.getId(), "origin"), equalTo(T2));

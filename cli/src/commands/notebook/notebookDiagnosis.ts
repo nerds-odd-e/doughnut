@@ -97,4 +97,7 @@ export async function diagnoseNotebookCheckout(
   console.log(
     '\nReview the exact differences with the notebook owner before server recovery. Genuine live edits require an explicitly reviewed forward commit; projection defects require a cause-specific correction. Pull alone cannot repair server projection drift. Your local work is unchanged.'
   )
+  console.log(
+    `After owner review of genuine live edits, run "donut notebook recover ${directory} ${report.acceptedHead} ${report.liveTree}". If either state changes, diagnose and review again.`
+  )
 }

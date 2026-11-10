@@ -517,6 +517,11 @@ export type NotebookHealthFixRequest = {
     removeEmptyFolders: boolean;
 };
 
+export type Review = {
+    acceptedHead?: string;
+    liveTree?: string;
+};
+
 /**
  * Create a folder under notebook root, nested under an explicit parent folder, or nested under the folder of a context note.
  */
@@ -2531,6 +2536,24 @@ export type FixResponses = {
      */
     200: unknown;
 };
+
+export type RecoverNotebookGitData = {
+    body: Review;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/git-recovery';
+};
+
+export type RecoverNotebookGitResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type RecoverNotebookGitResponse = RecoverNotebookGitResponses[keyof RecoverNotebookGitResponses];
 
 export type DownloadNotebookGitBundleData = {
     body?: never;

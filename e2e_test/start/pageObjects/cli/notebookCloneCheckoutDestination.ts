@@ -20,24 +20,6 @@ export type CliNotebookCloneDestinationAlias =
   | 'cliCloneReceiverDestination'
   | 'cliCloneFreshDestination'
 
-function runInstalledOn(
-  destinationAlias: CliNotebookCloneDestinationAlias,
-  subcommand: 'publish' | 'pull',
-  task: 'runInstalledCli' | 'runInstalledCliExpectingRejection'
-): Cypress.Chainable<null> {
-  return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
-    cy.get<string>('@donutPath').then((donutPath) =>
-      cy.get<string>('@cliConfigDir').then((configDir) =>
-        cy.task<null>(task, {
-          donutPath,
-          args: ['notebook', subcommand, checkoutDir],
-          env: { DONUT_CONFIG_DIR: configDir },
-        })
-      )
-    )
-  )
-}
-
 function expectCanonicalTreeAt(
   destinationAlias: CliNotebookCloneDestinationAlias,
   seededEntries: string[]
@@ -252,5 +234,4 @@ export {
   expectSameBlobAt,
   readCheckoutBranchStateAt,
   readCheckoutStateAt,
-  runInstalledOn,
 }

@@ -5,7 +5,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -27,40 +26,34 @@ public class NotebookGitProposalPublisher {
   private final AuthorizationService authorizationService;
   private final NotebookGitProjection projection;
   private final NotebookGitProposalAcceptance proposalAcceptance;
-  private final NotebookGitAcceptedRepositoryStore repositoryStore;
+  private final NotebookGitCandidateAdmission candidateAdmission;
   private final TestabilitySettings testabilitySettings;
   private final NotebookGitProposalFolderRelocation folderRelocation;
   private final NotebookGitProposalDocumentApplication documentApplication;
   private final NotebookGitProposalNoteAddition noteAddition;
   private final NotebookGitProposalOrdinaryNoteApplication ordinaryNoteApplication;
-  private final NotebookAttachmentContent notebookAttachmentContent;
-  private final NotebookGitBookSourceFileProtection bookSourceFileProtection;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
       AuthorizationService authorizationService,
       NotebookGitProjection projection,
       NotebookGitProposalAcceptance proposalAcceptance,
-      NotebookGitAcceptedRepositoryStore repositoryStore,
+      NotebookGitCandidateAdmission candidateAdmission,
       TestabilitySettings testabilitySettings,
       NotebookGitProposalFolderRelocation folderRelocation,
       NotebookGitProposalDocumentApplication documentApplication,
       NotebookGitProposalNoteAddition noteAddition,
-      NotebookGitProposalOrdinaryNoteApplication ordinaryNoteApplication,
-      NotebookAttachmentContent notebookAttachmentContent,
-      NotebookGitBookSourceFileProtection bookSourceFileProtection) {
+      NotebookGitProposalOrdinaryNoteApplication ordinaryNoteApplication) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
     this.proposalAcceptance = proposalAcceptance;
-    this.repositoryStore = repositoryStore;
+    this.candidateAdmission = candidateAdmission;
     this.testabilitySettings = testabilitySettings;
     this.folderRelocation = folderRelocation;
     this.documentApplication = documentApplication;
     this.noteAddition = noteAddition;
     this.ordinaryNoteApplication = ordinaryNoteApplication;
-    this.notebookAttachmentContent = notebookAttachmentContent;
-    this.bookSourceFileProtection = bookSourceFileProtection;
   }
 
   @Transactional(
@@ -94,21 +87,7 @@ public class NotebookGitProposalPublisher {
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
-        NotebookGitProposalTreeShape.inspectRegularFiles(
-            proposal.repository(), acceptedHead, proposal.mainHead());
-    NotebookGitProposalTreeShape.refuseMiscasedMarkdown(files);
-    NotebookGitProposalTreeShape.refuseLeftoverFolderMarkers(files);
-    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(proposal.repository(), files);
-    try (var accepted = repositoryStore.open(binding)) {
-      NotebookGitAttachmentSizeAdmission.admit(
-          proposal.repository(),
-          proposal.mainHead(),
-          accepted.repository(),
-          acceptedHead,
-          notebook.getId(),
-          notebookAttachmentContent);
-    }
-    bookSourceFileProtection.refuseChanging(notebook.getId(), files);
+        candidateAdmission.admit(binding, proposal.repository(), proposal.mainHead());
     projection.requireMatchingAcceptedTree(
         notebook, folders, storedNotes, proposal.repository(), acceptedHead);
     List<NotebookGitProposalTreeShape.ChangedDocument> documents =

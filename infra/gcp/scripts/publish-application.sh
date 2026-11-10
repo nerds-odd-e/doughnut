@@ -41,7 +41,6 @@ record_application_outcome() {
 
 record_application_outcome publishing
 bash "$SCRIPT_DIR/upload-frontend-static-to-gcs.sh"
-bash "$SCRIPT_DIR/upload-cli-binary-to-gcs.sh"
 if git -C "$RELEASE_SOURCE_ROOT" log -1 --format=%B "$GITHUB_SHA" | grep -qE 'force-deployment[[:space:]]*:[[:space:]]*true'; then
 	export FORCE_FULL_DEPLOY=1
 fi

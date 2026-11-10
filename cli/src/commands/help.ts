@@ -5,6 +5,7 @@ import type {
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
 import { notebookDiagnosisDoc } from './notebook/notebookDiagnosis.js'
+import { notebookRecoveryDoc } from './notebook/notebookRecovery.js'
 
 export const helpDoc: CommandDoc = {
   name: '/help',
@@ -32,6 +33,7 @@ export function formatInteractiveHelp(
     versionDoc,
     updateDoc,
     notebookDiagnosisDoc,
+    notebookRecoveryDoc,
   ])
   const slashRows = formatDocRows(interactiveDocs)
   return [

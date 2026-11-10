@@ -26,6 +26,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
   private final AuthorizationService authorizationService;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final NotebookGitProposalNoteAddition noteAddition;
+  private final NotebookGitNoteDocuments noteDocuments;
   private final NotebookGitProposalFilenameTitle filenameTitle;
   private final NoteMotionService noteMotionService;
   private final EntityPersister entityPersister;
@@ -38,6 +39,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
       AuthorizationService authorizationService,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       NotebookGitProposalNoteAddition noteAddition,
+      NotebookGitNoteDocuments noteDocuments,
       NotebookGitProposalFilenameTitle filenameTitle,
       NoteMotionService noteMotionService,
       EntityPersister entityPersister,
@@ -48,6 +50,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
     this.authorizationService = authorizationService;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.noteAddition = noteAddition;
+    this.noteDocuments = noteDocuments;
     this.filenameTitle = filenameTitle;
     this.noteMotionService = noteMotionService;
     this.entityPersister = entityPersister;
@@ -86,7 +89,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
     for (NotebookGitProposalTreeShape.NoteChange noteChange : admitted.noteChanges()) {
       if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document =
-            noteAddition.readValidatedDocument(proposal, noteChange.path());
+            noteDocuments.readValidatedDocument(proposal, noteChange.path());
         Note changedNote = projection.requireOneNoteAtPath(proposedNotes, noteChange.path());
         authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.RENAMED) {
@@ -111,7 +114,7 @@ class NotebookGitProposalOrdinaryNoteApplication {
     entityPersister.save(note);
     if (!noteChange.blobId().equals(noteChange.origin().blobId())) {
       AuthoredNoteDocument document =
-          noteAddition.readValidatedDocument(proposal, noteChange.path());
+          noteDocuments.readValidatedDocument(proposal, noteChange.path());
       authoredNoteDocumentPersistence.persist(note, document, publishedAt);
     }
   }

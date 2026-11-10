@@ -10,8 +10,8 @@ import {
   expectCheckoutFileAt,
   expectCleanAcceptedHeadAt,
   readCheckoutStateAt,
-  runInstalledOn,
 } from './notebookCloneCheckoutDestination'
+import { runInstalledOn } from './notebookCloneCheckoutExecution'
 import { notebookCloneCheckoutFresh } from './notebookCloneCheckoutFresh'
 import { notebookCloneCheckoutObservations } from './notebookCloneCheckoutObservations'
 import { notebookCloneCheckoutRebaseObservations } from './notebookCloneCheckoutRebase'
