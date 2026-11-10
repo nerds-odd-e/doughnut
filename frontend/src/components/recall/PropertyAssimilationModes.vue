@@ -11,7 +11,16 @@
       :data-property-value="row.propertyValue"
       :class="{ 'property-value-frame': isList }"
       :data-property-value-focused="isList && index === focusedItemIndex ? 'true' : undefined"
+      @click="selectRow($event, index)"
     >
+      <button
+        v-if="isList && selectable"
+        type="button"
+        class="property-item-select"
+        :aria-label="`Select ${propertyKey} item ${index + 1}`"
+        :aria-pressed="index === focusedItemIndex"
+        @click="emit('selectItem', index)"
+      />
       <span
         class="text-right text-sm font-medium"
         data-test="mode-label-UNDERSTANDING"
@@ -99,6 +108,7 @@ const props = defineProps<{
   propertyValues?: readonly string[]
   authoredPropertyValues?: readonly string[]
   focusedItemIndex?: number
+  selectable?: boolean
   showLearningControls?: boolean
   loading?: boolean
   disabled?: boolean
@@ -108,6 +118,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  selectItem: [index: number]
   assimilate: [request: AssimilateEvent]
   skip: []
   returnToSequence: []
@@ -119,6 +130,16 @@ const isList = computed(
     props.authoredPropertyValues !== undefined ||
     props.propertyValues !== undefined
 )
+
+function selectRow(event: MouseEvent, index: number) {
+  if (
+    props.selectable &&
+    isList.value &&
+    !(event.target as HTMLElement).closest("a, button")
+  ) {
+    emit("selectItem", index)
+  }
+}
 
 function unitRow(
   propertyValue?: string,
@@ -166,3 +187,18 @@ const rows = computed(() => {
 </script>
 
 <style scoped lang="scss" src="./PropertyAssimilationModes.scss"></style>
+
+<style scoped lang="scss">
+@media (pointer: coarse) {
+  .list-assimilation-modes > div,
+  .list-assimilation-modes > div > div {
+    min-height: 2.75rem;
+  }
+
+  .list-assimilation-modes :deep([data-test="assimilation-status-UNDERSTANDING"]) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}
+</style>

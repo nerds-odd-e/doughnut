@@ -4,6 +4,8 @@
     :property-key="row.key"
     :authored-property-values="row.value.items"
     :focused-item-index="focusedItemIndex(row.key, row.value.items)"
+    :selectable="canSelectPropertyItems"
+    @select-item="selectPropertyItem(row.key, row.value.items, $event)"
     :wiki-links="wikiLinks"
     :last-saved-markdown="lastSavedMarkdown"
   />
@@ -64,7 +66,12 @@ import {
 } from "@/utils/noteContentFrontmatter"
 import { isListPropertyValue } from "@/utils/noteProperties"
 
-const { isFocusedProperty, focusedItemIndex } = useFocusedNoteProperty()
+const {
+  isFocusedProperty,
+  focusedItemIndex,
+  canSelectPropertyItems,
+  selectPropertyItem,
+} = useFocusedNoteProperty()
 
 defineProps<{
   row: PropertyRow

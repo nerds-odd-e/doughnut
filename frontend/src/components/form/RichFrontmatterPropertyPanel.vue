@@ -41,6 +41,8 @@
       :property-values="assimilableListValues(propertyValue)"
       :authored-property-values="authoredListValues"
       :focused-item-index="focusedItemIndex(propertyKey, authoredListValues ?? [])"
+      :selectable="canSelectPropertyItems"
+      @select-item="selectPropertyItem(propertyKey, authoredListValues!, $event)"
       :show-learning-controls="hasSavedNote"
       :loading="hasSavedNote && !noteInfoLoaded"
       :disabled="assimilatingPropertyKey === propertyKey"
@@ -103,7 +105,8 @@ const {
 } = useInjectedMemoryTrackerActions(toRef(() => props.noteId ?? 0))
 
 const router = useRouter()
-const { focusedItemIndex } = useFocusedNoteProperty()
+const { focusedItemIndex, canSelectPropertyItems, selectPropertyItem } =
+  useFocusedNoteProperty()
 const noteStore = useNoteStore()
 
 const reifyReasonId = useId()

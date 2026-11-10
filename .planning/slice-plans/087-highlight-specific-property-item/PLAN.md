@@ -150,7 +150,7 @@ record every shard's terminal verdict, never repeat an unchanged failing run.
 
 ### 4. Select a list item while reading or operating its row
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Open chevron → first authored item destination; choose another row by
 background or keyboard → that row's location/highlight replaces it. Existing
 value links and learning controls still execute their own actions.

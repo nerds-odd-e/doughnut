@@ -1,5 +1,6 @@
 import {
   propertyItemIndex,
+  propertyItemFocusAt,
   type PropertyItemFocus,
 } from "@/utils/noteProperties"
 import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
@@ -7,6 +8,7 @@ import {
   locationKeepingQuery,
   notePropertyKeyFromRoute,
   notePropertyItemFromRoute,
+  notePropertyItemLocation,
   notePropertyLocation,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
@@ -83,12 +85,34 @@ export function useFocusedNoteProperty(
   const isFocusedProperty = (propertyKey: string) =>
     focusedPropertyKey.value === propertyKey
 
-  const togglePropertyPanel = (propertyKey: string) => {
+  const selectPropertyItem = (
+    propertyKey: string,
+    items: readonly string[],
+    index: number
+  ) =>
+    router.replace(
+      locationKeepingQuery(
+        route,
+        notePropertyItemLocation(
+          Number(noteRouteFamilyNoteId(route)),
+          propertyKey,
+          propertyItemFocusAt(items, index)
+        )
+      )
+    )
+
+  const togglePropertyPanel = (
+    propertyKey: string,
+    items?: readonly string[]
+  ) => {
     const closing = isFocusedProperty(propertyKey)
     const noteId = noteRouteFamilyNoteId(route)
     if (noteId === undefined) {
       offNoteRoutePropertyKey.value = closing ? undefined : propertyKey
       return
+    }
+    if (!closing && items?.length) {
+      return selectPropertyItem(propertyKey, items, 0)
     }
     return router.replace(
       locationKeepingQuery(
@@ -128,6 +152,12 @@ export function useFocusedNoteProperty(
     { immediate: true, flush: "post" }
   )
 
+  const canSelectPropertyItems = computed(
+    () =>
+      providedPropertyKey === undefined &&
+      noteRouteFamilyNoteId(route) !== undefined
+  )
+
   const focusedItemIndex = (propertyKey: string, items: readonly string[]) => {
     const focus = focusedProperty.value
     return focus?.key === propertyKey && focus.item
@@ -136,6 +166,8 @@ export function useFocusedNoteProperty(
   }
 
   return {
+    canSelectPropertyItems,
+    selectPropertyItem,
     focusedProperty,
     focusedItemIndex,
     isFocusedProperty,

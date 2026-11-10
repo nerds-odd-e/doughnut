@@ -14,7 +14,7 @@
       :read-only="readOnly"
       :set-root-ref="(el) => setPropertyRowRef(row!.key, el)"
       @row-focus="emit('row-focus', idx)"
-      @toggle-panel="togglePropertyPanel(row!.key)"
+      @toggle-panel="togglePropertyPanel(row!.key, row!.value.kind === 'list' ? row!.value.items : undefined)"
       @commit="emit('commit', idx)"
       @remove="emit('remove', idx)"
       @wikidata-dialog-open="emit('wikidata-dialog-open', idx)"
