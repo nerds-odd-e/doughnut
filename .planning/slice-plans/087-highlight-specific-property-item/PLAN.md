@@ -54,20 +54,20 @@ SEED-120 export. Ordinary authoring retains empty lists; final-item minus delete
 | Final promise | Owning slice | Observable proof |
 | --- | --- | --- |
 | Scalar/specialized/read-only/context value focus and retained controls | 1 | Mounted editor, complete note and just-review context; value-frame geometry/tint and real controls |
-| Exact URL, reload, duplicates, reorder, stale item, authored key, query, shared note chrome | 2 | Route round-trip plus mounted page and real inbound/reload E2E |
-| Chevron first item; row/background and keyboard selection; shared focus for consumers | 3 | Mounted editor actions change route and selected value; complete authored rows remain usable |
-| Value links and learning actions retain their destination; narrow/touch controls | 3 | Real browser click/keyboard/geometry tests including tracker-loading state |
-| Assimilation's exact value opens first matching occurrence | 4 | Production-router assimilation boundary and notebook workspace continuation |
-| Warn/cancel preserves content/history/focus; confirm removes exact item/history and preserves distinct siblings | 5 | Mounted note save boundary plus real persisted reload/tracker E2E |
-| Selected removal clears focus; other removal preserves selected occurrence | 5 | Mounted editor route/content, including earlier equal occurrence removal |
-| Final removal deletes entry and its key's history, then goes to note | 6 | Mounted note save boundary and real persisted final-entry save/reload journey |
+| Exact URL, reload, duplicates, reorder, stale item, authored key, query, shared note chrome | 3 | Route round-trip plus mounted page and real inbound/reload E2E |
+| Chevron first item; row/background and keyboard selection; shared focus for consumers | 4 | Mounted editor actions change route and selected value; complete authored rows remain usable |
+| Value links and learning actions retain their destination; narrow/touch controls | 4 | Real browser click/keyboard/geometry tests including tracker-loading state |
+| Assimilation's exact value opens first matching occurrence | 5 | Production-router assimilation boundary and notebook workspace continuation |
+| Warn/cancel preserves content/history/focus; confirm removes exact item/history and preserves distinct siblings | 6 | Mounted note save boundary plus real persisted reload/tracker E2E |
+| Selected removal clears focus; other removal preserves selected occurrence | 6 | Mounted editor route/content, including earlier equal occurrence removal |
+| Final removal deletes entry and its key's history, then goes to note | 7 | Mounted note save boundary and real persisted final-entry save/reload journey |
 
 ## Premises and observations
 
 [Dated preparation observations and decisive premises](source-review.md#premises-and-observations)
-are retained verbatim in the acceptance evidence. Before slice 2 edits, run the
-bounded existing `note_property.feature` probe as specified there; failure stops
-dependent route/E2E work until diagnosis/replanning.
+are retained verbatim in the acceptance evidence. The bounded existing
+`note_property.feature` probe passed before the parked URL implementation; reuse
+that matching observation before restoring Behavior 3.
 
 ## Consumer trace and structural seams
 
@@ -97,8 +97,8 @@ helpers. Preserve scalar remove/reify/edit and replace focus proof at the value 
 ## Ordered slices
 
 Accepted interim behavior: list chevrons can open key-only/no-selection until
-slice 3, and assimilation can open key-only until slice 4. Slice 5 can save an
-emptied list as `[]`; slice 6 replaces that with final-entry deletion. These
+slice 4, and assimilation can open key-only until slice 5. Slice 6 can save an
+emptied list as `[]`; slice 7 replaces that with final-entry deletion. These
 states keep ordinary authoring usable and add no rejection or disabled action.
 
 ### 1. Focus the value area consistently
@@ -114,36 +114,54 @@ affected baseline; replace old presentation proof with these observables.
 Sizing: about 5 minutes including checks/cleanup for one presentation rule;
 no new scalar rendering or editing model.
 
-### 2. Return to an exact list occurrence from its URL
+### 2. Establish exact occurrence identity
+Type: Structure
+Status: planned
+Internal change: Add the shared exact-text/one-based-occurrence type and pure
+index/selector conversion in the existing property-value owner. Preserve all
+external rendering, routes and editing behavior; register no item URL yet.
+Enables immediately following Behavior 3, which consumes this single identity.
+Proof: Stable domain algorithm examples cover ordered distinct values, duplicate
+occurrences, blank/exact whitespace text and an unresolved selector; existing
+scalar property-location proof and both typechecks preserve external behavior.
+Sizing: about 3–5 minutes using the parked implementation's compatible utility;
+no routing, rendering, new selection state or generic identity framework.
+
+### 3. Return to an exact list occurrence from its URL
 Type: Behavior
 Status: planned
 Behavior: Open/reload a named item URL → expand and highlight exact text plus
 occurrence; stale selector → explicit unresolved feedback with readable note.
-Run the bounded early probe first. Extend route metadata and component mapping,
+Reuse the passed bounded early probe. Extend route metadata and component mapping,
 named helpers, focus/follow-location parsing, item-row frame and note-family
 classifier together. Preserve query/chrome, exact authored key and rename.
-Expose the same resolved item focus for later consumers. Value changes/reorder
+Treat a list changed to scalar as an unresolved item without selecting its new
+value. Expose the same resolved item focus for later consumers. Value changes/reorder
 must exercise one text/occurrence rule, not another selector representation.
 Proof: Named round-trip and mounted page examples for reload-equivalent fresh
 mount, distinct reorder, duplicate occurrence, stale text and preserved query;
-real inbound URL/reload scenario in existing `note_property.feature`.
-Sizing: 5–8 minutes plus isolated stack external wait; the coherent URL-to-row
-journey stays together. The probe's startup wait is the stated timing exception.
+real inbound URL/reload scenario in existing `note_property.feature`. G1/G2
+and the failed broad-run proof are owned here; final typechecks must pass.
+Sizing: about 5 active minutes restoring compatible parked work and correcting
+one scalar-replacement focus predicate. Reuse matching focused proof; rerun
+invalidated observations. Check/stack waits remain exceptions. Recover broad
+proof through the existing CI GC reporter and bounded shards with retries off;
+record every shard's terminal verdict, never repeat an unchanged failing run.
 
-### 3. Select a list item while reading or operating its row
+### 4. Select a list item while reading or operating its row
 Type: Behavior
 Status: planned
 Behavior: Open chevron → first authored item destination; choose another row by
 background or keyboard → that row's location/highlight replaces it. Existing
 value links and learning controls still execute their own actions.
-Use the slice 2 focus/route rule. Empty/property-only destinations represent
+Use the slice 3 focus/route rule. Empty/property-only destinations represent
 expanded lists without selection. Keep all authored occurrences available,
 including rows ineligible for assimilation; retain existing off-note expansion.
 Proof: Mounted editor interactions, duplicate/blank/long representative data,
 real link/tracker clicks and narrow/coarse-pointer geometry/loading stability.
 Sizing: about 5 minutes; no separate local selection model on note routes.
 
-### 4. Continue assimilation at the addressed value
+### 5. Continue assimilation at the addressed value
 Type: Behavior
 Status: planned
 Behavior: Next assimilation unit includes key/value → push its item destination
@@ -153,7 +171,7 @@ Proof: Extend `useGoToNextAssimilation.spec.ts` using the production router and
 the notebook workspace continuation; exercise the actual returned value.
 Sizing: about 5 minutes including the focused existing suite.
 
-### 5. Remove an occurrence with informed history deletion
+### 6. Remove an occurrence with informed history deletion
 Type: Behavior
 Status: planned
 Behavior: Minus with matching history → warning/cancel; cancel preserves the
@@ -172,65 +190,34 @@ Markdown. Cover shared duplicate history, earlier-equal-row removal and scalar
 removal. Real E2E cancels/confirms assimilated-item removal, reloads persisted
 values and observes surviving sibling learning data.
 Sizing: 5–8 minutes including focused proof/cleanup; retain warning and mutation
-together. Final-entry policy and its separate proof loop move to slice 6.
+together. Final-entry policy and its separate proof loop move to slice 7.
 
-### 6. Remove the final item as a property entry
+### 7. Remove the final item as a property entry
 Type: Behavior
 Status: planned
 Behavior: Final-item minus → warn/cancel using the existing whole-key history
 guard; confirm removes the key and its matching history, then replaces location
-with the whole note. Reuse slice 5's operation, changing the empty-result rule;
+with the whole note. Reuse slice 6's operation, changing the empty-result rule;
 ordinary value editing still supports authored empty lists.
 Proof: Mounted save/route boundary distinguishes Cancel from confirmed key
 removal, including existing history for the key. Real E2E removes the final
 item, reloads the saved note, and observes whole-note navigation and the retained
-other properties. This replaces slice 5's interim empty-list result.
+other properties. This replaces slice 6's interim empty-list result.
 Sizing: about 5 minutes plus focused-check/stack wait; existing whole-key guard
 and named note navigation supply the special final-entry rule.
 
 ## Commands and acceptance
-
-```sh
-# Retained parser/editor observation (20 tests)
-./scripts/run.sh pnpm frontend:test tests/utils/noteContentFrontmatterList.spec.ts tests/components/form/RichMarkdownEditor.propertyValueDialog.spec.ts
-# Retained affected baseline (41 tests)
-./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/components/form/RichMarkdownEditor.propertyMemoryTracking.spec.ts tests/components/form/RichMarkdownEditor.listPropertyLayout.spec.ts tests/components/form/RichMarkdownEditor.listPropertyMemoryTracking.spec.ts tests/composables/usePropertyMemoryTrackerGuard.listProperty.spec.ts tests/notes/NoteTextContent.properties.spec.ts tests/pages/RecallPage.justReview.spec.ts
-# Retained scratch route observation (28 tests; probe file was deleted)
-./scripts/run.sh pnpm frontend:test tests/routes/seed119ItemUrlProbe.spec.ts tests/routes/noteRouteFamily.spec.ts tests/composables/useGoToNextAssimilation.spec.ts
-# Execution frontend acceptance and required typechecks
-./scripts/run.sh pnpm frontend:test
-./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit
-./scripts/run.sh pnpm -C frontend exec tsc --noEmit
-# Execution integrated proof; private OpenAI mock is runner-owned
-./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_topology/note_property.feature,e2e_test/features/assimilation/assimilation_property_order.feature,e2e_test/features/recall/property_memory_tracker.feature
-```
-
-Assess execution-host load/memory and owned competing work before starting the
-stack; run these three affected features together, not the entire E2E suite.
-No live OpenAI call is required. If adding/deleting a component, regenerate
-`frontend/components.d.ts` with `pnpm -C frontend exec vite build --emptyOutDir`.
-No API regeneration is needed for the selected existing-endpoint approach.
-
-Acceptance reading, separately from tests: collect deleted names/selectors,
-sweep product code, tests, fixtures, CSS, docs, CLI, MCP and generated consumers
-for orphaned dependencies, and inspect property/value/action render ownership.
-Classify still-used focus/expansion attributes separately from retired visual
-responsibility. Record searches/results once; add no permanent absence test.
-
-Delivery follows AGENTS.md: Jidoka → fresh refactor agent → API generation if
-needed → coordinator `./scripts/run.sh pnpm format:changed` once → evidence →
-commit/check-only hook → push. Slices target ~5 minutes including proof/cleanup;
-scrutinize overruns and decompose before >10 minutes except stated check/wait
-exceptions. Retrospective/wrap-up follow authorized execution.
+[Required commands and acceptance readings](source-review.md#commands-and-acceptance)
+remain the proof/delivery contract; use their focused forms for each slice.
 
 ## Concern review
-
-Refinement ran: retain 1–4; split original 5 into occurrence removal (5) and
-final-entry policy (6), isolating its proof loop while keeping warning/mutation
-together. Six Behavior slices share one model; no consolidation/Escalate/resplit.
-Only focused-check/external-stack waits justify >10 minutes. Slice 2's early
-probe bounds its state-changing prerequisite; no other blocking concern remains.
-The coordinator records readiness; this plan grants no Take/execution authority.
+Original slice 2 overran at 10–12 active minutes plus check/stack waits; its
+owned product changes are parked with hashes in the acceptance evidence.
+Split hidden exact-occurrence preparation into Structure 2 immediately before
+Behavior 3. Retain completed 1 and later selection/assimilation/removal outcomes
+as 4–7. Seven slices use one exact-text/occurrence rule; no source scope, PFE,
+ADR or North Star decision changes. Implementation and proof already completed
+remain reusable only at matching boundaries. Ready after reassessment.
 
 ## Execution context
 
@@ -242,3 +229,22 @@ The coordinator records readiness; this plan grants no Take/execution authority.
 - Observer: GitHub Actions selector `ci.yml`, verified active workflow `donut CI`, push covers all branches. Coordinator `nao-seed119`, directory `/tmp/dough-ci-501/watch-HpTDpK`, PID 69392, session 83266, yielded cell `g824:9`; runtime and launch rooted in this checkout. Target is the remote execution branch.
 - Replanning remains authorized by the selected planned workflow; target about 5 minutes, hard scrutiny beyond 10 active minutes, with focused-check and external-stack waits excepted as stated above.
 - Delivery hook is the common Git `pre-commit`, invoking check-only `./scripts/run.sh pnpm lint:changed`; coordinator fresh delivery owns selective formatting once. No API generation for existing endpoints; component inventory regeneration only on component addition/deletion.
+
+## Story obligations
+
+### G1. Resolved list item marker (first reported in original slice 2)
+Reported: slice 2 — "Coordinator inspection found the scalar action row index -1 matched unresolved selectedItemIndex -1, marking a learning action as a focused item."
+Story clause: "Scalar and list values share the presentation responsibility while retaining their different editing and learning semantics."
+Disposition: receiving slice 3
+Commitment: 73
+### G2. Stale list destination after scalar replacement (first reported in original slice 2)
+Reported: slice 2 — "Slice 2 inspection found that replacing an addressed list property with a scalar shows unresolved-item feedback but still highlights the scalar through property-level focus."
+Story clause: "It does not substitute another value."
+Disposition: receiving slice 3
+Commitment: 26
+
+### G3. Complete URL journey proof (first reported in original slice 2)
+Reported: slice 2 — "The full frontend run failed on a closed browser connection after 1664 passing tests; final typechecks and post-change inbound/reload E2E remain pending."
+Story clause: "Opening or reloading that URL expands the property and highlights that occurrence."
+Disposition: receiving slice 3
+Commitment: 23

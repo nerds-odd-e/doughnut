@@ -15,88 +15,88 @@ afterward by the coordinator; the observation or obligation cells start empty.
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | A learner can focus a particular value within the existing note page, using tint and a leading edge on the selected value row only. | slice 3 | |
-| 2 | The highlight is the only added visible selection cue. | slice 3 | |
-| 3 | Opening a list property’s chevron chooses its first item destination in displayed order: `[walk, run, jog]` initially highlights `walk`. | slice 3 | |
-| 4 | Selecting empty space in another item row moves the highlight and updates the URL: selecting `run` makes its URL current. | slice 3 | |
-| 5 | Keyboard users can select an item. | slice 3 | |
-| 6 | Value links retain their interaction, including opening their referenced note. | slice 3 | |
-| 7 | Assimilation and tracker actions retain their interactions; a tracker action opens its tracker instead of selecting its row. | slice 3 | |
-| 8 | Existing chevrons and property edit controls remain available. | slice 3 | |
+| 1 | A learner can focus a particular value within the existing note page, using tint and a leading edge on the selected value row only. | slice 4 |  |
+| 2 | The highlight is the only added visible selection cue. | slice 4 |  |
+| 3 | Opening a list property’s chevron chooses its first item destination in displayed order: `[walk, run, jog]` initially highlights `walk`. | slice 4 |  |
+| 4 | Selecting empty space in another item row moves the highlight and updates the URL: selecting `run` makes its URL current. | slice 4 |  |
+| 5 | Keyboard users can select an item. | slice 4 |  |
+| 6 | Value links retain their interaction, including opening their referenced note. | slice 4 |  |
+| 7 | Assimilation and tracker actions retain their interactions; a tracker action opens its tracker instead of selecting its row. | slice 4 |  |
+| 8 | Existing chevrons and property edit controls remain available. | slice 4 |  |
 | 9 | Scalar properties use the same tint and leading edge on their single value area; opening `topic: movement` highlights the area containing `movement`. | slice 1 | observed: frontend/tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts: focused editable value uses expectFocusedPropertyValue computed tint, leading edge and positive geometry |
 | 10 | Scalar values retain their specialized edit controls and learning actions within the highlighted value area. | slice 1 | observed: RichMarkdownEditor.propertyLocation.spec.ts: actual scalar edit-dialog click and specialized image control containment; propertyMemoryTracking.spec.ts: assimilation/skip actions. Original source keeps scalar action panel ordinary. |
 | 11 | Scalar values are not rendered a second time. | slice 1 | observed: RichMarkdownEditor.propertyLocation.spec.ts: one existing scalar value field; production RichFrontmatterPropertyRow retains its single renderer |
 | 12 | Property keys, chevrons, and scalar action panels retain their ordinary presentation. | slice 1 | observed: Reading RichFrontmatterPropertyRow.vue and RichFrontmatterPropertyPanel.vue: value-only class binding, retained ordinary key/chevron/panel markup; full frontend controls/layout suite passes |
 | 13 | Read-only scalar/context rendering applies the same value-focus treatment. | slice 1 | observed: RichMarkdownEditor.propertyLocation.spec.ts read-only value frame; RecallPage.justReview.spec.ts tracked-property context frame; both computed tint/edge and geometry |
-| 14 | Controls remain usable on narrow and touch screens. | slice 3 | |
+| 14 | Controls remain usable on narrow and touch screens. | slice 4 |  |
 | 15 | The interactive mockup supplies the row treatment; the recorded decisions govern deletion and scalar focus. | slice 1 | observed: Reading propertyValueFocus.scss against source UI decision/mockup: tint and leading edge on existing value frame |
-| 16 | An item destination identifies its note, exact authored property key, exact parsed item text, and occurrence among equal values. | slice 2 | |
-| 17 | The named route is `notePropertyItem` within the note route family, with path `/n:noteId/p/:propertyKey/i/:occurrence/:itemText`. | slice 2 | |
-| 18 | Occurrence is positive and one-based. | slice 2 | |
-| 19 | The route segment is `itemText = "~" + exact parsed value`, allowing empty and dot-only values. | slice 2 | |
-| 20 | The route helper owns the single prefix. | slice 2 | |
-| 21 | Callers supply decoded authored keys and values; Vue Router handles serialization. | slice 2 | |
-| 22 | Hrefs are compiled from named locations; an example destination is `/n42/p/example%20of/i/1/~run`. | slice 2 | |
-| 23 | Opening or reloading an item URL expands the property and highlights the addressed occurrence, including the second `run` in `[run, run, walk]`. | slice 2 | |
-| 24 | Distinct values retain their destinations through reordering and unrelated item removal; reordering distinct values leaves a saved `run` URL identifying `run`. | slice 2 | |
-| 25 | Changed or missing text, or a missing occurrence, produces explicit unresolved-item feedback while leaving the readable note and property visible; this includes editing or removing the saved `run` text. | slice 2 | |
-| 26 | An unresolved item destination does not substitute another value. | slice 2 | |
-| 27 | A missing property uses the existing unresolved-property behavior. | slice 2 | |
-| 28 | Identical occurrences have no durable identity through edits among equal rows. | slice 2 | |
-| 29 | Assimilation knows a value and opens its first matching occurrence; receiving `run` as the next assimilation item opens its property with `run` highlighted. | slice 4 | |
-| 30 | The shared item destination and current focus are available to other surfaces. | slice 2 | |
-| 31 | An existing `noteProperty` list destination opens the property without selecting an item. | slice 2 | |
-| 32 | That property destination represents cleared focus after deletion, without parallel local selection state. | slice 2 | |
-| 33 | Expanding an empty list opens the property. | slice 3 | |
+| 16 | An item destination identifies its note, exact authored property key, exact parsed item text, and occurrence among equal values. | slice 3 |  |
+| 17 | The named route is `notePropertyItem` within the note route family, with path `/n:noteId/p/:propertyKey/i/:occurrence/:itemText`. | slice 3 |  |
+| 18 | Occurrence is positive and one-based. | slice 3 |  |
+| 19 | The route segment is `itemText = "~" + exact parsed value`, allowing empty and dot-only values. | slice 3 |  |
+| 20 | The route helper owns the single prefix. | slice 3 |  |
+| 21 | Callers supply decoded authored keys and values; Vue Router handles serialization. | slice 3 |  |
+| 22 | Hrefs are compiled from named locations; an example destination is `/n42/p/example%20of/i/1/~run`. | slice 3 |  |
+| 23 | Opening or reloading an item URL expands the property and highlights the addressed occurrence, including the second `run` in `[run, run, walk]`. |  | G3 |
+| 24 | Distinct values retain their destinations through reordering and unrelated item removal; reordering distinct values leaves a saved `run` URL identifying `run`. | slice 3 |  |
+| 25 | Changed or missing text, or a missing occurrence, produces explicit unresolved-item feedback while leaving the readable note and property visible; this includes editing or removing the saved `run` text. | slice 3 |  |
+| 26 | An unresolved item destination does not substitute another value. |  | G2 |
+| 27 | A missing property uses the existing unresolved-property behavior. | slice 3 |  |
+| 28 | Identical occurrences have no durable identity through edits among equal rows. | slice 3 |  |
+| 29 | Assimilation knows a value and opens its first matching occurrence; receiving `run` as the next assimilation item opens its property with `run` highlighted. | slice 5 |  |
+| 30 | The shared item destination and current focus are available to other surfaces. | slice 3 |  |
+| 31 | An existing `noteProperty` list destination opens the property without selecting an item. | slice 3 |  |
+| 32 | That property destination represents cleared focus after deletion, without parallel local selection state. | slice 3 |  |
+| 33 | Expanding an empty list opens the property. | slice 4 |  |
 | 34 | A scalar `noteProperty` destination highlights its scalar value. | slice 1 | observed: RichMarkdownEditor.propertyLocation.spec.ts mounted noteProperty route highlights existing scalar frame |
-| 35 | Panel and row changes replace history. | slice 2 | |
-| 36 | Inbound links push history. | slice 2 | |
-| 37 | The conversation query survives navigation within the note route family. | slice 2 | |
-| 38 | Rename follows the authored key while preserving a still-resolvable item selector. | slice 2 | |
-| 39 | Each expanded list item has a minus button at the start of its row. | slice 5 | |
-| 40 | The list’s whole-property minus and everything used only by that interface are deleted. | slice 5 | |
-| 41 | Expanded lists offer item removal while ordinary Markdown and value editing remain available. | slice 5 | |
-| 42 | Scalar removal remains available. | slice 5 | |
-| 43 | Item minus removes one displayed occurrence. | slice 5 | |
-| 44 | Removing the final item removes the entire property entry and returns to the whole-note location; `[run]` follows this journey after confirmation when history exists. | slice 6 | |
-| 45 | Removing an item from a surviving property preserves sibling values and their order; removing `run` preserves `walk` and `jog`. | slice 5 | |
-| 46 | Removing the highlighted item clears item focus while leaving the surviving property open. | slice 5 | |
-| 47 | Removing another row retains focus on the surviving selected occurrence and adjusts its occurrence number when necessary; removing the first `run` from `[run, run, walk]` keeps the selected second `run` highlighted as occurrence 1. | slice 5 | |
-| 48 | Before deleting matching learning history, the learner receives a warning and can Cancel. | slice 5 | |
-| 49 | Cancel preserves content, learning history, focus, and URL. | slice 5 | |
-| 50 | Confirm removes the selected content and this learner’s matching trackers through existing tracker-deletion semantics. | slice 5 | |
-| 51 | For an item in a surviving property, history matching uses the exact property key and value. | slice 5 | |
-| 52 | When removing the property entry, history deletion uses the existing whole-property behavior. | slice 6 | |
-| 53 | Equal values share learning history, and the item warning explains that deletion affects any remaining equal occurrence too. | slice 5 | |
-| 54 | Sibling values retain their histories; confirming removal of `run` preserves the histories of `walk` and `jog`. | slice 5 | |
-| 55 | Removal can proceed directly when there is no matching learning history. | slice 5 | |
-| 56 | Existing authorization continues to govern content editing. | slice 5 | |
-| 57 | Existing authorization continues to govern each learner’s tracker deletion. | slice 5 | |
-| 58 | Assimilation eligibility does not limit which authored rows can be focused. | slice 3 | |
-| 59 | Assimilation eligibility does not limit which authored rows can be removed. | slice 5 | |
-| 60 | Ordinary list editing continues to support authored empty lists; final-item minus removes the property entry. | slice 6 | |
-| 61 | This story supplies destinations and the focus contract for SEED-117 recall navigation; recall presentation remains in that story. | slice 2 | |
-| 62 | This story supplies destinations and the focus contract for SEED-120 focused export; export implementation remains in that story. | slice 2 | |
-| 63 | Portable wiki-link item syntax is deferred. | slice 2 | |
-| 64 | Persistent row IDs are deferred. | slice 2 | |
-| 65 | The implementation extends existing route-owned focus and shared named-location/href owners, without a second selection store. | slice 2 | |
-| 66 | Authored list rendering is reused. | slice 2 | |
-| 67 | Ordinary content saving is reused. | slice 5 | |
-| 68 | The tracker guard is extended to distinguish item focus from whole-property removal. | slice 5 | |
-| 69 | Existing tracker DELETE is reused. | slice 5 | |
-| 70 | Existing warning and cancellation UI is reused. | slice 5 | |
-| 71 | History deletion and content saving remain separate existing operations. | slice 5 | |
-| 72 | This story introduces no atomic publication protocol. | slice 5 | |
-| 73 | Scalar and list values share presentation responsibility while retaining their different editing and learning semantics. | slice 2 | |
+| 35 | Panel and row changes replace history. | slice 4 |  |
+| 36 | Inbound links push history. | slice 3 |  |
+| 37 | The conversation query survives navigation within the note route family. | slice 3 |  |
+| 38 | Rename follows the authored key while preserving a still-resolvable item selector. | slice 3 |  |
+| 39 | Each expanded list item has a minus button at the start of its row. | slice 6 |  |
+| 40 | The list’s whole-property minus and everything used only by that interface are deleted. | slice 6 |  |
+| 41 | Expanded lists offer item removal while ordinary Markdown and value editing remain available. | slice 6 |  |
+| 42 | Scalar removal remains available. | slice 6 |  |
+| 43 | Item minus removes one displayed occurrence. | slice 6 |  |
+| 44 | Removing the final item removes the entire property entry and returns to the whole-note location; `[run]` follows this journey after confirmation when history exists. | slice 7 |  |
+| 45 | Removing an item from a surviving property preserves sibling values and their order; removing `run` preserves `walk` and `jog`. | slice 6 |  |
+| 46 | Removing the highlighted item clears item focus while leaving the surviving property open. | slice 6 |  |
+| 47 | Removing another row retains focus on the surviving selected occurrence and adjusts its occurrence number when necessary; removing the first `run` from `[run, run, walk]` keeps the selected second `run` highlighted as occurrence 1. | slice 6 |  |
+| 48 | Before deleting matching learning history, the learner receives a warning and can Cancel. | slice 6 |  |
+| 49 | Cancel preserves content, learning history, focus, and URL. | slice 6 |  |
+| 50 | Confirm removes the selected content and this learner’s matching trackers through existing tracker-deletion semantics. | slice 6 |  |
+| 51 | For an item in a surviving property, history matching uses the exact property key and value. | slice 6 |  |
+| 52 | When removing the property entry, history deletion uses the existing whole-property behavior. | slice 7 |  |
+| 53 | Equal values share learning history, and the item warning explains that deletion affects any remaining equal occurrence too. | slice 6 |  |
+| 54 | Sibling values retain their histories; confirming removal of `run` preserves the histories of `walk` and `jog`. | slice 6 |  |
+| 55 | Removal can proceed directly when there is no matching learning history. | slice 6 |  |
+| 56 | Existing authorization continues to govern content editing. | slice 6 |  |
+| 57 | Existing authorization continues to govern each learner’s tracker deletion. | slice 6 |  |
+| 58 | Assimilation eligibility does not limit which authored rows can be focused. | slice 4 |  |
+| 59 | Assimilation eligibility does not limit which authored rows can be removed. | slice 6 |  |
+| 60 | Ordinary list editing continues to support authored empty lists; final-item minus removes the property entry. | slice 7 |  |
+| 61 | This story supplies destinations and the focus contract for SEED-117 recall navigation; recall presentation remains in that story. | slice 3 |  |
+| 62 | This story supplies destinations and the focus contract for SEED-120 focused export; export implementation remains in that story. | slice 3 |  |
+| 63 | Portable wiki-link item syntax is deferred. | slice 3 |  |
+| 64 | Persistent row IDs are deferred. | slice 3 |  |
+| 65 | The implementation extends existing route-owned focus and shared named-location/href owners, without a second selection store. | slice 3 |  |
+| 66 | Authored list rendering is reused. | slice 3 |  |
+| 67 | Ordinary content saving is reused. | slice 6 |  |
+| 68 | The tracker guard is extended to distinguish item focus from whole-property removal. | slice 6 |  |
+| 69 | Existing tracker DELETE is reused. | slice 6 |  |
+| 70 | Existing warning and cancellation UI is reused. | slice 6 |  |
+| 71 | History deletion and content saving remain separate existing operations. | slice 6 |  |
+| 72 | This story introduces no atomic publication protocol. | slice 6 |  |
+| 73 | Scalar and list values share presentation responsibility while retaining their different editing and learning semantics. |  | G1 |
 | 74 | The whole-property-box highlight implementation and its orphaned dependencies are deleted. | slice 1 | observed: Separate acceptance reading: retired exact wrapper visual expression has zero matches in frontend/backend/cli/e2e_test/packages/docs/.agents; replacement value-frame proof |
 | 75 | Route focus, expansion, scrolling, and missing-property handling remain required responsibilities. | slice 1 | observed: RichMarkdownEditor.propertyLocation.spec.ts route focus, real expanded panel, scrollIntoView signal and decoded missing-key notice; complete note/context continuation |
 | 76 | Affected proof is replaced with proof of value highlighting and retained interactions. | slice 1 | observed: Replaced wrapper-class assertions with expectFocusedPropertyValue; edit-dialog click plus existing real learning/link/reify/specialized suites passed full frontend 399 files/2470 tests |
 | 77 | A separate acceptance sweep is performed. | slice 1 | observed: One-time removal reading from slice1 return: exact retired visual expression zero matches; data-property-focused classified retained expansion/location responsibility; no permanent absence proof |
-| 78 | Removal is limited to obsolete presentation and list whole-property action branches; still-used focus machinery remains. | slice 5 | |
-| 79 | ADR 0001’s authored-property vocabulary and private key/value learning identity remain governing constraints. | slice 5 | |
-| 80 | ADR 0004 keeps Markdown authoritative and Portable references separate from SPA locations. | slice 2 | |
-| 81 | ADR 0005 governs the named route family, authored key, history navigation, and shared chrome. | slice 2 | |
-| 82 | The selected approach requires no ADR change or exception, schema change, or new North Star direction. | slice 2 | |
+| 78 | Removal is limited to obsolete presentation and list whole-property action branches; still-used focus machinery remains. | slice 6 |  |
+| 79 | ADR 0001’s authored-property vocabulary and private key/value learning identity remain governing constraints. | slice 6 |  |
+| 80 | ADR 0004 keeps Markdown authoritative and Portable references separate from SPA locations. | slice 3 |  |
+| 81 | ADR 0005 governs the named route family, authored key, history navigation, and shared chrome. | slice 3 |  |
+| 82 | The selected approach requires no ADR change or exception, schema change, or new North Star direction. | slice 3 |  |
 
 ## Premises and observations
 
@@ -124,7 +124,7 @@ Failure stops dependent E2E and route integration; diagnose/replan before
 extending the implementation. This probe grants no paid/real-service authority.
 
 Commands referred to by the retained observations above remain in the
-[plan's Commands and acceptance](PLAN.md#commands-and-acceptance).
+[retained Commands and acceptance](#commands-and-acceptance).
 
 ## Slice 1 acceptance
 
@@ -136,3 +136,62 @@ Commands referred to by the retained observations above remain in the
 - Implementation used about 6–7 active minutes plus proof wait; same cohesive scalar-frame change, no accumulating correction or scope change. Host prelaunch load 5.96/10.66/10.85 with 65% free memory, no coordinator-owned competing proof; sequence later heavy checks and reassess contention before launches.
 - Independent refactor `/root/refactor1` completed: unified scalar-frame attributes in `RichFrontmatterPropertyRow.vue`, simplified wrapper classes and scoped the shared SCSS with `@use`; row is 242 lines. No components/API generation. Root inspected actual changed bindings and unchanged observation locations; prior full-suite learning/reify/removal/link proof stays applicable.
 - Refactor proof passed 6 files/33 tests: `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/components/form/RichMarkdownEditor.readOnlyProperties.spec.ts tests/components/form/RichMarkdownEditor.propertyEditingLayout.spec.ts tests/components/form/RichMarkdownEditor.propertyTouchTargets.touch.spec.ts tests/notes/NoteTextContent.properties.spec.ts tests/pages/RecallPage.justReview.spec.ts`; both plan typechecks and `scripts/check_diff_whitespace.sh` passed. Reobserved actual scoped tint/edge/geometry, scroll/controls, read-only, draft layout and coarse-pointer targets. Trace `/tmp/seed119-refactor1-consumers.md` disposes every located consumer; no uncovered behavior.
+- Slice 1 delivery accepted `3349feafb0163ea7c0a72d54562b5638a9fa1b52` on `refs/heads/codex/highlight-and-link-to-a-specific-property-item`, suffix base `add1cf80f5ef58b668ea31fe6b1aa6b183b4fd57`; guarded fresh formatting and check-only commit hook passed, tree clean. Managed delivery reused observer `/tmp/dough-ci-501/watch-HpTDpK`. This accepted SHA is the next increment's previously published base.
+
+## Slice 2 prerequisite
+
+- Before implementation edits, `./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_topology/note_property.feature` passed 10/10 scenarios (21s browser time after isolated startup), at this checkout's application origin `http://127.0.0.1:57180`. The existing named property URL journey loaded its note, shared chrome, query, read-only view and rename. Runner-owned isolated services terminated through the normal wrapper. This fulfills the bounded state-changing prerequisite; item lookup/reload remains new slice proof.
+
+## Concern review
+
+Refinement ran: retain 1–4; split original 5 into occurrence removal (5) and
+final-entry policy (6), isolating its proof loop while keeping warning/mutation
+together. Six Behavior slices share one model; no consolidation/Escalate/resplit.
+Only focused-check/external-stack waits justify >10 minutes. Slice 2's early
+probe bounds its state-changing prerequisite; no other blocking concern remains.
+The coordinator records readiness; this plan grants no Take/execution authority.
+
+
+## Oversized URL slice and refinement
+
+- Original slice 2 used about 10–12 active minutes plus explicit check/stack waits. The sizing assumption that selector preparation, routing, rendering and proof would fit one 5–8 minute leaf failed. All 14 tracked and 4 untracked attempt-owned product/test paths were safely parked; no staged/unowned work was changed. Published slice 1 and its proof remain intact.
+- Park: `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/seed119-slice2-parked-3eixqvni/manifest.json`, base `3349feafb0163ea7c0a72d54562b5638a9fa1b52`; adjacent `tracked.patch` and `files/` preserve exact bytes and per-file SHA-256. Restore only each refined slice's subset; keep matching completed proof, never restore over unrelated edits.
+- Completed original-attempt proof: five focused route/editor/page suites passed 41 tests; the item-location file then passed 9 including G1's positive scalar-frame observation. The nullable classifier route-name type mismatch was corrected before parking, but final typechecks are pending. Post-change inbound/reload E2E is pending. Trace `/tmp/seed119-slice2-consumers.md` records consumers and these gaps.
+- Required broad command `./scripts/run.sh pnpm frontend:test --maxWorkers=2` failed after 275.37s, 255/402 files and 1664 passing tests, with `VITEST_BROWSER_CONNECTION_CLOSED` / RPC `createTesters` closure while starting unchanged `ConversationComponent.exclusion.spec.ts`; no assertion failure. This verdict remains incomplete. Source `frontend/orchestratorGcReporter.ts` describes this exact orchestrator accumulation failure class; `frontend/vitest.config.ts` enables its GC mitigation, sequential files and sharding for CI. No affirmative OS crash evidence was found.
+- Bounded proof recovery for Behavior 3: use the existing CI-mode GC reporter, retries explicitly off, and two complete disjoint full-suite shards, sequenced with E2E and current host headroom checks. This changes the known runner conditions rather than repeating the failed run. If the same failure recurs, diagnose/stop; no retry-until-green or waived verdict. Host at 11:53: load 20.18/23.26/18.21, 56% free memory, no coordinator-owned competing proof; unrelated load remains with its owners.
+- Cumulative design review: the exact selector is one domain algorithm, immediately consumed by the route-to-row Behavior. Structure 2 adds no live route/rendering change; Behavior 3 restores compatible work and owns G1/G2 and all URL proof. Later interactions, assimilation, occurrence removal and final-entry policy remain cohesive and unchanged. No story-boundary escalation or resplit threshold is reached; this is the first oversized slice.
+
+## Commands and acceptance
+
+```sh
+# Retained parser/editor observation (20 tests)
+./scripts/run.sh pnpm frontend:test tests/utils/noteContentFrontmatterList.spec.ts tests/components/form/RichMarkdownEditor.propertyValueDialog.spec.ts
+# Retained affected baseline (41 tests)
+./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/components/form/RichMarkdownEditor.propertyMemoryTracking.spec.ts tests/components/form/RichMarkdownEditor.listPropertyLayout.spec.ts tests/components/form/RichMarkdownEditor.listPropertyMemoryTracking.spec.ts tests/composables/usePropertyMemoryTrackerGuard.listProperty.spec.ts tests/notes/NoteTextContent.properties.spec.ts tests/pages/RecallPage.justReview.spec.ts
+# Retained scratch route observation (28 tests; probe file was deleted)
+./scripts/run.sh pnpm frontend:test tests/routes/seed119ItemUrlProbe.spec.ts tests/routes/noteRouteFamily.spec.ts tests/composables/useGoToNextAssimilation.spec.ts
+# Execution frontend acceptance and required typechecks
+./scripts/run.sh pnpm frontend:test
+./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit
+./scripts/run.sh pnpm -C frontend exec tsc --noEmit
+# Execution integrated proof; private OpenAI mock is runner-owned
+./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_topology/note_property.feature,e2e_test/features/assimilation/assimilation_property_order.feature,e2e_test/features/recall/property_memory_tracker.feature
+```
+
+Assess execution-host load/memory and owned competing work before starting the
+stack; run these three affected features together, not the entire E2E suite.
+No live OpenAI call is required. If adding/deleting a component, regenerate
+`frontend/components.d.ts` with `pnpm -C frontend exec vite build --emptyOutDir`.
+No API regeneration is needed for the selected existing-endpoint approach.
+
+Acceptance reading, separately from tests: collect deleted names/selectors,
+sweep product code, tests, fixtures, CSS, docs, CLI, MCP and generated consumers
+for orphaned dependencies, and inspect property/value/action render ownership.
+Classify still-used focus/expansion attributes separately from retired visual
+responsibility. Record searches/results once; add no permanent absence test.
+
+Delivery follows AGENTS.md: Jidoka → fresh refactor agent → API generation if
+needed → coordinator `./scripts/run.sh pnpm format:changed` once → evidence →
+commit/check-only hook → push. Slices target ~5 minutes including proof/cleanup;
+scrutinize overruns and decompose before >10 minutes except stated check/wait
+exceptions. Retrospective/wrap-up follow authorized execution.
