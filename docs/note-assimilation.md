@@ -25,6 +25,12 @@ property locations of [ADR 0005](adrs/0005-web-routes-accepted.md); when none
 remains it shows **No more notes to assimilate**, closes the presentation and
 keeps the note. Assimilating from a property row still advances on its own.
 
+A next unit carrying a list value opens its first exact matching occurrence.
+The next-unit wire contract uses an empty `propertyValue` string for a scalar
+unit and nonempty raw text for a list unit. Scalar units open the property and
+highlight its value area. Authored blank list rows remain independently
+focusable through item locations.
+
 **Skip from sequence…** confirms that only the note's Understanding entry stays
 out of the assimilation sequence until **Return to sequence**; its property
 entries and optional modes are unaffected, so a property of the same note may

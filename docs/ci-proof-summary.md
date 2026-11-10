@@ -11,16 +11,17 @@ file for that attempt. It also shows which CI parts did not report.
 | `frontend/tests` | `Frontend-unit-tests` shards | 2 | case | Vitest JSON report |
 | `frontend/tests` | The same frontend shards | 2 | file | Vitest failed-file results before assertions |
 | `backend/src/test/java` | `Backend-unit-tests` | 1 | case | Gradle JUnit XML under `backend/build/test-results/test/` |
-| `scripts` | Wrapped Node commands in `Lint-N-Backend-Generated-Types-For-Frontend`, in `lint:all` order | 12 | case | JSON lines from `scripts/ci/node-test-report.mjs` |
-| `scripts` | The same Node commands (parts 1–12) and Bash runner in `Other-unit-tests` (part 13) | 13 | file | Node file-load failures and Bash whole-file outcomes |
+| `scripts` | Wrapped Node commands in `Lint-N-Backend-Generated-Types-For-Frontend`, in `lint:all` order | 13 | case | JSON lines from `scripts/ci/node-test-report.mjs` |
+| `scripts` | The same Node commands (parts 1–13) and Bash runner in `Other-unit-tests` (part 14) | 14 | file | Node file-load failures and Bash whole-file outcomes |
 
 `cli/tests` has no entry. It shows no CI proof.
 
 The Lint job's `.github/lint_and_generated_types` action publishes the Node
 parts. Existing concern groups run the isolated-browser mocks, local runtime
-and development health checks. `test:worktree-retirement` runs the five
-retirement files as part 11, and `test:publication-receiver` runs the profiling
-receiver check as part 12. Each Node command publishes both units with the same
+and development health checks. `test:ci-repair-stash` contributes the reviewed
+stash-recovery checks as part 4. `test:worktree-retirement` runs the five
+retirement files as part 12, and `test:publication-receiver` runs the profiling
+receiver check as part 13. Each Node command publishes both units with the same
 part number: actual cases in its case stream and pre-case file-load failures in
 its file stream. Bash contributes one file result per invocation of a test file,
 regardless of the number of internal assertions. Each unit retains its own
@@ -63,7 +64,7 @@ outcomes, file breakdown and recorded times.
 3. The `ci-proof` job runs after the producers, even when they fail. The
    composite action `.github/ci_proof_summary` collects this attempt's
    fragments against `expect` (`e2e_test/features=6:case frontend/tests=2:case frontend/tests=2:file
-   backend/src/test/java=1:case scripts=12:case scripts=13:file`, in `intent.locations` order among proved
+   backend/src/test/java=1:case scripts=13:case scripts=14:file`, in `intent.locations` order among proved
    entries) and uploads the summary, kept for 30 days.
 
 ## Rules

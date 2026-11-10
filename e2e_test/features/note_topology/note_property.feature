@@ -97,3 +97,21 @@ Feature: Note property location
     And I visit property "topic" of note "Vitamins"
     When I remove rich note property "topic" confirming memory tracker change
     Then I should be at note "Vitamins"
+
+  Scenario: A direct item URL survives reloading and addresses an exact duplicate
+    Given I have a note "Activities" under notebook "Property location" with content:
+      """
+      ---
+      example of: [run, run, walk]
+      ---
+
+      Activity notes body.
+      """
+    When I open occurrence 2 of item "run" in property "example of" of note "Activities" from its URL
+    Then occurrence 2 of item "run" in property "example of" should be highlighted
+    And I should see the note tree in the sidebar
+      | note-title |
+      | Activities |
+      | Vitamins   |
+    When I reload the property item URL
+    Then occurrence 2 of item "run" in property "example of" should be highlighted

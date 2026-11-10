@@ -2,6 +2,7 @@ import {
   MemoryTrackerController,
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
+import { expectFocusedPropertyValue } from "../components/form/propertyLocationTestSupport"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
@@ -98,6 +99,9 @@ describe("RecallPage Just review", () => {
 
     const context = wrapper.find('article[aria-label="Note context"]')
     expect(context.text()).toContain("Inciting rebellion.")
+    expectFocusedPropertyValue(
+      context.find('[data-property-key="color"]').element
+    )
     expect(
       (
         context.find('[data-property-key="color"]').element as HTMLElement

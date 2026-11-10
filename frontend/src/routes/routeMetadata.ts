@@ -104,6 +104,12 @@ export const routeMetadata: RouteMetadata[] = [
     meta: { useNoteStorageAccessor: true },
   },
   {
+    path: "/n:noteId(\\d+)/p/:propertyKey/i/:occurrence/:itemText",
+    name: "notePropertyItem",
+    props: noteIdFromRoute,
+    meta: { useNoteStorageAccessor: true },
+  },
+  {
     path: "/circles/:circleId",
     name: "circleShow",
     props: (route: RouteLocation) => ({

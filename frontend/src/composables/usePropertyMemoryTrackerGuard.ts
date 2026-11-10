@@ -7,6 +7,7 @@ import {
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import type {
   PropertyKeyChange,
@@ -30,13 +31,9 @@ export function usePropertyMemoryTrackerGuard(
 ) {
   const { popups } = usePopups()
   const notifyChanged = onMemoryTrackerChanged ?? (() => undefined)
-  let noteInfoCache: NoteRecallInfo | undefined
-  let noteInfoLoadPromise: Promise<NoteRecallInfo | undefined> | undefined
-
-  const invalidateNoteInfoCache = () => {
-    noteInfoCache = undefined
-    noteInfoLoadPromise = undefined
-  }
+  let pendingNoteInfoRead:
+    | { noteId: number; promise: Promise<NoteRecallInfo | undefined> }
+    | undefined
 
   const loadNoteInfo = async (): Promise<NoteRecallInfo | undefined> => {
     const id = noteId()
@@ -44,56 +41,61 @@ export function usePropertyMemoryTrackerGuard(
       return
     }
 
-    if (noteInfoCache !== undefined) {
-      return noteInfoCache
+    let read = pendingNoteInfoRead
+    if (read?.noteId !== id) {
+      const promise = apiCallWithLoading(() =>
+        NoteController.getNoteInfo({ path: { note: id } })
+      ).then(({ data, error }) => (!error ? data : undefined))
+      read = { noteId: id, promise }
+      pendingNoteInfoRead = read
     }
 
-    if (noteInfoLoadPromise) {
-      return noteInfoLoadPromise
+    try {
+      const info = await read.promise
+      return noteId() === id ? info : undefined
+    } finally {
+      if (pendingNoteInfoRead === read) pendingNoteInfoRead = undefined
     }
-
-    noteInfoLoadPromise = (async () => {
-      const { data, error } = await NoteController.getNoteInfo({
-        path: { note: id },
-      })
-      if (!error) {
-        noteInfoCache = data!
-      }
-      return noteInfoCache
-    })()
-
-    return noteInfoLoadPromise
   }
 
   const confirmAndApplyRemoval = async (
-    propertyKey: string
+    propertyKey: string,
+    propertyValue?: string
   ): Promise<boolean> => {
     if (noteId() === undefined) {
       return true
     }
 
-    const trackers = propertyMemoryTrackers(await loadNoteInfo(), propertyKey)
+    const noteInfo = await loadNoteInfo()
+    if (!noteInfo) return false
+    const trackers = propertyMemoryTrackers(noteInfo, propertyKey).filter(
+      (tracker) =>
+        propertyValue === undefined || tracker.propertyValue === propertyValue
+    )
     if (trackers.length === 0) {
       return true
     }
 
     const confirmed = await popups.confirm(
-      `Property "${propertyKey}" has a memory tracker. Deleting it will also delete that tracker. Continue?`
+      propertyValue === undefined
+        ? `Property "${propertyKey}" has a memory tracker. Deleting it will also delete that tracker. Continue?`
+        : `Removing "${propertyValue}" from property "${propertyKey}" will delete its learning history. Equal values share this history; any remaining equal occurrence will lose it too. Continue?`
     )
     if (!confirmed) {
       return false
     }
 
     for (const tracker of trackers) {
-      const { error } = await MemoryTrackerController.delete({
-        path: { memoryTracker: tracker.id },
-      })
+      const { error } = await apiCallWithLoading(() =>
+        MemoryTrackerController.delete({
+          path: { memoryTracker: tracker.id },
+        })
+      )
       if (error) {
         return false
       }
     }
 
-    invalidateNoteInfoCache()
     await notifyChanged()
     return true
   }
@@ -106,7 +108,9 @@ export function usePropertyMemoryTrackerGuard(
       return true
     }
 
-    const trackers = propertyMemoryTrackers(await loadNoteInfo(), fromKey)
+    const noteInfo = await loadNoteInfo()
+    if (!noteInfo) return false
+    const trackers = propertyMemoryTrackers(noteInfo, fromKey)
     if (trackers.length === 0) {
       return true
     }
@@ -131,7 +135,6 @@ export function usePropertyMemoryTrackerGuard(
       }
     }
 
-    invalidateNoteInfoCache()
     await notifyChanged()
     return true
   }
@@ -175,7 +178,6 @@ export function usePropertyMemoryTrackerGuard(
       })
     }
 
-    invalidateNoteInfoCache()
     await notifyChanged()
   }
 

@@ -93,3 +93,51 @@ Feature: Property memory tracker
     Then I should be asked "Which verb is this an example of?"
     When I choose answer "walk"
     Then the note under question should focus on property "example of" with value "[[run]]"
+
+  Scenario: Removing an item confirms history loss and preserves its sibling after reload
+    Given I have a note "Activities" under notebook "Property recall" with content:
+      """
+      ---
+      activity: [walk, run, jog]
+      ---
+      Activity notes.
+      """
+    When I visit note "Activities"
+    And I assimilate the value "walk" of property "activity"
+    And I visit note "Activities"
+    And I assimilate the value "run" of property "activity"
+    And I visit note "Activities"
+    And I request removal of item 2 of property "activity"
+    And I cancel the property item removal
+    Then expanded rich note property "activity" should have these values in order:
+      | walk |
+      | run  |
+      | jog  |
+    And the value "run" of property "activity" should be tracked
+    When I request removal of item 2 of property "activity"
+    And I confirm the property item removal
+    And I reload the current page for note "Activities"
+    Then expanded rich note property "activity" should have these values in order:
+      | walk |
+      | jog  |
+    And the value "walk" of property "activity" should be tracked
+
+  Scenario: Removing the final item removes its property entry and returns to the note
+    Given I have a note "Final activity" under notebook "Property recall" with content:
+      """
+      ---
+      activity: [run]
+      source: local
+      ---
+      Activity notes.
+      """
+    When I visit note "Final activity"
+    And I assimilate the value "run" of property "activity"
+    And I visit note "Final activity"
+    And I request removal of the final item of property "activity"
+    And I confirm the property item removal
+    Then I should be at note "Final activity"
+    When I reload the current page for note "Final activity"
+    Then I should be at note "Final activity"
+    And I should see rich note property "source" with value "local"
+    And I should not see rich note property "activity"

@@ -69,10 +69,12 @@ export async function appliedState({
   const stagedNotRestored = (await differing("--cached", `${oid}^2`)).filter(
     (path) => staged.includes(path),
   );
+  const unmerged = await conflictPaths(checkout, "");
   const applied =
     notApplied.length + stagedNotRestored.length === 0
       ? "all"
-      : notApplied.length === tracked.length + untracked.length
+      : unmerged.length === 0 &&
+          notApplied.length === tracked.length + untracked.length
         ? "none"
         : "partial";
   return { applied, stagedNotRestored };

@@ -2,8 +2,11 @@ import type { RouteLocationNamedRaw } from 'vue-router'
 import { namedLocationHref } from '@/routes/namedLocationHref'
 import {
   notePropertyLocation,
+  notePropertyItemLocation,
   noteShowLocation,
 } from '@/routes/noteShowLocation'
+import router from '../router'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
 import {
   expectRichNotePropertyRowFocused,
@@ -40,6 +43,48 @@ function expectAtCompiledNoteLocation(
 }
 
 export const notePropertyLocationMethods = () => ({
+  visitRichNotePropertyItem(
+    noteTopology: string,
+    key: string,
+    value: string,
+    occurrence: number
+  ) {
+    testability()
+      .getInjectedNoteIdByTitle(noteTopology)
+      .then((noteId: number) => {
+        const location = notePropertyItemLocation(noteId, key, {
+          value,
+          occurrence,
+        })
+        router().visitNamed(
+          String(location.name),
+          location.params as Record<string, string>
+        )
+      })
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  reloadRichNotePropertyItem() {
+    cy.reload()
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  expectFocusedRichNotePropertyItem(
+    key: string,
+    value: string,
+    occurrence: number
+  ) {
+    findNoteContentRegion()
+      .find(richNotePropertyRow(key))
+      .within(() => {
+        cy.get('[data-test="assimilation-mode-row-UNDERSTANDING"]')
+          .filter((_, row) => row.getAttribute('data-property-value') === value)
+          .eq(occurrence - 1)
+          .should('have.attr', 'data-property-value-focused', 'true')
+          .and('be.visible')
+      })
+    return this
+  },
   openRichNotePropertyPanel(key: string) {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {

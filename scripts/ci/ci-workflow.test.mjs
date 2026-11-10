@@ -54,8 +54,8 @@ test('CI proof expects each entry in intent.locations order among proved entries
     { entry: 'frontend/tests', parts: 2, unit: 'case' },
     { entry: 'frontend/tests', parts: 2, unit: 'file' },
     { entry: 'backend/src/test/java', parts: 1, unit: 'case' },
-    { entry: 'scripts', parts: 12, unit: 'case' },
-    { entry: 'scripts', parts: 13, unit: 'file' },
+    { entry: 'scripts', parts: 13, unit: 'case' },
+    { entry: 'scripts', parts: 14, unit: 'file' },
   ])
 })
 
@@ -105,8 +105,8 @@ test('the Bash script runner reports its file checks as the scripts part', () =>
     report,
     entry: 'scripts',
     unit: 'file',
-    part: 13,
-    of: 13,
+    part: 14,
+    of: 14,
   })
 })
 

@@ -8,7 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Highlight and link to a specific property item](seeds/SEED-119-highlight-specific-property-item.md#highlight-and-link-to-a-specific-property-item) — SEED-119#highlight-and-link-to-a-specific-property-item ([plan](slice-plans/087-highlight-specific-property-item/PLAN.md))
 - [Publish large notebooks without losing history](seeds/SEED-121-publish-large-notebooks.md#publish-large-notebooks-without-losing-history) — SEED-121#publish-large-notebooks-without-losing-history ([plan](slice-plans/088-publish-large-notebooks-without-losing-history/PLAN.md))
 - [Export a note with recent quiz questions](seeds/SEED-118-export-recent-quiz-questions.md#export-a-note-with-recent-quiz-questions) — SEED-118#export-a-note-with-recent-quiz-questions ([plan](slice-plans/089-export-recent-note-questions/PLAN.md))
 

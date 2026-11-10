@@ -14,3 +14,20 @@ Feature: Assimilation property order
     When I add a rich note property with key "status" and value "draft"
     And I start assimilation from the menu
     Then I should be assimilating the note "Note 2"
+
+
+  Scenario: Assimilating a list value continues at the next exact value
+    Given the note "Note 2" was assimilated on day 1
+    And I have a notebook "Item assimilation"
+    And I have a note "Movement" under notebook "Item assimilation" with content:
+      """
+      ---
+      activity: [walk, run, run]
+      ---
+
+      Ways to move.
+      """
+    And the note "Movement" was assimilated on day 1
+    When I visit note "Movement"
+    And I assimilate the value "walk" of property "activity"
+    Then occurrence 1 of item "run" in property "activity" should be highlighted

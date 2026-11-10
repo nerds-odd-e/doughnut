@@ -10,6 +10,7 @@ import {
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import {
+  notePropertyItemLocation,
   notePropertyLocation,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
@@ -111,6 +112,36 @@ describe("useGoToNextAssimilation", () => {
       notePropertyLocation(42, "example of")
     )
   })
+
+  it("opens the property for a scalar next unit with an empty propertyValue", async () => {
+    mockSdkService(AssimilationController, "next", {
+      nextUnit: { noteId: 42, propertyKey: "topic", propertyValue: "" },
+      counts: { dueCount: 1 },
+    })
+    const { router, goToNextAssimilation } = await mountGoToNextAssimilation()
+    await goToNextAssimilation()
+    expect(router.currentRoute.value).toMatchObject(
+      notePropertyLocation(42, "topic")
+    )
+  })
+
+  it.each(["run", " [[Run|跑]] "])(
+    "pushes the first exact occurrence of returned value %j",
+    async (propertyValue) => {
+      mockSdkService(AssimilationController, "next", {
+        nextUnit: { noteId: 42, propertyKey: "example of", propertyValue },
+        counts: { dueCount: 1 },
+      })
+      const { router, goToNextAssimilation } = await mountGoToNextAssimilation()
+      await goToNextAssimilation()
+      expect(router.currentRoute.value).toMatchObject(
+        notePropertyItemLocation(42, "example of", {
+          value: propertyValue,
+          occurrence: 1,
+        })
+      )
+    }
+  )
 
   it("shows daily goal toast when dueCount is zero but next unit exists", async () => {
     mockSdkService(AssimilationController, "next", {

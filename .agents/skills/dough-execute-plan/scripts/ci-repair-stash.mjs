@@ -21,9 +21,10 @@ import {
   stashEntryByOid,
 } from "./ci-repair-stash-git.mjs";
 import { git } from "./publication-git.mjs";
+import { reviewRepairStashResolution } from "./ci-repair-stash-resolution.mjs";
 
 const usage =
-  "usage: ci-repair-stash.mjs save --checkout PATH --label TEXT | restore --record FILE | drop --record FILE";
+  "usage: ci-repair-stash.mjs save --checkout PATH --label TEXT | restore --record FILE | drop --record FILE | resolve --record FILE --reviewed-oid OID";
 
 function failureText(error) {
   return `${error.stdout ?? ""}\n${error.stderr ?? ""}\n${error.message ?? ""}`.trim();
@@ -159,6 +160,20 @@ async function restoreRecorded(file, record) {
   return { ok: true, status: "resumed", ...receipt, dropped: drop.selector };
 }
 
+// Records the explicit review without applying the stash again or dropping it.
+export async function resolveRepairStash({
+  record: file,
+  "reviewed-oid": reviewed,
+}) {
+  const record = await readRecord(file);
+  const result = await reviewRepairStashResolution(record, reviewed);
+  if (result.ok) {
+    record.restore = { status: "resolved", applied: "reviewed" };
+    await storeRecord(file, record);
+  }
+  return { record: file, ...result };
+}
+
 // Finishes a resolved conflict: drops only the recorded OID's entry, never
 // one whose last restore applied nothing (that work exists only there).
 export async function dropRepairStash({ record: file }) {
@@ -192,6 +207,7 @@ if (isDirectCliEntry(import.meta.url, process.argv[1])) {
       save: saveRepairStash,
       restore: restoreRepairStash,
       drop: dropRepairStash,
+      resolve: resolveRepairStash,
     }[command];
     if (!operation) throw new Error(usage);
     const result = await operation(options);

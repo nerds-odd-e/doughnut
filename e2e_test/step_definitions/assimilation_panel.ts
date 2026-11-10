@@ -2,7 +2,12 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import {
+  type DataTable,
+  Given,
+  Then,
+  When,
+} from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 Given(
@@ -90,3 +95,35 @@ Then('I should see Skip on the assimilation panel', () => {
 Then('I should see Return to sequence on the assimilation panel', () => {
   start.assumeAssimilationPage().expectReturnToSequenceOnPanel()
 })
+
+When(
+  'I request removal of item {int} of property {string}',
+  (index: number, key: string) => {
+    start.assumeNotePage().requestRichNotePropertyItemRemoval(key, index)
+  }
+)
+When(
+  'I request removal of the final item of property {string}',
+  (key: string) => {
+    start.assumeNotePage().requestFinalRichNotePropertyItemRemoval(key)
+  }
+)
+When('I cancel the property item removal', () => {
+  start.assumeNotePage().cancelRichNotePropertyItemRemoval()
+})
+When('I confirm the property item removal', () => {
+  start
+    .assumeNotePage()
+    .confirmRichNotePropertyItemRemoval()
+    .flushPendingContentSave()
+})
+
+Then(
+  'expanded rich note property {string} should have these values in order:',
+  (key: string, data: DataTable) => {
+    start.assumeNotePage().expectExpandedRichNotePropertyValues(
+      key,
+      data.raw().map((row) => row[0]!)
+    )
+  }
+)

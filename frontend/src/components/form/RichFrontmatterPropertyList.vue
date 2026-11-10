@@ -14,9 +14,10 @@
       :read-only="readOnly"
       :set-root-ref="(el) => setPropertyRowRef(row!.key, el)"
       @row-focus="emit('row-focus', idx)"
-      @toggle-panel="togglePropertyPanel(row!.key)"
+      @toggle-panel="togglePropertyPanel(row!.key, row!.value.kind === 'list' ? row!.value.items : undefined)"
       @commit="emit('commit', idx)"
       @remove="emit('remove', idx)"
+      @remove-item="emit('remove-item', idx, $event)"
       @wikidata-dialog-open="emit('wikidata-dialog-open', idx)"
       @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
       @relation-type-selected="emit('relation-type-selected', idx, $event)"
@@ -86,6 +87,7 @@ const emit = defineEmits<{
   cancel: []
   "draft-wikidata-dialog-open": []
   remove: [idx: number]
+  "remove-item": [idx: number, itemIndex: number]
   "wikidata-dialog-open": [idx: number]
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
   "relation-type-selected": [idx: number, type: string | undefined]

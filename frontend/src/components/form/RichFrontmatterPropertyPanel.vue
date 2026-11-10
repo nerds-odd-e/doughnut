@@ -5,6 +5,7 @@
     data-testid="rich-note-property-panel"
   >
     <button
+      v-if="!authoredListValues"
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
       :aria-label="`Remove note property ${propertyKey}`"
@@ -40,6 +41,11 @@
       :property-key="propertyKey"
       :property-values="assimilableListValues(propertyValue)"
       :authored-property-values="authoredListValues"
+      :focused-item-index="focusedItemIndex(propertyKey, authoredListValues ?? [])"
+      :selectable="canSelectPropertyItems"
+      removable
+      @remove-item="emit('remove-item', $event)"
+      @select-item="selectPropertyItem(propertyKey, authoredListValues!, $event)"
       :show-learning-controls="hasSavedNote"
       :loading="hasSavedNote && !noteInfoLoaded"
       :disabled="assimilatingPropertyKey === propertyKey"
@@ -60,6 +66,7 @@
 import { Minus } from "@lucide/vue"
 import { computed, toRef, useId } from "vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import { useRouter } from "vue-router"
 import PropertyAssimilationModes from "@/components/recall/PropertyAssimilationModes.vue"
 import { assimilableListValues } from "@/components/recall/assimilationMemoryTrackers"
@@ -88,6 +95,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   remove: []
+  "remove-item": [index: number]
   deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
@@ -101,6 +109,8 @@ const {
 } = useInjectedMemoryTrackerActions(toRef(() => props.noteId ?? 0))
 
 const router = useRouter()
+const { focusedItemIndex, canSelectPropertyItems, selectPropertyItem } =
+  useFocusedNoteProperty()
 const noteStore = useNoteStore()
 
 const reifyReasonId = useId()

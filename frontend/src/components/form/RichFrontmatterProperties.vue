@@ -1,6 +1,6 @@
 <template>
   <RichFrontmatterPropertyNotFound
-    :property-keys="propertyRows.map((row) => row.key)"
+    :property-rows="propertyRows"
   />
   <section
     v-if="showSection"
@@ -44,6 +44,7 @@
       @row-focus="onRowFocus"
       @commit="commitRow"
       @remove="removeRow"
+      @remove-item="removeItem"
       @wikidata-dialog-open="openWikidataDialog({ type: 'row', idx: $event })"
       @dead-wiki-link-click="emits('deadWikiLinkClick', $event)"
       @relation-type-selected="onRelationTypeSelected"
@@ -172,6 +173,7 @@ const {
   tryCommitInsert,
   onRowFocus,
   removeRow,
+  removeItem,
   commitRow,
   onRelationTypeSelected,
   addWikiLinkAsProperty,

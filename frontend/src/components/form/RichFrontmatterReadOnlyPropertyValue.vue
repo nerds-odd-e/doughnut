@@ -1,6 +1,16 @@
 <template>
+  <PropertyAssimilationModes
+    v-if="isListPropertyValue(row.value) && isFocusedProperty(row.key)"
+    :property-key="row.key"
+    :authored-property-values="row.value.items"
+    :focused-item-index="focusedItemIndex(row.key, row.value.items)"
+    :selectable="canSelectPropertyItems"
+    @select-item="selectPropertyItem(row.key, row.value.items, $event)"
+    :wiki-links="wikiLinks"
+    :last-saved-markdown="lastSavedMarkdown"
+  />
   <RichFrontmatterListPropertyValue
-    v-if="isListPropertyValue(row.value)"
+    v-else-if="isListPropertyValue(row.value)"
     :value="row.value"
     :property-key="row.key"
     :wiki-links="wikiLinks"
@@ -41,6 +51,8 @@
 </template>
 
 <script setup lang="ts">
+import PropertyAssimilationModes from "@/components/recall/PropertyAssimilationModes.vue"
+import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import WikiLinkToken from "@/components/notes/WikiLinkToken.vue"
@@ -53,6 +65,13 @@ import {
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
 import { isListPropertyValue } from "@/utils/noteProperties"
+
+const {
+  isFocusedProperty,
+  focusedItemIndex,
+  canSelectPropertyItems,
+  selectPropertyItem,
+} = useFocusedNoteProperty()
 
 defineProps<{
   row: PropertyRow

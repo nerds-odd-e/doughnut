@@ -125,7 +125,7 @@ jobs:
       - uses: ./.github/ci_proof_summary
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          expect: e2e_test/features=6:case frontend/tests=2:case frontend/tests=2:file backend/src/test/java=1:case scripts=12:case scripts=13:file
+          expect: e2e_test/features=6:case frontend/tests=2:case frontend/tests=2:file backend/src/test/java=1:case scripts=13:case scripts=14:file
 
   Other-unit-tests:
     name: Other Unit Tests
@@ -148,8 +148,8 @@ jobs:
           report: ${{ runner.temp }}/bash-report.tsv
           entry: scripts
           unit: file
-          part: 13
-          of: 13
+          part: 14
+          of: 14
 
   Package-artifacts:
     name: Package backend & frontend artifacts for deployment

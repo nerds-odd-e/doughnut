@@ -1,9 +1,12 @@
+@use "../form/propertyValueFocus.scss";
+
 .list-assimilation-modes {
   display: flex;
   flex-direction: column;
   align-items: stretch;
 
   > div {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     column-gap: 1rem;
@@ -20,4 +23,20 @@
       max-width: 100%;
     }
   }
+}
+
+.property-item-select {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+.list-assimilation-modes > div > :is(span, div) {
+  position: relative;
 }

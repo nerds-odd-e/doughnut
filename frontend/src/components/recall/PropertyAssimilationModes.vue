@@ -4,12 +4,30 @@
     :class="{ 'list-assimilation-modes': isList }"
   >
     <div
-      v-for="row in rows"
+      v-for="(row, index) in rows"
       :key="row.key"
       class="col-span-2 grid min-h-8 grid-cols-subgrid items-center"
       data-test="assimilation-mode-row-UNDERSTANDING"
       :data-property-value="row.propertyValue"
+      :class="{ 'property-value-frame': isList }"
+      :data-property-value-focused="isList && index === focusedItemIndex ? 'true' : undefined"
+      @click="selectRow($event, index)"
     >
+      <button
+        v-if="isList && selectable"
+        type="button"
+        class="property-item-select"
+        :aria-label="`Select ${propertyKey} item ${index + 1}`"
+        :aria-pressed="index === focusedItemIndex"
+        @click="emit('selectItem', index)"
+      />
+      <button
+        v-if="isList && removable"
+        type="button"
+        class="property-item-remove daisy-btn daisy-btn-ghost daisy-btn-sm shrink-0"
+        :aria-label="`Remove ${propertyKey} item ${index + 1}`"
+        @click="emit('removeItem', index)"
+      ><Minus class="h-4 w-4" aria-hidden="true" /></button>
       <span
         class="text-right text-sm font-medium"
         data-test="mode-label-UNDERSTANDING"
@@ -83,6 +101,7 @@
 
 <script setup lang="ts">
 import type { MemoryTracker, WikiLink } from "@generated/donut-backend-api"
+import { Minus } from "@lucide/vue"
 import { computed } from "vue"
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
@@ -96,6 +115,9 @@ const props = defineProps<{
   propertyKey: string
   propertyValues?: readonly string[]
   authoredPropertyValues?: readonly string[]
+  focusedItemIndex?: number
+  selectable?: boolean
+  removable?: boolean
   showLearningControls?: boolean
   loading?: boolean
   disabled?: boolean
@@ -105,6 +127,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  selectItem: [index: number]
+  removeItem: [index: number]
   assimilate: [request: AssimilateEvent]
   skip: []
   returnToSequence: []
@@ -116,6 +140,16 @@ const isList = computed(
     props.authoredPropertyValues !== undefined ||
     props.propertyValues !== undefined
 )
+
+function selectRow(event: MouseEvent, index: number) {
+  if (
+    props.selectable &&
+    isList.value &&
+    !(event.target as HTMLElement).closest("a, button")
+  ) {
+    emit("selectItem", index)
+  }
+}
 
 function unitRow(
   propertyValue?: string,
@@ -163,3 +197,20 @@ const rows = computed(() => {
 </script>
 
 <style scoped lang="scss" src="./PropertyAssimilationModes.scss"></style>
+
+<style scoped lang="scss">
+ .property-item-remove { position: relative; }
+@media (pointer: coarse) {
+  .property-item-remove { min-width: 2.75rem; min-height: 2.75rem; }
+  .list-assimilation-modes > div,
+  .list-assimilation-modes > div > div {
+    min-height: 2.75rem;
+  }
+
+  .list-assimilation-modes :deep([data-test="assimilation-status-UNDERSTANDING"]) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}
+</style>

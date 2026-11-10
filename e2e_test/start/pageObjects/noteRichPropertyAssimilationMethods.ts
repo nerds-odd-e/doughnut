@@ -1,3 +1,4 @@
+import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { switchToRichContentIfNeeded } from './noteContentEditingMethods'
 import {
@@ -40,6 +41,50 @@ const propertyValueRow = (value: string) =>
   cy.get(`[data-property-value="${value}"]`)
 
 export const noteRichPropertyAssimilationMethods = () => ({
+  requestFinalRichNotePropertyItemRemoval(key: string) {
+    withPropertyPanel(key, () => {
+      cy.findByRole('button', { name: `Remove ${key} item 1` }).click()
+    })
+    cy.get('dialog')
+      .filter(':visible')
+      .contains(`Property "${key}" has a memory tracker.`)
+      .should('be.visible')
+    return this
+  },
+  expectExpandedRichNotePropertyValues(key: string, values: string[]) {
+    withPropertyPanel(key, () => {
+      cy.get('[data-test="assimilation-mode-row-UNDERSTANDING"]').should(
+        ($rows) => {
+          expect(
+            [...$rows].map((row) => row.getAttribute('data-property-value'))
+          ).to.deep.equal(values)
+        }
+      )
+    })
+    return this
+  },
+  requestRichNotePropertyItemRemoval(key: string, occurrence: number) {
+    withPropertyPanel(key, () => {
+      cy.findByRole('button', {
+        name: `Remove ${key} item ${occurrence}`,
+      }).click()
+    })
+    cy.get('dialog')
+      .filter(':visible')
+      .contains('learning history')
+      .should('be.visible')
+    return this
+  },
+  cancelRichNotePropertyItemRemoval() {
+    cy.get('dialog').filter(':visible').contains('button', 'Cancel').click()
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  confirmRichNotePropertyItemRemoval() {
+    clickPopupConfirmOk()
+    waitUntilAppIsNotBusy()
+    return this
+  },
   assimilateRichNotePropertyValue(key: string, value: string) {
     withPropertyPanel(key, () => {
       cy.findByRole('button', { name: `Assimilate ${value}` }).click()
