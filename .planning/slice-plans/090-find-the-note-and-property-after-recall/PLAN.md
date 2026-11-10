@@ -2,11 +2,12 @@
 
 **Identity:** SEED-117#find-the-note-and-property-after-recall
 **Source:** [Refined story](../../seeds/SEED-117-recall-note-location.md#find-the-note-and-property-after-recall)
+**Source review:** [Source-only review](source-review.md)
 **Preparation:** Eimi-chan; established workspace and branch
 `/Users/terryyin/git/doughnut/.worktrees/find-the-note-and-property-after-recall`,
 `codex/find-the-note-and-property-after-recall`; origin → main;
 starting/published preparation revision `c2958ecb8e5ab5dd879ee339242649fdc03a7328`.
-This plan authorizes no implementation. The story remains queued.
+Execution authorized by the established start in this session.
 
 ## Outcome and boundaries
 
@@ -63,7 +64,7 @@ this story owns the links that reach those destinations.
 
 ### 1. Read the full location in every recall context
 Type: Behavior
-Status: planned
+Status: done
 Proof: first two proof rows; affected mounted suites, plus headless text-range
 geometry in the shared header and narrow ConversationComponent subject pane.
 
@@ -206,3 +207,25 @@ one source-context model, each owns its proof and names its safe interim state.
 No remaining slice-boundary, cumulative-design, proof-ownership, sizing or
 decisive-premise concern was identified. No pre-Take human decision remains.
 The readiness recorder owns the assessment; this review grants no execution.
+
+## Execution context
+
+Hibiki-chan; story-branch; workspace and branch as above. origin/main is the authorized integration target; execution increments publish to origin/codex/find-the-note-and-property-after-recall. Starting revision 9db0154c71473340882bc15f6c86fd9989815cf2; accepted claim/published base d17580ea6cee7f8eb3d348728721fdb9633e2f95. No second claim. Replanning permitted under existing planned execution authority. Setup `./scripts/run.sh bash scripts/worktree_setup.sh` passed against locked metadata; `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` passed. Hook is check-only scripts/git-hooks/pre-commit; coordinator formatter is `./scripts/run.sh pnpm format:changed`.
+
+CI: GitHub nerds-odd-e/doughnut, execution branch codex/find-the-note-and-property-after-recall, workflow ci.yml verified active donut CI with push ** trigger. Coordinator hibiki-recall, observer /tmp/dough-ci-501/watch-aOJ9AU, PID 3366, session 34778, yielded cell g1054:10; runtime in this exact checkout. Trunk claim pendingCi: unobserved.
+
+## Story obligations
+
+### G1. Distinct title destination awaits reviewed-source slice
+Reported: slice 1 — "Existing title-to-focused-property navigation remains for slice 2"
+Story clause: "The note-title link opens the full note."
+Disposition: interim until slices 2
+
+### G2. Readable reviewed values await reference presentation
+Reported: slice 1 — "raw reviewed-value presentation remains for slice 3"
+Story clause: "Render a resolved wiki value with its ordinary display label and destination, using the source note's viewer-scoped resolution."
+Disposition: interim until slices 3
+
+## Accepted execution evidence
+
+Slice 1: [return and promise observations](slice1-return.md), [actual consumer trace](consumer-trace-slice1.md). Coordinator inspected the header, all five location tests, preview setup/assertions and reached E2E helpers. Q passed 35 files/155 tests; both typechecks passed. Independent refactor1 returned REFACTOR COMPLETE with no product edits; supplemental helper-to-feature trace was records-only, proof unchanged. Early freshness unchanged at d17580ea6cee; no incoming named-sibling change.

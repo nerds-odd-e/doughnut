@@ -54,7 +54,12 @@ describe("AnsweredSpellingQuestion correct", () => {
     expect(noteContext.text()).toContain(
       "Inciting rebellion against authority."
     )
-    expect(wrapper.text().split(noteTitle).length - 1).toBe(1)
+    expect(noteUnderQuestion.find(".breadcrumb-wrapper").text()).toContain(
+      noteTitle
+    )
+    expect(noteUnderQuestion.find(".breadcrumb-wrapper").text()).toContain(
+      "Political History"
+    )
     expect(wrapper.find(".daisy-alert-success").text()).toContain("Correct!")
   })
 })

@@ -5,23 +5,30 @@
       :property-key="focusedPropertyKey"
       :property-value="focusedPropertyValue"
     />
-    <slot>
-      <div class="breadcrumb-wrapper">
+    <div class="breadcrumb-wrapper">
         <Breadcrumb
-          :ancestor-folders="ancestorFolders ?? []"
-          :breadcrumb-notebook-id="breadcrumbNotebookId"
+          :ancestor-folders="noteRealm?.ancestorFolders ?? ancestorFolders ?? []"
+          :breadcrumb-notebook-id="noteRealm?.notebookRealm.notebook.id ?? breadcrumbNotebookId"
         >
+          <template #topLink>
+            <li v-if="noteRealm">
+              <router-link :to="{ name: 'notebookPage', params: { notebookId: String(noteRealm.notebookRealm.notebook.id) } }">
+                {{ noteRealm.notebookRealm.notebook.name }}
+              </router-link>
+            </li>
+          </template>
           <template #additional>
             <NoteTitleWithLink v-bind="{ noteTopology, focusedPropertyKey }" />
           </template>
         </Breadcrumb>
-      </div>
-    </slot>
+    </div>
+    <slot />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
+import { computed, type PropType } from "vue"
+import { useNoteStore } from "@/store/noteStore"
 import type {
   FolderTrailSegment,
   NoteTopology,
@@ -30,7 +37,7 @@ import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import FocusedPropertyIndicator from "./FocusedPropertyIndicator.vue"
 
-defineProps({
+const props = defineProps({
   noteTopology: {
     type: Object as PropType<NoteTopology>,
     required: true,
@@ -52,6 +59,11 @@ defineProps({
     default: undefined,
   },
 })
+
+const noteStore = useNoteStore()
+const noteRealm = computed(
+  () => noteStore.getNoteRealmRefAndLoadWhenNeeded(props.noteTopology.id).value
+)
 </script>
 
 <style lang="sass" scoped>
@@ -78,8 +90,17 @@ defineProps({
   .breadcrumb-wrapper
     width: 100%
     min-width: 0
-    overflow-x: auto
     :deep(.daisy-breadcrumbs)
-      max-width: none !important
-      width: max-content
+      overflow: visible
+      ul
+        flex-wrap: wrap
+        white-space: normal
+      li, a
+        min-width: 0
+        max-width: 100%
+        overflow-wrap: anywhere
+      li
+        flex-shrink: 1
+      a
+        white-space: normal
 </style>

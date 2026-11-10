@@ -3,10 +3,12 @@ import {
   notePropertyLocation,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
-import helper from "@tests/helpers"
+import helper, { mockShowNote } from "@tests/helpers"
 import type { VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import { describe, it, expect } from "vitest"
+import { beforeEach, describe, it, expect } from "vitest"
+
+beforeEach(() => mockShowNote())
 
 function noteTitleLinkTo(wrapper: VueWrapper, title: string) {
   const link = wrapper

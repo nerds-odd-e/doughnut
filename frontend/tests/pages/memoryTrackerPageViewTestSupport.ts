@@ -8,7 +8,7 @@ import type {
 import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import MemoryTrackerPageView from "@/pages/MemoryTrackerPageView.vue"
 
@@ -62,6 +62,7 @@ export type MountMemoryTrackerPageViewProps = {
 }
 
 export function mockMemoryTrackerPageViewDefaults() {
+  mockShowNote()
   mockSdkService(
     MemoryTrackerController,
     "removeFromRepeating",
