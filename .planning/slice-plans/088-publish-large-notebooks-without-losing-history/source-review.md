@@ -32,36 +32,36 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | C22 | Provide supported diagnosis for the affected notebook. | slice 3 | observed: Production GET /api/notebooks/15/git-diagnosis HTTP200 at2026-11-10T07:36:43–07:37:01Z; private report retained |
 | C23 | Provide supported recovery for the affected notebook. | slice 14 |  |
 | C24 | Enable the owner to retry publication after recovery. | slice 14 |  |
-| C25 | Preserve genuine live-only edits through a forward recovery commit. | slice 6 |  |
-| C26 | Make that forward recovery commit owner-reviewed. | slice 6 |  |
+| C25 | Preserve genuine live-only edits through a forward recovery commit. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
+| C26 | Make that forward recovery commit owner-reviewed. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
 | C27 | Repair encoding defects against accepted Git content. |  | G3 |
 | C28 | Repair projection defects against accepted Git content. |  | G3 |
-| C29 | Preserve accepted commit IDs during repair. | slice 6 |  |
-| C30 | Preserve accepted ancestry during repair. | slice 6 |  |
-| C31 | Preserve soundly identified Note identities. | slice 6 |  |
-| C32 | Preserve soundly identified Folder identities. | slice 6 |  |
+| C29 | Preserve accepted commit IDs during repair. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
+| C30 | Preserve accepted ancestry during repair. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
+| C31 | Preserve soundly identified Note identities. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
+| C32 | Preserve soundly identified Folder identities. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
 | C33 | Preserve those identities’ dependent learning data. |  | G4 |
 | C34 | Preserve pending local work. | slice 7 |  |
 | C35 | Distinguish a stale local base from server projection drift. | slice 2 | observed: cli/tests/notebookPublish.ancestry.suite.ts#local main stale; cli/tests/notebookPublish.rebasedRejection.suite.ts#drift; cli/tests/notebookDiagnosis.test.ts; required full CLI/backend suites passed |
 | C36 | Use the existing Pull/rebase/conflict workflow for a stale local base. | slice 2 | observed: cli/tests/notebookPull.rebase.suite.ts#rebases two local note-edit commits over one accepted other-note commit, then publishes; required full CLI/backend suites passed |
 | C37 | Ordinary Publish continues to refuse drift until supported recovery settles it. | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java#rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection; required full CLI/backend suites passed |
-| C38 | Accepted content cannot be silently adopted. | slice 6 |  |
-| C39 | Accepted content cannot be silently rewritten. | slice 6 |  |
-| C40 | Publication remains atomic. | slice 6 |  |
-| C41 | Publication remains serialized per notebook. | slice 6 |  |
-| C42 | Ambiguous identity changes are refused. | slice 6 |  |
-| C43 | Existing file policies continue to govern admission. | slice 6 |  |
-| C44 | Existing upload-size policies continue to govern admission. | slice 6 |  |
+| C38 | Accepted content cannot be silently adopted. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#refusesReviewWhenEitherAcceptedOrLiveStateHasChanged; explicit A/L HTTP Review, current owner authorization, fresh review conflict and unchanged accepted head |
+| C39 | Accepted content cannot be silently rewritten. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
+| C40 | Publication remains atomic. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAtomicControllerTest.java#lateFailureRollsBackNativeObjectsHeadAndRefreshedDerivedState; separately committed native-object count/head/reopened history and derived index rollback after failing binding save |
+| C41 | Publication remains serialized per notebook. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#serializesTwoRecoveryRequestsAndRefusesTheSecondStaleReview; one locked acceptance, second review conflicts |
+| C42 | Ambiguous identity changes are refused. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#refusesAmbiguousRemovalAndAddition; uncertain correspondence refuses without advancing accepted head |
+| C43 | Existing file policies continue to govern admission. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#refusesInvalidLiveContentWithoutAdvancingHistory; shared NotebookGitCandidateAdmission and NotebookGitNoteDocuments retain existing file/authored-property rules; slice5 policy proof retained |
+| C44 | Existing upload-size policies continue to govern admission. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#enforcesAttachmentDurabilityForTheRecoveryCandidate plus unchanged NotebookGitCandidateAdmission size/book policies and slice5 full backend admission proof |
 | Q01 | The publication scope concerns **small committed Markdown edits**; the large-size example concerns the **full accepted Git tree listing**. | slice 9 |  |
 | Q02 | Sampled note equality is insufficient to establish the cause of the mismatch. | slice 3 | observed: Private exact-drift-review.diff reconstructs entire locked live tree from accepted history and all4differences; no sampled-note substitution |
 | Q03 | Sampled attachment-payload equality is insufficient to establish the cause of the mismatch. | slice 3 | observed: Locked report complete path/blob comparison; unchanged pointer/marker/README entries remain exact accepted context, no hydrated-payload substitution |
-| Q04 | Identity preservation is qualified by “soundly identified” Note/Folder identities. | slice 6 |  |
-| Q05 | Git content cannot recover already-deleted private identities. | slice 6 |  |
-| Q06 | Git content cannot recover already-deleted learning history. | slice 6 |  |
+| Q04 | Identity preservation is qualified by “soundly identified” Note/Folder identities. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
+| Q05 | Git content cannot recover already-deleted private identities. | slice 6 | observed: NotebookGitLiveRecovery.recover and NotebookGitProposalAcceptance accept existing live rows; success reloads their original IDs/learning. Source defers already-deleted private data; no identity reconstruction is performed. |
+| Q06 | Git content cannot recover already-deleted learning history. | slice 6 | observed: NotebookGitLiveRecovery.recover and NotebookGitProposalAcceptance accept existing live rows; success reloads their original IDs/learning. Source defers already-deleted private data; no identity reconstruction is performed. |
 | Q07 | Pull alone cannot fix server projection drift. | slice 2 | observed: cli/tests/notebookDiagnosis.test.ts#reviews exact server differences while retaining pending commits and dirty work; required full CLI/backend suites passed |
-| Q08 | The required restrictions preserve content correctness independently of the story’s size example. | slice 6 |  |
-| Q09 | The required restrictions preserve identity correctness independently of the story’s size example. | slice 6 |  |
-| Q10 | The required restrictions preserve storage correctness independently of the story’s size example. | slice 6 |  |
+| Q08 | The required restrictions preserve content correctness independently of the story’s size example. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#refusesInvalidLiveContentWithoutAdvancingHistory; shared NotebookGitCandidateAdmission and NotebookGitNoteDocuments retain existing file/authored-property rules; slice5 policy proof retained |
+| Q09 | The required restrictions preserve identity correctness independently of the story’s size example. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#refusesAmbiguousRemovalAndAddition; uncertain correspondence refuses without advancing accepted head |
+| Q10 | The required restrictions preserve storage correctness independently of the story’s size example. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#enforcesAttachmentDurabilityForTheRecoveryCandidate plus unchanged NotebookGitCandidateAdmission size/book policies and slice5 full backend admission proof |
 | Q11 | Deferred promises are delivery limits, not new rejection rules. | slice 10 |  |
 | Q12 | The observed mismatch’s cause remains this story’s work. | slice 14 |  |
 | Q13 | The observed mismatch’s recovery remains this story’s work. | slice 14 |  |
@@ -106,18 +106,18 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | J06.2 | **Review:** The owner reviews the exact differences. | slice 14 |  |
 | J06.3 | **Authorization:** The owner explicitly requests recovery. | slice 14 |  |
 | J06.4 | **Authorization context:** That request is against the observed accepted/live state. | slice 14 |  |
-| J06.5 | **Recovery result:** Recovery appends a validated forward commit. | slice 6 |  |
-| J06.6 | **Content preservation:** The forward commit preserves those edits. | slice 6 |  |
-| J06.7 | **Identity preservation:** Recovery preserves existing identity associations. | slice 6 |  |
+| J06.5 | **Recovery result:** Recovery appends a validated forward commit. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
+| J06.6 | **Content preservation:** The forward commit preserves those edits. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
+| J06.7 | **Identity preservation:** Recovery preserves existing identity associations. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
 | J06.8 | **Learning preservation:** Recovery preserves existing learning associations. |  | G4 |
-| J06.9 | **Changed-state alternative:** If either the accepted state or the live state has changed, recovery asks for a fresh review. | slice 6 |  |
-| J06.10 | **Changed-state behavior:** Recovery does not apply a stale decision. | slice 6 |  |
+| J06.9 | **Changed-state alternative:** If either the accepted state or the live state has changed, recovery asks for a fresh review. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#refusesReviewWhenEitherAcceptedOrLiveStateHasChanged; explicit A/L HTTP Review, current owner authorization, fresh review conflict and unchanged accepted head |
+| J06.10 | **Changed-state behavior:** Recovery does not apply a stale decision. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#refusesReviewWhenEitherAcceptedOrLiveStateHasChanged; explicit A/L HTTP Review, current owner authorization, fresh review conflict and unchanged accepted head |
 | J06.11 | **Ordinary publication restriction:** Ordinary Publish does not perform this adoption implicitly. | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java#rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection; required full CLI/backend suites passed |
 | X01 | A general repair policy for arbitrary corruption is deferred. | slice 14 |  |
 | X02 | Recovery of already-deleted identities is deferred. | slice 14 |  |
 | X03 | Recovery of already-deleted learning data is deferred. | slice 14 |  |
 | X04 | A performance commitment for large unpublished change ranges is deferred. | slice 14 |  |
-| D01 | The developer accepted preservation of genuine live-only edits through an owner-reviewed forward commit. | slice 6 |  |
+| D01 | The developer accepted preservation of genuine live-only edits through an owner-reviewed forward commit. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryControllerTest.java#acceptsExactlyTheReviewedLiveTreeAndRetainsHistoryIdentitiesAndLearning; exact reviewed L, parent A and retained native history/private row identities; current full backend XML2026-11-10T09:29:16Z |
 | D02 | Encoding defects are repaired against accepted Git content. |  | G3 |
 | D03 | Projection defects are repaired against accepted Git content. |  | G3 |
 | D04 | The exact diff determines the diagnosed cause. |  | G2 |

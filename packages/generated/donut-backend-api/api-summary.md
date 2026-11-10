@@ -130,6 +130,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `updateNotebook`: POST `/api/notebooks/{notebook}` -> `UpdateNotebookResponse` (request: `UpdateNotebookData`; path: notebook; body: NotebookUpdateRequest; response body: Notebook)
 - `shareNotebook`: POST `/api/notebooks/{notebook}/share` -> `ShareNotebookResponse` (request: `ShareNotebookData`; path: notebook; response body: Notebook)
 - `resetNotebookGitHistory`: POST `/api/notebooks/{notebook}/reset-git-history` -> `ResetNotebookGitHistoryResponse` (request: `ResetNotebookGitHistoryData`; path: notebook; response body: void)
+- `recoverNotebookGit`: POST `/api/notebooks/{notebook}/git-recovery` -> `RecoverNotebookGitResponse` (request: `RecoverNotebookGitData`; path: notebook; body: Review; response body: string)
 - `downloadNotebookGitBundle`: GET `/api/notebooks/{notebook}/git-bundle` -> `DownloadNotebookGitBundleResponse` (request: `DownloadNotebookGitBundleData`; path: notebook; response body: string)
 - `publishNotebookGitProposal`: POST `/api/notebooks/{notebook}/git-bundle` -> `PublishNotebookGitProposalResponse` (request: `PublishNotebookGitProposalData`; path: notebook; query: expectedHead; body: string; response body: string)
 - `createNoteAtNotebookRoot`: POST `/api/notebooks/{notebook}/create-note` -> `CreateNoteAtNotebookRootResponse` (request: `CreateNoteAtNotebookRootData`; path: notebook; body: NoteCreationDto; response body: NoteRealm)

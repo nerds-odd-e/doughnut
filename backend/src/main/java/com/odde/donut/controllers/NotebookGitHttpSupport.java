@@ -6,6 +6,7 @@ import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
 import com.odde.donut.services.notebookGit.NotebookGitDiagnosis;
 import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
+import com.odde.donut.services.notebookGit.NotebookGitLiveRecovery;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
 import com.odde.donut.testability.TestabilitySettings;
@@ -29,6 +30,7 @@ abstract class NotebookGitHttpSupport {
   private final NotebookGitProposalPublisher notebookGitProposalPublisher;
   private final NotebookGitHistoryService notebookGitHistoryService;
   private final NotebookGitDiagnosis notebookGitDiagnosis;
+  private final NotebookGitLiveRecovery notebookGitLiveRecovery;
 
   NotebookGitHttpSupport(
       AuthorizationService authorizationService,
@@ -36,13 +38,15 @@ abstract class NotebookGitHttpSupport {
       NotebookGitBundleDownloadService notebookGitBundleDownloadService,
       NotebookGitProposalPublisher notebookGitProposalPublisher,
       NotebookGitHistoryService notebookGitHistoryService,
-      NotebookGitDiagnosis notebookGitDiagnosis) {
+      NotebookGitDiagnosis notebookGitDiagnosis,
+      NotebookGitLiveRecovery notebookGitLiveRecovery) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.notebookGitBundleDownloadService = notebookGitBundleDownloadService;
     this.notebookGitProposalPublisher = notebookGitProposalPublisher;
     this.notebookGitHistoryService = notebookGitHistoryService;
     this.notebookGitDiagnosis = notebookGitDiagnosis;
+    this.notebookGitLiveRecovery = notebookGitLiveRecovery;
   }
 
   @Operation(
@@ -53,6 +57,17 @@ abstract class NotebookGitHttpSupport {
       @PathVariable("notebook") @Schema(type = "integer") Integer notebookId)
       throws UnexpectedNoAccessRightException {
     return notebookGitDiagnosis.inspect(notebookId);
+  }
+
+  @Operation(
+      operationId = "recoverNotebookGit",
+      summary = "Preserve explicitly reviewed live notebook edits")
+  @PostMapping("/{notebook}/git-recovery")
+  public String recoverNotebookGit(
+      @PathVariable("notebook") @Schema(type = "integer") Integer notebookId,
+      @RequestBody NotebookGitLiveRecovery.Review review)
+      throws UnexpectedNoAccessRightException {
+    return notebookGitLiveRecovery.recover(notebookId, review);
   }
 
   @Operation(

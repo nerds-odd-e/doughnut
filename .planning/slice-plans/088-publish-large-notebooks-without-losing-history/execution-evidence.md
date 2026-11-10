@@ -59,7 +59,7 @@ exceed 250. TreeShape is 251: prefer direct reuse; if editing is required, 3 mus
 inspection/classification versus correspondence/admission reorganization, callers and retained controller
 proof before implementation.
 
-10's separate one-time whole-product reading sweeps `CLI_DIST_ARTIFACT`, `CLI_BUNDLE_SOURCE`, `CAPTURED_CLI`,
+11's separate one-time whole-product reading sweeps `CLI_DIST_ARTIFACT`, `CLI_BUNDLE_SOURCE`, `CAPTURED_CLI`,
 `captured-cli` and app CLI artifact/publication references. Delete exclusive dependents transitively; classify
 surviving shared CLI/LB/E2E uses. Preserve dated provenance; delete obsolete synthetic fixture branches rather
 than renaming their actions. No permanent absence test.
@@ -159,3 +159,11 @@ scripts/ci/node-test.mjs 'scripts/ci/application-release-*.test.mjs'` and `bash
 scripts/test/upload-cli-binary-to-gcs.sh.test`. Regenerate API client when needed. Follow repo Jidoka, fresh
 post-change refactor, coordinator's one `./scripts/run.sh pnpm format:changed`, plan update, agent commit/hook
 and push. Full backend/E2E runtime and release/operator waits are explicit wait exceptions.
+
+## Slice 6 acceptance
+
+Root inspected recovery transaction/auth/review checks, native parent-A append and exact live L, existing correspondence/admission reuse and same-row document/index acceptance. Controller setup and executed assertions retain earlier commit IDs/ancestry, original and added Note/Folder IDs, real tracker/recall IDs and committed count, property changedAt and authored-reference index. Stale A/L, ownership, serialization, invalid authored/typed content, ambiguity and missing LFS refusals plus late native-object/head/reopened-history/index rollback are observed. Shared size/book policy proof from5 remains valid through the identical CandidateAdmission owner. All27 applicable source commitments are observed directly or through closed G4; no slice6 gap remains.
+
+Full backend:test_only passed3065tests,0failures/errors,2skipped1m49s; recovery success/stale/auth/serialization5cases XML2026-11-10T09:17:16.940Z and admission4/atomic1at09:18:02Z on Territory.local. Frontend399files/2470tests passed90s, both vue-tsc/tsc checks passed; CLI68files/442tests passed51.54s. The Python discovery selected0; inspection found only mineru_book_outline.py and no test_*.py in that package, so no Python coverage is claimed or needed by this additive wire change. First continuation failure used a cached inverse count; actual separately committed baseline corrects it, with successful learning/derived assertions now executed. Original attempt10active plus continuation7active retained, required runtime excepted. Independent refactor extracted unchanged document validation into NotebookGitNoteDocuments for additions, ordinary edits and recovery. Renewed full backend proof passed3065/0failures/2skipped in1m42s, recovery XML09:29:15–16Z; unchanged frontend/typecheck/CLI/generated proof retained. Generated contract output is reused unchanged; coordinator selective formatting/size and staged OpenAPI validation gates hold publication. Consumer trace is retained in consumer-trace-recovery.md with stable full lexical record outside Git.
+
+Structure5 published80dc6564d0d8362f0c04eed8e497f1f4886caa14; records-only refinement published8f013cefd3b9c01794bb63e96fcd8b31c71606fd on the same observer, zero reconciliations. Slice6 remained planned with G4 until current proof. Records-only refinement used the completed5 boundary without marking6 done. A trailing EOF blank line failed staged whitespace after preparation; only that mechanical byte was repaired and formatting renewed; duplicate staging declarations then refused before preparation and were corrected. No product proof invalidated.

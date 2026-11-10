@@ -102,7 +102,7 @@ Structure: modularize the cohesive existing inspection/typed-Markdown/attachment
 
 ### 6. Preserve explicitly reviewed live edits in accepted history
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller acceptance retains A/ancestors, appends one parent-A commit whose tree equals reviewed L,
 and retains sound Note/Folder IDs plus a real tracker and recall record. Assert required derived-index result.
 Separate cases prove stale A/L, invalid content/ambiguous identity refusal, and rollback after
@@ -242,5 +242,5 @@ Commitment: C27, C28, D02, D03
 ### G4. Recovery acceptance proof
 Reported: slice 6 — "The recovery attempt stopped at ten active minutes with one fixture assertion failure and unobserved successful learning/derived-state and generated-consumer proof."
 Story clause: "Repair must preserve accepted commit IDs and ancestry, soundly identified Note/Folder identities and their dependent learning data, and pending local work."
-Disposition: return
+Disposition: proved by slice 6: consumer-trace-recovery.md; successful committed learning/derived-state assertions, renewed backend3065 pass XML2026-11-10T09:29:16Z, frontend2470/two typechecks/CLI442 pass; first failed observations retained in execution-evidence.md
 Commitment: C33, J06.8
