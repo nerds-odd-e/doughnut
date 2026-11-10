@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import { NoteExportController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import JsonExportSection from "../../commons/JsonExportSection.vue"
 
@@ -66,7 +66,7 @@ onMounted(async () => {
 
 async function fetchAiMarkdown() {
   loadingMarkdown.value = true
-  const { data, error } = await NoteController.getAiContextMarkdown({
+  const { data, error } = await NoteExportController.getAiContextMarkdown({
     path: { note: props.note.id },
     query: { tokenLimit: tokenLimit.value },
   })

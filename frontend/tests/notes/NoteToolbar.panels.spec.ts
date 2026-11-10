@@ -1,6 +1,6 @@
 import {
   AiAudioController,
-  NoteController,
+  NoteExportController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -72,7 +72,7 @@ describe("NoteToolbar panels", () => {
   })
 
   it("copies export markdown while keeping the export dialog open", async () => {
-    mockSdkService(NoteController, "getAiContextMarkdown", {
+    mockSdkService(NoteExportController, "getAiContextMarkdown", {
       markdown: "# AI context\n\nHello **world**.",
     })
     const writeText = vi.fn().mockResolvedValue(undefined)

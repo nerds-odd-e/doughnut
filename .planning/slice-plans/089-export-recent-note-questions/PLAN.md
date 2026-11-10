@@ -1,6 +1,7 @@
 # Export recent note questions with personal selections
 
 **Source:** [selected story](../../seeds/SEED-118-export-recent-quiz-questions.md#export-a-note-with-recent-quiz-questions)
+**Source review:** [independent commitments](source-review.md)
 **Identity:** SEED-118#export-a-note-with-recent-quiz-questions
 
 ## Goal and scope
@@ -130,7 +131,7 @@ personal selections. Ordinary export remains usable throughout.
 
 ### 1. Give Markdown export its cohesive controller boundary
 Type: Structure
-Status: planned
+Status: done
 Change: Run the bounded early probe, then move the existing export route into
 `NoteExportController` as described above. Preserve its path, response, token
 semantics and read access. Regenerate the client and update the current form
@@ -141,6 +142,22 @@ query and guest baseline; mounted export baseline and frontend typechecks on
 the generated client. Keep the graph controller's retained behavior green.
 Sizing: about 5 minutes of edits/cleanup; full backend verification and API
 generation are the explicit focused-verification wait exception.
+
+**Accepted proof (pre-delivery evidence).** Early probe
+`./scripts/run.sh pnpm backend:test_only` green on isolated DB
+`doughnut_wt_b2412fc3c9a54b4ba536972faca16121_test`; scratch empty-Markdown
+mutation caught by three export boundary tests and restored. Post-move same
+backend suite: 3057 tests, 0 failures, 2 skipped; graph tests retained green.
+`NoteExportControllerAiContextMarkdownTests` covers readable Markdown, unauthorized
+refusal, real HTTP `tokenLimit` GET, and Bazaar guest ordinary export.
+`./scripts/run.sh pnpm frontend:test tests/notes/NoteExportForm.spec.ts` 2 passed;
+`vue-tsc --noEmit` and `tsc --noEmit` passed. Generated owner is
+`NoteExportController.getAiContextMarkdown` at unchanged path. Post-change
+refactor: no further edits (`## REFACTOR COMPLETE`).
+
+**Learnings.** OpenAPI tag became `note-export-controller` → generated
+`NoteExportController`; path/operationId unchanged. Adjacent toolbar/more-options
+SDK mocks must follow the generated service move.
 
 ### 2. Export the newest note questions with Donut's answer key
 Type: Behavior
@@ -220,3 +237,41 @@ ownership, question selection, private answer selection, and UI interaction.
 They share one domain model and mapped proof; the state-changing early probe
 bounds backend/generation prerequisites. No remaining slice-specific concern
 or human decision was identified in this review.
+
+## Story obligations
+
+### X1. Deferred automatic AI analysis or note changes
+Reported: slice 1 — "Deferred: automatic AI analysis or note changes."
+Story clause: "Deferred promises: automatic AI analysis or note changes"
+Disposition: excluded "Deferred promises: automatic AI analysis or note changes, a separate recall-history report, historical note-version reconstruction, and additional quiz metadata."
+Commitment: C14
+
+### X2. Deferred separate recall-history report
+Reported: slice 1 — "Deferred: a separate recall-history report."
+Story clause: "a separate recall-history report"
+Disposition: excluded "Deferred promises: automatic AI analysis or note changes, a separate recall-history report, historical note-version reconstruction, and additional quiz metadata."
+Commitment: C15
+
+### X3. Deferred historical note-version reconstruction
+Reported: slice 1 — "Deferred: historical note-version reconstruction."
+Story clause: "historical note-version reconstruction"
+Disposition: excluded "Deferred promises: automatic AI analysis or note changes, a separate recall-history report, historical note-version reconstruction, and additional quiz metadata."
+Commitment: C16
+
+### X4. Deferred additional quiz metadata
+Reported: slice 1 — "Deferred: additional quiz metadata."
+Story clause: "additional quiz metadata"
+Disposition: excluded "Deferred promises: automatic AI analysis or note changes, a separate recall-history report, historical note-version reconstruction, and additional quiz metadata."
+Commitment: C17
+
+### X5. Appendix does not become authored note content
+Reported: slice 1 — "It does not become authored note content."
+Story clause: "This appendix is a transient export; it does not become authored note content or notebook Git data."
+Disposition: excluded "This appendix is a transient export; it does not become authored note content or notebook Git data."
+Commitment: C36.2
+
+### X6. Appendix does not become notebook Git data
+Reported: slice 1 — "It does not become notebook Git data."
+Story clause: "This appendix is a transient export; it does not become authored note content or notebook Git data."
+Disposition: excluded "This appendix is a transient export; it does not become authored note content or notebook Git data."
+Commitment: C36.3

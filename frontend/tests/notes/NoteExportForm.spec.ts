@@ -2,7 +2,7 @@ import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import { NoteExportController } from "@generated/donut-backend-api/sdk.gen"
 import { saveAs } from "file-saver"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { Note } from "@generated/donut-backend-api"
@@ -16,7 +16,7 @@ describe("NoteExportForm", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
+    mockSdkService(NoteExportController, "getAiContextMarkdown", aiMarkdownStub)
   })
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe("NoteExportForm", () => {
     const note = mountForm()
     await flushPromises()
 
-    expect(NoteController.getAiContextMarkdown).toHaveBeenCalledWith({
+    expect(NoteExportController.getAiContextMarkdown).toHaveBeenCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 2000 },
     })
@@ -69,8 +69,8 @@ describe("NoteExportForm", () => {
     const note = makeMe.aNote.please()
     const md1 = { markdown: "first" }
     const md2 = { markdown: "second-budget" }
-    vi.mocked(NoteController.getAiContextMarkdown).mockReset()
-    vi.mocked(NoteController.getAiContextMarkdown)
+    vi.mocked(NoteExportController.getAiContextMarkdown).mockReset()
+    vi.mocked(NoteExportController.getAiContextMarkdown)
       .mockResolvedValueOnce(wrapSdkResponse(md1))
       .mockResolvedValueOnce(wrapSdkResponse(md2))
     mountForm(note)
@@ -80,7 +80,7 @@ describe("NoteExportForm", () => {
     await clickTestId("refresh-context-md-btn")
 
     expect(aiMarkdownTextarea()?.value).toContain("second-budget")
-    expect(NoteController.getAiContextMarkdown).toHaveBeenLastCalledWith({
+    expect(NoteExportController.getAiContextMarkdown).toHaveBeenLastCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 3000 },
     })
