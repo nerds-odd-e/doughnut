@@ -12,6 +12,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Publish large notebooks without losing history](seeds/SEED-121-publish-large-notebooks.md#publish-large-notebooks-without-losing-history) — SEED-121#publish-large-notebooks-without-losing-history
 - [Export a note with recent quiz questions](seeds/SEED-118-export-recent-quiz-questions.md#export-a-note-with-recent-quiz-questions) — SEED-118#export-a-note-with-recent-quiz-questions
 - [Export a note from the highlighted property](seeds/SEED-120-export-highlighted-property.md#export-a-note-from-the-highlighted-property) — SEED-120#export-a-note-from-the-highlighted-property
 - [Find the note and property after recall](seeds/SEED-117-recall-note-location.md#find-the-note-and-property-after-recall) — SEED-117#find-the-note-and-property-after-recall
