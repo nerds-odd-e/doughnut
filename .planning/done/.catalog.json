@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-116_run-repository-commands-without-interactive-shell-setup.json",
+      "identity": "SEED-116#run-repository-commands-without-interactive-shell-setup",
+      "completedAt": "2026-11-10T13:06:20.698Z",
+      "blob": "b5293bf70c5230bd5b8f160d8fa699d934107dea"
+    },
+    {
       "fileName": "SEED-117_find-the-note-and-property-after-recall.json",
       "identity": "SEED-117#find-the-note-and-property-after-recall",
       "completedAt": "2026-11-10T11:29:40.409Z",
@@ -456,12 +462,6 @@
       "identity": "SEED-071#removal-proof-and-evidence-recurrence",
       "completedAt": "2026-10-12T01:42:09.609Z",
       "blob": "0744f7e042777d7e6f61ac777772c1ac6466810a"
-    },
-    {
-      "fileName": "SEED-066_title-aware-voice-refinement.json",
-      "identity": "SEED-066#title-aware-voice-refinement",
-      "completedAt": "2026-10-11T12:49:44.324Z",
-      "blob": "048efa0fc1e37ee0d35ffa0890ef4e8f3978390f"
     }
   ],
   "unreadable": []

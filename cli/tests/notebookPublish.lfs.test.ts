@@ -41,6 +41,13 @@ vi.mock('node:child_process', async () => {
 describe('notebook publish — LFS object upload before bundle submission', () => {
   const ctx = installNotebookCliRunFixture('donut-cli-publish-lfs-test-')
 
+  // Ignore host Git config: a host-wide LFS filter would start git-lfs and
+  // its hooks on every setup clone and commit; pointers hash the same without it.
+  beforeEach(() => {
+    vi.stubEnv('GIT_CONFIG_GLOBAL', '/dev/null')
+    vi.stubEnv('GIT_CONFIG_NOSYSTEM', '1')
+  })
+
   function checkoutWithAcceptedAttachments(
     name: string,
     commits: number,
@@ -69,13 +76,6 @@ describe('notebook publish — LFS object upload before bundle submission', () =
   }
 
   describe('costs what the unpublished commits change', () => {
-    // Ignore host Git config: a host-wide LFS filter would start git-lfs and
-    // its hooks on every setup clone and commit; pointers hash the same without it.
-    beforeEach(() => {
-      vi.stubEnv('GIT_CONFIG_GLOBAL', '/dev/null')
-      vi.stubEnv('GIT_CONFIG_NOSYSTEM', '1')
-    })
-
     async function publishNoteEditAfter(name: string, commits: number) {
       const dir = checkoutWithAcceptedAttachments(name, commits, 10)
       fs.writeFileSync(join(dir, 'note.md'), '# lfs notebook edited\n')

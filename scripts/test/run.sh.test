@@ -31,6 +31,10 @@ printf 'lock 1\n' >"$repo/flake.lock"
 
 cat >"$work/bin/nix" <<'NIX'
 #!/usr/bin/env bash
+[[ "$2" == --extra-experimental-features && "$3" == 'nix-command flakes' ]] || {
+  echo 'error: nix-command and flakes are disabled' >&2
+  exit 1
+}
 printf 'nix %s\n' "$*" | sed -e "s#$DONUT_TEST_WORK#WORK#g" >>"$DONUT_TEST_WORK/nix.log"
 if [[ "$*" == *" --profile "* ]]; then
   [[ -z "${DONUT_TEST_POPULATE_FAIL:-}" ]] || { echo "error: undefined variable" >&2; exit 1; }
@@ -111,10 +115,10 @@ test-runs-directly-inside-nix() {
 
 test-populates-recorded-environment-once-then-reuses-it() {
   @assert-equals "WORK/repo/sub dir|a b|*|true
-nix develop path:WORK/repo/.git/donut-nix-env/KEY/flake --no-write-lock-file --profile WORK/repo/.git/donut-nix-env/KEY/profile -c true
-nix develop WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c bash -c printf \"%s|%s|%s|%s\\n\" \"\$PWD\" \"\$1\" \"\$2\" \"\${CURSOR_DEV:-}\"; exit \"\$3\" child a b * 0
+nix develop --extra-experimental-features nix-command flakes path:WORK/repo/.git/donut-nix-env/KEY/flake --no-write-lock-file --profile WORK/repo/.git/donut-nix-env/KEY/profile -c true
+nix develop --extra-experimental-features nix-command flakes WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c bash -c printf \"%s|%s|%s|%s\\n\" \"\$PWD\" \"\$1\" \"\$2\" \"\${CURSOR_DEV:-}\"; exit \"\$3\" child a b * 0
 WORK/repo/sub dir|a b|*|true
-nix develop WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c bash -c printf \"%s|%s|%s|%s\\n\" \"\$PWD\" \"\$1\" \"\$2\" \"\${CURSOR_DEV:-}\"; exit \"\$3\" child a b * 0
+nix develop --extra-experimental-features nix-command flakes WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c bash -c printf \"%s|%s|%s|%s\\n\" \"\$PWD\" \"\$1\" \"\$2\" \"\${CURSOR_DEV:-}\"; exit \"\$3\" child a b * 0
 snapshot: definition 1
 snapshot files: flake.lock flake.nix " "$(run-runner populate-then-reuse)"
 }
@@ -126,7 +130,7 @@ test-changed-definition-builds-a-new-environment() {
 test-populate-failure-is-visible-and-runs-nothing() {
   @assert-equals "error: undefined variable
 status 1
-nix develop path:WORK/repo/.git/donut-nix-env/KEY/flake --no-write-lock-file --profile WORK/repo/.git/donut-nix-env/KEY/profile -c true
+nix develop --extra-experimental-features nix-command flakes path:WORK/repo/.git/donut-nix-env/KEY/flake --no-write-lock-file --profile WORK/repo/.git/donut-nix-env/KEY/profile -c true
 no profile" "$(run-runner populate-failure)"
 }
 
