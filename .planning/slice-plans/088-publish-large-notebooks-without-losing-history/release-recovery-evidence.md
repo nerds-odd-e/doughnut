@@ -1,0 +1,11 @@
+# Release and owner checkpoint
+
+Slices1–12 are validated;13and14 remain planned. Execution is not complete. Keep the same story worktree, branch, Taken assignment, source review and exact published candidate. The earlier approved landing/appv1.3.70 covered diagnostics only. This new checkpoint must name the completed candidate and intended production actions before retained landing or tags.
+
+## Read-only preparation on 2026-11-10
+
+GitHub connected-source matching refs showed highest applicationv1.3.70 and CLIcli-v0.5.27; proposed immutable applicationv1.3.71 and CLIcli-v0.5.28 were unused. Recheck before release. After approval, land the tested candidate using Dough Land --keep-worktree, retain its exact accepted main SHA, and require applicable successful main CI and required frontend/backend artifacts before creating the app tag. Observe actual publication and public CLI updater input/replacement; local proof does not establish public delivery. No later trunk publication takes the already-consumed original landing context.
+
+One ordinary owner-authorized locked diagnostic at2026-11-10T11:25:35Z returnedHTTP200 in16.137seconds and exactly matched the prior four-file report. Exact A/L/content remain private under the incident checkpoint-review directory, outside Git. Owner checkout still holds the same pending commit and untracked.gitignore on main. No owner checkout/config/install mutation occurred. The existing exact four-file diff remains the review input: two rewritten originals link their two genuine live-only extracted notes. An A/L-bound recovery must be explicitly authorized for those exact bytes; if either state changes, obtain a fresh review. Existing private IDs/learning and pending local work remain required before/after observations in14.
+
+The next handoff asks once for retained landing plus both named releases and exact reviewed recovery/Pull/Publish continuation. Public CI, deployment, normal public update and actual owner recovery remain unobserved. No automatic retrospective, execution-complete marker, story closure or worktree retirement is appropriate here.

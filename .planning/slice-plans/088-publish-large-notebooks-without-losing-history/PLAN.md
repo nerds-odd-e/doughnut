@@ -165,7 +165,7 @@ fixture belongs solely to 12.
 
 ### 12. Update the authentic affected installation after application publication
 Type: Behavior
-Status: planned
+Status: done
 Proof: new isolated shared-store fixture drives tag-versioned CLI build/uploader, application publication,
 actual normal Update from authentic 0.5.9, and execution of fixed replacement/version and the large-tree CLI
 path. Existing call-log shell fixtures do not supply this integration. This one sequence owns updater
@@ -213,7 +213,7 @@ Policy agreement is not approval of unseen live content. Owner/operator waits.
 [Execution context, observer identity and accepted proof](execution-evidence.md).
 
 Developer accepted reviewed forward preservation on 2026-11-10; no source/ADR question remains.
-Completed1–11 stand. Slice10 continuation proved real large-notebook acceptance and receiving; earlier failed attempts remain dated evidence in execution-evidence.md. Fourteen leaves; application11 keeps its stated12–15-minute exception, updater12 and final delivery/owner13/14 remain. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Whole remaining scope was reassessed and stays supported; no source or story change.
+Completed1–12 stand. Slice10 continuation proved real large-notebook acceptance and receiving; earlier failed attempts remain dated evidence in execution-evidence.md. Fourteen leaves; application11 keeps its stated12–15-minute exception, updater12 and final delivery/owner13/14 remain. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Whole remaining scope was reassessed and stays supported; no source or story change.
 
 ## Story obligations
 

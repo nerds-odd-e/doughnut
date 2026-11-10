@@ -19,7 +19,7 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | C09 | Deliver the existing scan fix through `donut update` from the affected installed version. | slice 13 |  |
 | C10 | Deliver an accurately versioned build. | slice 13 |  |
 | C11 | Keep the normal update target usable across CLI publication. | slice 13 |  |
-| C12 | Keep the normal update target usable across application publication. | slice 12 |  |
+| C12 | Keep the normal update target usable across application publication. | slice 12 | observed: scripts/acceptance/cli-publication-update.mjs real workflow build/uploader then application publication in same objectstore; authentic0.5.9 update installs exact built/public digest and executes0.5.28 and large native Publish. Final acceptance1pass0fail/skip6.112s. |
 | C13 | Diagnose the reported live/accepted mismatch using the canonical Portable representation. | slice 3 | observed: Private drift-report.json and drift-report-metadata.json: one locked production comparison at9464923e, all4paths exactbytes/nativeGitIDs |
 | C14 | Identify differing paths. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | C15 | Identify entries that are live-only. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
@@ -65,12 +65,12 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | Q11 | Deferred promises are delivery limits, not new rejection rules. | slice 10 | observed: Reading of seven E2E-only changes: no production admission policy added; consumer-trace-large-backend.md#promise-observations-and-fixture-boundary. |
 | Q12 | The observed mismatch’s cause remains this story’s work. | slice 14 |  |
 | Q13 | The observed mismatch’s recovery remains this story’s work. | slice 14 |  |
-| J01.1 | **Starting condition:** The owner has the affected installed CLI; `0.5.9` is the incident version. | slice 12 |  |
-| J01.2 | **Action:** The owner runs `donut update`. | slice 12 |  |
+| J01.1 | **Starting condition:** The owner has the affected installed CLI; `0.5.9` is the incident version. | slice 12 | observed: scripts/acceptance/cli-publication-update.mjs verifies authentic predecessor SHA2565b868908f33576604389ad9b41f26a21eaa6efef982c570e2a60488d3365525c and executes owned copy version0.5.9 before update. |
+| J01.2 | **Action:** The owner runs `donut update`. | slice 12 | observed: scripts/acceptance/cli-publication-update.mjs executes authentic installed update, asserts Updateddonut0.5.9to0.5.28; installed digest==builtDigest and executed replacement version0.5.28. |
 | J01.3 | **Result:** The owner receives a strictly newer build. | slice 13 |  |
 | J01.4 | **Result:** The received build is correctly versioned. | slice 13 |  |
 | J01.5 | **Result:** The received build contains the fix. | slice 13 |  |
-| J01.6 | **Later journey:** A later application publication keeps that supported update path usable. | slice 12 |  |
+| J01.6 | **Later journey:** A later application publication keeps that supported update path usable. | slice 12 | observed: scripts/acceptance/cli-publication-update.mjs drives actual application publication after CLI upload, observes selected SPA/succeeded release and retained binarydigest; subsequent actual normalupdate/replacement/largePublish passes. consumer-trace-updater-sequence.md. |
 | J02.1 | **Starting condition:** The notebook is healthy. | slice 10 | observed: notebookLargePublication.expectHealthyLargeAcceptedTree actual diagnosis: A matches native HEAD, acceptedTree==liveTree, differences empty; final E2E1pass2026-11-10T11:11:51Z. |
 | J02.2 | **Starting condition:** Its complete accepted tree listing exceeds 1 MiB. | slice 10 | observed: createCliE2eNotebookListingTasks.measureCliNotebookListing native full ls-tree:1760068bytes11001entries; scenario requires>1MiB. |
 | J02.3 | **Local change:** Three Markdown files change in a local commit. | slice 10 | observed: notebookLargePublication.commitThreeEdits uses commitRelatedNoteChanges for three distinct typed Markdown files; final E2E1pass. |
