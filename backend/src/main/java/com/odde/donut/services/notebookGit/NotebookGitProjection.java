@@ -2,7 +2,6 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.util.List;
 import java.util.Map;
@@ -89,21 +88,32 @@ public class NotebookGitProjection {
       List<Note> storedNotes,
       Repository repository,
       ObjectId acceptedHead) {
-    List<PortableTreeEntry> acceptedMetadata =
-        NotebookGitAcceptedTree.metadataEntries(repository, acceptedHead);
-    if (!treeEncoder
-        .fullTree(notebook, folders, storedNotes, acceptedMetadata)
+    if (!liveTree(notebook, folders, storedNotes, repository, acceptedHead)
         .blobIds()
         .equals(NotebookGitAcceptedTree.blobIds(repository, acceptedHead))) {
       throw projectionDrift();
     }
   }
 
+  NotebookGitTreeContent liveTree(
+      Notebook notebook,
+      List<PortableTreeFolderRow> folders,
+      List<Note> storedNotes,
+      Repository repository,
+      ObjectId acceptedHead) {
+    return treeEncoder.fullTree(
+        notebook,
+        folders,
+        storedNotes,
+        NotebookGitAcceptedTree.metadataEntries(repository, acceptedHead));
+  }
+
   private static ResponseStatusException projectionDrift() {
     return new ResponseStatusException(
         HttpStatus.CONFLICT,
-        "The notebook's current Portable content differs from accepted main; refresh the checkout"
-            + " before publishing.");
+        "The notebook's current Portable content differs from accepted main. Run"
+            + " \"donut notebook diagnose <directory>\" and review server recovery; Pull alone cannot"
+            + " repair this drift.");
   }
 
   static ResponseStatusException unrepresentedParentFolder(String notePath) {

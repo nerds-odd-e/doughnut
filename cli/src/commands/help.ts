@@ -4,6 +4,7 @@ import type {
 } from './interactiveSlashCommand.js'
 import { updateDoc } from './update.js'
 import { versionDoc } from './version.js'
+import { notebookDiagnosisDoc } from './notebook/notebookDiagnosis.js'
 
 export const helpDoc: CommandDoc = {
   name: '/help',
@@ -27,7 +28,11 @@ export function formatSection(title: string, rows: string[]): string {
 export function formatInteractiveHelp(
   interactiveDocs: readonly CommandDoc[]
 ): string {
-  const subcommandRows = formatDocRows([versionDoc, updateDoc])
+  const subcommandRows = formatDocRows([
+    versionDoc,
+    updateDoc,
+    notebookDiagnosisDoc,
+  ])
   const slashRows = formatDocRows(interactiveDocs)
   return [
     formatSection('Subcommands', subcommandRows),

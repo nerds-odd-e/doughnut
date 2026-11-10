@@ -26,7 +26,7 @@ import {
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 
 const DRIFT_MESSAGE =
-  "The notebook's current Portable content differs from accepted main; refresh the checkout before publishing."
+  'The notebook\'s current Portable content differs from accepted main. Run "donut notebook diagnose <directory>" and review server recovery; Pull alone cannot repair this drift.'
 
 function rebasedWork(directory: string) {
   return {

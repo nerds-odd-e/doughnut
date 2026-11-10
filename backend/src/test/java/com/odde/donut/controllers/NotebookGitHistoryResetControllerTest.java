@@ -66,7 +66,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
             proposalBundleBytes(
                 driftedBinding, List.of(new NotebookGitProposalFile("note.md", EDITED_CONTENT))),
             HttpStatus.CONFLICT);
-    assertThat(beforeReset.getReason(), containsString("refresh the checkout before publishing"));
+    assertThat(beforeReset.getReason(), containsString("donut notebook diagnose"));
 
     controller.resetNotebookGitHistory(notebook);
 

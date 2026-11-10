@@ -30,7 +30,7 @@ import {
 } from './notebookPublish.testHelpers.js'
 
 const DRIFT_MESSAGE =
-  "The notebook's current Portable content differs from accepted main; refresh the checkout before publishing."
+  'The notebook\'s current Portable content differs from accepted main. Run "donut notebook diagnose <directory>" and review server recovery; Pull alone cannot repair this drift.'
 const INVALID_YAML_MESSAGE = `${SPACED_NOTE_PATH} has invalid YAML frontmatter`
 const BODY_INVALID_YAML =
   '---\ntype: Note\nbroken: [unterminated\n---\n# Note\n\nChosen sentence.\n'

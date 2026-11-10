@@ -138,6 +138,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `updateNotebookGroup`: PATCH `/api/notebooks/{notebook}/notebook-group` -> `UpdateNotebookGroupResponse` (request: `UpdateNotebookGroupData`; path: notebook; body: UpdateNotebookGroupRequest; response body: Notebook)
 - `moveToCircle`: PATCH `/api/notebooks/{notebook}/move-to-circle/{circle}` -> `MoveToCircleResponse` (request: `MoveToCircleData`; path: notebook, circle; response body: Notebook)
 - `myNotebooks`: GET `/api/notebooks` -> `MyNotebooksResponse` (request: none; response body: NotebooksViewedByUser)
+- `diagnoseNotebookGit`: GET `/api/notebooks/{notebook}/git-diagnosis` -> `DiagnoseNotebookGitResponse` (request: `DiagnoseNotebookGitData`; path: notebook; response body: Report)
 
 ## Notebook Health Controller
 
