@@ -32,6 +32,18 @@ it("keeps narrow touch selection and tracker hit targets stable while tracker in
   )
   await expandPropertyPanel(wrapper, propertyRowSelector("activity"))
   const row = wrapper.get('[data-property-value="run"]').element as HTMLElement
+  const remove = row.querySelector('[aria-label="Remove activity item 1"]')!
+  const removeBox = remove.getBoundingClientRect()
+  expect(removeBox.width).toBeGreaterThanOrEqual(44)
+  expect(removeBox.height).toBeGreaterThanOrEqual(44)
+  expect(
+    document
+      .elementFromPoint(
+        removeBox.left + removeBox.width / 2,
+        removeBox.top + removeBox.height / 2
+      )
+      ?.closest("button")
+  ).toBe(remove)
   const before = row.getBoundingClientRect()
   const select = row.querySelector(".property-item-select")!
   expect(select.getBoundingClientRect().height).toBeGreaterThanOrEqual(44)

@@ -3,6 +3,7 @@
 **Source:** [selected story](../../seeds/SEED-119-highlight-specific-property-item.md#highlight-and-link-to-a-specific-property-item)
 **Source review:** [source review](source-review.md)
 **Identity:** SEED-119#highlight-and-link-to-a-specific-property-item
+**Execution context:** [established context](proof-context.md#execution-context)
 
 ## Goal and scope
 
@@ -77,10 +78,7 @@ prepares the required cohesive removal owner before item behavior is added.
 
 ## Ordered slices
 
-Accepted interim behavior: list chevrons can open key-only/no-selection until
-slice 4, and assimilation can open key-only until slice 5. Slice 7 can save an
-emptied list as `[]`; slice 8 replaces that with final-entry deletion. These
-states keep ordinary authoring usable and add no rejection or disabled action.
+Interim: slice 7 may save the final removal as `[]`; slice 8 deletes the entry. Ordinary authoring remains usable.
 
 ### 1. Focus the value area consistently
 Type: Behavior
@@ -168,7 +166,7 @@ Sizing: about 3–5 active minutes; one cohesive extraction, no new public behav
 
 ### 7. Remove an occurrence with informed history deletion
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Minus with matching history → warning/cancel; cancel preserves the
 saved values/history/focus, confirm removes one occurrence and targeted history.
 Distinct siblings retain order/history; selected removal clears item selection,
@@ -186,7 +184,9 @@ Markdown. Cover shared duplicate history, earlier-equal-row removal and scalar
 removal. Real E2E cancels/confirms assimilated-item removal, reloads persisted
 values and observes surviving sibling learning data.
 Sizing: 5–8 minutes including focused proof/cleanup; retain warning and mutation
-together. Final-entry policy and its separate proof loop move to slice 8.
+together. At 10 active minutes only one focused E2E Cancel-query correction,
+terminal proof and trace remain; apply the bounded focused-check exception.
+Final-entry policy and its separate proof loop move to slice 8.
 
 ### 8. Remove the final item as a property entry
 Type: Behavior
@@ -215,10 +215,6 @@ policy becomes 8. Completed 1–5 and all accepted proof remain unchanged. Eight
 leaves use one focus/history model; no scope, PFE, ADR or North Star change.
 Ready after reassessment; no further story split or overrun reset is implied.
 
-## Execution context
-
-[Established execution context](proof-context.md#execution-context) remains in force.
-
 ## Story obligations
 
 ### G1. Resolved list item marker (first reported in original slice 2)
@@ -243,3 +239,10 @@ Reported: slice 5 — "CI run 42762324814 attempt 1 showed the scalar Skip conti
 Story clause: "A scalar `noteProperty` destination highlights its scalar value."
 Disposition: proved by slice 5: scalar empty-sentinel next-unit red reproduced on fa51; corrected production predicate and positive real-router/workspace cases pass in six suites/37 tests; actual assimilation_walkthrough Skip and property_order continuation pass 10/10 E2E, both typechecks; manual blank selection is unchanged and raw nonempty values remain exact
 Commitment: 34
+
+
+### G5. Persisted item removal Cancel journey
+Reported: slice 7 — "The initial Behavior 7 browser batch passed three scenarios but its new removal journey could not find Cancel because the query selected the loading dialog instead of the confirmation dialog; corrected collection query and terminal persisted-reload proof are pending."
+Story clause: "Cancel keeps content, learning history, focus and URL intact."
+Disposition: proved by slice 7: actual confirmation-root Cancel succeeds unforced; canonical mounted save boundary preserves DELETE/save/URL/selected run, then Confirm deletes11 and saves ordered siblings; final property_memory_tracker.feature 4/4 passes actual Cancel/Confirm and persisted reload walk/jog with retained walk history after correcting dialog and expanded-row fixture queries
+Commitment: 49

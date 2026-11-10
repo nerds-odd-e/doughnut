@@ -5,6 +5,7 @@
     data-testid="rich-note-property-panel"
   >
     <button
+      v-if="!authoredListValues"
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
       :aria-label="`Remove note property ${propertyKey}`"
@@ -42,6 +43,8 @@
       :authored-property-values="authoredListValues"
       :focused-item-index="focusedItemIndex(propertyKey, authoredListValues ?? [])"
       :selectable="canSelectPropertyItems"
+      removable
+      @remove-item="emit('remove-item', $event)"
       @select-item="selectPropertyItem(propertyKey, authoredListValues!, $event)"
       :show-learning-controls="hasSavedNote"
       :loading="hasSavedNote && !noteInfoLoaded"
@@ -92,6 +95,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   remove: []
+  "remove-item": [index: number]
   deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 

@@ -7,6 +7,7 @@ import {
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import type {
   PropertyKeyChange,
@@ -53,12 +54,15 @@ export function usePropertyMemoryTrackerGuard(
     }
 
     noteInfoLoadPromise = (async () => {
-      const { data, error } = await NoteController.getNoteInfo({
-        path: { note: id },
-      })
+      const { data, error } = await apiCallWithLoading(() =>
+        NoteController.getNoteInfo({
+          path: { note: id },
+        })
+      )
       if (!error) {
-        noteInfoCache = data!
+        noteInfoCache = data
       }
+      if (error) noteInfoLoadPromise = undefined
       return noteInfoCache
     })()
 
@@ -66,28 +70,38 @@ export function usePropertyMemoryTrackerGuard(
   }
 
   const confirmAndApplyRemoval = async (
-    propertyKey: string
+    propertyKey: string,
+    propertyValue?: string
   ): Promise<boolean> => {
     if (noteId() === undefined) {
       return true
     }
 
-    const trackers = propertyMemoryTrackers(await loadNoteInfo(), propertyKey)
+    const noteInfo = await loadNoteInfo()
+    if (!noteInfo) return false
+    const trackers = propertyMemoryTrackers(noteInfo, propertyKey).filter(
+      (tracker) =>
+        propertyValue === undefined || tracker.propertyValue === propertyValue
+    )
     if (trackers.length === 0) {
       return true
     }
 
     const confirmed = await popups.confirm(
-      `Property "${propertyKey}" has a memory tracker. Deleting it will also delete that tracker. Continue?`
+      propertyValue === undefined
+        ? `Property "${propertyKey}" has a memory tracker. Deleting it will also delete that tracker. Continue?`
+        : `Removing "${propertyValue}" from property "${propertyKey}" will delete its learning history. Equal values share this history; any remaining equal occurrence will lose it too. Continue?`
     )
     if (!confirmed) {
       return false
     }
 
     for (const tracker of trackers) {
-      const { error } = await MemoryTrackerController.delete({
-        path: { memoryTracker: tracker.id },
-      })
+      const { error } = await apiCallWithLoading(() =>
+        MemoryTrackerController.delete({
+          path: { memoryTracker: tracker.id },
+        })
+      )
       if (error) {
         return false
       }
@@ -106,7 +120,9 @@ export function usePropertyMemoryTrackerGuard(
       return true
     }
 
-    const trackers = propertyMemoryTrackers(await loadNoteInfo(), fromKey)
+    const noteInfo = await loadNoteInfo()
+    if (!noteInfo) return false
+    const trackers = propertyMemoryTrackers(noteInfo, fromKey)
     if (trackers.length === 0) {
       return true
     }

@@ -1,6 +1,7 @@
+import { flushPromises } from "@vue/test-utils"
 import {
   attemptRenamePropertyKey,
-  expandPropertyPanelAndClickRemove,
+  expandPropertyPanel,
   propertyRowSelector,
   propertyRows,
 } from "./propertiesTestDom"
@@ -112,14 +113,14 @@ describe("RichMarkdownEditor changes only what the user edited", () => {
       )
     })
 
-    it("removes only the removed property's line", async () => {
+    it("removes only the addressed item's line", async () => {
       const wrapper = await h.mountEditor(note)
-      await expandPropertyPanelAndClickRemove(
-        wrapper,
-        propertyRowSelector("tags")
+      await expandPropertyPanel(wrapper, propertyRowSelector("tags"))
+      await wrapper.get('[aria-label="Remove tags item 1"]').trigger("click")
+      await flushPromises()
+      expect(h.lastEmittedMarkdown()).toBe(
+        note.replace("tags: [x, y]", "tags:\n  - y")
       )
-
-      expect(h.lastEmittedMarkdown()).toBe(note.replace("tags: [x, y]\n", ""))
     })
 
     it("adds only the added property's line before the closing fence", async () => {

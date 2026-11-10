@@ -1,3 +1,4 @@
+import { listPropertyValue } from "@/utils/noteProperties"
 import type { Ref } from "vue"
 import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import {
@@ -7,8 +8,13 @@ import {
 
 export function useRichFrontmatterPropertyRemoval(options: {
   propertyRows: Ref<PropertyRow[]>
-  confirmAndApplyRemoval: (key: string) => Promise<boolean>
+  confirmAndApplyRemoval: (key: string, value?: string) => Promise<boolean>
   followFocusedPropertyDelete: (key: string) => void | Promise<unknown>
+  followFocusedPropertyItemRemoval: (
+    key: string,
+    previousItems: readonly string[],
+    removedIndex: number
+  ) => void | Promise<unknown>
   emitProperties: (rows: PropertyRow[]) => void
 }) {
   function removeRow(idx: number) {
@@ -25,5 +31,37 @@ export function useRichFrontmatterPropertyRemoval(options: {
     }, "Updating property…")
   }
 
-  return { removeRow }
+  function removeItem(idx: number, itemIndex: number) {
+    return runWithBlockingApiLoading(async () => {
+      const row = options.propertyRows.value[idx]!
+      if (row.value.kind !== "list") return
+      const previousItems = row.value.items
+      if (
+        !(await options.confirmAndApplyRemoval(
+          row.key,
+          previousItems[itemIndex]!
+        ))
+      )
+        return
+      options.propertyRows.value = options.propertyRows.value.map(
+        (current, index) =>
+          index === idx
+            ? {
+                ...row,
+                value: listPropertyValue(
+                  previousItems.filter((_, index) => index !== itemIndex)
+                ),
+              }
+            : current
+      )
+      await options.followFocusedPropertyItemRemoval(
+        row.key,
+        previousItems,
+        itemIndex
+      )
+      options.emitProperties(options.propertyRows.value)
+    }, "Updating property…")
+  }
+
+  return { removeRow, removeItem }
 }

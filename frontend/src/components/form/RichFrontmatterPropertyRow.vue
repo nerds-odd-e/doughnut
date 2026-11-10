@@ -111,6 +111,7 @@
       :wiki-links="wikiLinks"
       :last-saved-markdown="lastSavedMarkdown"
       @remove="emit('remove')"
+      @remove-item="emit('remove-item', $event)"
       @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
     />
   </div>
@@ -169,6 +170,7 @@ const emit = defineEmits<{
   add: []
   cancel: []
   remove: []
+  "remove-item": [index: number]
   "wikidata-dialog-open": []
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
   "relation-type-selected": [type: string | undefined]

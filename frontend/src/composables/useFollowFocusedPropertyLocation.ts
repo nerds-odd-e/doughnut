@@ -1,6 +1,6 @@
 import type { Ref } from "vue"
 import type { PropertyRow } from "@/utils/noteContentFrontmatter"
-import { propertyItemIndex } from "@/utils/noteProperties"
+import { propertyItemFocusAt, propertyItemIndex } from "@/utils/noteProperties"
 import { useRoute, useRouter, type RouteLocationNamedRaw } from "vue-router"
 import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
 import {
@@ -61,5 +61,43 @@ export function useFollowFocusedPropertyLocation(
     return replaceWhenFocusedKeyRemoved(removedKey, noteShowLocation)
   }
 
-  return { followFocusedPropertyRename, followFocusedPropertyDelete }
+  function followFocusedPropertyItemRemoval(
+    key: string,
+    previousItems: readonly string[],
+    removedIndex: number
+  ) {
+    const item = notePropertyItemFromRoute(route)
+    const noteId = noteRouteFamilyNoteId(route)
+    if (
+      notePropertyKeyFromRoute(route) !== key ||
+      !item ||
+      noteId === undefined
+    )
+      return
+    const selectedIndex = propertyItemIndex(previousItems, item)
+    if (selectedIndex < 0) return
+    const row = propertyRows.value.find((row) => row.key === key)
+    if (row?.value.kind !== "list") return
+    const focus =
+      selectedIndex === removedIndex
+        ? undefined
+        : propertyItemFocusAt(
+            row.value.items,
+            selectedIndex - (selectedIndex > removedIndex ? 1 : 0)
+          )
+    return router.replace(
+      locationKeepingQuery(
+        route,
+        focus
+          ? notePropertyItemLocation(Number(noteId), key, focus)
+          : notePropertyLocation(Number(noteId), key)
+      )
+    )
+  }
+
+  return {
+    followFocusedPropertyRename,
+    followFocusedPropertyDelete,
+    followFocusedPropertyItemRemoval,
+  }
 }

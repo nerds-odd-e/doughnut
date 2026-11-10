@@ -43,12 +43,16 @@ export function useRichFrontmatterPropertyEditing(options: {
   )
   const { confirmAndApplyRemoval, confirmAndApplyRename } =
     usePropertyMemoryTrackerGuard(options.noteId, reloadNoteInfo)
-  const { followFocusedPropertyRename, followFocusedPropertyDelete } =
-    useFollowFocusedPropertyLocation(options.propertyRows)
-  const { removeRow } = useRichFrontmatterPropertyRemoval({
+  const {
+    followFocusedPropertyRename,
+    followFocusedPropertyDelete,
+    followFocusedPropertyItemRemoval,
+  } = useFollowFocusedPropertyLocation(options.propertyRows)
+  const { removeRow, removeItem } = useRichFrontmatterPropertyRemoval({
     propertyRows: options.propertyRows,
     confirmAndApplyRemoval,
     followFocusedPropertyDelete,
+    followFocusedPropertyItemRemoval,
     emitProperties,
   })
 
@@ -229,6 +233,7 @@ export function useRichFrontmatterPropertyEditing(options: {
     tryCommitInsert,
     onRowFocus,
     removeRow,
+    removeItem,
     commitRow,
     onRelationTypeSelected,
     addWikiLinkAsProperty,
