@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Julia-chan",
+  "email": "julia-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-112#publish-explicit-ci-test-counts",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
