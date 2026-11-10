@@ -33,6 +33,10 @@ prints `Browser origin:`, runs the testability reset (seeded accounts such as
 `old_learner` / `password`; first-choice randomizer, GitHub stand-in, and
 feature toggle off), reports ready, and stops the stack on Ctrl-C with exit 0.
 It withholds `OPENAI_API_TOKEN` from the stack unless given `--paid-openai`.
+The E2E profile supplies a non-secret placeholder when that variable is unset,
+so mocked OpenAI features run without a credential export. A supplied token
+retains its value when the launch permits it; scenario tags and service
+configuration choose the OpenAI endpoint.
 When it runs in the background, stop it by sending SIGINT to the
 `node scripts/e2e-runner.mjs --hold` process, not to the `pnpm` shell wrapper.
 Worktree identity, database, and allocated application ports persist between

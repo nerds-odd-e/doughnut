@@ -188,3 +188,15 @@ CI: GitHub Actions `ci.yml`, verified active workflow 5208694, name `donut CI`; 
 ## Accepted execution evidence
 
 Slice 1 proof and consumer dispositions: [execution evidence](execution-evidence.md#slice-1-required-nix-features), [consumer trace](consumer-trace-nix.md). The six current-runner cases, real disabled-feature cold/reuse and public setup pass. Hook checks pass; profiling clone is compatibility-only evidence. No gaps.
+
+
+## Story obligations
+
+### G1. Record accepted credential publication
+Reported: slice 2 — "Exact credential delivery revision awaits coordinator publication."
+Story clause: "Record the delivered response and release at"
+Disposition: return
+
+## Delivery evidence
+
+Slice 1 accepted publication: `12e1f925a5e6199a27bbefcaf298f0b8c948045f` on the recorded remote story branch, suffix base `de3ec5af37e0a03538c17daa410b10af5252073c`, same observer reused. Slice 2 proof: [execution evidence](execution-evidence.md#slice-2-mocked-openai-credential-default) and [consumer trace](consumer-trace-credential.md); full backend, held cases and clean-shell seven-scenario batch passed. G1 keeps exact delivery attribution owned until its progress publication.
