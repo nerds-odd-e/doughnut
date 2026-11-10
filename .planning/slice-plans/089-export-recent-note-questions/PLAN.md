@@ -234,6 +234,16 @@ pending disable, error/retry, budget). Full `pnpm frontend:test` 2474 passed;
 vue-tsc/tsc OK. Toolbar panel consumer awaits preview after clear-on-start.
 G2 closed as proved by slice 4. Post-change refactor: sibling assertion trim only.
 
+## Execution complete
+
+Product advice: Leave deferred promises deferred (AI analysis/note mutation,
+separate recall-history report, historical note versions, additional quiz
+metadata). No backlog reorder from this review; keep SEED-120 separate. The
+accepted unanswered-newest challenge needs no follow-up unless the owner later
+wants an answered-focused export. Tip CI for the final implementation revision
+was still pending at retrospective time and remains owned by the completion
+operation.
+
 ## Commands, delivery, and concern review
 
 Run repo commands through `./scripts/run.sh` (the documented Nix wrapper):

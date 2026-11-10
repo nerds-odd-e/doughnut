@@ -77,6 +77,15 @@ Former local code: DD-160. Two refactor passes within one story treat barely tou
 
 Former local code: DD-176. Every small slice launches a fresh full refactor agent even when the accepted diff needs no further changes, creating substantial repeated cost. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-141.md).
 
+### Occurrences
+- Execution: SEED-118#export-a-note-with-recent-quiz-questions (first implementation `7089269e2e`)
+  - Timestamp: 2026-11-10T15:48:00+08:00
+  - Tool: Cursor
+  - Open Dough release: 0.3.94
+  - Evidence: plan `089-export-recent-note-questions` slices 1–4; published SHAs `7089269e2e`, `1c6d3e9945`, `011385133d`, `52e74feaa5`; refactor agents `0ae1c0d1` (slice 1, 15:48), `7fe03ae0` (slice 2, 16:03), `56d8503d` (slice 3, 16:15), `c7d4aaa4` (slice 4, 16:28) under parent `75e2007b-148e-453a-91c5-435dd0684d36`
+  - Observed effect: four consecutive post-slice refactor agents. Slices 1–2 returned `none — already clean` / no edits. Slice 3 collocated latest-selection folding into `RecallPromptRepository` and synced OpenAPI description. Slice 4 trimmed sibling test assertions only (production unchanged).
+  - Inference: same fixed per-slice refactor launch cost as ODF-141; two empty passes and one test-doc-only pass paid the full agent cost. Slice 3’s cohesion edit shows the pass is not always empty. Token/time cost of the empty passes was not separately measured here.
+
 <a id="odf-208"></a>
 
 ## ODF-208 — Observer worker exits without a recorded cause
