@@ -182,6 +182,15 @@ Former local code: DD-231. A slice proof table omits explicit story end conditio
 
 Former local code: DD-233. Broad whole-reference and metadata batches exceeded the response budget and truncated required context before delegation, forcing repeated retrieval despite existing targeted-reading guidance. Execution provenance and counts remain with the linked evidence owner; savings are unmeasured. This agent deviation is distinct from ODF-158’s required-reference cost. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-264.md).
 
+### Occurrences
+- Execution: SEED-117#find-the-note-and-property-after-recall; first implementation 8b9e70d9fb0f6ec7f11b30595278c29c6709f2c4
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: launch 5a2c1855-2aed-40c0-bd75-6e21ae06957b conversation, 2026-11-10; startup combined unit-testing/agent-map/plan/package read returned original token count 11774 with truncation; subsequent combined plan/seed/trace/backlog read returned 12465 with truncation. Retrospective combined full ADR read repeated the problem (12411 tokens).
+  - Observed effect: coordinator retrieved missing source/guidance again; targeted passages were sufficient when used.
+  - Inference: avoidable agent retrieval deviation recurred despite targeted-reading guidance; token/time savings are unmeasured.
+
 <a id="odf-265"></a>
 
 ## ODF-265 — A comparison of empty captures was printed as a match
