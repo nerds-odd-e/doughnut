@@ -28,7 +28,7 @@ list item highlighted, build the Markdown using that focus. Share the
 property-focus Markdown code already used by question generation.
 [FocusContextMarkdownAugmenter](../../backend/src/main/java/com/odde/donut/services/focusContext/FocusContextMarkdownAugmenter.java)
 
-Reuse the [recent quiz questions option](SEED-118-export-recent-quiz-questions.md#export-a-note-with-recent-quiz-questions).
+Reuse Export Note Data's **Include recent multiple-choice questions** option.
 When selected, include up to 10 of the most recent MCQs for the highlighted
 property or exact list item, with answer choices and the learner's selected
 answers where available. Apply the focus before selecting the 10 newest
