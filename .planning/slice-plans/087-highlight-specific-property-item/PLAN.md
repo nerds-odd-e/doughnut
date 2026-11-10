@@ -58,9 +58,9 @@ SEED-120 export. Ordinary authoring retains empty lists; final-item minus delete
 | Chevron first item; row/background and keyboard selection; shared focus for consumers | 4 | Mounted editor actions change route and selected value; complete authored rows remain usable |
 | Value links and learning actions retain their destination; narrow/touch controls | 4 | Real browser click/keyboard/geometry tests including tracker-loading state |
 | Assimilation's exact value opens first matching occurrence | 5 | Production-router assimilation boundary and notebook workspace continuation |
-| Warn/cancel preserves content/history/focus; confirm removes exact item/history and preserves distinct siblings | 6 | Mounted note save boundary plus real persisted reload/tracker E2E |
-| Selected removal clears focus; other removal preserves selected occurrence | 6 | Mounted editor route/content, including earlier equal occurrence removal |
-| Final removal deletes entry and its key's history, then goes to note | 7 | Mounted note save boundary and real persisted final-entry save/reload journey |
+| Warn/cancel preserves content/history/focus; confirm removes exact item/history and preserves distinct siblings | 7 | Mounted note save boundary plus real persisted reload/tracker E2E |
+| Selected removal clears focus; other removal preserves selected occurrence | 7 | Mounted editor route/content, including earlier equal occurrence removal |
+| Final removal deletes entry and its key's history, then goes to note | 8 | Mounted note save boundary and real persisted final-entry save/reload journey |
 
 ## Premises and observations
 
@@ -71,34 +71,15 @@ that matching observation before restoring Behavior 3.
 
 ## Consumer trace and structural seams
 
-Expected production edits include route metadata/assembly mapping, note location
-helpers/classifier, focus/follow-location composables, property row/list/panel,
-list learning rows, editing coordination, tracker guard and assimilation
-navigation. Follow actual changed output into notebook chrome/conversation,
-read-only `NoteContextReader`, complete-note rendering and just-review.
-
-Preserve API clients and backend deletion semantics. Trace copied item hrefs
-through classification/link handling, retaining selector and authored href.
-The probe reaches QuillEditor, `wikiLinkClick` and HTML-to-Markdown conversion.
-Backend `NoteIdUrl` recognizes exact note-show paths; item hrefs remain ordinary
-Markdown. Portable wiki-property destinations stay property-level.
-
-Expected production files are at most 250 lines at the base; near the ceiling:
-property editing 248, rich editor 248, properties 240, property row 237, editable
-content 242. Keep removal orchestration in a cohesive editing collaborator and
-value-frame presentation together. Add focused item specs rather than growing
-near-ceiling location/memory tests. Recheck sizes before editing.
-
-During delivery, run the installed consumer-trace procedure for the actual
-diff and give every consumer run/reused/excluded disposition. Include assertions,
-steps and `noteRichPropertyMethods`, `notePropertyLayoutMethods` and assimilation
-helpers. Preserve scalar remove/reify/edit and replace focus proof at the value boundary.
+[Trace and seam contract](proof-context.md#consumer-trace-and-structural-seams)
+remains unchanged. Current editing/row owners are248/247 lines; Structure 6
+prepares the required cohesive removal owner before item behavior is added.
 
 ## Ordered slices
 
 Accepted interim behavior: list chevrons can open key-only/no-selection until
-slice 4, and assimilation can open key-only until slice 5. Slice 6 can save an
-emptied list as `[]`; slice 7 replaces that with final-entry deletion. These
+slice 4, and assimilation can open key-only until slice 5. Slice 7 can save an
+emptied list as `[]`; slice 8 replaces that with final-entry deletion. These
 states keep ordinary authoring usable and add no rejection or disabled action.
 
 ### 1. Focus the value area consistently
@@ -171,7 +152,21 @@ Proof: Extend `useGoToNextAssimilation.spec.ts` using the production router and
 the notebook workspace continuation; exercise the actual returned value.
 Sizing: about 5 minutes including the focused existing suite.
 
-### 6. Remove an occurrence with informed history deletion
+### 6. Keep removal coordination in one editing owner
+Type: Structure
+Status: planned
+Internal change: Extract the existing whole-property removal orchestration into
+a cohesive editing collaborator, preserving the same guard/cache instance,
+loading, emit and focus-following callbacks. Keep every current public removal,
+warning/cancel and save behavior unchanged; add no item interface or matcher.
+Enables immediately following Behavior 7 without growing the 248-line editing
+owner past the ceiling. Shared whole-key removal remains for scalar and final
+entry use; do not construct a second guard with independently stale caches.
+Proof: Existing mounted scalar/list removal, cancellation and guard suites plus
+both typechecks; observe actual emitted content, API targets and route outcomes.
+Sizing: about 3–5 active minutes; one cohesive extraction, no new public behavior.
+
+### 7. Remove an occurrence with informed history deletion
 Type: Behavior
 Status: planned
 Behavior: Minus with matching history → warning/cancel; cancel preserves the
@@ -182,27 +177,28 @@ selector, including removal of an earlier equal row. Equal values share history;
 explain that loss in the warning. Replace list whole-property minus with item
 minus and delete its exclusive dependencies; preserve scalar whole-entry removal.
 Keep warning, deletion, content update and focus transition in one operation;
-extend guard matching instead of copying the whole-key deletion loop. Reflect
-existing API failures through shared loading/error handling before continuing.
+extend guard matching instead of copying the whole-key deletion loop. A failed
+tracker-info load or DELETE must stop content/focus mutation with existing error
+feedback; unknown history is not an empty result. Preserve shared loading.
 Proof: Mounted note/editor with real popup stack and mocked SDK boundary;
 assert warning text, cancellation state, accepted target tracker IDs and saved
 Markdown. Cover shared duplicate history, earlier-equal-row removal and scalar
 removal. Real E2E cancels/confirms assimilated-item removal, reloads persisted
 values and observes surviving sibling learning data.
 Sizing: 5–8 minutes including focused proof/cleanup; retain warning and mutation
-together. Final-entry policy and its separate proof loop move to slice 7.
+together. Final-entry policy and its separate proof loop move to slice 8.
 
-### 7. Remove the final item as a property entry
+### 8. Remove the final item as a property entry
 Type: Behavior
 Status: planned
 Behavior: Final-item minus → warn/cancel using the existing whole-key history
 guard; confirm removes the key and its matching history, then replaces location
-with the whole note. Reuse slice 6's operation, changing the empty-result rule;
+with the whole note. Reuse slice 7's operation, changing the empty-result rule;
 ordinary value editing still supports authored empty lists.
 Proof: Mounted save/route boundary distinguishes Cancel from confirmed key
 removal, including existing history for the key. Real E2E removes the final
 item, reloads the saved note, and observes whole-note navigation and the retained
-other properties. This replaces slice 6's interim empty-list result.
+other properties. This replaces slice 7's interim empty-list result.
 Sizing: about 5 minutes plus focused-check/stack wait; existing whole-key guard
 and named note navigation supply the special final-entry rule.
 
@@ -211,13 +207,13 @@ and named note navigation supply the special final-entry rule.
 remain the proof/delivery contract; use their focused forms for each slice.
 
 ## Concern review
-Original slice 2 overran at 10–12 active minutes plus check/stack waits; its
-owned product changes are parked with hashes in the acceptance evidence.
-Split hidden exact-occurrence preparation into Structure 2 immediately before
-Behavior 3. Retain completed 1 and later selection/assimilation/removal outcomes
-as 4–7. Seven slices use one exact-text/occurrence rule; no source scope, PFE,
-ADR or North Star decision changes. Implementation and proof already completed
-remain reusable only at matching boundaries. Ready after reassessment.
+Original URL slice 2's overrun and parked work remain in the evidence. Before
+remaining removal work, a read of the 248-line editing owner exposed necessary
+structural preparation: extract its existing removal command without splitting
+warning from mutation. Add Structure 6 immediately before Behavior 7; final-entry
+policy becomes 8. Completed 1–5 and all accepted proof remain unchanged. Eight
+leaves use one focus/history model; no scope, PFE, ADR or North Star change.
+Ready after reassessment; no further story split or overrun reset is implied.
 
 ## Execution context
 

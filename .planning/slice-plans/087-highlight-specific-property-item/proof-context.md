@@ -87,3 +87,34 @@ The coordinator records readiness; this plan grants no Take/execution authority.
 - Observer: GitHub Actions selector `ci.yml`, verified active workflow `donut CI`, push covers all branches. Coordinator `nao-seed119`, directory `/tmp/dough-ci-501/watch-HpTDpK`, PID 69392, session 83266, yielded cell `g824:9`; runtime and launch rooted in this checkout. Target is the remote execution branch.
 - Replanning remains authorized by the selected planned workflow; target about 5 minutes, hard scrutiny beyond 10 active minutes, with focused-check and external-stack waits excepted as stated above.
 - Delivery hook is the common Git `pre-commit`, invoking check-only `./scripts/run.sh pnpm lint:changed`; coordinator fresh delivery owns selective formatting once. No API generation for existing endpoints; component inventory regeneration only on component addition/deletion.
+
+## Consumer trace and structural seams
+
+Expected production edits include route metadata/assembly mapping, note location
+helpers/classifier, focus/follow-location composables, property row/list/panel,
+list learning rows, editing coordination, tracker guard and assimilation
+navigation. Follow actual changed output into notebook chrome/conversation,
+read-only `NoteContextReader`, complete-note rendering and just-review.
+
+Preserve API clients and backend deletion semantics. Trace copied item hrefs
+through classification/link handling, retaining selector and authored href.
+The probe reaches QuillEditor, `wikiLinkClick` and HTML-to-Markdown conversion.
+Backend `NoteIdUrl` recognizes exact note-show paths; item hrefs remain ordinary
+Markdown. Portable wiki-property destinations stay property-level.
+
+Expected production files are at most 250 lines at the base; near the ceiling:
+property editing 248, rich editor 248, properties 240, property row 237, editable
+content 242. Keep removal orchestration in a cohesive editing collaborator and
+value-frame presentation together. Add focused item specs rather than growing
+near-ceiling location/memory tests. Recheck sizes before editing.
+
+During delivery, run the installed consumer-trace procedure for the actual
+diff and give every consumer run/reused/excluded disposition. Include assertions,
+steps and `noteRichPropertyMethods`, `notePropertyLayoutMethods` and assimilation
+helpers. Preserve scalar remove/reify/edit and replace focus proof at the value boundary.
+
+## Resumed recovery context
+
+- Developer on 2026-11-10 explicitly requested fixing the recovery failure and retrying. Fresh implementation and independent refactor corrected exact-content false-none classification and added explicit operator-reviewed resolution, preserving ordinary no-apply refusal. Root inspected the complete saved diff against resolved planning content: all eight-leaf draft edits survive with accepted G4/repair evidence and context relocation. `resolve --record /var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/dough-ci-repair-stash-UxPGxe/record.json --reviewed-oid 266306cfa8064e45118b76c6581083a63bbcb2fd` returned resolved/reviewed; subsequent helper drop returned exact OID266306cfa8064e45118b76c6581083a63bbcb2fd, stash@{0}. Unrelated entries remain preserved. No second apply or manual record edit occurred.
+- Recovery regression: `./scripts/run.sh pnpm test:ci-repair-stash`3/3 real disposable Git CLI cases, including both merged contents, legacy review, refusal gates and unrelated stash preservation. `./scripts/run.sh pnpm test:ci-proof`25/25 reads actual command/YAML/report inventory and preserves14-part completeness. Independent refactor extracted coherent resolution validation and restoration guidance; current CI summary docs and producer inventory follow the new retained regression. All affected files under250, whitespace passes; traces `/tmp/seed119-stash-recovery-consumers.md` and `/tmp/seed119-refactor-stash-recovery-consumers.md`. App proof unchanged.
+- Previous observer's stopped receipt and PID exit permit rearm: current GitHub ci.yml execution-branch observer coordinatornao-seed119, directory `/tmp/dough-ci-501/watch-WW45zC`, PID6914, session96533, cell `g916:5`. c371659ac7121d1e83128c616fa1c0b391ac0867 registered. Re-delivered fa51/run42762324814/1 is the same known scalar failure already repaired/proved in c371; no nested repair. Source freshness unchanged at adc9f4ed41ac06af34c037851c8dce7682461b04; new SEED121 preparation only, no app/named-sibling overlap.

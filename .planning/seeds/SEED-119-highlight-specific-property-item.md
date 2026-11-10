@@ -13,7 +13,7 @@ scope: story
 
 **Identity:** SEED-119#highlight-and-link-to-a-specific-property-item
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/087-highlight-specific-property-item/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"09c13e2ebfb30a8c53b9fc9ee4cd2aaee1dbaf3881418f0e265704ef120bf346","plan":"3de195679115494ee9d1233912ba382a9a1ab030f635fa7b2cbd2eecf6eb77a7"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/087-highlight-specific-property-item/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"09c13e2ebfb30a8c53b9fc9ee4cd2aaee1dbaf3881418f0e265704ef120bf346","plan":"7f4f48266a363117fa6e4900d95242c1fc7360cc8224c8d483b1043f85bd12c5"}}
 ```
 
 **Goal.** A learner can focus a particular value in a note, return to a list

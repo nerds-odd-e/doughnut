@@ -28,7 +28,7 @@ runs:
         report: ${{ runner.temp }}/node-reports/test:path-routing.ndjson
         entry: scripts
         part: 2
-        of: 13
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
@@ -36,7 +36,7 @@ runs:
         report: ${{ runner.temp }}/node-reports/test:api-summary.ndjson
         entry: scripts
         part: 3
-        of: 13
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
@@ -44,76 +44,84 @@ runs:
         report: ${{ runner.temp }}/node-reports/test:workspace-syncpack-lifecycle.ndjson
         entry: scripts
         part: 4
-        of: 13
+        of: 14
+    - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
+      uses: ./.github/ci_proof_fragments
+      with:
+        format: node
+        report: ${{ runner.temp }}/node-reports/test:ci-repair-stash.ndjson
+        entry: scripts
+        part: 5
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:log-utils.ndjson
         entry: scripts
-        part: 5
-        of: 13
+        part: 6
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:sut-healthcheck.ndjson
         entry: scripts
-        part: 6
-        of: 13
+        part: 7
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:sut-start.ndjson
         entry: scripts
-        part: 7
-        of: 13
+        part: 8
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:browser-worktree-isolation.ndjson
         entry: scripts
-        part: 8
-        of: 13
+        part: 9
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:ci-proof.ndjson
         entry: scripts
-        part: 9
-        of: 13
+        part: 10
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:backend-test-worktree.ndjson
         entry: scripts
-        part: 10
-        of: 13
+        part: 11
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:development-stack.ndjson
         entry: scripts
-        part: 11
-        of: 13
+        part: 12
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:worktree-retirement.ndjson
         entry: scripts
-        part: 12
-        of: 13
+        part: 13
+        of: 14
     - if: ${{ !cancelled() && steps.lint-all.outcome != 'skipped' }}
       uses: ./.github/ci_proof_fragments
       with:
         format: node
         report: ${{ runner.temp }}/node-reports/test:publication-receiver.ndjson
         entry: scripts
-        part: 13
-        of: 13
+        part: 14
+        of: 14
