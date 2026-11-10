@@ -216,3 +216,11 @@ Review complete; applicable story-branch CI remains pending on the existing coor
 ## Execution complete
 
 Product advice: no change.
+
+## CI repair
+
+Registered revision `135d708fa6c914ff229dfa1095e05f7c3d2fdb08`, run 42815149180/1, Other Unit Tests timed out the converted raw-history LFS publication case. Fresh repair moves existing host-Git isolation to the outer LFS suite; controlled external-filter red and seven-case green discriminate the leak. Whole CLI proof remains coordinator-owned. Prior parallel (10 timeouts) and serial (one different Markdown rebase timeout) failed verdicts are retained; directed Git Trace2 excludes the LFS leak for that different case. At 20:40 local CPU 58% idle/load10.9, versus earlier load22.7, justified one full serial run under changed headroom; no deadlines/assertions changed.
+
+Original completion for `3a5b5bc848bf488c3e4f1dfd042cec98093a0fe9` returned pending, observer retained. Recovery record `/tmp/dough-ci-501/watch-PMpxGh/completion/3a5b5bc848bf488c3e4f1dfd042cec98093a0fe9.json`; original start1794313455222/deadline1794317055222. CI repair preservation receipt `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/dough-ci-repair-stash-4o78iJ/record.json` was clean, no stash entry. No other writer is paused or uncommitted work hidden.
+
+Full proof completed: [CI repair trace](consumer-trace-ci-repair.md#coordinator-completion-of-full-proof) records68files442tests allgreen under chosen single-worker headroom conditions, plus controlled7-caseLFSgreen. Independent `/root/ci_repair_refactor` returned `## REFACTOR COMPLETE`, none — already clean; no tests rerun, whitespace passed. Reconsidered only affected retrospective conclusions: fixture isolation is coherent, production behavior and original proof are unchanged, Product advice remains no change. No current proof gap.
