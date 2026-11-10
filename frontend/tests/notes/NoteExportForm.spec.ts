@@ -31,6 +31,12 @@ import type { Note } from "@generated/donut-backend-api"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
+import {
+  aiMarkdownTextarea,
+  copyButton,
+  downloadButton,
+} from "./noteExportFormTestSupport"
+
 const ordinaryMarkdown = "# AI context\n\nHello **world**."
 const withQuestionsMarkdown =
   "# AI context\n\nHello **world**.\n\n## Recent multiple-choice questions\n\n### Q1\nStem one"
@@ -61,28 +67,14 @@ describe("NoteExportForm", () => {
   const mountForm = (note: Note = makeMe.aNote.please()) => {
     wrapper = helper
       .component(NoteExportForm)
+      .withRouter()
       .withProps({ note })
       .mount({ attachTo: document.body })
     return note
   }
 
-  const aiMarkdownTextarea = () =>
-    document.querySelector(
-      '[data-testid="ai-context-markdown-textarea"]'
-    ) as HTMLTextAreaElement | null
-
   const inclusionCheckbox = () =>
     wrapper.find('[data-testid="include-recent-questions-checkbox"]')
-
-  const copyButton = () =>
-    document.querySelector(
-      '[data-testid="copy-ai-context-md-btn"]'
-    ) as HTMLButtonElement
-
-  const downloadButton = () =>
-    document.querySelector(
-      '[data-testid="download-ai-context-md-btn"]'
-    ) as HTMLButtonElement
 
   const clickTestId = async (testId: string) => {
     await wrapper.find(`[data-testid="${testId}"]`).trigger("click")

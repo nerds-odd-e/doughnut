@@ -141,7 +141,7 @@ the note-page export still uses its prior whole-note request until slice 2.
 ### 2. Export the note page's highlight through the existing action
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted note/toolbar/form tests drive selection, opening, refresh,
 checkbox, preview, copy/download, errors and recovery through the generated
 SDK boundary. One new unpaid Cypress journey in
@@ -217,26 +217,11 @@ a fresh headroom check before its larger workloads.
 
 ## Execution context
 
-Established Story Branch Mode in this owned workspace and branch. Publisher
-`dashboard-territory.local-doughnut`, agent Hitomi-chan; accepted claim
-`884a4fe8e463a1ea32120c7589cf808a82162285` on origin/main and execution branch.
-Starting revision `68fd5b9e4759faa8d239c9a707116e0a12f7bbc6`.
-Setup: `./scripts/run.sh bash scripts/worktree_setup.sh` completed frozen installation;
-`./scripts/run.sh pnpm exec node --version` succeeded (v26.13.0).
-Replanning remains authorized within the existing plan; ten active minute limit
-per slice, mandatory test waits excepted. No scope change authorized.
-
-Observer: Codex coordinator `hitomi-export`, cell `g1041:6`, session 7913,
-PID 15125, directory `/tmp/dough-ci-501/watch-J9bp5P`, checkout this workspace,
-repo nerds-odd-e/doughnut, target codex/export-a-note-from-the-highlighted-property,
-GitHub workflow ci.yml (5208694, donut CI). Claim trunk CI is unobserved.
-
-Proof capacity decision: Territory.local, 16 CPUs/48 GiB; current load 39/21/15
-and about 10 GiB inactive memory with substantial compression and other owned
-work visible. Sequence this execution's backend, frontend and Cypress workloads;
-permit one backend suite at a time, reconsider load immediately before launch.
-No competing heavy workload belongs to this coordinator. Other sessions remain
-with their owners. The implementation agent owns each proof through terminal result.
+Story Branch Mode, this owned workspace/branch; publisher `dashboard-territory.local-doughnut`, agent Hitomi-chan, origin/main. Claim `884a4fe8e463a1ea32120c7589cf808a82162285` accepted on trunk and execution branch; starting revision `68fd5b9e4759faa8d239c9a707116e0a12f7bbc6`.
+Setup: `./scripts/run.sh bash scripts/worktree_setup.sh` completed frozen installation; `./scripts/run.sh pnpm exec node --version` passed (v26.13.0). Replanning authorized within scope; ten active minutes per slice, mandatory runtime waits excepted.
+Observer: Codex `hitomi-export`, cell `g1041:6`, session7913, PID15125, `/tmp/dough-ci-501/watch-J9bp5P`, this checkout, nerds-odd-e/doughnut execution branch, ci.yml (5208694, donut CI). Claim trunk CI is unobserved.
+Capacity: Territory.local16CPUs/48GiB; startup load39/21/15, ~10GiB inactive with compression and other sessions. Sequence owned heavy jobs and reconsider before launch. Slice1 serial frontend/GC mode passed after parallel browser crash; slice2 reused it. Latest pre-Cypress load13.1/9.2/10.8, prior1.5GiBfree+10.8inactive; one owned heavy job. Each agent owned proof through terminal.
+Slice1 published `401bc9ff4a2bf02f4c4e922f2b87b1fb8b4e030f`, suffix base claim; remote execution branch accepted and observer reused.
 
 ## Accepted execution proof
 
@@ -246,3 +231,9 @@ Exact setup/assertions, corrected fixture outcomes, consumer trace, refactor
 disposition and literal commands are retained in [source review](source-review.md).
 Freshness unchanged on origin/main `d17580ea6cee7f8eb3d348728721fdb9633e2f95`;
 no incoming named-supplier behavior change.
+
+Slice 2: all 20 remaining commitments accepted; full frontend plus two later
+recovery cases, both typechecks, registry tests and real HTTP Cypress passed.
+Exact commands, setup/assertions, consumer trace and limits are in source review.
+Refactor accepted: duplicate route-only recovery proof consolidated into the
+stronger note-control cases; both replayed successfully, other proof reused.
