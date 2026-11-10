@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Aino-chan",
+  "email": "aino-chan@example.org",
+  "identity": "SEED-121#publish-large-notebooks-without-losing-history",
+  "mode": "story-branch",
+  "branch": "codex/publish-large-notebooks-without-losing-history",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
