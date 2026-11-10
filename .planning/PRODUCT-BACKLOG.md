@@ -10,5 +10,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Find the note and property after recall](seeds/SEED-117-recall-note-location.md#find-the-note-and-property-after-recall) — SEED-117#find-the-note-and-property-after-recall
 - [Run Donut's repository commands without interactive-shell setup](seeds/SEED-116-agent-shell-independent-commands.md#run-repository-commands-without-interactive-shell-setup) — SEED-116#run-repository-commands-without-interactive-shell-setup
 - [See Doughnut test cases and test files in Intent](seeds/SEED-112-publish-explicit-ci-test-counts.md#publish-explicit-ci-test-counts) — SEED-112#publish-explicit-ci-test-counts
