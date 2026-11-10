@@ -45,12 +45,7 @@ SEED-120 export. Ordinary authoring retains empty lists; final-item minus delete
 - Existing DELETE/content-save coordination is separate requests. Preserve its
   error propagation and loading behavior; cancellation precedes mutations.
   No new atomic API, schema or publication protocol is promised.
-- PFE: reuse `PropertyFocus` and assimilation key/value; recreated index IDs
-  cannot supply persistent identity. Add no competing focus or row-ID system.
-- Follow [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md),
-  [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-  and [ADR 0005](../../../docs/adrs/0005-web-routes-accepted.md), with no conflict.
-  Ordinary saving retains North Star's accepted-change owner; no new direction.
+- [Retained PFE and ADR decisions](proof-context.md#retained-architectural-reuse) remain unchanged.
 
 ## Proof ownership
 
@@ -132,26 +127,12 @@ Sizing: about 5 minutes; no separate local selection model on note routes.
 ### 5. Continue assimilation at the addressed value
 Type: Behavior
 Status: done
-Behavior: Next assimilation unit includes key/value → push its item destination
-and highlight first exact occurrence; a property-only unit opens its property.
-Reuse the shared named helper and current count/toast/dismiss behavior.
-Proof: Extend `useGoToNextAssimilation.spec.ts` using the production router and
-the notebook workspace continuation; exercise the actual returned value.
-Sizing: about 5 minutes including the focused existing suite.
+Accepted implementation and proof: [retained evidence](source-review.md#behavior-5-acceptance).
 
 ### 6. Keep removal coordination in one editing owner
 Type: Structure
 Status: done
-Internal change: Extract the existing whole-property removal orchestration into
-a cohesive editing collaborator, preserving the same guard/cache instance,
-loading, emit and focus-following callbacks. Keep every current public removal,
-warning/cancel and save behavior unchanged; add no item interface or matcher.
-Enables immediately following Behavior 7 without growing the 248-line editing
-owner past the ceiling. Shared whole-key removal remains for scalar and final
-entry use; do not construct a second guard with independently stale caches.
-Proof: Existing mounted scalar/list removal, cancellation and guard suites plus
-both typechecks; observe actual emitted content, API targets and route outcomes.
-Sizing: about 3–5 active minutes; one cohesive extraction, no new public behavior.
+Accepted implementation and proof: [retained evidence](source-review.md#structure-6-acceptance).
 
 ### 7. Remove an occurrence with informed history deletion
 Type: Behavior
@@ -191,14 +172,29 @@ other properties. This replaces slice 7's interim empty-list result.
 Sizing: about 5 minutes plus focused-check/stack wait; existing whole-key guard
 and named note navigation supply the special final-entry rule.
 
+### 9. Keep removal history bound to the edited note
+Type: Behavior
+Status: planned
+Behavior: Cancel item removal, then reuse the editor for another note → its
+history guard fetches and targets the current note's matching trackers.
+Keep the single guard/cache; associate cached and pending reads with note
+identity so prior-note history cannot satisfy a current-note removal or rename.
+Preserve exact key/value and whole-key matching, cancellation and shared errors.
+Proof: Mounted NoteTextContent switches notes after Cancel; current tracker22
+is deleted while prior-note tracker11 remains. Run reached guard/edit/save
+consumers and both types; renew complete retryOFF frontend shards after this
+cache-contract correction. Keep the accepted18E2E boundaries when unchanged.
+Sizing: about3–5 active minutes; one cache-identity correction, no new API/state
+store or generic synchronization protocol. Focused-check waits are excepted.
+
 ## Commands and acceptance
 [Required commands and acceptance readings](proof-context.md#commands-and-acceptance)
 remain the proof/delivery contract; use their focused forms for each slice.
 
 ## Concern review
 
-[Retained refinement rationale](proof-context.md#eight-leaf-refinement) records
-the eight-leaf design and completed readiness reassessment.
+[Retained refinement rationale](proof-context.md#eight-leaf-refinement) plus
+G8 supports nine leaves; matching-history completion remains open in slice9.
 
 ## Story obligations
 
@@ -245,6 +241,9 @@ Story clause: "When that is the final item, remove the entire property entry and
 Disposition: proved by slice 8: explicit final-item helper observes existing whole-key warning with unforced confirmation; final integrated batch18/18 reaches whole note, reloads retained source and deleted entry; quoted authored-key mounted case proves Cancel, targets11/12/13, exact save and noteShow/query; both combined types and final disjoint retryOFF frontend shards407files2514tests pass
 Commitment: 44
 
-## Execution complete
 
-Product advice: no change; existing recall and export stories consume the completed focus contract.
+### G8. History cache follows the edited note
+Reported: slice 9 — "After the initially completed review, an isolated mounted editor check canceled removal on note1, reused the editor for note99 and confirmed removal; expected current-note tracker22 but the guard deleted cached prior-note tracker11. The matching-history outcome is therefore unfinished despite the earlier completion marker."
+Story clause: "Confirm removes the selected content and this learner's matching trackers through existing tracker-deletion semantics."
+Disposition: return
+Commitment: 50
