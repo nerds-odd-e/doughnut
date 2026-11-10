@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Maki-chan",
+  "email": "maki-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-116#run-repository-commands-without-interactive-shell-setup",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
