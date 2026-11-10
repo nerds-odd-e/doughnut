@@ -119,6 +119,7 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronRight, X } from "@lucide/vue"
 import { computed, ref, type ComponentPublicInstance } from "vue"
+import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import RichFrontmatterPropertyPanel from "@/components/form/RichFrontmatterPropertyPanel.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterWikidataPropertyValue from "@/components/form/RichFrontmatterWikidataPropertyValue.vue"
@@ -175,13 +176,16 @@ const emit = defineEmits<{
 }>()
 
 const valueAreaRef = ref<HTMLElement | null>(null)
+const { focusedProperty } = useFocusedNoteProperty()
 const valueFrameAttributes = computed(() => {
   const scalar = !props.draft && props.modelValue.value.kind === "scalar"
   return {
     class: scalar ? "property-value-frame" : undefined,
     "data-testid": "rich-note-property-value-frame",
     "data-property-value-focused":
-      scalar && props.isFocused ? "true" : undefined,
+      scalar && props.isFocused && !focusedProperty.value?.item
+        ? "true"
+        : undefined,
   }
 })
 

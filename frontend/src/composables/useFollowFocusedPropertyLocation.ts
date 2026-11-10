@@ -1,15 +1,19 @@
 import type { Ref } from "vue"
+import type { PropertyRow } from "@/utils/noteContentFrontmatter"
+import { propertyItemIndex } from "@/utils/noteProperties"
 import { useRoute, useRouter, type RouteLocationNamedRaw } from "vue-router"
 import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
 import {
   locationKeepingQuery,
   notePropertyKeyFromRoute,
+  notePropertyItemFromRoute,
+  notePropertyItemLocation,
   notePropertyLocation,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
 
 export function useFollowFocusedPropertyLocation(
-  propertyRows: Ref<readonly { key: string }[]>
+  propertyRows: Ref<readonly PropertyRow[]>
 ) {
   const route = useRoute()
   const router = useRouter()
@@ -39,11 +43,17 @@ export function useFollowFocusedPropertyLocation(
     if (!fromKey || fromKey === toKey || toKey === "") {
       return
     }
-    if (!propertyRows.value.some((row) => row.key === toKey)) {
+    const row = propertyRows.value.find((row) => row.key === toKey)
+    if (!row) {
       return
     }
+    const item = notePropertyItemFromRoute(route)
     return replaceWhenFocusedKeyRemoved(fromKey, (noteId) =>
-      notePropertyLocation(noteId, toKey)
+      item &&
+      row.value.kind === "list" &&
+      propertyItemIndex(row.value.items, item) >= 0
+        ? notePropertyItemLocation(noteId, toKey, item)
+        : notePropertyLocation(noteId, toKey)
     )
   }
 

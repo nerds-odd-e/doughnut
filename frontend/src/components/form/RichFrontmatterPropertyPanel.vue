@@ -40,6 +40,7 @@
       :property-key="propertyKey"
       :property-values="assimilableListValues(propertyValue)"
       :authored-property-values="authoredListValues"
+      :focused-item-index="focusedItemIndex(propertyKey, authoredListValues ?? [])"
       :show-learning-controls="hasSavedNote"
       :loading="hasSavedNote && !noteInfoLoaded"
       :disabled="assimilatingPropertyKey === propertyKey"
@@ -60,6 +61,7 @@
 import { Minus } from "@lucide/vue"
 import { computed, toRef, useId } from "vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import { useRouter } from "vue-router"
 import PropertyAssimilationModes from "@/components/recall/PropertyAssimilationModes.vue"
 import { assimilableListValues } from "@/components/recall/assimilationMemoryTrackers"
@@ -101,6 +103,7 @@ const {
 } = useInjectedMemoryTrackerActions(toRef(() => props.noteId ?? 0))
 
 const router = useRouter()
+const { focusedItemIndex } = useFocusedNoteProperty()
 const noteStore = useNoteStore()
 
 const reifyReasonId = useId()

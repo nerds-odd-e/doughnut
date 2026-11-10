@@ -39,6 +39,7 @@ const componentMap: Record<string, RouteComponent> = {
   notebookGroup: NotebookGroupPage,
   noteShow: NoteShowPage,
   noteProperty: NoteShowPage,
+  notePropertyItem: NoteShowPage,
   circleShow: CircleShowPage,
   bazaar: BazaarPage,
   adminDashboard: AdminDashboardPage,

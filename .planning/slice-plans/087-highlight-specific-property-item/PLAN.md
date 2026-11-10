@@ -129,7 +129,7 @@ no routing, rendering, new selection state or generic identity framework.
 
 ### 3. Return to an exact list occurrence from its URL
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Open/reload a named item URL → expand and highlight exact text plus
 occurrence; stale selector → explicit unresolved feedback with readable note.
 Reuse the passed bounded early probe. Extend route metadata and component mapping,
@@ -235,16 +235,15 @@ remain reusable only at matching boundaries. Ready after reassessment.
 ### G1. Resolved list item marker (first reported in original slice 2)
 Reported: slice 2 — "Coordinator inspection found the scalar action row index -1 matched unresolved selectedItemIndex -1, marking a learning action as a focused item."
 Story clause: "Scalar and list values share the presentation responsibility while retaining their different editing and learning semantics."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: RichMarkdownEditor.propertyItemLocation.spec.ts single existing scalar frame and editable/read-only exact duplicate; unchanged standalone PropertyAssimilationModes 8 cases plus complete final 403-file/2499-test retry0 shards pass with optional parent-resolved index
 Commitment: 73
 ### G2. Stale list destination after scalar replacement (first reported in original slice 2)
 Reported: slice 2 — "Slice 2 inspection found that replacing an addressed list property with a scalar shows unresolved-item feedback but still highlights the scalar through property-level focus."
 Story clause: "It does not substitute another value."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: RichMarkdownEditor.propertyItemLocation.spec.ts keeps a scalar replacement unresolved, editable/read-only; red reproduced one substituted selection, corrected shared-frame predicate gives explicit feedback/readable scalar/zero selections/unchanged URL; final focused, E2E and full shards pass
 Commitment: 26
-
 ### G3. Complete URL journey proof (first reported in original slice 2)
 Reported: slice 2 — "The full frontend run failed on a closed browser connection after 1664 passing tests; final typechecks and post-change inbound/reload E2E remain pending."
 Story clause: "Opening or reloading that URL expands the property and highlights that occurrence."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: final note_property.feature 11/11 observes actual inbound second duplicate plus browser reload and both sidebar notes; both typechecks and final disjoint CI GC retry0 shards pass 403 files/2499 tests on corrected wiring, including prior 8 standalone failures; /tmp/seed119-restored-item-consumers.md proof chronology
 Commitment: 23

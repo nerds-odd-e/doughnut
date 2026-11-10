@@ -1,3 +1,4 @@
+import type { PropertyItemFocus } from "@/utils/noteProperties"
 import {
   createMemoryHistory,
   createRouter,
@@ -41,10 +42,44 @@ export function notePropertyHref(noteId: number, propertyKey: string): string {
   return namedLocationHref(notePropertyLocation(noteId, propertyKey))
 }
 
+export function notePropertyItemLocation(
+  noteId: number,
+  propertyKey: string,
+  item: PropertyItemFocus
+): RouteLocationNamedRaw {
+  return {
+    name: "notePropertyItem",
+    params: {
+      noteId: String(noteId),
+      propertyKey,
+      occurrence: String(item.occurrence),
+      itemText: `~${item.value}`,
+    },
+  }
+}
+
+export function notePropertyItemHref(
+  noteId: number,
+  propertyKey: string,
+  item: PropertyItemFocus
+): string {
+  return namedLocationHref(notePropertyItemLocation(noteId, propertyKey, item))
+}
+
+export function notePropertyItemFromRoute(
+  route: Pick<RouteLocationNormalizedLoaded, "name" | "params">
+): PropertyItemFocus | undefined {
+  if (route.name !== "notePropertyItem") return
+  return {
+    value: String(route.params.itemText).slice(1),
+    occurrence: Number(route.params.occurrence),
+  }
+}
+
 export function notePropertyKeyFromRoute(
   route: Pick<RouteLocationNormalizedLoaded, "name" | "params">
 ): string | undefined {
-  if (route.name !== "noteProperty") {
+  if (route.name !== "noteProperty" && route.name !== "notePropertyItem") {
     return undefined
   }
   const raw = route.params.propertyKey
@@ -112,6 +147,7 @@ function resolveFollowingRedirects(router: Router, location: RouteLocationRaw) {
 export type InternalNoteFamilyHref = {
   noteId: number
   propertyKey: string | undefined
+  item?: PropertyItemFocus
 }
 
 function pathnameFromHref(href: string): string | undefined {
@@ -145,6 +181,14 @@ export function resolveInternalNoteFamilyFromHref(
   }
   return {
     noteId,
+    ...(resolved.name === "notePropertyItem"
+      ? {
+          item: notePropertyItemFromRoute({
+            name: resolved.name ?? undefined,
+            params: resolved.params,
+          }),
+        }
+      : {}),
     propertyKey: notePropertyKeyFromRoute({
       name: resolved.name ?? undefined,
       params: resolved.params,

@@ -1,6 +1,6 @@
 <template>
   <RichFrontmatterPropertyNotFound
-    :property-keys="propertyRows.map((row) => row.key)"
+    :property-rows="propertyRows"
   />
   <section
     v-if="showSection"

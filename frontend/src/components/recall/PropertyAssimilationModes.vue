@@ -4,11 +4,13 @@
     :class="{ 'list-assimilation-modes': isList }"
   >
     <div
-      v-for="row in rows"
+      v-for="(row, index) in rows"
       :key="row.key"
       class="col-span-2 grid min-h-8 grid-cols-subgrid items-center"
       data-test="assimilation-mode-row-UNDERSTANDING"
       :data-property-value="row.propertyValue"
+      :class="{ 'property-value-frame': isList }"
+      :data-property-value-focused="isList && index === focusedItemIndex ? 'true' : undefined"
     >
       <span
         class="text-right text-sm font-medium"
@@ -96,6 +98,7 @@ const props = defineProps<{
   propertyKey: string
   propertyValues?: readonly string[]
   authoredPropertyValues?: readonly string[]
+  focusedItemIndex?: number
   showLearningControls?: boolean
   loading?: boolean
   disabled?: boolean

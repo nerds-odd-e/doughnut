@@ -41,12 +41,15 @@ describe("note route family", () => {
     expect(parent.children?.map((child) => child.name)).toEqual([
       "noteShow",
       "noteProperty",
+      "notePropertyItem",
     ])
     expect(parent.children?.map((child) => child.path)).toEqual([
       "",
       "p/:propertyKey",
+      "p/:propertyKey/i/:occurrence/:itemText",
     ])
     expect(parent.children?.map((child) => child.component)).toEqual([
+      NoteShowPage,
       NoteShowPage,
       NoteShowPage,
     ])
