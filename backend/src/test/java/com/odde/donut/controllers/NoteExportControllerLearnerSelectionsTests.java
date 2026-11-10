@@ -61,7 +61,8 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
           .answerChoiceIndex(0)
           .please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(
           markdown,
@@ -99,7 +100,8 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
           .answerTimestamp(Timestamp.from(Instant.parse("2026-06-01T00:00:00Z")))
           .please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("Learner's selected answer: newer-pick"));
     }
@@ -130,7 +132,8 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
           .answerTimestamp(sameTime)
           .please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("Learner's selected answer: higher-id-pick"));
     }
@@ -161,7 +164,8 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
           .answerTimestamp(Timestamp.from(Instant.parse("2026-11-01T00:00:00Z")))
           .please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("Learner's selected answer: exporter-pick"));
       assertThat(markdown, not(containsString("Learner's selected answer: other-pick")));
@@ -186,7 +190,8 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
           .answerChoiceIndex(0)
           .please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("other-only-stem"));
       assertThat(markdown, containsString("Donut answer key: key-choice"));
@@ -229,7 +234,7 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
       Note unauthorized = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.getAiContextMarkdown(unauthorized, 5000, true));
+          () -> controller.getAiContextMarkdown(unauthorized, 5000, true, null, null, null));
     }
 
     private static int countOccurrences(String haystack, String needle) {

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-120#export-a-note-from-the-highlighted-property",
+  "title": "Export a note from the highlighted property",
+  "completedAt": "2026-11-10T11:14:14.027Z",
+  "developer": "Terry Yin",
+  "agent": "Hitomi-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol",
+  "intentCoverage": {
+    "report": "# Dough Intent Coverage: SEED-120#export-a-note-from-the-highlighted-property\n\n**Outcome: Caught.**\n\n- Story and revision: `.planning/seeds/SEED-120-export-highlighted-property.md#export-a-note-from-the-highlighted-property` at `adb024c325c6586d38318f268eb1b3ff57ea436c`.\n- Promise: identify the exact highlighted occurrence while equal raw values share quiz history.\n- Fault: in an isolated scratch checkout, removed only `propertyOccurrence: focus.item.occurrence` from `frontend/src/components/notes/core/NoteExportForm.vue`. The selected route still identified occurrence 2. The server's `ResolvedPropertyFocus.resolve` defaults an omitted item occurrence to 1, so this request would report the wrong visible occurrence.\n- Existing protection: `frontend/tests/notes/NoteExportForm.focused.spec.ts`, the two item-route entry cases and the token/checkbox refresh case. The real mounted toolbar/router fixture highlights the second `[[run]]`; its existing SDK-boundary assertions require `propertyOccurrence: 2`.\n- Command in scratch: `CI=true ./scripts/run.sh pnpm frontend:test tests/notes/NoteExportForm.focused.spec.ts --maxWorkers=2 --retry=0`.\n- Observations: baseline passed all five cases. With the fault, both item entry cases and refresh case reached their intended request assertion and failed specifically on missing `propertyOccurrence: 2`; scalar and whole-list cases passed. No fixture or assertion was changed. Restoring the exact original bytes returned all five cases to passing. Git state matched the clean pre-probe state; the scratch worktree was removed.\n- Evidence: `/tmp/export-intent-{baseline,fault,restored}.log`; restoration SHA-256 `197840f49c4852fe535cc0c3585f1ec66728ba0a30fc25e176048fc947d86f59` for the form's original bytes.\n\nCosts:\n\n- Test runtime — measured from Vitest: baseline 11.27s, fault 3.98s, restored 3.17s; total 18.42s.\n- Human effort — unavailable: no separate measurement; no developer action was requested during this check.\n- Agent effort — unavailable: the host exposes no separate agent-only effort measurement distinct from setup and tool waits.\n\n\n- **Invocation-to-report elapsed.** 135828 ms (measured), from 1794309024184 to 1794309160012 in Unix epoch ms. The end clock was sampled after writing the prepared report body.\n"
+  }
+}

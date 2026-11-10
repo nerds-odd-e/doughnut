@@ -50,6 +50,7 @@
           </span>
         </span>
       </label>
+      <p v-if="exportError" class="daisy-alert daisy-alert-error" data-testid="export-error">{{ exportError }}</p>
       <JsonExportSection
         :json-data="aiMarkdown"
         :filename="`note-${note.id}-focus-context`"
@@ -71,10 +72,14 @@ import { onMounted, ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
 import { NoteExportController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import JsonExportSection from "../../commons/JsonExportSection.vue"
 
 const props = defineProps<{ note: Note }>()
 
+const { focusedProperty } = useFocusedNoteProperty()
+const exportError = ref<string>()
 const tokenLimit = ref(2000)
 const includeRecentQuestions = ref(false)
 const aiMarkdown = ref("")
@@ -87,11 +92,20 @@ onMounted(async () => {
 async function fetchAiMarkdown() {
   loadingMarkdown.value = true
   aiMarkdown.value = ""
+  exportError.value = undefined
+  const focus = focusedProperty.value
   const { data, error } = await apiCallWithLoading(() =>
     NoteExportController.getAiContextMarkdown({
       path: { note: props.note.id },
       query: {
         tokenLimit: tokenLimit.value,
+        ...(focus ? { propertyKey: focus.key } : {}),
+        ...(focus?.item
+          ? {
+              propertyValue: focus.item.value,
+              propertyOccurrence: focus.item.occurrence,
+            }
+          : {}),
         ...(includeRecentQuestions.value
           ? { includeRecentQuestions: true }
           : {}),
@@ -100,6 +114,8 @@ async function fetchAiMarkdown() {
   )
   if (!error) {
     aiMarkdown.value = data!.markdown ?? ""
+  } else {
+    exportError.value = toOpenApiError(error).message
   }
   loadingMarkdown.value = false
 }

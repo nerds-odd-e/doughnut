@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 480. Removed numbers are never reused.
+- Highest allocated local number: 481. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 - [Source before the 2026-11-10 compaction](https://github.com/nerds-odd-e/doughnut/blob/d3eb0ef73aca13a5ed229738f92dbe44ee12bf95/DearDough.md); its rows are retained at the [Open Dough catalog](https://github.com/terryyin/open-dough/tree/5afe6fee8fe34322752e9e44911d72eb31dd4991/docs/maintainer/findings). DD-443 (disposable break checks) was pruned as successful practice, not a problem.
@@ -474,3 +474,16 @@ The frontend treated any supplied propertyValue, including empty string, as a li
   - Evidence: 2026-11-10; CI run42762324814/attempt1 E2E job129650701015, Skip expected /n6/p/topic but received /n6/p/topic/i/1/~; backend PropertyFocus/AssimilationUnit documentation; repair c371659ac7121d1e83128c616fa1c0b391ac0867.
   - Observed effect: selected mocked proof and list continuation E2E passed before the existing scalar walkthrough failed. Positive scalar-empty red reproduced the defect; nonempty raw values retain item routing and manual blank selection remains a separate input path. The corrected workspace fixture,37 focused tests, both types and10 real E2E scenarios passed.
   - Inference: reuse of the key/value shape did not establish the wire sentinel. Read the producing contract before choosing a branch or manufacturing fixture variants; one observed execution does not establish recurrence.
+
+## DD-481 — Full local frontend proof lost the browser connection despite fewer workers
+
+A two-worker full frontend run ended before all files loaded. The existing CI configuration already serializes file imports and uses an orchestrator GC reporter; selecting that configuration completed the full required proof without assertion retries.
+
+### Occurrences
+- Execution: SEED-120#export-a-note-from-the-highlighted-property / 401bc9ff4a2bf02f4c4e922f2b87b1fb8b4e030f
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown; execution guidance snapshot 884a4fe8e463a1ea32120c7589cf808a82162285
+  - Evidence: 2026-11-10 execution conversation; `/tmp/export-property-frontend-tests.log` (start18:17:41 Asia/Singapore), `/tmp/export-property-frontend-tests-serial.log`, `/tmp/export-ui-frontend.log`; retained acceptance at `7df14ec0c6:.planning/slice-plans/089-export-a-note-from-the-highlighted-property/source-review.md`; `frontend/vitest.config.ts` fileParallelism/orchestratorGcReporter.
+  - Observed effect: `./scripts/run.sh pnpm frontend:test --maxWorkers=2` ended after259/408 files and1,950 passing tests with VITEST_BROWSER_CONNECTION_CLOSED (114.11s), without an assertion failure. `CI=true ./scripts/run.sh pnpm frontend:test --maxWorkers=2 --retry=0` then passed408files/2,521tests in262.65s and the next slice passed409files/2,528tests in245.98s. All runs were headless on the shared16CPU/48GiB local host; no production or test behavior was changed to obtain those passes.
+  - Inference: worker reduction alone did not prevent this documented orchestrator failure mode. The existing serialized-import/GC mode is a supported bounded alternative for full local proof on a busy host. One failed run does not establish recurrence or a universal memory threshold; consider documenting the invocation in project testing guidance.

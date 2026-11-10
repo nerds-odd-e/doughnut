@@ -35,7 +35,8 @@ class NoteExportControllerAiContextMarkdownTests extends ControllerTestBase {
   void shouldReturnMarkdownForReadableNote() throws UnexpectedNoAccessRightException {
     Note note =
         makeMe.aNote("Focus").content("Body").notebookOwnedBy(currentUser.getUser()).please();
-    NoteAiContextMarkdown dto = controller.getAiContextMarkdown(note, 5000, false);
+    NoteAiContextMarkdown dto =
+        controller.getAiContextMarkdown(note, 5000, false, null, null, null);
     assertThat(dto.markdown(), containsString("Focus"));
     assertThat(dto.markdown(), containsString("Body"));
   }
@@ -45,7 +46,7 @@ class NoteExportControllerAiContextMarkdownTests extends ControllerTestBase {
     Note unauthorizedNote = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.getAiContextMarkdown(unauthorizedNote, 5000, false));
+        () -> controller.getAiContextMarkdown(unauthorizedNote, 5000, false, null, null, null));
   }
 
   @Test
@@ -103,7 +104,8 @@ class NoteExportControllerAiContextMarkdownTests extends ControllerTestBase {
           .correctAnswerIndex(1)
           .please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("Focus"));
       assertThat(markdown, containsString("Body"));
@@ -137,7 +139,8 @@ class NoteExportControllerAiContextMarkdownTests extends ControllerTestBase {
       makeMe.anMcq().forNote(note).stem("newest-first").createdAt(newest).please();
       makeMe.anMcq().forNote(note).stem("mid-07").createdAt(mid).please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
       String appendix = markdown.substring(markdown.indexOf("## Recent multiple-choice questions"));
 
       assertThat(
@@ -163,7 +166,8 @@ class NoteExportControllerAiContextMarkdownTests extends ControllerTestBase {
       Note other = makeMe.aNote("Other").notebookOwnedBy(currentUser.getUser()).please();
       makeMe.anMcq().forNote(other).stem("other-stem").please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("focus-stem"));
       assertThat(markdown, not(containsString("other-stem")));
@@ -173,7 +177,8 @@ class NoteExportControllerAiContextMarkdownTests extends ControllerTestBase {
     void questionsWithoutPromptsAreIncluded() throws UnexpectedNoAccessRightException {
       makeMe.anMcq().forNote(note).stem("no-prompt-stem").please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("no-prompt-stem"));
     }
@@ -183,14 +188,16 @@ class NoteExportControllerAiContextMarkdownTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       makeMe.anMcq().forNote(note).stem("contested-stem").contested().please();
 
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("contested-stem"));
     }
 
     @Test
     void zeroQuestionsStillExportsOrdinaryContext() throws UnexpectedNoAccessRightException {
-      String markdown = controller.getAiContextMarkdown(note, 5000, true).markdown();
+      String markdown =
+          controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
 
       assertThat(markdown, containsString("Focus"));
       assertThat(markdown, containsString("Body"));

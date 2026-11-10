@@ -48,6 +48,7 @@ export const SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC =
  * later slices and are not admitted here.
  */
 const ACTIVE_OPEN_AI_MOCK_SPECS = [
+  'e2e_test/features/note_topology/export_highlighted_property.feature',
   'e2e_test/features/ai_generated_recall_questions/question_contest.feature',
   'e2e_test/features/book_reading/ai_reorganize_layout.feature',
   'e2e_test/features/bazaar/bazaar_subscription.feature',

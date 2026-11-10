@@ -8,19 +8,24 @@ import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.NoteReferenceService;
+import com.odde.donut.services.focusContext.FocusContextMarkdownAugmenter;
 import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.donut.services.focusContext.FocusContextResult;
 import com.odde.donut.services.focusContext.FocusContextRetrievalService;
+import com.odde.donut.services.focusContext.ResolvedPropertyFocus;
 import com.odde.donut.services.focusContext.RetrievalConfig;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -30,6 +35,7 @@ class NoteExportController {
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final McqRepository mcqRepository;
+  private final NoteReferenceService noteReferenceService;
   private final RecallPromptRepository recallPromptRepository;
 
   NoteExportController(
@@ -37,11 +43,13 @@ class NoteExportController {
       FocusContextRetrievalService focusContextRetrievalService,
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       McqRepository mcqRepository,
+      NoteReferenceService noteReferenceService,
       RecallPromptRepository recallPromptRepository) {
     this.authorizationService = authorizationService;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.mcqRepository = mcqRepository;
+    this.noteReferenceService = noteReferenceService;
     this.recallPromptRepository = recallPromptRepository;
   }
 
@@ -64,17 +72,51 @@ class NoteExportController {
               description =
                   "When true, append up to ten newest distinct focus-note multiple-choice questions with Donut answer keys and the current learner's latest own selection when present.")
           @RequestParam(defaultValue = "false")
-          boolean includeRecentQuestions)
+          boolean includeRecentQuestions,
+      @Parameter(description = "Exact authored property key to focus the report on.")
+          @RequestParam(required = false)
+          String propertyKey,
+      @Parameter(description = "Exact raw list item value; omit to focus the whole property.")
+          @RequestParam(required = false)
+          String propertyValue,
+      @Parameter(
+              description =
+                  "One-based occurrence among equal raw values; defaults to one for an item.")
+          @RequestParam(required = false)
+          Integer propertyOccurrence)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
+    ResolvedPropertyFocus selection = null;
+    if (propertyKey != null) {
+      selection =
+          ResolvedPropertyFocus.resolve(note, propertyKey, propertyValue, propertyOccurrence)
+              .orElseThrow(() ->
+                  new ResponseStatusException(
+                      HttpStatus.BAD_REQUEST,
+                      "The highlighted property or item cannot be resolved. Close export, select an existing focus or clear the highlight, then reopen."));
+    } else if (propertyValue != null || propertyOccurrence != null) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "A highlighted item requires a property key.");
+    }
     User user = authorizationService.getCurrentUser();
     RetrievalConfig config = RetrievalConfig.forGraphApi(tokenLimit);
     FocusContextResult focusContextResult =
         focusContextRetrievalService.retrieve(note, user, config);
     String markdown = focusContextMarkdownRenderer.render(focusContextResult, config);
+    if (selection != null) {
+      markdown =
+          FocusContextMarkdownAugmenter.embedPropertyFocus(
+              markdown, FocusContextMarkdownAugmenter.buildPropertyFocusBlock(selection));
+      markdown =
+          FocusContextMarkdownAugmenter.ensureWikiLinks(
+              markdown, noteReferenceService.wikiLinksForViewer(note, user));
+    }
     if (includeRecentQuestions) {
       List<Mcq> questions =
-          mcqRepository.findTop10ByNote_IdOrderByCreatedAtDescIdDesc(note.getId());
+          selection == null
+              ? mcqRepository.findTop10ByNote_IdOrderByCreatedAtDescIdDesc(note.getId())
+              : mcqRepository.findRecentForProperty(
+                  note.getId(), selection.key(), selection.itemValue());
       markdown =
           markdown
               + RecentNoteQuestionsMarkdownAppendix.render(

@@ -1,5 +1,6 @@
 package com.odde.donut.services.focusContext;
 
+import com.odde.donut.algorithms.FrontmatterPropertyValue;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
@@ -21,6 +22,35 @@ public final class FocusContextMarkdownAugmenter {
                 .flatMap(split -> split.frontmatter().getString(propertyKey))
                 .orElse("")
             : propertyFocus.value();
+    return buildPropertyFocusBlock(propertyKey, propertyValue);
+  }
+
+  public static String buildPropertyFocusBlock(ResolvedPropertyFocus focus) {
+    String value =
+        switch (focus.property()) {
+          case FrontmatterPropertyValue.Scalar scalar -> scalar.value();
+          case FrontmatterPropertyValue.ListItems list ->
+              focus.itemValue() == null ? String.join("\n- ", list.items()) : focus.itemValue();
+        };
+    String block = buildPropertyFocusBlock(focus.key(), value);
+    if (focus.itemValue() == null
+        && focus.property() instanceof FrontmatterPropertyValue.ListItems) {
+      return block + "Focus: the whole list property, across all its values.\n";
+    }
+    if (focus.itemValue() != null) {
+      block +=
+          "Highlighted item occurrence: "
+              + focus.occurrence()
+              + " (one-based among equal values).\n";
+      var list = (FrontmatterPropertyValue.ListItems) focus.property();
+      if (list.items().stream().filter(focus.itemValue()::equals).count() > 1) {
+        block += "Quiz history is shared by all equal raw values of this property.\n";
+      }
+    }
+    return block;
+  }
+
+  private static String buildPropertyFocusBlock(String propertyKey, String propertyValue) {
     StringBuilder block = new StringBuilder();
     block.append(PROPERTY_FOCUS_CONTEXT_HEADER).append("\n");
     block
