@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 447. Removed numbers are never reused.
+- Highest allocated local number: 480. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 - [Source before the 2026-11-10 compaction](https://github.com/nerds-odd-e/doughnut/blob/d3eb0ef73aca13a5ed229738f92dbe44ee12bf95/DearDough.md); its rows are retained at the [Open Dough catalog](https://github.com/terryyin/open-dough/tree/5afe6fee8fe34322752e9e44911d72eb31dd4991/docs/maintainer/findings). DD-443 (disposable break checks) was pruned as successful practice, not a problem.
@@ -297,6 +297,15 @@ Former local code: DD-274. Consumer discovery treated execution-evidence Identit
 
 Former local code: DD-319. Acceptance traced the unchanged transport API but not the existing E2E journeys whose preconditions the explicit question-load recovery changed; seven failures reached CI in SEED-081#story-2 and were repaired in the execution. Distinct from ODF-272 and ODF-310. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-150.md).
 
+### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: modified; execution revision 8ab86f53f02c4cdb243ff0a2b34567d3a7f6c8a8; base release unknown
+  - Evidence: 2026-11-10; CI run42770072237/attempt1 frontend job129675536405, autosaveTrash expected3 saves/got2; local deterministic red and repair c5134729baf5379be70bb458200128998793efd8.
+  - Observed effect: stricter unknown-history refusal reached ordinary Markdown frontmatter removal in an existing mounted autosave/trash case omitted from slice7's indirect-consumer proof. Missing getNoteInfo data blocked its third save. Known-empty-history HTTP setup repaired the test; original expectations and exact third payload passed, with no production workaround.
+  - Inference: symbol-based tracing did not expose the indirect edit-to-property-removal path. The owned CI repair restored proof; shared prevention remains unestablished.
+
 <a id="odf-323"></a>
 
 ## ODF-323 — A caller-written plan-status mutation survives a later delivery refusal
@@ -421,3 +430,29 @@ Former local code: DD-445. A repair publication started before an `amended` fres
 ## ODF-478 — Slice delivery published without that slice's source-review observations
 
 Former local code: DD-447. A slice was published without its source-review observations. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-478.md).
+
+## DD-479 — Merged repair restores were misclassified as wholly unapplied
+
+Exact equality with the saved tree classified every merged file as unapplied when each also contained accepted repair edits. The restore had actually auto-merged draft content and reported a conflict. Its stored false-none then blocked exact stash cleanup and required a user-triggered resume.
+
+### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-11-10; affected snapshot c371659ac7121d1e83128c616fa1c0b391ac0867; ci-repair-stash restore/drop for OID266306cfa8064e45118b76c6581083a63bbcb2fd; unfinished dashboard receipt57246283-fdda-482d-8908-b608c63f8e4b; user requested fixing and retrying; repair b3ed6f70ea538888919593b2a13fb9a14b0e9c4f.
+  - Observed effect: all draft edits were preserved, but the helper returned applied:none and then unapplied. New real-Git regression reproduced it. The local fix identifies actual unmerged paths as partial and supplies an explicit reviewed-OID resolution with checkout/index/conflict guards; ordinary no-apply refusal remains. Three recovery tests and25 CI-proof tests passed, and the retained real entry resolved/dropped by exact OID. A later CI pause restored its five saved paths and dropped only its own entry automatically.
+  - Inference: tree inequality proves a merge differs, not that nothing applied. The local repair is delivered; propagation through the shared guidance release remains outside this product execution.
+
+## DD-480 — An HTTP fixture invented the meaning of an empty assimilation value
+
+The frontend treated any supplied propertyValue, including empty string, as a list item and wrote a passing blank-item fixture. The existing backend explicitly uses empty string for scalar units.
+
+### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown; execution-time snapshot fa51f486fca13f9f3c85eaebbec2ed93be8e8522
+  - Evidence: 2026-11-10; CI run42762324814/attempt1 E2E job129650701015, Skip expected /n6/p/topic but received /n6/p/topic/i/1/~; backend PropertyFocus/AssimilationUnit documentation; repair c371659ac7121d1e83128c616fa1c0b391ac0867.
+  - Observed effect: selected mocked proof and list continuation E2E passed before the existing scalar walkthrough failed. Positive scalar-empty red reproduced the defect; nonempty raw values retain item routing and manual blank selection remains a separate input path. The corrected workspace fixture,37 focused tests, both types and10 real E2E scenarios passed.
+  - Inference: reuse of the key/value shape did not establish the wire sentinel. Read the producing contract before choosing a branch or manufacturing fixture variants; one observed execution does not establish recurrence.
