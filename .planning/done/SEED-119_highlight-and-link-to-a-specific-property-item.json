@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-119#highlight-and-link-to-a-specific-property-item",
+  "title": "Highlight and link to a specific property item",
+  "completedAt": "2026-11-10T08:24:18.030Z",
+  "developer": "Terry Yin",
+  "agent": "Nao-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol",
+  "intentCoverage": {
+    "report": "**Caught.** For SEED-119#highlight-and-link-to-a-specific-property-item at revision 589bfb63ad278f6c3bc72c6e24f0039d6e1bbff5, the maintained test catches stale history after cancellation.\n\nThe selected promise is C50/G8: removing a property item warns about and targets the current learner's matching history, including history added after an earlier canceled removal. In the isolated, initially clean detached checkout, the fixture cancels removal, adds history tracker 33 for the same note, then retries. The existing `warns and targets history added in the same note after cancellation` test in `frontend/tests/notes/NoteTextContent.propertyHistoryNoteChange.spec.ts` requires the confirmation popup before deletion.\n\nThe single temporary fault in `frontend/src/composables/usePropertyMemoryTrackerGuard.ts` replaced clearing the completed pending read with retaining that read. The fixture and assertion were unchanged. The same command was used for baseline, fault, and restoration: `./scripts/run.sh pnpm frontend:test tests/notes/NoteTextContent.propertyHistoryNoteChange.spec.ts -t 'history added'`.\n\nBaseline passed the selected test (two others skipped). With the fault, the retry produced no confirmation popup; the intended `onlyPendingPopup` assertion failed at test line 134, expecting one popup and receiving zero. This observes the wrong behavior on the selected retry path. Restoring the exact original source bytes yielded a clean Git status and a passing restored run (one test, two skipped). The owned scratch checkout was then removed.\n\n- **Test runtime.** Measured Vitest durations: baseline 3.31 s, fault 3.69 s, restored 2.68 s; total 9.68 s. These exclude dependency/setup wrapper time.\n- **Human effort.** Unavailable: no separately supported human-time measurement was collected.\n- **Agent effort.** Unavailable: no separate agent-effort telemetry was available.\n\n\n- **Invocation-to-report elapsed.** 408179 ms (measured), from 1794298610878 to 1794299019057 in Unix epoch ms. The end clock was sampled after writing the prepared report body.\n"
+  }
+}

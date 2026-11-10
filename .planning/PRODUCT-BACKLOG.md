@@ -9,7 +9,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [See Doughnut test cases and test files in Intent](seeds/SEED-112-publish-explicit-ci-test-counts.md#publish-explicit-ci-test-counts) — SEED-112#publish-explicit-ci-test-counts ([plan](slice-plans/086-publish-explicit-ci-test-counts/PLAN.md))
-- [Highlight and link to a specific property item](seeds/SEED-119-highlight-specific-property-item.md#highlight-and-link-to-a-specific-property-item) — SEED-119#highlight-and-link-to-a-specific-property-item ([plan](slice-plans/087-highlight-specific-property-item/PLAN.md))
 
 ## Backlog list
 
