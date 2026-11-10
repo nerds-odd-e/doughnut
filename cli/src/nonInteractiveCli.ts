@@ -1,3 +1,7 @@
+import {
+  diagnoseNotebookCheckout,
+  notebookDiagnosisDoc,
+} from './commands/notebook/notebookDiagnosis.js'
 import { exitCliError } from './cliExit.js'
 import { exceptionText } from './exceptionText.js'
 import { runUpdate } from './commands/update.js'
@@ -68,6 +72,17 @@ async function completeNotebookSubcommand(
   notebookArgs: string[]
 ): Promise<void> {
   const [action] = notebookArgs
+
+  if (action === 'diagnose') {
+    const directory = notebookArgs[1]
+    if (!directory) exitCliError(`usage: donut ${notebookDiagnosisDoc.usage}`)
+    try {
+      await diagnoseNotebookCheckout(directory)
+    } catch (error) {
+      exitCliError(exceptionText(error))
+    }
+    return
+  }
 
   if (action === 'publish') {
     await completeNotebookPublish(notebookArgs)

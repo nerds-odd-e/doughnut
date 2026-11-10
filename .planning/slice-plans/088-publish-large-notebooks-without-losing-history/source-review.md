@@ -42,9 +42,9 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | C32 | Preserve soundly identified Folder identities. | slice 4 |  |
 | C33 | Preserve those identities’ dependent learning data. | slice 4 |  |
 | C34 | Preserve pending local work. | slice 5 |  |
-| C35 | Distinguish a stale local base from server projection drift. | slice 2 |  |
-| C36 | Use the existing Pull/rebase/conflict workflow for a stale local base. | slice 2 |  |
-| C37 | Ordinary Publish continues to refuse drift until supported recovery settles it. | slice 2 |  |
+| C35 | Distinguish a stale local base from server projection drift. | slice 2 | observed: cli/tests/notebookPublish.ancestry.suite.ts#local main stale; cli/tests/notebookPublish.rebasedRejection.suite.ts#drift; cli/tests/notebookDiagnosis.test.ts; required full CLI/backend suites passed |
+| C36 | Use the existing Pull/rebase/conflict workflow for a stale local base. | slice 2 | observed: cli/tests/notebookPull.rebase.suite.ts#rebases two local note-edit commits over one accepted other-note commit, then publishes; required full CLI/backend suites passed |
+| C37 | Ordinary Publish continues to refuse drift until supported recovery settles it. | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java#rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection; required full CLI/backend suites passed |
 | C38 | Accepted content cannot be silently adopted. | slice 4 |  |
 | C39 | Accepted content cannot be silently rewritten. | slice 4 |  |
 | C40 | Publication remains atomic. | slice 4 |  |
@@ -58,7 +58,7 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | Q04 | Identity preservation is qualified by “soundly identified” Note/Folder identities. | slice 4 |  |
 | Q05 | Git content cannot recover already-deleted private identities. | slice 4 |  |
 | Q06 | Git content cannot recover already-deleted learning history. | slice 4 |  |
-| Q07 | Pull alone cannot fix server projection drift. | slice 2 |  |
+| Q07 | Pull alone cannot fix server projection drift. | slice 2 | observed: cli/tests/notebookDiagnosis.test.ts#reviews exact server differences while retaining pending commits and dirty work; required full CLI/backend suites passed |
 | Q08 | The required restrictions preserve content correctness independently of the story’s size example. | slice 4 |  |
 | Q09 | The required restrictions preserve identity correctness independently of the story’s size example. | slice 4 |  |
 | Q10 | The required restrictions preserve storage correctness independently of the story’s size example. | slice 4 |  |
@@ -80,18 +80,18 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | J02.7 | **Result:** Publish retains unchanged accepted ancestry. | slice 7 |  |
 | J02.8 | **Result:** Publish applies the edits. | slice 7 |  |
 | J02.9 | **Qualification:** Notebook size alone does not impose an edit limit. | slice 7 |  |
-| J03.1 | **Trigger:** Accepted head advances after local work. | slice 2 |  |
-| J03.2 | **Publish response:** Publish explains the stale base. | slice 2 |  |
-| J03.3 | **Recovery step:** Pull rebases unpublished commits. | slice 2 |  |
-| J03.4 | **Conflict behavior:** Pull pauses for real conflicts. | slice 2 |  |
-| J03.5 | **Continuation:** After resolution, Publish can accept the resulting fast-forward proposal. | slice 2 |  |
-| J04.1 | **Starting condition:** Local work is already based on current accepted head. | slice 2 |  |
-| J04.2 | **Trigger:** The server’s live canonical tree differs. | slice 2 |  |
-| J04.3 | **Publish response:** Publish refuses. | slice 2 |  |
-| J04.4 | **Publication effect:** Publish does not apply that proposal. | slice 2 |  |
+| J03.1 | **Trigger:** Accepted head advances after local work. | slice 2 | observed: cli/tests/notebookPublish.ancestry.suite.ts#a two-note edit commit stale after a later accepted web save; required full CLI/backend suites passed |
+| J03.2 | **Publish response:** Publish explains the stale base. | slice 2 | observed: cli/tests/notebookPublish.ancestry.suite.ts#local main stale; required full CLI/backend suites passed |
+| J03.3 | **Recovery step:** Pull rebases unpublished commits. | slice 2 | observed: cli/tests/notebookPull.rebase.suite.ts#rebases two local note-edit commits over one accepted other-note commit, then publishes; required full CLI/backend suites passed |
+| J03.4 | **Conflict behavior:** Pull pauses for real conflicts. | slice 2 | observed: cli/tests/notebookPull.conflict.suite.ts#pauses with native Git guidance when the same body line conflicts; required full CLI/backend suites passed |
+| J03.5 | **Continuation:** After resolution, Publish can accept the resulting fast-forward proposal. | slice 2 | observed: cli/tests/notebookPublish.resolvedContinuation.suite.ts#submits the continued child as the bundle head with accepted main as expected head; required full CLI/backend suites passed |
+| J04.1 | **Starting condition:** Local work is already based on current accepted head. | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java#rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection; required full CLI/backend suites passed |
+| J04.2 | **Trigger:** The server’s live canonical tree differs. | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java#rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection; required full CLI/backend suites passed |
+| J04.3 | **Publish response:** Publish refuses. | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java#rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection; required full CLI/backend suites passed |
+| J04.4 | **Publication effect:** Publish does not apply that proposal. | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java#rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection; required full CLI/backend suites passed |
 | J04.5 | **Diagnosis:** Diagnosis identifies the differing paths. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsSortedExactContentForChangedAddedAndRemovedPortableFiles; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
 | J04.6 | **Diagnosis:** Diagnosis identifies the current accepted revision. | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitDiagnosisControllerTest.java#reportsMatchingNativeTreesAtTheAcceptedHead; backend:test_only passed3055 tests,0 failures/errors,2 skipped at2026-11-10T06:14–06:16Z |
-| J04.7 | **Guidance:** Guidance points to server recovery rather than a Pull/retry loop. | slice 2 |  |
+| J04.7 | **Guidance:** Guidance points to server recovery rather than a Pull/retry loop. | slice 2 | observed: cli/tests/notebookPublish.rebasedRejection.suite.ts#a projection-drift rejection reports the drift; cli/tests/notebookDiagnosis.test.ts#reviews exact server differences while retaining pending commits and dirty work; full cli:test passed442 tests |
 | J05.1 | **Starting condition:** The discrepancy has been confirmed. | slice 11 |  |
 | J05.2 | **Repair condition:** There is an evidence-supported repair. | slice 11 |  |
 | J05.3 | **Identity condition:** Identity correspondence is sound. | slice 11 |  |
@@ -112,7 +112,7 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | J06.8 | **Learning preservation:** Recovery preserves existing learning associations. | slice 4 |  |
 | J06.9 | **Changed-state alternative:** If either the accepted state or the live state has changed, recovery asks for a fresh review. | slice 4 |  |
 | J06.10 | **Changed-state behavior:** Recovery does not apply a stale decision. | slice 4 |  |
-| J06.11 | **Ordinary publication restriction:** Ordinary Publish does not perform this adoption implicitly. | slice 2 |  |
+| J06.11 | **Ordinary publication restriction:** Ordinary Publish does not perform this adoption implicitly. | slice 2 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitProjectionDriftControllerTest.java#rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection; required full CLI/backend suites passed |
 | X01 | A general repair policy for arbitrary corruption is deferred. | slice 11 |  |
 | X02 | Recovery of already-deleted identities is deferred. | slice 11 |  |
 | X03 | Recovery of already-deleted learning data is deferred. | slice 11 |  |

@@ -30,6 +30,7 @@ import NoteBuilder from './NoteBuilder'
 import NoteRecallInfoBuilder from './NoteRecallInfoBuilder'
 import NoteRealmBuilder from './NoteRealmBuilder'
 import NotebookBuilder from './NotebookBuilder'
+import NotebookGitDiagnosisBuilder from './NotebookGitDiagnosisBuilder'
 import NotebookCatalogBuilder from './NotebookCatalogBuilder'
 import NotebookCatalogGroupItemBuilder from './NotebookCatalogGroupItemBuilder'
 import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBuilder'
@@ -47,6 +48,10 @@ import WikidataEntityBuilder from './WikidataEntityBuilder'
 import WikidataSearchEntityBuilder from './WikidataSearchEntityBuilder'
 
 class MakeMe {
+  static get aNotebookGitDiagnosis() {
+    return new NotebookGitDiagnosisBuilder()
+  }
+
   static get anAssistantManagement(): AssistantManagementBuilder {
     return new AssistantManagementBuilder()
   }

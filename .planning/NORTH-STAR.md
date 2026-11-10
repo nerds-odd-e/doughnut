@@ -31,7 +31,7 @@ classification of accepted change kinds. Donut accepts only forward linear
 history. Extend these owners rather than creating a separate
 attachment store of truth or synchronization path.
 See [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
-and [domain operation ownership](../docs/notebook-git-synchronization.md#domain-operation-ownership).
+and [domain operation ownership](../docs/notebook-git-projection.md#domain-operation-ownership).
 
 ## One real-service audio test
 

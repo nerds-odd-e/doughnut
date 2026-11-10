@@ -67,7 +67,7 @@ backend proof below. This API is directly usable before the CLI inspection outco
 
 ### 2. Inspect drift and receive correct publish recovery guidance
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run`, real bound checkout, backend-only mocks; reviewable differences and A/L are displayed while
 commits, dirty/untracked work survive. Preserve stale-base, rebased-rejection and resolved-continuation proof
 with correct advice.
@@ -218,22 +218,7 @@ and push. Full backend/E2E runtime and release/operator waits are explicit wait 
 
 ## Consumers, structure and acceptance reading
 
-Guidance reaches projection-drift, history-reset and folder-publication safety controller tests, CLI
-rebased-rejection/resolved-continuation suites and sync docs. Preserve their refusal/local-work promises.
-Record actual consumer trace. App closure reaches entry/workflow/payload/publication/retry/bootstrap tests,
-CI/deploy YAML and operator docs; fixture presence is not behavioral proof.
-
-Expected edit candidates are below 250 lines at `8c0f3a25d2`: CLI dispatch 203, LFS suite 234, app CI 246,
-publication suite/fixture 202/196, retry suite 207, encoder 228, Git HTTP 98, publisher 201, drift tests 187.
-Keep new large-tree proof in its capability suite and notebook orchestration in its owner if dispatch would
-exceed 250. TreeShape is 251: prefer direct reuse; if editing is required, 3 must assign cohesive
-inspection/classification versus correspondence/admission reorganization, callers and retained controller
-proof before implementation.
-
-8's separate one-time whole-product reading sweeps `CLI_DIST_ARTIFACT`, `CLI_BUNDLE_SOURCE`, `CAPTURED_CLI`,
-`captured-cli` and app CLI artifact/publication references. Delete exclusive dependents transitively; classify
-surviving shared CLI/LB/E2E uses. Preserve dated provenance; delete obsolete synthetic fixture branches rather
-than renaming their actions. No permanent absence test.
+[Consumer scope, file structure and removal acceptance reading](execution-evidence.md#consumers-structure-and-acceptance-reading).
 
 ## Current decisions and concern evidence
 
@@ -246,3 +231,10 @@ Eleven leaves, plus mandatory correction leaves allocated after 3. One canonical
 publication and independent CLI publisher. Target ~5 minutes includes proof/cleanup; 5–8 minute leaves
 were scrutinized. Other editing overruns require finer decomposition. Cause/correspondence stays behind
 permitted probe 3; deployed observations stay with 10/11. No other blocking concern identified.
+
+## Story obligations
+
+### G1. Optional CLI static diagnostic
+Reported: slice 2 — "The optional CLI tsc --noEmit diagnostic reports 113 errors in existing configuration/imports and unchanged CLI typing sites."
+Story clause: "A notebook owner can publish small committed Markdown edits to an existing large notebook with the supported Donut CLI."
+Disposition: no user cost "A notebook owner can publish small committed Markdown edits to an existing large notebook with the supported Donut CLI.": package build uses esbuild, test uses Vitest/Python and lint uses Biome; none invokes this unsupported standalone tsc command. Inspected unchanged Node16/rootDir/generated imports and existing Key.name sites at f3bb7162. The one new SDK envelope issue was corrected with existing runDefaultBackendJson; the required CLI command passed 442 tests after that correction. No observed CLI behavior defect remains; the optional diagnostic is explicitly failed, not accepted proof. Evidence: /tmp/seed121-slice2-tsc-diagnostic.log and consumer-trace-cli.md.

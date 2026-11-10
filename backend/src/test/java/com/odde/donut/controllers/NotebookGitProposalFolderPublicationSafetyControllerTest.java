@@ -155,7 +155,7 @@ class NotebookGitProposalFolderPublicationSafetyControllerTest
             proposalBytes,
             HttpStatus.CONFLICT);
 
-    assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
+    assertThat(exception.getReason(), containsString("donut notebook diagnose"));
     assertThat(
         noteRepository.findById(fixture.existing().getId()).orElseThrow().getContent(),
         equalTo(EXISTING_CONTENT));

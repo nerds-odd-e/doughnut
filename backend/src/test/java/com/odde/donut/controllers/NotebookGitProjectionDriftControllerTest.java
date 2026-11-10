@@ -90,7 +90,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
                     new NotebookGitProposalFile("Archive/Topics/A.md", NOTE))),
             HttpStatus.CONFLICT);
 
-    assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
+    assertThat(exception.getReason(), containsString("donut notebook diagnose"));
     NotebookGitProposalFolderRelocationParentMap.assertUnchanged(
         transactionManager, folderRepository, notebook, archive, topics);
   }
@@ -123,7 +123,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
             notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-    assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
+    assertThat(exception.getReason(), containsString("donut notebook diagnose"));
     Note reloadedAccepted = noteRepository.findById(acceptedNote.getId()).orElseThrow();
     assertThat(reloadedAccepted.getContent(), equalTo(ACCEPTED_CONTENT));
     Note reloadedOccupiedDestination =
