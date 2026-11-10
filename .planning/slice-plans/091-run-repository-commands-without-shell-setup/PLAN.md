@@ -117,7 +117,7 @@ E2E still needs its credential default until slice 2.
 ### 2. Run mocked OpenAI journeys with a local E2E credential default
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: The configuration contract, existing held-stack token cases, full
 backend suite, and both real Cypress features establish the one E2E credential
 rule and its preserved caller choices.
@@ -195,8 +195,10 @@ Slice 1 proof and consumer dispositions: [execution evidence](execution-evidence
 ### G1. Record accepted credential publication
 Reported: slice 2 — "Exact credential delivery revision awaits coordinator publication."
 Story clause: "Record the delivered response and release at"
-Disposition: return
+Disposition: proved by slice 2: DonutRetrospectiveFindings.md DD-439 records accepted credential code revision be62cc90a427fc7663fb481a06e1f15a582fe99b
 
 ## Delivery evidence
 
 Slice 1 accepted publication: `12e1f925a5e6199a27bbefcaf298f0b8c948045f` on the recorded remote story branch, suffix base `de3ec5af37e0a03538c17daa410b10af5252073c`, same observer reused. Slice 2 proof: [execution evidence](execution-evidence.md#slice-2-mocked-openai-credential-default) and [consumer trace](consumer-trace-credential.md); full backend, held cases and clean-shell seven-scenario batch passed. G1 keeps exact delivery attribution owned until its progress publication.
+
+Slice 2 code progress publication accepted `be62cc90a427fc7663fb481a06e1f15a582fe99b`, suffix base `12e1f925a5e6199a27bbefcaf298f0b8c948045f`, same observer reused. G1 is proved by the exact delivered revision now recorded in DD-439; this final attribution increment is records-only.

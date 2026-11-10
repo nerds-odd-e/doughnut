@@ -29,8 +29,8 @@ Launch: collaboration.spawn_agent, task `/root/source_review`, fork_turns `none`
 | C21 | Existing service configuration continues to participate in choosing the OpenAI endpoint. | slice 2 | observed: OpenAiApiConfig TestabilitySettings baseUrl and private mock ownership preflight unchanged, seven scenarios pass |
 | C22 | Repository-entry reproductions pass without manual exports. | slice 1 | observed: execution-evidence.md slice 1 real cold/cached Nix command exits 0 |
 | C23 | Mocked-OpenAI reproductions pass without manual exports. | slice 2 | observed: execution-evidence.md slice 2 exact clean-shell Cypress command and terminal seven-pass result |
-| C24 | The delivered response is recorded at DD-439. |  | G1 |
-| C25 | The release is recorded at DD-439. |  | G1 |
+| C24 | The delivered response is recorded at DD-439. | slice 2 | observed: DonutRetrospectiveFindings.md DD-439 records delivered response and exact accepted code revision be62cc90a427fc7663fb481a06e1f15a582fe99b |
+| C25 | The release is recorded at DD-439. | slice 2 | observed: DonutRetrospectiveFindings.md DD-439 records delivered response and exact accepted code revision be62cc90a427fc7663fb481a06e1f15a582fe99b |
 | C26 | Dated observations are retained. | slice 2 | observed: DonutRetrospectiveFindings.md DD-439 original 2026-11-09 and 0.3.92 occurrence text preserved |
 | Q01 | The audience is contributors and coding agents working for them. | slice 1 | observed: docs/development-setup.md non-interactive contributor/agent wrapper recipe |
 | Q02 | The placeholder applies to the E2E application when the token is unset. | slice 2 | observed: OpenAiProfileConfigurationTest e2e unset and dev unset rows; YAML diff only E2E document |
