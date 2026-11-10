@@ -132,3 +132,30 @@ Slice4 published4d135fd1c8775fd360ad3ee24be0cf8f431fb257, prior basee7f811f43833
 ## Slice 5 acceptance
 
 The existing immutable candidate sequence now has one NotebookGitCandidateAdmission owner, called by ordinary Publish. Inspection, miscase, marker, typed Markdown, attachment durability/size and book-source policies retain their order and errors; ancestry, drift, identity/projection and transaction ownership are unchanged. Root inspected the moved block and controller Markdown/attachment/rollback assertions; full backend:test_only passed3055 tests,0failures/errors,2skipped in1m49s, XML begins2026-11-10T08:53:35.974Z on Territory.local. All reached consumers are disposed in consumer-trace-admission.md. Independent refactor complete; unchanged accepted proof retained. No API contract/generation trigger or slice5 gap. Coordinator selective formatter and size check passed.
+
+## Recovery attempt and validation remainder
+
+Slice6 stopped at its ten-active-minute hard limit (target5–8); endpoint, controller fixtures and generated-consumer closure did not fit the original estimate. No product work was delivered. Exact11 owned files are safely parked at /Users/terryyin/.codex/tmp/seed121-recovery-attempt, manifestSHA2564e1f39fab4a1fdad4eaaac36381cd1d2c31cfd30091ba99e06ba142e1cbaeacb, base80dc6564d0d8362f0c04eed8e497f1f4886caa14. Each modified byte is hashed; only those owned paths were restored/deleted after verification. Park retains current failure XML and raw consumer trace. No unowned work or shared stash touched.
+
+Generation passed. Full backend:test_only exited1 in2m18s:3065tests,1failure,2skipped; recovery XML2026-11-10T09:04:28Z. Nine new refusal/serialization/admission/atomic cases passed; success stopped at an incorrect expected tracker count. The fixture creates3logs via recallCount(3), then explicitly creates a fourth; getRecallCount derives valid log count. Capture actual persisted pre-recovery state after all fixture creation; do not change product or weaken learning preservation. Recall-log and successful derived-state assertions after the failure remain unobserved. Required frontend tests/two typechecks and consumer dispositions also remain incomplete. Raw trace1943lines includes unchanged regenerated-export matches; follow actual wire delta and retain dispositions for all reached consumers.
+
+Refinement retains the cohesive recovery6 boundary: implementation is parked, not falsely done, and only one known fixture repair plus bounded proof closure remains (~3–5 active minutes). Restore exact compatible bytes on the published refined-plan base; preserve cumulative first-attempt time and nine valid observations, rerunning full backend after the fixture correction. Add no behavior cases absent a concrete acceptance gap. New generation only if source changes; frontend consumer proof still required. No prior completed slice had a sizing overrun; one failed hypothesis does not trigger story resplitting. Goal/scope/ADR unchanged.
+
+The same hidden preparation risk applies to former7's command plus integrated journey. Split into independently usable CLI7 (~5active minutes) and installed server continuation8 (~5–8 plus runtime). Existing nonInteractiveCli218lines has a cohesive notebook-handler seam: extract that owner before adding recovery, preserving global routing, clone/Publish/Pull and errors. Existing install, checkout commit, real conflict continuation and clean receiver tasks are reusable. Fixture injection does not auto-accept; use it to establish live-only input, never resnapshot the action under test. Remaining cumulative design stays supported: diagnostic/shared rules → reviewed native acceptance → CLI → integrated continuation → large-tree proof → single CLI publisher/update/release. Fourteen leaves; no resplit recommendation. All future allocations/checkpoints shift together.
+
+## Execution checkpoints and proof commands
+
+Before trunk releases in 3/13, Story Branch Mode needs one human checkpoint naming tested candidate,
+`dough-land --keep-worktree` landing, exact main SHA, needed unused immutable app `vMAJOR.MINOR.PATCH` and/or
+`cli-vVERSION` tags and production action. That go-ahead covers landing and named release; ask once. Apply
+release-application/current runbook for app; CLI Release is independent. Recheck current CI/artifacts/release
+state. Preparation grants no live authority.
+
+Use `CURSOR_DEV=true nix develop -c`: backend `pnpm backend:test_only` runs all backend tests; CLI `pnpm
+cli:test`; relevant installed journeys use focused `pnpm cy:run --spec` with
+`e2e_test/features/cli/cli_notebook_publish_to_clean_clone.feature` and
+`e2e_test/features/cli/cli_install_and_run.feature` (admit any new feature). Release consumers: `node
+scripts/ci/node-test.mjs 'scripts/ci/application-release-*.test.mjs'` and `bash
+scripts/test/upload-cli-binary-to-gcs.sh.test`. Regenerate API client when needed. Follow repo Jidoka, fresh
+post-change refactor, coordinator's one `./scripts/run.sh pnpm format:changed`, plan update, agent commit/hook
+and push. Full backend/E2E runtime and release/operator waits are explicit wait exceptions.

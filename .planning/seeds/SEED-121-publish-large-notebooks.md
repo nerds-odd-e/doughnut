@@ -13,7 +13,7 @@ scope: story
 
 **Identity:** SEED-121#publish-large-notebooks-without-losing-history
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/088-publish-large-notebooks-without-losing-history/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"be8e962ce85d97b4b6ee238e38d296711369cddd88246355af1eea21dc2d49f1","plan":"149e209ae03b7bbaf201543c758d086b4b1bae8d84561afcbbdd98cfb3986f6c"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/088-publish-large-notebooks-without-losing-history/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"be8e962ce85d97b4b6ee238e38d296711369cddd88246355af1eea21dc2d49f1","plan":"5e2952eee4ddbf0c90e0a54304e3af8953728c28c08d0efb96c93882e59482d3"}}
 ```
 
 **Goal.** A notebook owner can publish small committed Markdown edits to an
