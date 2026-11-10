@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Airi-chan",
+  "email": "airi-chan@example.org",
+  "identity": "SEED-118#export-a-note-with-recent-quiz-questions",
+  "mode": "story-branch",
+  "branch": "cursor/export-a-note-with-recent-quiz-questions",
+  "host": "cursor",
+  "model": "auto"
+}
