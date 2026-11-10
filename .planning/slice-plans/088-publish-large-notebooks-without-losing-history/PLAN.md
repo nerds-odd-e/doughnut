@@ -67,7 +67,7 @@ Status: done
 Proof: accepted CLI run/refusal/Pull continuation and exact-byte/local-work observations are retained in execution-evidence.md#slice-2-acceptance, consumer-trace-cli.md and source-review.md.
 
 Behavior: diagnosis exposes exact reviewable state and correct recovery guidance; stale bases use Pull, pending/dirty/untracked work survives, and no tracked Donut files are required.
-Documentation structure: before editing the 328-line synchronization contract, move its domain-operation ownership and identity-correspondence sections to `docs/notebook-git-projection.md`, retaining precise links from the contract and updating the North Star's ownership link. This cohesive projection contract keeps both documents below 250 lines; preserve all decisions and examples while updating diagnosis guidance. Backend/CLI refusal and Pull tests retain the behavior proof.
+Completed structure: projection ownership/correspondence now lives in `docs/notebook-git-projection.md`, linked from the synchronization contract and North Star; retained decisions and proof are in execution-evidence.md.
 
 ### 3. Observe the incident and refine cause-dependent repair
 Type: Behavior
@@ -90,7 +90,7 @@ Type: Structure
 Status: done
 Proof: complete backend controller suite retains normal proposal acceptance/refusal, Markdown, marker, attachment-size/durability and book-source policy results. No controller/API contract change.
 
-Structure: modularize the cohesive existing inspection/typed-Markdown/attachment/book-policy block from NotebookGitProposalPublisher into one notebook-Git admission owner returning existing inspected files. Keep its order, errors and normal caller behavior; do not move ancestry, drift refusal, correspondence or projection into it. This directly enables reviewed recovery in 6 to reuse the identical immutable candidate checks. No TreeShape edit or new rule. Target ~5 minutes active plus full backend runtime.
+Structure: shared immutable candidate admission owns inspection, typed Markdown, attachment and book policies for normal publication and recovery; existing policy order/errors remain. Ancestry, drift, correspondence and projection retain their owners.
 
 ### 6. Preserve explicitly reviewed live edits in accepted history
 Type: Behavior
@@ -114,7 +114,7 @@ Type: Behavior
 Status: done
 Proof: installed CLI/isolated backend diagnoses, explicitly recovers A/L, Pulls/rebases pending work, resolves a real conflict, Publishes and receives both authored bodies in a clean clone with ancestry and learning associations retained. Controller6 owns identity edges; existing Pull tests retain other variations.
 
-Behavior: prove the completed CLI/server route using existing install/clone/rebase/receiver tasks and fixture injection. No second harness. New recovery page-object/task/steps are part of this ~5–8 active minute leaf, with E2E runtime excepted; inspect the isolated fixture seam before edits and refine if it cannot fit ten minutes.
+Behavior: installed CLI/server continuation reuses existing install/clone/rebase/receiver tasks and isolated fixtures; execution-evidence.md retains the real-conflict journey and literal proof.
 
 ### 9. Submit a small commit over an oversized accepted tree
 Type: Behavior
@@ -123,9 +123,7 @@ Proof: dedicated real-Git CLI `run` regression measures accepted listing above 1
 committed Markdown edits; backend is the only mock. It fails with old selection restored in a reverted scratch
 observation.
 
-Behavior: existing changed-file selection submits the small proposal and retains local main/work/history.
-Reuse the observed synthetic workload; avoid gratuitous production changes. ~5 minutes. This isolates the
-original subprocess failure; 10 separately owns backend workload/materialization risk and actual acceptance.
+Behavior: existing changed-file selection submits the small proposal and retains local main/work/history; no product change. The release-fixture repair trace retains renewed historical-failure/current-positive proof.
 
 ### 10. Receive the large-notebook publication through a real backend
 Type: Behavior
@@ -147,15 +145,7 @@ Proof: retain selected-source SPA/jar/routing, valid/missing payload admission, 
 fresh-artifact retry and completed-release replay observations. Run the complete application-release consumer
 suite and retained uploader proof.
 
-Behavior: application publishes SPA/routing/backend through its existing release boundary. Delete its CLI
-artifact/upload responsibility transitively through packaging, CI/deploy inputs/downloads, payload,
-publication, entry/workflow/retry/bootstrap fixtures/tests, docs and release skill; delete the now-orphaned
-`CLI_BUNDLE_SOURCE` override. Independent CLI/LB/install/E2E ownership remains. This is one indivisible
-artifact contract across producer/admission/consumer. A partial delivery either breaks release or leaves
-exclusive obsolete machinery; there is no coherent file-based subdivision. Stated good-reason sizing
-exception: ~12–15 minutes edits plus quick retained proof for this complete removal only. One bounded attempt;
-if closure cannot finish, park/revert only owned work and refine before delivering. New combined update
-fixture belongs solely to 12.
+Behavior: application publication owns SPA/routing/backend. Its CLI artifact/upload responsibility and orphaned override were deleted transitively across producers, admission, publication, fixtures and guidance; independent CLI/LB/install/E2E ownership remains. execution-evidence.md retains the separate removal sweep, retained proof and indivisible-contract12–15-minute sizing exception.
 
 ### 12. Update the authentic affected installation after application publication
 Type: Behavior
@@ -165,12 +155,7 @@ actual normal Update from authentic 0.5.9, and execution of fixed replacement/ve
 path. Existing call-log shell fixtures do not supply this integration. This one sequence owns updater
 replacement proof; 11 owns application release semantics.
 
-Behavior: retain selected correctly versioned CLI across application publication and install/run it normally.
-Predecessor: isolated copy of incident binary SHA-256
-`5b868908f33576604389ad9b41f26a21eaa6efef982c570e2a60488d3365525c`, or reproducible `cli-v0.5.9` build; never
-current source merely relabeled. No host installation/config mutation. Include new fixture work in ~5–8 minute
-estimate; if transport/store composition cannot fit ten minutes, refine before starting. Select unused release
-version above affected/published versions at checkpoint.
+Behavior: authentic isolated0.5.9 SHA-256`5b868908f33576604389ad9b41f26a21eaa6efef982c570e2a60488d3365525c` updates normally to the selected fixed build across application publication; no host mutation. consumer-trace-updater-sequence.md retains composition and proof.
 
 ### 13. Deliver fixed builds through supported release/update paths
 Type: Behavior
@@ -184,7 +169,7 @@ updater input and executed replacement. External waits.
 
 ### 14. Complete the affected owner's pending publication
 Type: Behavior
-Status: planned
+Status: done
 Proof: dated private before/after evidence of cause correction, accepted ancestry/content, and current
 identity/learning associations through recovery and pending Publish. Reuse adequate 3 evidence; HTTP success
 alone insufficient.
@@ -207,9 +192,24 @@ Policy agreement is not approval of unseen live content. Owner/operator waits.
 [Execution context, observer identity and accepted proof](execution-evidence.md).
 
 Developer accepted reviewed forward preservation on 2026-11-10; no source/ADR question remains.
-Completed1–12 stand. Slice10 continuation proved real large-notebook acceptance and receiving; earlier failed attempts remain dated evidence in execution-evidence.md. Fourteen leaves; application11 keeps its stated12–15-minute exception, updater12 and final delivery/owner13/14 remain. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Whole remaining scope was reassessed and stays supported; no source or story change.
+Completed1–13 stand;14owns the actual owner continuation. Earlier failed attempts remain dated in execution-evidence.md and release-recovery-evidence.md. Fourteen leaves; application11 retained its12–15-minute exception. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Evidence consolidation does not renew readiness or change source scope.
 
 ## Story obligations
+
+### G7. Owner Pull checkout readiness
+Reported: slice 14 — "Pull refused the original untracked .gitignore; holding it exposed two already-ignored files, so native exclude temporarily protected it before successful Pull and exact restoration."
+Story clause: "Repair must preserve accepted commit IDs and ancestry, soundly identified Note/Folder identities and their dependent learning data, and pending local work."
+Disposition: proved by slice 14: release-recovery-evidence.md#slice-14-acceptance; inspected read-only readiness guard and Pull continuation, exact local files/exclude restored, pending author/message/three blobs preserved through Pull/Publish
+
+### G8. Private observation coverage
+Reported: slice 14 — "Production learning observation covers representative private rows, not every private row; actual owner path had no conflict and historical caller remains unverified."
+Story clause: "Repair must preserve accepted commit IDs and ancestry, soundly identified Note/Folder identities and their dependent learning data, and pending local work."
+Disposition: proved by slice 14: release-recovery-evidence.md#slice-14-acceptance; full4042folder snapshot and reviewed identities plus representative3trackers/38history unchanged; accepted6transaction/correspondence tests establish preservation algorithm,8proves real conflict; G2 retains caller limit
+
+### G9. Materialized content oracle
+Reported: slice 14 — "Initial optional body-only probe used an inapplicable oracle because Note.content stores the entire Portable file including frontmatter; coordinator initially read the realm topology at the wrong nesting."
+Story clause: "and applies the edits."
+Disposition: proved by slice 14: release-recovery-evidence.md#slice-14-acceptance; corrected actual schema/whole-file oracle compares all three accepted Git blobs to raw production Note.content and confirms notebook/folder/Note IDs; failed probes retained, not accepted as product failures
 
 ### G1. Optional CLI static diagnostic
 Reported: slice 2 — "The optional CLI tsc --noEmit diagnostic reports 113 errors in existing configuration/imports and unchanged CLI typing sites."
