@@ -1,4 +1,5 @@
 {
+  "intentCoverage": true,
   "ciWorkflow": "ci.yml",
   "skipProcessRetrospective": false,
   "intent": {
