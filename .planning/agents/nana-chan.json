@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nana-chan",
+  "email": "nana-chan@example.org",
+  "identity": "SEED-116#run-repository-commands-without-interactive-shell-setup",
+  "mode": "story-branch",
+  "branch": "codex/run-donut-s-repository-commands-without-interact",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
