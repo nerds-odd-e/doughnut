@@ -15,7 +15,7 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | C05 | That recovery path preserves accepted commits. | slice 14 |  |
 | C06 | That recovery path preserves learning data. | slice 14 |  |
 | C07 | That recovery path preserves unpublished work. | slice 14 |  |
-| C08 | Verify publication of small committed Markdown edits when the full accepted Git tree listing exceeds 1 MiB. | slice 10 |  |
+| C08 | Verify publication of small committed Markdown edits when the full accepted Git tree listing exceeds 1 MiB. |  | G5 |
 | C09 | Deliver the existing scan fix through `donut update` from the affected installed version. | slice 13 |  |
 | C10 | Deliver an accurately versioned build. | slice 13 |  |
 | C11 | Keep the normal update target usable across CLI publication. | slice 13 |  |
@@ -75,7 +75,7 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | J02.2 | **Starting condition:** Its complete accepted tree listing exceeds 1 MiB. | slice 10 |  |
 | J02.3 | **Local change:** Three Markdown files change in a local commit. | slice 10 |  |
 | J02.4 | **Base condition:** The local commit is based on accepted head. | slice 10 |  |
-| J02.5 | **Result:** Publish succeeds. | slice 10 |  |
+| J02.5 | **Result:** Publish succeeds. |  | G5 |
 | J02.6 | **Result:** Publish retains submitted commit IDs. | slice 10 |  |
 | J02.7 | **Result:** Publish retains unchanged accepted ancestry. | slice 10 |  |
 | J02.8 | **Result:** Publish applies the edits. | slice 10 |  |

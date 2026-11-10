@@ -57,24 +57,16 @@ authorizes no implementation, release or production repair.
 ### 1. Obtain a consistent owner-authorized drift report
 Type: Behavior
 Status: done
-Proof: real controller/DB/Git fixtures cover matching tree, changed note/README, added/removed path, marker
-and LFS pointer; report exact A/L and bytes. Existing concurrent-controller support races sanctioned web
-publication with diagnosis: A/tree/bytes positively describe one complete committed state. Non-owner denied.
+Proof: accepted controller/DB/native-Git exact-content, structural/LFS, owner and concurrent web-snapshot observations are retained in execution-evidence.md#slice-1-acceptance and source-review.md.
 
-Behavior: owner requests diagnosis → receive a guard-equivalent snapshot under the existing notebook lock. Add
-the cohesive result at Git HTTP boundary and regenerate API client. Target ~5–8 minutes edits, complete
-backend proof below. This API is directly usable before the CLI inspection outcome.
+Behavior: owner diagnosis returns one locked, guard-equivalent A/accepted/live snapshot and sorted exact differing bytes through the Git HTTP boundary and generated client.
 
 ### 2. Inspect drift and receive correct publish recovery guidance
 Type: Behavior
 Status: done
-Proof: CLI `run`, real bound checkout, backend-only mocks; reviewable differences and A/L are displayed while
-commits, dirty/untracked work survive. Preserve stale-base, rebased-rejection and resolved-continuation proof
-with correct advice.
+Proof: accepted CLI run/refusal/Pull continuation and exact-byte/local-work observations are retained in execution-evidence.md#slice-2-acceptance, consumer-trace-cli.md and source-review.md.
 
-Behavior: diagnose bound checkout → inspect exact differences and explicit recovery route. Drift points here;
-stale base points to Pull. Reuse auth/binding and ordinary Git diff where useful; require no tracked Donut
-files. ~5–8 minutes.
+Behavior: diagnosis exposes exact reviewable state and correct recovery guidance; stale bases use Pull, pending/dirty/untracked work survives, and no tracked Donut files are required.
 Documentation structure: before editing the 328-line synchronization contract, move its domain-operation ownership and identity-correspondence sections to `docs/notebook-git-projection.md`, retaining precise links from the contract and updating the North Star's ownership link. This cohesive projection contract keeps both documents below 250 lines; preserve all decisions and examples while updating diagnosis guidance. Backend/CLI refusal and Pull tests retain the behavior proof.
 
 ### 3. Observe the incident and refine cause-dependent repair
@@ -152,6 +144,8 @@ E2E fixture/domain builders and accepted-tree seeding, with no production contro
 fixture/scenario edits; stop/refine before implementation if that seam cannot meet ten minutes. Measure
 runtime/resources before the focused E2E launch.
 
+Remainder: restore the exact parked attempt, retain every assertion, and give the observed full-notebook diagnosis its own bounded wait instead of the generic six-second client deadline. Keep250-note batches until evidence warrants another change. Fresh validation targets ~3–5 active minutes plus E2E runtime; preserve the ten-minute first attempt and unresolved retry-batch cause. See execution-evidence.md#large-backend-validation-remainder.
+
 ### 11. Publish the application with its SPA and backend artifacts
 Type: Behavior
 Status: planned
@@ -219,7 +213,7 @@ Policy agreement is not approval of unseen live content. Owner/operator waits.
 [Execution context, observer identity and accepted proof](execution-evidence.md).
 
 Developer accepted reviewed forward preservation on 2026-11-10; no source/ADR question remains.
-Current refinement retains completed 1–5 and the recovery6 outcome. Its first attempt stopped at ten active minutes and is safely parked; remaining validation is bounded in execution-evidence.md. Split the same underestimated command-plus-integration preparation in 7 into CLI7 and installed journey8. Fourteen leaves; application removal11 retains its 12–15-minute exception, updater continuity12, final delivery/owner13/14. Other targets remain five to eight active minutes, hard stop ten; required backend/E2E and external waits excepted. No story change or repeat-overrun threshold is implicated.
+Completed1–9 stand. Slice10 first attempt is parked after client deadlines blocked positive proof; its bounded validation remainder is retained in execution-evidence.md. Fourteen leaves; application11 keeps its stated12–15-minute exception, updater12 and final delivery/owner13/14 remain. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Whole remaining scope was reassessed and stays supported; no source or story change.
 
 ## Story obligations
 
@@ -246,3 +240,9 @@ Reported: slice 6 — "The recovery attempt stopped at ten active minutes with o
 Story clause: "Repair must preserve accepted commit IDs and ancestry, soundly identified Note/Folder identities and their dependent learning data, and pending local work."
 Disposition: proved by slice 6: consumer-trace-recovery.md; successful committed learning/derived-state assertions, renewed backend3065 pass XML2026-11-10T09:29:16Z, frontend2470/two typechecks/CLI442 pass; first failed observations retained in execution-evidence.md
 Commitment: C33, J06.8
+
+### G5. Large backend acceptance proof
+Reported: slice 10 — "The large-backend attempt stopped at ten active minutes after a diagnostic deadline and a retry injection timeout; no publication or fresh-receiver result was reached."
+Story clause: "A notebook owner can publish small committed Markdown edits to an existing large notebook with the supported Donut CLI."
+Disposition: return
+Commitment: C08, J02.5
