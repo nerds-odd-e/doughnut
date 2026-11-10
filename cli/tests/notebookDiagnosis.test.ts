@@ -78,6 +78,9 @@ describe('notebook diagnosis', () => {
     expect(text).toContain('Live content (base64): AP4=')
     expect(text).toContain('Pull alone cannot repair server projection drift')
     expect(text).toContain('explicitly reviewed forward commit')
+    expect(text).toContain(
+      `donut notebook recover ${directory} ${report.acceptedHead} ${report.liveTree}`
+    )
     expect(localGitObservation(directory)).toEqual(before)
     expect(runGit(['rev-list', '--count', 'main'], directory)).toBe('2')
     expect(backend).toHaveBeenCalledWith(

@@ -114,10 +114,12 @@ Remainder after ten-minute attempt: restore the exact parked implementation, cor
 
 ### 7. Request reviewed recovery through the CLI
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI run with real bound Git checkout and only backend mocked sends explicit A/L, reports accepted head and Pull continuation, and preserves pending commits plus dirty/untracked work on success/refusal. Full CLI suite retains existing routing and Pull/Publish behavior.
 
 Behavior: owner explicitly names reviewed A/L through notebook recover. Reuse binding/auth/generated API and help/docs. Before extending the 218-line nonInteractiveCli.ts, move its cohesive notebook routing/clone/publish/pull handlers into one notebook command owner with the existing global router as caller; retain errors and workflows. Target ~5 active minutes; integrated journey belongs to 8.
+
+Focused-proof exception for 7: one complete CLI repeat with VITEST_MAX_WORKERS=2 under observed host load26.8–29.17 is runtime-excepted; active edit/diagnosis/trace work retains the ten-minute stop. Retain first failures and require a terminal result; no automatic further repeat or timeout change.
 
 ### 8. Continue retained local work after reviewed recovery
 Type: Behavior
