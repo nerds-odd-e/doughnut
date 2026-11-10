@@ -64,8 +64,42 @@ year. The updated date is more prominent for newer edits within the current
 theme.
 
 An unfinished property draft keeps its entered values and validation until it
-is completed or cancelled. A property-targeted arrival focuses the requested
-existing row; a missing key shows its explicit notice beside the existing rows.
+is completed or cancelled. A property-targeted arrival opens the requested
+property; a missing key shows its explicit notice beside the existing rows.
+
+### Value focus and item locations
+
+Scalar focus highlights the existing value area with tint and a leading edge,
+including specialized controls and read-only views. List focus highlights one
+authored row. Opening a list chevron selects its first item; choosing row space
+or its keyboard selection control replaces the current item location. Value
+links and learning actions keep their own interactions. A property-only list
+location opens the property without selecting an item.
+
+The named `notePropertyItem` location identifies the note, exact authored key,
+exact parsed item text and one-based occurrence among equal values. Its path is
+`/n:noteId/p/:propertyKey/i/:occurrence/:itemText`; named helpers own the `~`
+prefix on item text and Vue Router serializes the parameters. Distinct values
+keep their destination through reordering. Missing text or occurrences show
+explicit unresolved-item feedback with the note still readable; identical
+occurrences have no durable identity through edits among equal rows. Inbound
+links push history, panel selections replace it, and conversation query stays
+with the note family. Portable wiki destinations remain property-level.
+
+Each expanded editable list row has an item minus. Before removal, the guard
+reads the current note's learning history for that action; only pending reads
+for the same note are shared. Matching history uses exact key and value. The
+warning explains that equal occurrences share history, so remaining equals
+lose that history too. Cancel preserves content, history, focus and URL.
+Confirmation deletes the matching private trackers and uses ordinary content
+saving, preserving sibling order and history. These remain separate requests;
+a history read or deletion error stops content and focus changes.
+
+Removing the selected row clears to the open property-only location. Removing
+another row retains the selected occurrence, adjusting its equal-value count.
+Final-item minus removes the entry with its whole-key history and returns to
+the whole-note location. Scalar entry removal remains available. Ordinary
+Markdown and value-dialog authoring still support empty lists.
 
 The title, properties and body share a centered reading measure of at most 48rem,
 with 1rem of padding on each side. Rich body text uses 17px at the default root
@@ -81,7 +115,7 @@ its chevron panel is closed and detailed when the panel is open: the
 detailed list in the panel shows each authored item in order, and collapsing
 restores the compact links beside the key. The key, panel toggle and
 value-dialog Edit control stay available whether the panel is open or
-closed. Read-only views show the compact list beside the key. Each
+closed. Read-only lists share the compact and focused expanded presentations. Each
 wiki-link element in a property list can be followed
 independently from its active placement. Mixed lists preserve plain-text
 elements and their order. Wiki links retain their authored display labels,
