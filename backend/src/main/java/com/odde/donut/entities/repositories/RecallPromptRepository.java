@@ -4,7 +4,9 @@ import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.services.RecallAnswerRow;
 import jakarta.persistence.LockModeType;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -79,4 +81,33 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
 
   void deleteByMemoryTracker_Id(Integer memoryTrackerId);
+
+  /**
+   * Answered MCQ choice indexes for one learner, newest first per attempt (answer time, then answer
+   * ID). Prefer {@link #findLatestAnsweredChoiceIndexByMcqIdForUser(Integer, List)}.
+   */
+  @Query(
+      """
+      SELECT rp.mcq.id, a.choiceIndex FROM RecallPrompt rp
+      JOIN rp.answer a JOIN rp.memoryTracker mt
+      WHERE mt.user.id = :userId AND rp.mcq.id IN :mcqIds AND a.choiceIndex IS NOT NULL
+      ORDER BY a.createdAt DESC, a.id DESC
+      """)
+  List<Object[]> findAnsweredChoiceIndexesForUserAndMcqs(
+      @Param("userId") Integer userId, @Param("mcqIds") List<Integer> mcqIds);
+
+  /**
+   * Latest answered choice index per MCQ for one learner (first row wins after newest-first order).
+   */
+  default Map<Integer, Integer> findLatestAnsweredChoiceIndexByMcqIdForUser(
+      Integer userId, List<Integer> mcqIds) {
+    if (mcqIds.isEmpty()) {
+      return Map.of();
+    }
+    Map<Integer, Integer> latest = new HashMap<>();
+    for (Object[] row : findAnsweredChoiceIndexesForUserAndMcqs(userId, mcqIds)) {
+      latest.putIfAbsent((Integer) row[0], (Integer) row[1]);
+    }
+    return latest;
+  }
 }

@@ -187,7 +187,7 @@ zero-question ordinary context, and omitted/false/true HTTP binding.
 
 ### 3. Attach only the exporting learner's latest selection
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Selected questions include repeated attempts and other learners'
 attempts → one entry per MCQ contains this learner's latest recorded selection,
 ordered by answer time then answer ID; unanswered questions remain included
@@ -199,6 +199,16 @@ other-learner attempt, an other-only answered question and guest access. Keep
 existing unreadable-note refusal. Deliberately different choice text identifies
 the selected answer separately from Donut's key.
 Sizing: about 5 minutes plus the required backend verification wait.
+
+**Accepted proof (pre-delivery evidence).** Current-user-scoped
+`RecallPromptRepository.findLatestAnsweredChoiceIndexByMcqIdForUser` plus
+appendix `Learner's selected answer:` lines.
+`NoteExportControllerLearnerSelectionsTests` covers one answered among three,
+repeated own answers by time, equal-time higher answer ID, newer other-learner
+non-substitution, other-only unanswered for exporter, guest include without
+selections, and unreadable refusal. `./scripts/run.sh pnpm backend:test_only`
+BUILD SUCCESSFUL after post-change refactor (fold into repository + OpenAPI
+description sync). G1 closed as proved by slice 3.
 
 ### 4. Choose inclusion and export the current preview reliably
 Type: Behavior
@@ -289,9 +299,7 @@ Commitment: C36.3
 ### G1. Learner latest selection half of refinement
 Reported: slice 2 — "C24 includes learner latest own selection not yet attached at export"
 Story clause: "newest created note questions with the learner's latest own selection"
-Disposition: receiving slice 3
-Commitment: C24
-
+Disposition: proved by slice 3: NoteExportControllerLearnerSelectionsTests#threeQuestionsOneAnsweredShowsOwnSelectionSeparateFromDonutKey
 ### G2. Preview copy download agreement for question appendix
 Reported: slice 2 — "C18 preview copied and downloaded agreement awaits Export Note Data UI"
 Story clause: "the preview, copied, and downloaded Markdown includes the 10 newest by question creation time"

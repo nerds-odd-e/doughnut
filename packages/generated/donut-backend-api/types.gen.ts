@@ -4053,7 +4053,7 @@ export type GetAiContextMarkdownData = {
          */
         tokenLimit: number;
         /**
-         * When true, append up to ten newest distinct focus-note multiple-choice questions with Donut answer keys.
+         * When true, append up to ten newest distinct focus-note multiple-choice questions with Donut answer keys and the current learner's latest own selection when present.
          */
         includeRecentQuestions?: boolean;
     };

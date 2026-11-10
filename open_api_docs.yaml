@@ -3018,7 +3018,8 @@ paths:
       - name: includeRecentQuestions
         in: query
         description: "When true, append up to ten newest distinct focus-note multiple-choice\
-          \ questions with Donut answer keys."
+          \ questions with Donut answer keys and the current learner's latest own\
+          \ selection when present."
         required: false
         schema:
           type: boolean
