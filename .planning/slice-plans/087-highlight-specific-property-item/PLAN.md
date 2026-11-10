@@ -116,7 +116,7 @@ no new scalar rendering or editing model.
 
 ### 2. Establish exact occurrence identity
 Type: Structure
-Status: planned
+Status: done
 Internal change: Add the shared exact-text/one-based-occurrence type and pure
 index/selector conversion in the existing property-value owner. Preserve all
 external rendering, routes and editing behavior; register no item URL yet.

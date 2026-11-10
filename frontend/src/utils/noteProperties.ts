@@ -5,6 +5,18 @@ export type PropertyValue =
 
 export type NoteProperties = Record<string, PropertyValue>
 
+export type PropertyItemFocus = { value: string; occurrence: number }
+
+export function propertyItemIndex(
+  items: readonly string[],
+  focus: PropertyItemFocus
+): number {
+  let occurrence = 0
+  return items.findIndex(
+    (value) => value === focus.value && ++occurrence === focus.occurrence
+  )
+}
+
 export function scalarPropertyValue(value: string): PropertyValue {
   return { kind: "scalar", value }
 }

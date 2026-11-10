@@ -195,3 +195,16 @@ needed → coordinator `./scripts/run.sh pnpm format:changed` once → evidence 
 commit/check-only hook → push. Slices target ~5 minutes including proof/cleanup;
 scrutinize overruns and decompose before >10 minutes except stated check/wait
 exceptions. Retrospective/wrap-up follow authorized execution.
+
+## Refined execution continuation
+
+Refinement was records-only, safely parked and refined, with the hard limit applied; seven slices remain Ready after actual reassessment of the unchanged story and revised plan. Accepted publication `9d9a5562ab1ebae56a5531a33551279a8532b612` on the remote execution branch, suffix base `3349feafb0163ea7c0a72d54562b5638a9fa1b52`, is the next increment base. Formatting no-op/check-only hook passed; managed observer remains `/tmp/dough-ci-501/watch-HpTDpK`. No second Take, preparation assignment or workspace was created.
+
+## Structure 2 acceptance
+
+- Added only the stable `PropertyItemFocus` / `propertyItemIndex` contract in the existing value owner; actual diff leaves prior exports and all public rendering/routes unchanged. Its immediate next consumer is Behavior 3; the inverse helper remains parked until selection needs it.
+- `./scripts/run.sh pnpm frontend:test tests/utils/notePropertyItemFocus.spec.ts tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts` passed 2 files/19 tests: nine supplied-array/selector cases observe exact indices for reordering, duplicate occurrences, blank/spaced strings and unresolved selectors; real mounted editor assertions retain scalar/read-only/specialized frame geometry, scroll, value-dialog edit, rename and removal. Both plan typecheck commands and `scripts/check_diff_whitespace.sh` passed on the same content.
+- Consumer trace `/tmp/seed119-occurrence-identity-consumers.md` from the installed script against `9d9a5562ab1ebae56a5531a33551279a8532b612` supplies `PropertyItemFocus` / `propertyItemIndex` terms and every consumer's run/excluded disposition. Unchanged exports' consumers do not gain a new runtime effect. G1/G2/G3 remain with Behavior 3, including the failed broad verdict.
+- About 3 active minutes plus checks; freshness unchanged at pinned trunk `fca96ef9073f5c0094fa1fe72c406fbe67fa55a7`, with the same unrelated queue-only incoming change and no named sibling product impact.
+- Independent `/root/refactor_identity` completed: none—already clean; no edits or invalidated proof, so no test rerun. Shared resolution is justified by the immediately following focus/rename Behavior; utility/test files are 146/18 lines.
+- Delivery-time freshness advanced to pinned trunk `dca7d78be57181ccdd154e130d9c386c3e82955b`: only SEED-112's Take/profile landed since the earlier pin. No product/sibling overlap; accepted proof remains applicable.
