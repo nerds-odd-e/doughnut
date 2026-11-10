@@ -7,6 +7,7 @@ import { describeNotebookPublishRebasedRejection } from './notebookPublish.rebas
 import { describeNotebookPublishResolvedContinuation } from './notebookPublish.resolvedContinuation.suite.js'
 import { describeNotebookPublishResolvedContinuationRejection } from './notebookPublish.resolvedContinuationRejection.suite.js'
 import { describeNotebookPublishSubmission } from './notebookPublish.submission.suite.js'
+import { describeNotebookPublishLargeTree } from './notebookPublish.largeTree.suite.js'
 
 // Keep every publish-flow suite registered from this one test entrypoint. The ancestry
 // leak-detection assertions snapshot a shared tmpdir prefix, so running sibling .test.ts files
@@ -23,3 +24,4 @@ describeNotebookPublishSubmission()
 describeNotebookPublishRebasedRejection()
 describeNotebookPublishResolvedContinuation()
 describeNotebookPublishResolvedContinuationRejection()
+describeNotebookPublishLargeTree()

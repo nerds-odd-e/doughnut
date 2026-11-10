@@ -130,14 +130,14 @@ Behavior: prove the completed CLI/server route using existing install/clone/reba
 
 ### 9. Submit a small commit over an oversized accepted tree
 Type: Behavior
-Status: planned
+Status: done
 Proof: dedicated real-Git CLI `run` regression measures accepted listing above 1 MiB and submits three
 committed Markdown edits; backend is the only mock. It fails with old selection restored in a reverted scratch
 observation.
 
 Behavior: existing changed-file selection submits the small proposal and retains local main/work/history.
 Reuse the observed synthetic workload; avoid gratuitous production changes. ~5 minutes. This isolates the
-original subprocess failure; 9 separately owns backend workload/materialization risk and actual acceptance.
+original subprocess failure; 10 separately owns backend workload/materialization risk and actual acceptance.
 
 ### 10. Receive the large-notebook publication through a real backend
 Type: Behavior
