@@ -174,7 +174,7 @@ version above affected/published versions at checkpoint.
 
 ### 13. Deliver fixed builds through supported release/update paths
 Type: Behavior
-Status: planned
+Status: done
 Proof: receipts name tested main SHA, immutable app/CLI tags, actual publication, public download
 version/digest and real Update/replacement from isolated affected installation. Local build/deployment
 response alone is insufficient.
