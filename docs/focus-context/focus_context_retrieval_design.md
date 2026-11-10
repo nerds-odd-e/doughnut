@@ -69,6 +69,27 @@ Title: Related
 </focus_context>
 ````
 
+## Focused note export
+
+Export Note Data uses the note's highlighted property or list item. The report
+retains surrounding focus context and readable wiki-link targets. A property-only
+list selection covers the whole property; an item selection preserves its exact
+raw value and one-based occurrence among equal values. Equal values share quiz
+history even when the report identifies a particular occurrence.
+
+The optional recent-question appendix contains up to ten distinct questions
+attributed through saved recall-prompt/tracker links to the exact authored key
+and, for an item, its exact raw value. Unanswered prompts remain eligible. Filter
+before ordering by question creation time and ID, newest first. Shared questions
+include choices and Donut's answer key; only the current learner's latest own
+answer is included, ordered by answer time and ID. The complete appendix sits
+outside the note-body token budget, and its checkbox is unchecked by default.
+
+Without a highlight, export retains whole-note questions, including questions
+without recall links. An unresolved key, raw value or occurrence returns an
+actionable error and unavailable copy/download controls. Close export, select an
+existing focus or clear the highlight, then reopen to recover.
+
 ## Code
 
 - `com.odde.donut.services.focusContext.FocusContextRetrievalService`
