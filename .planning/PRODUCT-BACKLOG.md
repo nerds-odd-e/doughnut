@@ -8,7 +8,5 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Publish large notebooks without losing history](seeds/SEED-121-publish-large-notebooks.md#publish-large-notebooks-without-losing-history) — SEED-121#publish-large-notebooks-without-losing-history ([plan](slice-plans/088-publish-large-notebooks-without-losing-history/PLAN.md))
-
 ## Backlog list
 

@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 481. Removed numbers are never reused.
+- Highest allocated local number: 482. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 - [Source before the 2026-11-10 compaction](https://github.com/nerds-odd-e/doughnut/blob/d3eb0ef73aca13a5ed229738f92dbe44ee12bf95/DearDough.md); its rows are retained at the [Open Dough catalog](https://github.com/terryyin/open-dough/tree/5afe6fee8fe34322752e9e44911d72eb31dd4991/docs/maintainer/findings). DD-443 (disposable break checks) was pruned as successful practice, not a problem.
@@ -190,6 +190,15 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
   - Evidence: launch 5a2c1855-2aed-40c0-bd75-6e21ae06957b conversation, 2026-11-10; startup combined unit-testing/agent-map/plan/package read returned original token count 11774 with truncation; subsequent combined plan/seed/trace/backlog read returned 12465 with truncation. Retrospective combined full ADR read repeated the problem (12411 tokens).
   - Observed effect: coordinator retrieved missing source/guidance again; targeted passages were sufficient when used.
   - Inference: avoidable agent retrieval deviation recurred despite targeted-reading guidance; token/time savings are unmeasured.
+
+### Occurrences
+- Execution: SEED-121#publish-large-notebooks-without-losing-history
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-11-10 resumed execution; coordinator tool results combined whole Execute Plan finish/CI/source/obligation references, then aggregate retrospective traces, exceeding output budgets and requiring targeted retrieval. Git recovery:59db9d970d2be39e5d7825e26118bbc455e52a0f retains the reviewed source/proof homes.
+  - Observed effect: multiple truncated responses and repeated reads during an otherwise settled owner journey; no measured token/time saving is claimed.
+  - Inference: coordinator batching repeated this known deviation despite targeted-reading guidance; the product outcome remained independently verified.
 
 <a id="odf-265"></a>
 
@@ -496,3 +505,16 @@ A two-worker full frontend run ended before all files loaded. The existing CI co
   - Evidence: 2026-11-10 execution conversation; `/tmp/export-property-frontend-tests.log` (start18:17:41 Asia/Singapore), `/tmp/export-property-frontend-tests-serial.log`, `/tmp/export-ui-frontend.log`; retained acceptance at `7df14ec0c6:.planning/slice-plans/089-export-a-note-from-the-highlighted-property/source-review.md`; `frontend/vitest.config.ts` fileParallelism/orchestratorGcReporter.
   - Observed effect: `./scripts/run.sh pnpm frontend:test --maxWorkers=2` ended after259/408 files and1,950 passing tests with VITEST_BROWSER_CONNECTION_CLOSED (114.11s), without an assertion failure. `CI=true ./scripts/run.sh pnpm frontend:test --maxWorkers=2 --retry=0` then passed408files/2,521tests in262.65s and the next slice passed409files/2,528tests in245.98s. All runs were headless on the shared16CPU/48GiB local host; no production or test behavior was changed to obtain those passes.
   - Inference: worker reduction alone did not prevent this documented orchestrator failure mode. The existing serialized-import/GC mode is a supported bounded alternative for full local proof on a busy host. One failed run does not establish recurrence or a universal memory threshold; consider documenting the invocation in project testing guidance.
+
+## DD-482 — An unterminated landed plan tail made appended evidence resemble a source conflict
+
+Source freshness's three-way containment check treated coordinator-owned observations appended after an identical landed, unterminated final disposition as overlapping source edits. No new human story/plan amendment existed. Keep the substantive conflict gate; assess newline-aware comparison or clearer record-edit diagnostics without weakening it.
+
+### Occurrences
+- Execution: SEED-121#publish-large-notebooks-without-losing-history
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-11-10 slice14 acceptance; Take0715d7d1b2b25d0ca224a3909e14cdf43fad0d42, landed plan0019fa5e4ada4cc630b90131580dadd83fb84d8a, accepted record59db9d970d2be39e5d7825e26118bbc455e52a0f; source-freshness-comparison.mjs compareThreeWay/compareRecord and source-freshness.mjs fromContainedBase. Raw coordinator results retained three conflict refusals; read-only git merge-file localized the conflict to the same G6 disposition's EOF plus appended G7–G9.
+  - Observed effect: extra source checks/inspection and record relayout. Preserving landed bytes and placing new obligations before existing G1 produced an unchanged comparison; no source scope, accepted proof or product behavior changed.
+  - Inference: the unterminated tail and same-EOF additions explain this instance; other source-conflict behavior was not investigated. Coordinator condensation also complicated the first comparison and was partly reversed; exact cost is unmeasured.
