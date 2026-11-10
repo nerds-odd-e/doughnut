@@ -150,7 +150,7 @@ Other suites temporarily retain legacy evidence; slice 3 replaces it.
 ### 3. Publish the other suites in their reported units
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: extend the existing report-to-action fixtures and workflow tests,
 run `CURSOR_DEV=true nix develop -c pnpm test:ci-proof`, then retain the
 matching final CI artifact observation under execution's normal CI ownership.
@@ -172,6 +172,10 @@ artifact from the exact executed revision and attempt when its CI finishes.
 Sizing: 5–8 minutes for edits, focused proof and cleanup; hosted CI wait is
 an external-wait exception. One case-publication rule covers these suites;
 the Vitest file stream uses the same unit partition as slice 2.
+
+## Execution complete
+
+Product advice: no change.
 
 ## Delivery and readiness review
 
@@ -210,4 +214,4 @@ Disposition: proved by slice 3: ci-workflow.test.mjs exact six explicit expectat
 ### G2. Hosted summary needs the final producer revision
 Reported: slice 2 — "Acceptance identifies the planned hosted artifact observation still needs the final producer publication."
 Story clause: "Adopt the new CI proof format in the existing Doughnut publisher."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: exact hosted run 42755674971 attempt 1 at 5395b1ac9dfb6add0536e5912c0c05b3bccc3d1b; released-reader validation and all six declared units/parts present.

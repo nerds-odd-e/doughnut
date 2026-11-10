@@ -90,3 +90,21 @@
 
 - Fresh `/root/refactor3` review: product already clean, no edits/tests; verified
   cohesive split of execution observations from executable plan. All files under250.
+
+### Hosted acceptance and retrospective
+
+- Final producer revision `5395b1ac9dfb6add0536e5912c0c05b3bccc3d1b` accepted
+  on the execution branch; suffix base `c383cc0a544a2a0dce509b55a4ee7f1344de0edc`.
+  Same observer reports exact run 42755674971, attempt 1, success.
+- `./scripts/run.sh node /tmp/seed112-read-proof.mjs 42755674971 1
+  5395b1ac9dfb6add0536e5912c0c05b3bccc3d1b`: installed released reader validates
+  the one summary archive and its repository/revision/run/attempt identity.
+  All expected units and all parts present: E2E case6 (372 passed); frontend
+  case2 (2470 passed), file2 (zero outcomes); backend case1 (2961 passed,2 other);
+  scripts case12 (447 passed), file13 (22 passed). No failures. Raw summary is
+  `/tmp/seed112-hosted-summary.json`. G2 and C01/C04 are proved.
+- Fresh `/root/retrospective` reviewed original source, attributable commits,
+  aggregate architecture, tests, process history and North Star: no correction,
+  new standing process finding or product advice change; no writes. Pending
+  hosted qualification is now settled by the matching artifact and CI success.
+- Records-only settlement reuses semantic proof and completed refactor reviews.
