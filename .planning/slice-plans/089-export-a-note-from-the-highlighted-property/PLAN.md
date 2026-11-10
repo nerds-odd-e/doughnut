@@ -237,3 +237,7 @@ recovery cases, both typechecks, registry tests and real HTTP Cypress passed.
 Exact commands, setup/assertions, consumer trace and limits are in source review.
 Refactor accepted: duplicate route-only recovery proof consolidated into the
 stronger note-control cases; both replayed successfully, other proof reused.
+
+## Execution complete
+
+Product advice: no change. The selected focus and attributable quiz evidence support the existing learning-to-refinement direction; no additional product promise or backlog change is needed.
