@@ -43,7 +43,7 @@ afterward by the coordinator; the observation or obligation cells start empty.
 | 26 | An unresolved item destination does not substitute another value. |  | G2 |
 | 27 | A missing property uses the existing unresolved-property behavior. | slice 3 | observed: RichMarkdownEditor.propertyLocation.spec.ts missing decoded key still observes existing banner/body; item route parser round trips exact keys and inspected PropertyNotFound prioritizes the same unresolvedPropertyKey before item feedback |
 | 28 | Identical occurrences have no durable identity through edits among equal rows. | slice 3 | observed: notePropertyItemFocus.spec.ts and RichMarkdownEditor.propertyItemLocation.spec.ts stale-second-occurrence case: current nth exact equality resolves; missing occurrence remains unresolved; row identity is derived rather than persisted |
-| 29 | Assimilation knows a value and opens its first matching occurrence; receiving `run` as the next assimilation item opens its property with `run` highlighted. | slice 5 |  |
+| 29 | Assimilation knows a value and opens its first matching occurrence; receiving `run` as the next assimilation item opens its property with `run` highlighted. | slice 5 | observed: useGoToNextAssimilation.spec.ts observes raw returned value routed with occurrence1 while five prior cases remain; NotebookWorkspaceAssimilation.spec.ts real compact action loads [walk, run, run] and selects row1 first run; assimilation_property_order.feature real walk assimilation continues to run occurrence1, 2/2 E2E passed |
 | 30 | The shared item destination and current focus are available to other surfaces. | slice 3 | observed: Reading shared notePropertyItemLocation/Href and useFocusedNoteProperty focusedProperty/focusedItemIndex exports; real editor and NoteShowPage consume the same route-owned focus |
 | 31 | An existing `noteProperty` list destination opens the property without selecting an item. | slice 3 | observed: RichMarkdownEditor.propertyItemLocation.spec.ts property-only list destination observes open panel and zero selected list items |
 | 32 | That property destination represents cleared focus after deletion, without parallel local selection state. | slice 6 |  |
@@ -98,33 +98,9 @@ afterward by the coordinator; the observation or obligation cells start empty.
 | 81 | ADR 0005 governs the named route family, authored key, history navigation, and shared chrome. | slice 3 | observed: Reading routeMetadata/routes/named helpers and noteRouteFamily meta; actual E2E note sidebar and production-router query/rename journeys retain shared chrome and authored keys |
 | 82 | The selected approach requires no ADR change or exception, schema change, or new North Star direction. | slice 3 | observed: Scope reading against unchanged accepted ADRs and original exclusions: changes stay in existing frontend routing/rendering owners; no architectural decision or persistence contract is amended |
 
-## Premises and observations
+## Proof context
 
-Observations used the owned workspace at `6282f1a14646b4d3213b14947e4bab8127021193`
-on 2026-11-10. New interactions remain future slice proof.
-
-| Premise / consuming operation | Observation and result | Remainder / owner |
-| --- | --- | --- |
-| Proposed raw key/value selector survives named routing and browser normalization | 10:32 Singapore: disposable Chromium spec used production metadata assembly, serialized raw named params, native `new URL`, then fresh router navigation; 9 cases passed, including empty/dot-only/reserved/Unicode/duplicate/long text and query/family | Actual page reload/fallback belongs to slice 2; scratch was deleted |
-| Existing authoring preserves duplicate order and supports empty-list emission | Parser/editor command below: 2 files, 20 tests passed | Server save belongs to slice 5; final-entry policy to slice 6 |
-| Existing focus, learning, list rendering and shared context boundaries execute here | Affected baseline command below: 7 files, 41 tests passed at 10:33 Singapore | Old presentation assertions are replaced in slice 1; baseline does not prove new behavior |
-| Existing assimilation navigation boundary executes here | Route probe command below also ran route-family 14 tests and assimilation 5 tests; all passed (28 total with probe) | Item targeting is new slice 4 behavior |
-| Copied item href reaches the route intact rather than being suppressed as a Portable path | 10:45 Singapore: real metadata registration, mounted QuillEditor ordinary-anchor clicks in editable/read-only modes, real classifier/handler/router; complete href/key/value/occurrence/query retained. Scratch plus conversion/paste suites: 42 tests passed | Actual item lookup/reload belongs to slice 2; scratch edits reverted |
-| Isolated E2E spec admission and mock selection accept the intended scope | 10:39 Singapore: ran `selectedCypressSpecs` and `assertSupportedIsolatedCypressSpecs` from production selection module with the exact three-feature `--spec` below; accepted all, private OpenAI mock required, no Wikidata mock | Stopped before state-changing database/stack launch; bounded early probe at slice 2 |
-
-The selection observation used the E2E spec argument below as
-`argv: ['--spec', selection]`, this `checkoutRoot`, and `parentSpecArgs: []`,
-under `./scripts/run.sh node --input-type=module`; all three features selected.
-
-Bounded early probe, before slice 2 edits: run existing `note_property.feature`
-through the isolated wrapper in the execution checkout. It must load the note
-and open a named property URL through that checkout's application origin.
-Stack/database startup is state-changing, so it is deferred to execution.
-Failure stops dependent E2E and route integration; diagnose/replan before
-extending the implementation. This probe grants no paid/real-service authority.
-
-Commands referred to by the retained observations above remain in the
-[retained Commands and acceptance](#commands-and-acceptance).
+[Retained premises, commands and original concern review](proof-context.md) preserve the dated planning inputs and acceptance contract.
 
 ## Slice 1 acceptance
 
@@ -142,16 +118,6 @@ Commands referred to by the retained observations above remain in the
 
 - Before implementation edits, `./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_topology/note_property.feature` passed 10/10 scenarios (21s browser time after isolated startup), at this checkout's application origin `http://127.0.0.1:57180`. The existing named property URL journey loaded its note, shared chrome, query, read-only view and rename. Runner-owned isolated services terminated through the normal wrapper. This fulfills the bounded state-changing prerequisite; item lookup/reload remains new slice proof.
 
-## Concern review
-
-Refinement ran: retain 1–4; split original 5 into occurrence removal (5) and
-final-entry policy (6), isolating its proof loop while keeping warning/mutation
-together. Six Behavior slices share one model; no consolidation/Escalate/resplit.
-Only focused-check/external-stack waits justify >10 minutes. Slice 2's early
-probe bounds its state-changing prerequisite; no other blocking concern remains.
-The coordinator records readiness; this plan grants no Take/execution authority.
-
-
 ## Oversized URL slice and refinement
 
 - Original slice 2 used about 10–12 active minutes plus explicit check/stack waits. The sizing assumption that selector preparation, routing, rendering and proof would fit one 5–8 minute leaf failed. All 14 tracked and 4 untracked attempt-owned product/test paths were safely parked; no staged/unowned work was changed. Published slice 1 and its proof remain intact.
@@ -160,41 +126,6 @@ The coordinator records readiness; this plan grants no Take/execution authority.
 - Required broad command `./scripts/run.sh pnpm frontend:test --maxWorkers=2` failed after 275.37s, 255/402 files and 1664 passing tests, with `VITEST_BROWSER_CONNECTION_CLOSED` / RPC `createTesters` closure while starting unchanged `ConversationComponent.exclusion.spec.ts`; no assertion failure. This verdict remains incomplete. Source `frontend/orchestratorGcReporter.ts` describes this exact orchestrator accumulation failure class; `frontend/vitest.config.ts` enables its GC mitigation, sequential files and sharding for CI. No affirmative OS crash evidence was found.
 - Bounded proof recovery for Behavior 3: use the existing CI-mode GC reporter, retries explicitly off, and two complete disjoint full-suite shards, sequenced with E2E and current host headroom checks. This changes the known runner conditions rather than repeating the failed run. If the same failure recurs, diagnose/stop; no retry-until-green or waived verdict. Host at 11:53: load 20.18/23.26/18.21, 56% free memory, no coordinator-owned competing proof; unrelated load remains with its owners.
 - Cumulative design review: the exact selector is one domain algorithm, immediately consumed by the route-to-row Behavior. Structure 2 adds no live route/rendering change; Behavior 3 restores compatible work and owns G1/G2 and all URL proof. Later interactions, assimilation, occurrence removal and final-entry policy remain cohesive and unchanged. No story-boundary escalation or resplit threshold is reached; this is the first oversized slice.
-
-## Commands and acceptance
-
-```sh
-# Retained parser/editor observation (20 tests)
-./scripts/run.sh pnpm frontend:test tests/utils/noteContentFrontmatterList.spec.ts tests/components/form/RichMarkdownEditor.propertyValueDialog.spec.ts
-# Retained affected baseline (41 tests)
-./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/components/form/RichMarkdownEditor.propertyMemoryTracking.spec.ts tests/components/form/RichMarkdownEditor.listPropertyLayout.spec.ts tests/components/form/RichMarkdownEditor.listPropertyMemoryTracking.spec.ts tests/composables/usePropertyMemoryTrackerGuard.listProperty.spec.ts tests/notes/NoteTextContent.properties.spec.ts tests/pages/RecallPage.justReview.spec.ts
-# Retained scratch route observation (28 tests; probe file was deleted)
-./scripts/run.sh pnpm frontend:test tests/routes/seed119ItemUrlProbe.spec.ts tests/routes/noteRouteFamily.spec.ts tests/composables/useGoToNextAssimilation.spec.ts
-# Execution frontend acceptance and required typechecks
-./scripts/run.sh pnpm frontend:test
-./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit
-./scripts/run.sh pnpm -C frontend exec tsc --noEmit
-# Execution integrated proof; private OpenAI mock is runner-owned
-./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_topology/note_property.feature,e2e_test/features/assimilation/assimilation_property_order.feature,e2e_test/features/recall/property_memory_tracker.feature
-```
-
-Assess execution-host load/memory and owned competing work before starting the
-stack; run these three affected features together, not the entire E2E suite.
-No live OpenAI call is required. If adding/deleting a component, regenerate
-`frontend/components.d.ts` with `pnpm -C frontend exec vite build --emptyOutDir`.
-No API regeneration is needed for the selected existing-endpoint approach.
-
-Acceptance reading, separately from tests: collect deleted names/selectors,
-sweep product code, tests, fixtures, CSS, docs, CLI, MCP and generated consumers
-for orphaned dependencies, and inspect property/value/action render ownership.
-Classify still-used focus/expansion attributes separately from retired visual
-responsibility. Record searches/results once; add no permanent absence test.
-
-Delivery follows AGENTS.md: Jidoka → fresh refactor agent → API generation if
-needed → coordinator `./scripts/run.sh pnpm format:changed` once → evidence →
-commit/check-only hook → push. Slices target ~5 minutes including proof/cleanup;
-scrutinize overruns and decompose before >10 minutes except stated check/wait
-exceptions. Retrospective/wrap-up follow authorized execution.
 
 ## Refined execution continuation
 
@@ -236,3 +167,12 @@ Refinement was records-only, safely parked and refined, with the hard limit appl
 - Independent `/root/refactor_selection` completed: first-item chevrons call the same selection action, and new mock cleanup moved to `afterEach`. Root inspected preserved scalar/empty/closing/off-note branches and unchanged public destinations/query semantics. `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyItemSelection.spec.ts tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/components/form/RichMarkdownEditor.propertyItemLocation.spec.ts` passed 3 files/25 tests after refactor; both typechecks and whitespace passed. Touch/link/learning/E2E boundaries remain unchanged and reused; every refactor consumer is disposed in `/tmp/seed119-refactor-selection-consumers.md`. No generation/gap.
 - Delivery freshness pin `55ae0d07ab6a02ca0d30529c3d9337ef0ad43364` additionally bumps pnpm12.18→12.19 in manifests/Nix/lockfile. Root inspected these attributable toolchain changes; no app/named-sibling behavior changed in this execution checkout. Keep current locked proof for branch delivery; refresh Nix/locked dependencies and validate the combined toolchain at final integration.
 - Guarded formatting stopped before commit/publication because Biome permits Vue `:deep` only inside an SFC, while the touch selector was in external SCSS. Independent refactor continuation moved the whole coarse-pointer block unchanged into the same component's inline scoped style, leaving base SCSS external. Root inspected identical selectors/heights; `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyItemSelection.touch.spec.ts tests/components/form/RichMarkdownEditor.listPropertyLayout.spec.ts tests/components/recall/PropertyAssimilationModes.spec.ts` passed 3 files/18 tests plus whitespace, retaining actual44px/loading hit targets. Script/types/public boundaries unchanged, prior type/E2E proof reused; trace `/tmp/seed119-refactor-selection-style-consumers.md`. Retry formatting is required by this repair; no older HEAD is delivered.
+- Behavior 4 publication accepted `dd9bb5f16310a48ba9de45f124000b28142f9f3e` on the remote execution branch, suffix base `6f5213de99f21270e450a3941fedc8b5409f131d`. Repaired formatting/check-only hook passed; observer reused and tree clean. Next increment base is this accepted SHA.
+
+## Behavior 5 acceptance
+
+- Original returned-value trigger now uses `notePropertyItemLocation` with untouched raw value and occurrence1; property-only/note-only, counts, dismissal, toast/loading/error code stays intact. Root inspected the actual workspace transition: API fixtures provide `[walk, run, run]` and returned `run`; real compact action/production router selects row1 (the first matching run), not the first authored row. Source commitment29 records the observing boundaries.
+- `./scripts/run.sh pnpm frontend:test tests/composables/useGoToNextAssimilation.spec.ts tests/layouts/NotebookWorkspaceAssimilation.spec.ts` passed 17 tests (5 prior composable cases plus3 raw-value cases and workspace continuation). `./scripts/run.sh pnpm frontend:test tests/layouts/NotebookWorkspaceUnderstandingResult.spec.ts tests/layouts/NotebookWorkspaceSequenceSkip.spec.ts tests/toolbars/DonutMenu.activity.spec.ts tests/components/recall/AssimilationPanel.spec.ts` passed 20 adjacent caller tests. Both listed typechecks and whitespace passed.
+- `./scripts/run.sh pnpm cy:run --spec e2e_test/features/assimilation/assimilation_property_order.feature` passed 2/2 scenarios, including actual walk assimilation→run occurrence1; log `/tmp/seed119-assimilation-e2e.log`. Trace `/tmp/seed119-assimilation-consumers.md` has every consumer disposition with actual setup/assertions and all terminal commands. No component/API generation or remaining gap; about7–8 active minutes plus checks.
+- Source freshness unchanged at `8283113d1844d30a50a6ddc5db265d14c8aabb52`: new SEED-121 queue/seed only, no app/named-sibling overlap. Prelaunch13:20 load4.12/7.00/7.69,57%free, one owned isolated batch and teardown completed. Dated preparation context/commands were relocated verbatim to linked `proof-context.md` to keep each record below250 lines; no scope or source promise changed and readiness was not renewed.
+- Independent `/root/refactor_assimilation` completed: none—already clean; no edits or invalidated proof, so no reruns. Shared helper owns serialization, caller supplies raw value/occurrence1, and existing next/count/toast/dismiss paths stay intact. All changed files under250; no generation/gap.

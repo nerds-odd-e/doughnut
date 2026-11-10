@@ -64,7 +64,7 @@ SEED-120 export. Ordinary authoring retains empty lists; final-item minus delete
 
 ## Premises and observations
 
-[Dated preparation observations and decisive premises](source-review.md#premises-and-observations)
+[Dated preparation observations and decisive premises](proof-context.md#premises-and-observations)
 are retained verbatim in the acceptance evidence. The bounded existing
 `note_property.feature` probe passed before the parked URL implementation; reuse
 that matching observation before restoring Behavior 3.
@@ -163,7 +163,7 @@ Sizing: about 5 minutes; no separate local selection model on note routes.
 
 ### 5. Continue assimilation at the addressed value
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Next assimilation unit includes key/value → push its item destination
 and highlight first exact occurrence; a property-only unit opens its property.
 Reuse the shared named helper and current count/toast/dismiss behavior.
@@ -207,7 +207,7 @@ Sizing: about 5 minutes plus focused-check/stack wait; existing whole-key guard
 and named note navigation supply the special final-entry rule.
 
 ## Commands and acceptance
-[Required commands and acceptance readings](source-review.md#commands-and-acceptance)
+[Required commands and acceptance readings](proof-context.md#commands-and-acceptance)
 remain the proof/delivery contract; use their focused forms for each slice.
 
 ## Concern review

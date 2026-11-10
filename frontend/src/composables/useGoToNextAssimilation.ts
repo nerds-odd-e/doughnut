@@ -5,6 +5,7 @@ import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useToast } from "@/composables/useToast"
 import {
+  notePropertyItemLocation,
   notePropertyLocation,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
@@ -45,10 +46,17 @@ export function useGoToNextAssimilation() {
       showSuccessToast(DAILY_GOAL_TOAST)
     }
 
-    const { noteId, propertyKey } = nextUnit
+    const { noteId, propertyKey, propertyValue } = nextUnit
     if (propertyKey) {
       dismiss()
-      await router.push(notePropertyLocation(noteId, propertyKey))
+      await router.push(
+        propertyValue !== undefined
+          ? notePropertyItemLocation(noteId, propertyKey, {
+              value: propertyValue,
+              occurrence: 1,
+            })
+          : notePropertyLocation(noteId, propertyKey)
+      )
       return true
     }
 

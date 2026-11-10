@@ -2,6 +2,7 @@ import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useRecallData } from "@/composables/useRecallData"
 import {
+  notePropertyItemLocation,
   notePropertyLocation,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
@@ -11,7 +12,7 @@ import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import { memoryTrackerLitesStub } from "@tests/toolbars/menuDataMocks"
 import makeMe from "donut-test-fixtures/makeMe"
 import type { VueWrapper } from "@vue/test-utils"
-import { afterEach, beforeEach, expect, it } from "vitest"
+import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
 import {
   atViewportWidth,
@@ -167,4 +168,42 @@ it("follows next-unit note to property destinations through the compact direct a
   await expectActivity("Assimilate")
   await expectPropertyLearningOpen(mounted.router, second.id, "topic")
   expect(activity().querySelector(".due-count")?.textContent?.trim()).toBe("6")
+})
+
+it("continues to the first matching occurrence of the returned property value", async () => {
+  const first = makeMe.aNoteRealm.title("First").please()
+  const second = makeMe.aNoteRealm
+    .content("---\nactivity: [walk, run, run]\n---\nBody.")
+    .please()
+  const next = mockSdkService(AssimilationController, "next", {
+    nextUnit: { noteId: first.id },
+    counts: { dueCount: 2 },
+  })
+  const mounted = await mountNotebookWorkspace([first, second])
+  wrapper = mounted.wrapper
+  await click('[aria-label="Donut menu"]')
+  await click('[aria-label="Donut menu panel"] [aria-label="Assimilate"]')
+  next.mockResolvedValue(
+    wrapSdkResponse({
+      nextUnit: {
+        noteId: second.id,
+        propertyKey: "activity",
+        propertyValue: "run",
+      },
+      counts: { dueCount: 1 },
+    })
+  )
+  await page.elementLocator(activity()).click()
+  await vi.waitFor(() => {
+    expect(mounted.router.currentRoute.value).toMatchObject(
+      notePropertyItemLocation(second.id, "activity", {
+        value: "run",
+        occurrence: 1,
+      })
+    )
+    const rows = document.querySelectorAll(
+      '[data-property-key="activity"] [data-test="assimilation-mode-row-UNDERSTANDING"]'
+    )
+    expect(rows[1]?.getAttribute("data-property-value-focused")).toBe("true")
+  })
 })
