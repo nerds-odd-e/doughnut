@@ -81,9 +81,17 @@ describe("NoteToolbar panels", () => {
     wrapper = await mountNoteToolbar(noteRealm)
     await layoutNoteToolbar(wrapper, allMoreOptionsFitNavWidth())
     await wrapper.find(`button[title="${titles.export}"]`).trigger("click")
+    await flushPromises()
 
     const dialog = document.querySelector("dialog") as HTMLDialogElement
     expect(dialog?.open).toBe(true)
+    expect(
+      (
+        document.querySelector(
+          '[data-testid="ai-context-markdown-textarea"]'
+        ) as HTMLTextAreaElement
+      ).value
+    ).toContain("AI context")
 
     document
       .querySelector<HTMLButtonElement>(

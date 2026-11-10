@@ -212,7 +212,7 @@ description sync). G1 closed as proved by slice 3.
 
 ### 4. Choose inclusion and export the current preview reliably
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Open Export Note Data → unchecked usual context. Select inclusion →
 refresh; successful preview, copied text and downloaded Markdown agree with
 the selected option. Clear inclusion → usual context. While pending or after
@@ -226,6 +226,13 @@ Proof: Mounted form default/check/clear, deferred response, error/retry and
 budget refresh. Observe exact preview, clipboard argument and Blob text using
 real internal components. Run frontend tests and both required typechecks.
 Sizing: 5–8 minutes plus full frontend-suite/typecheck verification waits.
+
+**Accepted proof (pre-delivery evidence).** `NoteExportForm` unchecked inclusion
+checkbox, `apiCallWithLoading`, clear-at-start, appendix-outside-budget note.
+`NoteExportForm.spec.ts` 6 cases (default, check→preview/clipboard/Blob, clear,
+pending disable, error/retry, budget). Full `pnpm frontend:test` 2474 passed;
+vue-tsc/tsc OK. Toolbar panel consumer awaits preview after clear-on-start.
+G2 closed as proved by slice 4. Post-change refactor: sibling assertion trim only.
 
 ## Commands, delivery, and concern review
 
@@ -303,5 +310,4 @@ Disposition: proved by slice 3: NoteExportControllerLearnerSelectionsTests#three
 ### G2. Preview copy download agreement for question appendix
 Reported: slice 2 — "C18 preview copied and downloaded agreement awaits Export Note Data UI"
 Story clause: "the preview, copied, and downloaded Markdown includes the 10 newest by question creation time"
-Disposition: interim until slices 4
-Commitment: C18
+Disposition: proved by slice 4: NoteExportForm.spec.ts inclusion preview clipboard download match

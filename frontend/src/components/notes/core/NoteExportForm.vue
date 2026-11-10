@@ -30,6 +30,26 @@
         </button>
         <span v-if="loadingMarkdown" class="daisy-loading daisy-loading-spinner daisy-loading-xs"></span>
       </div>
+      <label
+        class="daisy-label cursor-pointer justify-start gap-2 items-start mb-2 py-0"
+        for="include-recent-questions"
+      >
+        <input
+          id="include-recent-questions"
+          type="checkbox"
+          class="daisy-checkbox daisy-checkbox-sm mt-0.5"
+          :checked="includeRecentQuestions"
+          :disabled="loadingMarkdown"
+          data-testid="include-recent-questions-checkbox"
+          @change="onInclusionChange"
+        />
+        <span>
+          <span class="daisy-label-text">Include recent multiple-choice questions</span>
+          <span class="block text-xs text-base-content/70 font-normal">
+            Selected questions form a complete appendix outside the note-body token budget.
+          </span>
+        </span>
+      </label>
       <JsonExportSection
         :json-data="aiMarkdown"
         :filename="`note-${note.id}-focus-context`"
@@ -50,13 +70,13 @@
 import { onMounted, ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
 import { NoteExportController } from "@generated/donut-backend-api/sdk.gen"
-import {} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import JsonExportSection from "../../commons/JsonExportSection.vue"
 
 const props = defineProps<{ note: Note }>()
 
 const tokenLimit = ref(2000)
-
+const includeRecentQuestions = ref(false)
 const aiMarkdown = ref("")
 const loadingMarkdown = ref(false)
 
@@ -66,14 +86,27 @@ onMounted(async () => {
 
 async function fetchAiMarkdown() {
   loadingMarkdown.value = true
-  const { data, error } = await NoteExportController.getAiContextMarkdown({
-    path: { note: props.note.id },
-    query: { tokenLimit: tokenLimit.value },
-  })
-  if (!error && data) {
-    aiMarkdown.value = data.markdown ?? ""
+  aiMarkdown.value = ""
+  const { data, error } = await apiCallWithLoading(() =>
+    NoteExportController.getAiContextMarkdown({
+      path: { note: props.note.id },
+      query: {
+        tokenLimit: tokenLimit.value,
+        ...(includeRecentQuestions.value
+          ? { includeRecentQuestions: true }
+          : {}),
+      },
+    })
+  )
+  if (!error) {
+    aiMarkdown.value = data!.markdown ?? ""
   }
   loadingMarkdown.value = false
+}
+
+function onInclusionChange(event: Event) {
+  includeRecentQuestions.value = (event.target as HTMLInputElement).checked
+  refreshMarkdown()
 }
 
 function refreshMarkdown() {
