@@ -120,7 +120,7 @@ byte-for-byte copy and three bounded assertion adaptations; no new parser.
 ### 2. Publish Scripts and Infrastructure cases and files
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: extend the action-level mixed publication fixture and real Node
 runner fixtures, plus workflow assertions; run
 `CURSOR_DEV=true nix develop -c pnpm test:ci-proof`.
@@ -248,3 +248,25 @@ Disposition: interim until slices 2, 3
   sibling coordination obligations.
 
 - Fresh refactor review `/root/refactor1`: none — already clean; no edits or repeated tests.
+
+### Slice 2
+
+- Slice 1 accepted on remote execution branch as
+  `25b39f467e0dfc4d8b3f26d272c2765740aef255`, suffix base
+  `dca7d78be57181ccdd154e130d9c386c3e82955b`; observation reused.
+- `./scripts/run.sh pnpm test:ci-proof`: 26/26 pass. Real Node wrapper fixtures
+  distinguish 11 cases from one timed file-load failure and preserve parent,
+  skip/todo, imported-file and nested-run behavior. Mixed action-shell publication
+  observes case 3 passed/2 failed/330 ms/1 untimed and file 1 passed/1 failed/900 ms,
+  with independent breakdowns, zero file part and missing parts in both units.
+  Workflow assertions verify twelve Node parts in each unit, Bash file part 13,
+  unit-specific artifacts, failure conditions, needs and matrix fail-fast policy.
+- `./scripts/run.sh bash scripts/test/application-release.test`: 114 + 4 pass;
+  affected workflow/artifact consumers retain their behavior. Whitespace check
+  passes. Consumer record `/tmp/seed112-slice2-consumer-trace.md` disposes all hits.
+- G1 rechecked: scripts explicit; remaining suites legitimately await slice 3.
+  Existing Bash record call occurs once per file invocation, independent of
+  assertions inside the invoked file; no case extraction introduced.
+- Source freshness unchanged at claim trunk revision; no named sibling.
+
+- Fresh `/root/refactor2` review: none — already clean; proof reused unchanged.

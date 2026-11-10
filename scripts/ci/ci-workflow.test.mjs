@@ -29,13 +29,14 @@ const ciWithLintSteps = () => {
   return ci
 }
 
-const producersOf = (ci, entry) =>
+const producersOf = (ci, entry, unit) =>
   Object.entries(ci.jobs).flatMap(([name, job]) =>
     job.steps
       .filter(
         (step) =>
           step.uses === './.github/ci_proof_fragments' &&
-          step.with.entry === entry
+          step.with.entry === entry &&
+          (!unit || step.with.unit === unit)
       )
       .map((step) => ({ name, job, step }))
   )
@@ -43,22 +44,25 @@ const producersOf = (ci, entry) =>
 const expectationsOf = (ci) =>
   [
     ...stepUsing(ci.jobs['ci-proof'], 'ci_proof_summary').with.expect.matchAll(
-      /(\S+)=(\d+)/g
+      /(\S+)=(\d+)(?::(case|file))?/g
     ),
-  ].map(([, entry, parts]) => ({ entry, parts: Number(parts) }))
+  ].map(([, entry, parts, unit]) => ({ entry, parts: Number(parts), unit }))
 
 test('CI proof expects each entry in intent.locations order among proved entries', () => {
-  assert.deepEqual(
-    expectationsOf(ciWithLintSteps()).map(({ entry }) => entry),
-    ['e2e_test/features', 'frontend/tests', 'backend/src/test/java', 'scripts']
-  )
+  assert.deepEqual(expectationsOf(ciWithLintSteps()), [
+    { entry: 'e2e_test/features', parts: 6, unit: undefined },
+    { entry: 'frontend/tests', parts: 2, unit: undefined },
+    { entry: 'backend/src/test/java', parts: 1, unit: undefined },
+    { entry: 'scripts', parts: 12, unit: 'case' },
+    { entry: 'scripts', parts: 13, unit: 'file' },
+  ])
 })
 
 test('CI proof expects each entry in as many parts as its producers report', () => {
   const ci = ciWithLintSteps()
 
-  for (const { entry, parts } of expectationsOf(ci)) {
-    const producers = producersOf(ci, entry)
+  for (const { entry, parts, unit } of expectationsOf(ci)) {
+    const producers = producersOf(ci, entry, unit)
     const explicit = producers.filter(({ step }) => step.with.part)
     if (explicit.length > 0) {
       assert.deepEqual(
@@ -98,7 +102,8 @@ test('the Bash script runner reports its file checks as the scripts part', () =>
     format: 'bash',
     report,
     entry: 'scripts',
-    part: 1,
+    unit: 'file',
+    part: 13,
     of: 13,
   })
 })
@@ -115,7 +120,7 @@ const nodeTestCommands = packageScripts['lint:all']
     packageScripts[name]?.startsWith('node scripts/ci/node-test.mjs ')
   )
 
-test('each Node test command in lint:all reports its own scripts part after the Bash part', () => {
+test('each Node test command in lint:all reports case and file parts in command order', () => {
   const ci = ciWithLintSteps()
   const nodeProducers = producersOf(ci, 'scripts').filter(
     ({ step }) => step.with.format === 'node'
@@ -127,16 +132,28 @@ test('each Node test command in lint:all reports its own scripts part after the 
   assert.deepEqual(lintAll.env, { CI_PROOF_NODE_REPORT_DIR: reports })
   assert.deepEqual(
     nodeProducers.map(({ name, step }) => [name, step.if, step.with]),
-    nodeTestCommands.map((command, index) => [
-      lintJob,
-      `\${{ !cancelled() && steps.${lintAll.id}.outcome != 'skipped' }}`,
-      {
-        format: 'node',
-        report: `${reports}/${command}.ndjson`,
-        entry: 'scripts',
-        part: index + 2,
-        of: nodeTestCommands.length + 1,
-      },
-    ])
+    nodeTestCommands.flatMap((command, index) =>
+      ['case', 'file'].map((unit) => [
+        lintJob,
+        `\${{ !cancelled() && steps.${lintAll.id}.outcome != 'skipped' }}`,
+        {
+          format: 'node',
+          report: `${reports}/${command}.ndjson`,
+          entry: 'scripts',
+          unit,
+          part: index + 1,
+          of: nodeTestCommands.length + (unit === 'file' ? 1 : 0),
+        },
+      ])
+    )
+  )
+})
+
+test('fragment uploads distinguish units for the same job and part', () => {
+  const fragments = action('ci_proof_fragments')
+  assert.equal(fragments.runs.steps[0].env.UNIT, '${{ inputs.unit }}')
+  assert.equal(
+    fragments.runs.steps[1].with.name,
+    "ci-proof-fragments-${{ github.job }}-${{ inputs.unit || 'legacy' }}-${{ steps.fragments.outputs.part }}-attempt-${{ github.run_attempt }}"
   )
 })

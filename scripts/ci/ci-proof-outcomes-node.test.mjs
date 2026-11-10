@@ -12,11 +12,7 @@ import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { test } from 'node:test'
 import { outcomeLines } from './ci-proof-outcomes.mjs'
-import {
-  repoRoot,
-  summarizeFragments,
-  writeFragment,
-} from './ci-proof-outcomes-fixtures.mjs'
+import { repoRoot } from './ci-proof-outcomes-fixtures.mjs'
 
 const nodeTest = join(repoRoot, 'scripts/ci/node-test.mjs')
 
@@ -101,8 +97,9 @@ test('a Node report gives one check per test case from the directly selected fil
     (check) => check.path
   )
   const outcomes = (name) =>
-    checks[path(name)].map(({ status, seconds }) => [
+    checks[path(name)].map(({ status, seconds, unit }) => [
       status,
+      unit,
       typeof seconds === 'number',
     ])
   assert.deepEqual(Object.keys(checks).sort(), [
@@ -112,20 +109,24 @@ test('a Node report gives one check per test case from the directly selected fil
     path('outcomes'),
   ])
   assert.deepEqual(outcomes('outcomes'), [
-    ['passed', true],
-    ['failed', true],
-    ['other', true],
-    ['other', true],
-    ['passed', true],
-    ['failed', false],
-    ['passed', true],
-    ['failed', true],
-    ['passed', true],
+    ['passed', 'case', true],
+    ['failed', 'case', true],
+    ['other', 'case', true],
+    ['other', 'case', true],
+    ['passed', 'case', true],
+    ['failed', 'case', false],
+    ['passed', 'case', true],
+    ['failed', 'case', true],
+    ['passed', 'case', true],
   ])
-  assert.deepEqual(outcomes('broken'), [['failed', true]])
-  assert.deepEqual(outcomes('imports'), [['passed', true]])
-  assert.deepEqual(outcomes('launcher'), [['passed', true]])
-  assert.equal(outcomeLines('node', readFileSync(report, 'utf8')).length, 12)
+  assert.deepEqual(outcomes('broken'), [['failed', 'file', true]])
+  assert.deepEqual(outcomes('imports'), [['passed', 'case', true]])
+  assert.deepEqual(outcomes('launcher'), [['passed', 'case', true]])
+  const text = readFileSync(report, 'utf8')
+  assert.equal(outcomeLines('node', text, 'case').length, 11)
+  assert.deepEqual(outcomeLines('node', text, 'file'), [
+    `failed\t${path('broken')}`,
+  ])
 })
 
 test('without a report request the run keeps its output and exit status', (t) => {
@@ -140,105 +141,5 @@ test('a malformed Node report line fails the conversion', () => {
   assert.throws(
     () => outcomeLines('node', '{"status":"ok","path":"scripts/a.test.mjs"}\n'),
     /malformed Node report line/
-  )
-})
-
-const nodeLines = (checks) =>
-  checks.map((check) => `${JSON.stringify(check)}\n`).join('')
-
-test('Bash and Node parts of one job publish once each into the scripts entry, a skipped later part missing', (t) => {
-  const runnerTemp = realpathSync(mkdtempSync(join(tmpdir(), 'runner-')))
-  t.after(() => rmSync(runnerTemp, { recursive: true, force: true }))
-  const part = (n) => ({ PART: String(n), PARTS: '4' })
-  const routing = 'scripts/test/path-routing/routes.test.mjs'
-  const mixed = 'scripts/mixed.test.mjs'
-
-  const bash = writeFragment(
-    t,
-    'bash',
-    'scripts',
-    'passed\t0.500000\tscripts/test/a.sh.test\n',
-    part(1)
-  )
-  const passingNode = writeFragment(
-    t,
-    'node',
-    'scripts',
-    nodeLines([
-      { status: 'passed', path: routing, seconds: 0.01 },
-      { status: 'passed', path: routing, seconds: 0.02 },
-    ]),
-    part(2),
-    runnerTemp
-  )
-  const failedNode = writeFragment(
-    t,
-    'node',
-    'scripts',
-    nodeLines([
-      { status: 'passed', path: mixed, seconds: 0.1 },
-      { status: 'failed', path: mixed, seconds: 0.2 },
-      { status: 'failed', path: mixed },
-      { status: 'passed', path: 'e2e_test/config/a.test.mjs', seconds: 9 },
-    ]),
-    part(3),
-    runnerTemp
-  )
-  // Each part's staging held only its own fragment (writeFragment checks it);
-  // a part whose command never ran leaves nothing staged to upload.
-  assert.throws(() =>
-    writeFragment(t, 'node', 'scripts', undefined, part(4), runnerTemp)
-  )
-  assert.equal(existsSync(join(runnerTemp, 'ci-proof')), false)
-
-  const { summary, log } = summarizeFragments(
-    t,
-    [bash, passingNode, failedNode].map(({ fragmentText }) => fragmentText),
-    'scripts=4'
-  )
-  const [
-    {
-      evidence: [scripts],
-    },
-  ] = summary.entries
-  assert.deepEqual(
-    [scripts.passed, scripts.failed, scripts.durationMs, scripts.untimed],
-    [4, 2, 830, 1]
-  )
-  assert.deepEqual(
-    scripts.parts.map(({ part, status, failed, durationMs }) => [
-      part,
-      status,
-      failed,
-      durationMs,
-    ]),
-    [
-      [1, 'present', 0, 500],
-      [2, 'present', 0, 30],
-      [3, 'present', 2, 300],
-      [4, 'missing', undefined, undefined],
-    ]
-  )
-  assert.deepEqual(scripts.files, [
-    {
-      path: mixed,
-      passed: 1,
-      failed: 2,
-      other: 0,
-      durationMs: 300,
-      untimed: 1,
-    },
-    {
-      path: 'scripts/test/a.sh.test',
-      passed: 1,
-      failed: 0,
-      other: 0,
-      durationMs: 500,
-    },
-    { path: routing, passed: 2, failed: 0, other: 0, durationMs: 30 },
-  ])
-  assert.match(
-    log,
-    /scripts: 4 passed, 2 failed, 0 other legacy test results \(checks\); part 4 of 4 missing/
   )
 })

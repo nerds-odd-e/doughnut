@@ -53,6 +53,7 @@ export const writeFragment = (
     ({ id }) => id === 'fragments'
   )
   runStep(step, {
+    UNIT: '',
     FORMAT: format,
     REPORT: reportPath,
     ENTRY: entry,

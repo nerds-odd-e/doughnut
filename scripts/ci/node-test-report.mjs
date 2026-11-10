@@ -1,5 +1,5 @@
-// Node test reporter for CI proof: one JSON line per check,
-// `{"status":"passed"|"failed"|"other","path":<repo-relative test file>,"seconds"?:n}`.
+// Node test reporter for CI proof: one JSON line per reported case or file outcome,
+// `{"status":"passed"|"failed"|"other","unit":"case"|"file","path":<repo-relative test file>,"seconds"?:n}`.
 // Leaf tests are checks; skip and todo count as other. A file that fails to
 // load is one failed check. A suite or parent test is a check only when it
 // fails for its own reason, untimed because its duration covers its subtests.
@@ -34,7 +34,7 @@ export default async function* nodeTestReport(source) {
     lastNesting.set(testFile, nesting)
     const result = check(event, isParent)
     if (result) {
-      yield `${JSON.stringify({ status: result.status, path: relative(repoRoot, testFile), seconds: result.seconds })}\n`
+      yield `${JSON.stringify({ status: result.status, unit: entryFile ? 'case' : 'file', path: relative(repoRoot, testFile), seconds: result.seconds })}\n`
     }
   }
 }

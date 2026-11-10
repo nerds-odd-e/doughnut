@@ -10,16 +10,20 @@ file for that attempt. It also shows which CI parts did not report.
 | `e2e_test/features` | `E2E-tests` matrix | 6 | one Cucumber scenario (test case) | Cucumber preprocessor messages (NDJSON) |
 | `frontend/tests` | `Frontend-unit-tests` shards | 2 | one Vitest test | Vitest JSON report |
 | `backend/src/test/java` | `Backend-unit-tests` | 1 | one JUnit test method | Gradle JUnit XML under `backend/build/test-results/test/` |
-| `scripts` | Bash script runner in `Other-unit-tests` (part 1) and each wrapped Node test command in `Lint-N-Backend-Generated-Types-For-Frontend` (parts 2–13, in `lint:all` order) | 13 | one `scripts/test/*.test` file per Bash check and one test case per Node check | Bash runner's tab-separated report and JSON lines from `scripts/ci/node-test-report.mjs` |
+| `scripts` | Wrapped Node commands in `Lint-N-Backend-Generated-Types-For-Frontend`, in `lint:all` order | 12 | case | JSON lines from `scripts/ci/node-test-report.mjs` |
+| `scripts` | The same Node commands (parts 1–12) and Bash runner in `Other-unit-tests` (part 13) | 13 | file | Node file-load failures and Bash whole-file outcomes |
 
 `cli/tests` has no entry. It shows no CI proof.
 
 The Lint job's `.github/lint_and_generated_types` action publishes the Node
 parts. Existing concern groups run the isolated-browser mocks, local runtime
 and development health checks. `test:worktree-retirement` runs the five
-retirement files as part 12, and `test:publication-receiver` runs the profiling
-receiver check as part 13. Every file contributes its own outcomes and recorded
-time through the shared Node reporter.
+retirement files as part 11, and `test:publication-receiver` runs the profiling
+receiver check as part 12. Each Node command publishes both units with the same
+part number: actual cases in its case stream and pre-case file-load failures in
+its file stream. Bash contributes one file result per invocation of a test file,
+regardless of the number of internal assertions. Each unit retains its own
+outcomes, file breakdown and recorded times.
 
 ## How it is made
 
@@ -38,7 +42,11 @@ time through the shared Node reporter.
    `scripts/ci/ci-proof-outcomes.mjs` into one `<status><TAB><repo-relative
    path>` line per test case and one `<seconds><TAB><repo-relative path>`
    line per timed check. It passes both to the collector with `--by-file`,
-   writes the part's fragment and uploads it, kept for 1 day. A producer
+   writes the part's fragment and uploads it, kept for 1 day. Script producers
+   pass their declared `case` or `file` unit through conversion and collection;
+   artifact names include the unit, job and part so paired streams stay distinct.
+   An existing Node report with no file outcomes writes a present zero-result
+   file fragment. An absent report leaves both declared parts missing. A producer
    outside a matrix names its part with the action's `part` and `of` inputs;
    otherwise the part number is `strategy.job-index` plus 1, of
    `strategy.job-total`. It runs
@@ -54,7 +62,7 @@ time through the shared Node reporter.
 3. The `ci-proof` job runs after the producers, even when they fail. The
    composite action `.github/ci_proof_summary` collects this attempt's
    fragments against `expect` (`e2e_test/features=6 frontend/tests=2
-   backend/src/test/java=1 scripts=13`, in `intent.locations` order among proved
+   backend/src/test/java=1 scripts=12:case scripts=13:file`, in `intent.locations` order among proved
    entries) and uploads the summary, kept for 30 days.
 
 ## Rules
@@ -73,7 +81,8 @@ time through the shared Node reporter.
   (leaf test) is one check on its selected file's path: skip and todo are
   other. A suite or parent test is a check only when it fails for its own
   reason, and is untimed because its duration covers its subtests. A file
-  that fails to load is one failed check. Tests launched by a test's own
+  that fails to load is one failed file result, with its reported duration. Case
+  results do not imply an additional successful-file result. Tests launched by a test's own
   child run stay out of the report.
 - **Recorded execution time.** Vitest contributes the duration of each
   assertion that reports one. Cucumber contributes the recorded step

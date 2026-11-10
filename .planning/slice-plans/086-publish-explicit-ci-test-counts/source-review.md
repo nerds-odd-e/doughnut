@@ -18,12 +18,12 @@ in this native session; the returned source text is retained below verbatim.
 | C05 | Publish individual JUnit results as test cases. | slice 3 | |
 | C06 | Publish individual Vitest results as test cases. | slice 3 | |
 | C07 | Publish individual Cucumber results as test cases. | slice 3 | |
-| C08 | Publish individual Node results as test cases. | slice 2 | |
-| C09 | Publish Bash runner whole-file results as test files. | slice 2 | |
-| C10 | Preserve the Scripts and Infrastructure proof location. | slice 2 | |
-| C11 | Preserve that location’s file breakdown. | slice 2 | |
-| C12 | Preserve its outcomes. | slice 2 | |
-| C13 | Preserve its recorded execution times. | slice 2 | |
+| C08 | Publish individual Node results as test cases. | slice 2 | observed: scripts/ci/ci-proof-outcomes-node.test.mjs real wrapper: 11 case outcomes and one timed failed-file outcome; selected/imported cases, parent, skip/todo and nested-run behavior preserved. |
+| C09 | Publish Bash runner whole-file results as test files. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
+| C10 | Preserve the Scripts and Infrastructure proof location. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
+| C11 | Preserve that location’s file breakdown. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
+| C12 | Preserve its outcomes. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
+| C13 | Preserve its recorded execution times. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
 | C14 | Preserve existing proved locations. | slice 3 | |
 | C15 | Preserve existing producer commands. | slice 3 | |
 | C16 | Retain source-file attribution for individual case results. | slice 3 | |
@@ -33,12 +33,12 @@ in this native session; the returned source text is retained below verbatim.
 | C20 | Keep that failed file visible at its path. | slice 3 | |
 | C21 | Retain available timing for that failed file. | slice 3 | |
 | C22 | Have Vitest producers publish separate case and file streams. | slice 3 | |
-| C23 | Have Node producers publish separate case and file streams. | slice 2 | |
+| C23 | Have Node producers publish separate case and file streams. | slice 2 | observed: scripts/ci/ci-proof-outcomes-node.test.mjs real wrapper: 11 case outcomes and one timed failed-file outcome; selected/imported cases, parent, skip/todo and nested-run behavior preserved. |
 | C24 | Publish a present, zero-result fragment when an existing report contains no results in a declared unit. | slice 3 | |
 | C25 | Use Open Dough guidance at least as recent as the referenced installed release. | slice 1 | observed: Installed 0.3.94 CI-proof copy recipe and byte comparison of all seven project modules against .agents/skills/dough-test-optimization/scripts; matching evidence/options included. |
 | C26 | Copy all seven `ci-proof-*.mjs` collector modules into `scripts/ci/` through the CI proof copy recipe. | slice 1 | observed: Installed 0.3.94 CI-proof copy recipe and byte comparison of all seven project modules against .agents/skills/dough-test-optimization/scripts; matching evidence/options included. |
-| C27 | Add a unit input to `.github/ci_proof_fragments`. | slice 2 | |
-| C28 | Pass that input as `--unit case\|file`, preserving the two supported alternatives. | slice 2 | |
+| C27 | Add a unit input to `.github/ci_proof_fragments`. | slice 2 | observed: .github/ci_proof_fragments/action.yml unit input passes through converter and collector; action-shell mixed publication fixture and unit artifact workflow assertion pass. |
+| C28 | Pass that input as `--unit case\|file`, preserving the two supported alternatives. | slice 2 | observed: .github/ci_proof_fragments/action.yml unit input passes through converter and collector; action-shell mixed publication fixture and unit artifact workflow assertion pass. |
 | C29 | Declare every `.github/ci_proof_summary` expectation as `<entry>=<parts>:<unit>`. | slice 3 | |
 | C30 | Number each unit’s parts separately. | slice 3 | |
 | C31 | Leave a part missing in its declared unit when it writes no fragment. | slice 3 | |
@@ -55,20 +55,20 @@ in this native session; the returned source text is retained below verbatim.
 | Q08 | Under that comparison condition, Intent shows no count difference. | slice 3 | |
 | Q09 | Under that comparison condition, Intent shows no time difference. | slice 3 | |
 | Q10 | These comparison behaviors come from the released reader contract. | slice 3 | |
-| J01 | When one attempt contains individual Node case outcomes and Bash whole-file outcomes, Scripts and Infrastructure receives separate test-case and test-file totals. | slice 2 | |
-| J02 | Each total retains the outcomes belonging to its unit. | slice 2 | |
-| J03 | Each total retains its file breakdown. | slice 2 | |
-| J04 | Each total retains its recorded time. | slice 2 | |
-| J05 | A Bash file containing several internal assertions contributes one file result. | slice 2 | |
+| J01 | When one attempt contains individual Node case outcomes and Bash whole-file outcomes, Scripts and Infrastructure receives separate test-case and test-file totals. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
+| J02 | Each total retains the outcomes belonging to its unit. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
+| J03 | Each total retains its file breakdown. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
+| J04 | Each total retains its recorded time. | slice 2 | observed: scripts/ci/ci-proof-unit-publication.test.mjs: independent case/file outcomes, time, untimed, per-file and present/missing part assertions through actual action shells; test:ci-proof 26/26 pass. |
+| J05 | A Bash file containing several internal assertions contributes one file result. | slice 2 | observed: scripts/test/run_all_script_tests.sh records once per file invocation after its aggregate exit; Bash converter maps each report line to one file, exercised by mixed unit-publication fixture. |
 | J06 | The first expectation, in location order, is `e2e_test/features=6:case`. | slice 3 | |
 | J07 | The second expectation is `frontend/tests=2:case`. | slice 3 | |
 | J08 | The third expectation is `frontend/tests=2:file`. | slice 3 | |
 | J09 | The fourth expectation is `backend/src/test/java=1:case`. | slice 3 | |
-| J10 | The fifth expectation is `scripts=12:case`. | slice 2 | |
-| J11 | The sixth expectation is `scripts=13:file`. | slice 2 | |
-| J12 | The twelve `lint:all` Node reports correspond to script case parts 1–12. | slice 2 | |
-| J13 | Those same reports correspond to script file parts 1–12. | slice 2 | |
-| J14 | `run_all_script_tests.sh` corresponds to script file part 13. | slice 2 | |
+| J10 | The fifth expectation is `scripts=12:case`. | slice 2 | observed: scripts/ci/ci-workflow.test.mjs exact scripts unit expectations and independent producer-part mappings in lint:all order; Bash file part 13; all workflow assertions pass. |
+| J11 | The sixth expectation is `scripts=13:file`. | slice 2 | observed: scripts/ci/ci-workflow.test.mjs exact scripts unit expectations and independent producer-part mappings in lint:all order; Bash file part 13; all workflow assertions pass. |
+| J12 | The twelve `lint:all` Node reports correspond to script case parts 1–12. | slice 2 | observed: scripts/ci/ci-workflow.test.mjs exact scripts unit expectations and independent producer-part mappings in lint:all order; Bash file part 13; all workflow assertions pass. |
+| J13 | Those same reports correspond to script file parts 1–12. | slice 2 | observed: scripts/ci/ci-workflow.test.mjs exact scripts unit expectations and independent producer-part mappings in lint:all order; Bash file part 13; all workflow assertions pass. |
+| J14 | `run_all_script_tests.sh` corresponds to script file part 13. | slice 2 | observed: scripts/ci/ci-workflow.test.mjs exact scripts unit expectations and independent producer-part mappings in lint:all order; Bash file part 13; all workflow assertions pass. |
 | J15 | Each frontend shard uses the same part number in its case and file streams. | slice 3 | |
 | J16 | A producer that writes no report leaves its declared part missing. | slice 3 | |
 | J17 | A report with two actual case outcomes and one pre-case load failure produces two case results. | slice 3 | |
@@ -78,5 +78,5 @@ in this native session; the returned source text is retained below verbatim.
 | J21 | Comparing against an older unit-less build invokes the supplied legacy-reader behavior until both builds declare matching units. | slice 3 | |
 | X01 | Adding proof for further suites is outside this story. | slice 3 | |
 | X02 | Changing Intent itself is outside this story. | slice 3 | |
-| X03 | Do not extract test cases from the Bash runner’s whole-file report. | slice 2 | |
+| X03 | Do not extract test cases from the Bash runner’s whole-file report. | slice 2 | observed: scripts/test/run_all_script_tests.sh records once per file invocation after its aggregate exit; Bash converter maps each report line to one file, exercised by mixed unit-publication fixture. |
 | X04 | Case reports do not create additional successful-file results. | slice 3 | |

@@ -1,9 +1,9 @@
 // Converts a test runner's own report into the CI proof collector's outcome
-// lines: one `<status><TAB><repo-relative path>` per test case, where status
+// lines: one `<status><TAB><repo-relative path>` per result in the declared unit, where status
 // is `passed`, `failed` or `other`. An optional times file gets one
 // `<seconds><TAB><repo-relative path>` line per timed check.
 //
-//   node scripts/ci/ci-proof-outcomes.mjs <format> <report file or dir> [times file]
+//   node scripts/ci/ci-proof-outcomes.mjs <format> <report file or dir> [times file] [case|file]
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -144,15 +144,18 @@ const node = (text) =>
     .split('\n')
     .filter((line) => line !== '')
     .map((line) => {
-      const { status, path, seconds } = JSON.parse(line)
+      const { status, path, seconds, unit } = JSON.parse(line)
       if (
-        !['passed', 'failed', 'other'].includes(status) ||
+        !(
+          ['passed', 'failed', 'other'].includes(status) &&
+          ['case', 'file'].includes(unit)
+        ) ||
         typeof path !== 'string' ||
         !['number', 'undefined'].includes(typeof seconds)
       ) {
         throw new Error(`malformed Node report line: ${line}`)
       }
-      return { status, path, seconds }
+      return { status, path, seconds, unit }
     })
 
 const formats = { vitest, cucumber, junit, bash, node }
@@ -175,14 +178,22 @@ const checksFrom = (format, reportPath) =>
 const outcomesOf = (checks) =>
   checks.map((check) => `${status(check.status)}\t${check.path}`)
 
-export const outcomeLines = (format, reportText) =>
-  outcomesOf(formats[format](reportText))
+const inUnit = (format, checks, unit) =>
+  unit
+    ? checks.filter(
+        (check) =>
+          (check.unit ?? (format === 'bash' ? 'file' : 'case')) === unit
+      )
+    : checks
+
+export const outcomeLines = (format, reportText, unit) =>
+  outcomesOf(inUnit(format, formats[format](reportText), unit))
 
 const textOf = (lines) => lines.map((line) => `${line}\n`).join('')
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const [format, reportFile, timesFile] = process.argv.slice(2)
-  const checks = checksFrom(format, reportFile)
+  const [format, reportFile, timesFile, unit] = process.argv.slice(2)
+  const checks = inUnit(format, checksFrom(format, reportFile), unit)
   if (timesFile) {
     const times = checks
       .filter(({ seconds }) => seconds !== undefined)
