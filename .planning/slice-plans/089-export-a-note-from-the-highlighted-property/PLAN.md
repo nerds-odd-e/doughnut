@@ -1,6 +1,8 @@
 # Export a note from the highlighted property
 
 **Source:** [selected story](../../seeds/SEED-120-export-highlighted-property.md#export-a-note-from-the-highlighted-property)
+**Source review:** [source-review.md](source-review.md)
+
 **Identity:** SEED-120#export-a-note-from-the-highlighted-property
 
 ## Goal and scope
@@ -105,7 +107,7 @@ export outcomes remain planned proof.
 ### 1. Request a focused note report with matching quiz evidence
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Real MockMvc requests on `NoteExportController` with MakeMe data and
 real MySQL establish the focused Markdown, optional matching appendix,
 request binding, authorization, current-user privacy, and unresolved-focus
@@ -212,3 +214,35 @@ One full isolated backend run and three small headless frontend files were
 permitted concurrently; both completed without resource failure. No E2E stack
 ran. These are local observations, not remote-runner evidence. Execution owns
 a fresh headroom check before its larger workloads.
+
+## Execution context
+
+Established Story Branch Mode in this owned workspace and branch. Publisher
+`dashboard-territory.local-doughnut`, agent Hitomi-chan; accepted claim
+`884a4fe8e463a1ea32120c7589cf808a82162285` on origin/main and execution branch.
+Starting revision `68fd5b9e4759faa8d239c9a707116e0a12f7bbc6`.
+Setup: `./scripts/run.sh bash scripts/worktree_setup.sh` completed frozen installation;
+`./scripts/run.sh pnpm exec node --version` succeeded (v26.13.0).
+Replanning remains authorized within the existing plan; ten active minute limit
+per slice, mandatory test waits excepted. No scope change authorized.
+
+Observer: Codex coordinator `hitomi-export`, cell `g1041:6`, session 7913,
+PID 15125, directory `/tmp/dough-ci-501/watch-J9bp5P`, checkout this workspace,
+repo nerds-odd-e/doughnut, target codex/export-a-note-from-the-highlighted-property,
+GitHub workflow ci.yml (5208694, donut CI). Claim trunk CI is unobserved.
+
+Proof capacity decision: Territory.local, 16 CPUs/48 GiB; current load 39/21/15
+and about 10 GiB inactive memory with substantial compression and other owned
+work visible. Sequence this execution's backend, frontend and Cypress workloads;
+permit one backend suite at a time, reconsider load immediately before launch.
+No competing heavy workload belongs to this coordinator. Other sessions remain
+with their owners. The implementation agent owns each proof through terminal result.
+
+## Accepted execution proof
+
+Slice 1: focused HTTP report accepted against all 58 allocated commitments.
+Backend 3,090 / frontend 2,521 tests passed; both typechecks and OpenAPI passed.
+Exact setup/assertions, corrected fixture outcomes, consumer trace, refactor
+disposition and literal commands are retained in [source review](source-review.md).
+Freshness unchanged on origin/main `d17580ea6cee7f8eb3d348728721fdb9633e2f95`;
+no incoming named-supplier behavior change.

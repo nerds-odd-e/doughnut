@@ -301,7 +301,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Note Export Controller
 
-- `getAiContextMarkdown`: GET `/api/notes/{note}/ai-context-markdown` -> `GetAiContextMarkdownResponse` (request: `GetAiContextMarkdownData`; path: note; query: tokenLimit, includeRecentQuestions; response body: NoteAiContextMarkdown)
+- `getAiContextMarkdown`: GET `/api/notes/{note}/ai-context-markdown` -> `GetAiContextMarkdownResponse` (request: `GetAiContextMarkdownData`; path: note; query: tokenLimit, includeRecentQuestions, propertyKey, propertyValue, propertyOccurrence; response body: NoteAiContextMarkdown)
 
 ## Notebook Attachment Controller
 

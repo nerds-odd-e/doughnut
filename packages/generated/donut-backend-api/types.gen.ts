@@ -4056,6 +4056,18 @@ export type GetAiContextMarkdownData = {
          * When true, append up to ten newest distinct focus-note multiple-choice questions with Donut answer keys and the current learner's latest own selection when present.
          */
         includeRecentQuestions?: boolean;
+        /**
+         * Exact authored property key to focus the report on.
+         */
+        propertyKey?: string;
+        /**
+         * Exact raw list item value; omit to focus the whole property.
+         */
+        propertyValue?: string;
+        /**
+         * One-based occurrence among equal raw values; defaults to one for an item.
+         */
+        propertyOccurrence?: number;
     };
     url: '/api/notes/{note}/ai-context-markdown';
 };

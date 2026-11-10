@@ -3024,6 +3024,26 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: propertyKey
+        in: query
+        description: Exact authored property key to focus the report on.
+        required: false
+        schema:
+          type: string
+      - name: propertyValue
+        in: query
+        description: Exact raw list item value; omit to focus the whole property.
+        required: false
+        schema:
+          type: string
+      - name: propertyOccurrence
+        in: query
+        description: One-based occurrence among equal raw values; defaults to one
+          for an item.
+        required: false
+        schema:
+          type: integer
+          format: int32
       responses:
         "200":
           description: OK
