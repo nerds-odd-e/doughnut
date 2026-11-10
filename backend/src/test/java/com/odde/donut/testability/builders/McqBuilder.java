@@ -4,6 +4,7 @@ import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.testability.EntityBuilder;
 import com.odde.donut.testability.MakeMe;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class McqBuilder extends EntityBuilder<Mcq> {
@@ -63,6 +64,11 @@ public class McqBuilder extends EntityBuilder<Mcq> {
 
   public McqBuilder contested() {
     this.entity.setContested(true);
+    return this;
+  }
+
+  public McqBuilder createdAt(Timestamp createdAt) {
+    entity.setCreatedAt(createdAt);
     return this;
   }
 

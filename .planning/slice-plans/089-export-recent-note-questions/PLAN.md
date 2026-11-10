@@ -161,7 +161,7 @@ SDK mocks must follow the generated service move.
 
 ### 2. Export the newest note questions with Donut's answer key
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Request the Markdown export with optional `includeRecentQuestions=true`
 → ordinary context plus complete stems, ordered choices, and separately labeled
 stored keys for up to ten newest distinct focus-note MCQs. Omitted/false means
@@ -175,6 +175,15 @@ questions, no prompts, zero questions, and omitted/false/true HTTP query binding
 Sibling cases assert their distinguishing delta, not the whole shape again.
 Sizing: 5–8 minutes of edits/proof-local cleanup; backend suite and generation
 waits are explicit exceptions. Personal selections follow in slice 3.
+
+**Accepted proof (pre-delivery evidence).** `includeRecentQuestions` default false
+on `NoteExportController`; `McqRepository.findTop10ByNote_IdOrderByCreatedAtDescIdDesc`
+plus `RecentNoteQuestionsMarkdownAppendix`. Nested
+`RecentQuestionsAppendix` covers canonical shape, newest-ten chronology with
+equal-timestamp ID ties, other-note exclusion, no-prompt and contested inclusion,
+zero-question ordinary context, and omitted/false/true HTTP binding.
+`./scripts/run.sh pnpm backend:test_only`: 3066 tests, 0 failures; generateTypeScript
++ vue-tsc/tsc passed. Post-change refactor: no further edits.
 
 ### 3. Attach only the exporting learner's latest selection
 Type: Behavior
@@ -275,3 +284,16 @@ Reported: slice 1 — "It does not become notebook Git data."
 Story clause: "This appendix is a transient export; it does not become authored note content or notebook Git data."
 Disposition: excluded "This appendix is a transient export; it does not become authored note content or notebook Git data."
 Commitment: C36.3
+
+
+### G1. Learner latest selection half of refinement
+Reported: slice 2 — "C24 includes learner latest own selection not yet attached at export"
+Story clause: "newest created note questions with the learner's latest own selection"
+Disposition: receiving slice 3
+Commitment: C24
+
+### G2. Preview copy download agreement for question appendix
+Reported: slice 2 — "C18 preview copied and downloaded agreement awaits Export Note Data UI"
+Story clause: "the preview, copied, and downloaded Markdown includes the 10 newest by question creation time"
+Disposition: interim until slices 4
+Commitment: C18

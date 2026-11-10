@@ -3015,6 +3015,14 @@ paths:
         schema:
           type: integer
           format: int32
+      - name: includeRecentQuestions
+        in: query
+        description: "When true, append up to ten newest distinct focus-note multiple-choice\
+          \ questions with Donut answer keys."
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         "200":
           description: OK

@@ -4052,6 +4052,10 @@ export type GetAiContextMarkdownData = {
          * Approximate token budget for focus note content plus related note content combined (bodies).
          */
         tokenLimit: number;
+        /**
+         * When true, append up to ten newest distinct focus-note multiple-choice questions with Donut answer keys.
+         */
+        includeRecentQuestions?: boolean;
     };
     url: '/api/notes/{note}/ai-context-markdown';
 };
