@@ -12,8 +12,8 @@ import {
   expectCleanAcceptedHeadAt,
   expectCleanNotebookAcceptedHeadAt,
   readCheckoutStateAt,
-  runInstalledOn,
 } from './notebookCloneCheckoutDestination'
+import { runInstalledOn } from './notebookCloneCheckoutExecution'
 
 function notebookCloneCheckoutReceiver() {
   return {

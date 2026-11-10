@@ -123,7 +123,7 @@ Focused-proof exception for 7: one complete CLI repeat with VITEST_MAX_WORKERS=2
 
 ### 8. Continue retained local work after reviewed recovery
 Type: Behavior
-Status: planned
+Status: done
 Proof: installed CLI/isolated backend diagnoses, explicitly recovers A/L, Pulls/rebases pending work, resolves a real conflict, Publishes and receives both authored bodies in a clean clone with ancestry and learning associations retained. Controller6 owns identity edges; existing Pull tests retain other variations.
 
 Behavior: prove the completed CLI/server route using existing install/clone/rebase/receiver tasks and fixture injection. No second harness. New recovery page-object/task/steps are part of this ~5–8 active minute leaf, with E2E runtime excepted; inspect the isolated fixture seam before edits and refine if it cannot fit ten minutes.
