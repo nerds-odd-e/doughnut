@@ -13,6 +13,7 @@ import {
 } from './cliE2eInstalledCli'
 import { createCliE2ePluginConfigDirTasks } from './cliE2ePluginConfigDirTasks'
 import { createCliE2eNotebookCloneTasks } from './cliE2eNotebookCloneTasks'
+import { createCliE2eNotebookListingTasks } from './cliE2eNotebookListingTasks'
 import { createCliE2eNotebookLfsHistoricalFetchTasks } from './cliE2eNotebookLfsHistoricalFetchTasks'
 import { createCliE2eNotebookLfsPublishTasks } from './cliE2eNotebookLfsPublishTasks'
 import { createCliE2eNotebookLfsTasks } from './cliE2eNotebookLfsTasks'
@@ -111,6 +112,7 @@ export function createCliE2ePluginTasks(
   return {
     ...createCliE2ePluginConfigDirTasks(),
     ...createCliE2eNotebookCloneTasks(),
+    ...createCliE2eNotebookListingTasks(),
     ...createCliE2eNotebookLfsTasks(),
     ...createCliE2eNotebookLfsPublishTasks(),
     ...createCliE2eNotebookLfsHistoricalFetchTasks(),

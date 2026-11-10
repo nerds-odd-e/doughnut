@@ -62,7 +62,7 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | Q08 | The required restrictions preserve content correctness independently of the story’s size example. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#refusesInvalidLiveContentWithoutAdvancingHistory; shared NotebookGitCandidateAdmission and NotebookGitNoteDocuments retain existing file/authored-property rules; slice5 policy proof retained |
 | Q09 | The required restrictions preserve identity correctness independently of the story’s size example. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#refusesAmbiguousRemovalAndAddition; uncertain correspondence refuses without advancing accepted head |
 | Q10 | The required restrictions preserve storage correctness independently of the story’s size example. | slice 6 | observed: backend/src/test/java/com/odde/donut/controllers/NotebookGitLiveRecoveryAdmissionControllerTest.java#enforcesAttachmentDurabilityForTheRecoveryCandidate plus unchanged NotebookGitCandidateAdmission size/book policies and slice5 full backend admission proof |
-| Q11 | Deferred promises are delivery limits, not new rejection rules. | slice 10 |  |
+| Q11 | Deferred promises are delivery limits, not new rejection rules. | slice 10 | observed: Reading of seven E2E-only changes: no production admission policy added; consumer-trace-large-backend.md#promise-observations-and-fixture-boundary. |
 | Q12 | The observed mismatch’s cause remains this story’s work. | slice 14 |  |
 | Q13 | The observed mismatch’s recovery remains this story’s work. | slice 14 |  |
 | J01.1 | **Starting condition:** The owner has the affected installed CLI; `0.5.9` is the incident version. | slice 12 |  |
@@ -71,15 +71,15 @@ Reviewer `/root/source_review` was launched with `fork_turns: none` and supplied
 | J01.4 | **Result:** The received build is correctly versioned. | slice 13 |  |
 | J01.5 | **Result:** The received build contains the fix. | slice 13 |  |
 | J01.6 | **Later journey:** A later application publication keeps that supported update path usable. | slice 12 |  |
-| J02.1 | **Starting condition:** The notebook is healthy. | slice 10 |  |
-| J02.2 | **Starting condition:** Its complete accepted tree listing exceeds 1 MiB. | slice 10 |  |
-| J02.3 | **Local change:** Three Markdown files change in a local commit. | slice 10 |  |
-| J02.4 | **Base condition:** The local commit is based on accepted head. | slice 10 |  |
+| J02.1 | **Starting condition:** The notebook is healthy. | slice 10 | observed: notebookLargePublication.expectHealthyLargeAcceptedTree actual diagnosis: A matches native HEAD, acceptedTree==liveTree, differences empty; final E2E1pass2026-11-10T11:11:51Z. |
+| J02.2 | **Starting condition:** Its complete accepted tree listing exceeds 1 MiB. | slice 10 | observed: createCliE2eNotebookListingTasks.measureCliNotebookListing native full ls-tree:1760068bytes11001entries; scenario requires>1MiB. |
+| J02.3 | **Local change:** Three Markdown files change in a local commit. | slice 10 | observed: notebookLargePublication.commitThreeEdits uses commitRelatedNoteChanges for three distinct typed Markdown files; final E2E1pass. |
+| J02.4 | **Base condition:** The local commit is based on accepted head. | slice 10 | observed: notebookLargePublication.commitThreeEdits reads native pending parent==baseline A d4dbef89a293092d3fd631343ccf632eb35463c2. |
 | J02.5 | **Result:** Publish succeeds. |  | G5 |
-| J02.6 | **Result:** Publish retains submitted commit IDs. | slice 10 |  |
-| J02.7 | **Result:** Publish retains unchanged accepted ancestry. | slice 10 |  |
-| J02.8 | **Result:** Publish applies the edits. | slice 10 |  |
-| J02.9 | **Qualification:** Notebook size alone does not impose an edit limit. | slice 10 |  |
+| J02.6 | **Result:** Publish retains submitted commit IDs. | slice 10 | observed: Installed Publish stdout names original submitted C61f893db8c35c497cd32597113d6b001bd0ec2c4; fresh receiver native HEAD==C and clean. |
+| J02.7 | **Result:** Publish retains unchanged accepted ancestry. | slice 10 | observed: notebookLargePublication.expectFreshReceiver native is-ancestor baseline A against receiver HEAD succeeds; original C parent A retained. |
+| J02.8 | **Result:** Publish applies the edits. | slice 10 | observed: notebookLargePublication.expectFreshReceiver exact3receiver file bytes plus actual API bodies at original injected Note IDs all pass. |
+| J02.9 | **Qualification:** Notebook size alone does not impose an edit limit. | slice 10 | observed: Same installed Publish/freshreceiver pass with1760068-byte listing and11001entries; no production policy changes. |
 | J03.1 | **Trigger:** Accepted head advances after local work. | slice 2 | observed: cli/tests/notebookPublish.ancestry.suite.ts#a two-note edit commit stale after a later accepted web save; required full CLI/backend suites passed |
 | J03.2 | **Publish response:** Publish explains the stale base. | slice 2 | observed: cli/tests/notebookPublish.ancestry.suite.ts#local main stale; required full CLI/backend suites passed |
 | J03.3 | **Recovery step:** Pull rebases unpublished commits. | slice 2 | observed: cli/tests/notebookPull.rebase.suite.ts#rebases two local note-edit commits over one accepted other-note commit, then publishes; required full CLI/backend suites passed |

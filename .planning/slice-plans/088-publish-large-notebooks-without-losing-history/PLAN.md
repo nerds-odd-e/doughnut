@@ -133,7 +133,7 @@ original subprocess failure; 10 separately owns backend workload/materialization
 
 ### 10. Receive the large-notebook publication through a real backend
 Type: Behavior
-Status: planned
+Status: done
 Proof: installed CLI/isolated backend with independently measured accepted-tree listing above 1 MiB → Publish
 accepted; clean receiver retains submitted IDs, ancestry and edited bodies. Mocked POST success cannot prove
 this.
@@ -213,7 +213,7 @@ Policy agreement is not approval of unseen live content. Owner/operator waits.
 [Execution context, observer identity and accepted proof](execution-evidence.md).
 
 Developer accepted reviewed forward preservation on 2026-11-10; no source/ADR question remains.
-Completed1–9 stand. Slice10 first attempt is parked after client deadlines blocked positive proof; its bounded validation remainder is retained in execution-evidence.md. Fourteen leaves; application11 keeps its stated12–15-minute exception, updater12 and final delivery/owner13/14 remain. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Whole remaining scope was reassessed and stays supported; no source or story change.
+Completed1–10 stand. Slice10 continuation proved real large-notebook acceptance and receiving; earlier failed attempts remain dated evidence in execution-evidence.md. Fourteen leaves; application11 keeps its stated12–15-minute exception, updater12 and final delivery/owner13/14 remain. Other active targets5–8minutes, hard10; required backend/E2E and external waits excepted. Whole remaining scope was reassessed and stays supported; no source or story change.
 
 ## Story obligations
 
@@ -244,5 +244,5 @@ Commitment: C33, J06.8
 ### G5. Large backend acceptance proof
 Reported: slice 10 — "The large-backend attempt stopped at ten active minutes after a diagnostic deadline and a retry injection timeout; no publication or fresh-receiver result was reached."
 Story clause: "A notebook owner can publish small committed Markdown edits to an existing large notebook with the supported Donut CLI."
-Disposition: return
+Disposition: proved by slice 10: consumer-trace-large-backend.md; installed CLI/backend final E2E1pass at2026-11-10T11:11:51Z,1760068-byte listing, submitted/received C, A ancestry, exact3bytes and backend bodies at original Note IDs. Earlier failures remain dated evidence.
 Commitment: C08, J02.5
