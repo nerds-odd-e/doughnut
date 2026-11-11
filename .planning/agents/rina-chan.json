@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Rina-chan",
+  "email": "rina-chan@example.org",
+  "identity": "SEED-122#prefer-note-titles-in-wiki-links",
+  "mode": "story-branch",
+  "branch": "codex/prefer-note-titles-in-wiki-links",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
