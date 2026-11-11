@@ -5,9 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { test } from 'node:test'
 
-const cli = resolve(
-  '.agents/skills/dough-execute-plan/scripts/ci-repair-stash.mjs'
-)
+const cli = resolve('scripts/ci-repair-stash.mjs')
 const content = (first, last) =>
   [first, ...Array.from({ length: 12 }, (_, i) => `line ${i}`), last, ''].join(
     '\n'
@@ -59,6 +57,8 @@ test('restores merged draft plus repair, resolves a legacy record, and drops onl
   const restored = run('restore', '--record', saved.record)
   assert.equal(restored.status, 'conflict')
   assert.equal(restored.applied, 'partial')
+  const record = JSON.parse(readFileSync(saved.record, 'utf8'))
+  assert.deepEqual(record.restore, { status: 'conflict', applied: 'partial' })
   assert.equal(
     readFileSync(join(root, 'merged.txt'), 'utf8'),
     content('draft', 'repair')
@@ -72,7 +72,6 @@ test('restores merged draft plus repair, resolves a legacy record, and drops onl
   git('add', 'conflicted.txt')
   git('restore', '--staged', '.')
   // Existing records from the released classifier retain this false-negative.
-  const record = JSON.parse(readFileSync(saved.record, 'utf8'))
   record.restore.applied = 'none'
   writeFileSync(saved.record, JSON.stringify(record))
   assert.equal(

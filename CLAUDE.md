@@ -51,6 +51,7 @@ Portable digest (details live in the cited skills — keep `AGENTS.md` and `CLAU
 - **Plan refinement:** use **dough-slice-plan-refinement** in place when an existing PLAN is complex, sizing confidence is low, or execution overruns. Skip the extra pass when dough-slice-planning already produced clear commit-sized leaves.
 - **Execution retrospective:** review a completed or in-progress plan with **dough-execution-retrospective**; it may plan bounded corrections but never executes them. Close completed story history afterward with **dough-story-wrap-up**.
 - **Selected story delivery:** use **dough-slice-planning** → optional **dough-slice-plan-refinement** → **dough-execute-plan** under `.planning/slice-plans/`.
+- **CI repair:** When Dough Execute Plan pauses work for a CI repair, use the [Doughnut CI repair restoration guide](docs/ci-repair-restoration.md) for the stash commands.
 - **Test optimization:** `dough-test-optimization` — use the public Open Dough workflow; plans live under `.planning/slice-plans/` and run via dough-execute-plan. Donut-specific commands and profile exclusions live in `.agents/agent-map.md` and the applicable stack testing skills.
 
 ## Cursor Cloud specific instructions
