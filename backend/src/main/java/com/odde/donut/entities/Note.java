@@ -7,6 +7,7 @@ import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.ClozedString;
 import com.odde.donut.algorithms.FrontmatterAliases;
+import com.odde.donut.algorithms.FrontmatterPronunciation;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NoteTitle;
 import com.odde.donut.configs.ObjectMapperConfig;
@@ -142,7 +143,8 @@ public class Note extends EntityIdentifiedByIdOnly {
     return ClozedString.forMarkdownWithMarkMasks(
             NoteContentMarkdown.bodyWithoutLeadingFrontmatter(getContent()))
         .hide(getNoteTitle())
-        .hideAliases(FrontmatterAliases.fromNoteContent(getContent()));
+        .hideAliases(FrontmatterAliases.fromNoteContent(getContent()))
+        .hidePronunciations(FrontmatterPronunciation.fromNoteContent(getContent()));
   }
 
   @JsonIgnore

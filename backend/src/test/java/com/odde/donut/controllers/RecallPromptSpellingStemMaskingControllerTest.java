@@ -21,20 +21,16 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
 
   @Test
   void spellingQuestionMasksFrontmatterAliasesInStem() {
-    makeMe
-        .theNote(answerNote)
-        .title("colour")
-        .content(
+    SpellingQuestion question =
+        spellingQuestionFor(
+            "colour",
             """
             ---
             aliases:
               - color
             ---
             The color of the sky is blue
-            """)
-        .please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+            """);
 
     assertThat(question.getStem(), containsString("<mark"));
     assertThat(question.getStem(), not(containsString("color")));
@@ -42,10 +38,9 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
 
   @Test
   void spellingQuestionMasksPlainAliasButNotOverlapWikiLinkTargetTitle() {
-    makeMe
-        .theNote(answerNote)
-        .title("colour")
-        .content(
+    SpellingQuestion question =
+        spellingQuestionFor(
+            "colour",
             """
             ---
             aliases:
@@ -54,10 +49,7 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
               - "[[Other Note]]"
             ---
             The color of Other Note is blue
-            """)
-        .please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+            """);
 
     assertThat(question.getStem(), not(containsString("color")));
     assertThat(question.getStem(), containsString("Other Note"));
@@ -65,20 +57,16 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
 
   @Test
   void spellingQuestionDoesNotMaskOverlapTargetTitleFromOverlapsOnly() {
-    makeMe
-        .theNote(answerNote)
-        .title("colour")
-        .content(
+    SpellingQuestion question =
+        spellingQuestionFor(
+            "colour",
             """
             ---
             overlaps:
               - "[[Other Note]]"
             ---
             Mentions Other Note in the body
-            """)
-        .please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+            """);
 
     assertThat(question.getStem(), containsString("Other Note"));
     assertThat(question.getStem(), not(containsString("<mark")));
@@ -86,13 +74,10 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
 
   @Test
   void spellingQuestionMasksWholeSlashTitleButNotSeparateSegments() {
-    makeMe
-        .theNote(answerNote)
-        .title("word／~logical")
-        .content("The exact word／~logical term differs from a separate word or logical mention.")
-        .please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+    SpellingQuestion question =
+        spellingQuestionFor(
+            "word／~logical",
+            "The exact word／~logical term differs from a separate word or logical mention.");
 
     assertThat(question.getStem(), not(containsString("word／~logical")));
     assertThat(question.getStem(), containsString("a separate word or logical mention"));
@@ -100,9 +85,7 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
 
   @Test
   void spellingQuestionStillMasksLeadingTildeSuffix() {
-    makeMe.theNote(answerNote).title("~logical").content("This claim is illogical.").please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+    SpellingQuestion question = spellingQuestionFor("~logical", "This claim is illogical.");
 
     assertThat(question.getStem(), containsString("<mark"));
     assertThat(question.getStem(), not(containsString("logical.")));
@@ -110,13 +93,10 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
 
   @Test
   void spellingQuestionMasksTitleTextBeforeTrailingQualifier() {
-    makeMe
-        .theNote(answerNote)
-        .title("Deposition (phase transition) ")
-        .content("In physics, deposition is when gas becomes solid. Deposition skips liquid.")
-        .please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+    SpellingQuestion question =
+        spellingQuestionFor(
+            "Deposition (phase transition) ",
+            "In physics, deposition is when gas becomes solid. Deposition skips liquid.");
 
     assertThat(
         stemWithoutMarkTags(question),
@@ -125,24 +105,87 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
 
   @Test
   void spellingQuestionMasksWholeQualifiedTitleAsOneMaskAndKeepsQualifierTextReadable() {
-    makeMe
-        .theNote(answerNote)
-        .title("cat(animal)")
-        .content("A cat is an animal. See cat(animal).")
-        .please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+    SpellingQuestion question =
+        spellingQuestionFor("cat(animal)", "A cat is an animal. See cat(animal).");
 
     assertThat(stemWithoutMarkTags(question), equalTo("A [...] is an animal. See [...]."));
   }
 
   @Test
   void spellingQuestionLeavesClueReadableWhenNoTitleTextPrecedesTheQualifier() {
-    makeMe.theNote(answerNote).title("~(phase transition)").content("Gas becomes solid.").please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
+    SpellingQuestion question = spellingQuestionFor("~(phase transition)", "Gas becomes solid.");
 
     assertThat(stemWithoutMarkTags(question), equalTo("Gas becomes solid."));
+  }
+
+  @Test
+  void spellingQuestionHidesSavedPronunciationWhereTheBodyRepeatsIt() {
+    SpellingQuestion question =
+        spellingQuestionFor(
+            "多大",
+            """
+            ---
+            pronunciation: ただい
+            ---
+            数や量が非常に大きいこと。「多大（ただい）なるご迷惑」\
+            """);
+
+    assertThat(stemWithoutMarkTags(question), equalTo("数や量が非常に大きいこと。「[...]（/.../）なるご迷惑」"));
+    assertThat(
+        question.getStem(), containsString("<mark title='Hidden pronunciation'>/.../</mark>"));
+  }
+
+  @Test
+  void spellingQuestionHidesEveryValueOfAHandAuthoredPronunciationList() {
+    SpellingQuestion question =
+        spellingQuestionFor(
+            "顔色",
+            """
+            ---
+            pronunciation:
+              - かおいろ
+              - がんしょく
+            ---
+            顔色（かおいろ）が悪い。顔色（がんしょく）を失う。\
+            """);
+
+    assertThat(stemWithoutMarkTags(question), equalTo("[...]（/.../）が悪い。[...]（/.../）を失う。"));
+  }
+
+  @Test
+  void spellingQuestionHidesALongerSavedPronunciationBeforeAShorterOneItStartsWith() {
+    SpellingQuestion question =
+        spellingQuestionFor("人", "---\npronunciation: [ひと, ひとびと]\n---\n人々（ひとびと）と人（ひと）");
+
+    assertThat(stemWithoutMarkTags(question), equalTo("[...]々（/.../）と[...]（/.../）"));
+  }
+
+  @Test
+  void spellingQuestionHidesAOneKanaSavedPronunciationInsideOtherWords() {
+    SpellingQuestion question = spellingQuestionFor("手", "---\npronunciation: て\n---\n手を挙げて。");
+
+    assertThat(stemWithoutMarkTags(question), equalTo("[...]を挙げ/.../。"));
+  }
+
+  @Test
+  void spellingQuestionHidesBothASavedPronunciationAndASlashReadingInTheBody() {
+    SpellingQuestion question =
+        spellingQuestionFor("多大", "---\npronunciation: ただい\n---\n多大 /ただい/ は「ただい」と読む。");
+
+    assertThat(stemWithoutMarkTags(question), equalTo("[...] /.../ は「/.../」と読む。"));
+  }
+
+  @Test
+  void spellingQuestionIgnoresABlankSavedPronunciation() {
+    SpellingQuestion question =
+        spellingQuestionFor("sky", "---\npronunciation: \"\"\n---\nThe sky is blue.");
+
+    assertThat(stemWithoutMarkTags(question), equalTo("The [...] is blue."));
+  }
+
+  private SpellingQuestion spellingQuestionFor(String title, String content) {
+    makeMe.theNote(answerNote).title(title).content(content).please();
+    return spellingPrompt(memoryTracker).getSpellingQuestion();
   }
 
   private static String stemWithoutMarkTags(SpellingQuestion question) {

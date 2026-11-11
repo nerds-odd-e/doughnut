@@ -46,6 +46,23 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
   }
 
   @Test
+  void savedPronunciationIsNotAnAcceptedAnswer() throws UnexpectedNoAccessRightException {
+    makeMe
+        .theNote(answerNote)
+        .title("多大")
+        .content("---\npronunciation: ただい\n---\n数や量が非常に大きいこと。")
+        .please();
+
+    assertTrue(
+        controller.answerSpelling(recallPrompt, spellingAnswer("多大")).getAnswer().getCorrect());
+    assertFalse(
+        controller
+            .answerSpelling(spellingPrompt(memoryTracker), spellingAnswer("ただい"))
+            .getAnswer()
+            .getCorrect());
+  }
+
+  @Test
   void answerDoesNotMatchOverlapWikiLinkAliasTargetOrRawToken()
       throws UnexpectedNoAccessRightException {
     makeMe.theNote(answerNote).title("this").aliases("that").overlapWikiLink("Other Note").please();

@@ -2,6 +2,7 @@
 
 **Identity:** SEED-124#save-pronunciations-as-note-properties
 **Source:** [Save pronunciations as note properties](../../seeds/SEED-124-save-pronunciations-as-note-properties.md#save-pronunciations-as-note-properties)
+**Source review:** [source review](source-review.md)
 
 ## Goal and scope
 
@@ -96,7 +97,7 @@ publish notebook 15, as it does today.
 
 ### 1. Spelling review hides saved pronunciations
 Type: Behavior
-Status: planned
+Status: done
 Proof: The three controller observations in the table and a green backend suite.
 
 Behavior: Given a note whose frontmatter has `pronunciation` with one value or
@@ -118,6 +119,23 @@ Implementation brief:
 Sizing: the scratch change was about 25 production lines in three files and
 four probe cases; the suite took 117 seconds. About five minutes of edits plus
 the suite run.
+
+Accepted proof, 2026-11-11: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+on the implementation diff gave 3,118 tests, none failed (10 minutes 52 seconds
+with the host under heavy unrelated load). After the refactor pass, the six
+classes that reach the changed chain were run again: 128 tests, none failed.
+The observing cases are named per commitment in the
+[source review](source-review.md).
+
+Learnings:
+
+- A blank `pronunciation` value is ignored. Without that, an empty value
+  matched at every word boundary and the whole prompt became `/.../` marks.
+  `spellingQuestionIgnoresABlankSavedPronunciation` observes it.
+- A one-kana value is hidden inside other words, as the story's UI note says:
+  `手を挙げて。` with `pronunciation: て` gives `[...]を挙げ/.../。`.
+- Where a note has both the property and a `/…/` reading of the same text, a
+  bare repeat of that text shows the hidden-pronunciation mark.
 
 ### 2. Add property offers pronunciation
 Type: Behavior
@@ -296,6 +314,15 @@ Implementation brief:
 - Tell the owner to run `donut notebook pull` in their own checkout.
 - Delete the script and the report. Record in this plan the counts by kind,
   the commit IDs, the accepted heads and the comparison results.
+
+## Execution record
+
+Story Branch Mode. Execution checkout
+`.worktrees/save-pronunciations-as-note-properties`, branch
+`claude/save-pronunciations-as-note-properties`, remote `origin`, trunk
+`main`. The claim `15e3e95d5e` was accepted on `main` on 2026-11-11 and is the
+published base of the first increment. Replanning permission: the existing
+planning authority; no option was given.
 
 ## Decisive premises and observations
 

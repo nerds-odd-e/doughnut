@@ -21,11 +21,7 @@ record ClozeReplacement(
 
     var aliases =
         TitleFragment.mergeSortedLongestFirst(noteTitle.getTitleFragments(), extraAliases);
-    String step1 =
-        replaceFragmentsWithInternalPlaceholder(
-            aliases,
-            pronunciationMasked,
-            (p, t) -> t.replaceLiteralWords(p, internalFullMatchReplacement));
+    String step1 = maskLiteralWords(aliases, pronunciationMasked, internalFullMatchReplacement);
     String step2 =
         replaceFragmentsWithInternalPlaceholder(
             aliases, step1, (p, t) -> t.replaceSimilar(p, internalPartialMatchReplacement));
@@ -41,10 +37,19 @@ record ClozeReplacement(
     return fragments.stream().reduce(processed, replacer, (x, y) -> y);
   }
 
+  private static String maskLiteralWords(
+      List<TitleFragment> fragmentsLongestFirst, String content, String internalPlaceholder) {
+    return replaceFragmentsWithInternalPlaceholder(
+        fragmentsLongestFirst,
+        content,
+        (processed, fragment) -> fragment.replaceLiteralWords(processed, internalPlaceholder));
+  }
+
   String maskPronunciationsAndTitles(
       String originalContent1,
       List<NoteTitle> noteTitles1,
       List<TitleFragment> extraAliases,
+      List<TitleFragment> savedPronunciations,
       boolean followsNonWhitespace) {
     final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
     final String internalPronunciationSpellingReplacement = "__p_r_o_n_s_p_e_l__";
@@ -68,12 +73,16 @@ record ClozeReplacement(
           pronunciationsReplaced, Matcher.quoteReplacement(internalPronunciationReplacement));
     }
     matcher.appendTail(pronunciationsReplaced);
-    String spellingRepeatsMasked =
-        replaceFragmentsWithInternalPlaceholder(
-            TitleFragment.sortedLongestFirst(pronunciationSpellings),
+    String savedPronunciationsMasked =
+        maskLiteralWords(
+            TitleFragment.sortedLongestFirst(savedPronunciations),
             pronunciationsReplaced.toString(),
-            (content, spelling) ->
-                spelling.replaceLiteralWords(content, internalPronunciationSpellingReplacement));
+            internalPronunciationReplacement);
+    String spellingRepeatsMasked =
+        maskLiteralWords(
+            TitleFragment.sortedLongestFirst(pronunciationSpellings),
+            savedPronunciationsMasked,
+            internalPronunciationSpellingReplacement);
     return noteTitles1.stream()
         .reduce(
             spellingRepeatsMasked,
