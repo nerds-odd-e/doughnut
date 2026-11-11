@@ -111,12 +111,13 @@ concepts and exact attachment bytes. Pointer and hydration rules live in
   `[[portable-path|display-text]]`. Product insert writes wiki. Unqualified
   `[[Title-or-Alias]]` is a shorthand Portable path whose resolution scope is
   the source notebook's Portable notebook tree. `Notebook:Title-or-Alias`
-  qualifies that scope with another notebook. Candidate matching includes note
-  display names and recognized aliases. Trashed notes are excluded from
-  wiki-link destination matching and ambiguity checks. A shorthand Portable
-  path resolves only when it identifies one destination under that scope. With no match it is
-  unresolved; with multiple matches it is ambiguous and therefore unresolved,
-  and Donut asks for a longer path. The authored destination remains unchanged.
+  qualifies that scope with another notebook. Shorthand resolution considers
+  readable notes in that scope and excludes trashed notes. When one or more
+  note display names match, only those matches determine the destination.
+  When no display name matches, use recognized aliases. A single matching
+  note resolves, zero matches are unresolved, and multiple matching notes
+  are ambiguous and prompt Donut to ask for a longer path. Donut preserves
+  the authored destination.
   Donut-authored wiki bundle-root path form has no leading `/`, except the
   exact-root fallback `/Title` when that display name is an ambiguous
   shorthand. The reader accepts a leading `/` on a path-shaped wiki
