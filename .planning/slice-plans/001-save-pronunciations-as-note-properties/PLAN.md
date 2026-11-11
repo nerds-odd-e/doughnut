@@ -462,16 +462,30 @@ planning authority; no option was given.
 
 Published on `origin/claude/save-pronunciations-as-note-properties`: slice 1
 as `e9f109c3c2`, slice 2 as `3f43ec8853`, slice 3 as `588f51ccc2`, slice 4 as
-`550401a5dd`, slice 5 as `4e88d3d2ad`. CI observer directory:
+`550401a5dd`, slice 5 as `4e88d3d2ad`, the slice 6 evidence as `86f30bee22`.
+CI observer directory:
 `/tmp/dough-ci-501/watch-gNNSef`.
 
-CI on the story branch: run 43049319481, attempt 1, for `e9f109c3c2` had ten
-failed jobs. Each stopped in its dependency installation after about 50
-minutes with `Temporary failure resolving 'azure.archive.ubuntu.com'` from
-`apt-get`; the following install step was skipped and no test ran. This is a
-runner network failure, not a result about the change, so no repair was made.
-Trunk CI passed at `5d974f8eae` earlier the same day. Run 43053073660,
-attempt 1, for `3f43ec8853` failed the same way in eight jobs.
+CI on the story branch, 2026-11-11:
+
+- Run 43049319481 for `e9f109c3c2` and run 43053073660, attempt 1, for
+  `3f43ec8853` each had eleven failed jobs. Every one stopped in its
+  dependency installation with `Temporary failure resolving
+  'azure.archive.ubuntu.com'` from `apt-get`; no test ran in them. The backend
+  unit test job, which does not install those packages, passed in both runs.
+  Trunk CI had passed at `5d974f8eae` earlier the same day with the same
+  setup. This was a runner network failure, so no repair was made.
+- Run 43053073660 was run again once the two runs had ended. In attempt 2 ten
+  of the eleven jobs passed. The job for
+  `e2e_test/features/note_creation_and_update/**` ended with "The hosted
+  runner lost communication with the server" during its dependency setup,
+  before any test, and left no log.
+- That one job was run again. Attempt 3 passed, so run 43053073660 is
+  successful for `3f43ec8853`, the latest revision that changes product files.
+  The later revisions on the branch change planning records only and start no
+  CI run.
+- The CI observer ended by itself while attempt 2 was running. Attempt 3 was
+  read directly with `gh run view`.
 
 ## Story obligations
 
