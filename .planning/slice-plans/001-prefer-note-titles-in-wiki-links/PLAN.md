@@ -229,10 +229,11 @@ document folder/qualified navigation, ambiguity repair and current-property
 behavior. Detailed precedence variations belong at the real controller boundary;
 no suite consolidation is justified by current coverage/cost evidence.
 Product advice is no change: this bounded outcome adds no supported adjacent
-feature requirement. CI for the accepted branch revision remains pending.
-Process is selected by skipProcessRetrospective=false and deferred into wrap-up
-because intentCoverage=true will request its check there; conversation and agent
-history remain available. Product/proof review is complete; process is pending.
+feature requirement. Branch CI passed on the implementation basis; execution
+completion dbe2032df4 confirmed observer shutdown. Deferred process review is
+complete after the Caught Intent Coverage report and no-repair disposition.
+DearDough.md records ODF-189/ODF-264 occurrences and DD-483 at 556 physical lines.
+Product, proof and process review are complete; no unresolved decision remains.
 
 ## Execution complete
 

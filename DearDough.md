@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 482. Removed numbers are never reused.
+- Highest allocated local number: 483. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 - [Source before the 2026-11-10 compaction](https://github.com/nerds-odd-e/doughnut/blob/d3eb0ef73aca13a5ed229738f92dbe44ee12bf95/DearDough.md); its rows are retained at the [Open Dough catalog](https://github.com/terryyin/open-dough/tree/5afe6fee8fe34322752e9e44911d72eb31dd4991/docs/maintainer/findings). DD-443 (disposable break checks) was pruned as successful practice, not a problem.
@@ -58,6 +58,17 @@ Former local code: DD-138. An absolute changed-file size check conflicts with an
 ## ODF-189 — Small additions force unrelated size extractions
 
 Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-189.md).
+
+
+### Occurrences
+- Execution: SEED-122#prefer-note-titles-in-wiki-links / e257b144d1e9120528922da0f5dc045acb6c9d6d
+  - Timestamp: unknown
+  - Tool: Codex
+  - Model: gpt-6.1-sol
+  - Open Dough release: unknown; guidance retained at f6d89e3470a6ed3064443c324763a074bd5bc884
+  - Evidence: 2026-11-11 coordinator/refactor history; implementation e257b144d1 retains PLAN.md and preparation-evidence.md in .planning/slice-plans/001-prefer-note-titles-in-wiki-links/. Refactor agent returned no product edits and approximately four active minutes.
+  - Observed effect: Execution evidence grew the plan from227 to327 lines. The every-diff-file250-line gate required relocating129 lines of unchanged preparation observations; the plan became210 lines before final review records. No product proof changed or reran.
+  - Inference: This is a records-only instance of the existing size-extraction finding. The four-minute effort is the agent estimate, not a measured isolated cost. Guidance could distinguish long-lived product modules from disposable evidence without weakening product cohesion checks.
 
 <a id="odf-190"></a>
 
@@ -199,6 +210,17 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
   - Evidence: 2026-11-10 resumed execution; coordinator tool results combined whole Execute Plan finish/CI/source/obligation references, then aggregate retrospective traces, exceeding output budgets and requiring targeted retrieval. Git recovery:59db9d970d2be39e5d7825e26118bbc455e52a0f retains the reviewed source/proof homes.
   - Observed effect: multiple truncated responses and repeated reads during an otherwise settled owner journey; no measured token/time saving is claimed.
   - Inference: coordinator batching repeated this known deviation despite targeted-reading guidance; the product outcome remained independently verified.
+
+
+### Occurrences
+- Execution: SEED-122#prefer-note-titles-in-wiki-links / e257b144d1e9120528922da0f5dc045acb6c9d6d
+  - Timestamp: unknown
+  - Tool: Codex
+  - Model: gpt-6.1-sol
+  - Open Dough release: unknown; guidance retained at f6d89e3470a6ed3064443c324763a074bd5bc884
+  - Evidence: 2026-11-11 coordinator tool results: startup row batch returned original15975 tokens with truncation; pre-delegation batch11677 tokens also truncated; closure evidence listing accidentally included all XML filenames and returned original63280 tokens.
+  - Observed effect: Required missing guidance was fetched again in targeted passages; the late unbounded file inventory obscured the recording reference and required narrower retrieval.
+  - Inference: This repeats the coordinator retrieval deviation despite targeted-reading instructions. Savings are unmeasured; restrict inventory queries before emitting output and keep boundary rows separate.
 
 <a id="odf-265"></a>
 
@@ -518,3 +540,17 @@ Source freshness's three-way containment check treated coordinator-owned observa
   - Evidence: 2026-11-10 slice14 acceptance; Take0715d7d1b2b25d0ca224a3909e14cdf43fad0d42, landed plan0019fa5e4ada4cc630b90131580dadd83fb84d8a, accepted record59db9d970d2be39e5d7825e26118bbc455e52a0f; source-freshness-comparison.mjs compareThreeWay/compareRecord and source-freshness.mjs fromContainedBase. Raw coordinator results retained three conflict refusals; read-only git merge-file localized the conflict to the same G6 disposition's EOF plus appended G7–G9.
   - Observed effect: extra source checks/inspection and record relayout. Preserving landed bytes and placing new obligations before existing G1 produced an unchanged comparison; no source scope, accepted proof or product behavior changed.
   - Inference: the unterminated tail and same-EOF additions explain this instance; other source-conflict behavior was not investigated. Coordinator condensation also complicated the first comparison and was partly reversed; exact cost is unmeasured.
+
+## DD-483 — One backend Intent Coverage probe repeats the complete suite three times
+
+The project backend rule requires the entire suite even for a targeted scratch break check. The measured check caught the selected fault, but three full runs and scratch setup exceeded its original five-to-ten-minute estimate. Assess a supported proportionate proof route with the project owner; this observation changes no installed rule or default.
+
+### Occurrences
+- Execution: SEED-122#prefer-note-titles-in-wiki-links / e257b144d1e9120528922da0f5dc045acb6c9d6d
+  - Timestamp: 2026-11-11T17:42:34.664+08:00
+  - Tool: Codex
+  - Model: gpt-6.1-sol
+  - Open Dough release: unknown; guidance retained at f6d89e3470a6ed3064443c324763a074bd5bc884
+  - Evidence: Native worker /root/intent_coverage_live, checked implementation e257b144d1; verbatim report and wrap-up disposition in the SEED-122 Done record; raw evidence /tmp/dough-intent-coverage-122-1794389081/.
+  - Observed effect: One worker ran baseline/fault/restored commands across3111 maintained tests (plus one temporary independent witness in the fault run). Full command wall times315.751/162.748/218.847s total697.346s. Invocation-to-report1073.664s includes setup, reads, runs and verified retirement. The union fault caused six maintained failures and independently observed ambiguous controller results; baseline/restored suites and cleanup passed.
+  - Inference: Whole-suite repetition is required by the current backend instructions, rather than a worker decision to broaden proof. Shared-host contention and cold scratch caches also contributed; the17.9-minute elapsed cannot all be attributed to the suite policy. Native blocking waits and bounded overdue checks retained one worker without restart or duplicate probing.
