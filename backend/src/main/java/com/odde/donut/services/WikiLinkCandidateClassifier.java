@@ -4,12 +4,9 @@ import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 /**
  * Readable-candidate cardinality classification of a wiki Portable-path token against
@@ -35,12 +32,9 @@ final class WikiLinkCandidateClassifier {
       String token, String notebookFallbackName, User viewer) {
     List<Note> candidates =
         resolveRef(token, notebookFallbackName)
-            .map(ref -> noteCandidates.forNotebookAndTitle(ref.notebookName(), ref.noteTitle()))
+            .map(ref -> readableNotebookMatches(ref.notebookName(), ref.noteTitle(), viewer))
             .orElse(List.of());
-    return classifyCandidates(
-        token,
-        readableOf(
-            candidates, notebook -> authorizationService.userMayReadNotebook(viewer, notebook)));
+    return classifyCandidates(token, candidates);
   }
 
   private static WikiLinkResolver.CandidateCardinality classifyCandidates(
@@ -77,20 +71,12 @@ final class WikiLinkCandidateClassifier {
   }
 
   List<Note> readableNotebookMatches(String notebookName, String noteTitle, User viewer) {
-    return readableOf(
-        noteCandidates.forNotebookAndTitle(notebookName, noteTitle),
-        notebook -> authorizationService.userMayReadNotebook(viewer, notebook));
-  }
-
-  private static List<Note> readableOf(List<Note> candidates, Predicate<Notebook> readable) {
-    List<Note> result = new ArrayList<>();
-    for (Note candidate : candidates) {
-      Notebook notebook = candidate.getNotebook();
-      if (notebook != null && readable.test(notebook)) {
-        result.add(candidate);
-      }
-    }
-    return result;
+    return noteCandidates.forNotebookAndTitle(
+        notebookName,
+        noteTitle,
+        note ->
+            note.getNotebook() != null
+                && authorizationService.userMayReadNotebook(viewer, note.getNotebook()));
   }
 
   private static Note uniqueIfExactlyOne(List<Note> notes) {

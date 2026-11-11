@@ -66,7 +66,7 @@ class NoteControllerAuthoredPortablePathTests extends ControllerTestBase {
   }
 
   @Test
-  void shouldAuthorFullNormalizedFolderPathWhenDisplayNameCollidesWithAlias()
+  void shouldAuthorDisplayNameShorthandWhenDisplayNameCollidesWithAlias()
       throws UnexpectedNoAccessRightException {
     Folder pantry =
         makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("WikiDup Pantry").please();
@@ -76,7 +76,7 @@ class NoteControllerAuthoredPortablePathTests extends ControllerTestBase {
 
     AuthoredPortablePath authored = controller.authoredPortablePath(source, destination, "color");
 
-    assertThat(authored.portablePath(), equalTo("WikiDup Pantry/color"));
+    assertThat(authored.portablePath(), equalTo("color"));
   }
 
   @Test

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /** Notebook-scoped note candidates for wiki-link title, path-shaped, and alias matching. */
 final class WikiLinkNoteCandidates {
@@ -23,10 +24,10 @@ final class WikiLinkNoteCandidates {
     this.noteAliasIndexRepository = noteAliasIndexRepository;
   }
 
-  List<Note> forNotebookAndTitle(String notebookName, String noteTitle) {
+  List<Note> forNotebookAndTitle(String notebookName, String noteTitle, Predicate<Note> readable) {
     return PathShapedTarget.tryParse(noteTitle)
-        .map(path -> pathShaped(notebookName, path))
-        .orElseGet(() -> titleOrAlias(notebookName, noteTitle));
+        .map(path -> pathShaped(notebookName, path).stream().filter(readable).toList())
+        .orElseGet(() -> titleOrAlias(notebookName, noteTitle, readable));
   }
 
   static List<Note> distinctByNoteId(List<Note> notes) {
@@ -40,16 +41,14 @@ final class WikiLinkNoteCandidates {
     return distinct;
   }
 
-  private List<Note> titleOrAlias(String notebookName, String noteTitle) {
+  private List<Note> titleOrAlias(String notebookName, String noteTitle, Predicate<Note> readable) {
     List<Note> byTitle =
-        noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
-    return unionByNoteId(byTitle, aliasTargets(notebookName, noteTitle));
-  }
-
-  private static List<Note> unionByNoteId(List<Note> first, List<Note> second) {
-    List<Note> combined = new ArrayList<>(first);
-    combined.addAll(second);
-    return distinctByNoteId(combined);
+        noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle).stream()
+            .filter(readable)
+            .toList();
+    return byTitle.isEmpty()
+        ? aliasTargets(notebookName, noteTitle).stream().filter(readable).toList()
+        : byTitle;
   }
 
   private List<Note> pathShaped(String notebookName, PathShapedTarget path) {
