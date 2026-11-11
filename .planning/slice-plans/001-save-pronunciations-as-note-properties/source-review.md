@@ -63,9 +63,9 @@ acceptance record.
 | 14a.1 | qualification: Condition: its body has exactly one `/…/` reading as Spelling review recognizes it today. | slice 3 | observed: listing `01-listing.md` at `cc485736`: 750 notes with a match, 53 with several; the recognizer reproduces the story's measurement |
 | 14a.2 | qualification: Condition: that reading is written only in kana. | slice 3 | observed: listing `01-listing.md`: 641 with exactly one match in plain kana, 56 with one match that is not plain kana |
 | 14a.3 | qualification: Condition: the note has no `pronunciation` property. | slice 3 | observed: listing `01-listing.md`: 0 notes with a `pronunciation` property; the fixture note 見本 with the property is listed unchanged |
-| 14b | commitment: The reading becomes the `pronunciation` value. | slice 4 | |
-| 14c.1 | commitment: The body loses the marked reading. | slice 4 | |
-| 14c.2 | commitment: Together with the reading, the body loses the spacing that existed only to hold it (alternative to 14c.3). | slice 4 | |
+| 14b | commitment: The reading becomes the `pronunciation` value. | slice 4 | observed: Mechanical check on `06e5adbf` and `1b9fc990`: for all 298 changed notes the YAML parser reads `pronunciation` back as exactly the removed reading |
+| 14c.1 | commitment: The body loses the marked reading. | slice 4 | observed: Mechanical check on both commits: the recognizer finds no reading left in any of the 298 notes |
+| 14c.2 | commitment: Together with the reading, the body loses the spacing that existed only to hold it (alternative to 14c.3). | slice 4 | observed: Clone diff of 算術 in `06e5adbf`: `/さんじゅつ/ 算术` becomes `算术`; preview `02-changes.md`: 連濁 loses the reading's line and the empty line after it |
 | 14c.3 | commitment: Or, together with the reading, the body loses the bracket pair that existed only to hold it (alternative to 14c.2). | slice 5 | |
 | 14d | commitment: All other text stays. | slice 6 | |
 | 14d.1 | commitment: The text that stays includes readings of other words. | slice 6 | |

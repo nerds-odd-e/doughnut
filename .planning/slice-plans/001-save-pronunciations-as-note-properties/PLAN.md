@@ -236,7 +236,7 @@ Learnings for slices 4 to 8:
 
 ### 4. Convert readings that stand alone on a line or lead the body
 Type: Behavior
-Status: planned
+Status: done
 Proof: The mechanical check passes on both commits of this slice, and the
 preview section for this kind lists every changed note.
 
@@ -262,6 +262,41 @@ Implementation brief:
 
 Sizing: one rule family for two positions, with the check written here. About
 ten minutes; the check is the reason this slice is larger than the next two.
+
+Accepted proof, 2026-11-12, in the clone on branch `conversion`:
+
+- Pilot commit `06e5adbf8f704f7a2eb6cf0a24627901420abe65`: 10 notes, 5 of
+  each position. Second commit `1b9fc990874754b557a74e15b0ef49bd89ee202c`:
+  288 notes. In all 191 notes had the reading alone on its line and 107 had
+  it at the start of the body.
+- `python3 tools/conversion.py check notebook main..conversion` ends with
+  "298 converted so far + 332 candidates still to convert + 120 unchanged =
+  750" and "CHECK PASSED". It also passes on each commit alone. Run against a
+  deliberately wrong, uncommitted edit of 算術 and コツ it failed with five
+  named violations.
+- `preview/02-changes.md` lists the 298 notes, the ten pilot notes marked.
+- Local `main` is still `cc485736`; the clone's tree is clean.
+
+Pilot notes and their production note IDs, kept with their tracker IDs in
+`tools/pilot-notes.json`: 連濁 1486, 算術 9085, 名字 1523, 今度 2409, 体言 2010,
+定義 1237, 三十路 6554, 合羽 6533, 穏やか 1725, 了見 9011. Each has a tracker
+with a recall count above zero, and its production content equals the clone's
+file at `cc485736`.
+
+Decisions and learnings:
+
+- Blank-line rule: when the removed line stood between two blank lines, or
+  between the start of the body and a blank line, the one blank line after it
+  is removed too. No other blank line changes.
+- The check also accepts a comma and the spacing after a reading that was the
+  first item in a bracket that holds more. Slice 5 needs it; no commit of
+  slice 4 uses it.
+- The check counts against the fixed commit `cc485736`, so it stays right
+  after local `main` moves in slice 7. From then on the preview needs
+  `--range cc485736..conversion`.
+- 相当 is left for slice 6: text follows its leading reading with no spacing.
+- The YAML parser of the check is the system Ruby. Whether Doughnut reads the
+  values back the same is observed in production in slice 7.
 
 ### 5. Convert readings in brackets after a word
 Type: Behavior
@@ -363,7 +398,8 @@ published base of the first increment. Replanning permission: the existing
 planning authority; no option was given.
 
 Published on `origin/claude/save-pronunciations-as-note-properties`: slice 1
-as `e9f109c3c2`, slice 2 as `3f43ec8853`. CI observer directory:
+as `e9f109c3c2`, slice 2 as `3f43ec8853`, slice 3 as `588f51ccc2`. CI observer
+directory:
 `/tmp/dough-ci-501/watch-gNNSef`.
 
 ## Story obligations
@@ -382,6 +418,11 @@ Disposition: no user cost "The owner's existing readings in the 日本語学習 
 Reported: slice 3 — "Two agent-guidance files are among the 750: AGENTS.md and .agents/donut-format.md."
 Story clause: "750 notes have at least one `/…/` match"
 Disposition: no user cost "The owner's existing readings in the 日本語学習 notebook move into the same property": both files are listed unchanged because their matches are not plain kana, so the conversion leaves them as they are.
+
+### G4. 乗り越す has two line-break tags in a row after conversion
+Reported: slice 4 — "Its reading was alone on a line between two `<br>` lines, so it was converted by the rule and the two `<br>` now follow each other. Removing a `<br>` would touch other text, so the rule cannot do better."
+Story clause: "The body loses the marked reading together with the spacing or the bracket pair that existed only to hold it."
+Disposition: excluded "All other text stays, including readings of other words."
 
 ## Decisive premises and observations
 
