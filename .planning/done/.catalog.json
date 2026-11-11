@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-123_restore-reliable-ci.json",
+      "identity": "SEED-123#restore-reliable-ci",
+      "completedAt": "2026-11-11T08:00:17.747Z",
+      "blob": "6ab46348239531550e818d08f460365f50d7791c"
+    },
+    {
       "fileName": "SEED-121_publish-large-notebooks-without-losing-history.json",
       "identity": "SEED-121#publish-large-notebooks-without-losing-history",
       "completedAt": "2026-11-10T13:44:33.000Z",
@@ -462,12 +468,6 @@
       "identity": "SEED-075#story-1",
       "completedAt": "2026-10-12T12:28:02.156Z",
       "blob": "4766391127bf48d51679f45e4818e08631f4c8df"
-    },
-    {
-      "fileName": "SEED-071_removal-proof-and-evidence-recurrence.json",
-      "identity": "SEED-071#removal-proof-and-evidence-recurrence",
-      "completedAt": "2026-10-12T01:42:09.609Z",
-      "blob": "0744f7e042777d7e6f61ac777772c1ac6466810a"
     }
   ],
   "unreadable": []

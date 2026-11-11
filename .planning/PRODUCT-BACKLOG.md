@@ -8,8 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Restore reliable CI](seeds/SEED-123-restore-reliable-ci.md#restore-reliable-ci) — SEED-123#restore-reliable-ci
-
 ## Backlog list
 
 - [Prefer note titles in wiki links](seeds/SEED-122-prefer-note-titles-in-wiki-links.md#prefer-note-titles-in-wiki-links) — SEED-122#prefer-note-titles-in-wiki-links
