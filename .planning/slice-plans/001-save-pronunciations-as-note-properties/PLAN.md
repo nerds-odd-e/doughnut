@@ -353,6 +353,45 @@ Sizing: about ten minutes. The notes left for one-by-one edits share no rule;
 each is one small edit under the same check, so cutting this list further
 would only divide it arbitrarily.
 
+Evidence so far, 2026-11-12, in the clone on branch `conversion`. The slice
+stays open for the owner's decision in G5.
+
+- Commit `81f06fc829000d3736f4af87954a1f0fd54378c9`: 92 notes. 54 had the
+  reading alone on its line in bold, 20 after a word without brackets, 15
+  directly after the HTML tag `<p>`; 貧困 is converted as a first item in
+  brackets; 相当 and 復讐 were edited one by one.
+- `python3 tools/conversion.py check notebook main..conversion` ends with
+  "616 converted so far + 14 candidates still to convert + 120 unchanged =
+  750" and "CHECK PASSED". 多大 shows `「多大」とは…` with
+  `pronunciation: ただい` and keeps `甚大（じんだい）`.
+- The preview is `preview/00-start-here.md`, `01-listing.md` (134 unchanged
+  notes with reasons) and `02-changes.md` (616 changed notes by kind).
+  `tools/verify_preview.py` finds the two lists disjoint and together equal to
+  the 750 notes with a match.
+- Converted: 298 of the first kind, 227 of the second, 91 of the third.
+  Unchanged: 53 several matches, 56 not plain kana, 0 with the property, 11
+  subject of the sentence by the rule, 2 subject of the sentence found by
+  reading (通訳 and 緒の「いとぐち」の意味の広がり), and the 12 notes of G5.
+- Local `main` is still `cc485736`; the clone's tree is clean.
+
+G5, awaiting the owner. Three notes say how the word is read (冷奴,
+角立つの読み方, 省く): without the reading the sentence is broken or says
+something else. Nine notes have a label before the reading (一区切り, 学ぶ,
+一斉, 日にち, 理不尽, 示唆, 経過, 考慮, 都市): removing only the reading leaves
+an empty label, and removing the label changes other text. They are listed
+unchanged with these reasons in `preview/01-listing.md`. The owner decides for
+each group: leave unchanged, or convert and how.
+
+Decisions and learnings:
+
+- The check's comma rule also accepts spacing around a reading that is the
+  first item in a bracket; 貧困 needed it.
+- A defect in the check was corrected: a hyphen had counted as spacing, so a
+  line `--------` counted as blank. The check is now stricter, passes on all
+  four commits, and the listing still prints 750, 641, 56, 53 and 0.
+- `preview/00-start-here.md` is written by hand. Its numbers need an update
+  when a later commit changes them.
+
 ### 7. Publish a ten-note pilot and confirm learning history
 Type: Behavior
 Status: planned
@@ -423,7 +462,7 @@ planning authority; no option was given.
 
 Published on `origin/claude/save-pronunciations-as-note-properties`: slice 1
 as `e9f109c3c2`, slice 2 as `3f43ec8853`, slice 3 as `588f51ccc2`, slice 4 as
-`550401a5dd`. CI observer directory:
+`550401a5dd`, slice 5 as `4e88d3d2ad`. CI observer directory:
 `/tmp/dough-ci-501/watch-gNNSef`.
 
 CI on the story branch: run 43049319481, attempt 1, for `e9f109c3c2` had ten
@@ -431,7 +470,8 @@ failed jobs. Each stopped in its dependency installation after about 50
 minutes with `Temporary failure resolving 'azure.archive.ubuntu.com'` from
 `apt-get`; the following install step was skipped and no test ran. This is a
 runner network failure, not a result about the change, so no repair was made.
-Trunk CI passed at `5d974f8eae` earlier the same day.
+Trunk CI passed at `5d974f8eae` earlier the same day. Run 43053073660,
+attempt 1, for `3f43ec8853` failed the same way in eight jobs.
 
 ## Story obligations
 
@@ -452,6 +492,16 @@ Disposition: no user cost "The owner's existing readings in the 日本語学習 
 
 ### G4. 乗り越す has two line-break tags in a row after conversion
 Reported: slice 4 — "Its reading was alone on a line between two `<br>` lines, so it was converted by the rule and the two `<br>` now follow each other. Removing a `<br>` would touch other text, so the rule cannot do better."
+Story clause: "The body loses the marked reading together with the spacing or the bracket pair that existed only to hold it."
+Disposition: excluded "All other text stays, including readings of other words."
+
+### G5. Twelve candidates stay unchanged for reasons the story does not name
+Reported: slice 6 — "12 candidates are unconverted for two reasons the story does not name"
+Story clause: "A note is converted when its body has exactly one `/…/` reading as Spelling review recognizes it today, that reading is written only in kana, and the note has no `pronunciation` property."
+Disposition: return
+
+### G6. Fifteen converted notes look odd where the reading stood
+Reported: slice 6 — "Changed notes where the result may look odd"
 Story clause: "The body loses the marked reading together with the spacing or the bracket pair that existed only to hold it."
 Disposition: excluded "All other text stays, including readings of other words."
 

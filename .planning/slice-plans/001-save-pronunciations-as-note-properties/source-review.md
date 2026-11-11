@@ -51,15 +51,15 @@ acceptance record.
 | 12b | commitment: An agent, or a script that is not kept, edits the checkout (stated as alternatives). | slice 3 | observed: The script is `conversion.py` in a tools directory outside both repositories; `git status --short` is empty in the clone and in this worktree |
 | 12c | exclusion: No conversion code enters this repository. | slice 8 | |
 | 12d | qualification: The owner chose this on 2026-11-11. | slice 3 | observed: Reason for 12a and 12b; the owner's choice is recorded in the story |
-| 13a | commitment: Before anything is published, the owner gets a preview. | slice 6 | |
-| 13b.1 | commitment: Preview, for each note that would change: its title. | slice 6 | |
-| 13b.2 | commitment: Preview, for each note that would change: the reading. | slice 6 | |
-| 13b.3 | commitment: Preview, for each note that would change: the changed text before and after. | slice 6 | |
-| 13c | commitment: The changing notes are grouped by the kind of change so that similar changes can be checked together. | slice 6 | |
+| 13a | commitment: Before anything is published, the owner gets a preview. | slice 6 | observed: Preview files `00-start-here.md`, `01-listing.md` and `02-changes.md` exist; the clone's local `main` is still `cc485736` and nothing was published |
+| 13b.1 | commitment: Preview, for each note that would change: its title. | slice 6 | observed: `02-changes.md`: each of the 616 entries starts with the note's title and path; `verify_preview.py` finds its paths equal to the 616 changed files |
+| 13b.2 | commitment: Preview, for each note that would change: the reading. | slice 6 | observed: `02-changes.md`: each entry gives the reading and the new property line |
+| 13b.3 | commitment: Preview, for each note that would change: the changed text before and after. | slice 6 | observed: `02-changes.md`: each entry gives the changed text before and after |
+| 13c | commitment: The changing notes are grouped by the kind of change so that similar changes can be checked together. | slice 6 | observed: `02-changes.md`: three kinds of change with nine sub-groups (298, 227 and 91 notes) |
 | 13d.1 | commitment: The preview includes a list of the notes that contain `/…/` but would stay unchanged. | slice 3 | observed: listing `01-listing.md`, section “Notes that stay unchanged”: 120 notes |
 | 13d.2 | commitment: Each note in that list is given with the reason. | slice 3 | observed: listing `01-listing.md`: the unchanged notes are grouped under four reason headings (53, 56, 0 and 11 notes) |
-| 13e | commitment: Git's diff of the checkout shows the exact changes. | slice 6 | |
-| 14a | commitment: A note is converted when all three conditions 14a.1 to 14a.3 hold. | slice 6 | |
+| 13e | commitment: Git's diff of the checkout shows the exact changes. | slice 6 | observed: `git diff --shortstat cc485736 conversion` in the clone: 616 files changed, 987 insertions, 802 deletions |
+| 14a | commitment: A note is converted when all three conditions 14a.1 to 14a.3 hold. |  | G5 |
 | 14a.1 | qualification: Condition: its body has exactly one `/…/` reading as Spelling review recognizes it today. | slice 3 | observed: listing `01-listing.md` at `cc485736`: 750 notes with a match, 53 with several; the recognizer reproduces the story's measurement |
 | 14a.2 | qualification: Condition: that reading is written only in kana. | slice 3 | observed: listing `01-listing.md`: 641 with exactly one match in plain kana, 56 with one match that is not plain kana |
 | 14a.3 | qualification: Condition: the note has no `pronunciation` property. | slice 3 | observed: listing `01-listing.md`: 0 notes with a `pronunciation` property; the fixture note 見本 with the property is listed unchanged |
@@ -67,8 +67,8 @@ acceptance record.
 | 14c.1 | commitment: The body loses the marked reading. | slice 4 | observed: Mechanical check on both commits: the recognizer finds no reading left in any of the 298 notes |
 | 14c.2 | commitment: Together with the reading, the body loses the spacing that existed only to hold it (alternative to 14c.3). | slice 4 | observed: Clone diff of 算術 in `06e5adbf`: `/さんじゅつ/ 算术` becomes `算术`; preview `02-changes.md`: 連濁 loses the reading's line and the empty line after it |
 | 14c.3 | commitment: Or, together with the reading, the body loses the bracket pair that existed only to hold it (alternative to 14c.2). | slice 5 | observed: Mechanical check on `1551a951`: all 226 notes lost only the reading and the wrapper that held it; preview `02-changes.md`: 求める `「求める(/もとめる/)」とは、` becomes `「求める」とは、` |
-| 14d | commitment: All other text stays. | slice 6 | |
-| 14d.1 | commitment: The text that stays includes readings of other words. | slice 6 | |
+| 14d | commitment: All other text stays. | slice 6 | observed: Mechanical check on `cc485736..conversion`: all 616 notes lost only the reading and the wrapper that held it; `verify_preview.py` finds no other removed text |
+| 14d.1 | commitment: The text that stays includes readings of other words. | slice 6 | observed: Clone file 漢字/多/多大.md at `81f06fc8` still holds `甚大（じんだい）` |
 | 15a | commitment: A note stays unchanged and is listed when any one of the cases 15a.1 to 15a.4 applies. | slice 3 | observed: listing `01-listing.md`: 630 candidates and 120 unchanged notes add up to the 750 notes with a match |
 | 15a.1 | commitment: Case: it has several `/…/` matches. | slice 3 | observed: listing `01-listing.md`, reason “several matches”: 53 notes |
 | 15a.2 | commitment: Case: its match is not plain kana. | slice 3 | observed: listing `01-listing.md`, reason “the match is not plain kana”: 56 notes |
@@ -102,7 +102,7 @@ acceptance record.
 | 22b | qualification: Putting the title in its place was considered. It adds text the author did not write, so the rule leaves those notes to the owner. | slice 3 | observed: Reason for 22a; those 11 notes are left to the owner |
 | 23a | exclusion: Deferred: accepting the reading as an answer. | slice 1 | observed: RecallPromptAnswerSpellingControllerTest.savedPronunciationIsNotAnAcceptedAnswer; Note.matchAnswer is not in the slice diff |
 | 23b | exclusion: Deferred: a review that asks for the reading. | slice 1 | observed: Reading of the slice diff: ClozeReplacement, ClozedString, Note and FrontmatterPronunciation only; no question type added |
-| 24 | exclusion: Deferred: recording readings of other words that appear in a note body. | slice 6 | |
+| 24 | exclusion: Deferred: recording readings of other words that appear in a note body. | slice 6 | observed: `verify_preview.py`: all 616 converted notes gained exactly one line, `pronunciation` with the note's own reading |
 | 25a | exclusion: Considered and not chosen for the conversion: a tested temporary script kept in this repository. | slice 8 | |
 | 25b | exclusion: Considered and not chosen for the conversion: a temporary startup migration in production over every notebook, as the numbered-property consolidation did on 2026-10-02. | slice 8 | |
 | 25c | qualification: The second (startup migration) would change other owners' prose without their review. | slice 8 | |
@@ -121,10 +121,10 @@ acceptance record.
 | 28c | example: Expected: its Spelling prompt hides `がんしょく` wherever the body repeats it. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesEveryValueOfAHandAuthoredPronunciationList: stem `[...]（/.../）が悪い。[...]（/.../）を失う。` |
 | 29a | example: Setup: a note has `/じゅわ/` in its body and no `pronunciation` property. | slice 1 | observed: ClozeDescriptionTest `/…/` cases, unchanged and green in the full backend run |
 | 29b | example: Expected: its Spelling prompt hides that reading as it does today. | slice 1 | observed: ClozeDescriptionTest `/…/` cases, unchanged and green in the full backend run |
-| 30a | example: Setup (conversion, reading after the title): the body has `「多大　/ただい/」とは…`. | slice 6 | |
-| 30b | example: Expected: it becomes `「多大」とは…`. | slice 6 | |
-| 30c | example: Expected: the note has `pronunciation: ただい`. | slice 6 | |
-| 30d | example: Expected: the inline `甚大（じんだい）` stays with its explanation. | slice 6 | |
+| 30a | example: Setup (conversion, reading after the title): the body has `「多大　/ただい/」とは…`. | slice 6 | observed: Clone diff of 漢字/多/多大.md: the removed line starts `「多大　/ただい/」とは、` |
+| 30b | example: Expected: it becomes `「多大」とは…`. | slice 6 | observed: Clone diff of 漢字/多/多大.md: the added line starts `「多大」とは、` |
+| 30c | example: Expected: the note has `pronunciation: ただい`. | slice 6 | observed: Clone diff of 漢字/多/多大.md: the frontmatter gains `pronunciation: ただい` |
+| 30d | example: Expected: the inline `甚大（じんだい）` stays with its explanation. | slice 6 | observed: Clone file 漢字/多/多大.md at `81f06fc8`: the line `甚大（じんだい）` with its explanation is unchanged |
 | 30e | example: Expected: the note keeps its memory trackers. | slice 8 | |
 | 30f | example: Expected: the note keeps its recall history. | slice 8 | |
 | 31a | example: Setup (conversion, reading in brackets): the body has `水引（/みずひき/）は、…`. | slice 5 | observed: Clone diff of 文化/水引.md in `1551a951`: the removed line starts `水引（/みずひき/）は、` |
