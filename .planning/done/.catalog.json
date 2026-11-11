@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-122_prefer-note-titles-in-wiki-links.json",
+      "identity": "SEED-122#prefer-note-titles-in-wiki-links",
+      "completedAt": "2026-11-11T09:45:52.459Z",
+      "blob": "e7fdd120dba0a8ebcba1cafffaa42343a9d3547b"
+    },
+    {
       "fileName": "SEED-123_restore-reliable-ci.json",
       "identity": "SEED-123#restore-reliable-ci",
       "completedAt": "2026-11-11T08:00:17.747Z",

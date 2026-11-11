@@ -8,7 +8,5 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Prefer note titles in wiki links](seeds/SEED-122-prefer-note-titles-in-wiki-links.md#prefer-note-titles-in-wiki-links) — SEED-122#prefer-note-titles-in-wiki-links ([plan](slice-plans/001-prefer-note-titles-in-wiki-links/PLAN.md))
-
 ## Backlog list
 
