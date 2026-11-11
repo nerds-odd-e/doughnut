@@ -175,7 +175,7 @@ blank line between the closing fence and the body.
 
 ### 3. List what the conversion would change
 Type: Behavior
-Status: planned
+Status: done
 Proof: Run on the clone at commit `cc485736`, the listing reports 750 notes
 with a match, 641 with exactly one match in plain kana, 56 with one match that
 is not plain kana, 53 with several matches and none with a `pronunciation`
@@ -204,6 +204,35 @@ Implementation brief:
 
 Sizing: one small script and one report; about five minutes. The counts above
 make a wrong recognizer visible at once.
+
+Accepted proof, 2026-11-12: `python3 tools/conversion.py list notebook --rev cc485736`
+printed 750, 641, 56, 53 and 0 on its first run. The clone's accepted head is
+`cc485736fa2cab24e8776bd33a18558a3515e23d`, the commit of the measurement, so
+both runs read the same tree. The listing has 630 candidates and 120 unchanged
+notes: 53 with several matches, 56 not plain kana, 0 with the property, and 11
+whose reading is the subject of its sentence.
+
+Working directory, outside both repositories:
+`/Users/terryyin/doughnut-pronunciation-conversion`, with the clone in
+`notebook` (branch `conversion`, local `main` at the accepted head), the script
+in `tools` and the listing in `preview/01-listing.md`.
+
+Rule for "the reading is the subject of its sentence": before the reading,
+back to the start of the body, a line break or a sentence end, there is only
+spacing, Markdown marks and opening quotes or brackets; after it, past closing
+marks and spaces, comes a particle (とは, って, は, が, も, を, に, の, で, と).
+It selects 三叉路, さっぱり, 熟字訓, 薬味, 魚卵, 厳島, 松島, 土下座, 足利義満,
+飛鳥時代 and 捉える.
+
+Learnings for slices 4 to 8:
+
+- The clone's Git configuration holds the owner's access token. Do not print
+  it.
+- A note is `<folders>/<title>.md`. 744 of the 750 notes have no final line
+  break, so a conversion must not add one. In 553 the body starts with a blank
+  line after the closing fence. There is no CRLF.
+- The clone has no remote named `origin`; publication goes through the CLI.
+- In 45 candidates the reading text also appears elsewhere in the body.
 
 ### 4. Convert readings that stand alone on a line or lead the body
 Type: Behavior
@@ -334,7 +363,25 @@ published base of the first increment. Replanning permission: the existing
 planning authority; no option was given.
 
 Published on `origin/claude/save-pronunciations-as-note-properties`: slice 1
-as `e9f109c3c2`. CI observer directory: `/tmp/dough-ci-501/watch-gNNSef`.
+as `e9f109c3c2`, slice 2 as `3f43ec8853`. CI observer directory:
+`/tmp/dough-ci-501/watch-gNNSef`.
+
+## Story obligations
+
+### G1. About 27 readings with extra characters stay unchanged
+Reported: slice 3 — "about 27 real readings with something extra inside the slashes. They stay unchanged under the rule as written."
+Story clause: "when its match is not plain kana"
+Disposition: excluded "The owner may edit such notes by hand in the checkout, or ask for them one by one, before publishing."
+
+### G2. 音 has three matches, not the two the story names
+Reported: slice 3 — "音 has three matches, not the two the story names. Same reason, same outcome."
+Story clause: "**音** has `/ね/` and `/おん/` (several readings)"
+Disposition: no user cost "The owner's existing readings in the 日本語学習 notebook move into the same property": 音 is listed unchanged under several matches with two or with three matches, and no conversion touches it.
+
+### G3. Two agent-guidance files are among the 750 notes
+Reported: slice 3 — "Two agent-guidance files are among the 750: AGENTS.md and .agents/donut-format.md."
+Story clause: "750 notes have at least one `/…/` match"
+Disposition: no user cost "The owner's existing readings in the 日本語学習 notebook move into the same property": both files are listed unchanged because their matches are not plain kana, so the conversion leaves them as they are.
 
 ## Decisive premises and observations
 

@@ -47,33 +47,33 @@ acceptance record.
 | 10b | qualification: The owner confirmed this on 2026-11-11. | slice 2 | observed: Reason for 10a; the owner's confirmation is recorded in the story |
 | 11a | commitment: Scope limit: Spelling review keeps hiding `/…/` readings written in the note body exactly as it does today. | slice 1 | observed: ClozeDescriptionTest (82 unchanged cases) and the 8 earlier RecallPromptSpellingStemMaskingControllerTest cases green; RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesBothASavedPronunciationAndASlashReadingInTheBody |
 | 11b | qualification: Notes that are not converted depend on it. | slice 1 | observed: Reason for 11a; the `/…/` pass in ClozeReplacement.maskPronunciationsAndTitles is unchanged |
-| 12a | commitment: The conversion runs in the owner's own checkout of the notebook. | slice 3 | |
-| 12b | commitment: An agent, or a script that is not kept, edits the checkout (stated as alternatives). | slice 3 | |
+| 12a | commitment: The conversion runs in the owner's own checkout of the notebook. | slice 3 | observed: `donut notebook clone 15` with the owner's CLI login on the owner's machine printed “Cloned notebook 15”; the clone is on branch `conversion` at `cc485736` |
+| 12b | commitment: An agent, or a script that is not kept, edits the checkout (stated as alternatives). | slice 3 | observed: The script is `conversion.py` in a tools directory outside both repositories; `git status --short` is empty in the clone and in this worktree |
 | 12c | exclusion: No conversion code enters this repository. | slice 8 | |
-| 12d | qualification: The owner chose this on 2026-11-11. | slice 3 | |
+| 12d | qualification: The owner chose this on 2026-11-11. | slice 3 | observed: Reason for 12a and 12b; the owner's choice is recorded in the story |
 | 13a | commitment: Before anything is published, the owner gets a preview. | slice 6 | |
 | 13b.1 | commitment: Preview, for each note that would change: its title. | slice 6 | |
 | 13b.2 | commitment: Preview, for each note that would change: the reading. | slice 6 | |
 | 13b.3 | commitment: Preview, for each note that would change: the changed text before and after. | slice 6 | |
 | 13c | commitment: The changing notes are grouped by the kind of change so that similar changes can be checked together. | slice 6 | |
-| 13d.1 | commitment: The preview includes a list of the notes that contain `/…/` but would stay unchanged. | slice 3 | |
-| 13d.2 | commitment: Each note in that list is given with the reason. | slice 3 | |
+| 13d.1 | commitment: The preview includes a list of the notes that contain `/…/` but would stay unchanged. | slice 3 | observed: listing `01-listing.md`, section “Notes that stay unchanged”: 120 notes |
+| 13d.2 | commitment: Each note in that list is given with the reason. | slice 3 | observed: listing `01-listing.md`: the unchanged notes are grouped under four reason headings (53, 56, 0 and 11 notes) |
 | 13e | commitment: Git's diff of the checkout shows the exact changes. | slice 6 | |
 | 14a | commitment: A note is converted when all three conditions 14a.1 to 14a.3 hold. | slice 6 | |
-| 14a.1 | qualification: Condition: its body has exactly one `/…/` reading as Spelling review recognizes it today. | slice 3 | |
-| 14a.2 | qualification: Condition: that reading is written only in kana. | slice 3 | |
-| 14a.3 | qualification: Condition: the note has no `pronunciation` property. | slice 3 | |
+| 14a.1 | qualification: Condition: its body has exactly one `/…/` reading as Spelling review recognizes it today. | slice 3 | observed: listing `01-listing.md` at `cc485736`: 750 notes with a match, 53 with several; the recognizer reproduces the story's measurement |
+| 14a.2 | qualification: Condition: that reading is written only in kana. | slice 3 | observed: listing `01-listing.md`: 641 with exactly one match in plain kana, 56 with one match that is not plain kana |
+| 14a.3 | qualification: Condition: the note has no `pronunciation` property. | slice 3 | observed: listing `01-listing.md`: 0 notes with a `pronunciation` property; the fixture note 見本 with the property is listed unchanged |
 | 14b | commitment: The reading becomes the `pronunciation` value. | slice 4 | |
 | 14c.1 | commitment: The body loses the marked reading. | slice 4 | |
 | 14c.2 | commitment: Together with the reading, the body loses the spacing that existed only to hold it (alternative to 14c.3). | slice 4 | |
 | 14c.3 | commitment: Or, together with the reading, the body loses the bracket pair that existed only to hold it (alternative to 14c.2). | slice 5 | |
 | 14d | commitment: All other text stays. | slice 6 | |
 | 14d.1 | commitment: The text that stays includes readings of other words. | slice 6 | |
-| 15a | commitment: A note stays unchanged and is listed when any one of the cases 15a.1 to 15a.4 applies. | slice 3 | |
-| 15a.1 | commitment: Case: it has several `/…/` matches. | slice 3 | |
-| 15a.2 | commitment: Case: its match is not plain kana. | slice 3 | |
-| 15a.3 | commitment: Case: it already has a `pronunciation` property. | slice 3 | |
-| 15a.4 | commitment: Case: removing the reading would leave a sentence without its subject. | slice 3 | |
+| 15a | commitment: A note stays unchanged and is listed when any one of the cases 15a.1 to 15a.4 applies. | slice 3 | observed: listing `01-listing.md`: 630 candidates and 120 unchanged notes add up to the 750 notes with a match |
+| 15a.1 | commitment: Case: it has several `/…/` matches. | slice 3 | observed: listing `01-listing.md`, reason “several matches”: 53 notes |
+| 15a.2 | commitment: Case: its match is not plain kana. | slice 3 | observed: listing `01-listing.md`, reason “the match is not plain kana”: 56 notes |
+| 15a.3 | commitment: Case: it already has a `pronunciation` property. | slice 3 | observed: listing `01-listing.md`, reason “the note already has a pronunciation property”: 0 notes; fixture note 見本 is listed with this reason |
+| 15a.4 | commitment: Case: removing the reading would leave a sentence without its subject. | slice 3 | observed: listing `01-listing.md`, reason “the reading is the subject of its sentence”: 11 notes, with the rule stated in the plan |
 | 15b.1 | commitment: The owner may edit such notes by hand in the checkout before publishing (alternative to 15b.2). | slice 7 | |
 | 15b.2 | commitment: Or the owner may ask for them one by one, before publishing (alternative to 15b.1). | slice 7 | |
 | 16a | commitment: The owner publishes with `donut notebook publish`, the normal local publication. | slice 7 | |
@@ -82,12 +82,12 @@ acceptance record.
 | 17a.1 | commitment: Their memory trackers stay attached. | slice 8 | |
 | 17a.2 | commitment: Their recall history stays attached. | slice 8 | |
 | 17b | commitment: This is checked in production on converted notes after publishing. | slice 8 | |
-| 18a | qualification: Measurement basis: measured on 2026-11-11 from 日本語学習's accepted Git history at commit `cc485736`, with the text rule Spelling review applies today, notes outside trash. | slice 3 | |
-| 18b | qualification: 750 notes have at least one `/…/` match. | slice 3 | |
-| 18c | qualification: 641 have exactly one match in plain kana, which makes them the candidates for conversion. | slice 3 | |
-| 18d | qualification: 56 have one match that is not plain kana. | slice 3 | |
-| 18e | qualification: 53 have several matches. | slice 3 | |
-| 18f | qualification: No note has a `pronunciation` property. | slice 3 | |
+| 18a | qualification: Measurement basis: measured on 2026-11-11 from 日本語学習's accepted Git history at commit `cc485736`, with the text rule Spelling review applies today, notes outside trash. | slice 3 | observed: Listing run with `--rev cc485736`, notes under `_trash/` skipped, printed “Read from: cc485736fa2c…” |
+| 18b | qualification: 750 notes have at least one `/…/` match. | slice 3 | observed: Same run: 750 notes with at least one match |
+| 18c | qualification: 641 have exactly one match in plain kana, which makes them the candidates for conversion. | slice 3 | observed: Same run: 641 with exactly one match in plain kana |
+| 18d | qualification: 56 have one match that is not plain kana. | slice 3 | observed: Same run: 56 with one match that is not plain kana |
+| 18e | qualification: 53 have several matches. | slice 3 | observed: Same run: 53 with several matches |
+| 18f | qualification: No note has a `pronunciation` property. | slice 3 | observed: Same run: 0 with a `pronunciation` property |
 | 18g | qualification: As ordinary properties, the converted readings add up to 641 units to the owner's assimilation sequence. | slice 8 | |
 | 19 | qualification: Deferred items are not delivered here, and not prevented. | slice 8 | |
 | 20a | exclusion: Deferred: converting other notebooks. | slice 8 | |
@@ -95,11 +95,11 @@ acceptance record.
 | 20c | exclusion: Notebooks of other owners are not converted and were not counted, by the owner's decision. | slice 8 | |
 | 20d | commitment: Their `/…/` readings stay hidden as today. | slice 1 | observed: The `/…/` pass in ClozeReplacement.maskPronunciationsAndTitles is unchanged and applies to every note; ClozeDescriptionTest green |
 | 21a | exclusion: Deferred: removing Spelling review's handling of `/…/` in the note body. | slice 1 | observed: ClozeReplacement keeps its PRONUNCIATION matcher; ClozeDescriptionTest unchanged and green |
-| 21b | qualification: In 日本語学習 about 90 of the 750 notes have a match that is not a plain kana reading. | slice 3 | |
-| 21c | qualification: The sampled ones are parts of web addresses written as plain text and slash-separated alternatives or translation pairs, which today's rule hides as if they were readings. | slice 3 | |
+| 21b | qualification: In 日本語学習 about 90 of the 750 notes have a match that is not a plain kana reading. | slice 3 | observed: Same run: 91 notes with at least one match that is not plain kana |
+| 21c | qualification: The sampled ones are parts of web addresses written as plain text and slash-separated alternatives or translation pairs, which today's rule hides as if they were readings. | slice 3 | observed: listing `01-listing.md`, reason “the match is not plain kana”: about 17 web address parts, 2 file path parts, about 10 alternatives or translation pairs, and about 27 readings with extra characters (G1) |
 | 21d | qualification: Removal needs every notebook that relies on the rule to be converted first. | slice 1 | observed: Reason for 21a; nothing was removed |
-| 22a | exclusion: Deferred: rewriting by rule a sentence whose subject is the reading itself, for example `/あしかが よしみつ/は、室町時代…`, which about 11 of the candidates do. | slice 3 | |
-| 22b | qualification: Putting the title in its place was considered. It adds text the author did not write, so the rule leaves those notes to the owner. | slice 3 | |
+| 22a | exclusion: Deferred: rewriting by rule a sentence whose subject is the reading itself, for example `/あしかが よしみつ/は、室町時代…`, which about 11 of the candidates do. | slice 3 | observed: listing `01-listing.md`: the 11 notes whose reading is the subject of its sentence are listed unchanged; no rule rewrites them |
+| 22b | qualification: Putting the title in its place was considered. It adds text the author did not write, so the rule leaves those notes to the owner. | slice 3 | observed: Reason for 22a; those 11 notes are left to the owner |
 | 23a | exclusion: Deferred: accepting the reading as an answer. | slice 1 | observed: RecallPromptAnswerSpellingControllerTest.savedPronunciationIsNotAnAcceptedAnswer; Note.matchAnswer is not in the slice diff |
 | 23b | exclusion: Deferred: a review that asks for the reading. | slice 1 | observed: Reading of the slice diff: ClozeReplacement, ClozedString, Note and FrontmatterPronunciation only; no question type added |
 | 24 | exclusion: Deferred: recording readings of other words that appear in a note body. | slice 6 | |
@@ -130,10 +130,10 @@ acceptance record.
 | 31a | example: Setup (conversion, reading in brackets): the body has `水引（/みずひき/）は、…`. | slice 5 | |
 | 31b | example: Expected: it becomes `水引は、…`. | slice 5 | |
 | 31c | example: Expected: the note has `pronunciation: みずひき`. | slice 5 | |
-| 32a | example: Left unchanged and listed: 音 has `/ね/` and `/おん/` (several readings). | slice 3 | |
-| 32b | example: Left unchanged and listed: コツ has `釣りのコツ/钓鱼的秘诀。 コツを覚える/学会窍门` (not a reading). | slice 3 | |
-| 32c | example: Left unchanged and listed: 足利義満 begins `/あしかが よしみつ/は、…` (removing the reading would leave the sentence without its subject). | slice 3 | |
-| 32d | example: Left unchanged and listed: a note that already has a `pronunciation` property. | slice 3 | |
+| 32a | example: Left unchanged and listed: 音 has `/ね/` and `/おん/` (several readings). | slice 3 | observed: listing `01-listing.md`: 音 is under “several matches” with `/おと/`, `/ね/` and `/おん/` (G2) |
+| 32b | example: Left unchanged and listed: コツ has `釣りのコツ/钓鱼的秘诀。 コツを覚える/学会窍门` (not a reading). | slice 3 | observed: listing `01-listing.md`: コツ is under “the match is not plain kana” with `/钓鱼的秘诀。 　 コツを覚える/` |
+| 32c | example: Left unchanged and listed: 足利義満 begins `/あしかが よしみつ/は、…` (removing the reading would leave the sentence without its subject). | slice 3 | observed: listing `01-listing.md`: 足利義満 is under “the reading is the subject of its sentence”, sentence start `/あしかが よしみつ/は、` |
+| 32d | example: Left unchanged and listed: a note that already has a `pronunciation` property. | slice 3 | observed: Listing run on the fixture note 見本 with `pronunciation: みほん`: “1 unchanged: the note already has a pronunciation property” |
 | 33a | commitment: UI: `pronunciation` appears in the existing key choice list of Add property. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property” and “add form lists every available preset once the typed text is cleared”: the Add property list includes `pronunciation` |
 | 33b | commitment: UI: `pronunciation` appears in the existing key choice list of a property row's key field. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “existing row lists every available preset on focus and narrows on typing” and propertyRowEditing.spec.ts “omits another row's list preset while retaining the current row's own preset” |
 | 33c | exclusion: UI: it adds no new control. | slice 2 | observed: Reading of the slice diff: one line in frontend/src/utils/noteContentPropertyKeyPresets.ts; no component changed |
