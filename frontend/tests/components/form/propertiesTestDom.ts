@@ -163,6 +163,19 @@ function presetOptionEls(): HTMLElement[] {
   )
 }
 
+/** Key choices of an ordinary note when no property occupies a preset slot. */
+export const ALL_NOTE_PRESET_KEYS: readonly string[] = [
+  "aliases",
+  "overlaps",
+  "note_level",
+  "image",
+  "wikidata_id",
+  "url",
+  "example of",
+  "pronunciation",
+  "question_generation_instruction",
+]
+
 export function expectPresetOptions(expectedKeys: readonly string[]) {
   expect(presetOptionEls().map((o) => o.dataset.presetKey)).toEqual(
     expect.arrayContaining([...expectedKeys])

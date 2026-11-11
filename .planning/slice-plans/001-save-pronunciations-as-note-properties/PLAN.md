@@ -139,7 +139,7 @@ Learnings:
 
 ### 2. Add property offers pronunciation
 Type: Behavior
-Status: planned
+Status: done
 Proof: The mounted-editor observation in the table, the updated expected lists,
 both frontend typechecks, and the property layout feature.
 
@@ -163,6 +163,15 @@ Sizing: one production line, list updates in four spec files, one added case
 and a short documentation edit. About five minutes plus a 31-second focused
 run, two typechecks and one feature run of about two and a half minutes; that
 feature run is the focused-test wait.
+
+Accepted proof, 2026-11-11, on the implementation diff: the focused frontend
+run gave 150 files and 1,028 tests, none failed; both typechecks reported
+nothing; `note_property_layout.feature` gave 12 passing. The observing cases
+are named per commitment in the [source review](source-review.md).
+
+Learning: **Add property** on a note without properties emits
+`---\npronunciation: ただい\n---\n` directly followed by the body, with no
+blank line between the closing fence and the body.
 
 ### 3. List what the conversion would change
 Type: Behavior
@@ -323,6 +332,9 @@ Story Branch Mode. Execution checkout
 `main`. The claim `15e3e95d5e` was accepted on `main` on 2026-11-11 and is the
 published base of the first increment. Replanning permission: the existing
 planning authority; no option was given.
+
+Published on `origin/claude/save-pronunciations-as-note-properties`: slice 1
+as `e9f109c3c2`. CI observer directory: `/tmp/dough-ci-501/watch-gNNSef`.
 
 ## Decisive premises and observations
 

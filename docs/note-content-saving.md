@@ -157,10 +157,14 @@ changes only the key text. The panel matches keys exactly, including case.
 Removing the last property drops the block.
 
 Key presets use canonical base names and never generate numbered alternatives.
-Add property keeps an occupied list-capable key, such as `url` or `example of`,
-available: accepting another value promotes its scalar to a list or appends to
-its list in order. Matching is exact; an authored `example of 2` remains a
-separate property when `example of` is selected.
+Add property keeps an occupied list-capable key, `url`, `example of` or
+`pronunciation`, available: accepting another value promotes its scalar to a
+list or appends to its list in order. Matching is exact; an authored
+`example of 2` remains a separate property when `example of` is selected.
+
+`pronunciation` records how the note's title is read. It is an ordinary
+property with plain-text values. Spelling review hides each of its values
+wherever the note body repeats it.
 
 Occupied scalar-only and singleton preset slots are omitted. These include
 `image`, `wikidata_id`, `question_generation_instruction`, readme `title_pattern`,

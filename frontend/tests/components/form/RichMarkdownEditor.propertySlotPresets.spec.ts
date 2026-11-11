@@ -1,7 +1,11 @@
 import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, it, vi } from "vitest"
-import { expectPresetOptions, propertyInputEl } from "./propertiesTestDom"
+import {
+  ALL_NOTE_PRESET_KEYS,
+  expectPresetOptions,
+  propertyInputEl,
+} from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor occupied preset slots", () => {
@@ -23,14 +27,14 @@ describe("RichMarkdownEditor occupied preset slots", () => {
       frontmatter:
         'aliases: color\noverlaps: "[[Other]]"\nnote_level: 2\nimage: /x.png\nwikidata_id: Q1\nquestion_generation_instruction: Recall',
       isReadmeContext: false,
-      options: ["url", "example of"],
+      options: ["url", "example of", "pronunciation"],
     },
     {
       name: "legacy aliases and numbered note slots",
       frontmatter:
         'aliases 2: color\noverlaps 2: "[[Other]]"\nnoteLevel 2: 2\nimage 2: /x.png\nwikidataId 2: Q1\nquestionGenerationInstruction 2: Recall',
       isReadmeContext: false,
-      options: ["url", "example of"],
+      options: ["url", "example of", "pronunciation"],
     },
     {
       name: "readme title-pattern alias",
@@ -41,6 +45,7 @@ describe("RichMarkdownEditor occupied preset slots", () => {
         "wikidata_id",
         "url",
         "example of",
+        "pronunciation",
         "question_generation_instruction",
       ],
     },
@@ -53,6 +58,7 @@ describe("RichMarkdownEditor occupied preset slots", () => {
         "wikidata_id",
         "url",
         "example of",
+        "pronunciation",
         "question_generation_instruction",
       ],
     },
@@ -75,15 +81,6 @@ describe("RichMarkdownEditor occupied preset slots", () => {
     })
     propertyInputEl('[data-testid="rich-note-property-row-key-input"]').focus()
     await flushPromises()
-    expectPresetOptions([
-      "aliases",
-      "overlaps",
-      "note_level",
-      "image",
-      "wikidata_id",
-      "url",
-      "example of",
-      "question_generation_instruction",
-    ])
+    expectPresetOptions(ALL_NOTE_PRESET_KEYS)
   })
 })

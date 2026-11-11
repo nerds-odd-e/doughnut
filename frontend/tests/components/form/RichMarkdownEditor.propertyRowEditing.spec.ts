@@ -2,6 +2,7 @@ import { noteShowLocation } from "@/routes/noteShowLocation"
 import { README_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
 import { flushPromises } from "@vue/test-utils"
 import {
+  ALL_NOTE_PRESET_KEYS,
   attemptRenamePropertyKey,
   expectPresetOptions,
   expandPropertyPanel,
@@ -76,30 +77,13 @@ describe("RichMarkdownEditor property row editing", () => {
       `${propertyRowSelector("topic")} [data-testid="rich-note-property-row-key-input"]`
     ).focus()
     await flushPromises()
-    expectPresetOptions([
-      "aliases",
-      "overlaps",
-      "note_level",
-      "image",
-      "wikidata_id",
-      "example of",
-      "question_generation_instruction",
-    ])
+    expectPresetOptions(ALL_NOTE_PRESET_KEYS.filter((key) => key !== "url"))
 
     propertyInputEl(
       `${propertyRowSelector("url")} [data-testid="rich-note-property-row-key-input"]`
     ).focus()
     await flushPromises()
-    expectPresetOptions([
-      "aliases",
-      "overlaps",
-      "note_level",
-      "image",
-      "wikidata_id",
-      "url",
-      "example of",
-      "question_generation_instruction",
-    ])
+    expectPresetOptions(ALL_NOTE_PRESET_KEYS)
   })
 
   it("rejects manually renaming topic to an occupied list key without emitting a save", async () => {

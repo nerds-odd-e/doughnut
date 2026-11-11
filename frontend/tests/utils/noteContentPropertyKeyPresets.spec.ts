@@ -71,6 +71,7 @@ describe("richModeKeyDropdownPresetKeys", () => {
       "wikidata_id",
       "url",
       "example of",
+      "pronunciation",
       "question_generation_instruction",
     ])
   })
@@ -81,6 +82,7 @@ describe("richModeKeyDropdownPresetKeys", () => {
       "wikidata_id",
       "url",
       "example of",
+      "pronunciation",
       "question_generation_instruction",
       "title_pattern",
     ])

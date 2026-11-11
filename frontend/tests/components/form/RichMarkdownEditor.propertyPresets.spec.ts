@@ -8,6 +8,7 @@ import {
 } from "@/utils/noteContentFrontmatter"
 import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
 import {
+  ALL_NOTE_PRESET_KEYS,
   expectPresetOptions,
   selectPresetKey,
   propertyInputEl,
@@ -19,6 +20,7 @@ const INSERT_KEY_INPUT =
   '[data-property-draft="true"] [data-testid="rich-note-property-row-key-input"]'
 const ROW_KEY_INPUT = '[data-testid="rich-note-property-row-key-input"]'
 const ROW_VALUE_INPUT = '[data-testid="rich-note-property-row-value-input"]'
+const INSERT_VALUE_INPUT = `[data-property-draft="true"] ${ROW_VALUE_INPUT}`
 
 describe("RichMarkdownEditor property presets", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -34,6 +36,19 @@ describe("RichMarkdownEditor property presets", () => {
   })
 
   describe("key presets", () => {
+    async function addPropertyFromPreset(key: string, value: string) {
+      await selectPresetKey(key)
+      await h.setPropertyValueField(
+        h.getWrapper().find(INSERT_VALUE_INPUT),
+        value
+      )
+      await h
+        .getWrapper()
+        .find('[data-testid="rich-note-property-row-add"]')
+        .trigger("click")
+      await flushPromises()
+    }
+
     it.each([
       {
         name: "promotes an occupied scalar to an ordered list",
@@ -76,34 +91,28 @@ describe("RichMarkdownEditor property presets", () => {
         })
         await h.openAddProperty()
         await advanceAnimationFrame()
-        expectPresetOptions([
-          "aliases",
-          "overlaps",
-          "note_level",
-          "image",
-          "wikidata_id",
-          "url",
-          "example of",
-          "question_generation_instruction",
-        ])
-        await selectPresetKey(key)
-        const value = h
-          .getWrapper()
-          .find(
-            '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
-          )
-        await h.setPropertyValueField(value, added)
-        await h
-          .getWrapper()
-          .find('[data-testid="rich-note-property-row-add"]')
-          .trigger("click")
-        await flushPromises()
+        expectPresetOptions(ALL_NOTE_PRESET_KEYS)
+        await addPropertyFromPreset(key, added)
         const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
         expect(parsed.ok).toBe(true)
         if (!parsed.ok) return
         expect(parsed.properties).toEqual(properties)
       }
     )
+
+    it("adds a pronunciation chosen from the presets as an ordinary property", async () => {
+      await h.mountEditor("数や量が非常に大きいこと。", { attachToBody: true })
+      await h.openAddProperty()
+      await advanceAnimationFrame()
+      expect(propertyInputEl(INSERT_KEY_INPUT).value).toBe("")
+      expectPresetOptions(ALL_NOTE_PRESET_KEYS)
+
+      await addPropertyFromPreset("pronunciation", "ただい")
+
+      expect(h.lastEmittedMarkdown()).toBe(
+        "---\npronunciation: ただい\n---\n数や量が非常に大きいこと。"
+      )
+    })
 
     it("offers available presets and sets keys for existing and inserted rows", async () => {
       await h.mountEditor(
@@ -115,19 +124,14 @@ image: /x.png
 # Body`,
         { attachToBody: true }
       )
+      const presetKeysWithoutImage = ALL_NOTE_PRESET_KEYS.filter(
+        (key) => key !== "image"
+      )
       const existingKeyInput = propertyInputEl(ROW_KEY_INPUT)
       existingKeyInput.focus()
       await nextTick()
       await flushPromises()
-      expectPresetOptions([
-        "aliases",
-        "overlaps",
-        "note_level",
-        "wikidata_id",
-        "url",
-        "example of",
-        "question_generation_instruction",
-      ])
+      expectPresetOptions(presetKeysWithoutImage)
 
       await selectPresetKey("url")
       expect(existingKeyInput.value).toBe("url")
@@ -135,15 +139,7 @@ image: /x.png
 
       await h.openAddProperty()
       await advanceAnimationFrame()
-      expectPresetOptions([
-        "aliases",
-        "overlaps",
-        "note_level",
-        "wikidata_id",
-        "url",
-        "example of",
-        "question_generation_instruction",
-      ])
+      expectPresetOptions(presetKeysWithoutImage)
       await selectPresetKey("wikidata_id")
       expect(propertyInputEl(INSERT_KEY_INPUT).value).toBe("wikidata_id")
       expectPropertyInputFocused(
@@ -179,19 +175,9 @@ image: /x.png
 
     it("add form lists every available preset once the typed text is cleared", async () => {
       await openAddFormKey()
-      const all = [
-        "aliases",
-        "overlaps",
-        "note_level",
-        "image",
-        "wikidata_id",
-        "url",
-        "example of",
-        "question_generation_instruction",
-      ]
       await typeKey(INSERT_KEY_INPUT, "ur")
       await typeKey(INSERT_KEY_INPUT, "")
-      expectPresetOptions(all)
+      expectPresetOptions(ALL_NOTE_PRESET_KEYS)
     })
 
     it("existing row lists every available preset on focus and narrows on typing", async () => {
@@ -200,16 +186,7 @@ image: /x.png
       })
       propertyInputEl(ROW_KEY_INPUT).focus()
       await flushPromises()
-      expectPresetOptions([
-        "aliases",
-        "overlaps",
-        "note_level",
-        "image",
-        "wikidata_id",
-        "url",
-        "example of",
-        "question_generation_instruction",
-      ])
+      expectPresetOptions(ALL_NOTE_PRESET_KEYS)
 
       await typeKey(ROW_KEY_INPUT, "ur")
       expectPresetOptions(["url"])

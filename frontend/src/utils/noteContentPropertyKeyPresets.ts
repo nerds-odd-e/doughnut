@@ -23,6 +23,7 @@ export const RICH_MODE_PRESET_PROPERTY_KEYS = [
   "wikidata_id",
   "url",
   "example of",
+  "pronunciation",
   "question_generation_instruction",
 ] as const
 

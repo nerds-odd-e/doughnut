@@ -18,16 +18,16 @@ acceptance record.
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | commitment: Goal: a language learner records how a note's title is read in a `pronunciation` property instead of marking it inside the note text. | slice 2 | |
+| 1 | commitment: Goal: a language learner records how a note's title is read in a `pronunciation` property instead of marking it inside the note text. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: the emitted Markdown is `---\npronunciation: ただい\n---\n数や量が非常に大きいこと。` |
 | 2 | commitment: Goal: Spelling review still never shows that reading while it asks for the title. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesSavedPronunciationWhereTheBodyRepeatsIt: the stem shows `[...]（/.../）` for 多大（ただい） |
 | 3 | commitment: Goal: the owner's existing readings in the 日本語学習 notebook move into the same property. | slice 8 | |
 | 4 | commitment: Goal: those notes keep their learning history. | slice 8 | |
 | 5 | qualification: This serves the near-future direction of better note quality: the reading becomes named data, where today it is a `/…/` marking in prose that Spelling review has to recognize by pattern. | slice 8 | |
-| 6a | commitment: When a learner edits an ordinary note, Add property lists `pronunciation` among its key choices. | slice 2 | |
-| 6b | commitment: No choice is preselected. | slice 2 | |
-| 6c | commitment: No note receives the property unless someone adds it. | slice 2 | |
-| 7a | commitment: Choosing it adds an ordinary YAML property, for example `pronunciation: ただい`. | slice 2 | |
-| 7b | commitment: The value is plain text. | slice 2 | |
+| 6a | commitment: When a learner edits an ordinary note, Add property lists `pronunciation` among its key choices. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: the listed choices on an ordinary note include `pronunciation` |
+| 6b | commitment: No choice is preselected. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: the draft key input is empty when Add property opens |
+| 6c | commitment: No note receives the property unless someone adds it. | slice 2 | observed: Reading of the story diff: `pronunciation` occurs in frontend/src only in the key choice list; nothing writes it without the learner's Add |
+| 7a | commitment: Choosing it adds an ordinary YAML property, for example `pronunciation: ただい`. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: choosing the key and adding ただい emits `pronunciation: ただい` inside the frontmatter |
+| 7b | commitment: The value is plain text. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: the value is stored as typed, unquoted |
 | 7c | commitment: As with other ordinary properties, a YAML list holds several readings. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesEveryValueOfAHandAuthoredPronunciationList and …HidesALongerSavedPronunciationBeforeAShorterOneItStartsWith: both list values hidden |
 | 7d.1 | commitment: A property typed by hand behaves the same as one added through Add property. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesEveryValueOfAHandAuthoredPronunciationList: a block list typed as YAML text is hidden like a scalar |
 | 7d.2 | commitment: A property received through Git publication behaves the same as one added through Add property. | slice 1 | observed: Note.createMaskedContentForRecall passes only getContent() to FrontmatterPronunciation.fromNoteContent; no code path sees where the content came from |
@@ -39,12 +39,12 @@ acceptance record.
 | 9a.3 | commitment: Accepted form: its aliases. | slice 1 | observed: RecallPromptAnswerSpellingControllerTest.answerOneOfTheFrontmatterAliases, unchanged and green |
 | 9b | commitment: Being a `pronunciation` value does not make a text an accepted answer. | slice 1 | observed: RecallPromptAnswerSpellingControllerTest.savedPronunciationIsNotAnAcceptedAnswer: ただい is incorrect on a note with the property |
 | 9c | qualification: Spelling review trains the written form, and accepting the reading would pass a learner who did not recall it. | slice 1 | observed: Reason for 9b; observed with 9b in RecallPromptAnswerSpellingControllerTest.savedPronunciationIsNotAnAcceptedAnswer |
-| 10a | commitment: `pronunciation` is otherwise an ordinary property. | slice 2 | |
-| 10a.1 | commitment: It is shown with the note's other properties. | slice 2 | |
-| 10a.2 | commitment: It is edited with the note's other properties. | slice 2 | |
-| 10a.3 | commitment: It is published in the note's frontmatter. | slice 2 | |
-| 10a.4 | commitment: It is offered in the assimilation sequence as its own unit, as every ordinary property is. | slice 2 | |
-| 10b | qualification: The owner confirmed this on 2026-11-11. | slice 2 | |
+| 10a | commitment: `pronunciation` is otherwise an ordinary property. | slice 2 | observed: Reading of the story diff: PropertyKeyNaming and frontend/src/utils/noteContentPropertyKeys.ts are unchanged; no key-specific rule exists |
+| 10a.1 | commitment: It is shown with the note's other properties. | slice 2 | observed: No key-specific display code exists; RichMarkdownEditor.readOnlyProperties.spec.ts and propertyEntry.spec.ts hold for every ordinary key and pass |
+| 10a.2 | commitment: It is edited with the note's other properties. | slice 2 | observed: No key-specific editing code exists; RichMarkdownEditor.propertyRowEditing.spec.ts holds for every ordinary key and passes; its row key field lists `pronunciation` |
+| 10a.3 | commitment: It is published in the note's frontmatter. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: the property is emitted inside the note's frontmatter fence, the content that Git publication carries |
+| 10a.4 | commitment: It is offered in the assimilation sequence as its own unit, as every ordinary property is. | slice 2 | observed: Reading of the story diff: PropertyKeyNaming and the frontend structural-key lists are unchanged, so the key is an ordinary property unit |
+| 10b | qualification: The owner confirmed this on 2026-11-11. | slice 2 | observed: Reason for 10a; the owner's confirmation is recorded in the story |
 | 11a | commitment: Scope limit: Spelling review keeps hiding `/…/` readings written in the note body exactly as it does today. | slice 1 | observed: ClozeDescriptionTest (82 unchanged cases) and the 8 earlier RecallPromptSpellingStemMaskingControllerTest cases green; RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesBothASavedPronunciationAndASlashReadingInTheBody |
 | 11b | qualification: Notes that are not converted depend on it. | slice 1 | observed: Reason for 11a; the `/…/` pass in ClozeReplacement.maskPronunciationsAndTitles is unchanged |
 | 12a | commitment: The conversion runs in the owner's own checkout of the notebook. | slice 3 | |
@@ -106,11 +106,11 @@ acceptance record.
 | 25a | exclusion: Considered and not chosen for the conversion: a tested temporary script kept in this repository. | slice 8 | |
 | 25b | exclusion: Considered and not chosen for the conversion: a temporary startup migration in production over every notebook, as the numbered-property consolidation did on 2026-10-02. | slice 8 | |
 | 25c | qualification: The second (startup migration) would change other owners' prose without their review. | slice 8 | |
-| 26a | example: Trigger: a learner edits the note 多大 and opens Add property. | slice 2 | |
-| 26b | example: Expected: they see `pronunciation` among the key choices. | slice 2 | |
-| 26c | example: Expected: none is preselected. | slice 2 | |
-| 26d | example: Trigger: they choose it, enter `ただい`, and add it. | slice 2 | |
-| 26e | example: Expected: the note now stores `pronunciation: ただい`. | slice 2 | |
+| 26a | example: Trigger: a learner edits the note 多大 and opens Add property. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: Add property opened on an ordinary note shows an empty key and `pronunciation` among the choices |
+| 26b | example: Expected: they see `pronunciation` among the key choices. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: Add property opened on an ordinary note shows an empty key and `pronunciation` among the choices |
+| 26c | example: Expected: none is preselected. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: Add property opened on an ordinary note shows an empty key and `pronunciation` among the choices |
+| 26d | example: Trigger: they choose it, enter `ただい`, and add it. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: selecting it, entering ただい and clicking Add emits `pronunciation: ただい` |
+| 26e | example: Expected: the note now stores `pronunciation: ただい`. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: selecting it, entering ただい and clicking Add emits `pronunciation: ただい` |
 | 27a | example: Setup: 多大 has `pronunciation: ただい` and the body `数や量が非常に大きいこと。「多大（ただい）なるご迷惑」`. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesSavedPronunciationWhereTheBodyRepeatsIt: this content, stem `数や量が非常に大きいこと。「[...]（/.../）なるご迷惑」` |
 | 27b | example: Expected: its Spelling prompt hides 多大. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesSavedPronunciationWhereTheBodyRepeatsIt: this content, stem `数や量が非常に大きいこと。「[...]（/.../）なるご迷惑」` |
 | 27c | example: Expected: its Spelling prompt hides ただい. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesSavedPronunciationWhereTheBodyRepeatsIt: this content, stem `数や量が非常に大きいこと。「[...]（/.../）なるご迷惑」` |
@@ -134,9 +134,9 @@ acceptance record.
 | 32b | example: Left unchanged and listed: コツ has `釣りのコツ/钓鱼的秘诀。 コツを覚える/学会窍门` (not a reading). | slice 3 | |
 | 32c | example: Left unchanged and listed: 足利義満 begins `/あしかが よしみつ/は、…` (removing the reading would leave the sentence without its subject). | slice 3 | |
 | 32d | example: Left unchanged and listed: a note that already has a `pronunciation` property. | slice 3 | |
-| 33a | commitment: UI: `pronunciation` appears in the existing key choice list of Add property. | slice 2 | |
-| 33b | commitment: UI: `pronunciation` appears in the existing key choice list of a property row's key field. | slice 2 | |
-| 33c | exclusion: UI: it adds no new control. | slice 2 | |
+| 33a | commitment: UI: `pronunciation` appears in the existing key choice list of Add property. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property” and “add form lists every available preset once the typed text is cleared”: the Add property list includes `pronunciation` |
+| 33b | commitment: UI: `pronunciation` appears in the existing key choice list of a property row's key field. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “existing row lists every available preset on focus and narrows on typing” and propertyRowEditing.spec.ts “omits another row's list preset while retaining the current row's own preset” |
+| 33c | exclusion: UI: it adds no new control. | slice 2 | observed: Reading of the slice diff: one line in frontend/src/utils/noteContentPropertyKeyPresets.ts; no component changed |
 | 34a | commitment: UI: in the Spelling prompt, a hidden `pronunciation` value uses the existing hidden-pronunciation mark `/.../`, the one the learner already sees for a `/…/` reading. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesSavedPronunciationWhereTheBodyRepeatsIt: the stem contains `<mark title='Hidden pronunciation'>/.../</mark>` |
 | 34b | qualification: The mark tells the learner that a reading is hidden there, not the answer. | slice 1 | observed: Reason for 34a; the same mark is asserted there |
 | 35a | commitment: UI: a one-kana reading such as `て` is also hidden inside other words, as in `挙げて`, because the existing matching rule accepts any kana as a word boundary. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesAOneKanaSavedPronunciationInsideOtherWords: stem `[...]を挙げ/.../。` |
@@ -146,8 +146,8 @@ acceptance record.
 | 36c | qualification: The original condition for pure SQL, that it can prepare the changes safely, is not met. | slice 7 | |
 | 36d | commitment: The conversion uses that boundary's local path, which the owner already uses for this notebook. | slice 7 | |
 | 36e | exclusion: Production runs no conversion code. | slice 8 | |
-| 37a | commitment: Architecture, format: under ADR 0004, `pronunciation` is author-owned YAML frontmatter that is preserved as authored. | slice 2 | |
-| 37b | exclusion: It needs no format rule of its own. | slice 2 | |
+| 37a | commitment: Architecture, format: under ADR 0004, `pronunciation` is author-owned YAML frontmatter that is preserved as authored. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: the emitted YAML is the authored key and value; no format code changed |
+| 37b | exclusion: It needs no format rule of its own. | slice 2 | observed: Reading of the slice diff: no format rule added |
 | 38a | commitment: Architecture, one concept in two places for now: readings can be a `/…/` marking in the body or a `pronunciation` property, and Spelling review reads both. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesBothASavedPronunciationAndASlashReadingInTheBody: stem `[...] /.../ は「/.../」と読む。` |
 | 38b | qualification: This is deliberate while unconverted notes exist. | slice 1 | observed: Reason for 38a; both passes exist in ClozeReplacement.maskPronunciationsAndTitles |
 | 38c | qualification: Removing the body marking is the deferred item above. | slice 1 | observed: Refers to 21a; the body marking is kept |
