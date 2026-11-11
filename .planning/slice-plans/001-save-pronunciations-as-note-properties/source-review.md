@@ -66,7 +66,7 @@ acceptance record.
 | 14b | commitment: The reading becomes the `pronunciation` value. | slice 4 | observed: Mechanical check on `06e5adbf` and `1b9fc990`: for all 298 changed notes the YAML parser reads `pronunciation` back as exactly the removed reading |
 | 14c.1 | commitment: The body loses the marked reading. | slice 4 | observed: Mechanical check on both commits: the recognizer finds no reading left in any of the 298 notes |
 | 14c.2 | commitment: Together with the reading, the body loses the spacing that existed only to hold it (alternative to 14c.3). | slice 4 | observed: Clone diff of 算術 in `06e5adbf`: `/さんじゅつ/ 算术` becomes `算术`; preview `02-changes.md`: 連濁 loses the reading's line and the empty line after it |
-| 14c.3 | commitment: Or, together with the reading, the body loses the bracket pair that existed only to hold it (alternative to 14c.2). | slice 5 | |
+| 14c.3 | commitment: Or, together with the reading, the body loses the bracket pair that existed only to hold it (alternative to 14c.2). | slice 5 | observed: Mechanical check on `1551a951`: all 226 notes lost only the reading and the wrapper that held it; preview `02-changes.md`: 求める `「求める(/もとめる/)」とは、` becomes `「求める」とは、` |
 | 14d | commitment: All other text stays. | slice 6 | |
 | 14d.1 | commitment: The text that stays includes readings of other words. | slice 6 | |
 | 15a | commitment: A note stays unchanged and is listed when any one of the cases 15a.1 to 15a.4 applies. | slice 3 | observed: listing `01-listing.md`: 630 candidates and 120 unchanged notes add up to the 750 notes with a match |
@@ -127,9 +127,9 @@ acceptance record.
 | 30d | example: Expected: the inline `甚大（じんだい）` stays with its explanation. | slice 6 | |
 | 30e | example: Expected: the note keeps its memory trackers. | slice 8 | |
 | 30f | example: Expected: the note keeps its recall history. | slice 8 | |
-| 31a | example: Setup (conversion, reading in brackets): the body has `水引（/みずひき/）は、…`. | slice 5 | |
-| 31b | example: Expected: it becomes `水引は、…`. | slice 5 | |
-| 31c | example: Expected: the note has `pronunciation: みずひき`. | slice 5 | |
+| 31a | example: Setup (conversion, reading in brackets): the body has `水引（/みずひき/）は、…`. | slice 5 | observed: Clone diff of 文化/水引.md in `1551a951`: the removed line starts `水引（/みずひき/）は、` |
+| 31b | example: Expected: it becomes `水引は、…`. | slice 5 | observed: Clone diff of 文化/水引.md in `1551a951`: the added line starts `水引は、` |
+| 31c | example: Expected: the note has `pronunciation: みずひき`. | slice 5 | observed: Clone diff of 文化/水引.md in `1551a951`: the frontmatter gains `pronunciation: みずひき` |
 | 32a | example: Left unchanged and listed: 音 has `/ね/` and `/おん/` (several readings). | slice 3 | observed: listing `01-listing.md`: 音 is under “several matches” with `/おと/`, `/ね/` and `/おん/` (G2) |
 | 32b | example: Left unchanged and listed: コツ has `釣りのコツ/钓鱼的秘诀。 コツを覚える/学会窍门` (not a reading). | slice 3 | observed: listing `01-listing.md`: コツ is under “the match is not plain kana” with `/钓鱼的秘诀。 　 コツを覚える/` |
 | 32c | example: Left unchanged and listed: 足利義満 begins `/あしかが よしみつ/は、…` (removing the reading would leave the sentence without its subject). | slice 3 | observed: listing `01-listing.md`: 足利義満 is under “the reading is the subject of its sentence”, sentence start `/あしかが よしみつ/は、` |

@@ -300,7 +300,7 @@ Decisions and learnings:
 
 ### 5. Convert readings in brackets after a word
 Type: Behavior
-Status: planned
+Status: done
 Proof: The mechanical check passes on this slice's commit, the preview section
 lists every changed note, and 水引 shows `水引は、…` with
 `pronunciation: みずひき`.
@@ -311,6 +311,30 @@ the bracket pair that held only the reading is removed, or the reading and its
 following comma are removed from a bracket that holds more.
 
 Sizing: one rule for full-width and half-width brackets; about five minutes.
+
+Accepted proof, 2026-11-12, in the clone on branch `conversion`:
+
+- Commit `1551a951d9086a4140131f26e15e9ad6523dac1c`: 226 notes. In 215 the
+  brackets held only the reading and the pair is removed; in 11 the reading
+  was the first item and the reading with its comma is removed.
+- `python3 tools/conversion.py check notebook main..conversion` ends with
+  "524 converted so far + 106 candidates still to convert + 120 unchanged =
+  750" and "CHECK PASSED". The check's rules were not changed.
+- `preview/02-changes.md` has the second kind with its 226 notes beside the
+  298 of the first. 水引 shows `水引は、…` with `pronunciation: みずひき`.
+- Local `main` is still `cc485736`; the clone's tree is clean.
+
+Learnings for slice 6:
+
+- 貧困 is left: `**貧困**（ /ひんこん/ 、[英](…` has a space after the opening
+  bracket and a space before the comma. The check accepts a comma only
+  directly after the reading. Convert it as the other first-item notes are,
+  with the check's comma rule also accepting that spacing around the reading.
+- The 106 remaining candidates by position, as counted once by hand: 54 in a
+  bold pair, 17 next to an HTML tag, 13 after a word with spacing on both
+  sides, 7 after a colon, 5 after a word and spacing with text directly
+  after (多大 is one), 5 directly after text, 3 alone in another pair, 相当
+  and 貧困.
 
 ### 6. Convert the remaining candidates and complete the preview
 Type: Behavior
@@ -398,9 +422,16 @@ published base of the first increment. Replanning permission: the existing
 planning authority; no option was given.
 
 Published on `origin/claude/save-pronunciations-as-note-properties`: slice 1
-as `e9f109c3c2`, slice 2 as `3f43ec8853`, slice 3 as `588f51ccc2`. CI observer
-directory:
+as `e9f109c3c2`, slice 2 as `3f43ec8853`, slice 3 as `588f51ccc2`, slice 4 as
+`550401a5dd`. CI observer directory:
 `/tmp/dough-ci-501/watch-gNNSef`.
+
+CI on the story branch: run 43049319481, attempt 1, for `e9f109c3c2` had ten
+failed jobs. Each stopped in its dependency installation after about 50
+minutes with `Temporary failure resolving 'azure.archive.ubuntu.com'` from
+`apt-get`; the following install step was skipped and no test ran. This is a
+runner network failure, not a result about the change, so no repair was made.
+Trunk CI passed at `5d974f8eae` earlier the same day.
 
 ## Story obligations
 
