@@ -214,3 +214,26 @@ product and frontend proof is unchanged, so no tests were repeated.
 premises, disposable probe, consumer assessment and readiness reviews with their
 original dates, revisions, commands and limitations. Accepted execution evidence
 and outstanding obligations remain in this plan.
+
+## Retrospective
+
+Planned execution attribution: claim `f6d89e3470` is provenance; implementation
+`e257b144d1e9120528922da0f5dc045acb6c9d6d` is the only delivered product commit,
+accepted on origin/codex/prefer-note-titles-in-wiki-links, suffix base `f6d89e3470`.
+The aggregate selector, authoring, live references and controller proof satisfy
+the original story and Accepted ADRs 0004/0005. North Star alignment holds:
+authored content remains authoritative behind one resolution owner. No
+refactoring residue, architectural conflict or supported correction was found.
+Controller proof drove this rule change; retained E2E wiki/property scenarios
+document folder/qualified navigation, ambiguity repair and current-property
+behavior. Detailed precedence variations belong at the real controller boundary;
+no suite consolidation is justified by current coverage/cost evidence.
+Product advice is no change: this bounded outcome adds no supported adjacent
+feature requirement. CI for the accepted branch revision remains pending.
+Process is selected by skipProcessRetrospective=false and deferred into wrap-up
+because intentCoverage=true will request its check there; conversation and agent
+history remain available. Product/proof review is complete; process is pending.
+
+## Execution complete
+
+Product advice: no change; retain current backlog priorities.
