@@ -178,3 +178,50 @@ refinement was not needed: one bounded outcome, one proof loop, and no unresolve
 slice-specific concern remains after reviewing the baseline, discarded backend
 probe, frontend suite and both typechecks. This preparation records planned work;
 it grants no execution authority.
+
+### Follow-up refinement on 2026-11-11
+
+Reviewed the existing seed and plan at
+`ffca6fbe29ace57dbceb6557ecb70118d268f2b8` under Challenge, Clarify,
+Investigate, UX/UI and Architecture. The strongest consequential risk is the
+ordering of selection. A private title suppressing a readable alias, or a
+property-bearing alias displacing the selected title, would defeat the reader's
+direct title reference. The seed already specifies readable candidates first,
+title precedence second, and property validation after note selection. The
+retained controller probe above observed both boundaries. The existing goal,
+scope and examples remain sufficient and require no new product decision.
+
+An alias link can change destination when a matching title appears. The seed's
+reopen example and ADR 0004 explicitly establish that behavior. Reading
+`NoteRealmLoader.vue`, `noteStore.ts` and `noteRequests.ts` confirmed that reopening
+loads the current realm. `WikiLinkToken.vue` and `wikiLinkResolvedLocation.ts`
+consume the backend-selected note/property IDs, and the unresolved-link modal
+already offers longer-path repair. These interactions share the existing
+resolver and authoring responsibility under ADRs 0004 and 0005. The ADR index and
+both relevant records agree on Accepted status. This review found no conflict
+or additional architectural choice.
+
+`git diff --name-status 090302e0995ca47adfab14f4b733db75b25a832c HEAD` showed
+identical backend, frontend, generated-client and OpenAPI content. The retained
+discarded-probe and frontend observations therefore apply to the current product
+and test content. They remain preparation evidence with the original provenance
+and limitations above. The intervening Gradle wrapper update from 9.9.0 to 9.9.1
+prompted a fresh backend baseline through the ordinary command.
+
+For that baseline, `Territory.local` had 16 logical CPUs, load averages
+27.74/24.08/17.70, 48 GiB physical memory and concurrent system installation,
+Node, Python and Nix work.
+Chose one serialized backend run at ordinary concurrency, using the retained
+frontend evidence. Unrelated processes remained with their owners. Reconsider
+this workload choice on a failed run or changed contention.
+
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed at the reviewed
+revision with Gradle 9.9.1 and the ordinary test profile in the automatically
+isolated worktree database. Migration build took 3m 7s and test build took
+2m 58s. XML results in `backend/build/test-results/test/` report 625 suites,
+3,103 tests, two skipped, zero failures and zero errors. Inspected XML also
+confirms that the three current collision/cardinality expectations named in the
+implementation brief executed and passed. This verifies the current baseline
+and command route. The retained disposable probe owns the proposed precedence
+observations. The review found no remaining slice-specific concern and requires
+no additional plan-refinement pass.

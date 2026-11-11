@@ -13,7 +13,7 @@ scope: story
 
 **Identity:** SEED-122#prefer-note-titles-in-wiki-links
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-prefer-note-titles-in-wiki-links/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"bd90cbf5584c16e637e14dc9c1ec931d2ac14c81a43d79699696ad45fa40fb20","plan":"0d960e6c72c7b5709c4392ea12d944bfe7f2639f1feadfb17f630b0842884758"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-prefer-note-titles-in-wiki-links/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"bd90cbf5584c16e637e14dc9c1ec931d2ac14c81a43d79699696ad45fa40fb20","plan":"3a6d2e48afd81e51f5cb2f9c08abe338a0e663d107ad1c00748a03460394c424"}}
 ```
 
 **Goal.** A notebook reader can follow a shorthand wiki link to the note
