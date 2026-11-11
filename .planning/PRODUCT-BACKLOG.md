@@ -8,6 +8,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Save pronunciations as note properties](seeds/SEED-124-save-pronunciations-as-note-properties.md#save-pronunciations-as-note-properties) — SEED-124#save-pronunciations-as-note-properties ([plan](slice-plans/001-save-pronunciations-as-note-properties/PLAN.md))
+
 ## Backlog list
 
-- [Save pronunciations as note properties](seeds/SEED-124-save-pronunciations-as-note-properties.md#save-pronunciations-as-note-properties) — SEED-124#save-pronunciations-as-note-properties
