@@ -10,3 +10,4 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Save pronunciations as note properties](seeds/SEED-124-save-pronunciations-as-note-properties.md#save-pronunciations-as-note-properties) — SEED-124#save-pronunciations-as-note-properties
