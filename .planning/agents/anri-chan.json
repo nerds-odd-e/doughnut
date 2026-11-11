@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Anri-chan",
+  "email": "anri-chan@example.org",
+  "identity": "SEED-123#restore-reliable-ci",
+  "mode": "story-branch",
+  "branch": "codex/restore-reliable-ci",
+  "host": "codex"
+}
