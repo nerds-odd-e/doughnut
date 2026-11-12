@@ -1,14 +1,19 @@
 package com.odde.donut.services;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.odde.donut.entities.AnswerOutcome;
 import java.time.Instant;
 import java.util.List;
 
-/** One answer as recorded: when, whether it was correct, the question, and its source note. */
+/**
+ * One answer as recorded: when, whether it was correct, any special spelling outcome, the question,
+ * and its source note.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record RecallAttempt(
     Instant answeredAt,
     Boolean correct,
+    AnswerOutcome outcome,
     SourceNote note,
     MultipleChoice multipleChoice,
     Spelling spelling) {

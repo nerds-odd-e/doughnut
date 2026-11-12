@@ -32,7 +32,11 @@ public record ListRecallAnswersTool(
       What this returns (JSON):
       - **from**, **to** — the window as absolute instants; it ends at the call
       - **attempts** — each with **answeredAt** (instant), **correct** (as recorded),
-        **note** (current **title** and qualified **portablePath**), and for multiple choice
+        **outcome** when the spelling answer had a special outcome — **OVERLAP** (accepted as
+        overlapping another note; counts as correct) or **ACCIDENTAL_MATCH** (incorrect, but
+        named another note, whose recall schedule was adjusted as a confusion; listed once, under
+        the note being recalled), **note** (current **title** and qualified **portablePath** of
+        the note being recalled), and for multiple choice
         **multipleChoice** with **stem**, all **choices**, the **selectedChoice**, the
         **expectedAnswer**, and the stored **validationRationale** when available; for spelling
         **spelling** with the learner's **typedAnswer** and the masked **prompt** derived from

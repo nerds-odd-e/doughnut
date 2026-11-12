@@ -137,8 +137,9 @@ Type: Behavior
 Status: done
 Proof: New MCP endpoint cases and the tool-list assertion; full backend suite.
 Accepted proof: `ListRecallAnswersMcpEndpointTest`
-(`returnsTheFullRecordedMultipleChoiceAttempt`,
-`returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst`) and the
+(`returnsTheFullRecordedMultipleChoiceAttempt`; the window case
+`returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst` now lives in
+`ListRecallAnswersWindowMcpEndpointTest`) and the
 `McpEndpointTest` tool list, via
 `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.mcp.*'`
 after refactoring; full suite `pnpm backend:test_only` green before the
@@ -161,7 +162,7 @@ Type: Behavior
 Status: done
 Proof: MCP endpoint cases; full backend suite.
 
-Accepted proof: `ListRecallAnswersMcpEndpointTest` cases
+Accepted proof: `ListRecallAnswersWindowMcpEndpointTest` cases
 `looksBackTheGivenNumberOfDays`, `refusesDaysThatAreNotPositive`,
 `refusesDaysThatAreNotANumber`; full suite green before the MCP-only refactor,
 `com.odde.donut.mcp.*` green after it.
@@ -190,8 +191,13 @@ Sizing: about five active minutes.
 
 ### 5. Name Overlap and Accidental match outcomes
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP endpoint cases; full backend suite.
+
+Accepted proof: `ListRecallAnswersMcpEndpointTest` cases
+`returnsAnOverlapAsACorrectAttemptNamingTheOutcome` and
+`returnsAnAccidentalMatchAsOneIncorrectAttemptNamingTheOutcome`; full suite green
+before the refactor, `com.odde.donut.mcp.*` green after it.
 
 Behavior: A spelling answer was accepted as an Overlap → the attempt is correct
 and names that outcome. A spelling answer named another note and adjusted that
@@ -285,9 +291,9 @@ checks against real history after delivery; that check is not a slice.
 - `RecallAnswerHistoryService.recentAttempts` reads answers by time through
   `AnswerRepository.findRecordedAnswersOfLearnerBetween`, batches prompts with
   `RecallPromptRepository.findAllByAnswerIn`, and takes the source note from the
-  answer's non-Confusion recall log, so slice 8 keeps it when the prompt is gone.
-  It still filters to answers with a multiple-choice prompt; slices 4 and 8 lift
-  that filter. Open-in-view is off, so every lazy walk (logs, note, content,
+  prompt's tracker. It keeps only answers that have a prompt; slice 8 lifts that
+  and must take the source note from the answer's non-Confusion recall log when
+  the prompt is gone. Open-in-view is off, so every lazy walk (logs, note, content,
   graph) stays inside that read-only transaction and the service returns records.
 - MCP tools that return JSON share `McpJsonToolResult.of`.
 - Full backend suite after slice 2: 3,173 tests, 0 failures.
@@ -306,3 +312,13 @@ checks against real history after delivery; that check is not a slice.
   parts. Fixtures: `answerSpellingIncorrectly(text)`, and set the note's
   `updatedAt` before the test clock's `now`, since `NoteBuilder` uses real time.
   Full suite: 3,179 tests green.
+- Slice 5 (accepted): an Overlap records no recall log (ADR 0003), so
+  `AnswerRepository.findRecordedAnswersOfLearnerBetween` finds an answer through
+  a recall log of the learner OR a recall prompt on the learner's tracker.
+  `RecallAttempt.outcome` carries `AnswerOutcome` names (`OVERLAP`,
+  `ACCIDENTAL_MATCH`), as `RecallHistoryExport` does. Fixtures: Overlap without
+  `.recorded()`; Accidental match with `.accidentalMatch().recorded()` plus
+  `aRecallLogFor(other).confusion().answer(..)`. Tests are split:
+  `ListRecallAnswersMcpEndpointTest` (what an attempt carries; slices 6–8),
+  `ListRecallAnswersWindowMcpEndpointTest` (which attempts; slice 9), sharing
+  `ListRecallAnswersMcpEndpointTestBase`. Full suite: 3,181 tests green.

@@ -3,7 +3,6 @@ package com.odde.donut.services;
 import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.AnswerRepository;
@@ -52,17 +51,12 @@ public class RecallAnswerHistoryService {
   }
 
   private RecallAttempt attempt(Answer answer, RecallPrompt prompt, User learner) {
-    Note note =
-        answer.getRecallLogs().stream()
-            .filter(log -> !log.isConfusion())
-            .map(RecallLog::getMemoryTracker)
-            .findFirst()
-            .orElseThrow()
-            .getNote();
+    Note note = prompt.requireMemoryTracker().getNote();
     Mcq mcq = prompt.getMcq();
     return new RecallAttempt(
         answer.getCreatedAt().toInstant(),
         answer.getCorrect(),
+        answer.getOutcome(),
         new RecallAttempt.SourceNote(
             note.getTitle(), portablePathAuthoring.qualifiedPortablePath(note, learner)),
         mcq == null ? null : multipleChoice(answer, mcq),
