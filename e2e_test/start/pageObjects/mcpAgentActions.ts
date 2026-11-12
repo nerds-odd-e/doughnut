@@ -108,7 +108,13 @@ export const mcpAgentActions = () => {
     },
 
     readNoteFromLastSearch() {
-      callToolOnFirstCandidate('read_note', {}, 'MCPReadResponse')
+      getResponseText('@MCPApiResponse').then((responseText) => {
+        const { portablePath } = JSON.parse(responseText)[0]
+        cy.task('callMcpToolWithParams', {
+          apiName: 'read_note',
+          params: { portablePath },
+        }).then((response) => cy.wrap(response).as('MCPReadResponse'))
+      })
       return this
     },
 

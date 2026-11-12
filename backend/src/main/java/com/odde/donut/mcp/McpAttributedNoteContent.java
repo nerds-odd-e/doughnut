@@ -4,7 +4,6 @@ import com.odde.donut.controllers.dto.AttributedNoteContent;
 import java.sql.Timestamp;
 
 record McpAttributedNoteContent(
-    Integer noteId,
     String portablePath,
     String title,
     String notebookName,
@@ -14,7 +13,6 @@ record McpAttributedNoteContent(
     String acceptedRevision) {
   static McpAttributedNoteContent from(AttributedNoteContent content, String portablePath) {
     return new McpAttributedNoteContent(
-        content.noteId(),
         portablePath,
         content.title(),
         content.notebookName(),

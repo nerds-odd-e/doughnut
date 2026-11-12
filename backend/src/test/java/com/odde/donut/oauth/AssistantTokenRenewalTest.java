@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.UserRepository;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -56,7 +57,7 @@ class AssistantTokenRenewalTest extends AssistantAuthorizationTestSupport {
                     Set.of("notes:read")),
                 metadata -> metadata.putAll(saved.getAccessToken().getMetadata()))
             .build());
-    read(access, note.getId()).andExpect(status().isUnauthorized());
+    read(access, note).andExpect(status().isUnauthorized());
 
     var renewed =
         renew(refresh, Map.of(), "test-assistant", "test-assistant-secret")
@@ -85,7 +86,7 @@ class AssistantTokenRenewalTest extends AssistantAuthorizationTestSupport {
         is(saved.getId()));
     assertThat(current.getRefreshToken().isActive(), is(true));
     assertThat(authorizations.findByToken(refresh, OAuth2TokenType.REFRESH_TOKEN), nullValue());
-    read(nextAccess, note.getId())
+    read(nextAccess, note)
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.result.content[0].text").value(containsString("Renewed read")));
     refused(
@@ -206,7 +207,7 @@ class AssistantTokenRenewalTest extends AssistantAuthorizationTestSupport {
         .andExpect(jsonPath("$.refresh_token").doesNotExist());
   }
 
-  private ResultActions read(String access, int noteId) throws Exception {
+  private ResultActions read(String access, Note note) throws Exception {
     return mockMvc.perform(
         post("/api/mcp")
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + access)
@@ -222,6 +223,12 @@ class AssistantTokenRenewalTest extends AssistantAuthorizationTestSupport {
                         "method",
                         "tools/call",
                         "params",
-                        Map.of("name", "read_note", "arguments", Map.of("noteId", noteId))))));
+                        Map.of(
+                            "name",
+                            "read_note",
+                            "arguments",
+                            Map.of(
+                                "portablePath",
+                                note.getNotebook().getName() + ":" + note.getTitle()))))));
   }
 }

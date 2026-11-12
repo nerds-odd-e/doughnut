@@ -100,7 +100,9 @@ class McpEndpointTest extends McpEndpointTestBase {
           .andExpect(jsonPath("$.result.tools[0].name", equalTo(ListNoteCandidatesTool.NAME)))
           .andExpect(jsonPath("$.result.tools[0].inputSchema.properties.query").exists())
           .andExpect(jsonPath("$.result.tools[1].name", equalTo(ReadNoteTool.NAME)))
-          .andExpect(jsonPath("$.result.tools[1].inputSchema.properties.noteId").exists())
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[1].inputSchema.properties.portablePath.type", equalTo("string")))
           .andExpect(jsonPath("$.result.tools[2].name", equalTo(GetNoteGraphTool.NAME)))
           .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.noteId").exists())
           .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.tokenLimit").exists())

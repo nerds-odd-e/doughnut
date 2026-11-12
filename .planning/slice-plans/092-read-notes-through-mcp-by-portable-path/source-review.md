@@ -14,7 +14,7 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 | C06 | Unqualified alias: An alias destination requires explicit notebook scope. | slice 5 |  |
 | C07 | Unqualified folder path: A folder-path destination requires explicit notebook scope. | slice 5 |  |
 | C08 | Unqualified exact-root path: An exact-root destination requires explicit notebook scope. | slice 5 |  |
-| C09 | Qualified destination: A notebook-qualified destination supplies notebook-name scope. | slice 4 |  |
+| C09 | Qualified destination: A notebook-qualified destination supplies notebook-name scope. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | C10 | No inferred source: Resolution does not infer a source note. | slice 5 |  |
 | C11 | Name precedence: Readable display-name matches take precedence over alias matches. | slice 5 |  |
 | C12 | Alias resolution: Aliases retain their existing resolution semantics. | slice 5 |  |
@@ -29,7 +29,7 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 | C21 | Candidate folder context: Candidates provide the full folder information needed to choose. | slice 6 |  |
 | C22 | Discovery ranking: Discovery retains existing ranked title/alias search. | slice 1 | observed: SearchControllerAliasTests.shouldRankTitleMatchesBeforeAliasMatches and NoteSearchServiceExactMatchTest full backend pass; ListNoteCandidatesTool preserves search result stream order |
 | C23 | Candidate paths: list_note_candidates supplies qualified Portable paths. | slice 1 | observed: ListNoteCandidatesMcpEndpointTest returnsAliasMatchAsCandidate, equalTitlesAreDisambiguatedByNotebookAndFolder, rootCandidateUsesExactRootPathWhenTitleIsAmbiguous and candidatePathEscapesWikiDestinationCharacters HTTP qualified-address assertions |
-| C24 | Direct candidate read: Those paths are accepted directly by read_note. | slice 4 |  |
+| C24 | Direct candidate read: Those paths are accepted directly by read_note. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | C25 | Direct candidate graph: Those paths are accepted directly by get_note_graph. | slice 7 |  |
 | C26 | Focus references: MCP-generated focus-note references follow the same addressing contract. | slice 9 |  |
 | C27 | Related references: MCP-generated related-note references follow that contract. | slice 9 |  |
@@ -52,10 +52,10 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 | C44 | Browser identities: Shared browser identities retain their existing contracts. | slice 9 |  |
 | C45 | Authored URLs: Authored Markdown URLs retain their existing contracts. | slice 9 |  |
 | C46 | Candidate authorization: Existing notebook read authorization applies to resolution candidates. | slice 6 |  |
-| C47 | Read authorization: Existing notebook read authorization applies to full reads. | slice 4 |  |
+| C47 | Read authorization: Existing notebook read authorization applies to full reads. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | C48 | Graph authorization: Existing notebook read authorization applies to graph reads. | slice 7 |  |
 | C49 | Trashed notes: Existing wiki semantics exclude trashed notes. | slice 5 |  |
-| C50 | Missing targets: Zero-match targets remain unresolved. | slice 4 |  |
+| C50 | Missing targets: Zero-match targets remain unresolved. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | C51 | Ambiguous targets: Ambiguous targets remain unresolved. | slice 6 |  |
 | C52 | No arbitrary choice: Resolution does not choose an ambiguous target arbitrarily. | slice 6 |  |
 | Q01 | Naming assumption: The developer explicitly selected unique notebook names on 2026-11-12. | slice 9 |  |
@@ -70,19 +70,19 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 | Q10 | Documentation sweep: That reading includes documentation. | slice 9 |  |
 | Q11 | Caller sweep: That reading includes callers. | slice 9 |  |
 | Q12 | Sweep separation: The one-time sweep remains separate from replacement-behavior proof. | slice 9 |  |
-| J01 | Qualified read: Pass Engineering:Practices/Code Review directly to read_note, without discovery first. | slice 4 |  |
+| J01 | Qualified read: Pass Engineering:Practices/Code Review directly to read_note, without discovery first. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | J02 | Qualified graph: Pass that same destination directly to get_note_graph, without discovery first. | slice 7 |  |
-| J03 | Read content: The qualified full-read journey returns authored content. | slice 4 |  |
-| J04 | Read path: That journey returns the qualified path. | slice 4 |  |
-| J05 | Read revision: That journey returns the notebook revision when available. | slice 4 |  |
+| J03 | Read content: The qualified full-read journey returns authored content. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
+| J04 | Read path: That journey returns the qualified path. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
+| J05 | Read revision: That journey returns the notebook revision when available. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | J06 | Graph context: The qualified graph journey returns the existing bounded graph context. | slice 7 |  |
 | J07 | Ambiguity: Two Code Review notes in Engineering yield both candidates with their full folder information. | slice 6 |  |
 | J08 | Selection: A candidate’s selection path resolves the intended note. | slice 6 |  |
-| J09 | Root selection: Engineering:/Code Review selects the root destination. | slice 4 |  |
+| J09 | Root selection: Engineering:/Code Review selects the root destination. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | J10 | Display-name precedence: A readable display name Review wins over an alias Review. | slice 5 |  |
 | J11 | Alias match: An alias resolves when only the alias matches. | slice 5 |  |
 | J12 | Nested discovery: Alias discovery for a note in a nested folder yields a qualified path. | slice 1 | observed: ListNoteCandidatesMcpEndpointTest.returnsAliasMatchAsCandidate: alias query with nested Practices/Design folder and same-title root returns Engineering:Practices/Design/Colour Theory |
-| J13 | Discovered read: Pass that discovered path unchanged to read_note. | slice 4 |  |
+| J13 | Discovered read: Pass that discovered path unchanged to read_note. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | J14 | Discovered graph: Pass that discovered path unchanged to get_note_graph. | slice 7 |  |
 | J15 | Generated reference reuse: A graph-generated reference distinguishes one of two equal-titled notes in different folders and selects it on a later request. | slice 8 |  |
 | J16 | Authored wiki link: An authored wiki link remains unchanged. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |

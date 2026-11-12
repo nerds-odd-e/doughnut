@@ -125,7 +125,7 @@ Sizing: five to seven active minutes, plus required full-suite wait.
 
 ### 4. Follow a qualified destination directly for a full read
 Type: Behavior
-Status: planned
+Status: done
 Proof: Known qualified and discovered paths → full reads, exact-root selection,
 retained attribution/authorization/OAuth proof; full backend and both MCP E2Es.
 
@@ -236,4 +236,9 @@ Disposition: interim until slices 4, 7
 ### G3. Read projection retains its current numeric bridge during citation enrichment
 Reported: slice 3 — "Sizing inspection found hosted graph calls consume the current read result identity; retain it during additive citation output and migrate graph identity to discovery in the qualified-input transition."
 Story clause: "Delete numeric note ID arguments and MCP-generated note ID fields"
-Disposition: interim until slices 4
+Disposition: proved by slice 4: qualified read HTTP projection/callers plus hosted E2E discovery identity → graph, detailed in execution-evidence.md and /tmp/seed125-slice4-consumer-trace.md
+
+### G4. Explicit shorthand scope follows qualified-path migration
+Reported: slice 4 — "Unqualified destinations currently receive qualification advice; explicit notebookName shorthand scope is the next slice's input contract."
+Story clause: "Every unqualified destination (title, alias, folder path, or exact-root path) needs an explicit notebook scope because MCP has no source note."
+Disposition: interim until slices 5
