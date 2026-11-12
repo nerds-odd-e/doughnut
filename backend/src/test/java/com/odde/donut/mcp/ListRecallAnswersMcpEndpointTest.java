@@ -67,6 +67,9 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
 
     assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
     assertThat(attempt.at("/excludedAsAmbiguous/reason").asText(), equalTo("both choices fit"));
+    assertThat(
+        attempt.at("/note/graph/focusNote/portablePath").asText(),
+        equalTo("Engineering:Code Review"));
   }
 
   @Test
@@ -119,6 +122,7 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
     assertThat(attempt.get("correct"), equalTo(BooleanNode.TRUE));
     assertThat(attempt.get("outcome").asText(), equalTo("OVERLAP"));
     assertThat(attempt.at("/spelling/typedAnswer").asText(), equalTo("Review"));
+    assertTitleAndPathOnly(attempt.get("note"));
   }
 
   @Test

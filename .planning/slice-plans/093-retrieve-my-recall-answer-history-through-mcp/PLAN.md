@@ -219,8 +219,13 @@ Sizing: under five active minutes.
 
 ### 7. Attach source note evidence for misses
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP endpoint cases for the four combinations; full backend suite.
+
+Accepted proof: `ListRecallAnswersEvidenceMcpEndpointTest` (five cases, including
+`theBoundedGraphStaysWithinItsBudget`) and the Overlap and exclusion assertions in
+`ListRecallAnswersMcpEndpointTest`; full suite green, `com.odde.donut.mcp.*`
+green after the test-only refactor.
 
 Behavior: Correct attempts of either type → title and path only. An incorrect
 spelling attempt → also the note's full current content. An incorrect
@@ -329,3 +334,12 @@ checks against real history after delivery; that check is not a slice.
   `exclusionReason`); attempts carry `excludedAsAmbiguous.reason` and keep
   `correct` as recorded. Fixture: `.recorded().excludedAsAmbiguous(reason)`.
   Full suite: 3,182 tests green.
+- Slice 7 (accepted): `RecallAnswerHistoryService.sourceNote` adds `content`
+  (`AttributedNoteContentService`) to a spelling miss and `graph`
+  (`NoteGraphService.getGraph`, `GRAPH_TOKEN_BUDGET` 1,000, the unchanged
+  `FocusContextResult`) to a multiple-choice miss. Lost access currently fails
+  the whole call through `UnexpectedNoAccessRightException`; slice 8 catches it
+  per attempt. `answer.getCorrect()` is unboxed, so an answer found through its
+  prompt with no grade, no log and no outcome would fail the call; slice 8 checks
+  whether that shape exists. Evidence cases live in
+  `ListRecallAnswersEvidenceMcpEndpointTest`. Full suite: 3,187 tests green.

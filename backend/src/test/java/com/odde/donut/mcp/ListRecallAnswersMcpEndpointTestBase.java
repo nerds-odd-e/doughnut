@@ -1,5 +1,8 @@
 package com.odde.donut.mcp;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,6 +48,16 @@ abstract class ListRecallAnswersMcpEndpointTestBase extends McpEndpointTestBase 
   static List<String> texts(JsonNode array, String pointer) {
     return StreamSupport.stream(array.spliterator(), false)
         .map(node -> node.at(pointer).asText())
+        .toList();
+  }
+
+  static void assertTitleAndPathOnly(JsonNode sourceNote) {
+    assertThat(fieldNames(sourceNote), containsInAnyOrder("title", "portablePath"));
+    assertThat(sourceNote.get("portablePath").asText(), equalTo("Engineering:Code Review"));
+  }
+
+  private static List<String> fieldNames(JsonNode node) {
+    return StreamSupport.stream(((Iterable<String>) () -> node.fieldNames()).spliterator(), false)
         .toList();
   }
 

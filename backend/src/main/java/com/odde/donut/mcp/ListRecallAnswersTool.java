@@ -2,6 +2,7 @@ package com.odde.donut.mcp;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.entities.User;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.RecallAnswerHistoryService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.modelcontextprotocol.common.McpTransportContext;
@@ -38,14 +39,19 @@ public record ListRecallAnswersTool(
         the note being recalled), **excludedAsAmbiguous** with the learner's **reason** when they
         excluded the attempt as ambiguous (**correct** still shows the recorded result, though
         recall scheduling and statistics leave the attempt out), **note** (current **title** and
-        qualified **portablePath** of the note being recalled), and for multiple choice
+        qualified **portablePath** of the note being recalled; when the attempt is recorded as
+        incorrect, a spelling miss adds the note's full current **content** and a multiple-choice
+        miss adds its bounded **graph**, shaped like get_note_graph's result with notes addressed
+        by portablePath, within a fixed modest budget of about 1,000 tokens; correct attempts carry
+        title and path only), and for multiple choice
         **multipleChoice** with **stem**, all **choices**, the **selectedChoice**, the
         **expectedAnswer**, and the stored **validationRationale** when available; for spelling
         **spelling** with the learner's **typedAnswer** and the masked **prompt** derived from
         the note, or **promptUnavailable** explaining why the prompt as shown cannot be
         recovered (the note was edited after the answer)
 
-      Pass a note's portablePath unchanged to read_note or get_note_graph for more context.
+      Pass a note's portablePath unchanged to read_note, or to get_note_graph with a larger
+      tokenLimit for more context.
       This changes nothing.\
       """;
 
@@ -85,11 +91,15 @@ public record ListRecallAnswersTool(
           "A positive number of days is required, such as 14. Omit days for the last 7 days.");
     }
     User user = (User) context.get(McpServerConfiguration.TRANSPORT_USER_KEY);
-    return McpJsonToolResult.of(
-        objectMapper,
-        recallAnswerHistory.recentAttempts(
-            user,
-            testabilitySettings.getCurrentUTCTimestamp().toInstant(),
-            Duration.ofMillis(Math.round(days * Duration.ofDays(1).toMillis()))));
+    try {
+      return McpJsonToolResult.of(
+          objectMapper,
+          recallAnswerHistory.recentAttempts(
+              user,
+              testabilitySettings.getCurrentUTCTimestamp().toInstant(),
+              Duration.ofMillis(Math.round(days * Duration.ofDays(1).toMillis()))));
+    } catch (UnexpectedNoAccessRightException e) {
+      throw McpToolFailures.rethrow(e);
+    }
   }
 }

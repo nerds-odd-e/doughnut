@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.odde.donut.entities.AnswerOutcome;
+import com.odde.donut.services.focusContext.FocusContextResult;
 import java.time.Instant;
 import java.util.List;
 
@@ -22,7 +23,13 @@ public record RecallAttempt(
   /** The learner excluded the attempt as ambiguous; its recorded correctness is kept. */
   public record AmbiguityExclusion(String reason) {}
 
-  public record SourceNote(String title, String portablePath) {}
+  /**
+   * The note being recalled; a missed spelling adds its full current content, a missed multiple
+   * choice its bounded graph.
+   */
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record SourceNote(
+      String title, String portablePath, String content, FocusContextResult graph) {}
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record MultipleChoice(
