@@ -2,6 +2,24 @@
 
 **Identity:** SEED-127#verify-test-guidance-links
 **Source:** [bounded correction](../../seeds/SEED-127-verify-test-guidance-links.md#verify-test-guidance-links)
+**Source review:** [source-only commitments](source-review.md)
+
+## Execution context
+
+Established claim: `669aa5f59cdec27de494ef5c23f04a6bd276ff7f`, publisher
+`dashboard-territory.local-doughnut`, agent Mana-chan. Story Branch Mode uses
+`/Users/terryyin/git/doughnut/.worktrees/verify-testing-guidance-links`, branch
+`codex/verify-testing-guidance-links`, remote `origin`, integration target `main`.
+Starting revision: `37bb542ff51c2f4f179b508448c4dcc11d79d536`.
+Workspace reused from the established start; originating and execution checkout
+are the same. Default checkout is `/Users/terryyin/git/doughnut`.
+Checkout setup and `./scripts/run.sh pnpm exec biome --version` passed against
+the current lockfile (Biome 2.6.6). Existing planning authority is retained for
+overrun replanning; no new scope is authorized.
+CI uses GitHub Actions `ci.yml` (verified active, `donut CI`) on the execution
+branch. Claim CI on trunk is unobserved. Codex stream coordinator: `mana-seed127`.
+Observer `/tmp/dough-ci-501/watch-AQFVKN`, PID `38325`, session `36029`,
+yielded cell `g134:10`; runtime is this checkout's installed execution skill.
 
 ## Goal and boundaries
 
@@ -74,7 +92,7 @@ Observed in the execution checkout serving SEED-126 on 2026-11-12 at
 
 ### 1. Validate the local testing guidance route
 Type: Behavior
-Status: planned
+Status: done
 Proof: all rows in the proof table, at the command boundary.
 
 Behavior: A test author/refactorer runs the focused guidance lint command with
@@ -110,4 +128,46 @@ premise review. No Take or execution is authorized by this preparation.
 
 ## Learnings
 
-None beyond the recorded proof gap and existing-solution decision.
+The current bounded route contains 22 local Markdown links across 10 sources.
+Code spans/fences and external URLs are excluded from inputs; destination files
+remain outside traversal unless explicitly listed as sources.
+
+## Slice 1 accepted proof
+
+Implementation/proof took about three active minutes. Source freshness returned
+`unchanged` at trunk `669aa5f59cdec27de494ef5c23f04a6bd276ff7f`; predecessor
+SEED-126 is already in the baseline, and no named sibling introduces a change.
+All source-review commitments are compared individually in `source-review.md`.
+
+- `./scripts/run.sh pnpm lint:test-guidance-links`: pass, 22 local links across
+  10 sources. Actual guidance inputs supply the precondition; checker filesystem
+  resolution and `anchors()` supply the result, rather than fixture outcomes.
+- In isolated scratch copied from this candidate, public command
+  `pnpm lint:test-guidance-links` at
+  `/tmp/nix-shell.E9MFiu/seed127-link-proof-7f1s4kc9` produced baseline 0;
+  replacing unit-testing's `../dough-makeme/SKILL.md` with
+  `../dough-makeme/SKILL-missing.md` produced 1 and
+  `.agents/skills/unit-testing/SKILL.md -> ../dough-makeme/SKILL-missing.md: ENOENT`;
+  restoration produced 0. Separately replacing `#test-data-guidance` with
+  `#test-data-guidance-missing` produced 1 and
+  `.agents/skills/unit-testing/SKILL.md -> #test-data-guidance-missing: heading anchor #test-data-guidance-missing not found`;
+  restoration produced 0. Final SHA-256 matched the original byte-for-byte:
+  `6419f683f0952f8984113e2e98bdb23bf699f767be5544ef51f7288fc0ee39b2`.
+  Raw stages retained at `/tmp/seed127-link-proof-evidence.json`; scratch retired.
+- `./scripts/run.sh node .agents/skills/dough-execute-plan/scripts/test-entry-rules.mjs --project /Users/terryyin/git/doughnut/.worktrees/verify-testing-guidance-links --source frontend/tests/store/noteStore.trashNote.spec.ts`:
+  pass, `makeMe:true,pageObjects:false`; independent membership boundary unchanged.
+- `./scripts/run.sh node scripts/ci/node-test.mjs scripts/ci/ci-workflow.test.mjs`:
+  seven tests pass, including lint command/report integration. Inspected root
+  package scripts and `.github/lint_and_generated_types/action.yml`: normal CI
+  lint reaches the new public command, with existing report groups preserved.
+- `./scripts/run.sh node .agents/skills/dough-execute-plan/scripts/consumer-trace.mjs --checkout /Users/terryyin/git/doughnut/.worktrees/verify-testing-guidance-links --base 669aa5f59cdec27de494ef5c23f04a6bd276ff7f --term lint:test-guidance-links --term lint:all`:
+  all 89 rows dispositioned at `/tmp/seed127-consumer-trace.md`. Affected root lint
+  and CI consumers have the command and workflow proof above. Generic anchor,
+  unchanged metadata, fixture, and planning-reader matches do not consume the
+  added validation behavior. No affected consumer or promised observation remains
+  unproved. No application suite adds proof at this boundary.
+- `scripts/check_diff_whitespace.sh`: pass.
+
+Fresh `/root/refactor_links` review returned `## REFACTOR COMPLETE`: none —
+already clean, no edits or test reruns. Accepted proof remains applicable;
+changed-source conventions are off and all edited files are below 250 lines.
