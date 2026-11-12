@@ -225,3 +225,7 @@ Disposition: proved by slice 9: GraphNavigationMcpEndpointTest six real HTTP gra
 Reported: slice 8 — "Focus and related projections keep current metadata; direct reusable portablePath fields remain owned by slice10."
 Story clause: "MCP-generated references to the focus note, related notes, outgoing destinations, inbound referrers, sampled peers, and retrieval paths use that same addressing contract."
 Disposition: proved by slice 10: GraphNodePortablePathMcpEndpointTest root/folder focus and wiki/peer related node portablePath → unchanged path → exact full-read content, four real HTTP cases; backend3171, actual SDK9, frontend2543 and both typechecks pass; execution-evidence.md slice10
+
+## Execution complete
+
+Product advice: no change. The completed shared resolution, address authoring and MCP projections satisfy the selected outcome and align with the current direction. Preserve the existing recall-history queue priority; no additional product work is recommended.
