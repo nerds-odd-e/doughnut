@@ -35,8 +35,10 @@ public record ListRecallAnswersTool(
         **outcome** when the spelling answer had a special outcome — **OVERLAP** (accepted as
         overlapping another note; counts as correct) or **ACCIDENTAL_MATCH** (incorrect, but
         named another note, whose recall schedule was adjusted as a confusion; listed once, under
-        the note being recalled), **note** (current **title** and qualified **portablePath** of
-        the note being recalled), and for multiple choice
+        the note being recalled), **excludedAsAmbiguous** with the learner's **reason** when they
+        excluded the attempt as ambiguous (**correct** still shows the recorded result, though
+        recall scheduling and statistics leave the attempt out), **note** (current **title** and
+        qualified **portablePath** of the note being recalled), and for multiple choice
         **multipleChoice** with **stem**, all **choices**, the **selectedChoice**, the
         **expectedAnswer**, and the stored **validationRationale** when available; for spelling
         **spelling** with the learner's **typedAnswer** and the masked **prompt** derived from

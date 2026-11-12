@@ -22,6 +22,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private Timestamp answerTimestamp = null;
   private AnswerOutcome answerOutcome = null;
   private boolean recorded = false;
+  private String ambiguityExclusionReason = null;
 
   public RecallPromptBuilder(MakeMe makeMe, RecallPrompt recallPrompt) {
     super(makeMe, recallPrompt);
@@ -52,6 +53,9 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
       entity.getAnswer().setOutcome(answerOutcome);
       entity.getAnswer().setCorrect(false);
     }
+    if (ambiguityExclusionReason != null) {
+      entity.getAnswer().excludeAsAmbiguous(ambiguityExclusionReason, resolvedAnswerTimestamp());
+    }
     if (entity.getMemoryTracker() == null && memoryTracker == null) {
       throw new IllegalStateException("call forMemoryTracker() before please()");
     }
@@ -76,6 +80,12 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   /** Records the answer's grade in a recall log, as answering in the product does. */
   public RecallPromptBuilder recorded() {
     this.recorded = true;
+    return this;
+  }
+
+  /** Records the learner's ambiguity exclusion on the answer, as excluding in the product does. */
+  public RecallPromptBuilder excludedAsAmbiguous(String reason) {
+    this.ambiguityExclusionReason = reason;
     return this;
   }
 

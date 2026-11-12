@@ -57,6 +57,9 @@ public class RecallAnswerHistoryService {
         answer.getCreatedAt().toInstant(),
         answer.getCorrect(),
         answer.getOutcome(),
+        answer.isExcludedAsAmbiguous()
+            ? new RecallAttempt.AmbiguityExclusion(answer.getExclusionReason())
+            : null,
         new RecallAttempt.SourceNote(
             note.getTitle(), portablePathAuthoring.qualifiedPortablePath(note, learner)),
         mcq == null ? null : multipleChoice(answer, mcq),

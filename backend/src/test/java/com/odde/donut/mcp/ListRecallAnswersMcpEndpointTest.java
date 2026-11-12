@@ -47,6 +47,26 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
     assertThat(question.get("selectedChoice").asText(), equalTo("Nobody"));
     assertThat(question.get("expectedAnswer").asText(), equalTo("Peers"));
     assertThat(question.get("validationRationale").asText(), equalTo("Peers review code."));
+    assertThat(attempt.has("excludedAsAmbiguous"), equalTo(false));
+  }
+
+  @Test
+  void returnsAnAmbiguityExcludedAttemptAsRecordedWithItsReason() throws Exception {
+    makeMe
+        .aRecallPrompt()
+        .withMcqForNote(note)
+        .forMemoryTracker(trackerOf(personalUser))
+        .answerChoiceIndex(1)
+        .answerTimestamp(hoursAgo(24))
+        .recorded()
+        .excludedAsAmbiguous("both choices fit")
+        .please();
+    makeMe.entityPersister.flushAndClear();
+
+    JsonNode attempt = listRecallAnswers().get("attempts").get(0);
+
+    assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
+    assertThat(attempt.at("/excludedAsAmbiguous/reason").asText(), equalTo("both choices fit"));
   }
 
   @Test
@@ -66,6 +86,7 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
                 + " catches bugs early."));
     assertThat(spelling.has("promptUnavailable"), equalTo(false));
     assertThat(attempt.has("outcome"), equalTo(false));
+    assertThat(attempt.has("excludedAsAmbiguous"), equalTo(false));
   }
 
   @Test

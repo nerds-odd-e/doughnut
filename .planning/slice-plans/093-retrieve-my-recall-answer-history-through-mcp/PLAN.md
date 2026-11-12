@@ -207,8 +207,11 @@ Sizing: about five active minutes.
 
 ### 6. Show ambiguity exclusions
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP endpoint case; full backend suite.
+
+Accepted proof: `ListRecallAnswersMcpEndpointTest` case
+`returnsAnAmbiguityExcludedAttemptAsRecordedWithItsReason`; full suite green.
 
 Behavior: An incorrect multiple-choice attempt was excluded as ambiguous → the
 attempt still shows incorrect, and adds that it was excluded and why.
@@ -322,3 +325,7 @@ checks against real history after delivery; that check is not a slice.
   `ListRecallAnswersMcpEndpointTest` (what an attempt carries; slices 6–8),
   `ListRecallAnswersWindowMcpEndpointTest` (which attempts; slice 9), sharing
   `ListRecallAnswersMcpEndpointTestBase`. Full suite: 3,181 tests green.
+- Slice 6 (accepted): the exclusion is stored on `Answer` (`excludedAt`,
+  `exclusionReason`); attempts carry `excludedAsAmbiguous.reason` and keep
+  `correct` as recorded. Fixture: `.recorded().excludedAsAmbiguous(reason)`.
+  Full suite: 3,182 tests green.
