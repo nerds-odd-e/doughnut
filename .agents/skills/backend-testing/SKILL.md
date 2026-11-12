@@ -6,7 +6,7 @@ paths:
 ---
 # Backend Testing Rules
 
-**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** the `unit-testing` skill — follow that first.
+**Style ("small test" practice — stable boundary, data over mocks, focused assertions):** the `unit-testing` skill — follow that first.
 
 ## Commands
 
@@ -91,11 +91,19 @@ class TextContentValidatorTest extends SpringTestBase {
 }
 ```
 
-## MakeMe Builders
+## Test-data guidance and Java construction
 
-- Use the central `makeMe` factory; chain methods; end with `please()` (or `please(boolean)` for persistence control).
-- Builders handle relationships and defaults — see `unit-testing` skill for when to extend them vs set fields in the test.
-- Ownership: prefer `notebookOwnedBy(user)` so `aMemoryTrackerFor(note)` inherits the owner.
+For authoring, extension and implicated refactoring, follow
+[Dough MakeMe](../dough-makeme/SKILL.md) with the actual test source path before
+arranging fixtures. Use the selected shared convention and its unresolved
+selection handling; other entries keep their practice.
+
+Backend `MakeMe` is supplied by `SpringTestBase`. Java factory access calls a
+method such as `makeMe.aNote()`. Entity builders complete with `please()` to
+persist, or `inMemoryPlease()` / `please(false)` for in-memory construction;
+`please(boolean)` passes the persistence choice through related construction.
+`notebookOwnedBy(user)` sets notebook ownership, which `aMemoryTrackerFor(note)`
+uses for its tracker owner. Preserve [destructive-fixture integrity](../unit-testing/SKILL.md#destructive-operations-hard-deletes-delete-migrations).
 
 ```java
 Note note = makeMe.aNote()

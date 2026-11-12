@@ -2,13 +2,13 @@
 
 **Identity:** SEED-126#use-shared-test-guidance
 **Source:** [refined story](../../seeds/SEED-126-use-shared-test-guidance.md#use-shared-test-guidance)
+**Source review:** [source-only commitments](source-review.md)
 
 ## Goal and boundaries
 
 A Doughnut test author or refactorer reaches the installed Open Dough MakeMe
 and browser page-object conventions for the entries enabling them, together
-with the local integration guidance needed to apply them. This preparation
-authorizes no implementation; both slices below remain planned.
+with the local integration guidance needed to apply them. Execution is authorized by the developer’s Dough Execute Plan instruction.
 
 Audit the five local testing skills and their linked guidance. Replace generic
 convention copies with selection-aware routing. Preserve TypeScript imports,
@@ -125,7 +125,7 @@ role/message expectations to `ConversationAboutNotePage.expectMessages()`.
 
 ### 1. Follow shared MakeMe from local testing guidance
 Type: Behavior
-Status: planned
+Status: done
 Proof: The slice-1 rows in the proof table, replaying the selector command and
 following the author/refactorer guidance chain for frontend, CLI, Java and scripts.
 
@@ -187,3 +187,43 @@ guidance audit. No human decision or external dependency blocks these slices.
 ## Learnings
 
 None beyond the preparation observations above.
+
+## Execution context
+
+Established start retained: story-branch mode, workspace
+`/Users/terryyin/git/doughnut/.worktrees/use-shared-makeme-and-page-object-guidance`,
+branch `codex/use-shared-makeme-and-page-object-guidance`, remote `origin`,
+trunk `main`, publisher `dashboard-territory.local-doughnut`, agent Kirara-chan.
+Starting revision `b503972834ecdae1026118f6d0a57a5fad5f44de`;
+claim and initial published base `a5f5b56692c3749f9508bfe7e30fcefee3b1ab3c`.
+The existing owned worktree was reused; no integration checkout was supplied.
+Replanning retains the existing planned-execution authority and scope.
+No user-visible path or persisted behavior is removed by these guidance edits.
+
+Checkout setup: `./scripts/run.sh bash scripts/worktree_setup.sh` exited 0,
+locked dependencies unchanged. The literal baseline selector command above
+exited 0 with the recorded selections in this exact checkout on 2026-11-12.
+The active pre-commit hook runs check-only `lint:changed`; the coordinator owns
+`./scripts/run.sh pnpm format:changed` through guarded fresh delivery.
+
+CI source: GitHub Actions `ci.yml`, verified active as `donut CI`, push-triggered
+on all branches. Story-branch target is
+`nerds-odd-e/doughnut:codex/use-shared-makeme-and-page-object-guidance`.
+Claim CI on trunk is unobserved. Observer coordinator `kirara-seed126`,
+directory `/tmp/dough-ci-501/watch-9bfSqM`, PID 87514, stream session 18535,
+yielded cell `g100:13`, runtime in this checkout's `.agents/skills/dough-execute-plan`.
+No expensive verification is needed: the guidance/selector boundary requires
+only bounded reading and local commands; application suites are outside it.
+
+## Slice 1 acceptance
+
+The four fixture sections reach shared MakeMe selection and the convention.
+The baseline selector replay passed unchanged; TS examples/imports, Java
+EntityBuilder completion, DB/refresh rules, FK closure and script fixtures were
+read against the representative sources. All local links/anchors and
+`scripts/check_diff_whitespace.sh` passed; skills are 92/236/125/119 lines.
+Consumer trace `/tmp/seed126-slice1-consumers.md` has 823 classified rows;
+unchanged runtime APIs and Storybook's separate practice are outside its effect.
+Fresh `refactor_makeme` returned `REFACTOR COMPLETE`, no edits/tests; proof reused.
+Eight active implementation minutes reflect bounded consumer classification,
+within the ten-minute hard limit. Freshness remained unchanged before delivery.

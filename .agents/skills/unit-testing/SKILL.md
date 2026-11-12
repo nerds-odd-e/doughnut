@@ -1,18 +1,18 @@
 ---
 name: unit-testing
-description: Small-test style for unit tests — stable boundary, data over mocks, focused assertions, concise makeMe (all packages). Use when writing or changing unit tests in any package.
+description: Small-test style for unit tests — stable boundary, data over mocks, focused assertions, selected MakeMe guidance (all packages). Use when writing or changing unit tests in any package.
 ---
 # "Small test" style
 
 This repo’s automated tests are **E2E** or **unit tests** — nothing in between. Write unit tests in the **"small test"** style below.
 
-A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …) that drives a **stable boundary** with crafted data/`makeMe`, exercises real lower-level production code, and mocks only external dependencies. Stack commands, entry points, and tooling stay in the package skills (`frontend` / `frontend-testing`, `backend` / `backend-testing`, `cli`, `mcp-server`).
+A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …) that drives a **stable boundary** with crafted data, exercises real lower-level production code, and mocks only external dependencies. Stack commands, entry points, and tooling stay in the package skills (`frontend` / `frontend-testing`, `backend` / `backend-testing`, `cli`, `mcp-server`).
 
 ## Stable boundary
 
 - **Drive the outermost (or domain-stable) interface.** Prefer the public surface under test — e.g. a controller, mounted component, CLI `run` / `runInteractive`, MCP tool — or an interface that is itself a deliberate, domain-stable contract (pure algorithm, validation API). Do not add a test class per internal production class, and do not widen exports only so tests can reach helpers.
 - **Cover lower layers with data, not with more test surfaces.** Craft realistic, scenario-specific preconditions and fixtures so one boundary test exercises the real lower-level production routines. Prefer that over isolating each collaborator behind mocks or thin wrapper tests.
-- **Build those fixtures with `makeMe`** — keep construction concise (see below).
+- Select fixture conventions through [test-data guidance](#test-data-guidance).
 - **Do not mock unless external or exceptional.** Mock only true external dependencies (third-party APIs, network services, and the like) or extremely rare special cases. Package rules name the allowed exceptions (`OpenAIClient`, frontend `mockSdkService` for the backend HTTP API, CLI spies on `donut-api`, etc.). Prefer the real database, real in-process collaborators, and real browser rendering inside the system under test.
 - **Loud failures** — Code that is allowed to fail loudly is not a unit-test subject for that failure. Policy: ADR 0006 Usage.
 
@@ -71,38 +71,22 @@ behavior's tests.
 
 ## Destructive operations (hard deletes, delete migrations)
 
-The concise-fixture guidance below is correct for **behavior** tests. For **hard deletes** and **delete migrations**, **fixture completeness beats minimality** — a bare target row with no children only proves row *selection*, not referential *fan-out*.
+For **hard deletes** and **delete migrations**, **fixture completeness beats minimality** — a bare target row with no children only proves row *selection*, not referential *fan-out*.
 
 - **Hard-delete endpoints:** build a row in **every table that holds an FK into the deleted entity** (directly or via CASCADE). Example: `MemoryTrackerDeleteControllerTest` uses `makeMe.aConversation().forARecallPrompt(...)` so deleting a tracker exercises the `conversation → recall_prompt` edge, not just the tracker row.
 - **Delete migrations:** same rule — seed every child table in the FK closure, not only rows the `WHERE` clause selects. While a gated migration is pending, pair it with a focused temporary test for the placeholder and row selection; remove that migration-only harness after confirmed production application.
 - **Schema guard:** `DeletableEntityFkClosureTest` catches restricting FKs without fixtures; it does not replace completeness tests for runtime delete paths.
 
-## Concise makeMe setup
+## Test-data guidance
 
-- Build fixtures with **`makeMe`** (`donut-test-fixtures/makeMe` on TS; backend `MakeMe` on Java). Rely on **builder defaults** when a value is unused in assertions and does not affect the logic under test. **Exception:** destructive operations above — do not minimize away FK children.
-- Do **not** create users, notebooks, or owners only to satisfy wiring if the builder already defaults them and the test never refers to them.
-- Prefer ownership helpers so dependents inherit the owner (e.g. backend `notebookOwnedBy` → tracker `.by` default).
-- Prefer builder APIs over **post-construction mutation** (e.g. `.id(10)`, not `note.id = 10`).
-- Prefer **domain-shaped helpers** over field soup when the same shape repeats (e.g. `.accidentalMatch(...)`, `.overlap(...)`, `.aliases(...)`).
-- If a mandatory dependency or repeated fixture cannot be expressed concisely, **extend the makeMe builder** — do not leave verbose setup in every test.
+Before arranging fixtures for ordinary authoring, extension or implicated
+refactoring, follow [Dough MakeMe](../dough-makeme/SKILL.md). It selects each
+actual test source through the shared entry rules, including intended new
+paths, and loads the shared convention only for enabled entries. Follow its
+unresolved-selection handling before convention-dependent edits.
 
-```java
-// ❌
-Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-Note n = makeMe.aNote().notebook(nb).title("X").please();
-makeMe.aMemoryTrackerFor(n).by(currentUser.getUser()).spelling().please();
-
-// ✅
-Note n = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("X").please();
-makeMe.aMemoryTrackerFor(n).spelling().please();
-```
-
-```typescript
-// ❌
-const note = makeMe.aNote.please()
-note.id = 10
-note.noteTopology.id = 10
-
-// ✅
-const note = makeMe.aNote.id(10).please()
-```
+Keep the source's established fixture practice when MakeMe is off. In
+particular, script tests keep their Bach or Node fixtures. MakeMe and page
+objects are independent selections; a browser-mode unit test does not acquire
+page objects from its runtime. Language imports and construction/persistence
+mechanics live in the stack testing skills.

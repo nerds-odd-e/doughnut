@@ -7,7 +7,7 @@ paths:
 ---
 # Frontend Testing Rules
 
-**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** the `unit-testing` skill — follow that first.
+**Style ("small test" practice — stable boundary, data over mocks, focused assertions):** the `unit-testing` skill — follow that first.
 
 These commands cover behavioral testing only. Before accepting frontend proof,
 also pass the typecheck required by the `frontend` skill's "Frontend proof" rule.
@@ -68,7 +68,7 @@ the normal browser-mode command and do not compare its wall time directly with
 
 ## Component Behavior
 
-- Drive the mounted component / page ("small test" style per `unit-testing` skill); cover lower layers with realistic `makeMe` props/state, not by testing internal helpers in isolation.
+- Drive the mounted component / page ("small test" style per `unit-testing` skill); cover lower layers with realistic scenario props/state, not by testing internal helpers in isolation.
 - Test through user interactions; assert observable DOM outcomes.
 - Use `data-testid` for test selectors.
 - Use Vitest browser mode and prefer real browser rendering over mocking sibling components or internal modules; stop using jsdom.
@@ -117,7 +117,7 @@ The backend HTTP API is an **external** dependency from the frontend’s perspec
 - It returns a spy that can be reconfigured in tests.
 - Use `wrapSdkResponse` when updating mock return values.
 - Use `mockSdkServiceWithImplementation` only for custom async logic based on options.
-- Build response payloads with `makeMe`; do not mock in-process collaborators to “reach” coverage.
+- Arrange response payloads through [test-data guidance](#test-data-guidance); do not mock in-process collaborators to “reach” coverage.
 
 ```typescript
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
@@ -161,14 +161,22 @@ const wrapper = helper
 await wrapper.setProps({ value: newValue })
 ```
 
-## Data Builders
+## Test-data guidance
 
-- Use `makeMe` for API-shaped test data; implementation lives in `packages/donut-test-fixtures`.
-- Import `donut-test-fixtures/makeMe` only. Do not import the bare package name or deep paths into `src/`.
-- Concise setup, defaults, and extending builders: `unit-testing` skill.
+For authoring, extension and implicated refactoring, follow
+[Dough MakeMe](../dough-makeme/SKILL.md) with the actual test source path before
+arranging fixtures. Use the selected shared convention, with its unresolved
+selection handling; other entries keep their practice. Running Vitest in
+Chromium does not select browser page objects.
+
+The frontend's API-shaped fixtures live in `packages/donut-test-fixtures`.
+Import `donut-test-fixtures/makeMe` only, rather than the bare package or a
+`src/` deep path. For example:
 
 ```typescript
-const note = makeMe.aNoteRealm.title("Dummy Title").content("Description").please()
+import makeMe from "donut-test-fixtures/makeMe"
+
+const note = makeMe.aNoteRealm.please()
 const answered = makeMe.anAnsweredQuestion
   .accidentalMatch("alias", [note.note.noteTopology])
   .please()
