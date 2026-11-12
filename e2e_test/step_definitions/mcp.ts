@@ -210,3 +210,14 @@ Then(
 Then('the read note should cite a different accepted revision', () => {
   start.mcpAgentActions().expectReadRevisionDiffersFromCited()
 })
+
+When('AI agent lists my recall answers', () => {
+  start.mcpAgentActions().listRecallAnswers()
+})
+
+Then(
+  'the recall answers should include the spelling answer {string} to a note containing {string}',
+  (typedAnswer: string, content: string) => {
+    start.mcpAgentActions().expectSpellingRecallAnswer(typedAnswer, content)
+  }
+)

@@ -266,9 +266,14 @@ Sizing: about five active minutes.
 
 ### 10. Serve hosted assistants and document the tool
 Type: Behavior
-Status: planned
+Status: done
 Proof: `AssistantMcpAccessTest` case; one new `mcp_services.feature` scenario;
 both MCP features green; documentation read.
+
+Accepted proof: `AssistantMcpAccessTest.assistantReadsTheLearnersRecallAnswers`;
+`mcp_services.feature` scenario "AI agent reads a wrong spelling answer from
+recall"; both MCP features 10 of 10 after the refactor; documentation read
+against the tool description.
 
 Behavior: A hosted assistant connected with `notes:read` → calls the tool →
 receives the learner's attempts. A learner answers a spelling prompt wrongly in
@@ -357,3 +362,10 @@ checks against real history after delivery; that check is not a slice.
   ignored. The cursor advances by the last answer fetched, so the post-query
   prompt filter can only shorten a page until slice 8 drops it. Full suite:
   3,190 tests green.
+- Slice 10 ran before slice 8. The spelling journey needs no paid AI (it reuses
+  the `@disableOpenAiService` spelling recall flow). In E2E the backend clock is
+  time-travelled while the note's `updatedAt` is real time, so the scenario
+  asserts typed answer, correctness and content, not the masked prompt. Slice 8
+  adds its unavailable-evidence fields to `.agents/skills/mcp-server/SKILL.md`
+  and `docs/assistant-oauth.md`. `mcpAgentActions.ts` is at the 250-line limit.
+  Backend 3,191 tests and both MCP features (10 of 10) green.

@@ -98,6 +98,26 @@ export const mcpAgentActions = () => {
       return this.callTool('list_note_candidates', { query: searchTerm })
     },
 
+    listRecallAnswers() {
+      return this.callTool('list_recall_answers')
+    },
+
+    expectSpellingRecallAnswer(typedAnswer: string, content: string) {
+      getResponseText('@MCPApiResponse').then((responseText) => {
+        const attempt = JSON.parse(responseText).attempts.find(
+          (a: { spelling?: { typedAnswer: string } }) =>
+            a.spelling?.typedAnswer === typedAnswer
+        )
+        expect(
+          attempt,
+          `spelling answer "${typedAnswer}" in recall answers: ${responseText}`
+        ).to.exist
+        expect(attempt.correct, 'recorded correctness').to.equal(false)
+        expect(attempt.note.content, 'source note content').to.contain(content)
+      })
+      return this
+    },
+
     getNoteGraphFromLastSearch(tokenLimit: number) {
       callToolOnFirstCandidate(
         'get_note_graph',

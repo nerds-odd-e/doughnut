@@ -69,6 +69,16 @@ Search matches titles and aliases; use a more precise title when no match is
 found. A full read supplies citation evidence; graph context guides further
 reading and may contain truncated excerpts.
 
+Try also: “List my Donut recall answers from the last week and tell me what I
+keep confusing.” `list_recall_answers` serves the learner's own recall answers,
+newest first, under `notes:read` and changes nothing. `days` sets the lookback
+(default 7). A default call can take several responses: the assistant passes
+each `nextCursor` back as `cursor` until a response has none. Each answer
+carries its question, the learner's answer and recorded correctness. A correct
+answer names its note by title and portablePath; a missed spelling answer adds
+the note's full content and a missed multiple-choice answer adds bounded graph
+context. `get_note_graph` gives more context.
+
 ## Commissioned learning through ChatGPT
 
 Before connecting, confirm that the registered client's allowed scopes include
@@ -131,10 +141,10 @@ migration. [Authorization schema](../backend/src/main/resources/db/migration/V30
 [MySQL date and time conversion](https://dev.mysql.com/doc/refman/8.4/en/date-and-time-type-conversion.html)
 
 Every call checks the current user/client/resource/read grant and current
-notebook permissions. The assistant can search candidates, read attributed notes
-and request bounded graph context. With `learning_session:record`, it can also
-record Learning Session Reports, saving Feedback and updating schedules for
-completed items. Existing read-only connections need fresh authorization requesting
+notebook permissions. The assistant can search candidates, read attributed notes,
+request bounded graph context and read the user's own recall answers. With
+`learning_session:record`, it can also record Learning Session Reports, saving
+Feedback and updating schedules for completed items. Existing read-only connections need fresh authorization requesting
 both scopes to gain recording permission. It gains no general API access, personal-token
 creation or content editing. Losing notebook permission affects subsequent reads.
 

@@ -82,6 +82,18 @@ Feature: MCP (Model Context Protocol) Services
     When AI agent reads "Engineering:Code Review" and selects the candidate in "Practices/Design"
     Then the read note should be at "Engineering:Practices/Design/Code Review" in folder "Practices / Design"
 
+  @disableOpenAiService
+  Scenario: AI agent reads a wrong spelling answer from recall
+    Given I have a notebook "English practice" with notes:
+      | Title    | Content                        |
+      | sedition | Sedition means incite violence |
+    And the note "sedition" was assimilated as spelling on day 1
+    When I visit recall for a due recall prompt on day 2
+    And I type my answer "sedation"
+    Then I should see that my spelling answer "sedation" is incorrect
+    When AI agent lists my recall answers
+    Then the recall answers should include the spelling answer "sedation" to a note containing "Sedition means incite violence"
+
   Scenario: MCP calls stay scoped to each personal token's user
     Given there are some notes for existing user "another_old_learner" in notebook "Other Private"
       | Title          |

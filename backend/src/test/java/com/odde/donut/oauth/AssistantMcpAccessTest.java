@@ -49,6 +49,40 @@ class AssistantMcpAccessTest extends AssistantMcpTestSupport {
     assertThat(read.get("title").asString(), is("Delegated read"));
   }
 
+  @Test
+  void assistantReadsTheLearnersRecallAnswers() throws Exception {
+    var learner = users.findByExternalIdentifier("old_learner");
+    var note = makeMe.aNote("Recalled").notebookOwnedBy(learner).please();
+    var answeredAt = makeMe.aTimestamp().of(10, 8).please();
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(10, 9).please());
+    makeMe
+        .aRecallPrompt()
+        .withMcqForNote(note)
+        .forMemoryTracker(makeMe.aMemoryTrackerFor(note).by(learner).please())
+        .answerChoiceIndex(0)
+        .answerTimestamp(answeredAt)
+        .recorded()
+        .please();
+    makeMe.entityPersister.flushAndClear();
+
+    var response =
+        call(issueAccessToken(), "list_recall_answers", Map.of())
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse();
+
+    var attempt =
+        objectMapper
+            .readTree(
+                objectMapper
+                    .readTree(response.getContentAsString())
+                    .at("/result/content/0/text")
+                    .asString())
+            .at("/attempts/0");
+    assertThat(attempt.at("/note/title").asString(), is("Recalled"));
+    assertThat(attempt.get("answeredAt").asString(), is(answeredAt.toInstant().toString()));
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {"expired", "revoked", "deleted", "resource", "scope", "token-scope", "audience"})
