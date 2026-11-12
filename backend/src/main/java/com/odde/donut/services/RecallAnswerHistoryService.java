@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 /** Owns the learner's recall answer history in a rolling window ending at the call. */
 @Service
 public class RecallAnswerHistoryService {
-  private static final Duration DEFAULT_LOOKBACK = Duration.ofDays(7);
-
   private final AnswerRepository answerRepository;
   private final RecallPromptRepository recallPromptRepository;
   private final PortablePathAuthoring portablePathAuthoring;
@@ -37,8 +35,8 @@ public class RecallAnswerHistoryService {
   }
 
   @Transactional(readOnly = true)
-  public RecallAnswerHistory recentAttempts(User learner, Instant to) {
-    Instant from = to.minus(DEFAULT_LOOKBACK);
+  public RecallAnswerHistory recentAttempts(User learner, Instant to, Duration lookback) {
+    Instant from = to.minus(lookback);
     List<Answer> answers =
         answerRepository.findRecordedAnswersOfLearnerBetween(
             learner.getId(), Timestamp.from(from), Timestamp.from(to));

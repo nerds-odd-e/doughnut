@@ -7,6 +7,7 @@ import com.odde.donut.testability.TestabilitySettings;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.time.Duration;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +18,16 @@ public record ListRecallAnswersTool(
     TestabilitySettings testabilitySettings,
     JsonMapper objectMapper) {
   public static final String NAME = "list_recall_answers";
+  private static final int DEFAULT_DAYS = 7;
 
   private static final String DESCRIPTION =
       """
-      Lists the learner's own recall answers from the last seven days, newest first, so you can
-      investigate what they confuse and where notes or questions could improve.
+      Lists the learner's own recall answers from the last **days** days (default 7), newest
+      first, so you can investigate what they confuse and where notes or questions could improve.
+
+      Arguments:
+      - **days** (optional) — a positive number of days to look back; the window is that many
+        24-hour periods ending at the call
 
       What this returns (JSON):
       - **from**, **to** — the window as absolute instants; it ends at the call
@@ -42,7 +48,18 @@ public record ListRecallAnswersTool(
                 .meta(McpToolAuthorization.readOnlyMetadata())
                 .description(DESCRIPTION)
                 .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
-                .inputSchema(Map.of("type", "object", "properties", Map.of()))
+                .inputSchema(
+                    Map.of(
+                        "type",
+                        "object",
+                        "properties",
+                        Map.of(
+                            "days",
+                            Map.of(
+                                "type",
+                                "number",
+                                "description",
+                                "Positive number of days to look back. Defaults to 7."))))
                 .build())
         .callHandler(this::call)
         .build();
@@ -50,10 +67,20 @@ public record ListRecallAnswersTool(
 
   private McpSchema.CallToolResult call(
       McpTransportContext context, McpSchema.CallToolRequest request) {
+    double days =
+        request.arguments() == null
+            ? DEFAULT_DAYS
+            : ((Number) request.arguments().getOrDefault("days", DEFAULT_DAYS)).doubleValue();
+    if (days <= 0) {
+      return McpToolRefusal.because(
+          "A positive number of days is required, such as 14. Omit days for the last 7 days.");
+    }
     User user = (User) context.get(McpServerConfiguration.TRANSPORT_USER_KEY);
     return McpJsonToolResult.of(
         objectMapper,
         recallAnswerHistory.recentAttempts(
-            user, testabilitySettings.getCurrentUTCTimestamp().toInstant()));
+            user,
+            testabilitySettings.getCurrentUTCTimestamp().toInstant(),
+            Duration.ofMillis(Math.round(days * Duration.ofDays(1).toMillis()))));
   }
 }

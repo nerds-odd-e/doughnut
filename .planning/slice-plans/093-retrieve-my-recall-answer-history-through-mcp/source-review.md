@@ -9,7 +9,7 @@ Launched 2026-11-12 by the execution coordinator as a fresh general-purpose agen
 | G1 | As a Donut learner, I can ask my connected assistant for my recall answers so it can use real attempts to investigate what I confuse and where my notes or questions could improve. | slice 10 | |
 | 1 | A read-only MCP call retrieves every recorded answered recall prompt for the connected learner. | slice 8 |  |
 | 2a | The lookback defaults to seven days, measured by answer time. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: stems exactly Yesterday, Two days ago; from = now - 168h |
-| 2b | The caller can optionally supply a different positive number of days. | slice 3 | |
+| 2b | The caller can optionally supply a different positive number of days. | slice 3 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#looksBackTheGivenNumberOfDays: 10x24h-old answer returned with days 14, absent without days |
 | 2c | The lookback is a rolling window of days × 24 hours ending at the call. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: from = now - 7x24h, to = now (call time) |
 | 2d | Times are returned as absolute instants, so the call needs no timezone. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt answeredAt and backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst from/to equal Instant.toString() ISO-Z |
 | 3a | The full window is retrievable even when the results need more than one response. | slice 9 | |
@@ -47,7 +47,7 @@ Launched 2026-11-12 by the execution coordinator as a fresh general-purpose agen
 | 7f | An answer whose question is no longer stored reports the question as unavailable. | slice 8 | |
 | R1 | Only the connected learner's own attempts are returned (private learning evidence). | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: other learner's answer 1h ago on the same note absent from exact list |
 | R2 | Source note title, path, content, and graph need current notebook read access (authorization). | slice 8 | |
-| R3 | The days argument, when given, is a positive number (a window must have a length). | slice 3 | |
+| R3 | The days argument, when given, is a positive number (a window must have a length). | slice 3 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#refusesDaysThatAreNotPositive (0, -1: isError, 'A positive number of days is required') and #refusesDaysThatAreNotANumber (text: isError, schema refusal naming /days and number expected) |
 | R4 | The tool changes nothing: no schedule, tracker, or note. | slice 2 | observed: McpEndpointTest tool list: readOnlyHint true, destructiveHint false; RecallAnswerHistoryService @Transactional(readOnly) |
 | Q1 | Clarifications follow from the scope and observations and add no restriction of their own. | slice 10 | |
 | E1 | With the default lookback, yesterday's correct multiple-choice answer has the full question and the note's title and path. | slice 7 | |

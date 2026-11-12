@@ -158,8 +158,13 @@ would leave a tool that returns nothing.
 
 ### 3. Choose the lookback
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP endpoint cases; full backend suite.
+
+Accepted proof: `ListRecallAnswersMcpEndpointTest` cases
+`looksBackTheGivenNumberOfDays`, `refusesDaysThatAreNotPositive`,
+`refusesDaysThatAreNotANumber`; full suite green before the MCP-only refactor,
+`com.odde.donut.mcp.*` green after it.
 
 Behavior: An incorrect answer is ten days old → the call gives `days` 14 → the
 attempt is returned; with no `days` it is not. A `days` that is zero, negative,
@@ -281,3 +286,10 @@ checks against real history after delivery; that check is not a slice.
   graph) stays inside that read-only transaction and the service returns records.
 - MCP tools that return JSON share `McpJsonToolResult.of`.
 - Full backend suite after slice 2: 3,173 tests, 0 failures.
+- Slice 3 (accepted): `days` is a JSON-schema `number` (fractions allowed),
+  default 7 in `ListRecallAnswersTool`; the service takes a `Duration`. The MCP
+  SDK validates argument types against the input schema before the handler, so a
+  text `days` is refused by the SDK naming `/days` and the expected type; the
+  handler refuses only non-positive values. In-band refusals share
+  `McpToolRefusal.because` (also used by `McpNoteLookup`); slice 9's unreadable
+  cursor should use it.

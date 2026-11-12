@@ -2,7 +2,9 @@ package com.odde.donut.mcp;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,6 +20,8 @@ import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class ListRecallAnswersMcpEndpointTest extends McpEndpointTestBase {
@@ -88,6 +92,36 @@ class ListRecallAnswersMcpEndpointTest extends McpEndpointTestBase {
     assertThat(result.get("to").asText(), equalTo(now.toInstant().toString()));
   }
 
+  @Test
+  void looksBackTheGivenNumberOfDays() throws Exception {
+    MemoryTracker tracker = trackerOf(personalUser);
+    answeredAt(tracker, "Ten days ago", hoursAgo(10 * 24));
+
+    assertThat(
+        texts(listRecallAnswers(Map.of("days", 14)).get("attempts"), "/multipleChoice/stem"),
+        contains("Ten days ago"));
+    assertThat(listRecallAnswers().get("attempts").size(), equalTo(0));
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {0, -1})
+  void refusesDaysThatAreNotPositive(int days) throws Exception {
+    expectRefusal(Map.of("days", days), "A positive number of days is required");
+  }
+
+  @Test
+  void refusesDaysThatAreNotANumber() throws Exception {
+    expectRefusal(Map.of("days", "two weeks"), "/days: string found, number expected");
+  }
+
+  private void expectRefusal(Map<String, Object> arguments, String message) throws Exception {
+    mockMvc
+        .perform(authorized(mcpPost(callBody(arguments))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.result.isError").value(true))
+        .andExpect(jsonPath("$.result.content[0].text").value(containsString(message)));
+  }
+
   private MemoryTracker trackerOf(User learner) {
     return makeMe.aMemoryTrackerFor(note).by(learner).please();
   }
@@ -118,20 +152,26 @@ class ListRecallAnswersMcpEndpointTest extends McpEndpointTestBase {
   }
 
   private JsonNode listRecallAnswers() throws Exception {
-    String body =
-        objectMapper.writeValueAsString(
-            Map.of(
-                "jsonrpc",
-                "2.0",
-                "id",
-                3,
-                "method",
-                "tools/call",
-                "params",
-                Map.of("name", ListRecallAnswersTool.NAME, "arguments", Map.of())));
+    return listRecallAnswers(Map.of());
+  }
+
+  private String callBody(Map<String, Object> arguments) throws Exception {
+    return objectMapper.writeValueAsString(
+        Map.of(
+            "jsonrpc",
+            "2.0",
+            "id",
+            3,
+            "method",
+            "tools/call",
+            "params",
+            Map.of("name", ListRecallAnswersTool.NAME, "arguments", arguments)));
+  }
+
+  private JsonNode listRecallAnswers(Map<String, Object> arguments) throws Exception {
     var response =
         mockMvc
-            .perform(authorized(mcpPost(body)))
+            .perform(authorized(mcpPost(callBody(arguments))))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse();
