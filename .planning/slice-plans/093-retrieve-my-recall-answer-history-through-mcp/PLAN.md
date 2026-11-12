@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#retrieve-my-recall-answer-history-through-mcp
 **Source:** [refined story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#retrieve-my-recall-answer-history-through-mcp)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and boundaries
 
@@ -133,8 +134,15 @@ Sizing: about five active minutes.
 
 ### 2. List recent multiple-choice attempts
 Type: Behavior
-Status: planned
+Status: done
 Proof: New MCP endpoint cases and the tool-list assertion; full backend suite.
+Accepted proof: `ListRecallAnswersMcpEndpointTest`
+(`returnsTheFullRecordedMultipleChoiceAttempt`,
+`returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst`) and the
+`McpEndpointTest` tool list, via
+`CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.mcp.*'`
+after refactoring; full suite `pnpm backend:test_only` green before the
+MCP-only refactor.
 
 Behavior: A learner answered multiple-choice recall prompts in the last seven
 days → an assistant calls `list_recall_answers` with no arguments → each of
@@ -253,4 +261,23 @@ checks against real history after delivery; that check is not a slice.
 
 ## Learnings
 
-None yet.
+- Execution started 2026-11-12 in Story Branch Mode on
+  `claude/retrieve-my-recall-answer-history-through-mcp`, claim `e5ee25233c`.
+- Slice 1 is deferred, not skipped: the local `gcloud` login had expired
+  (reauthentication required) and the owner was asked to sign in. Only slice 8's
+  missing-question case waits on it.
+- Slice 2 (accepted): attempts are arranged with
+  `makeMe.aRecallPrompt().withMcq(..).forMemoryTracker(t).answerChoiceIndex(i).answerTimestamp(ts).recorded().please()`
+  then `makeMe.entityPersister.flushAndClear()`; `.recorded()` writes the recall
+  log with the answer's grade, as answering does, so `Answer.getCorrect` reads
+  the recorded grade. For an Accidental match, add
+  `aRecallLogFor(other).confusion().answer(answer)` on the second tracker.
+- `RecallAnswerHistoryService.recentAttempts` reads answers by time through
+  `AnswerRepository.findRecordedAnswersOfLearnerBetween`, batches prompts with
+  `RecallPromptRepository.findAllByAnswerIn`, and takes the source note from the
+  answer's non-Confusion recall log, so slice 8 keeps it when the prompt is gone.
+  It still filters to answers with a multiple-choice prompt; slices 4 and 8 lift
+  that filter. Open-in-view is off, so every lazy walk (logs, note, content,
+  graph) stays inside that read-only transaction and the service returns records.
+- MCP tools that return JSON share `McpJsonToolResult.of`.
+- Full backend suite after slice 2: 3,173 tests, 0 failures.

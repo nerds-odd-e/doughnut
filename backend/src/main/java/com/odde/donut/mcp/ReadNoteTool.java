@@ -10,8 +10,6 @@ import com.odde.donut.services.PortablePathAuthoring;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -117,16 +115,10 @@ public class ReadNoteTool {
     try {
       AttributedNoteContent content = attributedNoteContentService.read(user, destination.getId());
       String portablePath = portablePathAuthoring.qualifiedPortablePath(destination, user);
-      String serializedContent =
-          objectMapper.writeValueAsString(McpAttributedNoteContent.from(content, portablePath));
-      return McpSchema.CallToolResult.builder()
-          .addContent(new McpSchema.TextContent(serializedContent))
-          .structuredContent(objectMapper.readValue(serializedContent, Object.class))
-          .build();
+      return McpJsonToolResult.of(
+          objectMapper, McpAttributedNoteContent.from(content, portablePath));
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolFailures.rethrow(e);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
     }
   }
 }

@@ -3,6 +3,7 @@ package com.odde.donut.testability.builders;
 import com.odde.donut.controllers.dto.AnswerDTO;
 import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.AnswerOutcome;
+import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -19,6 +20,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private String spellingAnswerText = null;
   private Timestamp answerTimestamp = null;
   private AnswerOutcome answerOutcome = null;
+  private boolean recorded = false;
 
   public RecallPromptBuilder(MakeMe makeMe, RecallPrompt recallPrompt) {
     super(makeMe, recallPrompt);
@@ -53,6 +55,27 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
       throw new IllegalStateException("call forMemoryTracker() before please()");
     }
     entity.setMemoryTracker(memoryTracker);
+  }
+
+  @Override
+  protected void afterCreate(boolean needPersist) {
+    if (!recorded) {
+      return;
+    }
+    Answer answer = entity.getAnswer();
+    answer.addRecallLog(
+        makeMe
+            .aRecallLogFor(memoryTracker)
+            .answer(answer)
+            .recordedAt(answer.getCreatedAt())
+            .grade(Grade.fromCorrect(Boolean.TRUE.equals(answer.getCorrect())))
+            .please(needPersist));
+  }
+
+  /** Records the answer's grade in a recall log, as answering in the product does. */
+  public RecallPromptBuilder recorded() {
+    this.recorded = true;
+    return this;
   }
 
   public RecallPromptBuilder forMemoryTracker(MemoryTracker memoryTracker) {

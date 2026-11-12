@@ -1,5 +1,6 @@
 package com.odde.donut.entities.repositories;
 
+import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.services.RecallAnswerRow;
 import jakarta.persistence.LockModeType;
@@ -37,6 +38,8 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       @Param("memoryTrackerId") Integer memoryTrackerId);
 
   List<RecallPrompt> findAllByMemoryTracker_IdOrderByIdDesc(Integer memoryTrackerId);
+
+  List<RecallPrompt> findAllByAnswerIn(List<Answer> answers);
 
   @Query(
       value =

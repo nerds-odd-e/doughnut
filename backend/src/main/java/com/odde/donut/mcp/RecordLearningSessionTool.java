@@ -12,8 +12,6 @@ import com.odde.donut.testability.TestabilitySettings;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,15 +100,9 @@ public record RecordLearningSessionTool(
       var result =
           learningSessions.record(
               user, notebook, reportMarkdown, testabilitySettings.getCurrentUTCTimestamp());
-      String serialized = objectMapper.writeValueAsString(result);
-      return McpSchema.CallToolResult.builder()
-          .addContent(new McpSchema.TextContent(serialized))
-          .structuredContent(objectMapper.readValue(serialized, Object.class))
-          .build();
+      return McpJsonToolResult.of(objectMapper, result);
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolFailures.rethrow(e);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
     }
   }
 }

@@ -1,0 +1,70 @@
+# Source review
+
+Launched 2026-11-12 by the execution coordinator as a fresh general-purpose agent without conversation inheritance. Input: the story section of `.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#retrieve-my-recall-answer-history-through-mcp` from **Goal** through **Key examples** (Goal, Scope, Clarifications, Scope limits, Required restrictions, Key examples), with no plan, product, or proof. Instructed to read nothing else and change nothing. Exclusions were returned with an X prefix.
+
+## Commitments
+
+| Id | Source commitment | Slice | Observation or obligation |
+| --- | --- | --- | --- |
+| G1 | As a Donut learner, I can ask my connected assistant for my recall answers so it can use real attempts to investigate what I confuse and where my notes or questions could improve. | slice 10 | |
+| 1 | A read-only MCP call retrieves every recorded answered recall prompt for the connected learner. | slice 8 |  |
+| 2a | The lookback defaults to seven days, measured by answer time. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: stems exactly Yesterday, Two days ago; from = now - 168h |
+| 2b | The caller can optionally supply a different positive number of days. | slice 3 | |
+| 2c | The lookback is a rolling window of days × 24 hours ending at the call. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: from = now - 7x24h, to = now (call time) |
+| 2d | Times are returned as absolute instants, so the call needs no timezone. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt answeredAt and backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst from/to equal Instant.toString() ISO-Z |
+| 3a | The full window is retrievable even when the results need more than one response. | slice 9 | |
+| 3b | Responses are sized for an assistant to read. | slice 9 | |
+| 3c | When the window does not fit one response, the response says so. | slice 9 | |
+| 3d | When the window does not fit one response, it gives what the next call needs to continue. | slice 9 | |
+| 3e | Continuing to the end returns each attempt exactly once. | slice 9 | |
+| 4a.1 | Each attempt includes its answer time. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: answeredAt equals yesterday's instant |
+| 4a.2 | Each attempt includes the full question used. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: multipleChoice.stem |
+| 4a.3 | Each attempt includes the learner's selected choice or typed answer. | slice 4 | |
+| 4a.4 | Each attempt includes the recorded correctness. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: correct = false after flushAndClear, read from recorded recall log |
+| 4b.1 | For multiple choice, include all choices. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: choices contains Peers, Nobody, The compiler in order |
+| 4b.2 | For multiple choice, include the expected answer. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: expectedAnswer = Peers |
+| 4b.3 | For multiple choice, include the stored validation rationale when available. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: validationRationale present when stored; RecallAttempt.MultipleChoice NON_NULL omits it otherwise |
+| 4c | Preserve recorded outcomes such as overlap and ambiguity exclusion so they can be interpreted correctly. | slice 6 | |
+| 5a | One attempt is one answer. | slice 5 | |
+| 5b | An attempt's correctness is the grade recorded with that answer, or the Overlap outcome, which counts as correct. | slice 5 | |
+| 5c | An Accidental match is an incorrect attempt that also says it is an Accidental match. | slice 5 | |
+| 5d | An Accidental match's Confusion record on the other note's tracker is part of the same attempt, not a second one. | slice 5 | |
+| 5e | An attempt later excluded as ambiguous keeps its recorded correctness and adds the exclusion and its reason. | slice 6 | |
+| 6a | The response selects source note evidence automatically from the recorded correctness and question type. | slice 7 | |
+| 6b | Source note evidence follows the recorded correctness (including for ambiguity-excluded attempts). | slice 7 | |
+| 6c | Source note evidence applies current notebook read access. | slice 8 | |
+| 6d | Source note evidence uses the note's current title. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: note.title = Code Review |
+| 6e | Source note evidence uses the notebook-qualified Portable path, addressed the way other MCP tools address notes, with no numeric note ID. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: note.portablePath = Engineering:Code Review; RecallAttempt.SourceNote has no ID field |
+| 6f | For a correct answer of either question type, the title and path are the entire source note payload. | slice 7 | |
+| 6g | For an incorrect spelling answer, source note evidence includes title, path, and full current content. | slice 7 | |
+| 6h | For an incorrect multiple-choice answer, source note evidence includes title, path, and a bounded graph. | slice 7 | |
+| 6i | The bounded graph uses a fixed modest budget chosen by Donut; `get_note_graph` remains the way to ask for more. | slice 7 | |
+| 7a | Missing historical evidence is identified explicitly. | slice 8 | |
+| 7b | An older spelling attempt may carry its typed answer even when the original masked prompt cannot be recovered after a note edit, with the prompt reported unavailable. | slice 4 | |
+| 7c | When the learner can no longer read the source note (access withdrawn or note in trash), the attempt stays with time, answer, correctness, and stored question. | slice 8 | |
+| 7d | When the learner can no longer read the source note, source note evidence is reported as unavailable with the reason. | slice 8 | |
+| 7e | An answer whose question is no longer stored is still an attempt, carrying its time, answer, and correctness. | slice 8 | |
+| 7f | An answer whose question is no longer stored reports the question as unavailable. | slice 8 | |
+| R1 | Only the connected learner's own attempts are returned (private learning evidence). | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: other learner's answer 1h ago on the same note absent from exact list |
+| R2 | Source note title, path, content, and graph need current notebook read access (authorization). | slice 8 | |
+| R3 | The days argument, when given, is a positive number (a window must have a length). | slice 3 | |
+| R4 | The tool changes nothing: no schedule, tracker, or note. | slice 2 | observed: McpEndpointTest tool list: readOnlyHint true, destructiveHint false; RecallAnswerHistoryService @Transactional(readOnly) |
+| Q1 | Clarifications follow from the scope and observations and add no restriction of their own. | slice 10 | |
+| E1 | With the default lookback, yesterday's correct multiple-choice answer has the full question and the note's title and path. | slice 7 | |
+| E2 | Yesterday's incorrect spelling answer includes the note's title, path, and full current content so the assistant can inspect the clue in context. | slice 7 | |
+| E3 | An incorrect multiple-choice answer from ten days ago appears when the caller requests fourteen days, with title, path, and bounded graph. | slice 7 | |
+| E4 | An answer from eight days ago is absent from the default call. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: eight-day-old answer absent |
+| E5 | A spelling answer that named another note is one incorrect attempt marked Accidental match, with the typed answer, and does not appear a second time for the other note. | slice 5 | |
+| E6 | A spelling answer accepted as an Overlap is correct with that outcome named, and has title and path only. | slice 7 | |
+| E7 | An incorrect multiple-choice attempt later excluded as ambiguous shows incorrect, excluded, and the reason, with the bounded graph. | slice 7 | |
+| E8 | A spelling note edited after it was answered returns the typed answer and correctness, and reports the prompt as shown unavailable. | slice 4 | |
+| E9 | A week holding more attempts than one response carries: the first response says more remain; following it to the end yields every attempt once. | slice 9 | |
+| E10 | The learner lost access to a subscribed notebook after answering: the attempt and its stored question remain, and note evidence is reported unavailable. | slice 8 | |
+| E11 | Another learner's attempts on the same shared note never appear. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: another learner's tracker on the same note, answered 1h ago, absent |
+| X1 | Just review and Tutor Feedback events have no answered recall prompt and are not returned. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: just-review recall log without answer, 2h ago, absent |
+| X2 | Filtering, such as incorrect attempts only or one notebook, is deferred. | slice 10 | |
+| X3 | A compact index of attempts with details on request is deferred (see the size observation). | slice 10 | |
+| X4 | Thinking time and other attention readings are deferred. | slice 10 | |
+| X5 | Aggregates are deferred. | slice 10 | |
+| X6 | Any diagnosis is deferred; the assistant draws conclusions, the tool supplies evidence. | slice 10 | |
+| X7 | Hard-deleting a note deletes its recall prompts today; this story does not preserve those attempts. | slice 10 | |

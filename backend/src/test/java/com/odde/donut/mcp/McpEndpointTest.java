@@ -118,17 +118,18 @@ class McpEndpointTest extends McpEndpointTestBase {
           .andExpect(jsonPath("$.result.tools[3].inputSchema.properties.timezone").exists())
           .andExpect(jsonPath("$.result.tools[4].name", equalTo(RecordLearningSessionTool.NAME)))
           .andExpect(jsonPath("$.result.tools[4].inputSchema.properties.reportMarkdown").exists())
+          .andExpect(jsonPath("$.result.tools[5].name", equalTo(ListRecallAnswersTool.NAME)))
           .andExpect(
               jsonPath(
                   "$.result.tools[*].securitySchemes[0].type",
-                  contains("oauth2", "oauth2", "oauth2", "oauth2", "oauth2")))
+                  contains("oauth2", "oauth2", "oauth2", "oauth2", "oauth2", "oauth2")))
           .andExpect(result -> {
             String json = result.getResponse().getContentAsString();
             var mapper = McpJsonDefaults.getMapper();
             var response = mapper.readValue(json, McpSchema.JSONRPCResponse.class);
             var decodedTools =
                 mapper.convertValue(response.result(), McpSchema.ListToolsResult.class);
-            assertThat(decodedTools.tools(), hasSize(5));
+            assertThat(decodedTools.tools(), hasSize(6));
             JsonNode tools = new ObjectMapper().readTree(json).path("result").path("tools");
             for (JsonNode tool : tools) {
               assertThat(
@@ -139,7 +140,7 @@ class McpEndpointTest extends McpEndpointTestBase {
           .andExpect(
               jsonPath(
                   "$.result.tools[*]._meta.securitySchemes[0].type",
-                  contains("oauth2", "oauth2", "oauth2", "oauth2", "oauth2")))
+                  contains("oauth2", "oauth2", "oauth2", "oauth2", "oauth2", "oauth2")))
           .andExpect(
               jsonPath("$.result.tools[0]._meta.securitySchemes[0].scopes", contains("notes:read")))
           .andExpect(
@@ -153,17 +154,19 @@ class McpEndpointTest extends McpEndpointTestBase {
                   "$.result.tools[4]._meta.securitySchemes[0].scopes",
                   contains("notes:read", "learning_session:record")))
           .andExpect(
+              jsonPath("$.result.tools[5]._meta.securitySchemes[0].scopes", contains("notes:read")))
+          .andExpect(
               jsonPath(
                   "$.result.tools[*].annotations.readOnlyHint",
-                  contains(true, true, true, true, false)))
+                  contains(true, true, true, true, false, true)))
           .andExpect(
               jsonPath(
                   "$.result.tools[*].annotations.destructiveHint",
-                  contains(false, false, false, false, false)))
+                  contains(false, false, false, false, false, false)))
           .andExpect(
               jsonPath(
                   "$.result.tools[*].annotations.openWorldHint",
-                  contains(false, false, false, false, false)));
+                  contains(false, false, false, false, false, false)));
     }
   }
 }
