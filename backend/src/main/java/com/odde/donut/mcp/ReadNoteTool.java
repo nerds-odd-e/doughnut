@@ -1,14 +1,12 @@
 package com.odde.donut.mcp;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.controllers.dto.AttributedNoteContent;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AttributedNoteContentService;
 import com.odde.donut.services.PortablePathAuthoring;
-import com.odde.donut.services.WikiLinkResolver;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -46,21 +44,18 @@ public class ReadNoteTool {
 
   private final AttributedNoteContentService attributedNoteContentService;
   private final JsonMapper objectMapper;
-  private final WikiLinkResolver wikiLinkResolver;
+  private final McpNoteLookup mcpNoteLookup;
   private final PortablePathAuthoring portablePathAuthoring;
-  private final McpNoteCandidates mcpNoteCandidates;
 
   public ReadNoteTool(
       AttributedNoteContentService attributedNoteContentService,
       JsonMapper objectMapper,
-      WikiLinkResolver wikiLinkResolver,
-      PortablePathAuthoring portablePathAuthoring,
-      McpNoteCandidates mcpNoteCandidates) {
+      McpNoteLookup mcpNoteLookup,
+      PortablePathAuthoring portablePathAuthoring) {
     this.attributedNoteContentService = attributedNoteContentService;
     this.objectMapper = objectMapper;
-    this.wikiLinkResolver = wikiLinkResolver;
+    this.mcpNoteLookup = mcpNoteLookup;
     this.portablePathAuthoring = portablePathAuthoring;
-    this.mcpNoteCandidates = mcpNoteCandidates;
   }
 
   public SyncToolSpecification specification() {
@@ -112,40 +107,13 @@ public class ReadNoteTool {
         .build();
   }
 
-  private static McpSchema.CallToolResult unresolved(String message) {
-    return McpSchema.CallToolResult.builder()
-        .isError(true)
-        .addContent(new McpSchema.TextContent(message))
-        .build();
-  }
-
   private McpSchema.CallToolResult call(
       McpTransportContext transportContext, McpSchema.CallToolRequest request) {
     User user = (User) transportContext.get(McpServerConfiguration.TRANSPORT_USER_KEY);
-    Object argument = request.arguments() == null ? null : request.arguments().get("portablePath");
-    if (!(argument instanceof String path) || path.isBlank()) {
-      return unresolved(
-          "portablePath is required. Supply a qualified destination such as Engineering:Practices/Code Review.");
-    }
-    Object scopeArgument = request.arguments().get("notebookName");
-    String notebookName = scopeArgument instanceof String scope ? scope : null;
-    if (!WikiLinkMarkdown.splitInner(path).portablePath().hasNotebookQualifier()
-        && (notebookName == null || notebookName.isBlank())) {
-      return unresolved(
-          "Supply notebookName for an unqualified portablePath, or qualify it as Engineering:Practices/Code Review. MCP has no source note from which to infer notebook scope.");
-    }
-    Note destination;
-    switch (wikiLinkResolver.classifyToken(path, notebookName, user)) {
-      case WikiLinkResolver.CandidateCardinality.Resolved resolved ->
-          destination = resolved.destinationNote();
-      case WikiLinkResolver.CandidateCardinality.Unresolved ignored -> {
-        return unresolved(
-            "No readable note matches portablePath. Check the qualified destination or use list_note_candidates.");
-      }
-      case WikiLinkResolver.CandidateCardinality.Ambiguous ambiguous -> {
-        return ambiguity(ambiguous.candidates(), user);
-      }
-    }
+    return mcpNoteLookup.resolve(request, user, destination -> read(user, destination));
+  }
+
+  private McpSchema.CallToolResult read(User user, Note destination) {
     try {
       AttributedNoteContent content = attributedNoteContentService.read(user, destination.getId());
       String portablePath = portablePathAuthoring.qualifiedPortablePath(destination, user);
@@ -157,26 +125,6 @@ public class ReadNoteTool {
           .build();
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolArguments.rethrow(e);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  private McpSchema.CallToolResult ambiguity(List<Note> notes, User viewer) {
-    String message =
-        "Several readable notes match portablePath. Select a candidate's portablePath.";
-    Map<String, Object> result =
-        Map.of(
-            "message",
-            message,
-            "candidates",
-            notes.stream().map(note -> mcpNoteCandidates.describe(note, viewer)).toList());
-    try {
-      return McpSchema.CallToolResult.builder()
-          .isError(true)
-          .addContent(
-              new McpSchema.TextContent(message + "\n" + objectMapper.writeValueAsString(result)))
-          .build();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

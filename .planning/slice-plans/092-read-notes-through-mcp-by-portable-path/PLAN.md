@@ -164,7 +164,7 @@ Sizing: about five active minutes, plus required full-suite wait.
 
 ### 7. Share MCP note destination resolution
 Type: Structure
-Status: planned
+Status: done
 Proof: Preserved read HTTP scope/property/candidate/authorization proof, actual
 SDK recovery and hosted qualified/renewal journey; full backend and both MCP E2Es.
 
