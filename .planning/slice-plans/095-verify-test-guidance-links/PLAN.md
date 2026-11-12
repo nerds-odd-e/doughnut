@@ -20,6 +20,8 @@ CI uses GitHub Actions `ci.yml` (verified active, `donut CI`) on the execution
 branch. Claim CI on trunk is unobserved. Codex stream coordinator: `mana-seed127`.
 Observer `/tmp/dough-ci-501/watch-AQFVKN`, PID `38325`, session `36029`,
 yielded cell `g134:10`; runtime is this checkout's installed execution skill.
+Accepted implementation `3cd9d8d52d3d646e7de66e1890a293fbd12f2f3a` on
+`origin/codex/verify-testing-guidance-links`, suffix base the established claim.
 
 ## Goal and boundaries
 
@@ -171,3 +173,20 @@ All source-review commitments are compared individually in `source-review.md`.
 Fresh `/root/refactor_links` review returned `## REFACTOR COMPLETE`: none —
 already clean, no edits or test reruns. Accepted proof remains applicable;
 changed-source conventions are off and all edited files are below 250 lines.
+
+## Execution complete
+
+Product advice: no change. Retrospective of the accepted implementation against
+the original source, full net change, focused proof and consumer observations
+found no correction or product follow-up. The ten-source command owns the local
+guidance route coherently; package/CI lint consumes it without changing existing
+report groups. Application tests and E2E journeys are unchanged and add no proof
+to this documentation boundary. North Star product topics do not govern this
+local validation; no architectural choice or ADR change is introduced.
+
+Process review enabled by `skipProcessRetrospective:false` and completed from
+the available conversation/tool history; no persistent process finding needed.
+This bounded correction is outside automatic feature-story Intent Coverage,
+so no process review is deferred. CI for the accepted implementation remains
+pending on the retained story-branch observer; completion owns that result.
+This completion increment is `records-only`; accepted semantic proof is unchanged.
