@@ -175,7 +175,7 @@ Sizing: five to eight active minutes, plus required proof waits.
 
 ### 10. Address returned graph notes for subsequent reads
 Type: Behavior
-Status: planned
+Status: done
 Proof: Focus/related portablePath → full read; full backend, MCP E2Es, regenerated
 API, frontend tests and both typechecks from proof-routes.md.
 
@@ -224,4 +224,4 @@ Disposition: proved by slice 9: GraphNavigationMcpEndpointTest six real HTTP gra
 ### G7. Returned graph nodes still need direct reusable addresses
 Reported: slice 8 — "Focus and related projections keep current metadata; direct reusable portablePath fields remain owned by slice10."
 Story clause: "MCP-generated references to the focus note, related notes, outgoing destinations, inbound referrers, sampled peers, and retrieval paths use that same addressing contract."
-Disposition: interim until slices 10
+Disposition: proved by slice 10: GraphNodePortablePathMcpEndpointTest root/folder focus and wiki/peer related node portablePath → unchanged path → exact full-read content, four real HTTP cases; backend3171, actual SDK9, frontend2543 and both typechecks pass; execution-evidence.md slice10

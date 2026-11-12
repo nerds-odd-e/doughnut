@@ -47,7 +47,16 @@ class AiNoteAutomationServiceExtractRequestTest {
         .thenReturn(
             new FocusContextResult(
                 new FocusContextFocusNote(
-                    "nb", "title", "", 0, List.of(), List.of(), List.of(), null, "content",
+                    "nb:title",
+                    "nb",
+                    "title",
+                    "",
+                    0,
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    null,
+                    "content",
                     false)));
 
     FocusContextMarkdownRenderer focusContextMarkdownRenderer =

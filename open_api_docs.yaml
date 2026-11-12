@@ -6395,6 +6395,8 @@ components:
     FocusContextFocusNote:
       type: object
       properties:
+        portablePath:
+          type: string
         notebook:
           type: string
         title:
@@ -6426,6 +6428,8 @@ components:
     FocusContextNote:
       type: object
       properties:
+        portablePath:
+          type: string
         notebook:
           type: string
         title:

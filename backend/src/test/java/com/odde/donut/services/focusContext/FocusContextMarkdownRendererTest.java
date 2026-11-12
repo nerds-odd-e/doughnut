@@ -22,7 +22,17 @@ class FocusContextMarkdownRendererTest {
   private static FocusContextFocusNote focusNote(
       String notebook, String title, String content, boolean contentTruncated) {
     return new FocusContextFocusNote(
-        notebook, title, "", 0, List.of(), List.of(), List.of(), null, content, contentTruncated);
+        notebook + ":" + title,
+        notebook,
+        title,
+        "",
+        0,
+        List.of(),
+        List.of(),
+        List.of(),
+        null,
+        content,
+        contentTruncated);
   }
 
   @Nested
@@ -105,7 +115,15 @@ class FocusContextMarkdownRendererTest {
       FocusContextResult result = new FocusContextResult(focusNote("NB", "A", "focus", false));
       result.addRelatedNote(
           new FocusContextNote(
-              "NB", "B", "", 1, List.of("[[NB:A]]", "[[NB:B]]"), null, "content of B", false));
+              "NB:B",
+              "NB",
+              "B",
+              "",
+              1,
+              List.of("[[NB:A]]", "[[NB:B]]"),
+              null,
+              "content of B",
+              false));
 
       String output = renderer.render(result, depth1Config);
 
@@ -122,6 +140,7 @@ class FocusContextMarkdownRendererTest {
           new FocusContextResult(focusNote("NB", "Focus", "focus body", false));
       result.addRelatedNote(
           new FocusContextNote(
+              "NB:Far",
               "NB",
               "Far",
               "",
@@ -145,7 +164,15 @@ class FocusContextMarkdownRendererTest {
           new FocusContextResult(focusNote("NB", "AnchorTitle", "focus", false));
       result.addRelatedNote(
           new FocusContextNote(
-              "NB", "Peer", "", 1, List.of("[[NB:AnchorTitle]]"), null, "peer body", false));
+              "NB:Peer",
+              "NB",
+              "Peer",
+              "",
+              1,
+              List.of("[[NB:AnchorTitle]]"),
+              null,
+              "peer body",
+              false));
 
       String output = renderer.render(result, depth1Config);
 
@@ -157,7 +184,8 @@ class FocusContextMarkdownRendererTest {
   @Nested
   class RelatedNotesBlock {
     private static FocusContextNote relatedNote(String title) {
-      return new FocusContextNote("NB", title, "", 1, List.of(), null, "body of " + title, false);
+      return new FocusContextNote(
+          "NB:" + title, "NB", title, "", 1, List.of(), null, "body of " + title, false);
     }
 
     @Test

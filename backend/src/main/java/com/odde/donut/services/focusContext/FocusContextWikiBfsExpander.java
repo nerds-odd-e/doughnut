@@ -18,14 +18,17 @@ final class FocusContextWikiBfsExpander {
   private final NoteReferenceService noteReferenceService;
   private final NoteRepository noteRepository;
   private final FocusContextWikiUri wikiUri;
+  private final FocusContextRelatedNoteMaterializer relatedNoteMaterializer;
 
   FocusContextWikiBfsExpander(
       NoteReferenceService noteReferenceService,
       NoteRepository noteRepository,
-      FocusContextWikiUri wikiUri) {
+      FocusContextWikiUri wikiUri,
+      FocusContextRelatedNoteMaterializer relatedNoteMaterializer) {
     this.noteReferenceService = noteReferenceService;
     this.noteRepository = noteRepository;
     this.wikiUri = wikiUri;
+    this.relatedNoteMaterializer = relatedNoteMaterializer;
   }
 
   record WikiExpansion(Set<Integer> wikiClaimedNoteIds, List<SiblingAnchor> siblingAnchors) {}
@@ -86,7 +89,7 @@ final class FocusContextWikiBfsExpander {
           continue;
         }
         var materialized =
-            FocusContextRelatedNoteMaterializer.materialize(hydratedNote, p.depth, p.retrievalPath);
+            relatedNoteMaterializer.materialize(hydratedNote, viewer, p.depth, p.retrievalPath);
         wikiRemainingBudget -= materialized.tokenCost();
         result.addRelatedNote(materialized.note());
         wikiClaimedNoteIds.add(hydratedNote.getId());

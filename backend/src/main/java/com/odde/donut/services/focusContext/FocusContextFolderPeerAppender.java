@@ -1,6 +1,7 @@
 package com.odde.donut.services.focusContext;
 
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.services.NoteService;
 import java.util.ArrayList;
@@ -14,10 +15,15 @@ import java.util.Set;
 final class FocusContextFolderPeerAppender {
   private final NoteRepository noteRepository;
   private final NoteService noteService;
+  private final FocusContextRelatedNoteMaterializer relatedNoteMaterializer;
 
-  FocusContextFolderPeerAppender(NoteRepository noteRepository, NoteService noteService) {
+  FocusContextFolderPeerAppender(
+      NoteRepository noteRepository,
+      NoteService noteService,
+      FocusContextRelatedNoteMaterializer relatedNoteMaterializer) {
     this.noteRepository = noteRepository;
     this.noteService = noteService;
+    this.relatedNoteMaterializer = relatedNoteMaterializer;
   }
 
   record SiblingAnchor(Note note, int wikiDepth, List<String> pathToAnchorWikiUris) {}
@@ -27,6 +33,7 @@ final class FocusContextFolderPeerAppender {
 
   void append(
       FocusContextResult result,
+      User viewer,
       Integer focusId,
       List<SiblingAnchor> siblingAnchors,
       int siblingBudgetTokens,
@@ -83,8 +90,8 @@ final class FocusContextFolderPeerAppender {
         continue;
       }
       var materialized =
-          FocusContextRelatedNoteMaterializer.materialize(
-              hydratedNote, o.anchorWikiDepth + 1, o.pathToAnchor);
+          relatedNoteMaterializer.materialize(
+              hydratedNote, viewer, o.anchorWikiDepth + 1, o.pathToAnchor);
       if (materialized.tokenCost() > siblingRemaining) {
         continue;
       }

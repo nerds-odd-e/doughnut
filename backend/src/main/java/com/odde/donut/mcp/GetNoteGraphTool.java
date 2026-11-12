@@ -30,8 +30,8 @@ public class GetNoteGraphTool {
       Retrieves structured **focus context** for one note: the focus note plus related notes discovered through wiki links, inbound references, and sampled folder peers.
 
       What this returns (JSON):
-      - **focusNote** — The requested note (depth 0) with title, notebook, folder path, truncated **content** when needed, and lightweight lists: **outgoingLinks** and **inboundReferences** (wiki-style link strings), plus **sampleSiblings** (a small capped sample of peers in the same folder or notebook root).
-      - **relatedNotes** — Notes reached within the post-focus share of the combined token budget and max traversal depth. Each entry includes **depth**, **retrievalPath** (how the note was reached from the focus), and truncated **content** when needed.
+      - **focusNote** — The requested note (depth 0) with a reusable **portablePath**, title, notebook, folder path, truncated **content** when needed, and lightweight lists: **outgoingLinks** and **inboundReferences** (wiki-style link strings), plus **sampleSiblings** (a small capped sample of peers in the same folder or notebook root).
+      - **relatedNotes** — Notes reached within the post-focus share of the combined token budget and max traversal depth. Each entry includes a reusable **portablePath**, **depth**, **retrievalPath** (how the note was reached from the focus), and truncated **content** when needed.
 
       Use cases:
       - Inspect how a note connects to the rest of the notebook before answering questions about it.
@@ -48,7 +48,7 @@ public class GetNoteGraphTool {
       1. Follow a known Portable path or use 'list_note_candidates' to list matching notes
       2. Pick a candidate's portablePath
       3. Use this tool to load focus context around that note
-      4. Follow **outgoingLinks** / **relatedNotes** titles for deeper exploration if needed\
+      4. Pass a focus or related note's **portablePath** to read_note for full content, or follow **outgoingLinks** for deeper exploration if needed\
       """;
 
   private final NoteGraphService noteGraphService;

@@ -7,6 +7,7 @@ import com.odde.donut.services.ApproximateUtf8TokenBudget;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.NoteService;
+import com.odde.donut.services.PortablePathAuthoring;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class FocusContextRetrievalService {
   private final AuthorizationService authorizationService;
   private final NoteService noteService;
   private final FocusContextWikiUri wikiUri;
+  private final PortablePathAuthoring portablePathAuthoring;
   private final FocusContextWikiBfsExpander wikiBfsExpander;
   private final FocusContextFolderPeerAppender folderPeerAppender;
 
@@ -31,15 +33,20 @@ public class FocusContextRetrievalService {
       NoteRepository noteRepository,
       AuthorizationService authorizationService,
       NoteService noteService,
-      FocusContextWikiUri wikiUri) {
+      FocusContextWikiUri wikiUri,
+      PortablePathAuthoring portablePathAuthoring) {
     this.noteReferenceService = noteReferenceService;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
     this.noteService = noteService;
     this.wikiUri = wikiUri;
+    this.portablePathAuthoring = portablePathAuthoring;
+    var relatedNoteMaterializer = new FocusContextRelatedNoteMaterializer(portablePathAuthoring);
     this.wikiBfsExpander =
-        new FocusContextWikiBfsExpander(noteReferenceService, noteRepository, wikiUri);
-    this.folderPeerAppender = new FocusContextFolderPeerAppender(noteRepository, noteService);
+        new FocusContextWikiBfsExpander(
+            noteReferenceService, noteRepository, wikiUri, relatedNoteMaterializer);
+    this.folderPeerAppender =
+        new FocusContextFolderPeerAppender(noteRepository, noteService, relatedNoteMaterializer);
   }
 
   public FocusContextResult retrieve(Note focusNote, RetrievalConfig config) {
@@ -111,6 +118,7 @@ public class FocusContextRetrievalService {
 
     FocusContextFocusNote focusNoteModel =
         new FocusContextFocusNote(
+            portablePathAuthoring.qualifiedPortablePath(hydrated, viewer),
             hydrated.getNotebook() != null ? hydrated.getNotebook().getName() : null,
             hydrated.getTitle(),
             FocusContextConstants.folderPathOf(hydrated),
@@ -153,6 +161,7 @@ public class FocusContextRetrievalService {
 
     folderPeerAppender.append(
         result,
+        viewer,
         focusId,
         wikiExpansion.siblingAnchors(),
         siblingBudgetTotal,

@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 class MergedRelatedNotesTest {
 
   private static FocusContextNote note(String notebook, String title, String content) {
-    return new FocusContextNote(notebook, title, "", 1, List.of(), null, content, false);
+    return new FocusContextNote(
+        notebook + ":" + title, notebook, title, "", 1, List.of(), null, content, false);
   }
 
   @Test
