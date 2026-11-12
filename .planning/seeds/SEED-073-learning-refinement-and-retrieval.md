@@ -82,25 +82,58 @@ These are starting observations, not promises that the current UI works in every
 
 **Identity:** SEED-073#report-recall-answers-whose-question-is-gone
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-report-recall-answers-whose-question-is-gone/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"66e0bda6d342fa201fc378aee36c2107800000c24c98e79bdcebc8273da233c7","plan":"7b9d83bc8ff1bdf76f71e09299d6f205d9e8ca0d6e8c6912a3a8fe854d6f0fe0"}}
 ```
 
 **Goal.** As a Donut learner, my connected assistant sees every recall answer
 I gave in the window, including answers whose question Donut no longer stores,
 so its investigation of what I confuse is not silently missing attempts.
 
-**Scope (unrefined).**
+**Scope.**
 
-- Find out from production data how answered recall prompts disappear while
-  their trackers remain. This needs a read-only production database read
-  through the owner's `gcloud` access; when `gcloud` is not signed in, ask the
-  owner to sign in.
-- If the cause is a defect that deletes answered prompts, report it to the
-  owner as its own work before building on it.
-- `list_recall_answers` returns an answer whose question is no longer stored as
-  an attempt with its time, answer, and correctness, and reports the question
-  as unavailable. The tool's description, the MCP skill and
-  `docs/assistant-oauth.md` say so.
+- `list_recall_answers` includes an answer whose recall prompt is gone when
+  the learner's surviving graded recall log still attributes that attempt.
+  Keep its original time, recorded correctness, outcome and ambiguity exclusion
+  when recorded, and explicitly explain that its question is unavailable.
+- Return what the answer actually stores: its zero-based choice index for an
+  MCQ or its typed spelling answer. A choice index cannot recover the selected
+  choice's text without the original choices. Another question on the same
+  tracker does not supply that missing history.
+- Identify the recalled source note through the primary graded log, rather
+  than a secondary Confusion log. Apply the existing evidence rule: title and
+  Portable path for a correct answer, bounded graph for an MCQ miss, full
+  current content for a spelling miss. If the note is trashed or unreadable,
+  return its unavailable reason while retaining the learner's attempt.
+- Preserve the existing lookback, newest-first ordering and cursor contract:
+  reading every response returns each attributable attempt exactly once.
+  Only the connected learner's attempts are returned, because learning history
+  is private; current notebook access governs source-note evidence.
+- Explain missing questions and stored answer indexes consistently in the tool
+  description, MCP skill and `docs/assistant-oauth.md`.
+
+**Scope limits (deferred work).** Repairing the separately reported deletion
+defect below, restoring deleted question text, adding historical snapshots,
+changing scheduling/statistics, and recovering attribution after its tracker
+and recall logs are hard-deleted are separate work. Reporting surviving records
+does not depend on repairing future question retention.
+
+**Plan:** [Report surviving recall answers](../slice-plans/001-report-recall-answers-whose-question-is-gone/PLAN.md)
+
+**Key examples.**
+
+1. An MCQ answer has index `2`, an AGAIN log and no stored prompt. Listing its
+   window returns its original time, `correct: false`, index `2`, an explicit
+   question-unavailable reason and the readable source note's bounded graph.
+2. The same tracker has since received another question. Listing the earlier
+   answer still reports its original question unavailable; the later prompt
+   cannot supply the earlier answer's choice text.
+3. A promptless spelling miss retains its typed answer. A linked Confusion log
+   for another tracker does not change the recalled note or duplicate the
+   attempt. A trashed or unreadable source note produces an explicit note
+   unavailable reason alongside the retained answer.
+4. A window spans several pages of ordinary and promptless answers, including
+   equal answer times at a page boundary. Following all cursors returns every
+   in-window attempt once; another learner's attempts remain private.
 
 **Observations (2026-11-12).**
 
@@ -126,6 +159,51 @@ so its investigation of what I confuse is not silently missing attempts.
   with no recorded grade, no recall log and no outcome would make
   `list_recall_answers` fail the whole call, because its correctness is null.
   While reading production, check whether such answers exist.
+
+**Production investigation (2026-11-13 SGT).**
+
+Read-only MySQL transactions and binary-log replay used the owner's signed-in
+`gcloud` access, through `doughnut-app-group-qk27` to Cloud SQL `doughnut-db`,
+database `doughnut`, MySQL `8.4.11-google`. The deployed app reported revision
+`12288107bd2a2dbbfc2eabc2d00f44e0d4ed4e74`; the relevant tracker-rehoming code
+matches preparation revision `b3f4ce10bd0d`. No production data was changed.
+
+- At `2026-11-12 23:22:30 UTC`, a distinct-answer count joining `answer` through
+  `recall_log`/`memory_tracker`, with `NOT EXISTS` on `recall_prompt.answer_id`,
+  found **2,197** promptless answers, all on UNDERSTANDING trackers. The three
+  original samples retain choice indexes `2`, `1`, `3` and AGAIN logs on
+  trackers `19414`, `5943`, `3227`. Tracker `3227` now has a new unanswered
+  prompt, `265138`; it is not answer `246496`'s question.
+- A query of all answers reachable through a prompt or recall log found **0**
+  without correctness derivable from GOOD/AGAIN or OVERLAP. No new unknown-grade
+  policy is needed for the observed population.
+- Live FK metadata confirms `note → mcq → recall_prompt` CASCADE deletion.
+  There are **3,538** stored prompts whose MCQ's note differs from their
+  tracker's current note. Counts describe this snapshot, not every cause.
+- Successful UTC replay used `mysqlbinlog --read-from-remote-server
+  --base64-output=DECODE-ROWS -vv --start-datetime='2026-11-12 01:12:00'
+  --stop-datetime='2026-11-12 02:41:00' mysql-bin.000048` over an authenticated
+  DB tunnel. Only numeric row identities and transaction metadata were retained.
+  Answer `246452` is attached to prompt `264841`, MCQ `258176`, tracker `5943`
+  at `01:13:32 UTC` (position `7385375`, GTID suffix `54733`). At `01:13:43`,
+  transaction `54749` moves that tracker from note `14696` to `2116`
+  (position `7400392`) and deletes note `14696` (`7401416`).
+- Answer `246496` is attached to prompt `264504`, MCQ `257912`, tracker `3227`
+  at `02:38:22 UTC` (`8149412`, transaction `55305`). At `02:39:29`,
+  transaction `55341` moves the tracker from note `13313` to `1657`
+  (`8224209`) and deletes `13313` (`8225492`). These GTIDs share UUID
+  `b5b67510-b8d5-11f1-b37b-42010a6f101b`.
+
+**Separate defect report — relationship reduction loses answered questions.**
+Reported to the owner during refinement, before implementation planning.
+`RelationReduceService.reduceToSourceProperty` rehomes understanding trackers
+through `PropertyMemoryTrackerService.rehomeNoteLevelTrackersToProperty`, then
+permanently removes the relationship note. Its MCQs remain owned by that note;
+the cascade deletes their answered prompts while graded logs survive on the
+rehomed trackers. The two production transaction traces above support this
+cause; they do not explain all 2,197 losses, and the loss of sample `246327`
+was not replayed. Preserving answered questions during reduction needs its own
+follow-up and owner prioritization; this story reports the surviving evidence.
 
 ## Open Decisions
 
