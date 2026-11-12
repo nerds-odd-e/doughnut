@@ -13,7 +13,7 @@ scope: story
 
 **Identity:** SEED-125#read-notes-through-mcp-by-portable-path
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/092-read-notes-through-mcp-by-portable-path/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e915ddae4c595fbf8e74a3531a54ccfaa2aa343aa81068b9a02fac92cd5cd68f","plan":"be8b9a1be20f8d957398c03e744f63fa994a8abf88bdd3a7c24f014d14676f3d"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/092-read-notes-through-mcp-by-portable-path/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e915ddae4c595fbf8e74a3531a54ccfaa2aa343aa81068b9a02fac92cd5cd68f","plan":"8bfd183847d193b6354f236f2b4028fd15435a16e0f0bb626aaa03e56ba51573"}}
 ```
 
 **Goal.** A Donut user can ask their connected assistant to follow a wiki link
