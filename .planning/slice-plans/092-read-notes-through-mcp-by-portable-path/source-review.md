@@ -37,10 +37,10 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 | C29 | Inbound references: MCP-generated inbound-referrer references follow that contract. | slice 8 |  |
 | C30 | Peer references: MCP-generated sampled-peer references follow that contract. | slice 8 |  |
 | C31 | Retrieval references: MCP-generated retrieval paths follow that contract. | slice 8 |  |
-| C32 | Full-read path: Full reads supply a qualified path. | slice 3 |  |
-| C33 | Available revision: Full reads supply the whole notebook’s acceptedRevision when available. | slice 3 |  |
-| C34 | Unavailable revision: Full reads omit acceptedRevision when unavailable. | slice 3 |  |
-| C35 | Authored content: Full reads return authored Markdown verbatim. | slice 3 |  |
+| C32 | Full-read path: Full reads supply a qualified path. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
+| C33 | Available revision: Full reads supply the whole notebook’s acceptedRevision when available. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
+| C34 | Unavailable revision: Full reads omit acceptedRevision when unavailable. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
+| C35 | Authored content: Full reads return authored Markdown verbatim. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | C36 | Graph budget: Graph reads retain the existing combined token budget. | slice 7 |  |
 | C37 | Graph traversal: Graph reads retain existing traversal behavior. | slice 7 |  |
 | C38 | Graph truncation: Graph reads retain explicit body truncation. | slice 7 |  |
@@ -62,8 +62,8 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 | Q02 | Scope rationale: MCP has no source note, which explains the explicit notebook-scope requirement. | slice 5 |  |
 | Q03 | Existing semantics: Wiki-link resolution and property-selection behavior are inherited contracts, subject to the stated addressing changes. | slice 5 |  |
 | Q04 | Existing authorization: This work preserves current authorization. | slice 9 |  |
-| Q05 | Revision meaning: The supplied revision is the whole notebook’s acceptedRevision. | slice 3 |  |
-| Q06 | Revision availability: Revision metadata is conditional on availability. | slice 3 |  |
+| Q05 | Revision meaning: The supplied revision is the whole notebook’s acceptedRevision. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
+| Q06 | Revision availability: Revision metadata is conditional on availability. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | Q07 | Limits: Deferred capabilities are scope limits; they do not independently establish rejection rules. | slice 9 |  |
 | Q08 | Schema sweep: The source requires a one-time reading of tool schemas for remnants of the removed MCP numeric-ID contract. | slice 9 |  |
 | Q09 | Response sweep: That reading includes responses. | slice 9 |  |
@@ -85,9 +85,9 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 | J13 | Discovered read: Pass that discovered path unchanged to read_note. | slice 4 |  |
 | J14 | Discovered graph: Pass that discovered path unchanged to get_note_graph. | slice 7 |  |
 | J15 | Generated reference reuse: A graph-generated reference distinguishes one of two equal-titled notes in different folders and selects it on a later request. | slice 8 |  |
-| J16 | Authored wiki link: An authored wiki link remains unchanged. | slice 3 |  |
-| J17 | Authored Markdown URL: [Reference](/n1234) remains unchanged. | slice 3 |  |
-| J18 | Address metadata: Metadata supplies paths alongside unchanged authored content. | slice 3 |  |
+| J16 | Authored wiki link: An authored wiki link remains unchanged. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
+| J17 | Authored Markdown URL: [Reference](/n1234) remains unchanged. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
+| J18 | Address metadata: Metadata supplies paths alongside unchanged authored content. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | X01 | Circle ownership: Circle-owned notebooks are deferred. | slice 9 |  |
 | X02 | Duplicate notebook names: Handling duplicate notebook names is deferred. | slice 9 |  |
 | X03 | Access changes: Adding MCP access restrictions is outside this story. | slice 9 |  |

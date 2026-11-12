@@ -38,6 +38,19 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
 
   @Test
   void readsTheNoteWithItsSourceAttribution() throws Exception {
+    String authoredContent =
+        """
+        ---
+        type: Note
+        reference: '[[Physics:Potential]]'
+        ---
+        Authored [[Physics:Potential|potential energy]].
+        [Reference](/n1234)
+
+        ```text
+        keep spacing
+        ```
+        """;
     Timestamp updatedAt = Timestamp.from(Instant.parse("2026-09-06T04:05:06Z"));
     Notebook notebook = createGitBackedNotebook("Physics");
     Folder outer = makeMe.aFolder().notebook(notebook).name("Mechanics").please();
@@ -47,9 +60,10 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
             .aNote()
             .folder(inner)
             .title("Kinetic")
-            .content(ACCEPTED_CONTENT)
+            .content(authoredContent)
             .updatedAt(updatedAt)
             .please();
+    makeMe.aNote("Kinetic").notebook(notebook).please();
     String head = snapshotCurrentPortableTree(notebook).getAcceptedGitObjectId();
     UserToken token = tokenForOwner();
 
@@ -59,10 +73,11 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
 
     assertThat(read, equalTo(text));
     assertThat(read.get("noteId").asInt(), equalTo(note.getId()));
+    assertThat(read.get("portablePath").asText(), equalTo("Physics:Mechanics/Energy/Kinetic"));
     assertThat(read.get("title").asText(), equalTo("Kinetic"));
     assertThat(read.get("notebookName").asText(), equalTo("Physics"));
     assertThat(read.get("folderPath").asText(), equalTo("Mechanics / Energy"));
-    assertThat(read.get("content").asText(), equalTo(ACCEPTED_CONTENT));
+    assertThat(read.get("content").asText(), equalTo(authoredContent));
     assertThat(read.get("updatedAt").asText(), equalTo("2026-09-06T04:05:06.000+00:00"));
     assertThat(read.get("acceptedRevision").asText(), equalTo(head));
     assertThat(head, matchesPattern("[0-9a-f]{40}"));
@@ -75,14 +90,15 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.result.tools[1].outputSchema.type").value("object"))
         .andExpect(
-            jsonPath("$.result.tools[1].outputSchema.properties.noteId.type").value("integer"))
+            jsonPath("$.result.tools[1].outputSchema.properties.portablePath.type").value("string"))
         .andExpect(
             jsonPath("$.result.tools[1].outputSchema.properties.acceptedRevision.type")
                 .value("string"))
         .andExpect(
             jsonPath(
                 "$.result.tools[1].outputSchema.required",
-                contains("noteId", "title", "notebookName", "folderPath", "updatedAt")));
+                contains(
+                    "noteId", "portablePath", "title", "notebookName", "folderPath", "updatedAt")));
   }
 
   @Test

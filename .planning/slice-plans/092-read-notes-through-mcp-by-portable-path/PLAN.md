@@ -111,7 +111,7 @@ Sizing: about five active minutes, plus required full-suite wait.
 
 ### 3. Cite full reads with qualified addresses
 Type: Behavior
-Status: planned
+Status: done
 Proof: Canonical MCP full-read result supplies qualified path/full location,
 verbatim content and whole-notebook revision, including another-note edit and
 unbound omission; full backend suite. Existing E2E inputs/results stay compatible.

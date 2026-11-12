@@ -86,6 +86,6 @@ await client.listTools()
 
 - `list_note_candidates` - List every note whose title or alias matches a query, with notebook and folder to tell candidates apart
 - `get_note_graph` - Fetch graph context for a note by ID and token limit
-- `read_note` - Read one note in full by ID: the user's note text (treated as evidence) with notebook, folder, and the whole notebook's accepted Git revision (null when none)
+- `read_note` - Read one note in full by ID: the user's note text (treated as evidence) with a qualified Portable path for citation, notebook, complete folder trail, and the whole notebook's accepted Git revision (omitted when unavailable)
 - `request_learning_session` - With the learner's IANA `timezone`, obtain the first available Potential learning session in due order. Returns its `notebookId`, `notebookName`, and existing `requestMarkdown` to tutor from, or an explicit no-session result.
 - `record_learning_session` - Submit `notebookId` and existing `reportMarkdown` for completed Session Items only when the session finishes or ends early. Returns recorded items and rejected entries; an empty report records nothing. Hosted assistants require `learning_session:record`.
