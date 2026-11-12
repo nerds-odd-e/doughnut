@@ -118,4 +118,8 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     String stem = note.createMaskedContentForRecall().maskedContentAsMarkdown();
     return new SpellingQuestion(stem, getNotebook());
   }
+
+  public boolean isNoteEditedSinceAnswer() {
+    return memoryTracker.getNote().getUpdatedAt().after(getAnswerTime());
+  }
 }

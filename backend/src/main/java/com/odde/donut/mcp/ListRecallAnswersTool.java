@@ -34,7 +34,10 @@ public record ListRecallAnswersTool(
       - **attempts** — each with **answeredAt** (instant), **correct** (as recorded),
         **note** (current **title** and qualified **portablePath**), and for multiple choice
         **multipleChoice** with **stem**, all **choices**, the **selectedChoice**, the
-        **expectedAnswer**, and the stored **validationRationale** when available
+        **expectedAnswer**, and the stored **validationRationale** when available; for spelling
+        **spelling** with the learner's **typedAnswer** and the masked **prompt** derived from
+        the note, or **promptUnavailable** explaining why the prompt as shown cannot be
+        recovered (the note was edited after the answer)
 
       Pass a note's portablePath unchanged to read_note or get_note_graph for more context.
       This changes nothing.\

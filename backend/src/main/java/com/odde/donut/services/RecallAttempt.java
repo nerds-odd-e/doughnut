@@ -5,8 +5,13 @@ import java.time.Instant;
 import java.util.List;
 
 /** One answer as recorded: when, whether it was correct, the question, and its source note. */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record RecallAttempt(
-    Instant answeredAt, Boolean correct, SourceNote note, MultipleChoice multipleChoice) {
+    Instant answeredAt,
+    Boolean correct,
+    SourceNote note,
+    MultipleChoice multipleChoice,
+    Spelling spelling) {
 
   public record SourceNote(String title, String portablePath) {}
 
@@ -17,4 +22,8 @@ public record RecallAttempt(
       String selectedChoice,
       String expectedAnswer,
       String validationRationale) {}
+
+  /** A spelling prompt is derived from the note, so a later note edit loses what was shown. */
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record Spelling(String typedAnswer, String prompt, String promptUnavailable) {}
 }

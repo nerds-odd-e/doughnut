@@ -174,8 +174,13 @@ Sizing: about five active minutes.
 
 ### 4. Include spelling attempts
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP endpoint cases; full backend suite.
+
+Accepted proof: `ListRecallAnswersMcpEndpointTest` cases
+`returnsTheSpellingAttemptWithItsTypedAnswerAndPrompt` and
+`reportsTheSpellingPromptUnavailableWhenTheNoteWasEditedAfterTheAnswer`; full
+suite green after refactoring.
 
 Behavior: A learner answered a spelling prompt → the attempt carries the typed
 answer, recorded correctness, and the prompt as derived from the note. The note
@@ -293,3 +298,11 @@ checks against real history after delivery; that check is not a slice.
   handler refuses only non-positive values. In-band refusals share
   `McpToolRefusal.because` (also used by `McpNoteLookup`); slice 9's unreadable
   cursor should use it.
+- Slice 4 (accepted): a spelling attempt carries `spelling.typedAnswer` and the
+  masked `prompt` from `RecallPrompt.getSpellingQuestion`; when
+  `RecallPrompt.isNoteEditedSinceAnswer()` (the prompt's note `updatedAt` after
+  the answer time) it carries `promptUnavailable` instead. Any note edit counts,
+  even one that leaves the masked text the same. `RecallAttempt` omits null
+  parts. Fixtures: `answerSpellingIncorrectly(text)`, and set the note's
+  `updatedAt` before the test clock's `now`, since `NoteBuilder` uses real time.
+  Full suite: 3,179 tests green.

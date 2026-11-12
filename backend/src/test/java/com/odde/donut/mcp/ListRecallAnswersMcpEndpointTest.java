@@ -75,6 +75,38 @@ class ListRecallAnswersMcpEndpointTest extends McpEndpointTestBase {
   }
 
   @Test
+  void returnsTheSpellingAttemptWithItsTypedAnswerAndPrompt() throws Exception {
+    noteLastUpdatedAt(hoursAgo(48));
+    answeredSpellingIncorrectly("Code Reveiw", hoursAgo(24));
+
+    JsonNode attempt = listRecallAnswers().get("attempts").get(0);
+
+    assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
+    JsonNode spelling = attempt.get("spelling");
+    assertThat(spelling.get("typedAnswer").asText(), equalTo("Code Reveiw"));
+    assertThat(
+        spelling.get("prompt").asText(),
+        equalTo(
+            "A <mark title='Hidden text that is matching the answer'>[...]</mark>"
+                + " catches bugs early."));
+    assertThat(spelling.has("promptUnavailable"), equalTo(false));
+  }
+
+  @Test
+  void reportsTheSpellingPromptUnavailableWhenTheNoteWasEditedAfterTheAnswer() throws Exception {
+    noteLastUpdatedAt(hoursAgo(1));
+    answeredSpellingIncorrectly("Code Reveiw", hoursAgo(24));
+
+    JsonNode attempt = listRecallAnswers().get("attempts").get(0);
+
+    assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
+    JsonNode spelling = attempt.get("spelling");
+    assertThat(spelling.get("typedAnswer").asText(), equalTo("Code Reveiw"));
+    assertThat(spelling.has("prompt"), equalTo(false));
+    assertThat(spelling.get("promptUnavailable").asText(), containsString("edited after"));
+  }
+
+  @Test
   void returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst() throws Exception {
     MemoryTracker tracker = trackerOf(personalUser);
     answeredAt(tracker, "Two days ago", hoursAgo(48));
@@ -135,6 +167,22 @@ class ListRecallAnswersMcpEndpointTest extends McpEndpointTestBase {
         .answerTimestamp(answeredAt)
         .recorded()
         .please();
+  }
+
+  private void noteLastUpdatedAt(Timestamp updatedAt) {
+    makeMe.theNote(note).content("A code review catches bugs early.").updatedAt(updatedAt).please();
+  }
+
+  private void answeredSpellingIncorrectly(String typed, Timestamp answeredAt) {
+    makeMe
+        .aRecallPrompt()
+        .spelling()
+        .forMemoryTracker(trackerOf(personalUser))
+        .answerSpellingIncorrectly(typed)
+        .answerTimestamp(answeredAt)
+        .recorded()
+        .please();
+    makeMe.entityPersister.flushAndClear();
   }
 
   private Timestamp hoursAgo(int hours) {

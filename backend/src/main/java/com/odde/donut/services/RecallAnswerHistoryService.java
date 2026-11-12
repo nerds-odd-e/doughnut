@@ -45,13 +45,13 @@ public class RecallAnswerHistoryService {
             .collect(Collectors.toMap(RecallPrompt::getAnswer, Function.identity()));
     List<RecallAttempt> attempts =
         answers.stream()
-            .filter(answer -> prompts.containsKey(answer) && prompts.get(answer).getMcq() != null)
-            .map(answer -> attempt(answer, prompts.get(answer).getMcq(), learner))
+            .filter(prompts::containsKey)
+            .map(answer -> attempt(answer, prompts.get(answer), learner))
             .toList();
     return new RecallAnswerHistory(from, to, attempts);
   }
 
-  private RecallAttempt attempt(Answer answer, Mcq mcq, User learner) {
+  private RecallAttempt attempt(Answer answer, RecallPrompt prompt, User learner) {
     Note note =
         answer.getRecallLogs().stream()
             .filter(log -> !log.isConfusion())
@@ -59,16 +59,33 @@ public class RecallAnswerHistoryService {
             .findFirst()
             .orElseThrow()
             .getNote();
+    Mcq mcq = prompt.getMcq();
     return new RecallAttempt(
         answer.getCreatedAt().toInstant(),
         answer.getCorrect(),
         new RecallAttempt.SourceNote(
             note.getTitle(), portablePathAuthoring.qualifiedPortablePath(note, learner)),
-        new RecallAttempt.MultipleChoice(
-            mcq.getQuestionStem(),
-            mcq.getResponseChoices(),
-            mcq.getResponseChoices().get(answer.getChoiceIndex()),
-            mcq.getResponseChoices().get(mcq.getCorrectAnswerIndex()),
-            mcq.getValidationRationale()));
+        mcq == null ? null : multipleChoice(answer, mcq),
+        mcq == null ? spelling(answer, prompt) : null);
+  }
+
+  private static RecallAttempt.MultipleChoice multipleChoice(Answer answer, Mcq mcq) {
+    return new RecallAttempt.MultipleChoice(
+        mcq.getQuestionStem(),
+        mcq.getResponseChoices(),
+        mcq.getResponseChoices().get(answer.getChoiceIndex()),
+        mcq.getResponseChoices().get(mcq.getCorrectAnswerIndex()),
+        mcq.getValidationRationale());
+  }
+
+  private static RecallAttempt.Spelling spelling(Answer answer, RecallPrompt prompt) {
+    if (prompt.isNoteEditedSinceAnswer()) {
+      return new RecallAttempt.Spelling(
+          answer.getSpellingAnswer(),
+          null,
+          "The note was edited after this answer, so the prompt as shown cannot be recovered.");
+    }
+    return new RecallAttempt.Spelling(
+        answer.getSpellingAnswer(), prompt.getSpellingQuestion().getStem(), null);
   }
 }

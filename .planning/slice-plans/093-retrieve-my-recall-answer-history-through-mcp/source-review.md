@@ -19,7 +19,7 @@ Launched 2026-11-12 by the execution coordinator as a fresh general-purpose agen
 | 3e | Continuing to the end returns each attempt exactly once. | slice 9 | |
 | 4a.1 | Each attempt includes its answer time. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: answeredAt equals yesterday's instant |
 | 4a.2 | Each attempt includes the full question used. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: multipleChoice.stem |
-| 4a.3 | Each attempt includes the learner's selected choice or typed answer. | slice 4 | |
+| 4a.3 | Each attempt includes the learner's selected choice or typed answer. | slice 4 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheSpellingAttemptWithItsTypedAnswerAndPrompt: spelling.typedAnswer; #returnsTheFullRecordedMultipleChoiceAttempt: selectedChoice |
 | 4a.4 | Each attempt includes the recorded correctness. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: correct = false after flushAndClear, read from recorded recall log |
 | 4b.1 | For multiple choice, include all choices. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: choices contains Peers, Nobody, The compiler in order |
 | 4b.2 | For multiple choice, include the expected answer. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsTheFullRecordedMultipleChoiceAttempt: expectedAnswer = Peers |
@@ -40,7 +40,7 @@ Launched 2026-11-12 by the execution coordinator as a fresh general-purpose agen
 | 6h | For an incorrect multiple-choice answer, source note evidence includes title, path, and a bounded graph. | slice 7 | |
 | 6i | The bounded graph uses a fixed modest budget chosen by Donut; `get_note_graph` remains the way to ask for more. | slice 7 | |
 | 7a | Missing historical evidence is identified explicitly. | slice 8 | |
-| 7b | An older spelling attempt may carry its typed answer even when the original masked prompt cannot be recovered after a note edit, with the prompt reported unavailable. | slice 4 | |
+| 7b | An older spelling attempt may carry its typed answer even when the original masked prompt cannot be recovered after a note edit, with the prompt reported unavailable. | slice 4 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#reportsTheSpellingPromptUnavailableWhenTheNoteWasEditedAfterTheAnswer: typedAnswer kept, prompt absent, promptUnavailable says edited after |
 | 7c | When the learner can no longer read the source note (access withdrawn or note in trash), the attempt stays with time, answer, correctness, and stored question. | slice 8 | |
 | 7d | When the learner can no longer read the source note, source note evidence is reported as unavailable with the reason. | slice 8 | |
 | 7e | An answer whose question is no longer stored is still an attempt, carrying its time, answer, and correctness. | slice 8 | |
@@ -57,7 +57,7 @@ Launched 2026-11-12 by the execution coordinator as a fresh general-purpose agen
 | E5 | A spelling answer that named another note is one incorrect attempt marked Accidental match, with the typed answer, and does not appear a second time for the other note. | slice 5 | |
 | E6 | A spelling answer accepted as an Overlap is correct with that outcome named, and has title and path only. | slice 7 | |
 | E7 | An incorrect multiple-choice attempt later excluded as ambiguous shows incorrect, excluded, and the reason, with the bounded graph. | slice 7 | |
-| E8 | A spelling note edited after it was answered returns the typed answer and correctness, and reports the prompt as shown unavailable. | slice 4 | |
+| E8 | A spelling note edited after it was answered returns the typed answer and correctness, and reports the prompt as shown unavailable. | slice 4 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#reportsTheSpellingPromptUnavailableWhenTheNoteWasEditedAfterTheAnswer: correct false, typedAnswer, promptUnavailable |
 | E9 | A week holding more attempts than one response carries: the first response says more remain; following it to the end yields every attempt once. | slice 9 | |
 | E10 | The learner lost access to a subscribed notebook after answering: the attempt and its stored question remain, and note evidence is reported unavailable. | slice 8 | |
 | E11 | Another learner's attempts on the same shared note never appear. | slice 2 | observed: backend/src/test/java/com/odde/donut/mcp/ListRecallAnswersMcpEndpointTest.java#returnsOnlyTheLearnersOwnAnswersOfTheLastSevenDaysNewestFirst: another learner's tracker on the same note, answered 1h ago, absent |

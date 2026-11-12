@@ -18,6 +18,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private AnswerDTO answerDTO = null;
   private MemoryTracker memoryTracker = null;
   private String spellingAnswerText = null;
+  private boolean spellingAnswerCorrect = true;
   private Timestamp answerTimestamp = null;
   private AnswerOutcome answerOutcome = null;
   private boolean recorded = false;
@@ -43,7 +44,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     } else if (spellingAnswerText != null) {
       Answer answer = new Answer();
       answer.setSpellingAnswer(spellingAnswerText);
-      answer.setCorrect(true);
+      answer.setCorrect(spellingAnswerCorrect);
       answer.setCreatedAt(resolvedAnswerTimestamp());
       entity.setAnswer(answer);
     }
@@ -121,6 +122,11 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   public RecallPromptBuilder answerSpelling(String spellingAnswer) {
     this.spellingAnswerText = spellingAnswer;
     return this;
+  }
+
+  public RecallPromptBuilder answerSpellingIncorrectly(String spellingAnswer) {
+    this.spellingAnswerCorrect = false;
+    return answerSpelling(spellingAnswer);
   }
 
   public RecallPromptBuilder answerTimestamp(Timestamp timestamp) {
