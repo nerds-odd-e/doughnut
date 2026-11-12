@@ -465,7 +465,7 @@ with the difference as evidence.
 
 ### 8. Publish the remaining conversion and confirm
 Type: Behavior
-Status: planned
+Status: done
 Proof: The publish output names the last conversion commit as the accepted
 head; a fresh download of the notebook shows the converted content; for twenty
 converted notes spread over the three kinds, `note-info` read before and after
@@ -486,6 +486,31 @@ Implementation brief:
 - Tell the owner to run `donut notebook pull` in their own checkout.
 - Delete the script and the report. Record in this plan the counts by kind,
   the commit IDs, the accepted heads and the comparison results.
+
+Accepted proof, 2026-11-12:
+
+- The check on `a8de2940..conversion` passed (625 + 5 + 120 = 750). One
+  `donut notebook publish notebook` printed "Published notebook. Accepted
+  head: 2787ae83b5fd09b225b0fc1b496e6ef44f30b203." It took 1 minute 42
+  seconds for the four commits (615 notes).
+- Twenty converted notes outside the pilot, over the three kinds, were read
+  3 seconds before the publish and again after it: 多大, 三日, 学ぶ, 交互態,
+  仕返し, 困惑, 復讐, 水引, 創造, 弾劾, 粗い, 懐石, 厳島神社, 干支, 丸で, 溜池,
+  済まない, 人数, 強調 and 生地. Same note IDs, the same 53 memory trackers
+  with equal fields, the same 292 recall history entries, and content equal to
+  the published files. The ten pilot notes were still equal as well.
+- A fresh `donut notebook clone 15` had head `2787ae83` and the same tree as
+  the conversion tip. Its listing shows 125 notes that still have a match.
+- Counts by kind: 298 alone on a line or at the start, 227 in brackets, 100
+  in another place. Unchanged: 53 several matches, 56 not plain kana, 13
+  subject of the sentence, 3 whose sentence says how the word is read.
+- Accepted heads: `418fc3e6` (pilot), then `2787ae83`.
+- No tracker for `pronunciation` was created by publishing. Whether the
+  readings are offered at assimilation time was not observed.
+- The script, the preview and the snapshots are deleted. The clone stays at
+  `/Users/terryyin/doughnut-pronunciation-conversion/notebook`.
+- The story's diff from `5d974f8eae` holds backend, frontend, documentation
+  and planning files only.
 
 ## Execution record
 
