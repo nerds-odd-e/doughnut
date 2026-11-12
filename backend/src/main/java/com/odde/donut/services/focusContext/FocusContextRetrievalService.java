@@ -21,6 +21,7 @@ public class FocusContextRetrievalService {
   private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
   private final NoteService noteService;
+  private final FocusContextWikiUri wikiUri;
   private final FocusContextWikiBfsExpander wikiBfsExpander;
   private final FocusContextFolderPeerAppender folderPeerAppender;
 
@@ -29,12 +30,15 @@ public class FocusContextRetrievalService {
       NoteReferenceService noteReferenceService,
       NoteRepository noteRepository,
       AuthorizationService authorizationService,
-      NoteService noteService) {
+      NoteService noteService,
+      FocusContextWikiUri wikiUri) {
     this.noteReferenceService = noteReferenceService;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
     this.noteService = noteService;
-    this.wikiBfsExpander = new FocusContextWikiBfsExpander(noteReferenceService, noteRepository);
+    this.wikiUri = wikiUri;
+    this.wikiBfsExpander =
+        new FocusContextWikiBfsExpander(noteReferenceService, noteRepository, wikiUri);
     this.folderPeerAppender = new FocusContextFolderPeerAppender(noteRepository, noteService);
   }
 
@@ -69,7 +73,7 @@ public class FocusContextRetrievalService {
 
     List<String> outgoingLinkUris =
         noteReferenceService.outgoingWikiLinkTargetNotesForViewer(hydrated, viewer).stream()
-            .map(FocusContextWikiUri::of)
+            .map(note -> wikiUri.of(note, viewer))
             .toList();
     Set<Integer> focusInboundExclude = new HashSet<>();
     if (focusId != null) {
@@ -84,7 +88,7 @@ public class FocusContextRetrievalService {
                 FocusContextConstants.FOCUS_INBOUND_URI_CAP,
                 config.getSampleSeed())
             .stream()
-            .map(FocusContextWikiUri::of)
+            .map(note -> wikiUri.of(note, viewer))
             .toList();
     int focusContentTokens = ApproximateUtf8TokenBudget.estimateApproxTokens(focusDetails);
     int relatedTotalBudget = Math.max(0, combinedContentBudget - focusContentTokens);
@@ -101,7 +105,7 @@ public class FocusContextRetrievalService {
                     FocusContextConstants.sampleCapAtGraphDepth(1),
                     config.getSampleSeed())
                 .stream()
-                .map(FocusContextWikiUri::of)
+                .map(note -> wikiUri.of(note, viewer))
                 .toList()
             : List.of();
 

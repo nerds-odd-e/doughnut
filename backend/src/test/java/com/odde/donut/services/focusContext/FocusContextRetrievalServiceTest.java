@@ -80,7 +80,7 @@ class FocusContextRetrievalServiceTest extends FocusContextRetrievalTestBase {
       assertThat(related.getDepth(), equalTo(1));
       List<String> path = related.getRetrievalPath();
       assertThat(path, hasSize(2));
-      assertThat(path.get(0), equalTo("[[Focus]]"));
+      assertThat(path.get(0), equalTo("[[" + focusNote.getNotebook().getName() + ":Focus]]"));
       assertThat(path.get(1), containsString("Linked"));
     }
   }

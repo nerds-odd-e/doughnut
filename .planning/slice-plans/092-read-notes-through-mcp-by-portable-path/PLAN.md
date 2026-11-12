@@ -164,7 +164,7 @@ Sizing: five to eight active minutes, plus required proof waits.
 
 ### 9. Follow graph navigation references without title ambiguity
 Type: Behavior
-Status: planned
+Status: done
 Proof: Graph → read/graph round trips distinguish equal titles for outgoing,
 inbound, sampled-peer and retrieval-path strings; full backend and MCP E2Es.
 
@@ -219,7 +219,7 @@ Disposition: proved by slice 6: actual cached-schema SDK ambiguity → candidate
 ### G6. Generated graph navigation addresses still need canonical qualification
 Reported: slice 8 — "Graph input now uses paths; generated outgoing, inbound, sampled-peer and retrieval-path wiki spellings remain interim until navigation slice9."
 Story clause: "MCP-generated references to the focus note, related notes, outgoing destinations, inbound referrers, sampled peers, and retrieval paths use that same addressing contract."
-Disposition: interim until slices 9
+Disposition: proved by slice 9: GraphNavigationMcpEndpointTest six real HTTP graph → extracted destination → read/graph round trips for outgoing/inbound/root peers and focus/traversed/peer-anchor paths, with full-folder namesakes and escaping; backend3167 and both MCP E2Es9 passed; execution-evidence.md slice9
 
 ### G7. Returned graph nodes still need direct reusable addresses
 Reported: slice 8 — "Focus and related projections keep current metadata; direct reusable portablePath fields remain owned by slice10."

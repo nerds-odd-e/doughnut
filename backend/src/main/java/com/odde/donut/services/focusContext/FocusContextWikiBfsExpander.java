@@ -17,11 +17,15 @@ import java.util.Set;
 final class FocusContextWikiBfsExpander {
   private final NoteReferenceService noteReferenceService;
   private final NoteRepository noteRepository;
+  private final FocusContextWikiUri wikiUri;
 
   FocusContextWikiBfsExpander(
-      NoteReferenceService noteReferenceService, NoteRepository noteRepository) {
+      NoteReferenceService noteReferenceService,
+      NoteRepository noteRepository,
+      FocusContextWikiUri wikiUri) {
     this.noteReferenceService = noteReferenceService;
     this.noteRepository = noteRepository;
+    this.wikiUri = wikiUri;
   }
 
   record WikiExpansion(Set<Integer> wikiClaimedNoteIds, List<SiblingAnchor> siblingAnchors) {}
@@ -34,7 +38,7 @@ final class FocusContextWikiBfsExpander {
       int maxDepth,
       int wikiBudgetTotal,
       Optional<Long> sampleSeed) {
-    String focusWikiUri = FocusContextWikiUri.ofFocusNote(hydratedFocus);
+    String focusWikiUri = wikiUri.of(hydratedFocus, viewer);
 
     Map<Integer, List<String>> pathEndingAtWikiUriByNoteId = new HashMap<>();
     if (focusId != null) {
@@ -135,19 +139,21 @@ final class FocusContextWikiBfsExpander {
         if (target.getId() == null || target.getId().equals(focusId)) {
           continue;
         }
-        proposals.add(new Proposal(target.getId(), depth, appendWikiUri(parentPath, target)));
+        proposals.add(
+            new Proposal(target.getId(), depth, appendWikiUri(parentPath, target, viewer)));
       }
 
       for (Note target : sampledInbound) {
-        proposals.add(new Proposal(target.getId(), depth, appendWikiUri(parentPath, target)));
+        proposals.add(
+            new Proposal(target.getId(), depth, appendWikiUri(parentPath, target, viewer)));
       }
     }
     return proposals;
   }
 
-  private static List<String> appendWikiUri(List<String> prefix, Note target) {
+  private List<String> appendWikiUri(List<String> prefix, Note target, User viewer) {
     List<String> path = new ArrayList<>(prefix);
-    path.add(FocusContextWikiUri.of(target));
+    path.add(wikiUri.of(target, viewer));
     return List.copyOf(path);
   }
 

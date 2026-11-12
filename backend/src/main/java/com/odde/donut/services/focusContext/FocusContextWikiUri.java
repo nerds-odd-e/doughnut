@@ -1,18 +1,19 @@
 package com.odde.donut.services.focusContext;
 
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.User;
+import com.odde.donut.services.PortablePathAuthoring;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FocusContextWikiUri {
-  public static String of(Note note) {
-    String title = note.getTitle() != null ? note.getTitle() : "";
-    if (note.getNotebook() == null) {
-      return "[[" + title + "]]";
-    }
-    return "[[" + note.getNotebook().getName() + ": " + title + "]]";
+  private final PortablePathAuthoring portablePathAuthoring;
+
+  public FocusContextWikiUri(PortablePathAuthoring portablePathAuthoring) {
+    this.portablePathAuthoring = portablePathAuthoring;
   }
 
-  public static String ofFocusNote(Note note) {
-    String title = note.getTitle() != null ? note.getTitle() : "";
-    return "[[" + title + "]]";
+  public String of(Note note, User viewer) {
+    return "[[" + portablePathAuthoring.qualifiedPortablePath(note, viewer) + "]]";
   }
 }
