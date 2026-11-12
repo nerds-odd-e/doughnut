@@ -126,7 +126,7 @@ public final class WikiLinkMarkdown {
         true);
   }
 
-  static String escape(String decoded) {
+  public static String escape(String decoded) {
     return decoded.replace("\\", "\\\\").replace("|", "\\|");
   }
 

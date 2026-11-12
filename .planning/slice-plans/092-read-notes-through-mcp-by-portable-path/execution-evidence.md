@@ -1,0 +1,23 @@
+# Execution evidence
+
+## Execution resume context
+
+Established story-branch execution in `/Users/terryyin/git/doughnut/.worktrees/read-notes-through-mcp-by-portable-path`, branch `codex/read-notes-through-mcp-by-portable-path`; publisher `dashboard-territory.local-doughnut`, agent Sola-chan. Starting revision `17b0ac219523fe78a4f31b8eccd46cd631434156`; accepted Take and initial candidate `2ce2cef04add07a7459f44c08d70521055b45b42`, published to origin/main and execution branch. No second claim. Replanning allowed under existing planning authority. No named coordination siblings.
+
+Checkout setup: `./scripts/run.sh bash scripts/worktree_setup.sh` passed, frozen lockfile unchanged; `CURSOR_DEV=true nix develop -c pnpm exec tsc --version` passed (6.0.3), in this checkout. Check-only installed hook contract is `scripts/git-hooks/pre-commit`; coordinator formatter is `./scripts/run.sh pnpm format:changed`.
+
+Observer: Codex yielded cell `g74:11`, key `ci-watch-execution:nerds-odd-e/doughnut:codex/read-notes-through-mcp-by-portable-path:sola-seed125`, coordinator `sola-seed125`, session 6321, directory `/tmp/dough-ci-501/watch-a6nStV`, PID 82724. Runtime canonical checkout verified. GitHub Actions `ci.yml`, verified active workflow 5208694, name donut CI; target is origin execution branch. Claim trunk CI unobserved.
+
+Expensive-proof decision: this macOS host at 16:00 has load 50.21/26.42/16.80, roughly 13 GiB inactive memory and 0.6 GiB free; CPU consumers include unrelated yes processes and other projects. Leave unrelated processes alone. Required backend proof remains the full suite (~1m38 baseline). Run one owned backend invocation at a time, never alongside Cypress; inspect load again before launch and use measured result to reconsider on contention/failure. No other owned heavy work currently running. Implementation agent owns command through terminal result.
+
+## Accepted slice evidence
+
+### Slice 1
+
+Trigger/setup: authenticated discovery with real MakeMe notebooks, nested folders, aliases, readable subscriptions and duplicate titles. Expected qualified reusable addresses and complete locations; inspected `ListNoteCandidatesMcpEndpointTest.returnsAliasMatchAsCandidate`, `equalTitlesAreDisambiguatedByNotebookAndFolder`, `rootCandidateUsesExactRootPathWhenTitleIsAmbiguous`, `candidatePathEscapesWikiDestinationCharacters` observe the nested/root/escaped addresses and folder trails. `SearchControllerAliasTests.shouldRankTitleMatchesBeforeAliasMatches` and `NoteSearchServiceExactMatchTest` retain ranking; the tool preserves search stream order. Shared authoring now takes the explicit viewer while its existing authored-path caller keeps current-user behavior.
+
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed final source, 3,120 tests, zero failures/errors, two skipped (626 XML suites inspected). `scripts/check_diff_whitespace.sh` passed. First compilation rejected unsupported CrudRepository getReferenceById; fixed to findById/orElseThrow before the accepted run. New-DB preparation/migration 1m12 plus final Gradle/test phase 4m52 under load, about six minutes total; active implementation about eight minutes. Process/result progress was inspected through terminal success. No owned commands remain.
+
+Consumer trace: `/tmp/seed125-slice1-consumer-trace.md`, installed script against HEAD with read_note/get_note_graph/callToolOnFirstCandidate and reached MCP/hosted step phrases. Every located backend consumer ran in the full suite, including shared wiki rewrite, construction, grading and resolver consumers. E2E MCP services/account-linking, mcpAgentActions/hostedAssistant, steps and support are excluded for this additive slice after inspecting retained noteId/title/notebookName/folderName parsing and content substring assertions; their changed input contracts are proved in 3/5. Frontend authoredLinkMarkup and RichMarkdownEditor property-link references concern unchanged whole-link recognition and are excluded. Execution guidance/history/PLAN text matches are excluded because their behavior does not consume the discovery projection. G1/G2 own the known interims.
+
+Freshness: unchanged at pinned origin/main `b973cb8f60e19de6437f0696463e8584a31744ab`; no named coordination siblings. Independent fresh refactor returned `## REFACTOR COMPLETE`: product already clean, no edits/tests; inspected shared authoring, projection, HTTP assertions, rewrite/E2E callers. Coordinator split planning responsibilities into linked evidence/proof-route records; all changed files under 250 lines. Accepted implementation proof unchanged.

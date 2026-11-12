@@ -2,13 +2,15 @@
 
 **Identity:** SEED-125#read-notes-through-mcp-by-portable-path
 **Source:** [refined story](../../seeds/SEED-125-read-notes-through-mcp-by-portable-path.md#read-notes-through-mcp-by-portable-path)
+**Source review:** [independent commitments](source-review.md)
+**Execution evidence:** [identity, resume context and accepted proof](execution-evidence.md)
 
 ## Goal and boundaries
 
 Let an assistant follow a known wiki destination, read the intended note or
 bounded graph, and reuse returned candidate/reference addresses without numeric
 note identifiers. Full reads preserve authored Markdown and notebook revision
-attribution. This is preparation only; all slices remain unexecuted.
+attribution. Execution began on 2026-11-12; slice status below owns progress.
 
 Developer decision, 2026-11-12: assume notebook names are unique. Circle-owned
 notebooks and duplicate notebook-name handling are deferred. Adding or changing
@@ -71,67 +73,21 @@ New tests below are planned proof, not claims that existing tests cover new path
 
 ## Consumers and proof routes
 
-- `McpToolArguments` feeds both read tools. Their changed arguments reach
-  `ReadNoteMcpEndpointTest`, `GetNoteGraphMcpEndpointTest`,
-  `AssistantMcpAccessTest`, and `AssistantTokenRenewalTest`: migrate/run in 3/5.
-- `ListNoteCandidatesTool` feeds `mcpAgentActions.callToolOnFirstCandidate`,
-  `hostedAssistant`, and MCP step definitions. Inspect their actual request and
-  observation chains, migrate read consumers in 3 and graph consumers in 5.
-  Run `mcp_services.feature` and `assistant_account_linking.feature` for each
-  changed contract; retain isolation, budgets, revision, renewal, and withdrawal.
-- `FocusContextWikiUri` feeds retrieval/BFS/folder peers, then graph JSON and
-  `FocusContextMarkdownRenderer`. Export and AI question/conversation/session builders
-  consume the renderer: run full backend proof in 6; preserve content/traversal
-  purposes while updating intentional address spelling assertions.
-- Shared focus/related graph models reach OpenAPI and frontend generated types:
-  regenerate and run frontend proof in 7. Generator-owned files are regenerated,
-  not manually edited or split.
-- During execution, run the installed `consumer-trace.mjs` against each current
-  diff (`--base HEAD`), adding terms `read_note`, `get_note_graph`,
-  `callToolOnFirstCandidate`, and the changed MCP step phrases. Record every
-  located consumer as run, reused with matching evidence, or excluded with an
-  effect-based reason; extend this trace when the actual implementation differs.
+[Consumer chains and literal required commands](proof-routes.md) own the
+backend, MCP E2E, generation and frontend proof routes. Each implementation
+brief carries its selected routes and the consumer-trace requirement.
 
-Commands, from the execution checkout, with Nix:
+## Preparation evidence
 
-- Every backend slice: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
-  The backend skill requires the full suite. Do not substitute filtered tests.
-- Changed MCP caller journeys in 3/5/6/7:
-  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature,e2e_test/features/mcp/assistant_account_linking.feature`.
-- Shared graph DTO change in 7: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`,
-  then full backend proof against regenerated OpenAPI, plus
-  `CURSOR_DEV=true nix develop -c pnpm frontend:test`,
-  `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`, and
-  `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit`.
-  These broader checks are required by the API-generation and frontend skills.
-
-## Decisive premises and preparation observations
-
-Observed on 2026-11-12 in the named preparation worktree at
-`b481551f17d71f637213f7c7d706b282889eefcc`, using its isolated test database
-`doughnut_wt_0f536327332d443d8e6724b873e6c22a_test`. Each scratch edit was restored
-byte-for-byte before planning writes. Production Git diff is empty.
-
-| Premise/consumer | Consuming operation and observed form/profile | Result and limit |
-| --- | --- | --- |
-| Backend proof route can execute current behavior | `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, original source, isolated `test` profile | Green: 3,118 tests, zero failures/errors, two skipped; Gradle 1m38s. This is the retained unchanged baseline, not future path proof. |
-| Address changes reach real MCP and hosted callers; shared matching has discriminating proof | Same full-suite command with `McpToolArguments` lookup temporarily changed from `noteId` to `portablePath`, title matching temporarily forced to alias fallback, and formatter title temporarily set to `preparation-probe` | 154 expected failures among 3,118 tests. Read/graph endpoint, hosted access/renewal and title-precedence/property tests failed at their real results. Combined mutations do not isolate formatter coverage. |
-| Shared graph strings have maintained consumers | Same full-suite command with only both `FocusContextWikiUri` title expressions changed to `preparation-probe` | Three failures: outgoing depth/path, depth-two traversal, and seeded sibling-selection tests. Restore matched the earlier green source exactly; reuse that baseline. This does not prove all generated addresses are navigable: 6 adds round trips. |
-| Both named E2E specs are admitted in this checkout | Nix Node module executed `selectedCypressSpecs` with the exact two-spec argument above, then `assertSupportedIsolatedCypressSpecs` | Both selected; neither requires private OpenAI/Wikidata mocks. This observes runner selection only, stopping before starting/resetting an E2E stack. Actual journeys are owned by execution, not claimed run here. |
-
-Local host decision: macOS load averages 3.97/6.86/10.97, reclaimable inactive
-memory available; unrelated processes were left alone. Run one owned backend
-invocation at a time and never alongside Cypress in the same checkout. Before
-another expensive launch, refresh machine/load evidence if contention changes.
-The measured 1m38s–1m57s full-suite wait is an explicit focused-test timing
-exception; it does not excuse oversized active edits. No decisive current-state
-premise remains unobserved; new capability assertions remain implementation work.
+[Decisive premises and dated observations](preparation-evidence.md) retain the
+full baseline, mutation checks, environment, commands and limitations. Reuse the
+matching evidence; new capabilities still need their owning slice proof.
 
 ## Ordered slices
 
 ### 1. Discover notes with reusable qualified addresses
 Type: Behavior
-Status: planned
+Status: done
 Proof: Discovery HTTP results expose canonical qualified addresses/full folders;
 run full backend proof. Candidate → read round-trip proof belongs to 3.
 
@@ -244,3 +200,15 @@ Follow the execution skill; preparation grants no Take or implementation authori
 Plan refinement was not needed: the graph's two distinct address outcomes are
 separate bounded slices, Structure is adjacent to its first Behavior, and all
 final promises have proof owners. No remaining slice-specific concern was found.
+
+## Story obligations
+
+### G1. Discovery retains a numeric bridge during caller migration
+Reported: slice 1 — "Discovery adds Portable paths while retaining noteId for current read/graph callers until their migration."
+Story clause: "Delete numeric note ID arguments and MCP-generated note ID fields"
+Disposition: interim until slices 3, 5
+
+### G2. Discovery paths await read and graph consumers
+Reported: slice 1 — "Discovery produces reusable addresses; candidate-to-read and candidate-to-graph observations belong to slices 3 and 5."
+Story clause: "`list_note_candidates` supplies qualified Portable paths that the read and graph tools accept directly."
+Disposition: interim until slices 3, 5

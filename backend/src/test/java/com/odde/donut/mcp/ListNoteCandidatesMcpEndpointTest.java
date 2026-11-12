@@ -28,12 +28,20 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
 
   @Test
   void returnsAliasMatchAsCandidate() throws Exception {
-    Note aliasMatch =
-        makeMe.aNote("Colour Theory").notebookOwnedBy(personalUser).aliases("color").please();
+    Notebook notebook =
+        makeMe.aNotebook().creatorAndOwner(personalUser).name("Engineering").please();
+    Folder practices = makeMe.aFolder().notebook(notebook).name("Practices").please();
+    Folder design = makeMe.aFolder().parentFolder(practices).name("Design").please();
+    Note aliasMatch = makeMe.aNote("Colour Theory").folder(design).aliases("color").please();
+    makeMe.aNote("Colour Theory").notebook(notebook).please();
 
     JsonNode candidates = callListNoteCandidates(personalToken, "color");
 
-    assertThat(candidateIds(candidates), hasItem(aliasMatch.getId()));
+    JsonNode candidate = findCandidate(candidates, aliasMatch.getId());
+    assertThat(
+        candidate.get("portablePath").asText(),
+        equalTo("Engineering:Practices/Design/Colour Theory"));
+    assertThat(candidate.get("folderPath").asText(), equalTo("Practices/Design"));
   }
 
   @Test
@@ -64,7 +72,35 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
     assertThat(first.get("notebookName").asText(), equalTo("CS concepts"));
     assertThat(first.get("folderName").asText(), equalTo("Programming Concepts"));
     assertThat(second.get("notebookName").asText(), equalTo("Maths"));
+    assertThat(second.get("portablePath").asText(), equalTo("Maths:Functional"));
+    assertThat(second.get("folderPath").asText(), equalTo(""));
     assertThat(second.has("folderName"), equalTo(false));
+  }
+
+  @Test
+  void rootCandidateUsesExactRootPathWhenTitleIsAmbiguous() throws Exception {
+    Notebook notebook =
+        makeMe.aNotebook().creatorAndOwner(personalUser).name("Engineering").please();
+    Note root = makeMe.aNote("Code Review").notebook(notebook).please();
+    Folder practices = makeMe.aFolder().notebook(notebook).name("Practices").please();
+    makeMe.aNote("Code Review").folder(practices).please();
+
+    JsonNode candidates = callListNoteCandidates(personalToken, "Code Review");
+
+    assertThat(
+        findCandidate(candidates, root.getId()).get("portablePath").asText(),
+        equalTo("Engineering:/Code Review"));
+  }
+
+  @Test
+  void candidatePathEscapesWikiDestinationCharacters() throws Exception {
+    Notebook notebook =
+        makeMe.aNotebook().creatorAndOwner(personalUser).name("Engineering").please();
+    makeMe.aNote("A|B\\C").notebook(notebook).aliases("escaped destination").please();
+
+    JsonNode candidates = callListNoteCandidates(personalToken, "escaped destination");
+
+    assertThat(candidates.get(0).get("portablePath").asText(), equalTo("Engineering:A\\|B\\\\C"));
   }
 
   @Test
