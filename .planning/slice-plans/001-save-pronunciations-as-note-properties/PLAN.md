@@ -512,6 +512,22 @@ Accepted proof, 2026-11-12:
 - The story's diff from `5d974f8eae` holds backend, frontend, documentation
   and planning files only.
 
+## Execution complete
+
+Product advice: no change to the delivered behavior. Three things are worth
+the owner's attention later, none of them a correction:
+
+- 125 notes of 日本語学習 keep a `/…/` match. About 27 of them hold a real
+  reading with extra characters, such as `/こん‐きょ/`, and 16 were left
+  because removing the reading breaks a sentence. The owner can edit them or
+  ask for them one by one.
+- Publishing created no memory tracker for `pronunciation`. Whether each of
+  the 625 properties is offered in the assimilation sequence was not opened
+  or observed; the owner sees it at the next assimilation.
+- CI installs system packages with `apt-get` in every job. When the package
+  mirror did not resolve, each job waited about 50 minutes before failing. A
+  shorter limit for that step would return the runner sooner.
+
 ## Execution record
 
 Story Branch Mode. Execution checkout
