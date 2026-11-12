@@ -398,7 +398,7 @@ Decisions and learnings:
 
 ### 7. Publish a ten-note pilot and confirm learning history
 Type: Behavior
-Status: planned
+Status: done
 Proof: The publish output names the pilot commit as the accepted head, and for
 each pilot note the production `note-info` and each tracker's recall history,
 read before and after, are equal.
@@ -433,9 +433,31 @@ Progress, 2026-11-12:
 - The story branch was landed on `main` with the worktree kept: `main` is at
   `12288107bd2a2dbbfc2eabc2d00f44e0d4ed4e74`. Trunk CI run 43126110847 passed
   for that commit in every job, with its packaging job.
-- The release is not made. The next unused version is `v1.3.72`. The session
-  was not permitted to push the release tag, so the owner releases, or permits
-  the push. Nothing is published to the notebook yet.
+- The owner then authorized the release tag and the publication. Release
+  `v1.3.72` of `12288107bd`: Application Release run 43127613078 succeeded in
+  admission and in "GCP deploy (GCS + MIG + health probe)"; the production
+  health check reports commit `12288107bd2a2dbbfc2eabc2d00f44e0d4ed4e74`.
+- `donut notebook pull` received a new accepted head, `a8de2940`, one web
+  edit by the owner that touches no converted note. The five conversion
+  commits were rebased onto it: pilot `418fc3e6fb8339194ab2c40182179d0f4e4ffb40`,
+  then `d42ff734`, `1dee2ce5`, `db796694` and the tip
+  `2787ae83b5fd09b225b0fc1b496e6ef44f30b203`. The listing prints the same
+  counts on the new head, and the check with `--base main` passes on the range
+  and on the pilot commit.
+- `donut notebook publish notebook` printed "Published notebook. Accepted
+  head: 418fc3e6fb8339194ab2c40182179d0f4e4ffb40." It took 23 seconds.
+- Comparison of the ten pilot notes, read 13 seconds before the publish and
+  about a minute after it: the same note IDs, the same 23 memory trackers with
+  equal fields, and the same 59 recall history entries. Each note's production
+  content equals its file in the pilot commit. Accepted proof of this slice.
+
+Learnings for slice 8:
+
+- Pull and publish need `main` checked out in the clone.
+- The publish created no memory tracker for the new property. Whether the
+  property is offered at assimilation time was not observed.
+- `tools/pilot_snapshot.py` and `tools/pilot_compare.py` serve the twenty-note
+  comparison as well.
 
 A refused publication changes nothing; correct the named file and publish
 again. Any difference in the comparison stops slice 8 and returns to planning

@@ -74,10 +74,10 @@ acceptance record.
 | 15a.2 | commitment: Case: its match is not plain kana. | slice 3 | observed: listing `01-listing.md`, reason “the match is not plain kana”: 56 notes |
 | 15a.3 | commitment: Case: it already has a `pronunciation` property. | slice 3 | observed: listing `01-listing.md`, reason “the note already has a pronunciation property”: 0 notes; fixture note 見本 is listed with this reason |
 | 15a.4 | commitment: Case: removing the reading would leave a sentence without its subject. | slice 3 | observed: listing `01-listing.md`, reason “the reading is the subject of its sentence”: 11 notes, with the rule stated in the plan |
-| 15b.1 | commitment: The owner may edit such notes by hand in the checkout before publishing (alternative to 15b.2). | slice 7 | |
-| 15b.2 | commitment: Or the owner may ask for them one by one, before publishing (alternative to 15b.1). | slice 7 | |
-| 16a | commitment: The owner publishes with `donut notebook publish`, the normal local publication. | slice 7 | |
-| 16b | commitment: Nothing changes in production until that publication is accepted. | slice 7 | |
+| 15b.1 | commitment: The owner may edit such notes by hand in the checkout before publishing (alternative to 15b.2). | slice 7 | observed: The preview's start-here file told the owner the unchanged notes can be edited by hand in the copy; the owner asked for no hand edit before the go-ahead |
+| 15b.2 | commitment: Or the owner may ask for them one by one, before publishing (alternative to 15b.1). | slice 7 | observed: The owner's go-ahead of 2026-11-12 took the nine label notes one by one; they are commit `4d8ecf5f`, later `2787ae83` |
+| 16a | commitment: The owner publishes with `donut notebook publish`, the normal local publication. | slice 7 | observed: `donut notebook publish notebook` printed “Published notebook. Accepted head: 418fc3e6fb8339194ab2c40182179d0f4e4ffb40.” |
+| 16b | commitment: Nothing changes in production until that publication is accepted. | slice 7 | observed: The before snapshot of the ten pilot notes, taken 13 seconds before the publish, still showed the `/reading/` text and no property; the clone's local `main` had not left the accepted head until then |
 | 17a | commitment: Converted notes are the same notes. | slice 8 | |
 | 17a.1 | commitment: Their memory trackers stay attached. | slice 8 | |
 | 17a.2 | commitment: Their recall history stays attached. | slice 8 | |
@@ -141,10 +141,10 @@ acceptance record.
 | 34b | qualification: The mark tells the learner that a reading is hidden there, not the answer. | slice 1 | observed: Reason for 34a; the same mark is asserted there |
 | 35a | commitment: UI: a one-kana reading such as `て` is also hidden inside other words, as in `挙げて`, because the existing matching rule accepts any kana as a word boundary. | slice 1 | observed: RecallPromptSpellingStemMaskingControllerTest.spellingQuestionHidesAOneKanaSavedPronunciationInsideOtherWords: stem `[...]を挙げ/.../。` |
 | 35b | qualification: A `/て/` marking in the body does the same today. | slice 1 | observed: Saved values and repeats of a `/…/` reading both go through TitleFragment.replaceLiteralWords in ClozeReplacement.maskPronunciationsAndTitles |
-| 36a | qualification: Architecture, publication: under ADR 0002, every accepted change to notebook content goes through Git publication. | slice 7 | |
-| 36b | qualification: A SQL update of note content would change content outside that boundary: live notes would differ from accepted `main`, which local publication refuses until a recovery, and the property index and reference rows derived on a content write would be skipped. | slice 7 | |
-| 36c | qualification: The original condition for pure SQL, that it can prepare the changes safely, is not met. | slice 7 | |
-| 36d | commitment: The conversion uses that boundary's local path, which the owner already uses for this notebook. | slice 7 | |
+| 36a | qualification: Architecture, publication: under ADR 0002, every accepted change to notebook content goes through Git publication. | slice 7 | observed: Reason for 36d; the pilot changed production content only through `donut notebook publish` |
+| 36b | qualification: A SQL update of note content would change content outside that boundary: live notes would differ from accepted `main`, which local publication refuses until a recovery, and the property index and reference rows derived on a content write would be skipped. | slice 7 | observed: Reason for 36d; no SQL update was made |
+| 36c | qualification: The original condition for pure SQL, that it can prepare the changes safely, is not met. | slice 7 | observed: Reason for 36d; no SQL update was made |
+| 36d | commitment: The conversion uses that boundary's local path, which the owner already uses for this notebook. | slice 7 | observed: The pilot commit was published from the local clone with `donut notebook publish`, the local publication path |
 | 36e | exclusion: Production runs no conversion code. | slice 8 | |
 | 37a | commitment: Architecture, format: under ADR 0004, `pronunciation` is author-owned YAML frontmatter that is preserved as authored. | slice 2 | observed: RichMarkdownEditor.propertyPresets.spec.ts “adds a pronunciation chosen from the presets as an ordinary property”: the emitted YAML is the authored key and value; no format code changed |
 | 37b | exclusion: It needs no format rule of its own. | slice 2 | observed: Reading of the slice diff: no format rule added |
