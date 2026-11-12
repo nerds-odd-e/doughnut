@@ -97,6 +97,15 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
   - Observed effect: four consecutive post-slice refactor agents. Slices 1–2 returned `none — already clean` / no edits. Slice 3 collocated latest-selection folding into `RecallPromptRepository` and synced OpenAPI description. Slice 4 trimmed sibling test assertions only (production unchanged).
   - Inference: same fixed per-slice refactor launch cost as ODF-141; two empty passes and one test-doc-only pass paid the full agent cost. Slice 3’s cohesion edit shows the pass is not always empty. Token/time cost of the empty passes was not separately measured here.
 
+- Execution: SEED-126#use-shared-test-guidance / 78a6275f59584502829c57b1f3ca204fac1e88ba
+  - Timestamp: unknown
+  - Tool: Codex
+  - Model: gpt-6.1-sol
+  - Open Dough release: unknown; execution guidance retained at 924d9293c767d15f7247402d387ebb7fc8654f85
+  - Evidence: 2026-11-12 launch 728cbb5c-718a-4147-b0af-60b8616da3d3; `refactor_makeme` and `refactor_browser` returns; source and plan recoverable at `924d9293c767d15f7247402d387ebb7fc8654f85:.planning/slice-plans/094-use-shared-test-guidance/PLAN.md`.
+  - Observed effect: both guidance slices launched fresh refactor agents and both returned `none — already clean`, no edits and no tests. Each return estimated three active minutes; accepted guidance/selector proof remained unchanged.
+  - Inference: the two no-edit passes repeat ODF-141's fixed per-slice review cost. Their combined six active minutes are an estimate from worker reports, not a measured wall-clock or token saving; this occurrence does not establish that independent review can always be omitted.
+
 <a id="odf-208"></a>
 
 ## ODF-208 — Observer worker exits without a recorded cause
@@ -221,6 +230,15 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
   - Evidence: 2026-11-11 coordinator tool results: startup row batch returned original15975 tokens with truncation; pre-delegation batch11677 tokens also truncated; closure evidence listing accidentally included all XML filenames and returned original63280 tokens.
   - Observed effect: Required missing guidance was fetched again in targeted passages; the late unbounded file inventory obscured the recording reference and required narrower retrieval.
   - Inference: This repeats the coordinator retrieval deviation despite targeted-reading instructions. Savings are unmeasured; restrict inventory queries before emitting output and keep boundary rows separate.
+
+- Execution: SEED-126#use-shared-test-guidance / 78a6275f59584502829c57b1f3ca204fac1e88ba
+  - Timestamp: unknown
+  - Tool: Codex
+  - Model: gpt-6.1-sol
+  - Open Dough release: unknown; execution guidance retained at 924d9293c767d15f7247402d387ebb7fc8654f85
+  - Evidence: 2026-11-12 launch 728cbb5c-718a-4147-b0af-60b8616da3d3 coordinator/tool history; startup/context batches reported original token counts 11,386 and 16,418 with truncation. A later full consumer-trace read reported 57,802 tokens and truncated; the coordinator then selected the relevant guidance/disposition rows. This deferred review's initial combined log read also truncated at 7,458 original tokens before targeted section retrieval.
+  - Observed effect: required delegation guidance and relevant consumer observations were retrieved again in narrower passages after broad output obscured them. Product proof was accepted through the bounded readings; no delivered defect was established.
+  - Inference: this repeats ODF-264's agent retrieval deviation despite existing targeted-reading guidance. The avoidable repeated retrieval is observed; time/token savings from a bounded-first query are unmeasured.
 
 <a id="odf-265"></a>
 

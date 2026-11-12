@@ -212,8 +212,8 @@ CI source: GitHub Actions `ci.yml`, verified active as `donut CI`, push-triggere
 on all branches. Story-branch target is
 `nerds-odd-e/doughnut:codex/use-shared-makeme-and-page-object-guidance`.
 Claim CI on trunk is unobserved. Observer coordinator `kirara-seed126`,
-directory `/tmp/dough-ci-501/watch-9bfSqM`, PID 87514, stream session 18535,
-yielded cell `g100:13`, runtime in this checkout's `.agents/skills/dough-execute-plan`.
+closure directory `/tmp/dough-ci-501/watch-nsVyZT`, PID 80433, stream session 87048,
+yielded cell `g100:84`, runtime in this checkout's `.agents/skills/dough-execute-plan`.
 No expensive verification is needed: the guidance/selector boundary requires
 only bounded reading and local commands; application suites are outside it.
 
@@ -244,6 +244,7 @@ Nine active implementation minutes include extraction and consumer reading.
 
 ## Execution complete
 
-Product advice: no change. Product/proof retrospective complete; process selected
-and deferred to wrap-up after Intent Coverage. Both slices accepted on the branch,
-latest `54f8c5c906a150fcc84a86115ce3d7313154b5ec`; CI pending. Records-only delivery.
+Product advice: no change. Product/proof retrospective complete; deferred process
+review finished after Intent Coverage. Both slices accepted on the branch,
+latest `54f8c5c906a150fcc84a86115ce3d7313154b5ec`; branch CI passed as basis for
+`924d9293c767d15f7247402d387ebb7fc8654f85` with confirmed shutdown. Process review completed.

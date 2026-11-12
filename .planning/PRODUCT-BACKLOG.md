@@ -13,4 +13,5 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Verify testing guidance links](seeds/SEED-127-verify-test-guidance-links.md#verify-test-guidance-links) — SEED-127#verify-test-guidance-links
 - [Retrieve my recall answer history through MCP](seeds/SEED-073-learning-refinement-and-retrieval.md#retrieve-my-recall-answer-history-through-mcp) — SEED-073#retrieve-my-recall-answer-history-through-mcp
