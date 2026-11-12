@@ -9,8 +9,8 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 ## Taken
 
 - [Read notes through MCP by Portable path](seeds/SEED-125-read-notes-through-mcp-by-portable-path.md#read-notes-through-mcp-by-portable-path) — SEED-125#read-notes-through-mcp-by-portable-path ([plan](slice-plans/092-read-notes-through-mcp-by-portable-path/PLAN.md))
+- [Verify testing guidance links](seeds/SEED-127-verify-test-guidance-links.md#verify-test-guidance-links) — SEED-127#verify-test-guidance-links ([plan](slice-plans/095-verify-test-guidance-links/PLAN.md))
 
 ## Backlog list
 
-- [Verify testing guidance links](seeds/SEED-127-verify-test-guidance-links.md#verify-test-guidance-links) — SEED-127#verify-test-guidance-links
 - [Retrieve my recall answer history through MCP](seeds/SEED-073-learning-refinement-and-retrieval.md#retrieve-my-recall-answer-history-through-mcp) — SEED-073#retrieve-my-recall-answer-history-through-mcp
