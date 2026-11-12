@@ -100,7 +100,7 @@ Sizing: about five active minutes, plus required full-suite wait.
 
 ### 2. Share source-less candidate resolution
 Type: Structure
-Status: planned
+Status: done
 Proof: Full backend suite preserves wiki behavior; the scratch observation
 specifically discriminated title-precedence/property effects, not every rule.
 
