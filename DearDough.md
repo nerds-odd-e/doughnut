@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 483. Removed numbers are never reused.
+- Highest allocated local number: 486. Removed numbers are never reused.
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 - [Source before the 2026-11-10 compaction](https://github.com/nerds-odd-e/doughnut/blob/d3eb0ef73aca13a5ed229738f92dbe44ee12bf95/DearDough.md); its rows are retained at the [Open Dough catalog](https://github.com/terryyin/open-dough/tree/5afe6fee8fe34322752e9e44911d72eb31dd4991/docs/maintainer/findings). DD-443 (disposable break checks) was pruned as successful practice, not a problem.
@@ -554,3 +554,45 @@ The project backend rule requires the entire suite even for a targeted scratch b
   - Evidence: Native worker /root/intent_coverage_live, checked implementation e257b144d1; verbatim report and wrap-up disposition in the SEED-122 Done record; raw evidence /tmp/dough-intent-coverage-122-1794389081/.
   - Observed effect: One worker ran baseline/fault/restored commands across3111 maintained tests (plus one temporary independent witness in the fault run). Full command wall times315.751/162.748/218.847s total697.346s. Invocation-to-report1073.664s includes setup, reads, runs and verified retirement. The union fault caused six maintained failures and independently observed ambiguous controller results; baseline/restored suites and cleanup passed.
   - Inference: Whole-suite repetition is required by the current backend instructions, rather than a worker decision to broaden proof. Shared-host contention and cold scratch caches also contributed; the17.9-minute elapsed cannot all be attributed to the suite policy. Native blocking waits and bounded overdue checks retained one worker without restart or duplicate probing.
+
+## DD-484 — The source review of a small story gave 137 rows that were typed and recorded one at a time
+
+The source-only reviewer returned 137 numbered commitments for a story with two small product changes and a one-time content conversion. The coordinator retyped the whole table into `source-review.md`, because the reviewer's transcript must not be read, and then recorded one observation per row with one script call each.
+
+### Occurrences
+- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
+  - Timestamp: 2026-11-11T23:05:00+08:00
+  - Tool: Claude Code
+  - Model: claude-fable-5-2
+  - Open Dough release: 0.3.96
+  - Evidence: `source-review.md` at e9f109c3c2 and its later revisions through 3a79a9d489; coordinator conversation before the first delegation and at each acceptance.
+  - Observed effect: About 140 `record` calls over eight slices; 39 rows for slice 1 alone. Roughly a third of the rows were qualifications or reasons with no result of their own to observe.
+  - Inference: The review did catch one promise the plan had no proof for (a one-kana reading hidden inside other words). The cost is in the row count and the hand transfer, not in having the review. Token cost was not measured.
+
+## DD-485 — CI jobs waited about 50 minutes each on a package mirror that did not resolve
+
+Two story-branch CI runs failed in every job that installs system packages, each after about 50 minutes inside `apt-get`. The failures arrived as separate notifications over about 90 minutes, and the CI observer ended by itself before the rerun finished.
+
+### Occurrences
+- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
+  - Timestamp: 2026-11-11T23:32:09+08:00
+  - Tool: Claude Code
+  - Model: claude-fable-5-2
+  - Open Dough release: 0.3.96
+  - Evidence: CI runs 43049319481 and 43053073660 (attempts 1 to 3); failed step durations of about 3,046 seconds; `Temporary failure resolving 'azure.archive.ubuntu.com'`; attempt 2 lost one runner during the same step.
+  - Observed effect: Eleven failed jobs per run with no test executed; five diagnosis rounds for one cause; green evidence for the product commit came about eight hours after its push.
+  - Inference: The outage was outside the repository. The repository's part is that the install step has no shorter limit of its own, so a mirror outage holds each runner for the default limit. Whether a shorter limit is wanted is the owner's call.
+
+## DD-486 — A checkpoint go-ahead did not let the session push the release tag
+
+The plan's human checkpoint said one go-ahead covers the landing, the release and the publications. After the owner's "go ahead", the host refused the release tag push as a production deployment, and the session had to stop and ask again.
+
+### Occurrences
+- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
+  - Timestamp: 2026-11-12T08:27:00+08:00
+  - Tool: Claude Code
+  - Model: claude-fable-5-2
+  - Open Dough release: 0.3.96
+  - Evidence: Coordinator conversation: the denied `git push origin refs/tags/v1.3.72`, the second attention message, and the owner's reply "I authorize you to do these".
+  - Observed effect: One extra stop and owner turn between the landing and the release; the landing and trunk CI were already done.
+  - Inference: The host's permission check does not read the plan's checkpoint wording. A checkpoint message that asks for the release and publication permission in the host's own terms might avoid the second stop; this was not tried.
