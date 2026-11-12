@@ -365,3 +365,21 @@ checks against real history after delivery; that check is not a slice.
   so no second access check and no checked exception remain. Fixtures:
   `makeMe.theNote(note).trashed().please()`; a withdrawn subscription by
   removing the `Subscription`. Full suite: 3,194 tests green.
+
+## Execution complete
+
+Product advice:
+
+- After landing, check the initial sizes (50 attempts per response, a
+  1,000-token graph per missed multiple-choice answer) against the owner's
+  real history, as the plan intended.
+- Do SEED-073#report-recall-answers-whose-question-is-gone next (queued
+  first). While it reads production, also check whether any answer reachable
+  through its recall prompt has no recorded grade, no recall log and no
+  outcome; such an answer would make `list_recall_answers` fail the whole call
+  when `correct` is unboxed (a hypothesis from code reading, unverified).
+- `AnswerRepository.findRecordedAnswersOfLearnerBefore` also finds answers
+  through recall logs; until that story lands, those without a prompt are
+  dropped by the service. Keep the branch for that story rather than removing
+  it.
+- Process review is deferred into wrap-up (intent coverage enabled).
