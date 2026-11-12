@@ -12,4 +12,5 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Use shared MakeMe and page-object guidance](seeds/SEED-126-use-shared-test-guidance.md#use-shared-test-guidance) — SEED-126#use-shared-test-guidance
 - [Retrieve my recall answer history through MCP](seeds/SEED-073-learning-refinement-and-retrieval.md#retrieve-my-recall-answer-history-through-mcp) — SEED-073#retrieve-my-recall-answer-history-through-mcp
