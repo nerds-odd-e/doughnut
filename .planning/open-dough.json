@@ -6,22 +6,25 @@
     "locations": [
       {
         "path": "e2e_test/features",
-        "kind": "gherkin"
+        "kind": "gherkin",
+        "pageObjects": true
       },
       {
         "path": "frontend/tests",
         "kind": "typescript",
-        "include": ["**/*.spec.ts"]
+        "include": ["**/*.spec.ts"],
+        "makeMe": true
       },
       {
         "path": "cli/tests",
         "kind": "typescript",
-        "include": ["**/*.test.ts", "**/*.test.tsx"]
+        "include": ["**/*.test.ts", "**/*.test.tsx"],
+        "makeMe": true
       },
       {
         "path": "backend/src/test/java",
-        "kind": "java",
-        "include": ["**/*Test.java"]
+        "sources": [{ "include": ["**/*Test.java"], "syntax": "java" }],
+        "makeMe": true
       },
       {
         "path": "scripts",
