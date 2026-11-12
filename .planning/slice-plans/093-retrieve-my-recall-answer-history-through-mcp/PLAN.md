@@ -10,8 +10,11 @@ A connected assistant can read the learner's own recent recall attempts through
 one read-only MCP call: every answer in a rolling window (seven days unless the
 caller gives another positive number of days), each with its time, question,
 answer, recorded correctness and outcome, and source note evidence chosen from
-correctness and question type. This is preparation only; all slices remain
-unexecuted.
+correctness and question type. Answers whose recall prompt is no longer
+stored belong to
+[Report recall answers whose question is gone](../../seeds/SEED-073-learning-refinement-and-retrieval.md#report-recall-answers-whose-question-is-gone),
+split out on 2026-11-12 by the owner because it needs a production database
+read.
 
 Outside this plan, as the story records: Just review and Tutor Feedback events,
 filters and a compact index, attention readings and aggregates, any diagnosis,
@@ -41,8 +44,9 @@ tracker, or note. No new OAuth scope and no consent wording change.
 - Reuse, do not duplicate: `Answer.getCorrect` and `Answer.correctFrom` for
   recorded correctness; the stored `Mcq` for stem, choices, expected answer and
   validation rationale; `RecallPrompt.getSpellingQuestion` for the masked
-  prompt; `AttributedNoteContentService` for full content;
-  `NoteGraphService` with `RetrievalConfig.forGraphApi` for the bounded graph;
+  prompt; the note's content (as `read_note` returns it) for full content;
+  `FocusContextRetrievalService` with `RetrievalConfig.forGraphApi` for the
+  bounded graph (as `get_note_graph` builds it);
   `PortablePathAuthoring` for the qualified Portable path; existing notebook
   read authorization for note evidence.
 - One new service owns "recall answer history for a learner in a window"; the
@@ -83,7 +87,7 @@ feeds the tool.
 | Overlap is correct with its outcome; Accidental match is one incorrect attempt | 5 | Overlap case; accidental-match case with a Confusion log on a second tracker yields one attempt |
 | Ambiguity exclusion keeps recorded correctness and shows the reason | 6 | Excluded incorrect multiple-choice case |
 | Evidence follows correctness and type: title and path; plus full content; plus bounded graph | 7 | Correct of both types, incorrect spelling, incorrect multiple choice; graph respects its budget |
-| Lost access or trashed note keeps the attempt and reports note evidence unavailable; a missing question is reported unavailable | 8 | Withdrawn subscription, trashed note, and an answer without a prompt |
+| Lost access or trashed note keeps the attempt and reports note evidence unavailable | 8 | Withdrawn subscription and trashed note |
 | A window larger than one response is retrievable to the end, each attempt once | 9 | More attempts than one response; follow `nextCursor` to the end; an answer added mid-way does not repeat or shift |
 | A hosted assistant with `notes:read` can call it; a real wrong spelling answer reaches the assistant | 10 | `AssistantMcpAccessTest` case; one `mcp_services.feature` scenario |
 | Tool and its use are documented where the tools are listed | 10 | `.agents/skills/mcp-server/SKILL.md` and `docs/assistant-oauth.md` read correctly |
@@ -108,29 +112,10 @@ planning writes; the product diff is empty.
 | A fixture-built answered prompt carries recorded correctness | Scratch test in the MCP test package: `makeMe.aRecallPrompt().forMemoryTracker(..).answerChoiceIndex(0).please()`, flush and clear, then `RecallPromptRepository.findAnsweredRecallPromptsInTimeRange` and `Answer.getCorrect`; `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.mcp.*'`, this worktree's isolated test database | False: the windowed query found the prompt, and the reloaded answer's correctness was `null`. The builder sets only the transient flag and writes no recall log. Slice 2 arranges attempts through the product's answering path, or teaches the builder to record the grade; its sizing includes that. |
 | MCP HTTP tests run in this checkout | Same command and profile | The 33 existing MCP tests passed (34 run, the scratch test the only failure by design). A focused run, not the full suite. |
 | Full backend suite is green before this work | `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, isolated `test` profile, recorded in [plan 092](../092-read-notes-through-mcp-by-portable-path/PLAN.md) at `b481551f17` on 2026-11-12 | Green: 3,118 tests. `git diff b481551f17 7c1b8d3e6c -- backend e2e_test` is empty, so the result carries over; it was taken in another worktree of the same content. Slice 2 re-establishes it in the execution checkout. |
-| Answered prompts can lose their stored question | Owner's production history through `GET /api/user/recall-history-export` and `GET /api/memory-trackers/{id}/recall-prompts`, read-only with the owner's token | 2,189 answers, 24 in the last seven days, have no recall prompt; two such trackers answered on 2026-11-11 and 2026-11-12 list no prompts. Reading the code found no path that deletes an answered prompt. Cause unknown: slice 1 settles it. |
 | The window can be read by answer time without loading the whole history | Code reading only: `RecallPromptRepository.findAnsweredRecallAnswerRows` already serves recall statistics in production with the same range predicate; `idx_answer_created_at` exists | Presence, not a measurement. Bounded by slice 9, whose proof pages a window larger than one response. |
 | A spelling scenario in `mcp_services.feature` runs without paid AI mocks | Not observed | Bounded by slice 10; plan 092 observed that the feature is admitted by the isolated runner, without running a journey. |
 
 ## Ordered slices
-
-### 1. Explain answers that have no stored question
-Type: Structure
-Status: planned
-Proof: A recorded explanation, from production data, of how answers
-`246327`, `246452`, and `246496` lost their recall prompts, with the code path
-or data event named.
-
-An early probe; it changes no product code. With the production database
-(read-only, through the owner's `gcloud` access), read those answers' recall
-log, tracker, note, and any surviving prompt or question rows, and compare
-their times with question generation and note changes. It enables slice 8,
-which reports a missing question. If the cause is a defect that deletes
-answered prompts, stop slice 8, record the finding under Learnings, and report
-it to the owner as its own work; slices 2 to 7, 9, and 10 do not wait on it.
-The observation is owner-held and credentialed: when `gcloud` is not signed in,
-ask the owner to sign in rather than guessing.
-Sizing: about five active minutes.
 
 ### 2. List recent multiple-choice attempts
 Type: Behavior
@@ -235,15 +220,20 @@ Sizing: about five active minutes.
 
 ### 8. Report unavailable evidence
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP endpoint cases; full backend suite.
+
+Accepted proof: `ListRecallAnswersEvidenceMcpEndpointTest` cases
+`aWithdrawnSubscriptionKeepsTheAttemptAndReportsTheNoteUnavailable`,
+`aTrashedNoteKeepsTheAttemptAndReportsTheNoteUnavailable`,
+`aTrashedNotesSpellingPromptIsUnavailableToo`; full suite green; the refactor
+made no change.
 
 Behavior: The learner can no longer read the source note (subscription
 withdrawn, or the note is in the trash) → the attempt keeps its time, answer,
 correctness, and stored question, and reports the note evidence as unavailable
-with the reason. An answer has no stored question → the attempt keeps its time,
-answer, and correctness, and reports the question as unavailable.
-Depends on slice 1 for the missing-question case's real shape.
+with the reason. The tool description, `.agents/skills/mcp-server/SKILL.md` and
+`docs/assistant-oauth.md` say so.
 Sizing: about five active minutes.
 
 ### 9. Continue a window across responses
@@ -298,23 +288,10 @@ checks against real history after delivery; that check is not a slice.
 
 - Execution started 2026-11-12 in Story Branch Mode on
   `claude/retrieve-my-recall-answer-history-through-mcp`, claim `e5ee25233c`.
-- Slice 1 is deferred, not skipped: the local `gcloud` login had expired
-  (reauthentication required) and the owner was asked to sign in. Only slice 8's
-  missing-question case waits on it.
-- Slice 1 lead from code reading only (2026-11-12, not yet a finding):
-  `V300000325__cascade_note_dependents_on_note_delete.sql` made
-  `recall_prompt.mcq_id` cascade on MCQ delete, and `mcq.note_id` cascades on
-  note delete. If an understanding tracker's prompt can use an MCQ owned by
-  another note, hard-deleting that note silently deletes the answered prompt
-  while the tracker stays. No application code deletes MCQs or answered prompts
-  directly (`deleteByMemoryTracker_Id` has no caller;
-  `deleteUnansweredRecallPrompts` takes unanswered ones only). Slice 1 checks
-  this against answers `246327`, `246452`, `246496`: their prompts' former
-  `mcq_id`, the MCQ's note, and that note's deletion time.
-- Execution paused 2026-11-12 after slice 10 (published `895964e5bf`): slices 1
-  and 8 remain, both waiting on the owner's `gcloud auth login`. Slices 9 and 10
-  ran before 8 as the plan allows; slice 8 also adds its fields to the two docs
-  (see the slice 10 learning).
+- On 2026-11-12 the owner moved the production-dependent work (explaining
+  answers without a stored question, and reporting them) to
+  SEED-073#report-recall-answers-whose-question-is-gone; slice 8 keeps lost
+  access and trashed notes.
 - Slice 2 (accepted): attempts are arranged with
   `makeMe.aRecallPrompt().withMcq(..).forMemoryTracker(t).answerChoiceIndex(i).answerTimestamp(ts).recorded().please()`
   then `makeMe.entityPersister.flushAndClear()`; `.recorded()` writes the recall
@@ -324,9 +301,7 @@ checks against real history after delivery; that check is not a slice.
 - `RecallAnswerHistoryService.recentAttempts` reads answers by time through
   `AnswerRepository.findRecordedAnswersOfLearnerBetween`, batches prompts with
   `RecallPromptRepository.findAllByAnswerIn`, and takes the source note from the
-  prompt's tracker. It keeps only answers that have a prompt; slice 8 lifts that
-  and must take the source note from the answer's non-Confusion recall log when
-  the prompt is gone. Open-in-view is off, so every lazy walk (logs, note, content,
+  prompt's tracker. It keeps only answers that have a prompt. Open-in-view is off, so every lazy walk (logs, note, content,
   graph) stays inside that read-only transaction and the service returns records.
 - MCP tools that return JSON share `McpJsonToolResult.of`.
 - Full backend suite after slice 2: 3,173 tests, 0 failures.
@@ -360,21 +335,19 @@ checks against real history after delivery; that check is not a slice.
   `correct` as recorded. Fixture: `.recorded().excludedAsAmbiguous(reason)`.
   Full suite: 3,182 tests green.
 - Slice 7 (accepted): `RecallAnswerHistoryService.sourceNote` adds `content`
-  (`AttributedNoteContentService`) to a spelling miss and `graph`
-  (`NoteGraphService.getGraph`, `GRAPH_TOKEN_BUDGET` 1,000, the unchanged
+  to a spelling miss and `graph` (`GRAPH_TOKEN_BUDGET` 1,000, the unchanged
   `FocusContextResult`) to a multiple-choice miss. Lost access currently fails
   the whole call through `UnexpectedNoAccessRightException`; slice 8 catches it
   per attempt. `answer.getCorrect()` is unboxed, so an answer found through its
-  prompt with no grade, no log and no outcome would fail the call; slice 8 checks
-  whether that shape exists. Evidence cases live in
+  prompt with no grade, no log and no outcome would fail the call. Evidence cases live in
   `ListRecallAnswersEvidenceMcpEndpointTest`. Full suite: 3,187 tests green.
-- Slice 9 ran before slice 8, which waits on slice 1. Paging is keyset:
+- Slice 9 ran before slice 8. Paging is keyset:
   `AnswerRepository.findRecordedAnswersOfLearnerBefore` with a `Pageable` of 51
   (page size 50); `RecallAnswerCursor` (Base64url of window `from`, `to`, and the
   last answer time and ID) is the only home of the cursor format;
   `RecallAnswerCursor.firstPage` starts just after `to`. With a cursor, `days` is
   ignored. The cursor advances by the last answer fetched, so the post-query
-  prompt filter can only shorten a page until slice 8 drops it. Full suite:
+  prompt filter can only shorten a page, never skip an answer. Full suite:
   3,190 tests green.
 - Slice 10 ran before slice 8. The spelling journey needs no paid AI (it reuses
   the `@disableOpenAiService` spelling recall flow). In E2E the backend clock is
@@ -383,3 +356,12 @@ checks against real history after delivery; that check is not a slice.
   adds its unavailable-evidence fields to `.agents/skills/mcp-server/SKILL.md`
   and `docs/assistant-oauth.md`. `mcpAgentActions.ts` is at the 250-line limit.
   Backend 3,191 tests and both MCP features (10 of 10) green.
+- Slice 8 (accepted, narrowed by the owner's split): access is decided once per
+  attempt in `RecallAnswerHistoryService.unavailableReason` — trash first
+  (`Note.isTrashed`), then `AuthorizationService.userMayReadNote` — and an
+  unreadable note becomes `SourceNote.unavailable(reason)` with no title, path,
+  content or graph; a spelling prompt shares that reason. Readable content and
+  graph come straight from the loaded note and `FocusContextRetrievalService`,
+  so no second access check and no checked exception remain. Fixtures:
+  `makeMe.theNote(note).trashed().please()`; a withdrawn subscription by
+  removing the `Subscription`. Full suite: 3,194 tests green.

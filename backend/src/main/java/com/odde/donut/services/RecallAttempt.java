@@ -25,11 +25,19 @@ public record RecallAttempt(
 
   /**
    * The note being recalled; a missed spelling adds its full current content, a missed multiple
-   * choice its bounded graph.
+   * choice its bounded graph. When the learner can no longer read the note, only why.
    */
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record SourceNote(
-      String title, String portablePath, String content, FocusContextResult graph) {}
+      String title,
+      String portablePath,
+      String content,
+      FocusContextResult graph,
+      String unavailable) {
+    static SourceNote unavailable(String reason) {
+      return new SourceNote(null, null, null, null, reason);
+    }
+  }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record MultipleChoice(

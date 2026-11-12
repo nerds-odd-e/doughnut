@@ -2,7 +2,6 @@ package com.odde.donut.mcp;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.entities.User;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.RecallAnswerCursor;
 import com.odde.donut.services.RecallAnswerHistoryService;
 import com.odde.donut.testability.TestabilitySettings;
@@ -49,12 +48,14 @@ public record ListRecallAnswersTool(
         incorrect, a spelling miss adds the note's full current **content** and a multiple-choice
         miss adds its bounded **graph**, shaped like get_note_graph's result with notes addressed
         by portablePath, within a fixed modest budget of about 1,000 tokens; correct attempts carry
-        title and path only), and for multiple choice
-        **multipleChoice** with **stem**, all **choices**, the **selectedChoice**, the
+        title and path only; when the learner can no longer read the note, **note** carries only
+        **unavailable** with the reason — the note is in the trash, or the learner can no longer
+        read its notebook, such as after unsubscribing — and the rest of the attempt stays), and
+        for multiple choice **multipleChoice** with **stem**, all **choices**, the **selectedChoice**, the
         **expectedAnswer**, and the stored **validationRationale** when available; for spelling
         **spelling** with the learner's **typedAnswer** and the masked **prompt** derived from
         the note, or **promptUnavailable** explaining why the prompt as shown cannot be
-        recovered (the note was edited after the answer)
+        recovered (the note was edited after the answer, or the note is unavailable)
 
       Pass a note's portablePath unchanged to read_note, or to get_note_graph with a larger
       tokenLimit for more context.
@@ -96,28 +97,23 @@ public record ListRecallAnswersTool(
       McpTransportContext context, McpSchema.CallToolRequest request) {
     Map<String, Object> arguments = request.arguments() == null ? Map.of() : request.arguments();
     User user = (User) context.get(McpServerConfiguration.TRANSPORT_USER_KEY);
-    try {
-      if (arguments.get("cursor") instanceof String cursor) {
-        return continueFrom(user, cursor);
-      }
-      double days = ((Number) arguments.getOrDefault("days", DEFAULT_DAYS)).doubleValue();
-      if (days <= 0) {
-        return McpToolRefusal.because(
-            "A positive number of days is required, such as 14. Omit days for the last 7 days.");
-      }
-      return McpJsonToolResult.of(
-          objectMapper,
-          recallAnswerHistory.recentAttempts(
-              user,
-              testabilitySettings.getCurrentUTCTimestamp().toInstant(),
-              Duration.ofMillis(Math.round(days * Duration.ofDays(1).toMillis()))));
-    } catch (UnexpectedNoAccessRightException e) {
-      throw McpToolFailures.rethrow(e);
+    if (arguments.get("cursor") instanceof String cursor) {
+      return continueFrom(user, cursor);
     }
+    double days = ((Number) arguments.getOrDefault("days", DEFAULT_DAYS)).doubleValue();
+    if (days <= 0) {
+      return McpToolRefusal.because(
+          "A positive number of days is required, such as 14. Omit days for the last 7 days.");
+    }
+    return McpJsonToolResult.of(
+        objectMapper,
+        recallAnswerHistory.recentAttempts(
+            user,
+            testabilitySettings.getCurrentUTCTimestamp().toInstant(),
+            Duration.ofMillis(Math.round(days * Duration.ofDays(1).toMillis()))));
   }
 
-  private McpSchema.CallToolResult continueFrom(User user, String text)
-      throws UnexpectedNoAccessRightException {
+  private McpSchema.CallToolResult continueFrom(User user, String text) {
     RecallAnswerCursor cursor;
     try {
       cursor = RecallAnswerCursor.decode(text);

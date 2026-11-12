@@ -7,7 +7,8 @@ import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.AnswerRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.focusContext.FocusContextRetrievalService;
+import com.odde.donut.services.focusContext.RetrievalConfig;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -32,32 +33,30 @@ public class RecallAnswerHistoryService {
   private final AnswerRepository answerRepository;
   private final RecallPromptRepository recallPromptRepository;
   private final PortablePathAuthoring portablePathAuthoring;
-  private final AttributedNoteContentService attributedNoteContentService;
-  private final NoteGraphService noteGraphService;
+  private final AuthorizationService authorizationService;
+  private final FocusContextRetrievalService focusContextRetrievalService;
 
   public RecallAnswerHistoryService(
       AnswerRepository answerRepository,
       RecallPromptRepository recallPromptRepository,
       PortablePathAuthoring portablePathAuthoring,
-      AttributedNoteContentService attributedNoteContentService,
-      NoteGraphService noteGraphService) {
+      AuthorizationService authorizationService,
+      FocusContextRetrievalService focusContextRetrievalService) {
     this.answerRepository = answerRepository;
     this.recallPromptRepository = recallPromptRepository;
     this.portablePathAuthoring = portablePathAuthoring;
-    this.attributedNoteContentService = attributedNoteContentService;
-    this.noteGraphService = noteGraphService;
+    this.authorizationService = authorizationService;
+    this.focusContextRetrievalService = focusContextRetrievalService;
   }
 
   @Transactional(readOnly = true)
-  public RecallAnswerHistory recentAttempts(User learner, Instant to, Duration lookback)
-      throws UnexpectedNoAccessRightException {
+  public RecallAnswerHistory recentAttempts(User learner, Instant to, Duration lookback) {
     return continueFrom(learner, RecallAnswerCursor.firstPage(to.minus(lookback), to));
   }
 
   /** The page of the cursor's window after its position, with a cursor when more remain. */
   @Transactional(readOnly = true)
-  public RecallAnswerHistory continueFrom(User learner, RecallAnswerCursor cursor)
-      throws UnexpectedNoAccessRightException {
+  public RecallAnswerHistory continueFrom(User learner, RecallAnswerCursor cursor) {
     List<Answer> found =
         answerRepository.findRecordedAnswersOfLearnerBefore(
             learner.getId(),
@@ -90,10 +89,10 @@ public class RecallAnswerHistoryService {
         .encode();
   }
 
-  private RecallAttempt attempt(Answer answer, RecallPrompt prompt, User learner)
-      throws UnexpectedNoAccessRightException {
+  private RecallAttempt attempt(Answer answer, RecallPrompt prompt, User learner) {
     Note note = prompt.requireMemoryTracker().getNote();
     Mcq mcq = prompt.getMcq();
+    String unavailable = unavailableReason(note, learner);
     return new RecallAttempt(
         answer.getCreatedAt().toInstant(),
         answer.getCorrect(),
@@ -101,31 +100,42 @@ public class RecallAnswerHistoryService {
         answer.isExcludedAsAmbiguous()
             ? new RecallAttempt.AmbiguityExclusion(answer.getExclusionReason())
             : null,
-        sourceNote(note, learner, answer.getCorrect(), mcq != null),
+        unavailable != null
+            ? RecallAttempt.SourceNote.unavailable(unavailable)
+            : sourceNote(note, learner, answer.getCorrect(), mcq != null),
         mcq == null ? null : multipleChoice(answer, mcq),
-        mcq == null ? spelling(answer, prompt) : null);
+        mcq == null ? spelling(answer, prompt, unavailable) : null);
+  }
+
+  /** Why the learner can no longer read the note now, or null when they can. */
+  private String unavailableReason(Note note, User learner) {
+    if (note.isTrashed()) {
+      return "The note is in the trash.";
+    }
+    if (!authorizationService.userMayReadNote(learner, note)) {
+      return "The learner can no longer read this note's notebook.";
+    }
+    return null;
   }
 
   /** Evidence follows recorded correctness: a miss carries what the learner needs to see. */
   private RecallAttempt.SourceNote sourceNote(
-      Note note, User learner, boolean correct, boolean multipleChoice)
-      throws UnexpectedNoAccessRightException {
+      Note note, User learner, boolean correct, boolean multipleChoice) {
     String portablePath = portablePathAuthoring.qualifiedPortablePath(note, learner);
     if (correct) {
-      return new RecallAttempt.SourceNote(note.getTitle(), portablePath, null, null);
+      return new RecallAttempt.SourceNote(note.getTitle(), portablePath, null, null, null);
     }
     if (multipleChoice) {
       return new RecallAttempt.SourceNote(
           note.getTitle(),
           portablePath,
           null,
-          noteGraphService.getGraph(learner, note.getId(), GRAPH_TOKEN_BUDGET));
+          focusContextRetrievalService.retrieve(
+              note, learner, RetrievalConfig.forGraphApi(GRAPH_TOKEN_BUDGET)),
+          null);
     }
     return new RecallAttempt.SourceNote(
-        note.getTitle(),
-        portablePath,
-        attributedNoteContentService.read(learner, note.getId()).content(),
-        null);
+        note.getTitle(), portablePath, note.getContent(), null, null);
   }
 
   private static RecallAttempt.MultipleChoice multipleChoice(Answer answer, Mcq mcq) {
@@ -137,7 +147,12 @@ public class RecallAnswerHistoryService {
         mcq.getValidationRationale());
   }
 
-  private static RecallAttempt.Spelling spelling(Answer answer, RecallPrompt prompt) {
+  /** The masked prompt is derived from the note, so it shares the note's availability. */
+  private static RecallAttempt.Spelling spelling(
+      Answer answer, RecallPrompt prompt, String unavailable) {
+    if (unavailable != null) {
+      return new RecallAttempt.Spelling(answer.getSpellingAnswer(), null, unavailable);
+    }
     if (prompt.isNoteEditedSinceAnswer()) {
       return new RecallAttempt.Spelling(
           answer.getSpellingAnswer(),

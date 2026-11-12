@@ -56,7 +56,7 @@ abstract class ListRecallAnswersMcpEndpointTestBase extends McpEndpointTestBase 
     assertThat(sourceNote.get("portablePath").asText(), equalTo("Engineering:Code Review"));
   }
 
-  private static List<String> fieldNames(JsonNode node) {
+  static List<String> fieldNames(JsonNode node) {
     return StreamSupport.stream(((Iterable<String>) () -> node.fieldNames()).spliterator(), false)
         .toList();
   }

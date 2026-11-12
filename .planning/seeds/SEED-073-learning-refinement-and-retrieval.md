@@ -131,8 +131,6 @@ and the observations below; they add no restriction of their own.
   note is in the trash), the attempt stays: time, answer, correctness, and the
   stored question are the learner's own recall record. The source note evidence
   is reported as unavailable with the reason.
-- An answer whose question is no longer stored is still an attempt. It carries
-  its time, answer, and correctness, and reports the question as unavailable.
 
 **Scope limits (deferred promises, not rejections).**
 
@@ -144,6 +142,8 @@ and the observations below; they add no restriction of their own.
   The assistant draws conclusions; the tool supplies evidence.
 - Hard-deleting a note deletes its recall prompts today; this story does not
   preserve those attempts.
+- Answers whose recall prompt is no longer stored:
+  [Report recall answers whose question is gone](#report-recall-answers-whose-question-is-gone).
 
 **Required restrictions.** Only the connected learner's own attempts are
 returned (private learning evidence). Source note title, path, content, and
@@ -187,11 +187,6 @@ owner's own token; counts only).**
   about half had a validation rationale of about 100 characters. A default
   call therefore carries several hundred thousand characters before any note
   evidence, mostly Japanese text. Paging is required, not an edge case.
-- 24 of those 729 answers (and 2,189 of all recorded answers) have no recall
-  prompt any more, all on understanding trackers, some answered the day
-  before. Their trackers list no prompts. No code path that deletes an
-  answered prompt was found; the cause is unknown and is the first thing for
-  planning to settle, because it decides how often a question is unavailable.
 - Correctness is not stored on the answer. It is derived from the recall log
   linked to the answer and from the Overlap outcome
   ([Answer](../../backend/src/main/java/com/odde/donut/entities/Answer.java)).
@@ -248,6 +243,53 @@ hold the answered multiple-choice question and derive the spelling prompt from
 the note. The [MCP graph tool](../../backend/src/main/java/com/odde/donut/mcp/GetNoteGraphTool.java)
 already supplies bounded note context. Research and recommendations can follow
 once an assistant can retrieve this evidence.
+
+<a id="report-recall-answers-whose-question-is-gone"></a>
+
+### Report recall answers whose question is gone
+
+**Identity:** SEED-073#report-recall-answers-whose-question-is-gone
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal.** As a Donut learner, my connected assistant sees every recall answer
+I gave in the window, including answers whose question Donut no longer stores,
+so its investigation of what I confuse is not silently missing attempts.
+
+**Scope (unrefined).**
+
+- Find out from production data how answered recall prompts disappear while
+  their trackers remain. This needs a read-only production database read
+  through the owner's `gcloud` access; when `gcloud` is not signed in, ask the
+  owner to sign in.
+- If the cause is a defect that deletes answered prompts, report it to the
+  owner as its own work before building on it.
+- `list_recall_answers` returns an answer whose question is no longer stored as
+  an attempt with its time, answer, and correctness, and reports the question
+  as unavailable. The tool's description, the MCP skill and
+  `docs/assistant-oauth.md` say so.
+
+**Observations (2026-11-12).**
+
+- Read with the owner's own token: 24 of the owner's 729 answers in the seven
+  days before 2026-11-12 (and 2,189 of all recorded answers) have no recall
+  prompt any more, all on understanding trackers, some answered the day
+  before. Their trackers list no prompts. The cause is unknown and is the
+  first thing to settle, because it decides how often a question is
+  unavailable.
+- Answers to look at first: `246327`, `246452`, `246496`.
+- Lead from code reading only:
+  `V300000325__cascade_note_dependents_on_note_delete.sql` made
+  `recall_prompt.mcq_id` cascade on MCQ delete, and `mcq.note_id` cascades on
+  note delete. If an understanding tracker's prompt can use an MCQ owned by
+  another note, hard-deleting that note deletes the answered prompt while the
+  tracker stays. No application code deletes MCQs or answered prompts
+  directly.
+- `RecallAnswerHistoryService` finds answers through the learner's recall logs
+  or recall prompts and currently keeps only answers that still have a prompt;
+  the source note then comes from the prompt's tracker. Without a prompt it
+  would come from the answer's non-Confusion recall log.
 
 ## Open Decisions
 

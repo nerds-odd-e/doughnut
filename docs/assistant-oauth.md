@@ -77,7 +77,9 @@ each `nextCursor` back as `cursor` until a response has none. Each answer
 carries its question, the learner's answer and recorded correctness. A correct
 answer names its note by title and portablePath; a missed spelling answer adds
 the note's full content and a missed multiple-choice answer adds bounded graph
-context. `get_note_graph` gives more context.
+context. `get_note_graph` gives more context. When the note is in the trash or
+the user can no longer read its notebook, the answer stays and its note shows
+only why it is unavailable.
 
 ## Commissioned learning through ChatGPT
 

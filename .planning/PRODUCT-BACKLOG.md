@@ -12,3 +12,4 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Report recall answers whose question is gone](seeds/SEED-073-learning-refinement-and-retrieval.md#report-recall-answers-whose-question-is-gone) — SEED-073#report-recall-answers-whose-question-is-gone
