@@ -76,6 +76,16 @@ Former local code: DD-144. A small addition crosses the numeric file-size ceilin
 
 Former local code: DD-145. Planning names an observation route or log source that is not available to the executing project, causing owner probing or loss of the intended proof. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-190.md).
 
+### Occurrences
+- Execution: SEED-073#retrieve-my-recall-answer-history-through-mcp / c525e797bbf3f7d7e596f974137f1f29077b62b1
+  - Timestamp: 2026-11-12T15:43:36Z
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.97
+  - Evidence: Plan 093 slice 1 (production database read through the owner's `gcloud`) and slice 8's missing-question case depended on it; every `gcloud` call in the session failed with "Reauthentication failed. cannot prompt during non-interactive execution"; dashboard unfinished receipt 4da1fe1d; the owner then moved that work to SEED-073#report-recall-answers-whose-question-is-gone.
+  - Observed effect: Slices 2–7, 9 and 10 completed out of order around the blocked probe; execution stopped once for the owner, who split the story rather than sign in.
+  - Inference: The plan did say to ask the owner to sign in, but nothing checked the credential at Take or start, so the gap surfaced only after eight slices. Checking an owner-held observation route at start, or keeping such a probe in its own story from refinement, would likely have avoided the stop.
+
 <a id="odf-195"></a>
 
 ## ODF-195 — Pre-existing size overrun handled inconsistently

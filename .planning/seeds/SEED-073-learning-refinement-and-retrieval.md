@@ -290,6 +290,10 @@ so its investigation of what I confuse is not silently missing attempts.
   or recall prompts and currently keeps only answers that still have a prompt;
   the source note then comes from the prompt's tracker. Without a prompt it
   would come from the answer's non-Confusion recall log.
+- Unverified, from code reading: an answer reachable through its recall prompt
+  with no recorded grade, no recall log and no outcome would make
+  `list_recall_answers` fail the whole call, because its correctness is null.
+  While reading production, check whether such answers exist.
 
 ## Open Decisions
 
