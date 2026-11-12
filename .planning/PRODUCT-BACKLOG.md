@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Retrieve my recall answer history through MCP](seeds/SEED-073-learning-refinement-and-retrieval.md#retrieve-my-recall-answer-history-through-mcp) — SEED-073#retrieve-my-recall-answer-history-through-mcp ([plan](slice-plans/093-retrieve-my-recall-answer-history-through-mcp/PLAN.md))
-
 ## Backlog list
 
 - [Report recall answers whose question is gone](seeds/SEED-073-learning-refinement-and-retrieval.md#report-recall-answers-whose-question-is-gone) — SEED-073#report-recall-answers-whose-question-is-gone
