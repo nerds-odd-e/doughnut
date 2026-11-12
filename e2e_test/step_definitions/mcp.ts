@@ -159,7 +159,7 @@ Then(
 )
 
 When(
-  'AI agent extracts note ID and calls get graph MCP tool with token limit {string}',
+  'AI agent follows the candidate path to get graph MCP tool with token limit {string}',
   (limit: string) => {
     const tokenLimit = parseInt(limit)
     start.mcpAgentActions().getNoteGraphFromLastSearch(tokenLimit)

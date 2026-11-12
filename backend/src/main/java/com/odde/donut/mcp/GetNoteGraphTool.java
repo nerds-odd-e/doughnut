@@ -1,6 +1,7 @@
 package com.odde.donut.mcp;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.NoteGraphService;
@@ -36,24 +37,29 @@ public class GetNoteGraphTool {
       - Inspect how a note connects to the rest of the notebook before answering questions about it.
       - After search, pull bounded context around a candidate note without loading the whole notebook.
 
-      You MUST obtain a valid note ID first using 'list_note_candidates' unless the user explicitly provides a numeric note ID.
+      Pass a qualified Portable path directly, for example Engineering:Practices/Code Review. A candidate's portablePath from 'list_note_candidates' can be used unchanged.
+      For an unqualified title, alias, folder path or /Title, supply notebookName explicitly. A qualified path supplies its own notebook scope. Property selectors require the exact decoded key and return the containing note's graph.
+      If several readable notes match, select one of the returned candidates and pass its portablePath unchanged.
       You MUST provide a valid token limit (combined budget for focus plus related note bodies). Example choices:
       1. Short focus note and a large context window → higher limit (e.g., 5000).
       2. Long focus note or a small context window → lower limit (e.g., 500); a large focus body consumes budget before related notes are included.
 
       Navigation pattern:
-      1. Use 'list_note_candidates' to list matching notes
-      2. Pick a candidate and take its noteId
+      1. Follow a known Portable path or use 'list_note_candidates' to list matching notes
+      2. Pick a candidate's portablePath
       3. Use this tool to load focus context around that note
       4. Follow **outgoingLinks** / **relatedNotes** titles for deeper exploration if needed\
       """;
 
   private final NoteGraphService noteGraphService;
   private final JsonMapper objectMapper;
+  private final McpNoteLookup mcpNoteLookup;
 
-  public GetNoteGraphTool(NoteGraphService noteGraphService, JsonMapper objectMapper) {
+  public GetNoteGraphTool(
+      NoteGraphService noteGraphService, JsonMapper objectMapper, McpNoteLookup mcpNoteLookup) {
     this.noteGraphService = noteGraphService;
     this.objectMapper = objectMapper;
+    this.mcpNoteLookup = mcpNoteLookup;
   }
 
   public SyncToolSpecification specification() {
@@ -70,12 +76,18 @@ public class GetNoteGraphTool {
                         "object",
                         "properties",
                         Map.of(
-                            "noteId",
+                            "portablePath",
                             Map.of(
                                 "type",
-                                "number",
+                                "string",
                                 "description",
-                                "Numeric ID of the note to explore. Obtain this from a 'list_note_candidates' candidate or user-provided ID."),
+                                "Portable path of the note to explore, e.g. Engineering:Practices/Code Review."),
+                            "notebookName",
+                            Map.of(
+                                "type",
+                                "string",
+                                "description",
+                                "Explicit notebook scope for an unqualified portablePath; a qualified path supplies its own scope."),
                             "tokenLimit",
                             Map.of(
                                 "type",
@@ -83,7 +95,7 @@ public class GetNoteGraphTool {
                                 "description",
                                 "Approximate token budget for the focus note body plus all related note bodies combined. Pick a value that fits your remaining context window.")),
                         "required",
-                        List.of("noteId", "tokenLimit")))
+                        List.of("portablePath", "tokenLimit")))
                 .build())
         .callHandler(this::call)
         .build();
@@ -92,15 +104,19 @@ public class GetNoteGraphTool {
   private McpSchema.CallToolResult call(
       McpTransportContext transportContext, McpSchema.CallToolRequest request) {
     User user = (User) transportContext.get(McpServerConfiguration.TRANSPORT_USER_KEY);
+    int tokenLimit = tokenLimitArgument(request);
+    return mcpNoteLookup.resolve(
+        request, user, destination -> graph(user, destination, tokenLimit));
+  }
+
+  private McpSchema.CallToolResult graph(User user, Note destination, int tokenLimit) {
     try {
-      FocusContextResult graph =
-          noteGraphService.getGraph(
-              user, McpToolArguments.noteId(request), tokenLimitArgument(request));
+      FocusContextResult graph = noteGraphService.getGraph(user, destination.getId(), tokenLimit);
       return McpSchema.CallToolResult.builder()
           .addContent(new McpSchema.TextContent(objectMapper.writeValueAsString(graph)))
           .build();
     } catch (UnexpectedNoAccessRightException e) {
-      throw McpToolArguments.rethrow(e);
+      throw McpToolFailures.rethrow(e);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

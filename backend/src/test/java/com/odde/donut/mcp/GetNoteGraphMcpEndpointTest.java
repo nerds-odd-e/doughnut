@@ -14,14 +14,13 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.UserToken;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MvcResult;
 
 class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
@@ -33,7 +32,7 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
     Note focus = makeMe.aNote().folder(folder).title("Functional").please();
     makeMe.aNote().folder(folder).title("Object Oriented").please();
 
-    JsonNode graph = callGetNoteGraph(personalToken, focus.getId(), 1000);
+    JsonNode graph = callGetNoteGraph(focus, 1000);
 
     assertThat(graph.at("/focusNote/title").asText(), equalTo("Functional"));
     assertThat(graph.at("/focusNote/notebook").asText(), equalTo(folder.getNotebook().getName()));
@@ -46,7 +45,7 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
     Note focus = makeMe.aNote().folder(folder).title("Functional").please();
     makeMe.aNote().folder(folder).title("Object Oriented").please();
 
-    JsonNode graph = callGetNoteGraph(personalToken, focus.getId(), 10);
+    JsonNode graph = callGetNoteGraph(focus, 10);
 
     assertThat(graph.at("/focusNote/title").asText(), equalTo("Functional"));
     assertThat(graph.at("/focusNote/sampleSiblings").size(), equalTo(0));
@@ -59,7 +58,7 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
     Note focus = makeMe.aNote().notebookOwnedBy(personalUser).please();
 
     mockMvc
-        .perform(authorized(mcpPost(toolsCallBody(focus.getId(), tokenLimit))))
+        .perform(authorized(mcpPost(toolsCallBody(focus, tokenLimit))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.error.message", containsString(message)));
   }
@@ -69,10 +68,11 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
     Note foreign = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
 
     mockMvc
-        .perform(authorized(mcpPost(toolsCallBody(foreign.getId(), 1000))))
+        .perform(authorized(mcpPost(toolsCallBody(foreign, 1000))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.error.code").exists())
-        .andExpect(jsonPath("$.error.message").value("It seems you cannot access this page."));
+        .andExpect(jsonPath("$.result.isError").value(true))
+        .andExpect(
+            jsonPath("$.result.content[0].text", containsString("No readable note matches")));
   }
 
   @Test
@@ -89,20 +89,17 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
             .please();
     makeMe.aNote().underSameNotebookAs(focus).title("Linked").content("ok").please();
 
-    JsonNode graph = callGetNoteGraph(personalToken, focus.getId(), 1000);
+    JsonNode graph = callGetNoteGraph(focus, 1000);
 
     assertThat(relatedTitles(graph), hasItem("Linked"));
     assertThat(relatedTitles(graph), not(hasItem("Hidden")));
     assertThat(graph.at("/focusNote/outgoingLinks").toString(), not(containsString("Hidden")));
   }
 
-  private JsonNode callGetNoteGraph(UserToken token, Integer noteId, int tokenLimit)
-      throws Exception {
+  private JsonNode callGetNoteGraph(Note note, int tokenLimit) throws Exception {
     MvcResult result =
         mockMvc
-            .perform(
-                mcpPost(toolsCallBody(noteId, tokenLimit))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken()))
+            .perform(authorized(mcpPost(toolsCallBody(note, tokenLimit))))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.result.content[0].text").exists())
             .andReturn();
@@ -110,12 +107,25 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
     return objectMapper.readTree(root.at("/result/content/0/text").asText());
   }
 
-  private static String toolsCallBody(Integer noteId, int tokenLimit) {
-    return """
-    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{\
-    "name":"%s","arguments":{"noteId":%d,"tokenLimit":%d}}}
-    """
-        .formatted(GetNoteGraphTool.NAME, noteId, tokenLimit);
+  private String toolsCallBody(Note note, int tokenLimit) throws Exception {
+    return objectMapper.writeValueAsString(
+        Map.of(
+            "jsonrpc",
+            "2.0",
+            "id",
+            3,
+            "method",
+            "tools/call",
+            "params",
+            Map.of(
+                "name",
+                GetNoteGraphTool.NAME,
+                "arguments",
+                Map.of(
+                    "portablePath",
+                    note.getNotebook().getName() + ":" + note.getTitle(),
+                    "tokenLimit",
+                    tokenLimit))));
   }
 
   private static List<String> relatedTitles(JsonNode graph) {

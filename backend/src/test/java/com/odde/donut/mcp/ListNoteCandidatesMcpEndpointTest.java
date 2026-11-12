@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,12 +31,12 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
         makeMe.aNotebook().creatorAndOwner(personalUser).name("Engineering").please();
     Folder practices = makeMe.aFolder().notebook(notebook).name("Practices").please();
     Folder design = makeMe.aFolder().parentFolder(practices).name("Design").please();
-    Note aliasMatch = makeMe.aNote("Colour Theory").folder(design).aliases("color").please();
+    makeMe.aNote("Colour Theory").folder(design).aliases("color").please();
     makeMe.aNote("Colour Theory").notebook(notebook).please();
 
     JsonNode candidates = callListNoteCandidates(personalToken, "color");
 
-    JsonNode candidate = findCandidate(candidates, aliasMatch.getId());
+    JsonNode candidate = findCandidate(candidates, "Engineering:Practices/Design/Colour Theory");
     assertThat(
         candidate.get("portablePath").asText(),
         equalTo("Engineering:Practices/Design/Colour Theory"));
@@ -53,22 +52,24 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode candidates = callListNoteCandidates(personalToken, "viva la");
 
-    assertThat(candidateIds(candidates), hasItem(subscribed.getId()));
+    assertThat(
+        candidatePaths(candidates),
+        hasItem(subscribed.getNotebook().getName() + ":viva la subscription"));
   }
 
   @Test
   void equalTitlesAreDisambiguatedByNotebookAndFolder() throws Exception {
     Notebook cs = makeMe.aNotebook().creatorAndOwner(personalUser).name("CS concepts").please();
     Folder programming = makeMe.aFolder().notebook(cs).name("Programming Concepts").please();
-    Note inFolder = makeMe.aNote().title("Functional").folder(programming).please();
+    makeMe.aNote().title("Functional").folder(programming).please();
     Notebook maths = makeMe.aNotebook().creatorAndOwner(personalUser).name("Maths").please();
-    Note atRoot = makeMe.aNote().title("Functional").notebook(maths).please();
+    makeMe.aNote().title("Functional").notebook(maths).please();
 
     JsonNode candidates = callListNoteCandidates(personalToken, "Functional");
 
     assertThat(candidates.size(), equalTo(2));
-    JsonNode first = findCandidate(candidates, inFolder.getId());
-    JsonNode second = findCandidate(candidates, atRoot.getId());
+    JsonNode first = findCandidate(candidates, "CS concepts:Functional");
+    JsonNode second = findCandidate(candidates, "Maths:Functional");
     assertThat(first.get("notebookName").asText(), equalTo("CS concepts"));
     assertThat(first.get("folderName").asText(), equalTo("Programming Concepts"));
     assertThat(second.get("notebookName").asText(), equalTo("Maths"));
@@ -81,14 +82,14 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
   void rootCandidateUsesExactRootPathWhenTitleIsAmbiguous() throws Exception {
     Notebook notebook =
         makeMe.aNotebook().creatorAndOwner(personalUser).name("Engineering").please();
-    Note root = makeMe.aNote("Code Review").notebook(notebook).please();
+    makeMe.aNote("Code Review").notebook(notebook).please();
     Folder practices = makeMe.aFolder().notebook(notebook).name("Practices").please();
     makeMe.aNote("Code Review").folder(practices).please();
 
     JsonNode candidates = callListNoteCandidates(personalToken, "Code Review");
 
     assertThat(
-        findCandidate(candidates, root.getId()).get("portablePath").asText(),
+        findCandidate(candidates, "Engineering:/Code Review").get("portablePath").asText(),
         equalTo("Engineering:/Code Review"));
   }
 
@@ -121,8 +122,7 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
     UserToken tokenB = makeMe.aUserToken().forUser(userB).withLabel("mcp-b").please();
     Note noteA = makeMe.aNote("AlphaOnlySecret").notebookOwnedBy(userA).please();
     Note noteB = makeMe.aNote("BetaOnlySecret").notebookOwnedBy(userB).please();
-    Note privateForeign =
-        makeMe.aNote("AlphaOnlySecret").notebookOwnedBy(makeMe.aUser().please()).please();
+    makeMe.aNote("AlphaOnlySecret").notebookOwnedBy(makeMe.aUser().please()).please();
 
     // Poison test CurrentUser so an identity leak would surface as A's notes on B's token.
     currentUser.setUser(userA);
@@ -132,11 +132,12 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
     JsonNode aLookingForB = callListNoteCandidates(tokenA, "BetaOnlySecret");
     JsonNode bLookingForB = callListNoteCandidates(tokenB, "BetaOnlySecret");
 
-    assertThat(candidateIds(bLookingForA), hasSize(0));
-    assertThat(candidateIds(aLookingForA), contains(noteA.getId()));
-    assertThat(candidateIds(aLookingForA), not(hasItem(privateForeign.getId())));
-    assertThat(candidateIds(aLookingForB), hasSize(0));
-    assertThat(candidateIds(bLookingForB), contains(noteB.getId()));
+    assertThat(candidatePaths(bLookingForA), hasSize(0));
+    assertThat(
+        candidatePaths(aLookingForA), contains(noteA.getNotebook().getName() + ":AlphaOnlySecret"));
+    assertThat(candidatePaths(aLookingForB), hasSize(0));
+    assertThat(
+        candidatePaths(bLookingForB), contains(noteB.getNotebook().getName() + ":BetaOnlySecret"));
   }
 
   private JsonNode callListNoteCandidates(UserToken token, String query) throws Exception {
@@ -167,20 +168,20 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
     return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
   }
 
-  private static List<Integer> candidateIds(JsonNode candidates) {
-    List<Integer> ids = new ArrayList<>();
+  private static List<String> candidatePaths(JsonNode candidates) {
+    List<String> paths = new ArrayList<>();
     for (JsonNode candidate : candidates) {
-      ids.add(candidate.get("noteId").asInt());
+      paths.add(candidate.get("portablePath").asText());
     }
-    return ids;
+    return paths;
   }
 
-  private static JsonNode findCandidate(JsonNode candidates, Integer noteId) {
+  private static JsonNode findCandidate(JsonNode candidates, String portablePath) {
     for (JsonNode candidate : candidates) {
-      if (candidate.get("noteId").asInt() == noteId) {
+      if (candidate.get("portablePath").asText().equals(portablePath)) {
         return candidate;
       }
     }
-    throw new AssertionError("candidate not found: " + noteId);
+    throw new AssertionError("candidate not found: " + portablePath);
   }
 }

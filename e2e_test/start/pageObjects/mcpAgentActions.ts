@@ -22,10 +22,10 @@ const callToolOnFirstCandidate = (
   alias: string
 ) => {
   getResponseText('@MCPApiResponse').then((responseText) => {
-    const noteId = JSON.parse(responseText)[0].noteId
+    const { portablePath } = JSON.parse(responseText)[0]
     cy.task('callMcpToolWithParams', {
       apiName,
-      params: { noteId, ...params },
+      params: { portablePath, ...params },
     }).then((response) => {
       cy.wrap(response).as(alias)
     })
@@ -108,13 +108,7 @@ export const mcpAgentActions = () => {
     },
 
     readNoteFromLastSearch() {
-      getResponseText('@MCPApiResponse').then((responseText) => {
-        const { portablePath } = JSON.parse(responseText)[0]
-        cy.task('callMcpToolWithParams', {
-          apiName: 'read_note',
-          params: { portablePath },
-        }).then((response) => cy.wrap(response).as('MCPReadResponse'))
-      })
+      callToolOnFirstCandidate('read_note', {}, 'MCPReadResponse')
       return this
     },
 

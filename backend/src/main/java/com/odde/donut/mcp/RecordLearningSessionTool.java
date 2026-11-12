@@ -108,7 +108,7 @@ public record RecordLearningSessionTool(
           .structuredContent(objectMapper.readValue(serialized, Object.class))
           .build();
     } catch (UnexpectedNoAccessRightException e) {
-      throw McpToolArguments.rethrow(e);
+      throw McpToolFailures.rethrow(e);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

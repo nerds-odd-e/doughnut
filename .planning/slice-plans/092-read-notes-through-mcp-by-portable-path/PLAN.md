@@ -22,33 +22,8 @@ existing contracts.
 
 ## Current decisions and existing solutions
 
-- MCP input is a required `portablePath` destination string, with optional
-  explicit `notebookName` scope for an unqualified destination. A qualified
-  destination supplies its own scope. Missing scope receives actionable feedback;
-  it is not inferred from an earlier call or another user's request.
-- Reuse `PortablePath`/`WikiLinkMarkdown` syntax and the shared
-  `WikiLinkResolver` → `WikiLinkCandidateClassifier` → `WikiLinkNoteCandidates`
-  rules. Expose their candidate-bearing source-less operation; do not implement
-  another title/alias/path matcher in MCP. Preserve note cardinality before
-  property-key validation and the current readable/available-note rule.
-- Reuse `PortablePathAuthoring` for qualified addresses, with the authenticated
-  viewer explicit. Preserve exact folder trails, root ambiguity fallback, and
-  wiki escaping. `NotebookGitPortablePath` owns exported filenames, so it is not
-  the wiki address owner. No separate notebook identifier is needed here.
-- Reuse `AttributedNoteContentService` for full content and accepted revision;
-  MCP owns its wire projection while shared REST identifiers remain useful.
-  Preserve current omission of `acceptedRevision` when unavailable. New MCP
-  schema assertions describe the positive Portable-path shape.
-- Keep bounded graph retrieval with its existing owners. Route graph-generated
-  references through the same address authoring; add reusable addresses to focus
-  and related-note projections. Preserve authored body/YAML destinations.
-- These PFE choices follow [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md),
-  [ADR 0002](../../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md),
-  [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md),
-  [ADR 0005](../../../docs/adrs/0005-web-routes-accepted.md), and
-  [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md).
-  [North Star](../../NORTH-STAR.md), One notebook tree/One format boundary,
-  supports these existing owners; no new architectural direction is needed.
+[Selected design and existing owners](design-context.md) retain the exact input,
+resolution, authoring, attribution, graph and ADR decisions. Reuse these owners.
 
 ## Outside-in proof ownership
 
@@ -177,7 +152,7 @@ Sizing: five to eight active minutes, plus required proof waits.
 
 ### 8. Retrieve bounded graphs by the same address
 Type: Behavior
-Status: planned
+Status: done
 Proof: Graph HTTP path/scoped/ambiguous input, budgets/private-content refusal;
 full backend and both MCP E2Es against migrated callers.
 
@@ -219,12 +194,12 @@ acceptance and per-slice delivery. Execution evidence retains refinement decisio
 ### G1. Discovery retains a numeric bridge during caller migration
 Reported: slice 1 — "Discovery adds Portable paths while retaining noteId for current read/graph callers until their migration."
 Story clause: "Delete numeric note ID arguments and MCP-generated note ID fields"
-Disposition: interim until slices 4, 8
+Disposition: proved by slice 8: discovery bridge deletion reading and positive Portable-path schemas; discovered nested alias path → intended graph HTTP, preserved discovery → read and both actual SDK graph journeys; execution-evidence.md slice8 and /tmp/seed125-slice8-handoff.md
 
 ### G2. Discovery paths await read and graph consumers
 Reported: slice 1 — "Discovery produces reusable addresses; candidate-to-read and candidate-to-graph observations belong to slices 3 and 5."
 Story clause: "`list_note_candidates` supplies qualified Portable paths that the read and graph tools accept directly."
-Disposition: interim until slices 4, 8
+Disposition: proved by slice 8: discovered nested alias path passed unchanged → intended graph; qualified/discovered reads and both real SDK journeys retained and rerun, full backend3161 and MCP E2Es9 passing; execution-evidence.md slice8
 
 ### G3. Read projection retains its current numeric bridge during citation enrichment
 Reported: slice 3 — "Sizing inspection found hosted graph calls consume the current read result identity; retain it during additive citation output and migrate graph identity to discovery in the qualified-input transition."
@@ -240,3 +215,13 @@ Disposition: proved by slice 5: ReadNoteScopedPathMcpEndpointTest explicit scope
 Reported: slice 6 — "Coordinator inspected cached SDK output validation: raw HTTP cases alone do not execute the client error path. Add one actual SDK ambiguity → returned-path selection → full-read journey."
 Story clause: "If several notes match within a notebook, return the actual readable resolution candidates with enough notebook and full folder information to choose."
 Disposition: proved by slice 6: actual cached-schema SDK ambiguity → candidate full-folder selection → returned Portable path → full read, mcp_services.feature new scenario8/8 passing
+
+### G6. Generated graph navigation addresses still need canonical qualification
+Reported: slice 8 — "Graph input now uses paths; generated outgoing, inbound, sampled-peer and retrieval-path wiki spellings remain interim until navigation slice9."
+Story clause: "MCP-generated references to the focus note, related notes, outgoing destinations, inbound referrers, sampled peers, and retrieval paths use that same addressing contract."
+Disposition: interim until slices 9
+
+### G7. Returned graph nodes still need direct reusable addresses
+Reported: slice 8 — "Focus and related projections keep current metadata; direct reusable portablePath fields remain owned by slice10."
+Story clause: "MCP-generated references to the focus note, related notes, outgoing destinations, inbound referrers, sampled peers, and retrieval paths use that same addressing contract."
+Disposition: interim until slices 10

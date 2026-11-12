@@ -21,7 +21,7 @@ Feature: MCP (Model Context Protocol) Services
     Then the MCP client used this checkout's isolated HTTPS MCP endpoint
     When AI agent searches for this worktree's MCP isolation marker
     Then the response should contain this worktree's MCP isolation marker
-    When AI agent extracts note ID and calls get graph MCP tool with token limit "1000"
+    When AI agent follows the candidate path to get graph MCP tool with token limit "1000"
     Then the graph response should contain this worktree's MCP isolation focus note
     And the graph response should not contain the other worktree's MCP isolation marker
     When AI agent searches for the other worktree's MCP isolation marker
@@ -49,7 +49,7 @@ Feature: MCP (Model Context Protocol) Services
   Scenario Outline: AI agent respects token limits when retrieving a note graph
     When AI agent searches for relevant notes using MCP tool with the term "Functional"
     Then the response should contain "Functional"
-    When AI agent extracts note ID and calls get graph MCP tool with token limit "<token_limit>"
+    When AI agent follows the candidate path to get graph MCP tool with token limit "<token_limit>"
     Then the graph response should contain the focus note "Functional"
     And the graph response should <sibling_inclusion> "Object Oriented"
 

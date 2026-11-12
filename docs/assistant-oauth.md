@@ -63,7 +63,7 @@ secret out of prompts and source control. Existing GitHub/Donut sign-in and an
 operator-registered confidential client are prerequisites.
 
 Try: “Find my Donut note titled <title>, read it in full, and explain it. Cite
-the returned title, notebook, folder path, note ID and acceptedRevision.”
+the returned title, notebook, folder path, portablePath and acceptedRevision.”
 `acceptedRevision` identifies the accepted commit of the whole notebook.
 Search matches titles and aliases; use a more precise title when no match is
 found. A full read supplies citation evidence; graph context guides further

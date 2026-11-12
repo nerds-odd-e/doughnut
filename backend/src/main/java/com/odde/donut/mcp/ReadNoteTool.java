@@ -124,7 +124,7 @@ public class ReadNoteTool {
           .structuredContent(objectMapper.readValue(serializedContent, Object.class))
           .build();
     } catch (UnexpectedNoAccessRightException e) {
-      throw McpToolArguments.rethrow(e);
+      throw McpToolFailures.rethrow(e);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

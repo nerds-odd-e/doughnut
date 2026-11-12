@@ -2,7 +2,8 @@
 
 ## Consumers and proof routes
 
-- Shared MCP destination resolution plus `McpToolArguments` feed both read tools. Their changed arguments reach
+- Shared MCP destination resolution feeds both note-read tools; checked deliberate
+  failures retain their identity through the current MCP failure helper. Their changed arguments reach
   `ReadNoteMcpEndpointTest`, `GetNoteGraphMcpEndpointTest`,
   `AssistantMcpAccessTest`, and `AssistantTokenRenewalTest`: migrate/run in 4/8.
 - `ListNoteCandidatesTool` feeds `mcpAgentActions.callToolOnFirstCandidate`,

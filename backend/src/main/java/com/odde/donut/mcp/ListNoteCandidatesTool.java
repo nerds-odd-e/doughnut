@@ -37,10 +37,10 @@ public class ListNoteCandidatesTool {
       - Returns note candidates only, in the search's ranking order
 
       Response Format:
-      - JSON array; each candidate has portablePath (a qualified Portable path), noteId, title, notebookName, folderPath (the complete folder trail, empty at root), folderName (omitted at notebook root), and distance
+      - JSON array; each candidate has portablePath (a qualified Portable path), title, notebookName, folderPath (the complete folder trail, empty at root), folderName (omitted at notebook root), and distance
       - Candidates with equal titles are told apart by notebookName and folderName
       - If no note matches, returns "%s"
-      - Use a candidate's portablePath with 'read_note' to read it in full for citing; use its noteId with 'get_note_graph' for its context and connections
+      - Use a candidate's portablePath with 'read_note' to read it in full for citing; use its portablePath with 'get_note_graph' for its context and connections
 
       For best results, search with a likely note title or a distinctive word from it.\
       """
@@ -130,7 +130,6 @@ public class ListNoteCandidatesTool {
   private Map<String, Object> toCandidate(NoteSearchResult note, User viewer) {
     Note destination = noteRepository.findById(note.getNoteTopology().getId()).orElseThrow();
     Map<String, Object> candidate = mcpNoteCandidates.describe(destination, viewer);
-    candidate.put("noteId", note.getNoteTopology().getId());
     if (note.getFolderName() != null) {
       candidate.put("folderName", note.getFolderName());
     }

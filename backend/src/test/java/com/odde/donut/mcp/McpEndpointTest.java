@@ -104,7 +104,15 @@ class McpEndpointTest extends McpEndpointTestBase {
               jsonPath(
                   "$.result.tools[1].inputSchema.properties.portablePath.type", equalTo("string")))
           .andExpect(jsonPath("$.result.tools[2].name", equalTo(GetNoteGraphTool.NAME)))
-          .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.noteId").exists())
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[2].inputSchema.properties.portablePath.type", equalTo("string")))
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[2].inputSchema.properties.notebookName.type", equalTo("string")))
+          .andExpect(
+              jsonPath(
+                  "$.result.tools[2].inputSchema.required", contains("portablePath", "tokenLimit")))
           .andExpect(jsonPath("$.result.tools[2].inputSchema.properties.tokenLimit").exists())
           .andExpect(jsonPath("$.result.tools[3].name", equalTo(RequestLearningSessionTool.NAME)))
           .andExpect(jsonPath("$.result.tools[3].inputSchema.properties.timezone").exists())
