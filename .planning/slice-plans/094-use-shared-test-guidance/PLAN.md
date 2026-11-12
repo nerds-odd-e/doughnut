@@ -145,7 +145,7 @@ the preparation already identified the shared owners and affected local homes.
 
 ### 2. Follow shared browser guidance for features and support-only edits
 Type: Behavior
-Status: planned
+Status: done
 Proof: The slice-2 rows above, separately exercising the feature, step-only,
 page-object-only, and terminal-only guidance routes; final one-time sweep.
 
@@ -196,6 +196,8 @@ branch `codex/use-shared-makeme-and-page-object-guidance`, remote `origin`,
 trunk `main`, publisher `dashboard-territory.local-doughnut`, agent Kirara-chan.
 Starting revision `b503972834ecdae1026118f6d0a57a5fad5f44de`;
 claim and initial published base `a5f5b56692c3749f9508bfe7e30fcefee3b1ab3c`.
+Slice 1 accepted on the execution branch: `78a6275f59584502829c57b1f3ca204fac1e88ba`
+(suffix base was the claim); observation attached to the retained stream.
 The existing owned worktree was reused; no integration checkout was supplied.
 Replanning retains the existing planned-execution authority and scope.
 No user-visible path or persisted behavior is removed by these guidance edits.
@@ -227,3 +229,15 @@ unchanged runtime APIs and Storybook's separate practice are outside its effect.
 Fresh `refactor_makeme` returned `REFACTOR COMPLETE`, no edits/tests; proof reused.
 Eight active implementation minutes reflect bounded consumer classification,
 within the ten-minute hard limit. Freshness remained unchanged before delivery.
+
+## Slice 2 acceptance
+
+Feature, step-only and page-object-only guidance/selector walkthroughs pass;
+terminal helpers keep their surface-specific practice. All 20 links/anchors
+resolve, moved executable examples are exact, and whitespace passes.
+E2E authoring/running are 196/89 lines with the planned cohesive seam.
+The whole-guidance one-time reading sweep found canonical shared guidance and
+local mechanics only; 202 consumer rows are classified in
+`/tmp/seed126-slice2-consumers.md`, literal proof in `/tmp/seed126-slice2-proof.md`.
+Fresh `refactor_browser` returned `REFACTOR COMPLETE`, no edits; proof reused.
+Nine active implementation minutes include extraction and consumer reading.

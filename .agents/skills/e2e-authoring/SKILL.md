@@ -1,6 +1,6 @@
 ---
 name: e2e-authoring
-description: E2E testing with Cypress and Cucumber, feature files, step definitions, page objects, fluent interface, assertions, data-app-busy / waitUntilAppIsNotBusy pairing, test execution. Use when writing Cypress/Cucumber E2E tests.
+description: E2E testing with Cypress and Cucumber, shared browser test guidance, feature files, step definitions, named navigation, assertions, app-busy waits, test execution. Use when writing Cypress/Cucumber E2E tests.
 paths:
   - "e2e_test/**/*.feature"
   - "e2e_test/**/*.ts"
@@ -9,90 +9,41 @@ paths:
 
 Use this skill when writing or modifying E2E tests, Cypress/Cucumber feature files, step definitions, page objects, or E2E assertions. For OCR-specific canvas assertions, use the `e2e-ocr` skill.
 
-## Environment Assumption
+## Select browser test guidance
 
-The `pnpm cy:run` wrapper owns its stack and compiles current backend source once per batch, without a continuous backend compiler. Local batches retain frontend HMR; backend edits need a new invocation. Use `pnpm cy:open` for an interactive session with backend reload and frontend HMR. Required mocks are owned by the selected invocation.
+For browser authoring, extension and implicated refactoring, follow
+[Dough Page Objects](../dough-page-objects/SKILL.md) with the owning feature
+source path. Its shared entry selector decides whether to load the convention;
+MakeMe is an independent selection. Other entries retain their practice.
 
-If services are not running, suggest running `pnpm cy:run --spec <feature>` in a separate terminal.
+When only a Cucumber step, page object or other support source changes, trace
+its changed operation through callers and step wording to the owning browser
+feature(s), and select those feature paths. Do this even when `--changed`
+lists only support sources: they do not themselves match the feature entry.
+Carry each edited support path, owning feature path and caller/step evidence
+into the implementation or refactor brief. For new support, identify the
+intended owning feature before applying the convention. Follow the shared
+unresolved-rule handling if ownership, selection or selected guidance is
+unresolved; leave only convention-dependent work unperformed.
 
-## Cypress Origin
+For example, `conversation.ts`'s “I start a conversation about the note …
+inviting AI …” step belongs to
+`e2e_test/features/messages/conversation_about_a_note.feature`. Starting instead
+at `conversationAboutNotePage.ts`, trace
+`replyToConversationAndInviteAiToReply` through
+`noteConversationAndQuestionMethods.ts`'s `sendMessageToAI` to that step and
+feature. Run the shared selector for the feature; keep the original support
+path and this owner evidence in the brief. No feature edit is required.
 
-Primary unconfigured checkouts and CI use `http://localhost:5173` as the Cypress
-app origin through the local load balancer. A linked worktree (or a primary
-with `.worktree.local.json`) uses that checkout's isolated origin
-`http://127.0.0.1:<lbListenPort>` — see `docs/worktree-browser-tests.md`. Isolated
-Cypress accepts one or more selections from the assessed active feature set
-declared in `scripts/isolated-cypress-spec-selection.mjs` (application-only
-active specs plus the active CLI, MCP, OpenAI-mock, and Wikidata-mock focused
-specs) per run; a new feature file must be added to that set (e.g.
-`APPLICATION_ONLY_ACTIVE_SPECS` in `scripts/isolated-cypress-active-specs.mjs`) before an
-isolated run accepts it. The CLI command is scoped to the assessed active CLI workflows.
-The MCP command is scoped to that one search/graph feature. OpenAI-mock specs
-start a runner-owned private OpenAI Mountebank; Wikidata-mock specs start a
-runner-owned private Wikidata Mountebank; application-only, CLI, and MCP specs
-do not require Mountebank. Each isolated checkout needs its own healthy E2E
-allocation. Paired CLI-vs-browser reset proof:
+Apply browser conventions only to browser work. A terminal-only CLI feature
+may select `pageObjects` through its entry but keeps the
+[CLI helpers](#cli-terminal-helpers). A frontend unit test's Chromium runtime
+alone does not select page objects.
 
-```bash
-CURSOR_DEV=true nix develop -c node scripts/worktree-reset-isolation-harness.mjs --mode cli --peer <cli-checkout> --resetter <browser-checkout>
-```
+## Running and debugging
 
-CI vs `pnpm cy:run`, `wait-on`, `NO_PROXY`, and env vars are documented in
-`docs/gcp/prod_env.md`, Local dev / Cypress under section 6.
-
-## Run E2E Tests
-
-Agents should default to `pnpm cypress run --spec` with one or more `.feature` paths tied to the changed capability. Add adjacent specs only when regression risk warrants it. Do not run bare `pnpm cypress run`, `pnpm verify`, or the whole suite unless the user explicitly asks for a full E2E run or the instructions require reproducing CI.
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
-```
-
-Important notes:
-
-- Do not use `cypress run -- --spec`; the empty `--` causes the `--spec` parameter to be ignored.
-- The default tag filter is `expose.tags` in `e2e_test/config/ci.ts`, for example `not @ignore`. Override per raw `pnpm cypress run` with `--expose tags='...'` (`-x`; the `pnpm cy:run` wrapper drops it), not `--env tags=...` (ignored by `@badeball/cypress-cucumber-preprocessor` v27 on Cypress >= 15.17).
-- `@skipOptimizationDueToKnownNecessarySlowness` is Donut's profile-only
-  exclusion for known-necessary slowness. `dough-test-optimization` profiles
-  exclude it as described under "Test-optimization profiling" below.
-  Normal CI/dev runs still execute these scenarios. Do not add this tag without
-  developer review, except when an explicit `dough-test-optimization --resolve`
-  pass makes an evident exclusion under the public skill's candidate-resolution
-  rules.
-- `@focus` and `@only` are local debugging aids only. Do not commit them; CI runs `./scripts/check_focus_tags.sh` on `.feature` files to block `@focus`, and `@only` should be treated the same.
-- If any node in a feature file is tagged `@focus` or `@only`, `@badeball/cypress-cucumber-preprocessor` filters scenarios in that file to `@focus or @only` only.
-
-### Test-optimization profiling
-
-For per-scenario timing, run the selected feature scope through the owning
-wrapper and tee its output to a local file:
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cy:run --spec '<feature,feature,...>' 2>&1 | tee /tmp/donut-e2e-profile.log
-```
-
-- The wrapper forwards only `--spec` (and `--browser`) to Cypress
-  (`scripts/e2e-cypress-process.mjs`); `--reporter` and `--expose tags=...`
-  are dropped. Apply the profile-only exclusion by leaving
-  `@skipOptimizationDueToKnownNecessarySlowness` features out of the spec list,
-  and subtract excluded scenarios inside a selected feature from the profile.
-- Per-scenario times are the spec reporter's `✓ <scenario> (<N>ms)` lines;
-  associate them with the preceding `Running: <feature>` line.
-- An isolated checkout (a linked worktree, or a primary with
-  `.worktree.local.json`) refuses glob spec selections; list the features
-  comma-separated. If mirroring CI, also leave out `@wip` features.
-
-This exclusion is profiling-only and must not narrow normal verification.
-
-## Debugging
-
-Use the canonical log-tail command for backend E2E log inspection:
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e
-```
-
-Frontend Vite checker terminal errors still matter even though the browser overlay is disabled for E2E stability. For canonical lint and format commands, use the `linting_formating` skill.
+Use [running E2E tests](references/running-e2e.md) for environment assumptions,
+checkout origins, focused commands, profiling and debugging.
 
 ## Technology And Structure
 
@@ -123,13 +74,10 @@ Avoid e2e test that is only about the presentation of a state and having no stat
 - Name feature files and titles by domain/capability, such as `note_creation.feature` or `spaced_repetition.feature`. Never name them by planning sequence number or delivery order.
 - Use tags, such as `@usingMockedOpenAiService` or `@mockBrowserTime`, to control test execution.
 - Keep scenarios focused and concise.
-- Prefer `Scenario Outline` with an `Examples` table when the path and assertion focus are the same and only data varies. Do not copy-paste near-identical Scenarios for different inputs. Keep separate Scenarios when the observable behavior differs (see Explicit Conditions and step-definition guidance on variants).
+- Prefer `Scenario Outline` with an `Examples` table when the path and assertion focus are the same and only data varies. Keep separate scenarios when observable behavior differs, with the condition in the step wording (for example slash command, plain line, Enter alone or ESC).
 
 ## Step Definitions
 
-- Keep step definitions lightweight.
-- Delegate implementation details to page objects, preferably as fluent chains.
-- When user-visible behavior differs, use different steps and thin implementations. Do not hide variants behind one parameterized step.
 - Use TypeScript and reuse steps where practical.
 - Use parameter types for complex objects.
 
@@ -140,8 +88,6 @@ When("I start a conversation about the note {string}", (noteTopology: string) =>
 ```
 
 ## Page Objects
-
-Use page objects with a fluent interface: methods perform an action and return the next page object, or `this` when staying on the same screen. This keeps step definitions short and navigation explicit in the types.
 
 - Navigation (ADR 0005). E2E navigation goes through `e2e_test/start/router.ts`
   (`visitNamed` / named `push`). Compile hrefs with `namedLocationHref` /
@@ -162,10 +108,6 @@ Use page objects with a fluent interface: methods perform an action and return t
 - Recall: `visitRecallPage` is remount (`visitNamed('recall')`);
   `navigateToRecallPage` is sidebar UI. Gherkin `When I visit recall`
   stays remount — do not convert it to sidebar.
-- Centralize UI interactions in page objects.
-- Prefer fluent chaining over one-off helpers that do not return a navigable object.
-- Keep page objects focused on a single responsibility.
-- Use meaningful method names that reflect user actions.
 - Note-level assimilation actions, tracker status, Understanding success, and
   sequence controls live under `[data-testid="note-assimilation-modes"]`
   (`assimilationPage/shared.ts`). Scope those queries to that root. Property-row
@@ -173,14 +115,7 @@ Use page objects with a fluent interface: methods perform an action and return t
   (`noteRichPropertyAssimilationMethods` / `clickPropertyPanelAction`), not a
   note-level ancestry filter.
 
-```typescript
-const notePage = {
-  startAConversationAboutNote() {
-    this.toolbarButton("Start a conversation").click()
-    return conversationPage()
-  },
-}
-```
+## CLI terminal helpers
 
 CLI steps use `cli.xxx` page objects, not `start.xxx`. For the install feature, use `cli.backend()`, `cli.installation()`, and `cli.nonInteractiveOutput()` for spawned `version` / `update` stdout. The `@interactiveCLI`-tagged CLI files (`cli_access_token.feature`, `cli_interactive_mode.feature`, `cli_recall.feature`) and `cli_gmail.feature` are `@ignore` in CI; extend Vitest under `cli/tests/interactive/` for interactive TTY coverage instead of adding a second Cypress PTY harness.
 
@@ -192,7 +127,7 @@ Then("I should see {string} in the non-interactive output", (expected: string) =
 
 ## Waiting until the app is not busy
 
-Product loading UI that means unfinished work marks itself with `data-app-busy` (`LoadingThinBar` from `apiCallWithLoading`, `ContentLoader` for pending page data, `LoadingModal` for `blockUi`). See `.agents/skills/frontend/SKILL.md`.
+Product loading UI that means unfinished work marks itself with `data-app-busy` (`LoadingThinBar` from `apiCallWithLoading`, `ContentLoader` for pending page data, `LoadingModal` for `blockUi`). See [frontend loading UI](../frontend/SKILL.md#api).
 
 E2E waits with `waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts` (also `start.waitUntilAppIsNotBusy()`):
 
@@ -223,8 +158,7 @@ Error messages must be immediately actionable:
 2. Show expected and actual values when they differ.
 3. Include relevant context, such as page content or API response, when helpful.
 4. Given, When, and Then steps should be assertive and fail early.
-5. Put assertions inside page objects where that keeps step definitions simple.
-6. For commissioned learning-session report scheduling, use the UI report
+5. For commissioned learning-session report scheduling, use the UI report
    response's `recordedAt` (`POST /api/learning-sessions/record`) as the time
    authority and assert each graded tracker’s next recall is after that time.
    Do not pin an exact hour spread in E2E; backend tests own scheduling
@@ -245,15 +179,6 @@ expectQuizScore(expectedScore?: string) {
   return this
 }
 ```
-
-## Explicit Conditions
-
-A scenario describes one fixed path. Prefer dumb automation: the path is visible in Gherkin and in small, purpose-named page-object methods, not inferred at runtime from a string or flag.
-
-- Avoid large `if` / `switch` trees, parameter sniffing, and mode flags in steps and page objects except when the branch exists only to assert or fail fast with a clear error.
-- Distinguish variants at the caller with different steps and/or page-object methods, not one smart API.
-- State the condition in step wording when behavior differs, for example slash command vs plain line vs Enter alone vs ESC.
-- For CLI TTY sequences, add or extend Vitest under `cli/tests/interactive/` instead of adding a second Cypress PTY stack.
 
 ## Before hook order
 
