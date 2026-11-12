@@ -10,3 +10,4 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Read notes through MCP by Portable path](seeds/SEED-125-read-notes-through-mcp-by-portable-path.md#read-notes-through-mcp-by-portable-path) — SEED-125#read-notes-through-mcp-by-portable-path
