@@ -204,6 +204,94 @@ rehomed trackers. The two production transaction traces above support this
 cause; they do not explain all 2,197 losses, and the loss of sample `246327`
 was not replayed. Preserving answered questions during reduction needs its own
 follow-up and owner prioritization; this story reports the surviving evidence.
+The owner prioritized that repair as
+[Keep answered questions with their tracker](#keep-answered-questions-with-their-tracker).
+
+<a id="keep-answered-questions-with-their-tracker"></a>
+
+### Keep answered questions with their tracker
+
+**Identity:** SEED-073#keep-answered-questions-with-their-tracker
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal.** As a Donut learner, every question I answered stays with the memory
+tracker that recorded my answer, wherever that tracker moves, so reducing or
+removing the note the question was generated from never erases my attempt's
+question while its grade and schedule survive.
+
+**Owner direction (2026-11-13).** Losing the question while keeping the
+tracker is a defect, not intended behavior. The owner prefers that a recall
+prompt's question belongs only to its tracker; if it does not, the question
+must at least follow the tracker to the right note.
+
+**Current design (analysis, local main `a595aec4e2`).** The question does not
+belong only to the tracker. `recall_prompt` points at both its tracker and an
+`mcq`; the MCQ separately records the note it was generated from
+(`mcq.note_id`, `ON DELETE CASCADE`), and `recall_prompt.mcq_id` cascades on
+MCQ delete (`V300000325`). So a prompt dies with the MCQ's note, not with its
+tracker. Every tracker move leaves its MCQs behind:
+`rehomeNoteLevelTrackersToProperty` (reduction, then permanent removal of the
+relationship note — the confirmed production cause) and
+`movePropertyTrackersOntoRelationshipNote` (later removal of the source note
+would do the same). Production held 3,538 prompts whose MCQ note differs from
+their tracker's note. Code still reads the MCQ's note as the prompt's note:
+`RecallPrompt.getNote`, `Conversation` subject note, `ConversationService`
+title, and contest/regenerate context in `RecallPromptController`. The note's
+**Questions** list (`McqController.list` via `Note.mcqs`), directly added
+questions (`NoteAddQuestion`), and the recent-questions AI context also read
+`mcq.note_id`.
+
+**Recommended direction.** Make the tracker the single owner of an asked
+question, as the owner prefers: an asked question's lifetime and its note come
+from its prompt's tracker, never from the note it was generated from. This
+removes the divided source of truth instead of adding a repointing step to
+every tracker move, and it makes the existing mismatched prompts harmless
+without a data migration. Repointing `mcq.note_id` on each move is the simpler
+alternative; it keeps the duplicate note reference, must be remembered by
+every current and future move, and would still leave the 3,538 mismatches to
+repair. Deletion stays application-owned, not a new database cascade.
+
+**Scope.**
+
+- An answered prompt, with its question, choices, recorded answer, grade,
+  outcome and ambiguity exclusion, lasts as long as its tracker, whichever
+  note the tracker moves to and whichever note is later removed.
+- Everywhere a recall prompt's note is used — recall history, connected
+  assistant recall answers, conversations about a prompt, contest and
+  regeneration context — it is the tracker's current note.
+- A note's Questions list and recent-questions AI context show questions asked
+  through trackers now on that note; questions added directly to a note stay
+  on that note.
+- Removing a tracker still removes its prompts and answered questions, as
+  today.
+
+**Scope limits.** Restoring the 2,197 questions already lost (production has
+no copy), merging the history of a relationship-note tracker that reduction
+drops because the learner already tracks that focus, and changing scheduling
+or statistics are outside this story.
+
+**Key examples.**
+
+1. A learner answered an MCQ (index `2`, wrong) on relationship note R's
+   note-level tracker. The owner reduces R into a property of source S, and R
+   is permanently removed. The learner's recall history and
+   `list_recall_answers` still show that question, its choices and index `2`,
+   now under S.
+2. A property tracker on S, with an answered question, moves onto a new
+   relationship note R. S is later permanently removed. The tracker's answered
+   question remains under R.
+3. After example 1, contesting or opening a conversation about a question on
+   the moved tracker uses S, not the removed R, as its note.
+4. After example 1, S's Questions list includes the moved tracker's questions;
+   a question added directly to S remains listed there.
+5. Deleting the tracker itself (for example its note is removed while it has
+   not moved) still removes its prompts.
+
+**Effort hypothesis:** M — a few hours; confidence medium. Assumes each asked
+MCQ belongs to exactly one prompt (true for generation, regeneration and batch
+import today).
 
 ## Open Decisions
 
