@@ -74,6 +74,58 @@ These are starting observations, not promises that the current UI works in every
   rewrites are outside this epic. Direct MCP and ChatGPT access follows the
   [hosted assistant setup guide](../../docs/assistant-oauth.md).
 
+## Story Decomposition
+
+<a id="retrieve-my-recall-answer-history-through-mcp"></a>
+
+### Retrieve my recall answer history through MCP
+
+**Identity:** SEED-073#retrieve-my-recall-answer-history-through-mcp
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal.** As a Donut learner, I can ask my connected assistant for my recall
+answers so it can use real attempts to investigate what I confuse and where my
+notes or questions could improve.
+
+**Scope.**
+
+- A read-only MCP call retrieves every recorded answered recall prompt for the
+  connected learner. The lookback defaults to seven days, measured by answer
+  time, and the caller can optionally supply a different positive number of
+  days. The full window is retrievable even when the results need more than one
+  response.
+- Each attempt includes its answer time, the full question used, the learner's
+  selected choice or typed answer, and the recorded correctness. For multiple
+  choice, include all choices, the expected answer, and the stored validation
+  rationale when available. Preserve recorded outcomes such as overlap and
+  ambiguity exclusion so they can be interpreted correctly.
+- The response selects source note evidence automatically from the recorded
+  correctness and question type. Apply current notebook read access. Use the
+  current title and the notebook-qualified [Portable path](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#links-and-attachments).
+- Identify missing historical evidence explicitly. For example, an older
+  spelling attempt may have its typed answer even when the original masked
+  prompt cannot be recovered after a note edit.
+
+**Key examples.**
+
+- With the default lookback, yesterday's correct multiple-choice answer has
+  the full question and the note's title and path. The title and path are the
+  entire source note payload for a correct answer of either question type.
+- Yesterday's incorrect spelling answer includes the note's title, path, and
+  full current content so the assistant can inspect the clue in context.
+- An incorrect multiple-choice answer from ten days ago appears when the
+  caller requests fourteen days. Its source note evidence includes the title,
+  path, and bounded graph.
+
+The existing [recall history export](../../backend/src/main/java/com/odde/donut/controllers/dto/RecallHistoryExport.java)
+provides event metadata. [Recall prompts](../../backend/src/main/java/com/odde/donut/entities/RecallPrompt.java)
+hold the answered multiple-choice question and derive the spelling prompt from
+the note. The [MCP graph tool](../../backend/src/main/java/com/odde/donut/mcp/GetNoteGraphTool.java)
+already supplies bounded note context. Research and recommendations can follow
+once an assistant can retrieve this evidence.
+
 ## Open Decisions
 
 - Select real learner cases during evaluation; human comprehension,
