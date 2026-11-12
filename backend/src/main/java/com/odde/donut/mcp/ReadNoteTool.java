@@ -39,7 +39,8 @@ public class ReadNoteTool {
 
       Cite the note by portablePath and acceptedRevision. A later edit anywhere in the notebook yields a different acceptedRevision.
 
-      Pass a qualified Portable path directly, for example Engineering:Practices/Code Review. A candidate's portablePath from 'list_note_candidates' can be used unchanged.\
+      Pass a qualified Portable path directly, for example Engineering:Practices/Code Review. A candidate's portablePath from 'list_note_candidates' can be used unchanged.
+      For an unqualified title, alias, folder path or /Title, supply notebookName explicitly: MCP has no source note from which to infer it. A qualified path supplies its own notebook scope. Property selectors require the exact decoded key and return the containing full note.\
       """;
 
   private final AttributedNoteContentService attributedNoteContentService;
@@ -77,7 +78,13 @@ public class ReadNoteTool {
                                 "type",
                                 "string",
                                 "description",
-                                "Qualified Portable path of the note to read, e.g. Engineering:Practices/Code Review.")),
+                                "Portable path of the note to read, e.g. Engineering:Practices/Code Review or Practices/Code Review with notebookName."),
+                            "notebookName",
+                            Map.of(
+                                "type",
+                                "string",
+                                "description",
+                                "Explicit notebook scope for an unqualified portablePath; a qualified path supplies its own scope.")),
                         "required",
                         List.of("portablePath")))
                 .outputSchema(
@@ -116,12 +123,15 @@ public class ReadNoteTool {
       return unresolved(
           "portablePath is required. Supply a qualified destination such as Engineering:Practices/Code Review.");
     }
-    if (!WikiLinkMarkdown.splitInner(path).portablePath().hasNotebookQualifier()) {
+    Object scopeArgument = request.arguments().get("notebookName");
+    String notebookName = scopeArgument instanceof String scope ? scope : null;
+    if (!WikiLinkMarkdown.splitInner(path).portablePath().hasNotebookQualifier()
+        && (notebookName == null || notebookName.isBlank())) {
       return unresolved(
-          "Qualify portablePath with its notebook name, for example Engineering:Practices/Code Review.");
+          "Supply notebookName for an unqualified portablePath, or qualify it as Engineering:Practices/Code Review. MCP has no source note from which to infer notebook scope.");
     }
     Note destination;
-    switch (wikiLinkResolver.classifyToken(path, (String) null, user)) {
+    switch (wikiLinkResolver.classifyToken(path, notebookName, user)) {
       case WikiLinkResolver.CandidateCardinality.Resolved resolved ->
           destination = resolved.destinationNote();
       case WikiLinkResolver.CandidateCardinality.Unresolved ignored -> {

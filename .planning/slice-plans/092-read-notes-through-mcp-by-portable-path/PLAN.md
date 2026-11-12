@@ -139,7 +139,7 @@ Sizing: eight to ten active minutes; proof waits excepted. Return before extendi
 
 ### 5. Read shorthand within an explicit notebook scope
 Type: Behavior
-Status: planned
+Status: done
 Proof: Parameterized MCP scope/title/alias/path/property and missing-scope cases,
 including title precedence, exact decoded key and cardinality before property;
 full backend and both MCP E2Es for the completed read input contract.
@@ -149,6 +149,8 @@ Behavior: Supply unqualified portablePath with optional explicit notebookName
 keeps its own scope. Preserve readable/available matching and actionable missing
 scope/unresolved feedback. No separate matcher or inferred request history.
 Sizing: eight to ten active minutes, plus required proof waits.
+Timing exception: bounded fixture/index-precondition and compile repairs, about
+3.5 extra active minutes; same scope/property proof, detailed in execution evidence.
 
 ### 6. Recover from ambiguous shorthand by selecting a path
 Type: Behavior
@@ -241,4 +243,4 @@ Disposition: proved by slice 4: qualified read HTTP projection/callers plus host
 ### G4. Explicit shorthand scope follows qualified-path migration
 Reported: slice 4 — "Unqualified destinations currently receive qualification advice; explicit notebookName shorthand scope is the next slice's input contract."
 Story clause: "Every unqualified destination (title, alias, folder path, or exact-root path) needs an explicit notebook scope because MCP has no source note."
-Disposition: interim until slices 5
+Disposition: proved by slice 5: ReadNoteScopedPathMcpEndpointTest explicit scope and no-inferred-history HTTP cases, full backend3147 and MCP E2Es8 passing; execution-evidence.md
