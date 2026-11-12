@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
@@ -38,6 +39,19 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
 
   @Test
   void readsTheNoteWithItsSourceAttribution() throws Exception {
+    String authoredContent =
+        """
+        ---
+        type: Note
+        reference: '[[Physics:Potential]]'
+        ---
+        Authored [[Physics:Potential|potential energy]].
+        [Reference](/n1234)
+
+        ```text
+        keep spacing
+        ```
+        """;
     Timestamp updatedAt = Timestamp.from(Instant.parse("2026-09-06T04:05:06Z"));
     Notebook notebook = createGitBackedNotebook("Physics");
     Folder outer = makeMe.aFolder().notebook(notebook).name("Mechanics").please();
@@ -47,22 +61,23 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
             .aNote()
             .folder(inner)
             .title("Kinetic")
-            .content(ACCEPTED_CONTENT)
+            .content(authoredContent)
             .updatedAt(updatedAt)
             .please();
+    makeMe.aNote("Kinetic").notebook(notebook).please();
     String head = snapshotCurrentPortableTree(notebook).getAcceptedGitObjectId();
     UserToken token = tokenForOwner();
 
-    JsonNode result = callReadNoteResult(token, note.getId());
+    JsonNode result = callReadNoteResult(token, "Physics:Mechanics/Energy/Kinetic");
     JsonNode text = objectMapper.readTree(result.at("/content/0/text").asText());
     JsonNode read = result.get("structuredContent");
 
     assertThat(read, equalTo(text));
-    assertThat(read.get("noteId").asInt(), equalTo(note.getId()));
+    assertThat(read.get("portablePath").asText(), equalTo("Physics:Mechanics/Energy/Kinetic"));
     assertThat(read.get("title").asText(), equalTo("Kinetic"));
     assertThat(read.get("notebookName").asText(), equalTo("Physics"));
     assertThat(read.get("folderPath").asText(), equalTo("Mechanics / Energy"));
-    assertThat(read.get("content").asText(), equalTo(ACCEPTED_CONTENT));
+    assertThat(read.get("content").asText(), equalTo(authoredContent));
     assertThat(read.get("updatedAt").asText(), equalTo("2026-09-06T04:05:06.000+00:00"));
     assertThat(read.get("acceptedRevision").asText(), equalTo(head));
     assertThat(head, matchesPattern("[0-9a-f]{40}"));
@@ -75,14 +90,14 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.result.tools[1].outputSchema.type").value("object"))
         .andExpect(
-            jsonPath("$.result.tools[1].outputSchema.properties.noteId.type").value("integer"))
+            jsonPath("$.result.tools[1].outputSchema.properties.portablePath.type").value("string"))
         .andExpect(
             jsonPath("$.result.tools[1].outputSchema.properties.acceptedRevision.type")
                 .value("string"))
         .andExpect(
             jsonPath(
                 "$.result.tools[1].outputSchema.required",
-                contains("noteId", "title", "notebookName", "folderPath", "updatedAt")));
+                contains("portablePath", "title", "notebookName", "folderPath", "updatedAt")));
   }
 
   @Test
@@ -93,12 +108,18 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
         makeMe.aNote().notebook(notebook).title("Edited").content(ACCEPTED_CONTENT).please();
     snapshotCurrentPortableTree(notebook);
     UserToken token = tokenForOwner();
-    String earlier = callReadNote(token, note.getId()).get("acceptedRevision").asText();
+    String earlier =
+        callReadNote(token, note.getNotebook().getName() + ":" + note.getTitle())
+            .get("acceptedRevision")
+            .asText();
 
     textContentController.updateNoteContent(edited, contentDto(EDITED_CONTENT));
 
     assertThat(
-        callReadNote(token, note.getId()).get("acceptedRevision").asText(), not(equalTo(earlier)));
+        callReadNote(token, note.getNotebook().getName() + ":" + note.getTitle())
+            .get("acceptedRevision")
+            .asText(),
+        not(equalTo(earlier)));
     assertThat(earlier, matchesPattern("[0-9a-f]{40}"));
   }
 
@@ -107,7 +128,7 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     UserToken token = tokenForOwner();
 
-    JsonNode read = callReadNote(token, note.getId());
+    JsonNode read = callReadNote(token, note.getNotebook().getName() + ":" + note.getTitle());
 
     assertThat(read.has("acceptedRevision"), equalTo(false));
   }
@@ -118,24 +139,29 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
     UserToken token = tokenForOwner();
 
     mockMvc
-        .perform(authorized(mcpPost(toolsCallBody(foreign.getId())), token))
+        .perform(
+            authorized(
+                mcpPost(toolsCallBody(foreign.getNotebook().getName() + ":" + foreign.getTitle())),
+                token))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.error.code").exists())
-        .andExpect(jsonPath("$.error.message").value("It seems you cannot access this page."));
+        .andExpect(jsonPath("$.result.isError").value(true))
+        .andExpect(
+            jsonPath("$.result.content[0].text").value(containsString("No readable note matches")));
   }
 
   private UserToken tokenForOwner() {
     return makeMe.aUserToken().forUser(currentUser.getUser()).withLabel("mcp-read").please();
   }
 
-  private JsonNode callReadNote(UserToken token, Integer noteId) throws Exception {
-    return objectMapper.readTree(callReadNoteResult(token, noteId).at("/content/0/text").asText());
+  private JsonNode callReadNote(UserToken token, String portablePath) throws Exception {
+    return objectMapper.readTree(
+        callReadNoteResult(token, portablePath).at("/content/0/text").asText());
   }
 
-  private JsonNode callReadNoteResult(UserToken token, Integer noteId) throws Exception {
+  private JsonNode callReadNoteResult(UserToken token, String portablePath) throws Exception {
     MvcResult result =
         mockMvc
-            .perform(authorized(mcpPost(toolsCallBody(noteId)), token))
+            .perform(authorized(mcpPost(toolsCallBody(portablePath)), token))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.result.content[0].text").exists())
             .andReturn();
@@ -155,11 +181,11 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
     return request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token.getToken());
   }
 
-  private static String toolsCallBody(Integer noteId) {
+  private static String toolsCallBody(String portablePath) {
     return """
     {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{\
-    "name":"%s","arguments":{"noteId":%d}}}
+    "name":"%s","arguments":{"portablePath":"%s"}}}
     """
-        .formatted(ReadNoteTool.NAME, noteId);
+        .formatted(ReadNoteTool.NAME, portablePath);
   }
 }

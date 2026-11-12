@@ -159,7 +159,7 @@ Then(
 )
 
 When(
-  'AI agent extracts note ID and calls get graph MCP tool with token limit {string}',
+  'AI agent follows the candidate path to get graph MCP tool with token limit {string}',
   (limit: string) => {
     const tokenLimit = parseInt(limit)
     start.mcpAgentActions().getNoteGraphFromLastSearch(tokenLimit)
@@ -180,6 +180,22 @@ Then(
 When('AI agent reads the first candidate note', () => {
   start.mcpAgentActions().readNoteFromLastSearch()
 })
+
+When(
+  'AI agent reads {string} and selects the candidate in {string}',
+  (portablePath: string, folderPath: string) => {
+    start
+      .mcpAgentActions()
+      .readNoteAfterSelectingAmbiguousCandidate(portablePath, folderPath)
+  }
+)
+
+Then(
+  'the read note should be at {string} in folder {string}',
+  (portablePath: string, folderPath: string) => {
+    start.mcpAgentActions().expectReadLocation(portablePath, folderPath)
+  }
+)
 
 Then(
   'the read note content should contain {string} with an accepted revision to cite',

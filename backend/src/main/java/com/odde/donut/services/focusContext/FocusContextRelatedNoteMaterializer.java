@@ -1,18 +1,24 @@
 package com.odde.donut.services.focusContext;
 
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.services.ApproximateUtf8TokenBudget;
+import com.odde.donut.services.PortablePathAuthoring;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 final class FocusContextRelatedNoteMaterializer {
-  private FocusContextRelatedNoteMaterializer() {}
+  private final PortablePathAuthoring portablePathAuthoring;
+
+  FocusContextRelatedNoteMaterializer(PortablePathAuthoring portablePathAuthoring) {
+    this.portablePathAuthoring = portablePathAuthoring;
+  }
 
   record Materialized(FocusContextNote note, int tokenCost) {}
 
-  static Materialized materialize(Note hydratedNote, int depth, List<String> retrievalPath) {
+  Materialized materialize(Note hydratedNote, User viewer, int depth, List<String> retrievalPath) {
     String truncatedContent =
         ApproximateUtf8TokenBudget.truncateByApproxTokens(
             hydratedNote.getContent(), FocusContextConstants.RELATED_NOTE_CONTENT_MAX_TOKENS);
@@ -23,6 +29,7 @@ final class FocusContextRelatedNoteMaterializer {
     int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(truncatedContent));
     FocusContextNote note =
         new FocusContextNote(
+            portablePathAuthoring.qualifiedPortablePath(hydratedNote, viewer),
             hydratedNote.getNotebook() != null ? hydratedNote.getNotebook().getName() : null,
             hydratedNote.getTitle(),
             FocusContextConstants.folderPathOf(hydratedNote),

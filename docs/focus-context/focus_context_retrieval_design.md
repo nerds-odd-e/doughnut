@@ -35,8 +35,13 @@ For **folder siblings**, an anchor at wiki depth `d` uses `sampleCapAtGraphDepth
 
 ## API shape (`FocusContextResult`)
 
-- `focusNote` — `notebook`, `title`, `folderPath`, `depth`, `outgoingLinks`, `inboundReferences`, `sampleSiblings` (wiki-style URI strings), `content`, `contentTruncated`, optional `createdAt`.
+- `focusNote` — `portablePath`, `notebook`, `title`, `folderPath`, `depth`, `outgoingLinks`, `inboundReferences`, `sampleSiblings` (wiki-style URI strings), `content`, `contentTruncated`, optional `createdAt`.
 - `relatedNotes` — Same core fields plus `depth`, `retrievalPath` (wiki URI chain), `createdAt`, `content`, `contentTruncated`.
+
+Both note projections carry a qualified `portablePath` that can be passed unchanged
+to MCP `read_note` for full content or `get_note_graph` for bounded context.
+Generated navigation links and retrieval paths use the same address inside wiki
+brackets, including the full folder trail or exact-root form when titles compete.
 
 ## Markdown rendering
 

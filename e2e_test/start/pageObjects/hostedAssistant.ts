@@ -53,9 +53,10 @@ export const hostedAssistant = () => ({
       const [candidate] = JSON.parse(reply.content[0]!.text)
       expect(candidate.title).to.equal(title)
       expect(candidate.notebookName).to.equal('SDK Notebook')
+      cy.wrap(candidate.portablePath).as('hostedGraphPath')
       cy.task<ToolReply>('assistantCallTool', {
         name: 'read_note',
-        arguments: { noteId: candidate.noteId },
+        arguments: { portablePath: candidate.portablePath },
       }).then((read) => {
         const note = JSON.parse(read.content[0]!.text)
         expect(note.content).to.equal(content)
@@ -67,10 +68,10 @@ export const hostedAssistant = () => ({
     return this
   },
   expectBoundedGraph(title: string) {
-    cy.get<{ noteId: number }>('@hostedNote').then(({ noteId }) => {
+    cy.get<string>('@hostedGraphPath').then((portablePath) => {
       cy.task<ToolReply>('assistantCallTool', {
         name: 'get_note_graph',
-        arguments: { noteId, tokenLimit: 1000 },
+        arguments: { portablePath, tokenLimit: 1000 },
       }).then((reply) => {
         const graph = JSON.parse(reply.content[0]!.text)
         expect(graph.focusNote.title).to.equal(title)
@@ -78,7 +79,7 @@ export const hostedAssistant = () => ({
       })
       cy.task<ToolReply>('assistantCallTool', {
         name: 'get_note_graph',
-        arguments: { noteId, tokenLimit: 10 },
+        arguments: { portablePath, tokenLimit: 10 },
       }).then((reply) => {
         expect(JSON.stringify(reply)).to.contain(title)
         expect(JSON.stringify(reply)).not.to.contain('Hosted SDK Sibling')
@@ -97,7 +98,7 @@ export const hostedAssistant = () => ({
     cy.get<Record<string, unknown>>('@hostedNote').then((note) => {
       cy.task<ToolReply>('assistantCallTool', {
         name: 'read_note',
-        arguments: { noteId: note.noteId },
+        arguments: { portablePath: note.portablePath },
       }).then((reply) =>
         expect(JSON.parse(reply.content[0]!.text)).to.deep.equal(note)
       )

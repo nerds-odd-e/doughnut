@@ -1225,6 +1225,7 @@ export type NoteRecallInfo = {
 };
 
 export type FocusContextFocusNote = {
+    portablePath?: string;
     notebook?: string;
     title?: string;
     folderPath?: string;
@@ -1238,6 +1239,7 @@ export type FocusContextFocusNote = {
 };
 
 export type FocusContextNote = {
+    portablePath?: string;
     notebook?: string;
     title?: string;
     folderPath?: string;

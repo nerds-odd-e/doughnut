@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.controllers.dto.NoteSearchResult;
 import com.odde.donut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.donut.controllers.dto.SearchTerm;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.services.search.NoteSearchService;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,10 +37,10 @@ public class ListNoteCandidatesTool {
       - Returns note candidates only, in the search's ranking order
 
       Response Format:
-      - JSON array; each candidate has noteId, title, notebookName, folderName (omitted at notebook root), and distance
+      - JSON array; each candidate has portablePath (a qualified Portable path), title, notebookName, folderPath (the complete folder trail, empty at root), folderName (omitted at notebook root), and distance
       - Candidates with equal titles are told apart by notebookName and folderName
       - If no note matches, returns "%s"
-      - Use a candidate's noteId with 'read_note' to read it in full for citing, or with 'get_note_graph' for its context and connections
+      - Use a candidate's portablePath with 'read_note' to read it in full for citing; use its portablePath with 'get_note_graph' for its context and connections
 
       For best results, search with a likely note title or a distinctive word from it.\
       """
@@ -47,10 +48,18 @@ public class ListNoteCandidatesTool {
 
   private final NoteSearchService noteSearchService;
   private final JsonMapper objectMapper;
+  private final NoteRepository noteRepository;
+  private final McpNoteCandidates mcpNoteCandidates;
 
-  public ListNoteCandidatesTool(NoteSearchService noteSearchService, JsonMapper objectMapper) {
+  public ListNoteCandidatesTool(
+      NoteSearchService noteSearchService,
+      JsonMapper objectMapper,
+      NoteRepository noteRepository,
+      McpNoteCandidates mcpNoteCandidates) {
     this.noteSearchService = noteSearchService;
     this.objectMapper = objectMapper;
+    this.noteRepository = noteRepository;
+    this.mcpNoteCandidates = mcpNoteCandidates;
   }
 
   public SyncToolSpecification specification() {
@@ -92,7 +101,7 @@ public class ListNoteCandidatesTool {
             .filter(RelationshipLiteralSearchHit::isNote)
             .map(RelationshipLiteralSearchHit::getNoteSearchResult)
             .filter(Objects::nonNull)
-            .map(ListNoteCandidatesTool::toCandidate)
+            .map(note -> toCandidate(note, user))
             .toList();
 
     if (candidates.isEmpty()) {
@@ -118,11 +127,9 @@ public class ListNoteCandidatesTool {
     return query instanceof String string ? string : "";
   }
 
-  private static Map<String, Object> toCandidate(NoteSearchResult note) {
-    Map<String, Object> candidate = new LinkedHashMap<>();
-    candidate.put("noteId", note.getNoteTopology().getId());
-    candidate.put("title", note.getNoteTopology().getTitle());
-    candidate.put("notebookName", note.getNotebookName());
+  private Map<String, Object> toCandidate(NoteSearchResult note, User viewer) {
+    Note destination = noteRepository.findById(note.getNoteTopology().getId()).orElseThrow();
+    Map<String, Object> candidate = mcpNoteCandidates.describe(destination, viewer);
     if (note.getFolderName() != null) {
       candidate.put("folderName", note.getFolderName());
     }

@@ -22,7 +22,17 @@ class FocusContextMarkdownRendererTest {
   private static FocusContextFocusNote focusNote(
       String notebook, String title, String content, boolean contentTruncated) {
     return new FocusContextFocusNote(
-        notebook, title, "", 0, List.of(), List.of(), List.of(), null, content, contentTruncated);
+        notebook + ":" + title,
+        notebook,
+        title,
+        "",
+        0,
+        List.of(),
+        List.of(),
+        List.of(),
+        null,
+        content,
+        contentTruncated);
   }
 
   @Nested
@@ -105,14 +115,22 @@ class FocusContextMarkdownRendererTest {
       FocusContextResult result = new FocusContextResult(focusNote("NB", "A", "focus", false));
       result.addRelatedNote(
           new FocusContextNote(
-              "NB", "B", "", 1, List.of("[[A]]", "[[NB: B]]"), null, "content of B", false));
+              "NB:B",
+              "NB",
+              "B",
+              "",
+              1,
+              List.of("[[NB:A]]", "[[NB:B]]"),
+              null,
+              "content of B",
+              false));
 
       String output = renderer.render(result, depth1Config);
 
       assertThat(output, containsString(FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER));
       assertThat(output, containsString(FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG));
       assertThat(output, not(containsString("## Retrieved Note")));
-      assertThat(output, containsString("Path: [[A]] -> [[NB: B]]"));
+      assertThat(output, containsString("Path: [[NB:A]] -> [[NB:B]]"));
       assertThat(output, containsString("content of B"));
     }
 
@@ -122,11 +140,12 @@ class FocusContextMarkdownRendererTest {
           new FocusContextResult(focusNote("NB", "Focus", "focus body", false));
       result.addRelatedNote(
           new FocusContextNote(
+              "NB:Far",
               "NB",
               "Far",
               "",
               2,
-              List.of("[[Focus]]", "[[NB: Mid]]", "[[NB: Far]]"),
+              List.of("[[NB:Focus]]", "[[NB:Mid]]", "[[NB:Far]]"),
               null,
               "far content",
               true));
@@ -135,7 +154,7 @@ class FocusContextMarkdownRendererTest {
 
       assertThat(output, containsString("Max depth: 2"));
       assertThat(output, containsString("Depth: 2"));
-      assertThat(output, containsString("Path: [[Focus]] -> [[NB: Mid]] -> [[NB: Far]]"));
+      assertThat(output, containsString("Path: [[NB:Focus]] -> [[NB:Mid]] -> [[NB:Far]]"));
       assertThat(output, containsString("Truncated: true"));
     }
 
@@ -145,11 +164,19 @@ class FocusContextMarkdownRendererTest {
           new FocusContextResult(focusNote("NB", "AnchorTitle", "focus", false));
       result.addRelatedNote(
           new FocusContextNote(
-              "NB", "Peer", "", 1, List.of("[[AnchorTitle]]"), null, "peer body", false));
+              "NB:Peer",
+              "NB",
+              "Peer",
+              "",
+              1,
+              List.of("[[NB:AnchorTitle]]"),
+              null,
+              "peer body",
+              false));
 
       String output = renderer.render(result, depth1Config);
 
-      assertThat(output, containsString("Path: [[AnchorTitle]]"));
+      assertThat(output, containsString("Path: [[NB:AnchorTitle]]"));
       assertThat(output, containsString("Depth: 1"));
     }
   }
@@ -157,7 +184,8 @@ class FocusContextMarkdownRendererTest {
   @Nested
   class RelatedNotesBlock {
     private static FocusContextNote relatedNote(String title) {
-      return new FocusContextNote("NB", title, "", 1, List.of(), null, "body of " + title, false);
+      return new FocusContextNote(
+          "NB:" + title, "NB", title, "", 1, List.of(), null, "body of " + title, false);
     }
 
     @Test

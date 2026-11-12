@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-125_read-notes-through-mcp-by-portable-path.json",
+      "identity": "SEED-125#read-notes-through-mcp-by-portable-path",
+      "completedAt": "2026-11-12T12:45:21.813Z",
+      "blob": "d1f76ef9b81012ac715d32661a868662b698f6f5"
+    },
+    {
       "fileName": "SEED-127_verify-test-guidance-links.json",
       "identity": "SEED-127#verify-test-guidance-links",
       "completedAt": "2026-11-12T11:40:56.104Z",

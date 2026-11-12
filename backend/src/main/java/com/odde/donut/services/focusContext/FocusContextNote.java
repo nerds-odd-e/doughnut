@@ -8,6 +8,7 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 public class FocusContextNote {
+  private final String portablePath;
   private final String notebook;
   private final String title;
   private final String folderPath;
@@ -18,6 +19,7 @@ public class FocusContextNote {
   private final boolean contentTruncated;
 
   public FocusContextNote(
+      String portablePath,
       String notebook,
       String title,
       String folderPath,
@@ -26,6 +28,7 @@ public class FocusContextNote {
       Timestamp createdAt,
       String content,
       boolean contentTruncated) {
+    this.portablePath = portablePath;
     this.notebook = notebook;
     this.title = title;
     this.folderPath = folderPath;

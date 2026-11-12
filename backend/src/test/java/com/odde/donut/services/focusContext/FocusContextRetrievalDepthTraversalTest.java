@@ -40,7 +40,9 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
     FocusContextNote leafNote = relatedByTitle(result, "LeafDepth2");
     assertThat(leafNote.getDepth(), equalTo(2));
     assertThat(leafNote.getRetrievalPath(), hasSize(3));
-    assertThat(leafNote.getRetrievalPath().get(0), equalTo("[[ChainRoot]]"));
+    assertThat(
+        leafNote.getRetrievalPath().get(0),
+        equalTo("[[" + focus.getNotebook().getName() + ":ChainRoot]]"));
     assertThat(leafNote.getRetrievalPath().get(2), containsString("LeafDepth2"));
   }
 

@@ -47,15 +47,15 @@ public class WikiLinkResolver {
 
   /**
    * Cardinality of a wiki Portable-path token's readable candidates in a notebook scope: exactly
-   * one match ({@link Resolved}), no match ({@link Unresolved}), or more than one ({@link
-   * Ambiguous}).
+   * one match ({@link Resolved}), no match ({@link Unresolved}), or the matching notes when more
+   * than one ({@link Ambiguous}).
    */
   public sealed interface CandidateCardinality {
     record Resolved(Note destinationNote) implements CandidateCardinality {}
 
     record Unresolved() implements CandidateCardinality {}
 
-    record Ambiguous() implements CandidateCardinality {}
+    record Ambiguous(List<Note> candidates) implements CandidateCardinality {}
   }
 
   /**
@@ -156,10 +156,11 @@ public class WikiLinkResolver {
 
   /**
    * Classifies {@code token}'s readable-candidate cardinality for {@code viewer} resolved against
-   * {@code notebookFallbackName}. Used to classify a token in a notebook scope other than its
-   * current note's (e.g. before a cross-notebook move rewrites content).
+   * {@code notebookFallbackName}, without requiring a source note. A qualified Portable path
+   * supplies its own notebook scope. Also used before a cross-notebook move rewrites content.
    */
-  CandidateCardinality classifyToken(String token, String notebookFallbackName, User viewer) {
+  public CandidateCardinality classifyToken(
+      String token, String notebookFallbackName, User viewer) {
     return candidateClassifier.classify(token, notebookFallbackName, viewer);
   }
 

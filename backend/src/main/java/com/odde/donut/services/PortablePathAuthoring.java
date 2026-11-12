@@ -1,7 +1,9 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.PortablePath;
+import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,8 @@ public class PortablePathAuthoring {
 
   public String authoredPortablePath(
       Note sourceNote, Note destinationNote, String originalPortablePath) {
-    String notePortion = shortestUnambiguousNotePortion(destinationNote);
+    String notePortion =
+        shortestUnambiguousNotePortion(destinationNote, authorizationService.getCurrentUser());
     Optional<String> encodedPropertyKey =
         (originalPortablePath == null || originalPortablePath.isBlank())
             ? Optional.empty()
@@ -32,18 +35,27 @@ public class PortablePathAuthoring {
     return authored.format();
   }
 
-  private String shortestUnambiguousNotePortion(Note destinationNote) {
-    if (displayNameUniquelyIdentifies(destinationNote)) {
+  public String qualifiedPortablePath(Note destinationNote, User viewer) {
+    return WikiLinkMarkdown.escape(
+        new PortablePath(
+                Optional.of(destinationNote.getNotebook().getName()),
+                shortestUnambiguousNotePortion(destinationNote, viewer),
+                Optional.empty())
+            .format());
+  }
+
+  private String shortestUnambiguousNotePortion(Note destinationNote, User viewer) {
+    if (displayNameUniquelyIdentifies(destinationNote, viewer)) {
       return destinationNote.getTitle();
     }
     return lengthenedNotePortion(destinationNote);
   }
 
-  private boolean displayNameUniquelyIdentifies(Note destinationNote) {
+  private boolean displayNameUniquelyIdentifies(Note destinationNote, User viewer) {
     return wikiLinkResolver.readableNotebookMatchUniquelyIdentifies(
         destinationNote.getNotebook().getName(),
         destinationNote.getTitle(),
-        authorizationService.getCurrentUser(),
+        viewer,
         destinationNote);
   }
 

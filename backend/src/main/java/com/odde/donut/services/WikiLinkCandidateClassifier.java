@@ -40,7 +40,7 @@ final class WikiLinkCandidateClassifier {
   private static WikiLinkResolver.CandidateCardinality classifyCandidates(
       String token, List<Note> readable) {
     if (readable.size() > 1) {
-      return new WikiLinkResolver.CandidateCardinality.Ambiguous();
+      return new WikiLinkResolver.CandidateCardinality.Ambiguous(readable);
     }
     if (readable.size() == 1) {
       Note candidate = readable.getFirst();
