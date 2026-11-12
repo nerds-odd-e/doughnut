@@ -7,14 +7,12 @@ import com.odde.donut.controllers.dto.SearchTerm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.services.PortablePathAuthoring;
 import com.odde.donut.services.search.NoteSearchService;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,17 +49,17 @@ public class ListNoteCandidatesTool {
   private final NoteSearchService noteSearchService;
   private final JsonMapper objectMapper;
   private final NoteRepository noteRepository;
-  private final PortablePathAuthoring portablePathAuthoring;
+  private final McpNoteCandidates mcpNoteCandidates;
 
   public ListNoteCandidatesTool(
       NoteSearchService noteSearchService,
       JsonMapper objectMapper,
       NoteRepository noteRepository,
-      PortablePathAuthoring portablePathAuthoring) {
+      McpNoteCandidates mcpNoteCandidates) {
     this.noteSearchService = noteSearchService;
     this.objectMapper = objectMapper;
     this.noteRepository = noteRepository;
-    this.portablePathAuthoring = portablePathAuthoring;
+    this.mcpNoteCandidates = mcpNoteCandidates;
   }
 
   public SyncToolSpecification specification() {
@@ -131,12 +129,8 @@ public class ListNoteCandidatesTool {
 
   private Map<String, Object> toCandidate(NoteSearchResult note, User viewer) {
     Note destination = noteRepository.findById(note.getNoteTopology().getId()).orElseThrow();
-    Map<String, Object> candidate = new LinkedHashMap<>();
-    candidate.put("portablePath", portablePathAuthoring.qualifiedPortablePath(destination, viewer));
+    Map<String, Object> candidate = mcpNoteCandidates.describe(destination, viewer);
     candidate.put("noteId", note.getNoteTopology().getId());
-    candidate.put("title", note.getNoteTopology().getTitle());
-    candidate.put("notebookName", note.getNotebookName());
-    candidate.put("folderPath", String.join("/", destination.folderNamesFromRoot()));
     if (note.getFolderName() != null) {
       candidate.put("folderName", note.getFolderName());
     }

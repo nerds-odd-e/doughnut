@@ -70,6 +70,18 @@ Feature: MCP (Model Context Protocol) Services
     And AI agent reads the first candidate note
     Then the read note should cite a different accepted revision
 
+  Scenario: AI agent recovers an ambiguous read by selecting a returned path
+    Given I have a note "Code Review" under notebook "Engineering" in folder "Practices/Design" with content:
+      """
+      Design review guidance
+      """
+    And I have a note "Code Review" under notebook "Engineering" in folder "Other/Design" with content:
+      """
+      Other review guidance
+      """
+    When AI agent reads "Engineering:Code Review" and selects the candidate in "Practices/Design"
+    Then the read note should be at "Engineering:Practices/Design/Code Review" in folder "Practices / Design"
+
   Scenario: MCP calls stay scoped to each personal token's user
     Given there are some notes for existing user "another_old_learner" in notebook "Other Private"
       | Title          |

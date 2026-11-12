@@ -40,6 +40,7 @@ public class ReadNoteTool {
       Cite the note by portablePath and acceptedRevision. A later edit anywhere in the notebook yields a different acceptedRevision.
 
       Pass a qualified Portable path directly, for example Engineering:Practices/Code Review. A candidate's portablePath from 'list_note_candidates' can be used unchanged.
+      If several readable notes match, the error returns candidates with portablePath, title, notebookName and the complete folderPath. Select a candidate and pass its portablePath unchanged to read it.
       For an unqualified title, alias, folder path or /Title, supply notebookName explicitly: MCP has no source note from which to infer it. A qualified path supplies its own notebook scope. Property selectors require the exact decoded key and return the containing full note.\
       """;
 
@@ -47,16 +48,19 @@ public class ReadNoteTool {
   private final JsonMapper objectMapper;
   private final WikiLinkResolver wikiLinkResolver;
   private final PortablePathAuthoring portablePathAuthoring;
+  private final McpNoteCandidates mcpNoteCandidates;
 
   public ReadNoteTool(
       AttributedNoteContentService attributedNoteContentService,
       JsonMapper objectMapper,
       WikiLinkResolver wikiLinkResolver,
-      PortablePathAuthoring portablePathAuthoring) {
+      PortablePathAuthoring portablePathAuthoring,
+      McpNoteCandidates mcpNoteCandidates) {
     this.attributedNoteContentService = attributedNoteContentService;
     this.objectMapper = objectMapper;
     this.wikiLinkResolver = wikiLinkResolver;
     this.portablePathAuthoring = portablePathAuthoring;
+    this.mcpNoteCandidates = mcpNoteCandidates;
   }
 
   public SyncToolSpecification specification() {
@@ -138,9 +142,8 @@ public class ReadNoteTool {
         return unresolved(
             "No readable note matches portablePath. Check the qualified destination or use list_note_candidates.");
       }
-      case WikiLinkResolver.CandidateCardinality.Ambiguous ignored -> {
-        return unresolved(
-            "Several readable notes match portablePath. Use a complete folder path or /Title for a root note.");
+      case WikiLinkResolver.CandidateCardinality.Ambiguous ambiguous -> {
+        return ambiguity(ambiguous.candidates(), user);
       }
     }
     try {
@@ -154,6 +157,26 @@ public class ReadNoteTool {
           .build();
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolArguments.rethrow(e);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  private McpSchema.CallToolResult ambiguity(List<Note> notes, User viewer) {
+    String message =
+        "Several readable notes match portablePath. Select a candidate's portablePath.";
+    Map<String, Object> result =
+        Map.of(
+            "message",
+            message,
+            "candidates",
+            notes.stream().map(note -> mcpNoteCandidates.describe(note, viewer)).toList());
+    try {
+      return McpSchema.CallToolResult.builder()
+          .isError(true)
+          .addContent(
+              new McpSchema.TextContent(message + "\n" + objectMapper.writeValueAsString(result)))
+          .build();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

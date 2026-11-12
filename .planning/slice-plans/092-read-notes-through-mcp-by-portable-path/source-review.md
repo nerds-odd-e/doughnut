@@ -6,10 +6,10 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| C01 | Shared address: A connected assistant can follow a wiki-link address to the intended note. | slice 9 |  |
-| C02 | Graph address: That same addressing contract can retrieve the intended note’s graph context. | slice 7 |  |
+| C01 | Shared address: A connected assistant can follow a wiki-link address to the intended note. | slice 10 |  |
+| C02 | Graph address: That same addressing contract can retrieve the intended note’s graph context. | slice 8 |  |
 | C03 | Read resolution: read_note uses existing wiki-link resolution rules. | slice 5 | observed: ReadNoteScopedPathMcpEndpointTest 23 HTTP cases exercise unchanged WikiLinkResolver/classifier/candidate chain; setup/assertions in execution-evidence.md slice5 and /tmp/seed125-slice5-handoff.md; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
-| C04 | Graph resolution: get_note_graph uses existing wiki-link resolution rules. | slice 7 |  |
+| C04 | Graph resolution: get_note_graph uses existing wiki-link resolution rules. | slice 8 |  |
 | C05 | Unqualified title: A title destination requires explicit notebook scope. | slice 5 | observed: requiresScopeEvenAfterAReadInTheUsersNotebook populated title/alias/folder/root cases after positively successful qualified read, explicit missing-scope isError/advice; blank scope and positive explicit-scope resolution cases; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
 | C06 | Unqualified alias: An alias destination requires explicit notebook scope. | slice 5 | observed: requiresScopeEvenAfterAReadInTheUsersNotebook populated title/alias/folder/root cases after positively successful qualified read, explicit missing-scope isError/advice; blank scope and positive explicit-scope resolution cases; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
 | C07 | Unqualified folder path: A folder-path destination requires explicit notebook scope. | slice 5 | observed: requiresScopeEvenAfterAReadInTheUsersNotebook populated title/alias/folder/root cases after positively successful qualified read, explicit missing-scope isError/advice; blank scope and positive explicit-scope resolution cases; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
@@ -23,80 +23,80 @@ Reviewer launch: collaboration.spawn_agent, task `/root/source_review`, fork_tur
 | C15 | Property resolution order: A property selector settles the note before checking the property. | slice 5 | observed: settlesTheDisplayNameBeforeCheckingItsProperty with genuinely indexed alias+topic from WebNoteEditService.saveContent, and settlesNoteCardinalityBeforeCheckingProperties; unresolved title property and ambiguous pre-property note cardinality; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
 | C16 | Property key: Property selection requires the exact decoded property key. | slice 5 | observed: propertySelectorReturnsTheContainingFullNote exact authored YAML/body equality and requiresTheExactDecodedPropertyKey wrong-case/truncated/double-encoded/malformed percent unresolved cases; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
 | C17 | Property-selected read: read_note still returns the containing full note. | slice 5 | observed: propertySelectorReturnsTheContainingFullNote exact authored YAML/body equality and requiresTheExactDecodedPropertyKey wrong-case/truncated/double-encoded/malformed percent unresolved cases; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
-| C18 | Property-selected graph: get_note_graph still returns the containing note’s graph. | slice 7 |  |
-| C19 | Ambiguity candidates: Multiple matches within a notebook produce the actual readable resolution candidates. | slice 6 |  |
-| C20 | Candidate notebook context: Candidates provide enough notebook information for the user to choose. | slice 6 |  |
-| C21 | Candidate folder context: Candidates provide the full folder information needed to choose. | slice 6 |  |
+| C18 | Property-selected graph: get_note_graph still returns the containing note’s graph. | slice 8 |  |
+| C19 | Ambiguity candidates: Multiple matches within a notebook produce the actual readable resolution candidates. | slice 6 | observed: ReadNoteAmbiguityMcpEndpointTest exact actual title/readable candidates with nested/nested/root, alias/trash competitors, property cardinality, three returned-path full reads and private two-note refusal; real cached-schema SDK ambiguity recovery mcp_services scenario receives choices/selects full-folder path/reads expected location. Full backend3153/0/0/2 and MCP E2E8/8, exact inspected setups in execution-evidence.md slice6. |
+| C20 | Candidate notebook context: Candidates provide enough notebook information for the user to choose. | slice 6 | observed: ReadNoteAmbiguityMcpEndpointTest exact actual title/readable candidates with nested/nested/root, alias/trash competitors, property cardinality, three returned-path full reads and private two-note refusal; real cached-schema SDK ambiguity recovery mcp_services scenario receives choices/selects full-folder path/reads expected location. Full backend3153/0/0/2 and MCP E2E8/8, exact inspected setups in execution-evidence.md slice6. |
+| C21 | Candidate folder context: Candidates provide the full folder information needed to choose. | slice 6 | observed: ReadNoteAmbiguityMcpEndpointTest exact actual title/readable candidates with nested/nested/root, alias/trash competitors, property cardinality, three returned-path full reads and private two-note refusal; real cached-schema SDK ambiguity recovery mcp_services scenario receives choices/selects full-folder path/reads expected location. Full backend3153/0/0/2 and MCP E2E8/8, exact inspected setups in execution-evidence.md slice6. |
 | C22 | Discovery ranking: Discovery retains existing ranked title/alias search. | slice 1 | observed: SearchControllerAliasTests.shouldRankTitleMatchesBeforeAliasMatches and NoteSearchServiceExactMatchTest full backend pass; ListNoteCandidatesTool preserves search result stream order |
 | C23 | Candidate paths: list_note_candidates supplies qualified Portable paths. | slice 1 | observed: ListNoteCandidatesMcpEndpointTest returnsAliasMatchAsCandidate, equalTitlesAreDisambiguatedByNotebookAndFolder, rootCandidateUsesExactRootPathWhenTitleIsAmbiguous and candidatePathEscapesWikiDestinationCharacters HTTP qualified-address assertions |
 | C24 | Direct candidate read: Those paths are accepted directly by read_note. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
-| C25 | Direct candidate graph: Those paths are accepted directly by get_note_graph. | slice 7 |  |
-| C26 | Focus references: MCP-generated focus-note references follow the same addressing contract. | slice 9 |  |
-| C27 | Related references: MCP-generated related-note references follow that contract. | slice 9 |  |
-| C28 | Outgoing references: MCP-generated outgoing-destination references follow that contract. | slice 8 |  |
-| C29 | Inbound references: MCP-generated inbound-referrer references follow that contract. | slice 8 |  |
-| C30 | Peer references: MCP-generated sampled-peer references follow that contract. | slice 8 |  |
-| C31 | Retrieval references: MCP-generated retrieval paths follow that contract. | slice 8 |  |
+| C25 | Direct candidate graph: Those paths are accepted directly by get_note_graph. | slice 8 |  |
+| C26 | Focus references: MCP-generated focus-note references follow the same addressing contract. | slice 10 |  |
+| C27 | Related references: MCP-generated related-note references follow that contract. | slice 10 |  |
+| C28 | Outgoing references: MCP-generated outgoing-destination references follow that contract. | slice 9 |  |
+| C29 | Inbound references: MCP-generated inbound-referrer references follow that contract. | slice 9 |  |
+| C30 | Peer references: MCP-generated sampled-peer references follow that contract. | slice 9 |  |
+| C31 | Retrieval references: MCP-generated retrieval paths follow that contract. | slice 9 |  |
 | C32 | Full-read path: Full reads supply a qualified path. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | C33 | Available revision: Full reads supply the whole notebook’s acceptedRevision when available. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | C34 | Unavailable revision: Full reads omit acceptedRevision when unavailable. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | C35 | Authored content: Full reads return authored Markdown verbatim. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
-| C36 | Graph budget: Graph reads retain the existing combined token budget. | slice 7 |  |
-| C37 | Graph traversal: Graph reads retain existing traversal behavior. | slice 7 |  |
-| C38 | Graph truncation: Graph reads retain explicit body truncation. | slice 7 |  |
-| C39 | Argument removal: Delete numeric note ID arguments from MCP. | slice 7 |  |
-| C40 | Field removal: Delete MCP-generated note ID fields. | slice 9 |  |
-| C41 | Instruction removal: Delete instructions dedicated to the removed MCP numeric-ID contract. | slice 7 |  |
-| C42 | Fixture removal: Delete fixtures dedicated to that removed contract. | slice 7 |  |
-| C43 | REST identities: Shared REST identities retain their existing contracts. | slice 9 |  |
-| C44 | Browser identities: Shared browser identities retain their existing contracts. | slice 9 |  |
-| C45 | Authored URLs: Authored Markdown URLs retain their existing contracts. | slice 9 |  |
-| C46 | Candidate authorization: Existing notebook read authorization applies to resolution candidates. | slice 6 |  |
+| C36 | Graph budget: Graph reads retain the existing combined token budget. | slice 8 |  |
+| C37 | Graph traversal: Graph reads retain existing traversal behavior. | slice 8 |  |
+| C38 | Graph truncation: Graph reads retain explicit body truncation. | slice 8 |  |
+| C39 | Argument removal: Delete numeric note ID arguments from MCP. | slice 8 |  |
+| C40 | Field removal: Delete MCP-generated note ID fields. | slice 10 |  |
+| C41 | Instruction removal: Delete instructions dedicated to the removed MCP numeric-ID contract. | slice 8 |  |
+| C42 | Fixture removal: Delete fixtures dedicated to that removed contract. | slice 8 |  |
+| C43 | REST identities: Shared REST identities retain their existing contracts. | slice 10 |  |
+| C44 | Browser identities: Shared browser identities retain their existing contracts. | slice 10 |  |
+| C45 | Authored URLs: Authored Markdown URLs retain their existing contracts. | slice 10 |  |
+| C46 | Candidate authorization: Existing notebook read authorization applies to resolution candidates. | slice 6 | observed: ReadNoteAmbiguityMcpEndpointTest exact actual title/readable candidates with nested/nested/root, alias/trash competitors, property cardinality, three returned-path full reads and private two-note refusal; real cached-schema SDK ambiguity recovery mcp_services scenario receives choices/selects full-folder path/reads expected location. Full backend3153/0/0/2 and MCP E2E8/8, exact inspected setups in execution-evidence.md slice6. |
 | C47 | Read authorization: Existing notebook read authorization applies to full reads. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
-| C48 | Graph authorization: Existing notebook read authorization applies to graph reads. | slice 7 |  |
+| C48 | Graph authorization: Existing notebook read authorization applies to graph reads. | slice 8 |  |
 | C49 | Trashed notes: Existing wiki semantics exclude trashed notes. | slice 5 | observed: trashedDisplayNameLeavesTheAvailableAlias: trashed Review plus available indexed alias returns available target; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
 | C50 | Missing targets: Zero-match targets remain unresolved. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
-| C51 | Ambiguous targets: Ambiguous targets remain unresolved. | slice 6 |  |
-| C52 | No arbitrary choice: Resolution does not choose an ambiguous target arbitrarily. | slice 6 |  |
-| Q01 | Naming assumption: The developer explicitly selected unique notebook names on 2026-11-12. | slice 9 |  |
+| C51 | Ambiguous targets: Ambiguous targets remain unresolved. | slice 6 | observed: ReadNoteAmbiguityMcpEndpointTest exact actual title/readable candidates with nested/nested/root, alias/trash competitors, property cardinality, three returned-path full reads and private two-note refusal; real cached-schema SDK ambiguity recovery mcp_services scenario receives choices/selects full-folder path/reads expected location. Full backend3153/0/0/2 and MCP E2E8/8, exact inspected setups in execution-evidence.md slice6. |
+| C52 | No arbitrary choice: Resolution does not choose an ambiguous target arbitrarily. | slice 6 | observed: ReadNoteAmbiguityMcpEndpointTest exact actual title/readable candidates with nested/nested/root, alias/trash competitors, property cardinality, three returned-path full reads and private two-note refusal; real cached-schema SDK ambiguity recovery mcp_services scenario receives choices/selects full-folder path/reads expected location. Full backend3153/0/0/2 and MCP E2E8/8, exact inspected setups in execution-evidence.md slice6. |
+| Q01 | Naming assumption: The developer explicitly selected unique notebook names on 2026-11-12. | slice 10 |  |
 | Q02 | Scope rationale: MCP has no source note, which explains the explicit notebook-scope requirement. | slice 5 | observed: requiresScopeEvenAfterAReadInTheUsersNotebook populated title/alias/folder/root cases after positively successful qualified read, explicit missing-scope isError/advice; blank scope and positive explicit-scope resolution cases; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
 | Q03 | Existing semantics: Wiki-link resolution and property-selection behavior are inherited contracts, subject to the stated addressing changes. | slice 5 | observed: ReadNoteScopedPathMcpEndpointTest 23 HTTP cases exercise unchanged WikiLinkResolver/classifier/candidate chain; setup/assertions in execution-evidence.md slice5 and /tmp/seed125-slice5-handoff.md; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
-| Q04 | Existing authorization: This work preserves current authorization. | slice 9 |  |
+| Q04 | Existing authorization: This work preserves current authorization. | slice 10 |  |
 | Q05 | Revision meaning: The supplied revision is the whole notebook’s acceptedRevision. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | Q06 | Revision availability: Revision metadata is conditional on availability. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
-| Q07 | Limits: Deferred capabilities are scope limits; they do not independently establish rejection rules. | slice 9 |  |
-| Q08 | Schema sweep: The source requires a one-time reading of tool schemas for remnants of the removed MCP numeric-ID contract. | slice 9 |  |
-| Q09 | Response sweep: That reading includes responses. | slice 9 |  |
-| Q10 | Documentation sweep: That reading includes documentation. | slice 9 |  |
-| Q11 | Caller sweep: That reading includes callers. | slice 9 |  |
-| Q12 | Sweep separation: The one-time sweep remains separate from replacement-behavior proof. | slice 9 |  |
+| Q07 | Limits: Deferred capabilities are scope limits; they do not independently establish rejection rules. | slice 10 |  |
+| Q08 | Schema sweep: The source requires a one-time reading of tool schemas for remnants of the removed MCP numeric-ID contract. | slice 10 |  |
+| Q09 | Response sweep: That reading includes responses. | slice 10 |  |
+| Q10 | Documentation sweep: That reading includes documentation. | slice 10 |  |
+| Q11 | Caller sweep: That reading includes callers. | slice 10 |  |
+| Q12 | Sweep separation: The one-time sweep remains separate from replacement-behavior proof. | slice 10 |  |
 | J01 | Qualified read: Pass Engineering:Practices/Code Review directly to read_note, without discovery first. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
-| J02 | Qualified graph: Pass that same destination directly to get_note_graph, without discovery first. | slice 7 |  |
+| J02 | Qualified graph: Pass that same destination directly to get_note_graph, without discovery first. | slice 8 |  |
 | J03 | Read content: The qualified full-read journey returns authored content. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | J04 | Read path: That journey returns the qualified path. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | J05 | Read revision: That journey returns the notebook revision when available. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
-| J06 | Graph context: The qualified graph journey returns the existing bounded graph context. | slice 7 |  |
-| J07 | Ambiguity: Two Code Review notes in Engineering yield both candidates with their full folder information. | slice 6 |  |
-| J08 | Selection: A candidate’s selection path resolves the intended note. | slice 6 |  |
+| J06 | Graph context: The qualified graph journey returns the existing bounded graph context. | slice 8 |  |
+| J07 | Ambiguity: Two Code Review notes in Engineering yield both candidates with their full folder information. | slice 6 | observed: ReadNoteAmbiguityMcpEndpointTest exact actual title/readable candidates with nested/nested/root, alias/trash competitors, property cardinality, three returned-path full reads and private two-note refusal; real cached-schema SDK ambiguity recovery mcp_services scenario receives choices/selects full-folder path/reads expected location. Full backend3153/0/0/2 and MCP E2E8/8, exact inspected setups in execution-evidence.md slice6. |
+| J08 | Selection: A candidate’s selection path resolves the intended note. | slice 6 | observed: ReadNoteAmbiguityMcpEndpointTest exact actual title/readable candidates with nested/nested/root, alias/trash competitors, property cardinality, three returned-path full reads and private two-note refusal; real cached-schema SDK ambiguity recovery mcp_services scenario receives choices/selects full-folder path/reads expected location. Full backend3153/0/0/2 and MCP E2E8/8, exact inspected setups in execution-evidence.md slice6. |
 | J09 | Root selection: Engineering:/Code Review selects the root destination. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
 | J10 | Display-name precedence: A readable display name Review wins over an alias Review. | slice 5 | observed: readableDisplayNameWinsOverAliases: Review with distinct content competes against two indexed alias notes and returns display-name target; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
 | J11 | Alias match: An alias resolves when only the alias matches. | slice 5 | observed: resolvesAliasesUsingSharedWikiSpelling: indexed Review/review/valid escaped-pipe alias returns actual target authored content; final full backend3147/0/0/2 and both MCP E2Es8/8 pass. |
 | J12 | Nested discovery: Alias discovery for a note in a nested folder yields a qualified path. | slice 1 | observed: ListNoteCandidatesMcpEndpointTest.returnsAliasMatchAsCandidate: alias query with nested Practices/Design folder and same-title root returns Engineering:Practices/Design/Colour Theory |
 | J13 | Discovered read: Pass that discovered path unchanged to read_note. | slice 4 | observed: ReadNotePortablePathMcpEndpointTest direct qualified/discovered nested alias/exact-root/zero-match HTTP results; migrated ReadNoteMcpEndpointTest qualified canonical content/path/revision and private refusal; OAuth and both MCP E2E journeys3124 backend/8 E2E passing. Exact setup/assertions and inspected consumers in execution-evidence.md slice4. |
-| J14 | Discovered graph: Pass that discovered path unchanged to get_note_graph. | slice 7 |  |
-| J15 | Generated reference reuse: A graph-generated reference distinguishes one of two equal-titled notes in different folders and selects it on a later request. | slice 8 |  |
+| J14 | Discovered graph: Pass that discovered path unchanged to get_note_graph. | slice 8 |  |
+| J15 | Generated reference reuse: A graph-generated reference distinguishes one of two equal-titled notes in different folders and selects it on a later request. | slice 9 |  |
 | J16 | Authored wiki link: An authored wiki link remains unchanged. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | J17 | Authored Markdown URL: [Reference](/n1234) remains unchanged. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
 | J18 | Address metadata: Metadata supplies paths alongside unchanged authored content. | slice 3 | observed: ReadNoteMcpEndpointTest readsTheNoteWithItsSourceAttribution exact canonical path/content/text=structured/location/time/SHA, aContentEditInTheNotebookChangesTheRevisionOfALaterRead different-note edit and unbound revision omission; full backend3120/0/0/2. Inspected setup/assertions in execution-evidence.md slice3. |
-| X01 | Circle ownership: Circle-owned notebooks are deferred. | slice 9 |  |
-| X02 | Duplicate notebook names: Handling duplicate notebook names is deferred. | slice 9 |  |
-| X03 | Access changes: Adding MCP access restrictions is outside this story. | slice 9 |  |
-| X04 | Access modifications: Changing existing MCP access restrictions is outside this story. | slice 9 |  |
-| X05 | Ownership filter: This story does not introduce an ownership filter. | slice 9 |  |
-| X06 | Naming guard: This story does not introduce a naming guard. | slice 9 |  |
-| X07 | Historical reads: Reads by historical revision are deferred. | slice 9 |  |
-| X08 | Rename stability: Stable addresses across renames are deferred. | slice 9 |  |
-| X09 | Move stability: Stable addresses across moves are deferred. | slice 9 |  |
-| X10 | Property-only retrieval: Property-only retrieval is deferred. | slice 9 |  |
-| X11 | Discovery expansion: Broader discovery is deferred. | slice 9 |  |
-| X12 | Web routes: New web routes are deferred. | slice 9 |  |
+| X01 | Circle ownership: Circle-owned notebooks are deferred. | slice 10 |  |
+| X02 | Duplicate notebook names: Handling duplicate notebook names is deferred. | slice 10 |  |
+| X03 | Access changes: Adding MCP access restrictions is outside this story. | slice 10 |  |
+| X04 | Access modifications: Changing existing MCP access restrictions is outside this story. | slice 10 |  |
+| X05 | Ownership filter: This story does not introduce an ownership filter. | slice 10 |  |
+| X06 | Naming guard: This story does not introduce a naming guard. | slice 10 |  |
+| X07 | Historical reads: Reads by historical revision are deferred. | slice 10 |  |
+| X08 | Rename stability: Stable addresses across renames are deferred. | slice 10 |  |
+| X09 | Move stability: Stable addresses across moves are deferred. | slice 10 |  |
+| X10 | Property-only retrieval: Property-only retrieval is deferred. | slice 10 |  |
+| X11 | Discovery expansion: Broader discovery is deferred. | slice 10 |  |
+| X12 | Web routes: New web routes are deferred. | slice 10 |  |

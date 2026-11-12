@@ -118,6 +118,43 @@ export const mcpAgentActions = () => {
       return this
     },
 
+    readNoteAfterSelectingAmbiguousCandidate(
+      portablePath: string,
+      folderPath: string
+    ) {
+      this.callTool('read_note', { portablePath })
+      cy.get('@MCPApiResponse').its('isError').should('equal', true)
+      getResponseText('@MCPApiResponse').then((text) => {
+        const { candidates } = JSON.parse(
+          text.slice(text.indexOf('\n') + 1)
+        ) as {
+          candidates: Array<{ portablePath: string; folderPath: string }>
+        }
+        const selected = candidates.find(
+          (candidate) => candidate.folderPath === folderPath
+        )
+        expect(selected, `read candidate in ${folderPath}`).to.exist
+        cy.task('callMcpToolWithParams', {
+          apiName: 'read_note',
+          params: { portablePath: selected!.portablePath },
+        }).then((response) => cy.wrap(response).as('MCPReadResponse'))
+      })
+      return this
+    },
+
+    expectReadLocation(portablePath: string, folderPath: string) {
+      getResponseText('@MCPReadResponse').then((text) => {
+        const note = JSON.parse(text)
+        expect(note.portablePath, 'selected full-read address').to.equal(
+          portablePath
+        )
+        expect(note.folderPath, 'selected full-read folder trail').to.equal(
+          folderPath
+        )
+      })
+      return this
+    },
+
     // Response validation methods
     expectResponseContains(expectedText: string) {
       getResponseText('@MCPApiResponse').then((responseText) => {

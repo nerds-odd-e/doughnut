@@ -65,10 +65,10 @@ New tests below are planned proof, not claims that existing tests cover new path
 | Known qualified destination and discovered path work directly | 4 | MCP direct and discovery → read; exact-root selection; migrated personal/hosted callers |
 | Explicit shorthand scope and inherited title/alias/path/property rules | 5 | MCP scope and semantic cases, exact decoded property key, no inferred history |
 | Ambiguity returns every actual readable choice, selection resolves | 6 | Two folders plus exact-root candidate → chosen path → full read |
-| Graph same address, budgets/traversal/truncation and credentials | 7 | Migrated graph/MCP/OAuth proof and both MCP E2E journeys |
-| Generated navigation references distinguish equal titles | 8 | Outgoing/inbound/peer/retrieval strings → read/graph round trips |
-| Focus/related reusable paths and API consumers | 9 | Returned node → full read; regenerated API and frontend proof |
-| Current authorization/refusals stay effective | 2–9 | Retained MCP/wiki authorization proof, no added ownership policy |
+| Graph same address, budgets/traversal/truncation and credentials | 8 | Migrated graph/MCP/OAuth proof and both MCP E2E journeys |
+| Generated navigation references distinguish equal titles | 9 | Outgoing/inbound/peer/retrieval strings → read/graph round trips |
+| Focus/related reusable paths and API consumers | 10 | Returned node → full read; regenerated API and frontend proof |
+| Current authorization/refusals stay effective | 2–10 | Retained MCP/wiki authorization proof, no added ownership policy |
 
 ## Consumers and proof routes
 
@@ -94,7 +94,7 @@ Behavior: A title/alias search finds notes → `list_note_candidates` returns
 qualified Portable paths and complete folder context usable for selection.
 Extend the shared address authoring owner with an explicit viewer. Keep search
 ranking and coverage. Interim: retain the candidate's numeric bridge only for
-current callers; 4 migrates full reads and 7 deletes the remaining bridge.
+current callers; 4 migrates full reads and 8 deletes the remaining bridge.
 Sizing: about five active minutes, plus required full-suite wait.
 
 ### 2. Share source-less candidate resolution
@@ -132,7 +132,7 @@ retained attribution/authorization/OAuth proof; full backend and both MCP E2Es.
 Behavior: A qualified portablePath uniquely resolves through the shared resolver
 → return the full read projection from 3. Switch the read argument/schema and all
 OAuth/E2E read callers atomically; delete read-specific numeric fields/instructions.
-Keep hosted graph identity from discovery until 7. Unqualified input receives
+Keep hosted graph identity from discovery until 8. Unqualified input receives
 qualification advice; 5 supplies explicit notebookName shorthand scope. Ambiguity
 stays unresolved without arbitrary selection until 6 supplies choices.
 Sizing: eight to ten active minutes; proof waits excepted. Return before extending.
@@ -154,15 +154,28 @@ Timing exception: bounded fixture/index-precondition and compile repairs, about
 
 ### 6. Recover from ambiguous shorthand by selecting a path
 Type: Behavior
-Status: planned
+Status: done
 Proof: Actual readable folder/root candidates → selected returned path → intended
-full read; full backend suite.
+full read; full backend suite plus actual SDK ambiguity→selection E2E.
 
 Behavior: Several notes match → return the shared candidates with qualified paths
 and full locations. Keep title precedence and authorization; use no second search.
 Sizing: about five active minutes, plus required full-suite wait.
 
-### 7. Retrieve bounded graphs by the same address
+### 7. Share MCP note destination resolution
+Type: Structure
+Status: planned
+Proof: Preserved read HTTP scope/property/candidate/authorization proof, actual
+SDK recovery and hosted qualified/renewal journey; full backend and both MCP E2Es.
+
+Extract the existing MCP destination parsing, explicit scope, shared resolver
+result and actionable text-only refusals into one current read owner usable by
+immediate graph Behavior8. ReadNoteTool delegates without observable change;
+graph still uses its existing numeric contract until8. Reuse WikiLinkResolver
+and candidate projection, add no matcher, schema framework or speculative policy.
+Sizing: five to eight active minutes, plus required proof waits.
+
+### 8. Retrieve bounded graphs by the same address
 Type: Behavior
 Status: planned
 Proof: Graph HTTP path/scoped/ambiguous input, budgets/private-content refusal;
@@ -171,10 +184,10 @@ full backend and both MCP E2Es against migrated callers.
 Behavior: Portable path resolves → intended bounded focus context with the shared
 resolution/ambiguity outcome and token limit. Migrate graph/hosted/step callers and
 guidance; delete candidate numeric bridge and dedicated MCP numeric-note machinery.
-Generated navigation spelling follows in 8, direct focus/related paths in 9.
+Generated navigation spelling follows in 9, direct focus/related paths in 10.
 Sizing: five to eight active minutes, plus required proof waits.
 
-### 8. Follow graph navigation references without title ambiguity
+### 9. Follow graph navigation references without title ambiguity
 Type: Behavior
 Status: planned
 Proof: Graph → read/graph round trips distinguish equal titles for outgoing,
@@ -185,55 +198,33 @@ read selects the target. Change formatter and retrieval/BFS/peer callers coheren
 preserve escaping/authored content. Retain renderer content/traversal proof.
 Sizing: five to eight active minutes, plus required proof waits.
 
-### 9. Address returned graph notes for subsequent reads
+### 10. Address returned graph notes for subsequent reads
 Type: Behavior
 Status: planned
 Proof: Focus/related portablePath → full read; full backend, MCP E2Es, regenerated
 API, frontend tests and both typechecks from proof-routes.md.
 
 Behavior: Returned focus/related notes carry reusable qualified paths. Extend the
-shared projection, reuse authoring from 1/8 and regenerate API artifacts together.
+shared projection, reuse authoring from 1/9 and regenerate API artifacts together.
 Preserve budgets, truncation and internal AI consumers.
 Sizing: about five active minutes; required proof/generation waits excepted.
 
 ## Acceptance reading and delivery
 
-At final acceptance, separately from tests, sweep MCP schemas/handlers/responses,
-callers/fixtures, E2E phrases, docs and agent guidance for the removed numeric-note
-contract. Search `McpToolArguments.noteId`, numeric-note argument instructions,
-old MCP step phrases and `noteId` in MCP wire producers/consumers. Classify retained
-shared HTTP/browser identifiers and authored Markdown URLs by their live purpose.
-Delete dedicated remnants transitively. Record this as a one-time reading;
-create no absence assertions, migration guard, compatibility alias or tombstone.
-
-Expected handwritten edited files currently stay below 250 lines. Highest growth
-risk is `AssistantMcpAccessTest` (247): keep new resolution proof in cohesive new
-MCP test classes; if its migration needs growth, separate successful scoped access
-from credential-format/rejection tests in 4. Other expected services/tests/helpers
-are at most 243 lines. Respect the 250-line refactoring check as actual edits grow.
-
-Each execution slice uses Jidoka → fresh post-change-refactor agent → API generation
-when applicable → coordinator `./scripts/run.sh pnpm format:changed` once → plan
-update → agent commit/check-only hook → push with asynchronous CI ownership.
-Follow the execution skill; preparation grants no Take or implementation authority.
-
-Refinement on 2026-11-12 retains completed 1/2 and splits the oversized read
-contract into citation output (3), atomic qualified-input/caller transition (4),
-and explicit notebook scope (5). Their shared resolution/authoring model stays
-unchanged; all later slices shift by two. See execution evidence for sizing,
-stop-safe alternatives and retained proof. Nine slices; execution may resume.
+[Final sweep, file-size seams and delivery contract](acceptance.md) govern final
+acceptance and per-slice delivery. Execution evidence retains refinement decisions.
 
 ## Story obligations
 
 ### G1. Discovery retains a numeric bridge during caller migration
 Reported: slice 1 — "Discovery adds Portable paths while retaining noteId for current read/graph callers until their migration."
 Story clause: "Delete numeric note ID arguments and MCP-generated note ID fields"
-Disposition: interim until slices 4, 7
+Disposition: interim until slices 4, 8
 
 ### G2. Discovery paths await read and graph consumers
 Reported: slice 1 — "Discovery produces reusable addresses; candidate-to-read and candidate-to-graph observations belong to slices 3 and 5."
 Story clause: "`list_note_candidates` supplies qualified Portable paths that the read and graph tools accept directly."
-Disposition: interim until slices 4, 7
+Disposition: interim until slices 4, 8
 
 ### G3. Read projection retains its current numeric bridge during citation enrichment
 Reported: slice 3 — "Sizing inspection found hosted graph calls consume the current read result identity; retain it during additive citation output and migrate graph identity to discovery in the qualified-input transition."
@@ -244,3 +235,8 @@ Disposition: proved by slice 4: qualified read HTTP projection/callers plus host
 Reported: slice 4 — "Unqualified destinations currently receive qualification advice; explicit notebookName shorthand scope is the next slice's input contract."
 Story clause: "Every unqualified destination (title, alias, folder path, or exact-root path) needs an explicit notebook scope because MCP has no source note."
 Disposition: proved by slice 5: ReadNoteScopedPathMcpEndpointTest explicit scope and no-inferred-history HTTP cases, full backend3147 and MCP E2Es8 passing; execution-evidence.md
+
+### G5. Actual SDK ambiguity recovery still needs an observation
+Reported: slice 6 — "Coordinator inspected cached SDK output validation: raw HTTP cases alone do not execute the client error path. Add one actual SDK ambiguity → returned-path selection → full-read journey."
+Story clause: "If several notes match within a notebook, return the actual readable resolution candidates with enough notebook and full folder information to choose."
+Disposition: proved by slice 6: actual cached-schema SDK ambiguity → candidate full-folder selection → returned Portable path → full read, mcp_services.feature new scenario8/8 passing

@@ -181,6 +181,22 @@ When('AI agent reads the first candidate note', () => {
   start.mcpAgentActions().readNoteFromLastSearch()
 })
 
+When(
+  'AI agent reads {string} and selects the candidate in {string}',
+  (portablePath: string, folderPath: string) => {
+    start
+      .mcpAgentActions()
+      .readNoteAfterSelectingAmbiguousCandidate(portablePath, folderPath)
+  }
+)
+
+Then(
+  'the read note should be at {string} in folder {string}',
+  (portablePath: string, folderPath: string) => {
+    start.mcpAgentActions().expectReadLocation(portablePath, folderPath)
+  }
+)
+
 Then(
   'the read note content should contain {string} with an accepted revision to cite',
   (content: string) => {
