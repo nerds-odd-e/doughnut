@@ -3,6 +3,7 @@ package com.odde.donut.mcp;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.RecallAnswerCursor;
 import com.odde.donut.services.RecallAnswerHistoryService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.modelcontextprotocol.common.McpTransportContext;
@@ -29,9 +30,14 @@ public record ListRecallAnswersTool(
       Arguments:
       - **days** (optional) — a positive number of days to look back; the window is that many
         24-hour periods ending at the call
+      - **cursor** (optional) — the **nextCursor** of the previous response, to continue its
+        window; the window stays as the first call fixed it, so **days** is ignored
 
       What this returns (JSON):
-      - **from**, **to** — the window as absolute instants; it ends at the call
+      - **from**, **to** — the window as absolute instants; it ends at the first call
+      - **nextCursor** — present only when more attempts remain; a default call can take several
+        responses, so call again with it as **cursor** until a response has none to read the
+        whole window, each attempt exactly once
       - **attempts** — each with **answeredAt** (instant), **correct** (as recorded),
         **outcome** when the spelling answer had a special outcome — **OVERLAP** (accepted as
         overlapping another note; counts as correct) or **ACCIDENTAL_MATCH** (incorrect, but
@@ -74,7 +80,13 @@ public record ListRecallAnswersTool(
                                 "type",
                                 "number",
                                 "description",
-                                "Positive number of days to look back. Defaults to 7."))))
+                                "Positive number of days to look back. Defaults to 7."),
+                            "cursor",
+                            Map.of(
+                                "type",
+                                "string",
+                                "description",
+                                "nextCursor from the previous response, to continue its window."))))
                 .build())
         .callHandler(this::call)
         .build();
@@ -82,16 +94,17 @@ public record ListRecallAnswersTool(
 
   private McpSchema.CallToolResult call(
       McpTransportContext context, McpSchema.CallToolRequest request) {
-    double days =
-        request.arguments() == null
-            ? DEFAULT_DAYS
-            : ((Number) request.arguments().getOrDefault("days", DEFAULT_DAYS)).doubleValue();
-    if (days <= 0) {
-      return McpToolRefusal.because(
-          "A positive number of days is required, such as 14. Omit days for the last 7 days.");
-    }
+    Map<String, Object> arguments = request.arguments() == null ? Map.of() : request.arguments();
     User user = (User) context.get(McpServerConfiguration.TRANSPORT_USER_KEY);
     try {
+      if (arguments.get("cursor") instanceof String cursor) {
+        return continueFrom(user, cursor);
+      }
+      double days = ((Number) arguments.getOrDefault("days", DEFAULT_DAYS)).doubleValue();
+      if (days <= 0) {
+        return McpToolRefusal.because(
+            "A positive number of days is required, such as 14. Omit days for the last 7 days.");
+      }
       return McpJsonToolResult.of(
           objectMapper,
           recallAnswerHistory.recentAttempts(
@@ -101,5 +114,18 @@ public record ListRecallAnswersTool(
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolFailures.rethrow(e);
     }
+  }
+
+  private McpSchema.CallToolResult continueFrom(User user, String text)
+      throws UnexpectedNoAccessRightException {
+    RecallAnswerCursor cursor;
+    try {
+      cursor = RecallAnswerCursor.decode(text);
+    } catch (IllegalArgumentException e) {
+      return McpToolRefusal.because(
+          "The cursor cannot be read. Start again without a cursor, then pass each response's"
+              + " nextCursor unchanged.");
+    }
+    return McpJsonToolResult.of(objectMapper, recallAnswerHistory.continueFrom(user, cursor));
   }
 }

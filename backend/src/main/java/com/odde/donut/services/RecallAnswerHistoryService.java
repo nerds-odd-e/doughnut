@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecallAnswerHistoryService {
   /** A fixed modest budget for a missed multiple-choice note's graph; get_note_graph asks more. */
   private static final int GRAPH_TOKEN_BUDGET = 1000;
+
+  /** Answers per response, sized for an assistant to read. */
+  private static final int PAGE_SIZE = 50;
 
   private final AnswerRepository answerRepository;
   private final RecallPromptRepository recallPromptRepository;
@@ -47,10 +51,21 @@ public class RecallAnswerHistoryService {
   @Transactional(readOnly = true)
   public RecallAnswerHistory recentAttempts(User learner, Instant to, Duration lookback)
       throws UnexpectedNoAccessRightException {
-    Instant from = to.minus(lookback);
-    List<Answer> answers =
-        answerRepository.findRecordedAnswersOfLearnerBetween(
-            learner.getId(), Timestamp.from(from), Timestamp.from(to));
+    return continueFrom(learner, RecallAnswerCursor.firstPage(to.minus(lookback), to));
+  }
+
+  /** The page of the cursor's window after its position, with a cursor when more remain. */
+  @Transactional(readOnly = true)
+  public RecallAnswerHistory continueFrom(User learner, RecallAnswerCursor cursor)
+      throws UnexpectedNoAccessRightException {
+    List<Answer> found =
+        answerRepository.findRecordedAnswersOfLearnerBefore(
+            learner.getId(),
+            Timestamp.from(cursor.from()),
+            Timestamp.from(cursor.lastAnsweredAt()),
+            cursor.lastAnswerId(),
+            PageRequest.of(0, PAGE_SIZE + 1));
+    List<Answer> answers = found.subList(0, Math.min(PAGE_SIZE, found.size()));
     Map<Answer, RecallPrompt> prompts =
         recallPromptRepository.findAllByAnswerIn(answers).stream()
             .collect(Collectors.toMap(RecallPrompt::getAnswer, Function.identity()));
@@ -60,7 +75,19 @@ public class RecallAnswerHistoryService {
         attempts.add(attempt(answer, prompts.get(answer), learner));
       }
     }
-    return new RecallAnswerHistory(from, to, attempts);
+    return new RecallAnswerHistory(
+        cursor.from(), cursor.to(), attempts, nextCursor(cursor, found, answers));
+  }
+
+  private static String nextCursor(
+      RecallAnswerCursor cursor, List<Answer> found, List<Answer> answers) {
+    if (found.size() == answers.size()) {
+      return null;
+    }
+    Answer last = answers.getLast();
+    return new RecallAnswerCursor(
+            cursor.from(), cursor.to(), last.getCreatedAt().toInstant(), last.getId())
+        .encode();
   }
 
   private RecallAttempt attempt(Answer answer, RecallPrompt prompt, User learner)

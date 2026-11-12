@@ -248,8 +248,14 @@ Sizing: about five active minutes.
 
 ### 9. Continue a window across responses
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCP endpoint cases; full backend suite.
+
+Accepted proof: `ListRecallAnswersWindowMcpEndpointTest` cases
+`continuesAWindowLargerThanOneResponseToItsEndReturningEachAttemptOnce`,
+`anAnswerRecordedWhilePagingNeitherRepeatsNorShiftsAnAttempt`,
+`refusesACursorThatCannotBeRead`; full suite green before the refactor,
+`com.odde.donut.mcp.*` green after it.
 
 Behavior: The window holds more attempts than one response carries → the
 response gives a `nextCursor` → calling again with it, to the end, returns
@@ -343,3 +349,11 @@ checks against real history after delivery; that check is not a slice.
   prompt with no grade, no log and no outcome would fail the call; slice 8 checks
   whether that shape exists. Evidence cases live in
   `ListRecallAnswersEvidenceMcpEndpointTest`. Full suite: 3,187 tests green.
+- Slice 9 ran before slice 8, which waits on slice 1. Paging is keyset:
+  `AnswerRepository.findRecordedAnswersOfLearnerBefore` with a `Pageable` of 51
+  (page size 50); `RecallAnswerCursor` (Base64url of window `from`, `to`, and the
+  last answer time and ID) is the only home of the cursor format;
+  `RecallAnswerCursor.firstPage` starts just after `to`. With a cursor, `days` is
+  ignored. The cursor advances by the last answer fetched, so the post-query
+  prompt filter can only shorten a page until slice 8 drops it. Full suite:
+  3,190 tests green.
