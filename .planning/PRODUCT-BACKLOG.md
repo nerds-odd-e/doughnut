@@ -8,7 +8,8 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
+- [Read notes through MCP by Portable path](seeds/SEED-125-read-notes-through-mcp-by-portable-path.md#read-notes-through-mcp-by-portable-path) — SEED-125#read-notes-through-mcp-by-portable-path ([plan](slice-plans/092-read-notes-through-mcp-by-portable-path/PLAN.md))
+
 ## Backlog list
 
 - [Retrieve my recall answer history through MCP](seeds/SEED-073-learning-refinement-and-retrieval.md#retrieve-my-recall-answer-history-through-mcp) — SEED-073#retrieve-my-recall-answer-history-through-mcp
-- [Read notes through MCP by Portable path](seeds/SEED-125-read-notes-through-mcp-by-portable-path.md#read-notes-through-mcp-by-portable-path) — SEED-125#read-notes-through-mcp-by-portable-path
