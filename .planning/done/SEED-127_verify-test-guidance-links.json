@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-127#verify-test-guidance-links",
+  "title": "Verify testing guidance links",
+  "completedAt": "2026-11-12T11:40:56.104Z",
+  "developer": "Terry Yin",
+  "agent": "Mana-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

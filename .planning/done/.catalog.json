@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-127_verify-test-guidance-links.json",
+      "identity": "SEED-127#verify-test-guidance-links",
+      "completedAt": "2026-11-12T11:40:56.104Z",
+      "blob": "26814bad7c6962a10dd8452e0b93a7d975633252"
+    },
+    {
       "fileName": "SEED-126_use-shared-test-guidance.json",
       "identity": "SEED-126#use-shared-test-guidance",
       "completedAt": "2026-11-12T10:33:57.902Z",
@@ -450,12 +456,6 @@
       "identity": "SEED-073#story-7",
       "completedAt": "2026-10-13T21:50:12.770Z",
       "blob": "d4e1e7c83dd07e8266da64b04ef9f09eb5209a70"
-    },
-    {
-      "fileName": "SEED-066_recording-started-after-leaving.json",
-      "identity": "SEED-066#recording-started-after-leaving",
-      "completedAt": "2026-10-13T11:35:18.168Z",
-      "blob": "c68ce8bd14e49888fb1048ac3911556e90a03a56"
     }
   ],
   "unreadable": []
