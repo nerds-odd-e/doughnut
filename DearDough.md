@@ -97,6 +97,14 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
   - Observed effect: four consecutive post-slice refactor agents. Slices 1–2 returned `none — already clean` / no edits. Slice 3 collocated latest-selection folding into `RecallPromptRepository` and synced OpenAPI description. Slice 4 trimmed sibling test assertions only (production unchanged).
   - Inference: same fixed per-slice refactor launch cost as ODF-141; two empty passes and one test-doc-only pass paid the full agent cost. Slice 3’s cohesion edit shows the pass is not always empty. Token/time cost of the empty passes was not separately measured here.
 
+- Execution: SEED-125#read-notes-through-mcp-by-portable-path / 5c60263a1405f2a510458f7a540fa61a8fdc5eb9
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown; unchanged execution/refactor guidance is recoverable at 2ce2cef04add07a7459f44c08d70521055b45b42
+  - Evidence: 2026-11-12 coordinator history, fresh refactor9/refactor10 returns; source and proof recoverable at ff63ab95acb61440011f76081ac49f9ed988078d:.planning/slice-plans/092-read-notes-through-mcp-by-portable-path/execution-evidence.md. Their classified traces inspected 113 and 221 consumers respectively.
+  - Observed effect: both passes returned none, already clean, without edits or new tests. The workers estimated five and eight–ten active minutes, chiefly context, consumer tracing and accepted-proof correspondence; final product edits were estimated three–four active minutes. These are worker estimates, not measured wall-clock or token savings.
+  - Inference: this repeats the fixed per-slice review cost in ODF-141. The record supports considering review overhead in slice sizing; it does not establish that independent review can always be omitted or that any one tracing step caused the whole cost.
+
 <a id="odf-208"></a>
 
 ## ODF-208 — Observer worker exits without a recorded cause
@@ -221,6 +229,14 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
   - Evidence: 2026-11-11 coordinator tool results: startup row batch returned original15975 tokens with truncation; pre-delegation batch11677 tokens also truncated; closure evidence listing accidentally included all XML filenames and returned original63280 tokens.
   - Observed effect: Required missing guidance was fetched again in targeted passages; the late unbounded file inventory obscured the recording reference and required narrower retrieval.
   - Inference: This repeats the coordinator retrieval deviation despite targeted-reading instructions. Savings are unmeasured; restrict inventory queries before emitting output and keep boundary rows separate.
+
+- Execution: SEED-125#read-notes-through-mcp-by-portable-path / 5c60263a1405f2a510458f7a540fa61a8fdc5eb9
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown; execution guidance is recoverable at 2ce2cef04add07a7459f44c08d70521055b45b42
+  - Evidence: 2026-11-12 resumed coordinator tool results combined complete Execute Plan/PLAN/execution-evidence reads, then PLAN/source-review reads; responses reported original token counts 16,942 and 10,030 with truncation, followed by targeted retrieval. A later closure-context batch also reported 10,063 tokens with truncation. Completed source/proof is recoverable at ff63ab95acb61440011f76081ac49f9ed988078d:.planning/slice-plans/092-read-notes-through-mcp-by-portable-path/PLAN.md.
+  - Observed effect: broad batches exceeded the output budget and caused extra passage retrieval despite retained resume context and targeted-reading guidance. Required product evidence was subsequently inspected; no delivered defect was established.
+  - Inference: this is another coordinator retrieval deviation under ODF-264. Repeated retrieval is observed; saved time/tokens from a narrower first read were not measured.
 
 <a id="odf-265"></a>
 
