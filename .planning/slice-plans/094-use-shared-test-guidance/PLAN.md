@@ -235,9 +235,15 @@ within the ten-minute hard limit. Freshness remained unchanged before delivery.
 Feature, step-only and page-object-only guidance/selector walkthroughs pass;
 terminal helpers keep their surface-specific practice. All 20 links/anchors
 resolve, moved executable examples are exact, and whitespace passes.
-E2E authoring/running are 196/89 lines with the planned cohesive seam.
+E2E authoring/running are 196/88 lines with the planned cohesive seam.
 The whole-guidance one-time reading sweep found canonical shared guidance and
 local mechanics only; 202 consumer rows are classified in
 `/tmp/seed126-slice2-consumers.md`, literal proof in `/tmp/seed126-slice2-proof.md`.
 Fresh `refactor_browser` returned `REFACTOR COMPLETE`, no edits; proof reused.
 Nine active implementation minutes include extraction and consumer reading.
+
+## Execution complete
+
+Product advice: no change. Product/proof retrospective complete; process selected
+and deferred to wrap-up after Intent Coverage. Both slices accepted on the branch,
+latest `54f8c5c906a150fcc84a86115ce3d7313154b5ec`; CI pending. Records-only delivery.
