@@ -301,6 +301,20 @@ checks against real history after delivery; that check is not a slice.
 - Slice 1 is deferred, not skipped: the local `gcloud` login had expired
   (reauthentication required) and the owner was asked to sign in. Only slice 8's
   missing-question case waits on it.
+- Slice 1 lead from code reading only (2026-11-12, not yet a finding):
+  `V300000325__cascade_note_dependents_on_note_delete.sql` made
+  `recall_prompt.mcq_id` cascade on MCQ delete, and `mcq.note_id` cascades on
+  note delete. If an understanding tracker's prompt can use an MCQ owned by
+  another note, hard-deleting that note silently deletes the answered prompt
+  while the tracker stays. No application code deletes MCQs or answered prompts
+  directly (`deleteByMemoryTracker_Id` has no caller;
+  `deleteUnansweredRecallPrompts` takes unanswered ones only). Slice 1 checks
+  this against answers `246327`, `246452`, `246496`: their prompts' former
+  `mcq_id`, the MCQ's note, and that note's deletion time.
+- Execution paused 2026-11-12 after slice 10 (published `895964e5bf`): slices 1
+  and 8 remain, both waiting on the owner's `gcloud auth login`. Slices 9 and 10
+  ran before 8 as the plan allows; slice 8 also adds its fields to the two docs
+  (see the slice 10 learning).
 - Slice 2 (accepted): attempts are arranged with
   `makeMe.aRecallPrompt().withMcq(..).forMemoryTracker(t).answerChoiceIndex(i).answerTimestamp(ts).recorded().please()`
   then `makeMe.entityPersister.flushAndClear()`; `.recorded()` writes the recall
