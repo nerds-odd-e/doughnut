@@ -427,6 +427,16 @@ Implementation brief:
   `lastRecalledAt`, `nextRecallAt`, `assimilatedAt`, `removedFromTracking`
   and the recall history entries.
 
+Progress, 2026-11-12:
+
+- The owner gave the go-ahead ("go ahead") after the checkpoint message.
+- The story branch was landed on `main` with the worktree kept: `main` is at
+  `12288107bd2a2dbbfc2eabc2d00f44e0d4ed4e74`. Trunk CI run 43126110847 passed
+  for that commit in every job, with its packaging job.
+- The release is not made. The next unused version is `v1.3.72`. The session
+  was not permitted to push the release tag, so the owner releases, or permits
+  the push. Nothing is published to the notebook yet.
+
 A refused publication changes nothing; correct the named file and publish
 again. Any difference in the comparison stops slice 8 and returns to planning
 with the difference as evidence.
