@@ -133,7 +133,7 @@ class ListRecallAnswersWindowMcpEndpointTest extends ListRecallAnswersMcpEndpoin
   private void answeredAt(MemoryTracker tracker, String stem, Timestamp answeredAt) {
     makeMe
         .aRecallPrompt()
-        .withMcq(makeMe.anMcq().forNote(note).stem(stem).inMemoryPlease())
+        .withMcq(makeMe.anMcq().stem(stem).inMemoryPlease())
         .forMemoryTracker(tracker)
         .answerChoiceIndex(0)
         .answerTimestamp(answeredAt)

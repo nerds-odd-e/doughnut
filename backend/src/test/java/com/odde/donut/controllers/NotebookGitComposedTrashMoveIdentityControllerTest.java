@@ -121,7 +121,6 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
           makeMe
               .aRecallPrompt()
               .forMemoryTracker(memoryTrackerRepository.findById(tracker.getId()).orElseThrow())
-              .withMcqForNote(reloaded)
               .please();
           makeMe.aConversation().forANote(reloaded).please();
         });

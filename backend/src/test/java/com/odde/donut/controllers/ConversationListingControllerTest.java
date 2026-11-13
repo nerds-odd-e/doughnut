@@ -25,8 +25,7 @@ class ConversationListingControllerTest extends ConversationMessageControllerTes
     Note original =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Original").please();
     var tracker = makeMe.aMemoryTrackerFor(original).please();
-    RecallPrompt prompt =
-        makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcqForNote(original).please();
+    RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
     controller.startConversationAboutRecallPrompt(prompt);
     reifyTrackedProperty(tracker, "Current");
 

@@ -36,7 +36,7 @@ class RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest
     recalledAt = makeMe.aTimestamp().of(1, 20).please();
     note = ownedNote();
     tracker = aTrackerWithStateNoRecallLogRecords().please();
-    recallPrompt = mcqPrompt(tracker, note);
+    recallPrompt = mcqPrompt(tracker);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 8).please());
   }
 
@@ -111,12 +111,7 @@ class RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest
   void anAttemptWithoutARecallLogIsExcludedAndChangesNoSchedule()
       throws UnexpectedNoAccessRightException {
     RecallPrompt answeredWithoutLog =
-        makeMe
-            .aRecallPrompt()
-            .forMemoryTracker(tracker)
-            .withMcqForNote(note)
-            .answerChoiceIndex(1)
-            .please();
+        makeMe.aRecallPrompt().forMemoryTracker(tracker).answerChoiceIndex(1).please();
     Timestamp nextRecallAtBefore = tracker.getNextRecallAt();
 
     controller.excludeAsAmbiguous(answeredWithoutLog, ambiguousExclusion("both tenses fit"));
@@ -164,7 +159,7 @@ class RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest
   private RecallPrompt answerWronglyTwice() throws UnexpectedNoAccessRightException {
     controller.answer(recallPrompt, choiceAnswer(1));
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(2, 8).please());
-    RecallPrompt laterPrompt = mcqPrompt(tracker, note);
+    RecallPrompt laterPrompt = mcqPrompt(tracker);
     controller.answer(laterPrompt, choiceAnswer(1));
     return laterPrompt;
   }

@@ -27,9 +27,9 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
     void shouldReturnAllRecallPromptsOrderedByIdDesc() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
-      RecallPrompt prompt1 = promptFor(tracker, note);
-      RecallPrompt prompt2 = promptFor(tracker, note);
-      RecallPrompt prompt3 = promptFor(tracker, note);
+      RecallPrompt prompt1 = promptFor(tracker);
+      RecallPrompt prompt2 = promptFor(tracker);
+      RecallPrompt prompt3 = promptFor(tracker);
 
       List<RecallPromptHistoryItem> prompts = controller.getRecallPrompts(tracker);
 
@@ -47,8 +47,8 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
     void shouldIncludeBothAnsweredAndUnansweredPrompts() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
-      RecallPrompt unanswered = promptFor(tracker, note);
-      RecallPrompt answered = answeredPromptFor(tracker, note);
+      RecallPrompt unanswered = promptFor(tracker);
+      RecallPrompt answered = answeredPromptFor(tracker);
 
       assertThat(
           controller.getRecallPrompts(tracker).stream()
@@ -61,7 +61,7 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
     void shouldOmitMcqSolutionFromUnansweredHistory() throws Exception {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
-      promptFor(tracker, note);
+      promptFor(tracker);
 
       JsonNode json =
           objectMapper.readTree(
@@ -78,7 +78,7 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
     void shouldIncludeMcqSolutionOnAnsweredHistory() throws Exception {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
-      answeredPromptFor(tracker, note);
+      answeredPromptFor(tracker);
 
       JsonNode json =
           objectMapper.readTree(
@@ -107,9 +107,9 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
     void shouldDeleteAllUnansweredRecallPrompts() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
-      promptFor(tracker, note);
-      promptFor(tracker, note);
-      RecallPrompt answered = answeredPromptFor(tracker, note);
+      promptFor(tracker);
+      promptFor(tracker);
+      RecallPrompt answered = answeredPromptFor(tracker);
 
       controller.deleteUnansweredRecallPrompts(tracker);
 
@@ -122,8 +122,8 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
     void shouldDeleteNothingWhenAllPromptsAreAnswered() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
-      RecallPrompt answered1 = answeredPromptFor(tracker, note);
-      RecallPrompt answered2 = answeredPromptFor(tracker, note);
+      RecallPrompt answered1 = answeredPromptFor(tracker);
+      RecallPrompt answered2 = answeredPromptFor(tracker);
 
       controller.deleteUnansweredRecallPrompts(tracker);
 
@@ -145,14 +145,9 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
     void shouldNotDeleteContestedUnansweredRecallPrompts() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
-      promptFor(tracker, note);
+      promptFor(tracker);
       RecallPrompt contested =
-          makeMe
-              .aRecallPrompt()
-              .withMcqForNote(note)
-              .forMemoryTracker(tracker)
-              .contested()
-              .please();
+          makeMe.aRecallPrompt().forMemoryTracker(tracker).contested().please();
 
       controller.deleteUnansweredRecallPrompts(tracker);
 
@@ -166,7 +161,7 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
         throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
-      RecallPrompt unanswered = promptFor(tracker, note);
+      RecallPrompt unanswered = promptFor(tracker);
       Conversation conversation =
           makeMe.aConversation().forARecallPrompt(unanswered).from(currentUser.getUser()).please();
 

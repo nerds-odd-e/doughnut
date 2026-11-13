@@ -82,7 +82,6 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
               .aRecallPrompt()
               .forMemoryTracker(
                   memoryTrackerRepository.findById(deletedTracker.getId()).orElseThrow())
-              .withMcqForNote(noteRepository.findById(deleted.getId()).orElseThrow())
               .please();
           makeMe
               .aConversation()

@@ -1,7 +1,6 @@
 package com.odde.donut.testability.builders;
 
 import com.odde.donut.entities.Mcq;
-import com.odde.donut.entities.Note;
 import com.odde.donut.testability.EntityBuilder;
 import com.odde.donut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -17,11 +16,6 @@ public class McqBuilder extends EntityBuilder<Mcq> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {}
-
-  public McqBuilder forNote(Note note) {
-    entity.setCompatibilityNoteId(note.getId());
-    return this;
-  }
 
   public McqBuilder mcq(Mcq mcq) {
     entity = mcq;

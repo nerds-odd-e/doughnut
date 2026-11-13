@@ -45,7 +45,7 @@ class MemoryTrackerRecallPromptHistoryCorrectnessControllerTest
   void correctMcqHistoryShowsCorrectAfterReload() throws UnexpectedNoAccessRightException {
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
-    gradeMcq(promptFor(tracker, note), 0);
+    gradeMcq(promptFor(tracker), 0);
 
     assertThat(reloadedHistoryCorrect(tracker), is(true));
   }
@@ -54,7 +54,7 @@ class MemoryTrackerRecallPromptHistoryCorrectnessControllerTest
   void incorrectMcqHistoryShowsIncorrectAfterReload() throws UnexpectedNoAccessRightException {
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
-    gradeMcq(promptFor(tracker, note), 1);
+    gradeMcq(promptFor(tracker), 1);
 
     assertThat(reloadedHistoryCorrect(tracker), is(false));
   }

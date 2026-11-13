@@ -169,13 +169,15 @@ sharing only existing setup and `answerMcqAtDay`. Enables Behavior 12.
 
 ### 10. Create test questions through their tracker and prompt
 Type: Structure
-Status: planned
+Status: done
 Proof: all creation-fixture consumers retain current ownership, authorization, payload and committed-isolation observations in the full backend suite.
 
 Retire note-only builder/helper inputs while keeping production compatibility
 mapping/writes and the prompt builder's scalar fallback/save. Enables Behavior 12.
 
 [Detailed implementation brief](implementation-briefs.md#create-test-questions-through-their-tracker-and-prompt).
+
+[Accepted fixture-preservation and full-suite proof](tracker-creation-fixtures-verification.md).
 
 ### 11. Keep destruction proof tied to the selected questions
 Type: Structure

@@ -36,12 +36,11 @@ class QuestionGenerationBatchPlanningServiceTest extends SpringTestBase {
 
   @Nested
   class FindUsersEligibleForBatchSubmission {
-    Note note;
     MemoryTracker memoryTracker;
 
     @BeforeEach
     void setupRecallFixtures() {
-      note = makeMe.aNote().notebookOwnedBy(user).please();
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
       memoryTracker = makeMe.aMemoryTrackerFor(note).please();
     }
 
@@ -55,7 +54,6 @@ class QuestionGenerationBatchPlanningServiceTest extends SpringTestBase {
       Timestamp oneHourAgo = new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1));
       makeMe
           .aRecallPrompt()
-          .withMcqForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0)
           .answerTimestamp(oneHourAgo)
@@ -71,7 +69,6 @@ class QuestionGenerationBatchPlanningServiceTest extends SpringTestBase {
       Timestamp eightDaysAgo = new Timestamp(currentTime.getTime() - TimeUnit.DAYS.toMillis(8));
       makeMe
           .aRecallPrompt()
-          .withMcqForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0)
           .answerTimestamp(eightDaysAgo)

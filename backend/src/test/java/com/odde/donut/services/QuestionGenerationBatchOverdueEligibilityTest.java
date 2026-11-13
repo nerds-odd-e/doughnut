@@ -23,13 +23,12 @@ class QuestionGenerationBatchOverdueEligibilityTest extends SpringTestBase {
   @Autowired QuestionGenerationBatchPlanningService planningService;
 
   User user;
-  Note note;
   MemoryTracker memoryTracker;
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    note = makeMe.aNote().notebookOwnedBy(user).please();
+    Note note = makeMe.aNote().notebookOwnedBy(user).please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).please();
   }
 
@@ -68,7 +67,6 @@ class QuestionGenerationBatchOverdueEligibilityTest extends SpringTestBase {
   private void createAnsweredRecall(Timestamp answerTime) {
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(answerTime)

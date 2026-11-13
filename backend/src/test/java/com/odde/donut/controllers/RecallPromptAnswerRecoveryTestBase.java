@@ -76,7 +76,7 @@ abstract class RecallPromptAnswerRecoveryTestBase extends RecallPromptController
                       .please()
                   : ownedTracker(note);
           testabilitySettings.timeTravelTo(tracker.getNextRecallAt());
-          return mcqPrompt(tracker, note);
+          return mcqPrompt(tracker);
         });
   }
 

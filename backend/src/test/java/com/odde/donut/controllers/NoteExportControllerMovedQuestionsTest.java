@@ -24,7 +24,6 @@ class NoteExportControllerMovedQuestionsTest extends ControllerTestBase {
         .withMcq(
             makeMe
                 .anMcq()
-                .forNote(original)
                 .stem("Question retained by its tracker")
                 .choices("key", "second", "selected-third")
                 .correctAnswerIndex(0)

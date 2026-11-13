@@ -79,8 +79,7 @@ class RecallConversationExclusionProposalControllerTest
   }
 
   private RecallPrompt wronglyAnsweredMcqPrompt() throws Exception {
-    RecallPrompt prompt =
-        makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(tracker).please();
+    RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
     recallPromptController.answer(prompt, choiceAnswer(1));
     return prompt;
   }

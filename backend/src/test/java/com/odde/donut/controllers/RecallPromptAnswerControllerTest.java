@@ -32,7 +32,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   void setup() {
     Note answerNote = ownedNote();
     memoryTracker = ownedTracker(answerNote);
-    recallPrompt = mcqPrompt(memoryTracker, answerNote);
+    recallPrompt = mcqPrompt(memoryTracker);
     answerDTO = choiceAnswer(0);
   }
 
@@ -80,7 +80,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     Float noteLevelStabilityBefore = noteLevelTracker.getStability();
     Integer propertyRecallCountBefore = propertyTracker.getRecallCount();
 
-    controller.answer(mcqPrompt(propertyTracker, note), answerDTO);
+    controller.answer(mcqPrompt(propertyTracker), answerDTO);
 
     assertThat(noteLevelTracker.getRecallCount(), equalTo(noteLevelRecallCountBefore));
     assertThat(noteLevelTracker.getStability(), equalTo(noteLevelStabilityBefore));
@@ -139,11 +139,11 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
 
     AnswerDTO zero = choiceAnswer(0);
     zero.setThinkingTimeMs(0);
-    controller.answer(mcqPrompt(zeroMs, zeroNote), zero);
+    controller.answer(mcqPrompt(zeroMs), zero);
 
     AnswerDTO sixty = choiceAnswer(0);
     sixty.setThinkingTimeMs(60_000);
-    controller.answer(mcqPrompt(sixtySeconds, sixtyNote), sixty);
+    controller.answer(mcqPrompt(sixtySeconds), sixty);
 
     assertThat(zeroMs.getStability(), equalTo(memoryTracker.getStability()));
     assertThat(sixtySeconds.getStability(), equalTo(memoryTracker.getStability()));
@@ -188,12 +188,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   @Test
   void shouldNotBeAbleToAnswerForOthersMemoryTracker() {
     MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
-    RecallPrompt othersPrompt =
-        makeMe
-            .aRecallPrompt()
-            .forMemoryTracker(othersTracker)
-            .withMcqForNote(othersTracker.getNote())
-            .please();
+    RecallPrompt othersPrompt = makeMe.aRecallPrompt().forMemoryTracker(othersTracker).please();
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.answer(othersPrompt, answerDTO));
   }

@@ -69,7 +69,6 @@ class RecallConversationConcurrentStartControllerTest
               return makeMe
                   .aRecallPrompt()
                   .forMemoryTracker(makeMe.aMemoryTrackerFor(note).please())
-                  .withMcqForNote(note)
                   .answerChoiceIndex(1)
                   .please();
             });

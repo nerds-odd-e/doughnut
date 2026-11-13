@@ -47,7 +47,7 @@ class NoteExportControllerPropertyHistoryTests extends ControllerTestBase {
             .please();
     Timestamp time = Timestamp.from(Instant.parse("2026-01-01T00:00:00Z"));
     for (int i = 0; i < 12; i++) {
-      Mcq mcq = makeMe.anMcq().forNote(note).stem("matching-" + i).createdAt(time).please();
+      Mcq mcq = makeMe.anMcq().stem("matching-" + i).createdAt(time).please();
       makeMe.aRecallPrompt().forMemoryTracker(run).withMcq(mcq).please();
       makeMe.aRecallPrompt().forMemoryTracker(run).withMcq(mcq).please();
     }
@@ -86,14 +86,12 @@ class NoteExportControllerPropertyHistoryTests extends ControllerTestBase {
     Mcq newer =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("newer-first")
             .createdAt(Timestamp.from(Instant.parse("2026-10-01T00:00:00Z")))
             .please();
     Mcq older =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("older-second")
             .createdAt(Timestamp.from(Instant.parse("2026-01-01T00:00:00Z")))
             .please();
@@ -109,7 +107,7 @@ class NoteExportControllerPropertyHistoryTests extends ControllerTestBase {
   }
 
   private Mcq question(String key, String value, String stem, User learner) {
-    Mcq mcq = makeMe.anMcq().forNote(note).stem(stem).please();
+    Mcq mcq = makeMe.anMcq().stem(stem).please();
     MemoryTracker tracker =
         makeMe.aMemoryTrackerFor(note).by(learner).propertyKey(key).propertyValue(value).please();
     makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcq(mcq).please();

@@ -134,7 +134,6 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
                 .toInstant());
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(mt)
         .answerChoiceIndex(0)
         .answerTimestamp(todayAnswer)
@@ -149,11 +148,7 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(9, 10).please());
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     RecallPrompt prompt =
-        makeMe
-            .aRecallPrompt()
-            .withMcqForNote(note)
-            .forMemoryTracker(makeMe.aMemoryTrackerFor(note).please())
-            .please();
+        makeMe.aRecallPrompt().forMemoryTracker(makeMe.aMemoryTrackerFor(note).please()).please();
     recallPromptController.answer(prompt, choiceAnswer(1));
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(10, 12).please());
     assertThat(controller.getRecallStats("UTC").getTotals().getTotalReviews365(), equalTo(1));
@@ -173,7 +168,6 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
     Timestamp myAnswer = makeMe.aTimestamp().of(9, 10).please();
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(myNote)
         .forMemoryTracker(myMt)
         .answerChoiceIndex(0)
         .answerTimestamp(myAnswer)
@@ -185,7 +179,6 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
     Timestamp otherAnswer = makeMe.aTimestamp().of(9, 10).please();
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(otherNote)
         .forMemoryTracker(otherMt)
         .answerChoiceIndex(0)
         .answerTimestamp(otherAnswer)

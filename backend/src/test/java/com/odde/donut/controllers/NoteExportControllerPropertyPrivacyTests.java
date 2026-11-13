@@ -35,7 +35,6 @@ class NoteExportControllerPropertyPrivacyTests extends ControllerTestBase {
     question =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("focused-question")
             .choices("first-pick", "latest-pick", "key")
             .correctAnswerIndex(2)
@@ -65,7 +64,6 @@ class NoteExportControllerPropertyPrivacyTests extends ControllerTestBase {
         .withMcq(
             makeMe
                 .anMcq()
-                .forNote(note)
                 .stem("another-learner-question")
                 .choices("other-pick", "unused", "key")
                 .please())

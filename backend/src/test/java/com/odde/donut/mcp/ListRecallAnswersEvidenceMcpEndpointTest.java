@@ -169,7 +169,6 @@ class ListRecallAnswersEvidenceMcpEndpointTest extends ListRecallAnswersMcpEndpo
         .withMcq(
             makeMe
                 .anMcq()
-                .forNote(note)
                 .stem("Who reviews code?")
                 .choices("Peers", "Nobody")
                 .correctAnswerIndex(0)

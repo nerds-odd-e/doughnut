@@ -34,8 +34,7 @@ class ConversationAiReplyControllerTest extends ConversationMessageControllerTes
   void usesTheTrackersCurrentNoteForAiContextAndCorrections() throws Exception {
     Note original = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     var tracker = makeMe.aMemoryTrackerFor(original).please();
-    RecallPrompt prompt =
-        makeMe.aRecallPrompt().withMcqForNote(original).forMemoryTracker(tracker).please();
+    RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
     Conversation conversation = controller.startConversationAboutRecallPrompt(prompt);
     Note current = reifyTrackedProperty(tracker, "Current conversation evidence");
     new OpenAiResponseStreamMocker(officialClient)
@@ -75,11 +74,7 @@ class ConversationAiReplyControllerTest extends ConversationMessageControllerTes
     Conversation conversation;
     if (mcq) {
       RecallPrompt prompt =
-          makeMe
-              .aRecallPrompt()
-              .withMcqForNote(note)
-              .forMemoryTracker(makeMe.aMemoryTrackerFor(note).please())
-              .please();
+          makeMe.aRecallPrompt().forMemoryTracker(makeMe.aMemoryTrackerFor(note).please()).please();
       conversation = controller.startConversationAboutRecallPrompt(prompt);
     } else {
       conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
@@ -134,11 +129,7 @@ class ConversationAiReplyControllerTest extends ConversationMessageControllerTes
   void retainsToolOnlyCorrectionFromAnEmptyRecallConversation() throws Exception {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     RecallPrompt prompt =
-        makeMe
-            .aRecallPrompt()
-            .withMcqForNote(note)
-            .forMemoryTracker(makeMe.aMemoryTrackerFor(note).please())
-            .please();
+        makeMe.aRecallPrompt().forMemoryTracker(makeMe.aMemoryTrackerFor(note).please()).please();
     Conversation conversation = controller.startConversationAboutRecallPrompt(prompt);
     new OpenAiResponseStreamMocker(officialClient)
         .withToolCall(
@@ -160,11 +151,7 @@ class ConversationAiReplyControllerTest extends ConversationMessageControllerTes
   void retainsTheExplanationAccompanyingAnExclusionTool() throws Exception {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     RecallPrompt prompt =
-        makeMe
-            .aRecallPrompt()
-            .withMcqForNote(note)
-            .forMemoryTracker(makeMe.aMemoryTrackerFor(note).please())
-            .please();
+        makeMe.aRecallPrompt().forMemoryTracker(makeMe.aMemoryTrackerFor(note).please()).please();
     Conversation conversation = controller.startConversationAboutRecallPrompt(prompt);
     new OpenAiResponseStreamMocker(officialClient)
         .withMessage("Both choices are defensible")

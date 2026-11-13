@@ -28,7 +28,6 @@ class QuestionGenerationBatchLocalPlanningTest extends SpringTestBase {
 
   User user;
   Timestamp currentTime;
-  Note note;
   MemoryTracker dueTracker;
   MemoryTracker secondDueTracker;
 
@@ -36,7 +35,7 @@ class QuestionGenerationBatchLocalPlanningTest extends SpringTestBase {
   void setup() {
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().of(10, 8).fromShanghai().please();
-    note = makeMe.aNote().notebookOwnedBy(user).please();
+    Note note = makeMe.aNote().notebookOwnedBy(user).please();
     dueTracker = makeMe.aMemoryTrackerFor(note).nextRecallAt(hoursFrom(currentTime, 24)).please();
     secondDueTracker =
         makeMe
@@ -72,12 +71,8 @@ class QuestionGenerationBatchLocalPlanningTest extends SpringTestBase {
 
   @Test
   void createsNoBatchWhenUserHasNoCandidateTrackers() {
-    makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(dueTracker).please();
-    makeMe
-        .aRecallPrompt()
-        .withMcqForNote(secondDueTracker.getNote())
-        .forMemoryTracker(secondDueTracker)
-        .please();
+    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).please();
+    makeMe.aRecallPrompt().forMemoryTracker(secondDueTracker).please();
 
     Optional<QuestionGenerationBatch> plannedBatch =
         planningService.planLocalBatchForUser(user, currentTime);

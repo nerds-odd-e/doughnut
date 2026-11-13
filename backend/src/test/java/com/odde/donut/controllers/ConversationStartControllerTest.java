@@ -51,8 +51,7 @@ class ConversationStartControllerTest extends ConversationMessageControllerTestB
     void setup() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
-      recallPrompt =
-          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).withMcqForNote(note).please();
+      recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
     }
 
     @Test

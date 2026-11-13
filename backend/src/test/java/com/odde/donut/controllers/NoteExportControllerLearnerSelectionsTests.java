@@ -39,7 +39,6 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
       Mcq answered =
           makeMe
               .anMcq()
-              .forNote(note)
               .stem("answered-stem")
               .choices("picked-by-learner", "distractor", "donut-key-choice")
               .correctAnswerIndex(2)
@@ -47,12 +46,12 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
       makeMe
           .aRecallPrompt()
           .forMemoryTracker(exporterTracker)
-          .withMcq(makeMe.anMcq().forNote(note).stem("unanswered-a").please())
+          .withMcq(makeMe.anMcq().stem("unanswered-a").please())
           .please();
       makeMe
           .aRecallPrompt()
           .forMemoryTracker(exporterTracker)
-          .withMcq(makeMe.anMcq().forNote(note).stem("unanswered-b").please())
+          .withMcq(makeMe.anMcq().stem("unanswered-b").please())
           .please();
       makeMe
           .aRecallPrompt()
@@ -80,7 +79,6 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
       Mcq mcq =
           makeMe
               .anMcq()
-              .forNote(note)
               .stem("repeat-stem")
               .choices("older-pick", "newer-pick", "key-choice")
               .correctAnswerIndex(2)
@@ -112,7 +110,6 @@ class NoteExportControllerLearnerSelectionsTests extends ControllerTestBase {
       Mcq mcq =
           makeMe
               .anMcq()
-              .forNote(note)
               .stem("tie-stem")
               .choices("lower-id-pick", "higher-id-pick", "key-choice")
               .correctAnswerIndex(2)

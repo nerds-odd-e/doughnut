@@ -82,7 +82,7 @@ class MemoryTrackerQuestionDeletionControllerTest extends MemoryTrackerControlle
     RecallPrompt answered =
         makeMe.aRecallPrompt().forMemoryTracker(tracker).answerChoiceIndex(0).recorded().please();
     makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcq(answered.getMcq()).please();
-    RecallPrompt unanswered = promptFor(tracker, tracker.getNote());
+    RecallPrompt unanswered = promptFor(tracker);
     Integer sharedQuestionId = answered.getMcq().getId();
     Integer unansweredQuestionId = unanswered.getMcq().getId();
     Conversation conversation =

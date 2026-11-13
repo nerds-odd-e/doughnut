@@ -61,7 +61,6 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
         makeMe
             .aRecallPrompt()
             .forMemoryTracker(makeMe.aMemoryTrackerFor(note).by(learner).please())
-            .withMcqForNote(note)
             .answerChoiceIndex(1)
             .please();
     conversation = controller.startConversationAboutRecallPrompt(prompt);
@@ -227,7 +226,6 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
         makeMe
             .aRecallPrompt()
             .forMemoryTracker(makeMe.aMemoryTrackerFor(note).by(learner).please())
-            .withMcqForNote(note)
             .please();
     Conversation shared =
         makeMe.aConversation().forARecallPrompt(otherPrompt).from(learner).please();

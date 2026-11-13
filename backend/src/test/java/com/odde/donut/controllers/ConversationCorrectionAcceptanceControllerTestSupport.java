@@ -61,12 +61,7 @@ abstract class ConversationCorrectionAcceptanceControllerTestSupport
               var conversation = makeMe.aConversation().from(currentUser.getUser());
               if (mcq) {
                 RecallPrompt prompt =
-                    makeMe
-                        .aRecallPrompt()
-                        .forMemoryTracker(tracker)
-                        .withMcqForNote(note)
-                        .answerChoiceIndex(1)
-                        .please();
+                    makeMe.aRecallPrompt().forMemoryTracker(tracker).answerChoiceIndex(1).please();
                 conversation.forARecallPrompt(prompt);
               } else {
                 conversation.forANote(note);

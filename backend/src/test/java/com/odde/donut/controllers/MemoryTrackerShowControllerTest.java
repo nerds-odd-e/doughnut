@@ -55,7 +55,7 @@ class MemoryTrackerShowControllerTest extends MemoryTrackerControllerTestBase {
     @Test
     void recallCountOmitsAnExcludedAttemptAndKeepsOrdinaryRecalls()
         throws UnexpectedNoAccessRightException {
-      answerWronglyThenExcludeAsAmbiguous(tracker, tracker.getNote());
+      answerWronglyThenExcludeAsAmbiguous(tracker);
       controller.markAsRecalled(tracker, Grade.GOOD);
 
       MemoryTracker shown = controller.showMemoryTracker(reloaded(tracker));

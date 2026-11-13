@@ -19,7 +19,6 @@ class RecallPromptRepositoryRecentRecallUsersTest extends SpringTestBase {
   @Autowired RecallPromptRepository recallPromptRepository;
 
   User user;
-  Note note;
   MemoryTracker memoryTracker;
   Timestamp windowStart;
   Timestamp windowEnd;
@@ -27,7 +26,7 @@ class RecallPromptRepositoryRecentRecallUsersTest extends SpringTestBase {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    note = makeMe.aNote().notebookOwnedBy(user).please();
+    Note note = makeMe.aNote().notebookOwnedBy(user).please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
     windowEnd = makeMe.aTimestamp().of(15, 8).fromShanghai().please();
     windowStart = new Timestamp(windowEnd.getTime() - TimeUnit.DAYS.toMillis(7));
@@ -46,7 +45,6 @@ class RecallPromptRepositoryRecentRecallUsersTest extends SpringTestBase {
     Timestamp oneHourBeforeEnd = new Timestamp(windowEnd.getTime() - TimeUnit.HOURS.toMillis(1));
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(oneHourBeforeEnd)
@@ -63,7 +61,6 @@ class RecallPromptRepositoryRecentRecallUsersTest extends SpringTestBase {
     Timestamp beforeWindow = new Timestamp(windowStart.getTime() - TimeUnit.MINUTES.toMillis(1));
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(beforeWindow)
@@ -79,7 +76,6 @@ class RecallPromptRepositoryRecentRecallUsersTest extends SpringTestBase {
   void includesRecallAnsweredAtWindowStart() {
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(windowStart)
@@ -95,7 +91,6 @@ class RecallPromptRepositoryRecentRecallUsersTest extends SpringTestBase {
   void excludesRecallAnsweredAtWindowEnd() {
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(windowEnd)
@@ -112,14 +107,12 @@ class RecallPromptRepositoryRecentRecallUsersTest extends SpringTestBase {
     Timestamp oneHourBeforeEnd = new Timestamp(windowEnd.getTime() - TimeUnit.HOURS.toMillis(1));
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(oneHourBeforeEnd)
         .please();
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(new Timestamp(windowEnd.getTime() - TimeUnit.HOURS.toMillis(2)))
@@ -140,14 +133,12 @@ class RecallPromptRepositoryRecentRecallUsersTest extends SpringTestBase {
 
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(oneHourBeforeEnd)
         .please();
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(otherNote)
         .forMemoryTracker(otherTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(oneHourBeforeEnd)

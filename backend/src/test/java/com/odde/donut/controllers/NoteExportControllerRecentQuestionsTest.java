@@ -40,7 +40,6 @@ class NoteExportControllerRecentQuestionsTest extends ControllerTestBase {
     Mcq canonical =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("What is two plus two?")
             .choices("three", "four", "five")
             .correctAnswerIndex(1)
@@ -69,18 +68,18 @@ class NoteExportControllerRecentQuestionsTest extends ControllerTestBase {
     Timestamp tie = Timestamp.from(Instant.parse("2026-08-01T00:00:00Z"));
 
     // Insertion order deliberately differs from creation chronology.
-    asked(makeMe.anMcq().forNote(note).stem("oldest-kept-out").createdAt(older).please());
-    asked(makeMe.anMcq().forNote(note).stem("mid-01").createdAt(mid).please());
-    asked(makeMe.anMcq().forNote(note).stem("mid-02").createdAt(mid).please());
-    asked(makeMe.anMcq().forNote(note).stem("mid-03").createdAt(mid).please());
-    asked(makeMe.anMcq().forNote(note).stem("mid-04").createdAt(mid).please());
-    asked(makeMe.anMcq().forNote(note).stem("mid-05").createdAt(mid).please());
-    asked(makeMe.anMcq().forNote(note).stem("mid-06").createdAt(mid).please());
-    asked(makeMe.anMcq().forNote(note).stem("tie-lower-id").createdAt(tie).please());
-    asked(makeMe.anMcq().forNote(note).stem("tie-higher-id").createdAt(tie).please());
-    asked(makeMe.anMcq().forNote(note).stem("second-oldest-kept-out").createdAt(older).please());
-    asked(makeMe.anMcq().forNote(note).stem("newest-first").createdAt(newest).please());
-    asked(makeMe.anMcq().forNote(note).stem("mid-07").createdAt(mid).please());
+    asked(makeMe.anMcq().stem("oldest-kept-out").createdAt(older).please());
+    asked(makeMe.anMcq().stem("mid-01").createdAt(mid).please());
+    asked(makeMe.anMcq().stem("mid-02").createdAt(mid).please());
+    asked(makeMe.anMcq().stem("mid-03").createdAt(mid).please());
+    asked(makeMe.anMcq().stem("mid-04").createdAt(mid).please());
+    asked(makeMe.anMcq().stem("mid-05").createdAt(mid).please());
+    asked(makeMe.anMcq().stem("mid-06").createdAt(mid).please());
+    asked(makeMe.anMcq().stem("tie-lower-id").createdAt(tie).please());
+    asked(makeMe.anMcq().stem("tie-higher-id").createdAt(tie).please());
+    asked(makeMe.anMcq().stem("second-oldest-kept-out").createdAt(older).please());
+    asked(makeMe.anMcq().stem("newest-first").createdAt(newest).please());
+    asked(makeMe.anMcq().stem("mid-07").createdAt(mid).please());
 
     String markdown =
         controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
@@ -105,9 +104,9 @@ class NoteExportControllerRecentQuestionsTest extends ControllerTestBase {
 
   @Test
   void anotherNotesQuestionsAreExcluded() throws UnexpectedNoAccessRightException {
-    asked(makeMe.anMcq().forNote(note).stem("focus-stem").please());
+    asked(makeMe.anMcq().stem("focus-stem").please());
     Note other = makeMe.aNote("Other").notebookOwnedBy(currentUser.getUser()).please();
-    Mcq otherQuestion = makeMe.anMcq().forNote(other).stem("other-stem").please();
+    Mcq otherQuestion = makeMe.anMcq().stem("other-stem").please();
     makeMe
         .aRecallPrompt()
         .forMemoryTracker(makeMe.aMemoryTrackerFor(other).please())
@@ -124,7 +123,7 @@ class NoteExportControllerRecentQuestionsTest extends ControllerTestBase {
   @Test
   void contestedQuestionsAreIncludedWithoutSchedulingFilter()
       throws UnexpectedNoAccessRightException {
-    asked(makeMe.anMcq().forNote(note).stem("contested-stem").contested().please());
+    asked(makeMe.anMcq().stem("contested-stem").contested().please());
 
     String markdown =
         controller.getAiContextMarkdown(note, 5000, true, null, null, null).markdown();
@@ -144,7 +143,7 @@ class NoteExportControllerRecentQuestionsTest extends ControllerTestBase {
 
   @Test
   void omittedIncludeRecentQuestionsDefaultsToOrdinaryContextViaHttp() throws Exception {
-    asked(makeMe.anMcq().forNote(note).stem("hidden-by-default").please());
+    asked(makeMe.anMcq().stem("hidden-by-default").please());
 
     performExportHttp(/* includeRecentQuestions */ null)
         .andExpect(status().isOk())
@@ -157,7 +156,7 @@ class NoteExportControllerRecentQuestionsTest extends ControllerTestBase {
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
   void includeRecentQuestionsHttpBinding(boolean includeRecentQuestions) throws Exception {
-    asked(makeMe.anMcq().forNote(note).stem("binding-stem").please());
+    asked(makeMe.anMcq().stem("binding-stem").please());
 
     ResultActions result =
         performExportHttp(Boolean.toString(includeRecentQuestions)).andExpect(status().isOk());

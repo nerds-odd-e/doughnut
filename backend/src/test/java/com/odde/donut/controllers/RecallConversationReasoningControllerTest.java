@@ -34,7 +34,6 @@ class RecallConversationReasoningControllerTest extends ConversationMessageContr
     Mcq mcq =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("What does co-movement establish?")
             .choices("Correlation", "Causation", "Independence")
             .correctAnswerIndex(0)

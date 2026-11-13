@@ -22,14 +22,13 @@ class QuestionGenerationBatchManualEligibilityTest extends SpringTestBase {
 
   User user;
   Timestamp currentTime;
-  Note note;
   MemoryTracker memoryTracker;
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().of(10, 8).fromShanghai().please();
-    note = makeMe.aNote().notebookOwnedBy(user).please();
+    Note note = makeMe.aNote().notebookOwnedBy(user).please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).please();
   }
 
@@ -102,7 +101,6 @@ class QuestionGenerationBatchManualEligibilityTest extends SpringTestBase {
   private void createAnsweredRecall(Timestamp answerTime) {
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(answerTime)

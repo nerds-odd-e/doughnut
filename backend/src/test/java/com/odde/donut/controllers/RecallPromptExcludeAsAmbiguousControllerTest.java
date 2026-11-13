@@ -41,7 +41,7 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
     excludedAt = makeMe.aTimestamp().of(2, 8).please();
     note = ownedNote();
     tracker = makeMe.aMemoryTrackerFor(note).assimilatedAt(assimilatedAt).please();
-    recallPrompt = mcqPrompt(tracker, note);
+    recallPrompt = mcqPrompt(tracker);
     testabilitySettings.timeTravelTo(answeredAt);
     controller.answer(recallPrompt, choiceAnswer(1));
     testabilitySettings.timeTravelTo(excludedAt);
@@ -117,12 +117,7 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
   void refusesAnotherLearnersAttempt() {
     MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
     RecallPrompt othersPrompt =
-        makeMe
-            .aRecallPrompt()
-            .forMemoryTracker(othersTracker)
-            .withMcqForNote(othersTracker.getNote())
-            .answerChoiceIndex(1)
-            .please();
+        makeMe.aRecallPrompt().forMemoryTracker(othersTracker).answerChoiceIndex(1).please();
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
@@ -131,7 +126,7 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
 
   @Test
   void refusesAnUnansweredPrompt() {
-    RecallPrompt unanswered = mcqPrompt(tracker, note);
+    RecallPrompt unanswered = mcqPrompt(tracker);
 
     assertThrows(
         QuestionAnswerException.class,

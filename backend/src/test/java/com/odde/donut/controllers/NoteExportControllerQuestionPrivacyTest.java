@@ -38,7 +38,6 @@ class NoteExportControllerQuestionPrivacyTest extends ControllerTestBase {
     Mcq mcq =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("exporter-stem")
             .choices("exporter-pick", "other-pick", "key-choice")
             .correctAnswerIndex(2)
@@ -56,7 +55,6 @@ class NoteExportControllerQuestionPrivacyTest extends ControllerTestBase {
         .withMcq(
             makeMe
                 .anMcq()
-                .forNote(note)
                 .stem("other-learner-stem")
                 .choices("exporter-pick", "other-pick", "key-choice")
                 .correctAnswerIndex(2)
@@ -79,7 +77,6 @@ class NoteExportControllerQuestionPrivacyTest extends ControllerTestBase {
     Mcq mcq =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("other-only-stem")
             .choices("other-pick", "unused", "key-choice")
             .correctAnswerIndex(2)
@@ -105,7 +102,6 @@ class NoteExportControllerQuestionPrivacyTest extends ControllerTestBase {
     Mcq mcq =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("guest-stem")
             .choices("owner-pick", "unused", "key-choice")
             .correctAnswerIndex(2)

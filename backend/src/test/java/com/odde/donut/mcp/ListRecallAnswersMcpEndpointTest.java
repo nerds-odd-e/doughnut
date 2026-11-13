@@ -18,7 +18,6 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
     var mcq =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("Who reviews code?")
             .choices("Peers", "Nobody", "The compiler")
             .correctAnswerIndex(0)
@@ -54,7 +53,6 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
   void returnsAnAmbiguityExcludedAttemptAsRecordedWithItsReason() throws Exception {
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(trackerOf(personalUser))
         .answerChoiceIndex(1)
         .answerTimestamp(hoursAgo(24))

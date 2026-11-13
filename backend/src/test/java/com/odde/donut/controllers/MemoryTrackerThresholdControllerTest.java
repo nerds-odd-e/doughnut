@@ -68,7 +68,7 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     addRecallLogs(tracker, Grade.AGAIN, 4, day1);
     testabilitySettings.timeTravelTo(day1);
-    answerWronglyThenExcludeAsAmbiguous(tracker, note);
+    answerWronglyThenExcludeAsAmbiguous(tracker);
 
     var result = controller.getThresholdExceeded(tracker);
     assertThat(result.wrongCount(), equalTo(4));

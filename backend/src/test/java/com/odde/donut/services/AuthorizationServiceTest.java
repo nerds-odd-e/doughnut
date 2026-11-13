@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Circle;
+import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
@@ -53,8 +54,9 @@ class AuthorizationServiceTest extends SpringTestBase {
       Note original = makeMe.aNote().please();
       Note current = makeMe.aNote().notebookOwnedBy(user).please();
       var tracker = makeMe.aMemoryTrackerFor(current).please();
-      RecallPrompt prompt =
-          makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcqForNote(original).please();
+      Mcq mcq = makeMe.anMcq().inMemoryPlease();
+      mcq.setCompatibilityNoteId(original.getId());
+      RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcq(mcq).please();
 
       authorizationService.assertReadAuthorization(user, prompt);
     }
@@ -63,8 +65,9 @@ class AuthorizationServiceTest extends SpringTestBase {
     void refusesAPromptWhoseCurrentNoteIsPrivateToAnotherUser() {
       Note original = makeMe.aNote().notebookOwnedBy(user).please();
       var tracker = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).please();
-      RecallPrompt prompt =
-          makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcqForNote(original).please();
+      Mcq mcq = makeMe.anMcq().inMemoryPlease();
+      mcq.setCompatibilityNoteId(original.getId());
+      RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcq(mcq).please();
 
       assertThrows(
           UnexpectedNoAccessRightException.class,

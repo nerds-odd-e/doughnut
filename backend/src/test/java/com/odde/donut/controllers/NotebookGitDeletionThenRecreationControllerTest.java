@@ -159,7 +159,6 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControl
           makeMe
               .aRecallPrompt()
               .forMemoryTracker(memoryTrackerRepository.findById(tracker.getId()).orElseThrow())
-              .withMcqForNote(noteRepository.findById(note.getId()).orElseThrow())
               .please();
           makeMe
               .aConversation()

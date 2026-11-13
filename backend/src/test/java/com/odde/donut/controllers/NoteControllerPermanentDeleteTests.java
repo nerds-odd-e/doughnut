@@ -29,11 +29,7 @@ class NoteControllerPermanentDeleteTests extends NoteDependentRowsControllerTest
     Notebook notebook = ownedNotebook();
     Folder trashedBiology = makeMe.aFolder().inTrashOf(notebook).name("Biology").please();
     Note cells = makeMe.aNote("Cells").folder(trashedBiology).please();
-    makeMe
-        .aRecallPrompt()
-        .forMemoryTracker(makeMe.aMemoryTrackerFor(cells).please())
-        .withMcqForNote(cells)
-        .please();
+    makeMe.aRecallPrompt().forMemoryTracker(makeMe.aMemoryTrackerFor(cells).please()).please();
     makeMe
         .aConversationNoteCorrection(
             makeMe.aConversationMessage(makeMe.aConversation().forANote(cells).please()).please())

@@ -22,7 +22,7 @@ class MemoryTrackerRecallHistoryControllerTest extends MemoryTrackerControllerTe
       throws UnexpectedNoAccessRightException {
     Note original = ownedNote();
     MemoryTracker tracker = ownedTracker(original);
-    RecallPrompt answered = answeredPromptFor(tracker, original);
+    RecallPrompt answered = answeredPromptFor(tracker);
     Note current = reifyTrackedProperty(tracker, "Current");
 
     List<RecallHistoryItem> history = controller.getRecallHistory(tracker);
@@ -36,7 +36,7 @@ class MemoryTrackerRecallHistoryControllerTest extends MemoryTrackerControllerTe
   void pairsARecallLogWithThePromptThatSharesItsAnswer() throws UnexpectedNoAccessRightException {
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
-    RecallPrompt answered = answeredPromptFor(tracker, note);
+    RecallPrompt answered = answeredPromptFor(tracker);
     RecallLog log = makeMe.aRecallLogFor(tracker).answer(answered.getAnswer()).please();
 
     List<RecallHistoryItem> history = controller.getRecallHistory(tracker);
@@ -62,7 +62,7 @@ class MemoryTrackerRecallHistoryControllerTest extends MemoryTrackerControllerTe
   void unansweredPromptHasNoLog() throws UnexpectedNoAccessRightException {
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
-    RecallPrompt unanswered = promptFor(tracker, note);
+    RecallPrompt unanswered = promptFor(tracker);
 
     List<RecallHistoryItem> history = controller.getRecallHistory(tracker);
 
@@ -77,7 +77,7 @@ class MemoryTrackerRecallHistoryControllerTest extends MemoryTrackerControllerTe
     MemoryTracker tracker = ownedTracker(note);
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).please();
     Timestamp day2 = makeMe.aTimestamp().of(2, 8).please();
-    RecallPrompt unanswered = promptFor(tracker, note);
+    RecallPrompt unanswered = promptFor(tracker);
     unanswered.setCreatedAt(day1);
     makeMe.entityPersister.save(unanswered);
     RecallLog laterLog = makeMe.aRecallLogFor(tracker).recordedAt(day2).please();

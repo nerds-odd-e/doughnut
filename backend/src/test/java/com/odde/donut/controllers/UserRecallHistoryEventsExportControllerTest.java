@@ -62,8 +62,7 @@ class UserRecallHistoryEventsExportControllerTest
   void anAnsweredRecallPromptCarriesItsTrackerPromptAndAnswerDetails()
       throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 8).please());
-    RecallPrompt prompt =
-        makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(tracker).please();
+    RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
     var answerDTO = choiceAnswer(0);
     answerDTO.setThinkingTimeMs(4200);
     answerDTO.setAwayMs(300);

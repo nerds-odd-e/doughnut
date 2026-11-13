@@ -102,7 +102,6 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
               .aRecallPrompt()
               .forMemoryTracker(
                   memoryTrackerRepository.findById(deletedTracker.getId()).orElseThrow())
-              .withMcqForNote(noteRepository.findById(deleted.getId()).orElseThrow())
               .please();
           makeMe
               .aConversation()

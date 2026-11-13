@@ -15,18 +15,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class AIGeneratedQuizFactoryTest extends SpringTestBase {
-  Note note;
   MemoryTracker memoryTracker;
   Mcq mcq;
 
   @BeforeEach
   void setup() {
-    note = makeMe.aNote("saying").content("Rome is not built in a day").please();
+    Note note = makeMe.aNote("saying").content("Rome is not built in a day").please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).please();
     mcq =
         makeMe
             .anMcq()
-            .forNote(note)
             .stem("How long did it take to build Rome?")
             .choices("1/2 day", "1 day", "more than 1 day")
             .correctAnswerIndex(2)

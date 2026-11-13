@@ -98,7 +98,6 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest extends SpringTestBase 
   void includesTrackerWithAnsweredPrompt() {
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(dueTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(currentTime)
@@ -109,14 +108,14 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest extends SpringTestBase 
 
   @Test
   void includesTrackerWithUnansweredContestedPrompt() {
-    makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(dueTracker).contested().please();
+    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).contested().please();
 
     assertThat(candidateIds(), contains(dueTracker.getId()));
   }
 
   @Test
   void excludesTrackerWithUnansweredNonContestedPrompt() {
-    makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(dueTracker).please();
+    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).please();
 
     assertThat(candidates(), empty());
   }

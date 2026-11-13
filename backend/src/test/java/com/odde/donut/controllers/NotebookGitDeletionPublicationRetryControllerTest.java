@@ -52,7 +52,6 @@ class NotebookGitDeletionPublicationRetryControllerTest extends NotebookGitContr
               .aRecallPrompt()
               .forMemoryTracker(
                   memoryTrackerRepository.findById(targetTracker.getId()).orElseThrow())
-              .withMcqForNote(noteRepository.findById(target.getId()).orElseThrow())
               .please();
           makeMe
               .aConversation()

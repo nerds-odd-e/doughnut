@@ -49,8 +49,8 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
     return ownedSpellingTracker(ownedNote());
   }
 
-  RecallPrompt mcqPrompt(MemoryTracker tracker, Note note) {
-    return makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcqForNote(note).please();
+  RecallPrompt mcqPrompt(MemoryTracker tracker) {
+    return makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
   }
 
   RecallPrompt spellingPrompt(MemoryTracker tracker) {

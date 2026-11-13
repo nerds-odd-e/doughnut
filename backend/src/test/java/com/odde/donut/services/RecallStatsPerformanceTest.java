@@ -48,7 +48,6 @@ class RecallStatsPerformanceTest extends SpringTestBase {
       // days 35..234, hour 10 — all inside the 1y (and 5y) window.
       makeMe
           .aRecallPrompt()
-          .withMcqForNote(note)
           .forMemoryTracker(mt)
           .answerChoiceIndex(0)
           .answerTimestamp(makeMe.aTimestamp().of(35 + i, 10).please())

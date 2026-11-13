@@ -127,7 +127,7 @@ class NoteExportControllerPropertyTests extends ControllerTestBase {
   }
 
   private Mcq question(String key, String value, String stem) {
-    Mcq mcq = makeMe.anMcq().forNote(note).stem(stem).please();
+    Mcq mcq = makeMe.anMcq().stem(stem).please();
     MemoryTracker tracker =
         makeMe
             .aMemoryTrackerFor(note)

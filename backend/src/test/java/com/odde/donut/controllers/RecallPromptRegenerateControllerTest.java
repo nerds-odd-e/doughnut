@@ -34,8 +34,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
   void setUp() {
     Note note = ownedNote();
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
-    recallPrompt =
-        makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).withMcqForNote(note).please();
+    recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
   }
 
   private QuestionContestResult contestAdvice(String advice) {
@@ -55,12 +54,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
   @Test
   void shouldNotBeAbleToRegenerateForOthersMemoryTracker() {
     MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
-    RecallPrompt othersPrompt =
-        makeMe
-            .aRecallPrompt()
-            .forMemoryTracker(othersTracker)
-            .withMcqForNote(othersTracker.getNote())
-            .please();
+    RecallPrompt othersPrompt = makeMe.aRecallPrompt().forMemoryTracker(othersTracker).please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.regenerate(othersPrompt, contestAdvice("test")));

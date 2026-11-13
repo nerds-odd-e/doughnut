@@ -35,7 +35,7 @@ class RecallPromptContestControllerTest extends RecallPromptControllerTestBase {
 
     Note note = ownedNote();
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
-    recallPrompt = mcqPrompt(memoryTracker, note);
+    recallPrompt = mcqPrompt(memoryTracker);
   }
 
   @Test
@@ -47,12 +47,7 @@ class RecallPromptContestControllerTest extends RecallPromptControllerTestBase {
   @Test
   void shouldNotBeAbleToContestForOthersMemoryTracker() {
     MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
-    RecallPrompt othersPrompt =
-        makeMe
-            .aRecallPrompt()
-            .forMemoryTracker(othersTracker)
-            .withMcqForNote(othersTracker.getNote())
-            .please();
+    RecallPrompt othersPrompt = makeMe.aRecallPrompt().forMemoryTracker(othersTracker).please();
     assertThrows(UnexpectedNoAccessRightException.class, () -> controller.contest(othersPrompt));
   }
 

@@ -27,8 +27,7 @@ abstract class UserRecallHistoryExportControllerTestBase extends ControllerTestB
 
   RecallPrompt answerMcqAtDay(int day) throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(day, 8).please());
-    RecallPrompt prompt =
-        makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(tracker).please();
+    RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
     recallPromptController.answer(prompt, choiceAnswer(0));
     return prompt;
   }

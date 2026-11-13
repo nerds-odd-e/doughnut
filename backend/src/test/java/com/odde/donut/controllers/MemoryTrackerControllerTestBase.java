@@ -31,22 +31,17 @@ abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
     return makeMe.aMemoryTrackerFor(note).please();
   }
 
-  RecallPrompt promptFor(MemoryTracker tracker, Note note) {
-    return makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(tracker).please();
+  RecallPrompt promptFor(MemoryTracker tracker) {
+    return makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
   }
 
-  RecallPrompt answeredPromptFor(MemoryTracker tracker, Note note) {
-    return makeMe
-        .aRecallPrompt()
-        .withMcqForNote(note)
-        .forMemoryTracker(tracker)
-        .answerChoiceIndex(0)
-        .please();
+  RecallPrompt answeredPromptFor(MemoryTracker tracker) {
+    return makeMe.aRecallPrompt().forMemoryTracker(tracker).answerChoiceIndex(0).please();
   }
 
-  void answerWronglyThenExcludeAsAmbiguous(MemoryTracker tracker, Note note)
+  void answerWronglyThenExcludeAsAmbiguous(MemoryTracker tracker)
       throws UnexpectedNoAccessRightException {
-    RecallPrompt prompt = promptFor(tracker, note);
+    RecallPrompt prompt = promptFor(tracker);
     recallPromptController.answer(prompt, choiceAnswer(1));
     recallPromptController.excludeAsAmbiguous(prompt, ambiguousExclusion("both tenses fit"));
   }

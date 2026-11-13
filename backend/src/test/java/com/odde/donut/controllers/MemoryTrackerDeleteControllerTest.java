@@ -34,7 +34,7 @@ class MemoryTrackerDeleteControllerTest extends MemoryTrackerControllerTestBase 
       throws UnexpectedNoAccessRightException {
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
-    RecallPrompt recallPrompt = promptFor(tracker, note);
+    RecallPrompt recallPrompt = promptFor(tracker);
     Conversation conversation =
         makeMe.aConversation().forARecallPrompt(recallPrompt).from(currentUser.getUser()).please();
     makeMe

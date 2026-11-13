@@ -23,7 +23,6 @@ class QuestionGenerationBatchRetryEligibilityTest extends SpringTestBase {
   @Autowired QuestionGenerationBatchPlanningService planningService;
 
   User user;
-  Note note;
   MemoryTracker memoryTracker;
   Timestamp cronTime;
   Timestamp recallTime;
@@ -31,13 +30,12 @@ class QuestionGenerationBatchRetryEligibilityTest extends SpringTestBase {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    note = makeMe.aNote().notebookOwnedBy(user).please();
+    Note note = makeMe.aNote().notebookOwnedBy(user).please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).please();
     cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 11, 15));
     recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(recallTime)

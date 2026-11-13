@@ -57,7 +57,6 @@ class AssistantMcpAccessTest extends AssistantMcpTestSupport {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(10, 9).please());
     makeMe
         .aRecallPrompt()
-        .withMcqForNote(note)
         .forMemoryTracker(makeMe.aMemoryTrackerFor(note).by(learner).please())
         .answerChoiceIndex(0)
         .answerTimestamp(answeredAt)

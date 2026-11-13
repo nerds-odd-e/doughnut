@@ -41,7 +41,6 @@ class AiOpenAiAssistantFactoryWithDBTest extends SpringTestBase {
       mcq =
           makeMe
               .anMcq()
-              .forNote(note)
               .stem("What is the first color in the rainbow?")
               .choices("red", "black", "green")
               .correctAnswerIndex(0)

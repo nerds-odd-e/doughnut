@@ -41,7 +41,6 @@ class RecallConversationContinuationControllerTest extends ConversationMessageCo
         makeMe
             .aRecallPrompt()
             .forMemoryTracker(prompt.getMemoryTracker())
-            .withMcqForNote(prompt.getNote())
             .answerChoiceIndex(0)
             .please();
 
@@ -119,7 +118,6 @@ class RecallConversationContinuationControllerTest extends ConversationMessageCo
     return makeMe
         .aRecallPrompt()
         .forMemoryTracker(makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please())
-        .withMcqForNote(note)
         .answerChoiceIndex(1)
         .please();
   }
