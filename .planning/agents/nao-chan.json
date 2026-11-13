@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nao-chan",
+  "email": "nao-chan@example.org",
+  "identity": "SEED-073#keep-answered-questions-with-their-tracker",
+  "mode": "story-branch",
+  "branch": "codex/keep-answered-questions-with-their-tracker",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
