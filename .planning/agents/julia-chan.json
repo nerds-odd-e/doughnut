@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Julia-chan",
-  "email": "julia-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-073#keep-answered-questions-with-their-tracker",
-  "host": "codex",
-  "model": "gpt-6.1-sol"
-}

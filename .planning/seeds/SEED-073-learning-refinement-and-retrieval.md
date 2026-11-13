@@ -82,7 +82,7 @@ These are starting observations, not promises that the current UI works in every
 
 **Identity:** SEED-073#keep-answered-questions-with-their-tracker
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/096-tracker-owned-answered-questions/PLAN.md","assessment":"not-ready","reasons":["Slice 8 inverse tracker move, original-note deletion and history/MCP/export read have not reached a local result-bearing observation; only source paths were read.","Slice 5 scalar compatibility write and fresh ORM prompt reload have not been observed locally with the proposed mapping; nullable-column and consumer readings do not settle hydration/write behavior.","Slice 7 application-owned question deletion has not been observed through all direct tracker, unanswered-prompt and permanent-note deletion consumers with populated FK-closure fixtures."],"basis":{"document":"54d3b5faafd3488ebc317888f7067c5229ea95dc08a107a449f906cea8b52a7b","plan":"9186f51e090b02da9d04043ba016610c9badce378558b83ad05490339d53beda"}}
 ```
 
 **Goal.** As a Donut learner, every question I answered stays with the memory
@@ -99,11 +99,11 @@ questions; with it gone, no question needs its own note.
 
 **Current design (analysis, local main `4ede0b87d1`).**
 
-- A question asked in recall always has exactly one recall prompt, and so one
-  tracker: recall generation, batch import and contest-and-regenerate each
-  create one question with one prompt (production sets
-  `question.regeneration.times: 0`). Its stored note (`mcq.note_id`) copies
-  the tracker's note at creation and goes stale when the tracker moves.
+- Current recall-generation, batch-import and contest-and-regenerate paths
+  create a fresh question for a prompt on one tracker. This is a caller
+  property, not a schema uniqueness guarantee: `RecallPrompt.mcq` is
+  many-to-one. Its stored note (`mcq.note_id`) copies the tracker's note at
+  creation and goes stale when the tracker moves.
 - `mcq.note_id` cascades on note delete, and `recall_prompt.mcq_id` cascades
   on MCQ delete (`V300000325`), so a prompt dies with the question's stored
   note, not with its tracker. Both tracker moves leave questions behind:
@@ -111,12 +111,16 @@ questions; with it gone, no question needs its own note.
   the relationship note, the confirmed production cause) and
   `movePropertyTrackersOntoRelationshipNote`. Production held 3,538 prompts
   whose question's note differs from their tracker's note.
-- The only questions without a tracker are trainer-added ones from a note's
+- Questions without a prompt include trainer-added ones from a note's
   Questions page (`McqController.add`, `NoteAddQuestion.vue`, typed or
   AI-drafted and refined). They came from the note question bank that
   notebook assessments used; approval and assessments were deleted on
-  2026-05-07 (`545681f2f6`, `d460611a64`). Today they are only listed on the
-  Questions page and included in the note export's recent questions.
+  2026-05-07 (`545681f2f6`, `d460611a64`). Today the trainer-added questions
+  are only listed on the Questions page and included in recent-question
+  exports. Generation also saves before the transactional duplicate-prompt
+  recheck, and configurable regeneration saves intermediate results; either
+  can leave unreferenced questions. Production's
+  `question.regeneration.times: 0` addresses only the latter path.
 - Code reads the stored note as the prompt's note: `RecallPrompt.getNote`,
   `Conversation` subject note, `ConversationService` title, contest and
   regenerate context (`RecallPromptController`, `McqService.contest`), and the
@@ -196,7 +200,7 @@ in `.planning/done/` stays as recorded.
     `OpenAiTransactionalRatchetTest`;
   - the stored note on a question: `Mcq.note`, the `mcq.note_id` column and
     its foreign key, with a migration that deletes questions no prompt uses
-    (the trainer-added ones) before dropping the column; question generation
+    before dropping the column; question generation
     takes the tracker's note as input instead of storing it;
   - testability and E2E: `injectMcq`, `McqsTestData`,
     `injectMcqsToNotebook`/`injectYesNoQuestionsForNumberNotes` (already
@@ -229,6 +233,47 @@ or statistics are outside this story.
    tracker's answered question and the learner's choice.
 5. Removing a note whose tracker never moved still removes the tracker with
    its prompts and questions.
+
+**Refinement findings (2026-11-13, checkout `1e331f5c5c`).** The recorded
+production replay remains applicable: the implicated tracker-move, question,
+prompt and cascade definitions have not changed since the analyzed revision.
+No new production access or model call was made. The strongest challenge is
+that deleting the note association alone does not establish tracker ownership:
+question cleanup must also follow direct tracker deletion, unanswered-prompt
+replacement and permanent note deletion. Generation must persist the selected
+question with its prompt, rather than leave discarded candidates behind.
+These are lifecycle consequences of the existing goal, not additional features.
+
+The owner-selected scope remains one outcome. A question belongs to one
+tracker; that does not independently require forbidding several prompts on the
+same tracker from referring to it. Export fixtures sharing a question across
+learners must use separate tracker-owned questions while preserving their
+privacy assertions. The scope limits above remain unchanged.
+
+**Architecture.** The tracker is the single source of current note attribution;
+the prompt carries its historical question and answer. Keep existing tracker,
+prompt, answer and log identities. Reuse the current prompt-persistence and
+note/tracker deletion boundaries for application-owned lifecycle management.
+Do not add a parallel question archive, content revision system or database
+cascade. This follows [ADR 0001, domain vocabulary](../../docs/adrs/0001-ubiquitous-language.md),
+[ADR 0002, private learning data and content identity](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md),
+[ADR 0003, scheduling and recorded attempts](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md),
+and [ADR 0006, failure handling](../../docs/adrs/0006-failure-handling-accepted.md).
+The current Accepted index and records agree; no conflict or exception is needed.
+
+Rollout must preserve compatibility between the two application instances.
+Original binaries read the question's stored note, including eager ORM
+hydration; a nullable column alone does not make new questions readable by
+those binaries. Use a compatibility release that derives attribution through
+the tracker while retaining a scalar note ID write for original readers. After
+that release is fully deployed, remove that mapping/write and drop its FK,
+retaining the physical nullable column until all mapped binaries are replaced.
+Then clean unreferenced questions and drop the column. This is three compatible
+release stages under the [migration release-safety rule](../../.agents/skills/db-migration/SKILL.md#release-safety),
+not authority to deploy them in this preparation. Full retention acceptance
+includes confirmation of the FK-drop migration; final cleanup includes the
+column-drop stage. The temporary compatibility representation is deleted in
+that sequence and leaves no final product guidance or tests about its absence.
 
 **Effort hypothesis:** L for one story — several hours, mostly deletion;
 confidence medium. Planning may split the tracker-ownership repair (examples
