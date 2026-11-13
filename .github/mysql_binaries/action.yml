@@ -5,12 +5,7 @@ runs:
   steps:
     - shell: bash
       run: |
-        ncurses_version=6.3-2ubuntu0.3
-        for package in libncurses5 libtinfo5; do
-          curl --fail --location --retry 3 "https://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/${package}_${ncurses_version}_amd64.deb" -o "$RUNNER_TEMP/$package.deb"
-        done
-        sudo apt-get install --yes --no-install-recommends libaio-dev libaio1t64 libnuma1 \
-          "$RUNNER_TEMP/libncurses5.deb" "$RUNNER_TEMP/libtinfo5.deb"
+        bash scripts/ci-system-packages.sh mysql
         if [ ! -e /usr/lib/x86_64-linux-gnu/libaio.so.1 ]; then
           sudo ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
         fi
