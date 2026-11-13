@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-129#bound-ci-system-package-installation",
+  "title": "Bound CI system package installation",
+  "completedAt": "2026-11-13T11:54:17.927Z",
+  "developer": "Terry Yin",
+  "agent": "Mihiro-chan",
+  "host": "cursor",
+  "model": "auto",
+  "intentCoverage": {
+    "report": "# Intent Coverage — SEED-129#bound-ci-system-package-installation\n\nChecked revision: 281dd13820f8aa2d6c426fdac20ee153171c524c\nInvocation start: 2026-11-13T11:50:51Z\nVerdict: Caught\n\nPromise: On package-phase failure, setup identifies the failing phase and its time budget and retains the original diagnostic.\n\nFault: Removed phase/budget enrichment echo from run_bounded_phase failure path.\n\nFocused command: CURSOR_DEV=true nix develop -c bash scripts/test/ci-system-packages-mysql.sh.test\n\nCatching assertion: [[ $out == *\"phase=mysql\"* ]] in test_mysql_compat_download_failure (scripts/test/ci-system-packages-mysql.sh.test)\n\nNext proof action: None — keep existing MySQL boundary failure assertions.\n\n## Wrap-up disposition\n\nChecked revision: 281dd13820f8aa2d6c426fdac20ee153171c524c\nEvidence: Intent Coverage Caught as above; scratch restored and re-verified.\nDecision: no follow-up; maintained proof already catches the selected fault on the examined path.\nCanonical follow-up links: none\n"
+  }
+}

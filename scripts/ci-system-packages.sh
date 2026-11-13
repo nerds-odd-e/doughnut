@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bound CI system-package phases (SEED-129).
+# Bound CI system-package phases.
 # Usage: scripts/ci-system-packages.sh <purpose>
 #
 # Purposes:

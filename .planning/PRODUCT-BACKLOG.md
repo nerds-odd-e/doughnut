@@ -9,7 +9,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 ## Taken
 
 - [Keep answered questions with their tracker](seeds/SEED-073-learning-refinement-and-retrieval.md#keep-answered-questions-with-their-tracker) — SEED-073#keep-answered-questions-with-their-tracker ([plan](slice-plans/096-tracker-owned-answered-questions/PLAN.md))
-- [Bound CI system package installation](seeds/SEED-129-bounded-ci-package-setup.md#bound-ci-system-package-installation) — SEED-129#bound-ci-system-package-installation ([plan](slice-plans/097-bounded-ci-system-packages/PLAN.md))
 
 ## Backlog list
 
