@@ -219,53 +219,94 @@ The owner prioritized that repair as
 **Goal.** As a Donut learner, every question I answered stays with the memory
 tracker that recorded my answer, wherever that tracker moves, so reducing or
 removing the note the question was generated from never erases my attempt's
-question while its grade and schedule survive.
+question while its grade and schedule survive. Every question belongs only to
+the tracker it was asked through.
 
 **Owner direction (2026-11-13).** Losing the question while keeping the
-tracker is a defect, not intended behavior. The owner prefers that a recall
-prompt's question belongs only to its tracker; if it does not, the question
-must at least follow the tracker to the right note.
+tracker is a defect, not intended behavior. A question should belong only to
+its tracker. The owner chose to delete the note question bank (Add Question
+and a note's Questions list), because no learner is ever asked those
+questions; with it gone, no question needs its own note.
 
-**Current design (analysis, local main `a595aec4e2`).** The question does not
-belong only to the tracker. `recall_prompt` points at both its tracker and an
-`mcq`; the MCQ separately records the note it was generated from
-(`mcq.note_id`, `ON DELETE CASCADE`), and `recall_prompt.mcq_id` cascades on
-MCQ delete (`V300000325`). So a prompt dies with the MCQ's note, not with its
-tracker. Every tracker move leaves its MCQs behind:
-`rehomeNoteLevelTrackersToProperty` (reduction, then permanent removal of the
-relationship note — the confirmed production cause) and
-`movePropertyTrackersOntoRelationshipNote` (later removal of the source note
-would do the same). Production held 3,538 prompts whose MCQ note differs from
-their tracker's note. Code still reads the MCQ's note as the prompt's note:
-`RecallPrompt.getNote`, `Conversation` subject note, `ConversationService`
-title, and contest/regenerate context in `RecallPromptController`. The note's
-**Questions** list (`McqController.list` via `Note.mcqs`), directly added
-questions (`NoteAddQuestion`), and the recent-questions AI context also read
-`mcq.note_id`.
+**Current design (analysis, local main `4ede0b87d1`).**
 
-**Recommended direction.** Make the tracker the single owner of an asked
-question, as the owner prefers: an asked question's lifetime and its note come
-from its prompt's tracker, never from the note it was generated from. This
-removes the divided source of truth instead of adding a repointing step to
-every tracker move, and it makes the existing mismatched prompts harmless
-without a data migration. Repointing `mcq.note_id` on each move is the simpler
-alternative; it keeps the duplicate note reference, must be remembered by
-every current and future move, and would still leave the 3,538 mismatches to
-repair. Deletion stays application-owned, not a new database cascade.
+- A question asked in recall always has exactly one recall prompt, and so one
+  tracker: recall generation, batch import and contest-and-regenerate each
+  create one question with one prompt (production sets
+  `question.regeneration.times: 0`). Its stored note (`mcq.note_id`) copies
+  the tracker's note at creation and goes stale when the tracker moves.
+- `mcq.note_id` cascades on note delete, and `recall_prompt.mcq_id` cascades
+  on MCQ delete (`V300000325`), so a prompt dies with the question's stored
+  note, not with its tracker. Both tracker moves leave questions behind:
+  `rehomeNoteLevelTrackersToProperty` (reduction, then permanent removal of
+  the relationship note, the confirmed production cause) and
+  `movePropertyTrackersOntoRelationshipNote`. Production held 3,538 prompts
+  whose question's note differs from their tracker's note.
+- The only questions without a tracker are trainer-added ones from a note's
+  Questions page (`McqController.add`, `NoteAddQuestion.vue`, typed or
+  AI-drafted and refined). They came from the note question bank that
+  notebook assessments used; approval and assessments were deleted on
+  2026-05-07 (`545681f2f6`, `d460611a64`). Today they are only listed on the
+  Questions page and included in the note export's recent questions.
+- Code reads the stored note as the prompt's note: `RecallPrompt.getNote`,
+  `Conversation` subject note, `ConversationService` title, contest and
+  regenerate context (`RecallPromptController`, `McqService.contest`), and the
+  recent-questions export (`McqRepository.findTop10ByNote_Id…`,
+  `findRecentForProperty`).
+
+**Removal rule — read before planning.** This story deletes a whole feature
+and a lot of code with it. Follow the "Removals leave no trace" principle in
+`CLAUDE.md`: delete each removed thing outright and transitively, and sweep
+backend, frontend, CLI, MCP, docs, code comments, agent guidance and generated
+artifacts so they read as if the question bank never existed. Keep no
+historical record of it in the product: no "removed" or "no longer" notes, no
+replacement documentation describing its absence. Do not replace deleted tests
+or docs with negations: no test or assertion that Add Question, the Questions
+list, its endpoints or the note column are gone, and no runtime guard against
+their return. Just delete them. Git history is the record. Proof of the
+removal is the surviving behavior's tests plus one sweep reading at
+acceptance, recorded in the plan as a reading, not as a test. Dated evidence
+in `.planning/done/` stays as recorded.
 
 **Scope.**
 
-- An answered prompt, with its question, choices, recorded answer, grade,
-  outcome and ambiguity exclusion, lasts as long as its tracker, whichever
-  note the tracker moves to and whichever note is later removed.
-- Everywhere a recall prompt's note is used — recall history, connected
+- **Keep answered questions with their tracker.** An answered prompt, with its
+  question, choices, recorded answer, grade, outcome and ambiguity exclusion,
+  lasts as long as its tracker, whichever note the tracker moves to and
+  whichever note is later removed. Removing a tracker still removes its
+  prompts and their questions. Deletion stays application-owned; add no new
+  database cascade.
+- **A question's note is its tracker's note.** Recall history, connected
   assistant recall answers, conversations about a prompt, contest and
-  regeneration context — it is the tracker's current note.
-- A note's Questions list and recent-questions AI context show questions asked
-  through trackers now on that note; questions added directly to a note stay
-  on that note.
-- Removing a tracker still removes its prompts and answered questions, as
-  today.
+  regenerate context, and the note export's recent questions all use the
+  tracker's current note. The recent-questions export lists questions asked
+  through trackers now on the exported note (property focus unchanged).
+- **Delete the note question bank, transitively,** including at least:
+  - frontend: the Questions entry in `NoteMoreOptionsActions.vue`,
+    `Mcqs.vue`, `NoteAddQuestion.vue`, `QuestionExportDialog.vue` (its
+    generation-request export lives only on that page), their specs and
+    `mcqsTestSupport.ts`, and `components.d.ts` entries;
+  - backend: `McqController` (list, add, refine, generate, export) and what
+    only it uses, such as `McqService.addQuestion`/`refineAIQuestion`,
+    `AiQuestionGenerator.getAiGeneratedRefineQuestion`,
+    `NoteQuestionGenerationService.refineQuestion` and its prompt, unused
+    `getAiGeneratedQuestion` overloads, `Note.mcqs`,
+    `McqRepository.findTop10ByNote_Id…`, `McqControllerTests`,
+    `McqRefinementControllerTests` and `McqController`'s entries in
+    `OpenAiTransactionalRatchetTest`;
+  - the stored note on a question: `Mcq.note`, the `mcq.note_id` column and
+    its foreign key, with a migration that deletes questions no prompt uses
+    (the trainer-added ones) before dropping the column; question generation
+    takes the tracker's note as input instead of storing it;
+  - testability and E2E: `injectMcq`, `McqsTestData`,
+    `injectMcqsToNotebook`/`injectYesNoQuestionsForNumberNotes` (already
+    unused), `mcq_management.feature`, `addQuestionPage.ts`, the related
+    step definitions and page-object methods, and the isolated-Cypress spec
+    selection and mock references;
+  - planning and guidance: the `mcq-creation-journey` entry in
+    `.planning/TEST-OPTIMIZATION-CANDIDATES.md`, any docs or agent guidance
+    describing the question bank, and regenerated `open_api_docs.yaml` and
+    `packages/generated/donut-backend-api`.
 
 **Scope limits.** Restoring the 2,197 questions already lost (production has
 no copy), merging the history of a relationship-note tracker that reduction
@@ -284,14 +325,15 @@ or statistics are outside this story.
    question remains under R.
 3. After example 1, contesting or opening a conversation about a question on
    the moved tracker uses S, not the removed R, as its note.
-4. After example 1, S's Questions list includes the moved tracker's questions;
-   a question added directly to S remains listed there.
-5. Deleting the tracker itself (for example its note is removed while it has
-   not moved) still removes its prompts.
+4. After example 1, exporting S with recent questions includes the moved
+   tracker's answered question and the learner's choice.
+5. Removing a note whose tracker never moved still removes the tracker with
+   its prompts and questions.
 
-**Effort hypothesis:** M — a few hours; confidence medium. Assumes each asked
-MCQ belongs to exactly one prompt (true for generation, regeneration and batch
-import today).
+**Effort hypothesis:** L for one story — several hours, mostly deletion;
+confidence medium. Planning may split the tracker-ownership repair (examples
+1–5) from the question-bank deletion if slices grow too large; the repair
+comes first because it is the defect.
 
 ## Open Decisions
 
