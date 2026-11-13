@@ -103,13 +103,15 @@ seams; keep the facade stable and every edited module under 250 lines.
 
 ### 5. Keep Git move and learning-identity proof in cohesive test homes
 Type: Structure
-Status: planned
+Status: done
 Proof: unchanged notebook Git proposal controller tests in the full backend suite.
 
 Split the two private-learning identity scenarios and their support into a
 focused sibling, preserving all existing move/identity proof under 250 lines.
 
 [Detailed implementation brief](implementation-briefs.md#keep-git-move-and-learning-identity-proof-in-cohesive-test-homes).
+
+[Accepted Git identity proof](git-identity-verification.md).
 
 ### 6. Keep ordinary recall and note actions through question-bank deletion
 Type: Behavior

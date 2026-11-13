@@ -14,8 +14,9 @@ import org.junit.jupiter.api.Test;
 /**
  * Verifies a learned note relocated across parents keeps its private associations, while an
  * untouched identical-content note keeps its own. The canonical private-association shape for
- * same-parent rename is covered in {@link NotebookGitProposalRenameControllerTest}.
- * Filename-preserving placement is covered in {@link NotebookGitProposalRelocationControllerTest}.
+ * same-parent rename is covered in {@link
+ * NotebookGitProposalRenamePrivateAssociationControllerTest}. Filename-preserving placement is
+ * covered in {@link NotebookGitProposalRelocationControllerTest}.
  */
 class NotebookGitProposalRelocationPrivateAssociationControllerTest
     extends NotebookGitMovedNotePrivateAssociationControllerTestBase {

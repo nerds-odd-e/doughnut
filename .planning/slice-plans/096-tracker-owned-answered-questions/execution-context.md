@@ -24,9 +24,12 @@
 - Accepted slice 3 increment on that
   same target: `8de9ca4b2849f2cfb988aeb65b119165ec88e511`; managed delivery
   reused the recorded observer.
-- Accepted CI repair / published base / current candidate on that same target:
+- Accepted CI repair on that same target:
   `9124093716d69beca4f5903460d71a27e1d8f48f`; the existing observer registered
   it. Default-worker hosted CI remains pending observation.
+- Accepted slice 4 increment / published base / current candidate on that
+  same target: `35e2b46e4af08c47f378432d3f12746b2eaa7c14`; selective formatting,
+  check-only hook, publication and existing-observer registration passed.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
