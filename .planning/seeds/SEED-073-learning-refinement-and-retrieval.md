@@ -82,7 +82,7 @@ These are starting observations, not promises that the current UI works in every
 
 **Identity:** SEED-073#keep-answered-questions-with-their-tracker
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/096-tracker-owned-answered-questions/PLAN.md","assessment":"not-ready","reasons":["Slice 8 inverse tracker move, original-note deletion and history/MCP/export read have not reached a local result-bearing observation; only source paths were read.","Slice 5 scalar compatibility write and fresh ORM prompt reload have not been observed locally with the proposed mapping; nullable-column and consumer readings do not settle hydration/write behavior.","Slice 7 application-owned question deletion has not been observed through all direct tracker, unanswered-prompt and permanent-note deletion consumers with populated FK-closure fixtures."],"basis":{"document":"54d3b5faafd3488ebc317888f7067c5229ea95dc08a107a449f906cea8b52a7b","plan":"9186f51e090b02da9d04043ba016610c9badce378558b83ad05490339d53beda"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/096-tracker-owned-answered-questions/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"fa22a11e3f2c5e7fa64bcb54da4d1ef9997b8b0c51199206af8dc055ceed17c3","plan":"6bcca7d056f55d140c1e4c1864f97ffffb28ad5030a648794c4d37e9ab98e1d4"}}
 ```
 
 **Goal.** As a Donut learner, every question I answered stays with the memory
@@ -274,6 +274,16 @@ not authority to deploy them in this preparation. Full retention acceptance
 includes confirmation of the FK-drop migration; final cleanup includes the
 column-drop stage. The temporary compatibility representation is deleted in
 that sequence and leaves no final product guidance or tests about its absence.
+
+**Preparation follow-through (2026-11-13, checkout `0ec6e1dafa`).** Disposable
+MySQL test-profile observations reached both real move/delete/history/MCP/export
+journeys, scalar compatibility persistence with a fresh ORM load, and all three
+question-deletion consumers with dependent rows. Inputs, results, failed legacy
+consumers, restoration and limits are recorded in the
+[active plan](../slice-plans/096-tracker-owned-answered-questions/PLAN.md#decisive-premises-and-observation).
+The plan includes the newly observed Git test reorganization and consumer
+closure. The selected goal, scope, examples and production rollout checkpoints
+remain the preparation input.
 
 **Effort hypothesis:** L for one story — several hours, mostly deletion;
 confidence medium. Planning may split the tracker-ownership repair (examples
