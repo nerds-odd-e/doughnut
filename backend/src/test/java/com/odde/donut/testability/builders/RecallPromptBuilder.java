@@ -19,6 +19,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private String spellingAnswerText = null;
   private boolean spellingAnswerCorrect = true;
   private Timestamp answerTimestamp = null;
+  private Timestamp questionGeneratedTime = null;
   private AnswerOutcome answerOutcome = null;
   private boolean recorded = false;
   private String ambiguityExclusionReason = null;
@@ -33,16 +34,13 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     if (entity == null) {
       entity = new RecallPrompt();
       if (entity.getQuestionType() != QuestionType.SPELLING) {
-        Mcq mcq = mcqBuilder.please(false);
-        if (mcq.getCompatibilityNoteId() == null) {
-          mcq.setCompatibilityNoteId(memoryTracker.getNote().getId());
-        }
-        if (needPersist) {
-          makeMe.entityPersister.save(mcq);
-        }
+        Mcq mcq = mcqBuilder.please(needPersist);
         entity.setMcq(mcq);
         entity.setQuestionType(QuestionType.MCQ);
       }
+    }
+    if (questionGeneratedTime != null) {
+      entity.setCreatedAt(questionGeneratedTime);
     }
     if (answerDTO != null && entity.getQuestionType() != QuestionType.SPELLING) {
       Answer answer = Answer.buildAnswer(answerDTO, entity.getMcq(), resolvedAnswerTimestamp());
@@ -137,6 +135,11 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   public RecallPromptBuilder answerSpellingIncorrectly(String spellingAnswer) {
     this.spellingAnswerCorrect = false;
     return answerSpelling(spellingAnswer);
+  }
+
+  public RecallPromptBuilder questionGeneratedTime(Timestamp timestamp) {
+    this.questionGeneratedTime = timestamp;
+    return this;
   }
 
   public RecallPromptBuilder answerTimestamp(Timestamp timestamp) {

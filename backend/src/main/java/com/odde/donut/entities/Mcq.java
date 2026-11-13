@@ -28,10 +28,6 @@ import lombok.EqualsAndHashCode;
   "responseChoices"
 })
 public class Mcq extends EntityIdentifiedByIdOnly {
-  @Column(name = "note_id")
-  @JsonIgnore
-  private Integer compatibilityNoteId;
-
   @JsonIgnore
   @Column(name = "raw_json_question")
   @Convert(converter = MCQToJsonConverter.class)

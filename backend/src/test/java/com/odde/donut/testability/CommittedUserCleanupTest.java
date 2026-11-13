@@ -32,10 +32,7 @@ class CommittedUserCleanupTest extends SpringTestBase {
     MemoryTracker targetTracker = makeMe.aMemoryTrackerFor(external).by(target).please();
     RecallPrompt targetPrompt = makeMe.aRecallPrompt().forMemoryTracker(targetTracker).please();
     MemoryTracker otherTracker = makeMe.aMemoryTrackerFor(owned).by(survivor).please();
-    Mcq otherQuestion = makeMe.anMcq().inMemoryPlease();
-    otherQuestion.setCompatibilityNoteId(external.getId());
-    RecallPrompt otherPrompt =
-        makeMe.aRecallPrompt().forMemoryTracker(otherTracker).withMcq(otherQuestion).please();
+    RecallPrompt otherPrompt = makeMe.aRecallPrompt().forMemoryTracker(otherTracker).please();
     RecallPrompt unrelatedPrompt =
         makeMe
             .aRecallPrompt()

@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.donut.controllers.dto.Randomization;
 import com.odde.donut.entities.Mcq;
-import com.odde.donut.entities.Note;
 import com.odde.donut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -26,8 +25,7 @@ class GeneratedQuestionPostProcessorTest {
             "focus",
             "rationale");
 
-    Note note = new Note();
-    Mcq result = postProcessor.assembleMcq(originalQuestion, note, 37L);
+    Mcq result = postProcessor.assembleMcq(originalQuestion, 37L);
 
     assertThat(result.getQuestionStem(), equalTo(originalQuestion.getQuestionStem()));
     assertThat(

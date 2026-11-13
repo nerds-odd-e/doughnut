@@ -1,0 +1,1 @@
+ALTER TABLE mcq DROP FOREIGN KEY fk_mcq_note;

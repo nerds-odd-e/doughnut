@@ -81,3 +81,8 @@ It inspected the listener/child/cleanup lifetime and every consumer disposition;
 all accepted observations remain applicable. No duplicate tests ran. Actual
 changed-source selection resolved both conventions off, all three owned files
 were within 250 lines, and both whitespace checks passed.
+
+Guarded formatter, check-only hook and managed publication accepted
+`b7213b7465b3ee84d26fd7d679a7a03735ac9776`, with no reconciliation and the
+replacement observer reused. The exact saved-record restore returned `resumed`,
+OID null, applied false and no dropped entry. The tree was clean before 12.

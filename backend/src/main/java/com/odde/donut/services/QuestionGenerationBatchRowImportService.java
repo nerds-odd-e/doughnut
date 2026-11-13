@@ -2,7 +2,6 @@ package com.odde.donut.services;
 
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
-import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
@@ -57,9 +56,7 @@ public class QuestionGenerationBatchRowImportService {
     }
 
     MemoryTracker memoryTracker = request.getMemoryTracker();
-    Note note = memoryTracker.getNote();
-    Mcq mcq =
-        generatedQuestionPostProcessor.assembleMcq(generatedMcq, note, request.getContextSeed());
+    Mcq mcq = generatedQuestionPostProcessor.assembleMcq(generatedMcq, request.getContextSeed());
     recallPromptPersister.persistNewRecallPromptForMcq(mcq, memoryTracker);
 
     request.setStatus(QuestionGenerationBatchRequestStatus.IMPORTED);

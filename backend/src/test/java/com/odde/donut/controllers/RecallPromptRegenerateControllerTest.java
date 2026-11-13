@@ -87,7 +87,6 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
         .isEqualTo("What is the first color in the rainbow?");
     Assertions.assertThat(persisted.getMemoryTracker().getId())
         .isEqualTo(recallPrompt.getMemoryTracker().getId());
-    Assertions.assertThat(persisted.getMcq().getCompatibilityNoteId()).isEqualTo(current.getId());
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     ArgumentCaptor<StructuredResponseCreateParams<GeneratedMcq>> paramsCaptor =

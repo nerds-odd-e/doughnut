@@ -28,7 +28,6 @@ erDiagram
     "note" ||--o{ authored_note_reference : "source_note_id ON DELETE CASCADE"
     "note" ||--o{ conversation : "note_id ON DELETE CASCADE"
     "note" ||--o{ conversation_note_correction : "note_id ON DELETE CASCADE"
-    "note" ||--o{ mcq : "note_id ON DELETE CASCADE"
     "note" ||--o{ memory_tracker : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_alias_index : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_creator : "note_id ON DELETE CASCADE"
@@ -159,7 +158,6 @@ erDiagram
     }
     mcq {
         int id PK
-        int note_id FK
     }
     memory_tracker {
         int id PK

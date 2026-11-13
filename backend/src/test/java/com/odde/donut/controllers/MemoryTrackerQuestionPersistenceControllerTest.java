@@ -77,7 +77,6 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
     assertThat(
         question.getValidationRationale(), equalTo("Selected answer follows the current focus"));
     assertThat(question.getContextSeed(), notNullValue());
-    assertThat(question.getCompatibilityNoteId(), equalTo(current.getId()));
     assertThat(questionCount(), equalTo(questionsBefore + 1));
 
     @SuppressWarnings({"unchecked", "rawtypes"})

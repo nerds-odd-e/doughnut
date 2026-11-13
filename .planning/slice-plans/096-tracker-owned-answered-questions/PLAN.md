@@ -21,23 +21,7 @@ Do not preserve export fixtures that share a question across different trackers.
 
 ## Architecture and reuse
 
-PFE: extend `RecallPrompt`'s existing tracker relationship for attribution;
-`RecallPromptPersister` for atomic selected-question persistence;
-`MemoryTrackerService` and `NoteService.permanentlyRemove` for lifecycle cleanup;
-the existing recent-question repository/export boundary for projection. Reuse
-the existing pre-DDL check pattern in `V300000338__DropNotebookGitBindingBundleBytes`.
-Do not add an archive, second ownership model or alternative deletion owner.
-
-Relevant Accepted decisions: [0001, domain vocabulary](../../../docs/adrs/0001-ubiquitous-language.md),
-[0002, private learning data and content identity](../../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md),
-[0003, grading and durable attempts](../../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md),
-[0006, failure handling](../../../docs/adrs/0006-failure-handling-accepted.md),
-and [0007, isolated test data](../../../docs/adrs/0007-environments-and-isolation-accepted.md).
-The index and record statuses agree; no conflict or exception was found.
-ADR 0001's Accepted filename lacks the suffix used by the catalog convention;
-this existing naming mismatch changes no decision. The North Star's
-[accepted-change boundary](../../NORTH-STAR.md#one-accepted-change-boundary)
-keeps private learning data outside Portable notebook content. No new direction is needed.
+[Reusable boundaries and Accepted architectural constraints](operational-policy.md#architecture-and-reuse).
 
 ## Execution resume context
 
@@ -202,6 +186,8 @@ Checkpoint B must confirm all binaries and applied migration before slice 13.
 
 [Detailed implementation brief](implementation-briefs.md#preserve-answered-questions-across-tracker-moves-and-old-note-deletion).
 
+[Local retention/schema proof; checkpoint B remains open](tracker-retention-verification.md).
+
 ### 13. Preserve learner evidence through the final schema upgrade
 Type: Behavior
 Status: planned
@@ -243,3 +229,10 @@ Commitment: C84
 Reported: slice 8 — "NoteDependentRowsControllerTestBase still counts MCQ rows through physical note_id; that compatibility consumer must change when mapping and writes retire."
 Story clause: "A question's note is its tracker's note."
 Disposition: proved by slice 11: selected-question-destruction-proof.md; pre-action distinct IDs remain the question observations through deletion, retry and rollback, and full red/green committed-graph cleanup preserves unrelated learning
+
+
+### G4. Observe checkpoint B retention rollout
+Reported: slice 12 — "B remains ROOT-OWNED/unobserved: human-reviewed exact retained landing/tag/SHA, actual publication/every active unmapped binary, production applied FK migration and smokes."
+Story clause: "Full retention acceptance includes confirmation of the FK-drop migration"
+Disposition: return
+Commitment: C55, C88, C89, Q07

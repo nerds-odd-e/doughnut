@@ -1,7 +1,6 @@
 package com.odde.donut.services.ai;
 
 import com.odde.donut.entities.Mcq;
-import com.odde.donut.entities.Note;
 import com.odde.donut.testability.TestabilitySettings;
 import java.util.List;
 import java.util.stream.Stream;
@@ -15,7 +14,7 @@ public class GeneratedQuestionPostProcessor {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public Mcq assembleMcq(GeneratedMcq original, Note note, Long contextSeed) {
+  public Mcq assembleMcq(GeneratedMcq original, Long contextSeed) {
     if (original == null) {
       return null;
     }
@@ -27,7 +26,6 @@ public class GeneratedQuestionPostProcessor {
         testabilitySettings.getRandomizer().shuffle(taggedChoices(original));
 
     Mcq mcq = new Mcq();
-    mcq.setCompatibilityNoteId(note.getId());
     mcq.setQuestionStem(original.getQuestionStem());
     mcq.setResponseChoices(choices.stream().map(TaggedChoice::text).toList());
     mcq.setCorrectAnswerIndex(correctAnswerIndex(choices));

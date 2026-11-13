@@ -29,7 +29,7 @@ public class AiQuestionGenerator {
       GeneratedMcq original =
           noteQuestionGenerationService.generateQuestion(
               note, additionalMessage, contextSeed, propertyFocus);
-      return generatedQuestionPostProcessor.assembleMcq(original, note, contextSeed);
+      return generatedQuestionPostProcessor.assembleMcq(original, contextSeed);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

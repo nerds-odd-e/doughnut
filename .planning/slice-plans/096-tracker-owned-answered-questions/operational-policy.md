@@ -1,5 +1,25 @@
 # Proof and execution policy
 
+## Architecture and reuse
+
+PFE: extend `RecallPrompt`'s existing tracker relationship for attribution;
+`RecallPromptPersister` for atomic selected-question persistence;
+`MemoryTrackerService` and `NoteService.permanentlyRemove` for lifecycle cleanup;
+the existing recent-question repository/export boundary for projection. Reuse
+the existing pre-DDL check pattern in `V300000338__DropNotebookGitBindingBundleBytes`.
+Do not add an archive, second ownership model or alternative deletion owner.
+
+Relevant Accepted decisions: [0001, domain vocabulary](../../../docs/adrs/0001-ubiquitous-language.md),
+[0002, private learning data and content identity](../../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md),
+[0003, grading and durable attempts](../../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md),
+[0006, failure handling](../../../docs/adrs/0006-failure-handling-accepted.md),
+and [0007, isolated test data](../../../docs/adrs/0007-environments-and-isolation-accepted.md).
+The index and record statuses agree; no conflict or exception was found.
+ADR 0001's Accepted filename lacks the suffix used by the catalog convention;
+this existing naming mismatch changes no decision. The North Star's
+[accepted-change boundary](../../NORTH-STAR.md#one-accepted-change-boundary)
+keeps private learning data outside Portable notebook content. No new direction is needed.
+
 ## Outside-in proof ownership
 
 Every row proves surviving behavior or an active access/migration-safety rule.
@@ -10,7 +30,7 @@ Removal acceptance is the separate sweep reading below, never an absence test.
 | Questions have one tracker owner without losing existing attempts | 1, 7 | Read-only ownership probe; generation/recovery controller tests exercise the transactional duplicate recheck and selected question/prompt write. |
 | History, conversations, contest and regeneration use the current note | 2, 12 | `MemoryTrackerRecallHistoryControllerTest`, `ConversationStartControllerTest`, `ConversationListingControllerTest`, `RecallPromptContestControllerTest`, `RecallPromptRegenerateControllerTest`; inspect emitted title/context and mocked external AI input for a moved tracker. |
 | Recent questions follow current note/property, preserving own-choice privacy and ordering | 3, 12 | `NoteExportControllerPropertyHistoryTests`, `NoteExportControllerPropertyPrivacyTests`, `NoteExportControllerLearnerSelectionsTests`, `NoteExportControllerRecentQuestionsTest`, `NoteExportControllerQuestionPrivacyTest`, `NoteExportControllerMovedQuestionsTest`; export moved questions and real recorded choices. |
-| Both move/delete journeys retain identities, question, choices, index, grade, outcome, exclusion and schedule | 12 | Maintained regressions beside `RelationControllerReduceToSourcePropertyTests` and `NoteReifyPropertyTests`: actual reduction/reification then old-note permanent deletion, flush/clear, history, focused MCP sibling reusing `ListRecallAnswersMcpEndpointTestBase`, and export through existing MockMvc/bearer access. Canonical index-2 wrong-answer payload once; inverse delta separately. Observe a positive populated legacy asked row through move/delete/read on the migrated schema too. |
+| Both move/delete journeys retain identities, question, choices, index, grade, outcome, exclusion and schedule | 12 | Maintained regressions in a focused MCP sibling reusing `ListRecallAnswersMcpEndpointTestBase`: actual reduction/reification then old-note permanent deletion, flush/clear, history and export through existing MockMvc/bearer access. The existing controller move suites retain their own mechanics proof. Canonical index-2 wrong-answer payload once; inverse delta separately. Observe a positive populated legacy asked row through move/delete/read on the migrated schema too. |
 | Deleting a tracker removes its owned learning questions; other trackers' history and conversation rules survive | 8, 11, 12 | Extend `MemoryTrackerDeleteControllerTest`, unanswered-prompt recovery and note hard-delete boundary tests with complete FK-closure fixtures, including answer/log/conversation/correction rows. Slice 11 carries pre-destruction selected question IDs into deletion/retry/rollback; 12 retains that proof through compatibility retirement. |
 | Ordinary recall and note actions remain usable | 6 | Mounted toolbar/action tests plus existing mocked recall, contest, property recall and conversation E2E journeys; delete bank-only tests rather than negate them. |
 | Upgrading schema preserves asked questions and their learner evidence | 13 | Temporary migration safety harness on populated isolated MySQL: default-off gate, enabled selection count, pre-DDL refusal and retained question/prompt/answer/log graph. No permanent test of missing bank rows, endpoints or columns. |

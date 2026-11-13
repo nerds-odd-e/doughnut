@@ -87,6 +87,13 @@
   retaining the published story history. It changes only the four incoming
   backlog/retrospective records. The slice 11 script-test CI repair carries this
   combined owned suffix from accepted publication base `2ac7cd...`.
+- Accepted CI repair increment:
+  `b7213b7465b3ee84d26fd7d679a7a03735ac9776`, including merge `3b80788...`.
+  The release-state fixture's deterministic reproduction and 115 passing cases,
+  fresh refactor, formatter and check-only hook support the repair. Managed
+  publication reused the replacement observer without reconciliation. The exact
+  preservation helper then returned `resumed`, OID null, applied false and no
+  dropped entry. Forward execution resumes at 12 from this accepted base.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
