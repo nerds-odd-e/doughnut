@@ -17,14 +17,17 @@ import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.openai.models.responses.StructuredResponseCreateParams;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBase {
+  @Autowired EntityManager entityManager;
   RecallPrompt recallPrompt;
 
   @BeforeEach
@@ -84,8 +87,13 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
     com.odde.donut.controllers.dto.RecallPrompt regeneratedPrompt =
         controller.regenerate(recallPrompt, contestAdvice("test"));
 
-    Assertions.assertThat(regeneratedPrompt.getMcq().getQuestionStem())
-        .contains("What is the first color in the rainbow?");
+    makeMe.entityPersister.flushAndClear();
+    RecallPrompt persisted = entityManager.find(RecallPrompt.class, regeneratedPrompt.getId());
+    Assertions.assertThat(persisted.getMcq().getQuestionStem())
+        .isEqualTo("What is the first color in the rainbow?");
+    Assertions.assertThat(persisted.getMemoryTracker().getId())
+        .isEqualTo(recallPrompt.getMemoryTracker().getId());
+    Assertions.assertThat(persisted.getMcq().getCompatibilityNoteId()).isEqualTo(current.getId());
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     ArgumentCaptor<StructuredResponseCreateParams<GeneratedMcq>> paramsCaptor =

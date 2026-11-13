@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.odde.donut.controllers.dto.Randomization;
-import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.services.McqService;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.ai.QuestionEvaluation;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class McqTest extends SpringTestBase {
   @Autowired McqService mcqService;
-  @Autowired McqRepository mcqRepository;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
@@ -87,7 +85,7 @@ class McqTest extends SpringTestBase {
     }
 
     @Test
-    void shouldRegenerateQuestionWhenEvaluatorDisagreesWithoutRewritingOriginalAnswer() {
+    void selectsRegeneratedQuestionWhenEvaluatorDisagrees() {
       GeneratedMcq regeneratedQuestion = makeMe.aGeneratedMcq().stem("regenerated stem").please();
       openAiStructuredResponseMock.enqueueStructuredResponse(generatedMcq);
       openAiStructuredResponseMock.enqueueStructuredResponse(regeneratedQuestion);
@@ -99,17 +97,6 @@ class McqTest extends SpringTestBase {
 
       assertThat(result.getQuestionStem(), equalTo("regenerated stem"));
       assertThat(result.isContested(), is(false));
-
-      Mcq contestedOriginal = null;
-      for (Mcq mcq : mcqRepository.findAll()) {
-        if (note.getId().equals(mcq.getCompatibilityNoteId()) && mcq.isContested()) {
-          contestedOriginal = mcq;
-          break;
-        }
-      }
-      assertThat(contestedOriginal, notNullValue());
-      assertThat(contestedOriginal.getQuestionStem(), equalTo(generatedMcq.getQuestionStem()));
-      assertThat(contestedOriginal.getCorrectAnswerIndex(), equalTo(0));
     }
   }
 }

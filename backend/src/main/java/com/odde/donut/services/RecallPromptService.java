@@ -5,7 +5,6 @@ import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
-import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.AiQuestionGenerator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 public class RecallPromptService {
   private final McqService mcqService;
   private final RecallPromptRepository recallPromptRepository;
-  private final EntityPersister entityPersister;
   private final AiQuestionGenerator aiQuestionGenerator;
   private final AnswerService answerService;
   private final MemoryTrackerService memoryTrackerService;
@@ -28,7 +26,6 @@ public class RecallPromptService {
   @Autowired
   public RecallPromptService(
       RecallPromptRepository recallPromptRepository,
-      EntityPersister entityPersister,
       AnswerService answerService,
       MemoryTrackerService memoryTrackerService,
       McqService mcqService,
@@ -36,7 +33,6 @@ public class RecallPromptService {
       RecallPromptPersister recallPromptPersister,
       EntityManager entityManager) {
     this.recallPromptRepository = recallPromptRepository;
-    this.entityPersister = entityPersister;
     this.answerService = answerService;
     this.memoryTrackerService = memoryTrackerService;
     this.mcqService = mcqService;
@@ -87,12 +83,7 @@ public class RecallPromptService {
     if (mcq == null) {
       return null;
     }
-    entityPersister.save(mcq);
-    return createARecallPromptFromMcq(mcq, memoryTracker);
-  }
-
-  private RecallPrompt createARecallPromptFromMcq(Mcq mcq, MemoryTracker memoryTracker) {
-    return entityPersister.save(RecallPrompt.forMcq(mcq, memoryTracker));
+    return recallPromptPersister.persistNewRecallPromptForMcq(mcq, memoryTracker);
   }
 
   public QuestionContestResult contest(RecallPrompt recallPrompt) {

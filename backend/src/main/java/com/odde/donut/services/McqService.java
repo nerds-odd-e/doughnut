@@ -27,17 +27,17 @@ public class McqService {
   }
 
   public QuestionContestResult contest(Note note, Mcq mcq) {
-    QuestionEvaluation questionContestResult =
-        aiQuestionGenerator.getQuestionContestResult(note, mcq);
-    if (questionContestResult == null) {
-      return null;
-    }
-    QuestionContestResult result = questionContestResult.getQuestionContestResult(mcq);
-    if (!result.rejected) {
+    QuestionContestResult result = evaluate(note, mcq);
+    if (result != null && !result.rejected) {
       mcq.setContested(true);
       entityPersister.merge(mcq);
     }
     return result;
+  }
+
+  private QuestionContestResult evaluate(Note note, Mcq mcq) {
+    QuestionEvaluation evaluation = aiQuestionGenerator.getQuestionContestResult(note, mcq);
+    return evaluation == null ? null : evaluation.getQuestionContestResult(mcq);
   }
 
   public Mcq generateAFeasibleQuestion(Note note) {
@@ -52,10 +52,8 @@ public class McqService {
       return null;
     }
 
-    entityPersister.save(result);
-
     for (int i = 0; i < regenerationTimes; i++) {
-      QuestionContestResult contestResult = contest(note, result);
+      QuestionContestResult contestResult = evaluate(note, result);
 
       if (contestResult == null || contestResult.rejected) {
         return result;
@@ -66,7 +64,7 @@ public class McqService {
           aiQuestionGenerator.regenerateQuestion(
               contestResult, note, result, regSeedBoxed, propertyFocus);
       if (regeneratedQuestion != null) {
-        result = entityPersister.save(regeneratedQuestion);
+        result = regeneratedQuestion;
       } else {
         return result;
       }

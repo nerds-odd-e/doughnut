@@ -80,7 +80,7 @@ probe has no source commitment allocated to it.
 | C54 | C54 — Stored note column: Delete `mcq.note_id` through the stated rollout sequence. | slice 10 | |
 | C55 | C55 — Stored note foreign key: Delete its foreign key through the stated rollout sequence. | slice 9 | |
 | C56 | C56 — Unreferenced-question migration: Before dropping the column, migrate by deleting questions no prompt uses. | slice 10 | |
-| C57 | C57 — Generation input: Generation takes the tracker’s note as input. | slice 7 | |
+| C57 | C57 — Generation input: Generation takes the tracker’s note as input. | slice 7 | observed: MemoryTrackerQuestionPersistenceControllerTest.persistsTheSelectedQuestionWithItsCurrentTracker: real property reification, exact current-title AI input, and flushed/cleared selected question/input reload; selected-question-verification.md |
 | C58 | C58 — Question representation: Generation does not store its own note on the question. | slice 9 | |
 | C59 | C59 — MCQ injection: Delete testability/E2E `injectMcq`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
 | C60 | C60 — MCQ test data: Delete `McqsTestData`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
@@ -105,7 +105,7 @@ probe has no source commitment allocated to it.
 | C77 | C77 — Prompt identities: Keep existing prompt identities. | slice 9 | |
 | C78 | C78 — Answer identities: Keep existing answer identities. | slice 9 | |
 | C79 | C79 — Log identities: Keep existing log identities. | slice 9 | |
-| C80 | C80 — Prompt boundary: Reuse the existing prompt persistence boundary. | slice 7 | |
+| C80 | C80 — Prompt boundary: Reuse the existing prompt persistence boundary. |  | G1 |
 | C81 | C81 — Note boundary: Reuse the existing note deletion boundary. | slice 8 | |
 | C82 | C82 — Tracker boundary: Reuse the existing tracker deletion boundary. | slice 8 | |
 | E01 | E01 — Relationship reduction journey: A learner answers MCQ index 2 incorrectly on relationship note R’s note-level tracker; the owner reduces R to a property of source S; R is permanently removed. | slice 9 | |
@@ -131,7 +131,7 @@ probe has no source commitment allocated to it.
 | X07 | X07 — Database cascades: Add no new database cascade. | slice 10 | |
 | C83 | C83 — Instance compatibility: Preserve compatibility between two app instances during rollout. | slice 10 | |
 | C84 | C84 — Compatibility attribution: The compatibility release derives attribution through the tracker. | slice 8 |  |
-| C85 | C85 — Compatibility write: That release retains a scalar note-ID write. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation: current fresh read and matching persisted scalar/input/joined note; original-binary launch explicitly unobserved, checkpoint A remains slice 8 |
+| C85 | C85 — Compatibility write: That release retains a scalar note-ID write. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation plus selected-question-verification.md#inspected-controller-observations: persisted current input re-observed through the new writer and actual regeneration after flush/clear; checkpoint A remains slice 8 |
 | Q06 | Q06 — Compatibility consumer: The retained write serves the original eager ORM readers. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation: current fresh read and matching persisted scalar/input/joined note; original-binary launch explicitly unobserved, checkpoint A remains slice 8 |
 | C86 | C86 — Mapping removal timing: After the compatibility release is fully deployed, remove the mapping. | slice 9 | |
 | C87 | C87 — Write removal timing: At that stage, remove the scalar write. | slice 9 | |

@@ -5,10 +5,7 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
-import com.odde.donut.entities.QuestionType;
-import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.ai.GeneratedQuestionPostProcessor;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
@@ -18,19 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class QuestionGenerationBatchRowImportService {
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
-  private final EntityPersister entityPersister;
+  private final RecallPromptPersister recallPromptPersister;
   private final OpenAiApiHandler openAiApiHandler;
   private final QuestionGenerationBatchMetrics batchMetrics;
   private final GeneratedQuestionPostProcessor generatedQuestionPostProcessor;
 
   public QuestionGenerationBatchRowImportService(
       QuestionGenerationBatchRequestRepository batchRequestRepository,
-      EntityPersister entityPersister,
+      RecallPromptPersister recallPromptPersister,
       OpenAiApiHandler openAiApiHandler,
       QuestionGenerationBatchMetrics batchMetrics,
       GeneratedQuestionPostProcessor generatedQuestionPostProcessor) {
     this.batchRequestRepository = batchRequestRepository;
-    this.entityPersister = entityPersister;
+    this.recallPromptPersister = recallPromptPersister;
     this.openAiApiHandler = openAiApiHandler;
     this.batchMetrics = batchMetrics;
     this.generatedQuestionPostProcessor = generatedQuestionPostProcessor;
@@ -63,13 +60,7 @@ public class QuestionGenerationBatchRowImportService {
     Note note = memoryTracker.getNote();
     Mcq mcq =
         generatedQuestionPostProcessor.assembleMcq(generatedMcq, note, request.getContextSeed());
-    entityPersister.save(mcq);
-
-    RecallPrompt recallPrompt = new RecallPrompt();
-    recallPrompt.setMcq(mcq);
-    recallPrompt.setMemoryTracker(memoryTracker);
-    recallPrompt.setQuestionType(QuestionType.MCQ);
-    entityPersister.save(recallPrompt);
+    recallPromptPersister.persistNewRecallPromptForMcq(mcq, memoryTracker);
 
     request.setStatus(QuestionGenerationBatchRequestStatus.IMPORTED);
     batchRequestRepository.save(request);

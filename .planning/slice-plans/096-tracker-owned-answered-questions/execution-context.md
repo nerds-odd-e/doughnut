@@ -30,9 +30,13 @@
 - Accepted slice 4 increment on that
   same target: `35e2b46e4af08c47f378432d3f12746b2eaa7c14`; selective formatting,
   check-only hook, publication and existing-observer registration passed.
-- Accepted slice 5 increment / published base / current candidate on that
+- Accepted slice 5 increment on that
   same target: `dae402dfcf6a4c64865b5e14a6885dc5832842af`; managed delivery
   reused the recorded observer after formatting and the check-only hook passed.
+- Accepted slice 6 increment / published base / current candidate on that
+  same target: `6fec446d97126241cb814e4a0d82acf1b2906514`; selective formatting,
+  independent check-only hook, managed publication and new-observer registration
+  passed without reconciliation.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt

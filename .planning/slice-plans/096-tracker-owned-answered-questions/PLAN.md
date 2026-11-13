@@ -128,13 +128,15 @@ Stop and refine before continuing if editing exceeds ten minutes.
 
 ### 7. Persist each selected question with its prompt
 Type: Behavior
-Status: planned
+Status: done
 Proof: generation and recovery controller boundaries exercise the transactional duplicate recheck, reload the returned prompt and observe the selected question.
 
 Persist only the final selected question atomically with its prompt; retain
 duplicate-recheck and actual-prompt regeneration behavior.
 
 [Detailed implementation brief](implementation-briefs.md#persist-each-selected-question-with-its-prompt).
+
+[Selected-write and application-owned atomicity proof](selected-question-verification.md).
 
 ### 8. Delete learning questions through their tracker lifecycle
 Type: Behavior
@@ -179,3 +181,12 @@ column/index. Confirm checkpoint C, regenerate the ERD and perform the final swe
 ## Plan concern review
 
 [Retained refinement decisions, consumer ownership and unobserved production gates](operational-policy.md#plan-concern-review).
+
+
+## Story obligations
+
+### G1. Observe application-owned question and prompt atomicity
+Reported: slice 7 — "The new payload/cardinality cases use the inherited outer test transaction; application-owned rollback on prompt-write failure has not been observed."
+Story clause: "Generation must persist the selected question with its prompt, rather than leave discarded candidates behind."
+Disposition: proved by slice 7: selected-question-verification.md#application-owned-atomicity; NOT_SUPPORTED controller call reaches a real SQL fault and a separate committed count retains its baseline, 1/1 in the final full suite
+Commitment: C80

@@ -29,6 +29,12 @@ public class RecallPromptPersister {
     if (existingPrompt != null) {
       return existingPrompt;
     }
+    return persistNewRecallPromptForMcq(mcq, memoryTracker);
+  }
+
+  @Transactional
+  public RecallPrompt persistNewRecallPromptForMcq(Mcq mcq, MemoryTracker memoryTracker) {
+    entityPersister.save(mcq);
     return entityPersister.save(RecallPrompt.forMcq(mcq, memoryTracker));
   }
 }
