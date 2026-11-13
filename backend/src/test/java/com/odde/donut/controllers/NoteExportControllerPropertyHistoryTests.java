@@ -54,7 +54,6 @@ class NoteExportControllerPropertyHistoryTests extends ControllerTestBase {
     question("example of", "[[walk]]", "newer-walk");
     question("Example of", "[[run]]", "different-key-case", makeMe.aUser().please());
     question("example of", "[[Run]]", "different-value-case", makeMe.aUser().please());
-    makeMe.anMcq().forNote(note).stem("unlinked-newer").please();
     String markdown = markdown(request("example of").param("propertyValue", "[[run]]"));
     List<String> stems =
         markdown.lines().filter(line -> line.matches("\\d+\\. matching-.*")).toList();
@@ -77,8 +76,7 @@ class NoteExportControllerPropertyHistoryTests extends ControllerTestBase {
             anyOf(
                 containsString("newer-walk"),
                 containsString("different-key-case"),
-                containsString("different-value-case"),
-                containsString("unlinked-newer"))));
+                containsString("different-value-case"))));
   }
 
   @Test

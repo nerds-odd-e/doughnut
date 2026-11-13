@@ -62,7 +62,13 @@ class NoteExportControllerPropertyPrivacyTests extends ControllerTestBase {
         makeMe.aMemoryTrackerFor(note).by(makeMe.aUser().please()).propertyKey("topic").please();
     makeMe
         .aRecallPrompt()
-        .withMcq(question)
+        .withMcq(
+            makeMe
+                .anMcq()
+                .forNote(note)
+                .stem("another-learner-question")
+                .choices("other-pick", "unused", "key")
+                .please())
         .forMemoryTracker(other)
         .answerChoiceIndex(0)
         .answerTimestamp(Timestamp.from(Instant.parse("2026-10-01T00:00:00Z")))
@@ -73,8 +79,9 @@ class NoteExportControllerPropertyPrivacyTests extends ControllerTestBase {
         .andExpect(jsonPath("$.markdown", containsString("Property value: Biology")))
         .andExpect(jsonPath("$.markdown", containsString("   - key")))
         .andExpect(jsonPath("$.markdown", containsString("Donut answer key: key")))
+        .andExpect(jsonPath("$.markdown", containsString("Learner's selected answer: latest-pick")))
         .andExpect(
-            jsonPath("$.markdown", containsString("Learner's selected answer: latest-pick")));
+            jsonPath("$.markdown", not(containsString("Learner's selected answer: other-pick"))));
   }
 
   @Test

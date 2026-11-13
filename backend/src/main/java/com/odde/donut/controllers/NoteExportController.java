@@ -113,10 +113,10 @@ class NoteExportController {
     }
     if (includeRecentQuestions) {
       List<Mcq> questions =
-          selection == null
-              ? mcqRepository.findTop10ByNote_IdOrderByCreatedAtDescIdDesc(note.getId())
-              : mcqRepository.findRecentForProperty(
-                  note.getId(), selection.key(), selection.itemValue());
+          mcqRepository.findRecentForNote(
+              note.getId(),
+              selection == null ? null : selection.key(),
+              selection == null ? null : selection.itemValue());
       markdown =
           markdown
               + RecentNoteQuestionsMarkdownAppendix.render(

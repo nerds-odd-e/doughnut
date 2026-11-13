@@ -42,9 +42,9 @@ probe has no source commitment allocated to it.
 | C19 | C19 — Prompt conversations: Conversations about a prompt use the tracker’s current note. | slice 2 | observed: ConversationStartControllerTest.usesTheTrackersCurrentNoteAsSubject; ConversationListingControllerTest.titlesRecallConversationsWithTheTrackersCurrentNote; ConversationAiReplyControllerTest.usesTheTrackersCurrentNoteForAiContextAndCorrections observes exact focus-note title and correction note ID after real reification; final full backend pass. |
 | C20 | C20 — Contest context: Contest context uses the tracker’s current note. | slice 2 | observed: RecallPromptContestControllerTest.contestsAgainstTheTrackersCurrentNote observes exact focus_note title in mocked external AI request after real reification; final full backend pass. |
 | C21 | C21 — Regeneration context: Regeneration context uses the tracker’s current note. | slice 2 | observed: RecallPromptRegenerateControllerTest.shouldPassOldQuestionAndContestResultToOpenAiApi observes exact current focus_note title and retained regeneration inputs after real reification; final full backend pass. |
-| C22 | C22 — Recent-question attribution: A note export’s recent questions use the tracker’s current note. | slice 3 | |
-| C23 | C23 — Export selection: Recent-question export lists questions asked through trackers currently on the exported note. | slice 3 | |
-| Q01 | Q01 — Property focus: Recent-question export keeps property focus unchanged. | slice 3 | |
+| C22 | C22 — Recent-question attribution: A note export’s recent questions use the tracker’s current note. | slice 3 | observed: NoteExportControllerMovedQuestionsTest.exportsTheMovedTrackersQuestionAndOwnChoiceOnItsCurrentNote: real reification then numbered question and recorded selection from current-note export; full backend pass. |
+| C23 | C23 — Export selection: Recent-question export lists questions asked through trackers currently on the exported note. | slice 3 | observed: McqRepository.findRecentForNote uses prompt/current-tracker EXISTS; RecentQuestionsTest.anotherNotesQuestionsAreExcluded and PropertyHistoryTests observe note/focus membership through export; full backend pass. |
+| Q01 | Q01 — Property focus: Recent-question export keeps property focus unchanged. | slice 3 | observed: NoteExportControllerPropertyHistoryTests exact key/value binary matching and distinct-newest-ten plus PropertyTests duplicate-occurrence/shared-history HTTP observations; full backend pass. |
 | C24 | C24 — Bank removal: Delete the note question bank transitively. | slice 6 | |
 | C25 | C25 — Add Question: Delete the bank’s Add Question capability. | slice 6 | |
 | C26 | C26 — Questions list: Delete the note’s Questions list. | slice 6 | |
@@ -72,7 +72,7 @@ probe has no source commitment allocated to it.
 | C46 | C46 — Refinement prompt: Delete its prompt. | slice 6 | |
 | C47 | C47 — Unused generation overloads: Delete unused `getAiGeneratedQuestion` overloads. | slice 6 | |
 | C48 | C48 — Note collection: Delete `Note.mcqs`. | slice 6 | |
-| C49 | C49 — Note-based repository query: Delete `McqRepository.findTop10ByNote_Id…`. | slice 3 | |
+| C49 | C49 — Note-based repository query: Delete `McqRepository.findTop10ByNote_Id…`. | slice 3 | observed: Retained current-tracker query/controller selection and ordering proof; consumer-trace directed inspection and separate retirement reading recorded in recent-question-verification.md. |
 | C50 | C50 — Controller tests: Delete `McqControllerTests`. | slice 6 | |
 | C51 | C51 — Refinement controller tests: Delete `McqRefinementControllerTests`. | slice 6 | |
 | C52 | C52 — Transactional ratchet entries: Delete `McqController` entries in `OpenAiTransactionalRatchetTest`. | slice 6 | |
@@ -99,8 +99,8 @@ probe has no source commitment allocated to it.
 | C73 | C73 — Generated API package: Regenerate `packages/generated/donut-backend-api`. | slice 6 | |
 | Q04 | Q04 — Ownership cardinality: One question belongs to one tracker. | slice 9 | |
 | Q05 | Q05 — Prompt sharing qualification: That ownership rule does not independently forbid multiple prompts on the same tracker from referring to that question. | slice 8 | |
-| C74 | C74 — Cross-learner export fixtures: Fixtures that share a question across learners must instead use separate tracker-owned questions. | slice 3 | |
-| C75 | C75 — Fixture privacy: Those fixtures preserve privacy. | slice 3 | |
+| C74 | C74 — Cross-learner export fixtures: Fixtures that share a question across learners must instead use separate tracker-owned questions. | slice 3 | observed: QuestionPrivacyTest.newerOtherLearnerAttemptDoesNotSubstitute and PropertyPrivacyTests.focusedRequestUsesLatestOwnAnswerAndKeepsCompleteAppendixOutsideBudget arrange distinct MCQs for each learner tracker; full backend pass. |
+| C75 | C75 — Fixture privacy: Those fixtures preserve privacy. | slice 3 | observed: QuestionPrivacyTest and PropertyPrivacyTests observe own selections, other-answer non-disclosure, guest behavior and access refusal through real export; full backend pass. |
 | C76 | C76 — Tracker identities: Keep existing tracker identities. | slice 9 | |
 | C77 | C77 — Prompt identities: Keep existing prompt identities. | slice 9 | |
 | C78 | C78 — Answer identities: Keep existing answer identities. | slice 9 | |

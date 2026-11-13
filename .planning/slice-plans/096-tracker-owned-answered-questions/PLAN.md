@@ -79,13 +79,15 @@ the tracker’s current note while retaining the compatibility storage write.
 
 ### 3. Export recent questions from trackers currently on the note
 Type: Behavior
-Status: planned
+Status: done
 Proof: export controller cases for note/property membership, newest ordering and the learner's own choice/privacy.
 
 Export through prompts/current trackers and property focus, retaining recent
 ordering, the learner’s own choice and privacy.
 
 [Detailed implementation brief](implementation-briefs.md#export-recent-questions-from-trackers-currently-on-the-note).
+
+[Accepted export proof and consumer dispositions](recent-question-verification.md).
 
 ### 4. Keep test setup stable while separating its domain responsibilities
 Type: Structure

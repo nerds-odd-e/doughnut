@@ -11,10 +11,16 @@
 - Starting revision: `59e8f14526f34e61d6cb02a98ba57ece17e4b15a`;
   accepted claim on `origin/main`:
   `9baf479ddac80f7e0b8bf27390f876109b0ff4d9`.
-- Accepted slice 1 increment / published base / current candidate on
+- Accepted slice 1 increment on
   `origin/codex/keep-answered-questions-with-their-tracker`:
   `007d7a2071eb247156d09dacbb87d3de5dddcc1b`; managed delivery reused the
   recorded observer after selective formatting and the agent commit passed.
+- Accepted slice 2 increment / published base / current candidate on that
+  same target: `9ca386f8c13635ecdc411513c673227f364520c5`. Selective formatting,
+  check-only commit hook and managed publication passed; the same observer
+  registered the accepted revision. A staged whitespace stop before commit
+  was resolved by trimming terminal blank lines in three new records and
+  retrying guarded preparation; semantic proof was unchanged.
 - Separate integration/default checkout: `/Users/terryyin/git/doughnut`;
   this execution has not mutated it.
 - Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh` passed its
