@@ -140,7 +140,7 @@ duplicate-recheck and actual-prompt regeneration behavior.
 
 ### 8. Delete learning questions through their tracker lifecycle
 Type: Behavior
-Status: planned
+Status: done
 Proof: direct tracker, unanswered-prompt and note-deletion controller tests with complete dependent fixtures, preserving other trackers' history and conversation behavior.
 
 Use the shared tracker lifecycle to clean owned questions across all destruction
@@ -152,8 +152,8 @@ Checkpoint A must confirm every active instance before slice 9.
 [Accepted local lifecycle proof and retained rollout obligation](tracker-lifecycle-verification.md).
 [Checkpoint A preparation and dated production baseline](release-checkpoints.md).
 
-Compatible publication and all-active/schema/public probes are observed.
-G2 awaits the remaining interactive login smoke before this slice and checkpoint settle.
+Compatible publication and all-active/schema/public probes are observed;
+the developer's manual login confirmation settles G2 and checkpoint A.
 
 ### 9. Preserve answered questions across tracker moves and old-note deletion
 Type: Behavior
@@ -201,9 +201,8 @@ Commitment: C80
 ### G2. Observe checkpoint A compatibility rollout
 Reported: slice 8 — "Checkpoint A still requires the reviewed retained landing and exact stable-tag go-ahead, then actual publication and all-active-instance compatibility evidence."
 Story clause: "Use a compatibility release that derives attribution through the tracker while retaining a scalar note ID write for original readers."
-Disposition: return
+Disposition: proved by slice 8: release-checkpoints.md#checkpoint-a-publication-and-observation; approved exact retained landing, main CI/artifacts, actual publication/all-active/schema/public observations and developer manual login confirmation
 Commitment: C84
-
 ### G3. Retain note deletion proof through compatibility retirement
 Reported: slice 8 — "NoteDependentRowsControllerTestBase still counts MCQ rows through physical note_id; that compatibility consumer must change when mapping and writes retire."
 Story clause: "A question's note is its tracker's note."

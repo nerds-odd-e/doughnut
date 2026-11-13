@@ -104,7 +104,7 @@ The retained-increment completion check correctly reports unfinished slices
   The release record independently reports the same identities and
   `outcome: succeeded`. No workflow rerun or automatic patch bump occurred.
 
-### Production observations and remaining smoke
+### Production observations and manual smoke
 
 The reviewed disposable probe ran with
 `./scripts/run.sh python3 /tmp/donut-tracker-delivery-60c866c4/checkpoint-a-postrelease.py`
@@ -140,9 +140,13 @@ LB health reports the same production build. The public CLI URL matches the
 frontend-bucket object generation `1794314872038666`, 2,037,020 bytes and
 `text/javascript` media type.
 
-Actual interactive login remains unobserved. CUA reported the browser access
-host unavailable before any UI action; that CUA part was closed with its
-failure summary. The developer has been asked asynchronously to sign in and
-confirm reaching notebooks. This is a missing smoke observation, not another
-release approval. G2 and slice 8 remain open pending that result; slice 9
-has not started. Automated success does not stand in for authentication.
+The automated observation did not exercise interactive login: CUA reported
+the browser access host unavailable before any UI action, and that CUA part
+was closed with its failure summary. Its raw result remains unchanged.
+The developer was asked to sign in and confirm reaching notebooks, then
+replied `LGTM` to that explicit outstanding check. At the
+`2026-11-13 07:33 UTC` resume this is accepted as the developer's manual
+login smoke confirmation, not an automated authentication result. Together
+with the accepted publication/all-active/schema/public observations above,
+it settles G2 and checkpoint A. Slice 9 may now proceed; its own checkpoint B
+still requires the plan's separate exact-identity go-ahead.

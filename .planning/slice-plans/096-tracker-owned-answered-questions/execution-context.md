@@ -26,7 +26,8 @@
   reused the recorded observer.
 - Accepted CI repair on that same target:
   `9124093716d69beca4f5903460d71a27e1d8f48f`; the existing observer registered
-  it. Default-worker hosted CI remains pending observation.
+  it. That original repair receipt left default-worker hosted CI unobserved;
+  checkpoint A's later exact main CI validated the integrated product.
 - Accepted slice 4 increment on that
   same target: `35e2b46e4af08c47f378432d3f12746b2eaa7c14`; selective formatting,
   check-only hook, publication and existing-observer registration passed.
@@ -43,15 +44,20 @@
   registration passed without reconciliation. G1 is proved by current
   outside-harness controller atomicity; G2 owns checkpoint A in slice 8.
 - Accepted slice 8 progress increment / published base:
-  `4059ac2353c590f33c971f5d531cf3853dacd4a8`; slice 8 stays planned until
-  checkpoint A's remaining login smoke is observed. Code proof, fresh refactor,
+  `4059ac2353c590f33c971f5d531cf3853dacd4a8`. Code proof, fresh refactor,
   formatter, check-only hook and publication passed. That exact commit then
   landed on main after the developer's checkpoint go-ahead; capture receipt
   `0990e918-fe44-41bf-af5c-3249d5ed7c02` records the original launch.
   Default checkout advanced safely to the same SHA. Application `v1.3.74`
   is deployed; exact main CI `43383257124`/1 and Application Release
   `43384379117`/1, actual publication job `131749515563`, succeeded.
-  [Dated rollout, schema, public smoke and remaining login evidence](release-checkpoints.md#checkpoint-a-publication-and-observation).
+  [Dated rollout, schema, public and manual smoke evidence](release-checkpoints.md#checkpoint-a-publication-and-observation).
+- Accepted release-record progress increment / published base:
+  `d4adc13a41782691b2f515e5ce24c9bb2fcde880`. It changes only ignored planning
+  records; its attached observer confirmed successful applicable basis
+  `4059ac2353c590f33c971f5d531cf3853dacd4a8`. Developer `LGTM` now settles
+  the requested manual login smoke and checkpoint A; slice 8's closing
+  records can be delivered before slice 9 starts.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
@@ -78,8 +84,12 @@
 - Observer key:
   `ci-watch-execution:nerds-odd-e/doughnut:codex/keep-answered-questions-with-their-tracker:nao-tracker-60c866c4`;
   coordinator: `nao-tracker-60c866c4`; directory:
-  `/tmp/dough-ci-501/watch-TP3o9D`; PID: `44192`; stream session: `20945`;
-  yielded cell: `g53:49`; checkout: the owned workspace above.
+  `/tmp/dough-ci-501/watch-kxc0PK`; PID: `31924`; stream session: `86510`;
+  yielded cell: `g59:5`; checkout: the owned workspace above.
+- The preceding branch observer `/tmp/dough-ci-501/watch-TP3o9D` stopped
+  for the manual-smoke handoff, zero unread; PID `44192` exit was confirmed.
+  It observed the records-only progress increment through the successful
+  applicable `4059ac2353c590f33c971f5d531cf3853dacd4a8` basis.
 - The preceding branch observer `/tmp/dough-ci-501/watch-GhQDNm` was stopped
   at the checkpoint approval handoff;
   PID `59821` exit was confirmed, zero unread. Exact branch CI
