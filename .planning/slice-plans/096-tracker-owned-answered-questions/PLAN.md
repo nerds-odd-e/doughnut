@@ -84,9 +84,6 @@ Type: Behavior
 Status: done
 Proof: generation and recovery controller boundaries exercise the transactional duplicate recheck, reload the returned prompt and observe the selected question.
 
-Persist only the final selected question atomically with its prompt; retain
-duplicate-recheck and actual-prompt regeneration behavior.
-
 [Detailed implementation brief](implementation-briefs.md#persist-each-selected-question-with-its-prompt).
 
 [Selected-write and application-owned atomicity proof](selected-question-verification.md).
@@ -113,9 +110,6 @@ Type: Structure
 Status: done
 Proof: all 14 existing recall-history export scenarios retain their bodies/assertions and pass in the full backend suite.
 
-Separate recall-event content/state from export envelope/access/daily probes,
-sharing only existing setup and `answerMcqAtDay`. Enables Behavior 12.
-
 [Detailed implementation brief](implementation-briefs.md#keep-recall-history-proof-in-cohesive-test-homes).
 
 [Accepted scenario-preservation and full-suite proof](recall-history-test-homes-verification.md).
@@ -125,9 +119,6 @@ Type: Structure
 Status: done
 Proof: all creation-fixture consumers retain current ownership, authorization, payload and committed-isolation observations in the full backend suite.
 
-Retire note-only builder/helper inputs while keeping production compatibility
-mapping/writes and the prompt builder's scalar fallback/save. Enables Behavior 12.
-
 [Detailed implementation brief](implementation-briefs.md#create-test-questions-through-their-tracker-and-prompt).
 
 [Accepted fixture-preservation and full-suite proof](tracker-creation-fixtures-verification.md).
@@ -136,9 +127,6 @@ mapping/writes and the prompt builder's scalar fallback/save. Enables Behavior 1
 Type: Structure
 Status: done
 Proof: capture question IDs before destruction and observe those same IDs across deletion, retry, rollback and committed fixture cleanup; full backend suite stays green.
-
-Settle G3 and fixture cleanup through tracker/prompt ownership while production
-mapping/writes/FK remain unchanged. Enables Behavior 12.
 
 [Detailed implementation brief](implementation-briefs.md#keep-destruction-proof-tied-to-the-selected-questions).
 
@@ -248,3 +236,8 @@ Disposition: receiving slice 15
 Reported: slice 13 — "Full-suite native 34545 stopped both new cases before DML because unrelated promptless rows existed; populated cleanup preservation remains unobserved."
 Story clause: "Then clean unreferenced questions and drop the column."
 Disposition: receiving slice 14
+
+### G7. Observe hosted isolated-catalog capability
+Reported: slice 13 — "The local owned-catalog proof and YAML checks do not observe GitHub root authentication, named-account bootstrap, credential transfer and catalog grant/revoke/drop."
+Story clause: "Then clean unreferenced questions and drop the column."
+Disposition: return

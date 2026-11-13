@@ -24,6 +24,10 @@ inputs:
   mysql_db_password:
     description: "MySQL DB password"
     required: true
+  mysql_db_root_password:
+    description: "Optional administrator password for isolated upgrade tests"
+    required: false
+    default: ""
   mysql_db_host_port:
     description: "MySQL DB host port"
     type: number
@@ -45,5 +49,16 @@ runs:
         mysql database: ${{ inputs.mysql_db_instance }}
         mysql user: ${{ inputs.mysql_db_user }}
         mysql password: ${{ inputs.mysql_db_password }}
+        mysql root password: ${{ inputs.mysql_db_root_password }}
         host port: ${{ inputs.mysql_db_host_port }}
         container port: ${{ inputs.mysql_db_container_port }}
+    - name: Create the named test account with administrator setup
+      if: ${{ inputs.mysql_db_root_password != '' }}
+      shell: bash
+      env:
+        MYSQL_BOOTSTRAP_ROOT_PASSWORD: ${{ inputs.mysql_db_root_password }}
+        MYSQL_BOOTSTRAP_USER: ${{ inputs.mysql_db_user }}
+        MYSQL_BOOTSTRAP_PASSWORD: ${{ inputs.mysql_db_password }}
+        MYSQL_BOOTSTRAP_DATABASE: ${{ inputs.mysql_db_instance }}
+        MYSQL_BOOTSTRAP_PORT: ${{ inputs.mysql_db_container_port }}
+      run: bash "$GITHUB_ACTION_PATH/create-test-user.sh"

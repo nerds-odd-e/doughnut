@@ -55,6 +55,7 @@ jobs:
           mysql_db_instance: ${{ env.MYSQL_UT_DB }}
           mysql_db_user: ${{ env.MYSQL_DB_USER }}
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
+          mysql_db_root_password: ${{ env.MYSQL_DB_PASSWORD }}
       - name: Setup Redis DB Server
         uses: ./.github/redis_db
         with:
@@ -65,6 +66,7 @@ jobs:
           java_version: ${{ vars.JAVA_VERSION }}
       - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
       - id: backend-tests
+        env: { QUESTION_UPGRADE_DB_ADMIN_PASSWORD: "${{ env.MYSQL_DB_PASSWORD }}" }
         run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
       - if: ${{ !cancelled() && steps.backend-tests.outcome != 'skipped' }}
         uses: ./.github/ci_proof_fragments

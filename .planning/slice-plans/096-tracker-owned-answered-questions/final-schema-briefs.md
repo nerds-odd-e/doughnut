@@ -97,7 +97,7 @@ remaining work, successful gate-on retry, exact intended selection and the
 complete asked graph. Include unanswered references and same-tracker shared
 questions, plus answered/excluded/logged question and conversation evidence.
 Keep independent expected identities/payload outside builders. Teardown owns
-only the fixture graph and temporary history, using finally; no FK disabling.
+only the isolated catalog and its temporary grant, using finally; no FK disabling.
 DDL auto-commits must never occur inside an assumed rollback-only transaction.
 
 Editing/cleanup budget 8–10 minutes, scrutinize above five and stop/refine above
@@ -165,3 +165,5 @@ Retained preflight/proposals and the corrected second-catalog assumption:
 `/tmp/donut-final-schema-preflight.md`,
 `/tmp/donut-final-schema-plan-proposal.md`,
 `/tmp/donut-final-schema-harness-readiness.md`.
+
+[Actual read-only production baseline and selection count for C review](checkpoint-c-preparation.md).

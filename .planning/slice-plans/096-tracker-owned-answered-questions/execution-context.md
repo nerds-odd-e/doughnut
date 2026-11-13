@@ -204,3 +204,13 @@
   attempt cost/failure provenance and selected PFE are in the final briefs.
   The 16-slice resplit recommendation has an optional developer question;
   current story authority continues the bounded setup pending that preference.
+
+- Local Structure 13 resource proof `63257` passed all 643 classes/3,199 tests,
+  including positive original-catalog sentinel preservation and target cleanup.
+  CI wrapper source/workflow checks passed separately. Merge `01afe6df...`
+  imports main `5d2ae88...` before proof. G7 still owns actual hosted capability;
+  the pending progress increment must not mark 13 done. Detailed evidence:
+  [isolated fixture verification](upgrade-isolation-verification.md).
+- Read-only C baseline native `67246` observed v1.3.75/34cf, applied357,
+  14,119 rows referenced by no prompt, the full FK closure and safe process
+  observation capability. [Dated inputs/limits](checkpoint-c-preparation.md).
