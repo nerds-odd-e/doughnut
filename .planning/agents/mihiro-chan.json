@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Mihiro-chan",
+  "email": "mihiro-chan@example.org",
+  "identity": "SEED-129#bound-ci-system-package-installation",
+  "mode": "story-branch",
+  "branch": "cursor/bound-ci-system-package-installation",
+  "host": "cursor",
+  "model": "auto"
+}
