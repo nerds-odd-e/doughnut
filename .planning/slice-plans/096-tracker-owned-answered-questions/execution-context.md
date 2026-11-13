@@ -214,3 +214,10 @@
 - Read-only C baseline native `67246` observed v1.3.75/34cf, applied357,
   14,119 rows referenced by no prompt, the full FK closure and safe process
   observation capability. [Dated inputs/limits](checkpoint-c-preparation.md).
+
+- Structure 13 progress `946605f1ba1e60ae1d12940a069e344ee404b086` published
+  after fresh refactor, formatting and hook. Exact branch CI `43429706691`/1
+  succeeded; native60577 await receipt agrees. Its actual backend case and
+  default E2E path settle G7. The same observer remains live. Ordinary 13 done
+  delivery is records-only; next14 may restore the compatible parked cleanup
+  logic using the verified isolated fixture after that accepted transition.

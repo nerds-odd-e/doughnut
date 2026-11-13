@@ -148,7 +148,7 @@ Checkpoint B must confirm all binaries and applied migration before slice 13.
 
 ### 13. Isolate the populated migration proof from shared test fixtures
 Type: Structure
-Status: planned
+Status: done
 Proof: canonical pre-C engine replay and committed MakeMe graph in an owned catalog, unchanged backend behavior, actual backend CI resource capability.
 
 Reuse the test datasource/transaction seams with owned catalog allocation and
@@ -240,4 +240,4 @@ Disposition: receiving slice 14
 ### G7. Observe hosted isolated-catalog capability
 Reported: slice 13 — "The local owned-catalog proof and YAML checks do not observe GitHub root authentication, named-account bootstrap, credential transfer and catalog grant/revoke/drop."
 Story clause: "Then clean unreferenced questions and drop the column."
-Disposition: return
+Disposition: proved by slice 13: upgrade-isolation-verification.md#hosted-resource-proof; exact run 43429706691/1 backend job 131899854654 and its uploaded isolation-file case prove the hosted setup and target lifecycle

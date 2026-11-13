@@ -1,7 +1,7 @@
 # Isolated upgrade fixture verification
 
-Local Structure 13 proof, 2026-11-13. Hosted capability remains G7, owned by
-13; destructive cleanup remains G6/14 and actual C remains G5/15.
+Structure 13 proof, 2026-11-13. Local and exact hosted capability are now
+observed; G7 is proved. Destructive cleanup remains G6/14 and actual C G5/15.
 
 ## Implemented responsibility
 
@@ -96,3 +96,33 @@ Current Java bytes match accepted 63257 sources; selected conventions, all
 handwritten size limits and documented whitespace checks passed. No refactor
 edits/tests were needed. Final source freshness remained unchanged at main
 `5d2ae88...`. Report: `/tmp/donut-upgrade-isolation-refactor.md`.
+
+## Hosted resource proof
+
+Progress `946605f1ba1e60ae1d12940a069e344ee404b086` published after the
+coordinator formatter and independent hook. Exact CI run `43429706691`/1
+backend job `131899854654` succeeded, including MySQL setup and full test
+step. Its uploaded artifact
+`ci-proof-fragments-Backend-unit-tests-case-1-attempt-1`, ID `14038691990`,
+contains the exact revision/attempt and the new IsolationTest file with
+one passed case, zero failed/other, 2,210ms. That actual case exercises the
+named-account bootstrap, admin credential, target routing and revoke/drop.
+The existing E2E default path also ran in completed successful database jobs.
+
+The project `fragmentProblems` validator accepted the unmodified artifact;
+identity and the file's exact counters were checked independently. Raw file:
+`/tmp/donut-structure13-ci-backend-proof/backend-src-test-java-case-1.json`.
+Saved job/step result:
+`/tmp/donut-tracker-delivery-60c866c4/isolation13-ci-backend-job.json`.
+The configured fragment reports 3,099 passed/0 failed/2 other within its
+Intent entry membership, not the local full-suite count of 3,199. Its exact
+file observation establishes this host promise without inferring it from
+an overall workflow label. G7 is proved; the selected whole-run CI wait must
+still succeed before ordinary 13 completion and Behavior 14.
+
+Whole-run CI wait `await-revision .../watch-iD99Qe 946605f1...`, native
+`60577`, exited 0 with requested exact SHA, execution-branch target and
+`verdict: success`, checked by `43429706691`/1. This is progress observation,
+not observer shutdown; the same live stream continues. Ordinary records-only
+13 completion can now proceed without another test/refactor run. Current code
+is unchanged from the accepted formatter/hook/CI candidate.
