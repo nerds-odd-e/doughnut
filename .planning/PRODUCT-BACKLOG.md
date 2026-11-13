@@ -8,6 +8,8 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
+- [Speed up the slowest E2E scenarios](seeds/SEED-128-faster-e2e-feedback.md#speed-up-the-slowest-e2e-scenarios) — SEED-128#speed-up-the-slowest-e2e-scenarios
+
 ## Backlog list
 
 - [Keep answered questions with their tracker](seeds/SEED-073-learning-refinement-and-retrieval.md#keep-answered-questions-with-their-tracker) — SEED-073#keep-answered-questions-with-their-tracker

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsukasa-chan",
+  "email": "tsukasa-chan@example.org",
+  "identity": "SEED-128#speed-up-the-slowest-e2e-scenarios",
+  "mode": "story-branch",
+  "branch": "claude/use-the-dough-test-optimization-skill-to-optimiz",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
