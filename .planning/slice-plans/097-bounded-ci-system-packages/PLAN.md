@@ -124,8 +124,9 @@ analysis; the single real package/run wait is an external-wait exception.
 ### 2. Give canvas package setup one bounded failure policy
 Type: Behavior
 Status: planned
-Proof: `CURSOR_DEV=true nix develop -c bash scripts/test/ci-system-packages.sh.test`,
-the Linux canvas action observations in the proof table, and normal push CI.
+Proof: focused shell ok (deadline + bypass, slow success, transient recovery);
+action wires `scripts/ci-system-packages.sh canvas`. Push CI caller inheritance
+outstanding (progress).
 
 Behavior: a Linux Node/Cypress caller requests its existing canvas packages →
 update and install share one 600-second budget with bounded acquisition retries

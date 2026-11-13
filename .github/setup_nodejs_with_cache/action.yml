@@ -32,10 +32,7 @@ runs:
     - name: Install canvas build dependencies
       if: runner.os == 'Linux'
       shell: bash
-      run: |
-        sudo apt-get update
-        sudo apt-get install --yes --no-install-recommends \
-          libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+      run: bash scripts/ci-system-packages.sh canvas
     - name: Install dependencies
       shell: bash
       run: pnpm --frozen-lockfile recursive install

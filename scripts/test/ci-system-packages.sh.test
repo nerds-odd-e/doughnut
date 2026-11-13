@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+#
+# Real Bash-boundary proof for scripts/ci-system-packages.sh canvas.
+# Exercises production run_bounded_phase with the real timeout binary; only
+# sudo/apt-get are stand-ins. MakeMe=false, pageObjects=false.
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SCRIPT="$REPO_ROOT/scripts/ci-system-packages.sh"
+# shellcheck source=ci-system-packages-test-lib.sh
+source "$REPO_ROOT/scripts/test/ci-system-packages-test-lib.sh"
+
+clear_fixture_env() {
+	unset APT_GET_HANG APT_GET_DELAY_SECONDS APT_GET_FAIL_ONCE \
+		CI_SYSTEM_PACKAGES_BUDGET_SECONDS CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS || true
+}
+
+# --- deadline exhaustion: hanging APT under real timeout ---
+test_deadline_exhaustion() {
+	require_timeout
+	local work status elapsed start end out
+	work=$(mktemp -d)
+	setup_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	export APT_GET_HANG=1
+	export CI_SYSTEM_PACKAGES_BUDGET_SECONDS=3
+	export CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2
+	unset APT_GET_DELAY_SECONDS APT_GET_FAIL_ONCE || true
+
+	start=$(date +%s)
+	set +e
+	run_canvas_under_fakes "$work"
+	status=$?
+	set -e
+	end=$(date +%s)
+	elapsed=$((end - start))
+	out=$(cat "$work/out")
+
+	deadline_assertions_hold "$status" "$out" "$elapsed" ||
+		fail "deadline exhaustion assertions failed; status=$status elapsed=$elapsed out=$out"
+
+	clear_fixture_env
+	trap - RETURN
+	rm -rf "$work"
+}
+
+# Guard bypass: same deadline assertions must fail when production timeout is a
+# passthrough (proves the regression is discriminating). Outer real timeout
+# bounds the hang so the suite cannot stall. Restore real timeout via PATH order.
+test_deadline_exhaustion_fails_with_guard_bypassed() {
+	require_timeout
+	local work status out elapsed start end real_timeout
+	work=$(mktemp -d)
+	setup_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+	real_timeout=$(command -v timeout)
+
+	# Passthrough timeout: keep argv shape, drop the deadline.
+	{
+		printf '#!%s\n' "$(command -v bash)"
+		cat <<'EOS'
+set -euo pipefail
+# timeout [--kill-after=Ns] DURATION COMMAND…
+while [[ ${1:-} == --kill-after=* ]]; do
+	shift
+done
+if [[ ${1:-} == *s ]]; then
+	shift
+fi
+exec "$@"
+EOS
+	} >"$work/bin/timeout"
+	chmod +x "$work/bin/timeout"
+
+	export APT_GET_HANG=1
+	export CI_SYSTEM_PACKAGES_BUDGET_SECONDS=3
+	export CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2
+	unset APT_GET_DELAY_SECONDS APT_GET_FAIL_ONCE || true
+
+	start=$(date +%s)
+	set +e
+	APT_GET_HANG=1 \
+		APT_GET_LOG="$APT_GET_LOG" \
+		APT_STATE_DIR="$APT_STATE_DIR" \
+		CI_SYSTEM_PACKAGES_BUDGET_SECONDS=3 \
+		CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2 \
+		"$real_timeout" --kill-after=2s 8s \
+		env PATH="$work/bin:$PATH" bash "$SCRIPT" canvas >"$work/out" 2>&1
+	status=$?
+	set -e
+	end=$(date +%s)
+	elapsed=$((end - start))
+	out=$(cat "$work/out")
+
+	if deadline_assertions_hold "$status" "$out" "$elapsed"; then
+		fail "deadline assertions still held with timeout guard bypassed (regression not discriminating); elapsed=$elapsed out=$out"
+	fi
+
+	clear_fixture_env
+	trap - RETURN
+	rm -rf "$work"
+}
+
+# --- slow success: delay below real deadline ---
+test_slow_success_within_deadline() {
+	require_timeout
+	local work status out
+	work=$(mktemp -d)
+	setup_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	export APT_GET_DELAY_SECONDS=2
+	export CI_SYSTEM_PACKAGES_BUDGET_SECONDS=8
+	export CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2
+	unset APT_GET_HANG APT_GET_FAIL_ONCE || true
+
+	set +e
+	run_canvas_under_fakes "$work"
+	status=$?
+	set -e
+	out=$(cat "$work/out")
+
+	((status == 0)) || fail "expected success for slow install within deadline; status=$status out=$out"
+	[[ $out == *"phase=canvas completed"* ]] || fail "expected completed diagnostic; out=$out"
+	assert_canvas_packages_in_install "$APT_GET_LOG"
+	grep -q 'Acquire::Retries=2' "$APT_GET_LOG" || fail "expected Acquire::Retries=2 on apt-get"
+	grep -q 'APT::Update::Error-Mode=any' "$APT_GET_LOG" || fail "expected Error-Mode=any on apt-get"
+
+	clear_fixture_env
+	trap - RETURN
+	rm -rf "$work"
+}
+
+# --- recovery after one transient acquisition failure ---
+test_transient_recovery() {
+	require_timeout
+	local work status out attempts
+	work=$(mktemp -d)
+	setup_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	export APT_GET_FAIL_ONCE=1
+	export CI_SYSTEM_PACKAGES_BUDGET_SECONDS=15
+	export CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2
+	unset APT_GET_HANG APT_GET_DELAY_SECONDS || true
+
+	set +e
+	run_canvas_under_fakes "$work"
+	status=$?
+	set -e
+	out=$(cat "$work/out")
+
+	((status == 0)) || fail "expected success after transient recovery; status=$status out=$out"
+	[[ $out == *"phase=canvas completed"* ]] || fail "expected completed diagnostic; out=$out"
+	assert_canvas_packages_in_install "$APT_GET_LOG"
+	grep -q 'transient acquire failure; retrying' "$APT_GET_LOG" || fail "expected transient failure then retry"
+	attempts=$(cat "$APT_STATE_DIR/install_attempts")
+	((attempts >= 2)) || fail "expected install attempt_count>=2, got $attempts"
+
+	clear_fixture_env
+	trap - RETURN
+	rm -rf "$work"
+}
+
+main() {
+	[[ -x $SCRIPT ]] || fail "script missing or not executable: $SCRIPT"
+	require_timeout
+
+	test_deadline_exhaustion
+	test_deadline_exhaustion_fails_with_guard_bypassed
+	test_slow_success_within_deadline
+	test_transient_recovery
+
+	echo "ok ci-system-packages.sh canvas boundary tests"
+}
+
+main "$@"

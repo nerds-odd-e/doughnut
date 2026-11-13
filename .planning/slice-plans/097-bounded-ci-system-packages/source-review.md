@@ -15,10 +15,10 @@
 | 5 | Transient package downloads may be retried at most two times, within the shared phase deadline. | slice 3 |  |
 | 6 | Retry exhaustion or deadline expiry fails setup and fails that job. | slice 3 |  |
 | 7 | On that failure, the job preserves the underlying package-manager/download output. | slice 3 |  |
-| 8 | On that failure, the job identifies the failing phase and its time budget. | slice 2 |  |
-| 9 | For a job that failed setup this way, tests for that job do not start. | slice 2 |  |
-| 10a | Bounded package work includes APT metadata refresh for the canvas build packages. | slice 2 |  |
-| 10b | Bounded package work includes APT installation of the canvas build packages. | slice 2 |  |
+| 8 | On that failure, the job identifies the failing phase and its time budget. | slice 2 | observed: scripts/test/ci-system-packages.sh.test deadline exhaustion: stderr phase=canvas budget=…s |
+| 9 | For a job that failed setup this way, tests for that job do not start. | slice 2 | observed: .github/setup_nodejs_with_cache/action.yml: canvas step precedes Install dependencies; nonzero canvas exit fails the composite step so later job steps do not start (GHA default); slice-1 probe Jobs API showed Downstream skipped after package failure |
+| 10a | Bounded package work includes APT metadata refresh for the canvas build packages. | slice 2 | observed: scripts/test/ci-system-packages.sh.test slow-success stand-in log: apt-get update with APT::Update::Error-Mode=any |
+| 10b | Bounded package work includes APT installation of the canvas build packages. | slice 2 | observed: scripts/test/ci-system-packages.sh.test slow-success stand-in log: apt-get install of five canvas packages |
 | 11a | Bounded package work includes compatibility `.deb` downloads for MySQL's system libraries. | slice 3 |  |
 | 11b | Bounded package work includes APT installation of those MySQL system libraries. | slice 3 |  |
 | 12.1 | Reuse the existing setup actions (with these bounds) for lint callers. | slice 3 |  |
@@ -30,8 +30,8 @@
 | 13a | Keep the required packages. | slice 3 |  |
 | 13b | Keep supported runner behavior. | slice 3 |  |
 | 13c | Keep downstream checks. | slice 3 |  |
-| 14 | Slow successful acquisition within the deadline remains successful setup. | slice 2 |  |
-| 15 | Recovery from a transient download failure within the retry allowance and deadline remains successful setup. | slice 2 |  |
+| 14 | Slow successful acquisition within the deadline remains successful setup. | slice 2 | observed: scripts/test/ci-system-packages.sh.test delayed success under real timeout budget completes |
+| 15 | Recovery from a transient download failure within the retry allowance and deadline remains successful setup. | slice 2 | observed: scripts/test/ci-system-packages.sh.test fail-once acquire then success under Acquire::Retries |
 | X1 | Does not change Open Dough's CI observation. |  | X1 |
 | X2 | Does not select new mirrors. |  | X2 |
 | X3 | Does not add cross-job retry coordination. |  | X3 |
