@@ -1,8 +1,8 @@
 # Checkpoint C publication and production observation
 
 2026-11-13, SEED-073#keep-answered-questions-with-their-tracker. Actual C
-publication/schema/public observations passed. Required fresh sign-in/notebook
-confirmation is pending; G5 and slice 15 are not yet complete. G8/16 follows.
+publication/schema/public observations passed. The developer confirmed the
+required fresh sign-in/notebook set with LGTM; G5 is proved. G8/16 follows.
 
 ## Approved retained identity and main proof
 
@@ -97,7 +97,7 @@ Physical retirement is this separate acceptance reading, not a permanent test.
 Compatibility was gated by every pre-C instance being the unmapped B build;
 this rollout's actual capacity was one, with no fixed two-instance assumption.
 
-## Public observations and remaining manual gate
+## Public observations and manual gate
 
 Public SPA HTML and a real `/assets/main-DHEN45RN.js` matched the approved
 release-prefix bytes. Public LB health reported exact prod build `1a865045...`.
@@ -107,15 +107,25 @@ in for actual authentication.
 
 The requested manual set is one fresh sign-in at https://doughnut.odd-e.com,
 then opening the notebook list, about two minutes. The developer question was
-sent after actual C schema/public proof. Its result is still pending.
+sent after actual C schema/public proof. The developer replied LGTM on
+2026-11-14 Asia/Singapore, confirming that set. On resumption at 23:21 UTC,
+the succeeded C release record and public backend health still matched
+v1.3.76/build `1a865045...`; the observation applies to the deployed C identity.
+The bounded manual check completed without a reported discrepancy.
 
 Raw commands, UTC times, output/source/protocol hashes and actual schema TSV:
 `/tmp/donut-tracker-delivery-60c866c4/checkpoint-c-postrelease-n54djolp/observation.json`.
-Only after the manual gate may 15 complete and 16 retire spent tooling, restore
-normal startup, prove current-local/fresh-hosted operation, then prepare its
-separately reviewed neutral publication. The C approval grants no future tag.
+The manual gate is complete. Slice 16 may retire spent tooling, restore normal
+startup, prove current-local/fresh-hosted operation, then prepare its separately
+reviewed neutral publication. The C approval grants no future tag.
 
 Fresh records refactoring found none already clean, with no edits/tests and
 passing documented whitespace. Product hashes/proof remain unchanged. Report:
 `/tmp/donut-checkpoint-c-records-refactor.md`. Final freshness `59052` returned
-unchanged at main/base `1a865045...`; the manual gate remains explicit.
+unchanged at main/base `1a865045...`. The subsequent manual result above changes
+only the observation/disposition, retaining the same executable proof boundary.
+
+Fresh manual-closure refactoring again found none already clean, with unchanged
+executable hashes and passing whitespace. Report:
+`/tmp/donut-c-manual-closure-refactor.md`. Freshness `66807` remained unchanged
+before ordinary slice 15 completion; no executable proof required a rerun.

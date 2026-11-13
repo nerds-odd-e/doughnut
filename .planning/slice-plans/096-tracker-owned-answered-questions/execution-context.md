@@ -242,4 +242,4 @@
 - Approved C landed/tagged `v1.3.76`/`1a865045...`; actual publication,
   every-active enabled JVM, applied358–360 and public/schema checks passed.
   [C proof](checkpoint-c-verification.md) retains timestamps/receipts and the
-  pending fresh sign-in/notebook-list observation. G5/15 stays open; G8/16 waits.
+  developer's LGTM for fresh sign-in/notebook list. G5 is proved; G8/16 is next.

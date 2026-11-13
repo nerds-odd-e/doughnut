@@ -171,7 +171,7 @@ Stop safely after branch publication; no intermediate production release.
 
 ### 15. Preserve learner evidence through guarded physical schema retirement
 Type: Behavior
-Status: planned
+Status: done
 Proof: complete canonical populated upgrade, pre-ALTER refusal and retained graph/product behavior; actual checkpoint C publication/all-active/schema/smokes.
 
 Guard the physical column/index drop, extend the same pending harness, and
@@ -229,7 +229,7 @@ Disposition: proved by slice 12: checkpoint-b-verification.md; approved exact re
 ### G5. Observe checkpoint C guarded schema rollout
 Reported: slice 13 — "Acceptance reading: physical retirement, deliberate production enablement and actual checkpoint C are not observed by the local cleanup-readiness slice."
 Story clause: "Then clean unreferenced questions and drop the column."
-Disposition: receiving slice 15
+Disposition: proved by slice 15: checkpoint-c-verification.md; exact approved retained landing/tag, actual publication/all-active enabled JVM/applied358–360/public observations and developer-confirmed fresh sign-in/notebook list
 
 ### G6. Establish populated cleanup proof after the shared-catalog failure
 Reported: slice 13 — "Full-suite native 34545 stopped both new cases before DML because unrelated promptless rows existed; populated cleanup preservation remains unobserved."
