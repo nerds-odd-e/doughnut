@@ -1,6 +1,6 @@
 # DearDough Process Findings
 
-Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
+Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
@@ -533,110 +533,52 @@ Former local code: DD-445. A repair publication started before an `amended` fres
 
 Former local code: DD-447. A slice was published without its source-review observations. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-478.md).
 
-## DD-479 — Merged repair restores were misclassified as wholly unapplied
+<a id="dd-479"></a>
+<a id="dd-479--merged-repair-restores-were-misclassified-as-wholly-unapplied"></a>
+<a id="odf-487"></a>
 
-Exact equality with the saved tree classified every merged file as unapplied when each also contained accepted repair edits. The restore had actually auto-merged draft content and reported a conflict. Its stored false-none then blocked exact stash cleanup and required a user-triggered resume.
+## ODF-487 — Merged repair restores were misclassified as wholly unapplied
 
-### Occurrences
-- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: 2026-11-10; affected snapshot c371659ac7121d1e83128c616fa1c0b391ac0867; ci-repair-stash restore/drop for OID266306cfa8064e45118b76c6581083a63bbcb2fd; unfinished dashboard receipt57246283-fdda-482d-8908-b608c63f8e4b; user requested fixing and retrying; repair b3ed6f70ea538888919593b2a13fb9a14b0e9c4f.
-  - Observed effect: all draft edits were preserved, but the helper returned applied:none and then unapplied. New real-Git regression reproduced it. The local fix identifies actual unmerged paths as partial and supplies an explicit reviewed-OID resolution with checkout/index/conflict guards; ordinary no-apply refusal remains. Three recovery tests and25 CI-proof tests passed, and the retained real entry resolved/dropped by exact OID. A later CI pause restored its five saved paths and dropped only its own entry automatically.
-  - Inference: tree inequality proves a merge differs, not that nothing applied. The local repair is delivered; propagation through the shared guidance release remains outside this product execution.
+Former local code: DD-479. A merged CI repair restore was reported as wholly unapplied when the retained draft had in fact been applied in part. Donut delivered its own exact-OID recovery, now in the [project recovery guide](docs/ci-repair-restoration.md). The shared helper remains open. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-487.md#odf-487). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L536).
 
-## DD-480 — An HTTP fixture invented the meaning of an empty assimilation value
+<a id="dd-480"></a>
 
-The frontend treated any supplied propertyValue, including empty string, as a list item and wrote a passing blank-item fixture. The existing backend explicitly uses empty string for scalar units.
+DD-480 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-480).
 
-### Occurrences
-- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown; execution-time snapshot fa51f486fca13f9f3c85eaebbec2ed93be8e8522
-  - Evidence: 2026-11-10; CI run42762324814/attempt1 E2E job129650701015, Skip expected /n6/p/topic but received /n6/p/topic/i/1/~; backend PropertyFocus/AssimilationUnit documentation; repair c371659ac7121d1e83128c616fa1c0b391ac0867.
-  - Observed effect: selected mocked proof and list continuation E2E passed before the existing scalar walkthrough failed. Positive scalar-empty red reproduced the defect; nonempty raw values retain item routing and manual blank selection remains a separate input path. The corrected workspace fixture,37 focused tests, both types and10 real E2E scenarios passed.
-  - Inference: reuse of the key/value shape did not establish the wire sentinel. Read the producing contract before choosing a branch or manufacturing fixture variants; one observed execution does not establish recurrence.
+<a id="dd-481"></a>
 
-## DD-481 — Full local frontend proof lost the browser connection despite fewer workers
+DD-481 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-481).
 
-A two-worker full frontend run ended before all files loaded. The existing CI configuration already serializes file imports and uses an orchestrator GC reporter; selecting that configuration completed the full required proof without assertion retries.
+<a id="dd-482"></a>
+<a id="dd-482--an-unterminated-landed-plan-tail-made-appended-evidence-resemble-a-source-conflict"></a>
+<a id="odf-489"></a>
 
-### Occurrences
-- Execution: SEED-120#export-a-note-from-the-highlighted-property / 401bc9ff4a2bf02f4c4e922f2b87b1fb8b4e030f
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown; execution guidance snapshot 884a4fe8e463a1ea32120c7589cf808a82162285
-  - Evidence: 2026-11-10 execution conversation; `/tmp/export-property-frontend-tests.log` (start18:17:41 Asia/Singapore), `/tmp/export-property-frontend-tests-serial.log`, `/tmp/export-ui-frontend.log`; retained acceptance at `7df14ec0c6:.planning/slice-plans/089-export-a-note-from-the-highlighted-property/source-review.md`; `frontend/vitest.config.ts` fileParallelism/orchestratorGcReporter.
-  - Observed effect: `./scripts/run.sh pnpm frontend:test --maxWorkers=2` ended after259/408 files and1,950 passing tests with VITEST_BROWSER_CONNECTION_CLOSED (114.11s), without an assertion failure. `CI=true ./scripts/run.sh pnpm frontend:test --maxWorkers=2 --retry=0` then passed408files/2,521tests in262.65s and the next slice passed409files/2,528tests in245.98s. All runs were headless on the shared16CPU/48GiB local host; no production or test behavior was changed to obtain those passes.
-  - Inference: worker reduction alone did not prevent this documented orchestrator failure mode. The existing serialized-import/GC mode is a supported bounded alternative for full local proof on a busy host. One failed run does not establish recurrence or a universal memory threshold; consider documenting the invocation in project testing guidance.
+## ODF-489 — An unterminated landed plan tail made appended evidence resemble a source conflict
 
-## DD-482 — An unterminated landed plan tail made appended evidence resemble a source conflict
+Former local code: DD-482. An unterminated plan tail made appended observations look like a source conflict. Moving the observations away from the end let the original comparison pass. The execution found no substantive source amendment. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-489.md#odf-489). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L557).
 
-Source freshness's three-way containment check treated coordinator-owned observations appended after an identical landed, unterminated final disposition as overlapping source edits. No new human story/plan amendment existed. Keep the substantive conflict gate; assess newline-aware comparison or clearer record-edit diagnostics without weakening it.
+<a id="dd-483"></a>
 
-### Occurrences
-- Execution: SEED-121#publish-large-notebooks-without-losing-history
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: 2026-11-10 slice14 acceptance; Take0715d7d1b2b25d0ca224a3909e14cdf43fad0d42, landed plan0019fa5e4ada4cc630b90131580dadd83fb84d8a, accepted record59db9d970d2be39e5d7825e26118bbc455e52a0f; source-freshness-comparison.mjs compareThreeWay/compareRecord and source-freshness.mjs fromContainedBase. Raw coordinator results retained three conflict refusals; read-only git merge-file localized the conflict to the same G6 disposition's EOF plus appended G7–G9.
-  - Observed effect: extra source checks/inspection and record relayout. Preserving landed bytes and placing new obligations before existing G1 produced an unchanged comparison; no source scope, accepted proof or product behavior changed.
-  - Inference: the unterminated tail and same-EOF additions explain this instance; other source-conflict behavior was not investigated. Coordinator condensation also complicated the first comparison and was partly reversed; exact cost is unmeasured.
+DD-483 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-483).
 
-## DD-483 — One backend Intent Coverage probe repeats the complete suite three times
+<a id="dd-484"></a>
+<a id="dd-484--the-source-review-of-a-small-story-gave-137-rows-that-were-typed-and-recorded-one-at-a-time"></a>
+<a id="odf-481"></a>
 
-The project backend rule requires the entire suite even for a targeted scratch break check. The measured check caught the selected fault, but three full runs and scratch setup exceeded its original five-to-ten-minute estimate. Assess a supported proportionate proof route with the project owner; this observation changes no installed rule or default.
+## ODF-481 — The source review of a small story gave 137 rows that were typed and recorded one at a time
 
-### Occurrences
-- Execution: SEED-122#prefer-note-titles-in-wiki-links / e257b144d1e9120528922da0f5dc045acb6c9d6d
-  - Timestamp: 2026-11-11T17:42:34.664+08:00
-  - Tool: Codex
-  - Model: gpt-6.1-sol
-  - Open Dough release: unknown; guidance retained at f6d89e3470a6ed3064443c324763a074bd5bc884
-  - Evidence: Native worker /root/intent_coverage_live, checked implementation e257b144d1; verbatim report and wrap-up disposition in the SEED-122 Done record; raw evidence /tmp/dough-intent-coverage-122-1794389081/.
-  - Observed effect: One worker ran baseline/fault/restored commands across3111 maintained tests (plus one temporary independent witness in the fault run). Full command wall times315.751/162.748/218.847s total697.346s. Invocation-to-report1073.664s includes setup, reads, runs and verified retirement. The union fault caused six maintained failures and independently observed ambiguous controller results; baseline/restored suites and cleanup passed.
-  - Inference: Whole-suite repetition is required by the current backend instructions, rather than a worker decision to broaden proof. Shared-host contention and cold scratch caches also contributed; the17.9-minute elapsed cannot all be attributed to the suite policy. Native blocking waits and bounded overdue checks retained one worker without restart or duplicate probing.
+Former local code: DD-484. In a single execution on Open Dough 0.3.96, a source review returned 137 rows and the coordinator made about 140 recording calls. The review caught a missing promise, and many rows were qualifications without an independent result. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-481.md#odf-481). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L574).
 
-## DD-484 — The source review of a small story gave 137 rows that were typed and recorded one at a time
+<a id="dd-485"></a>
 
-The source-only reviewer returned 137 numbered commitments for a story with two small product changes and a one-time content conversion. The coordinator retyped the whole table into `source-review.md`, because the reviewer's transcript must not be read, and then recorded one observation per row with one script call each.
+## DD-485 — GitHub Actions observation ended before a rerun finished
 
-### Occurrences
-- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
-  - Timestamp: 2026-11-11T23:05:00+08:00
-  - Tool: Claude Code
-  - Model: claude-fable-5-2
-  - Open Dough release: 0.3.96
-  - Evidence: `source-review.md` at e9f109c3c2 and its later revisions through 3a79a9d489; coordinator conversation before the first delegation and at each acceptance.
-  - Observed effect: About 140 `record` calls over eight slices; 39 rows for slice 1 alone. Roughly a third of the rows were qualifications or reasons with no result of their own to observe.
-  - Inference: The review did catch one promise the plan had no proof for (a one-kana reading hidden inside other words). The cost is in the row count and the hand transfer, not in having the review. Token cost was not measured.
+The SEED-124 pronunciation execution on Open Dough 0.3.96 lost story-branch observation after the GitHub Jobs API returned HTTP 502 for run 43053073660, attempt 2. The coordinator read successful attempt 3 directly. The same execution later lost trunk observation to a TLS handshake timeout. The [retained observer evidence](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-121.md#odf-121) identifies both transport failures. See the [original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L590) and [Donut’s package-install facet](DonutRetrospectiveFindings.md#dd-485).
 
-## DD-485 — CI jobs waited about 50 minutes each on a package mirror that did not resolve
+<a id="dd-486"></a>
+<a id="dd-486--a-checkpoint-go-ahead-did-not-let-the-session-push-the-release-tag"></a>
+<a id="odf-492"></a>
 
-Two story-branch CI runs failed in every job that installs system packages, each after about 50 minutes inside `apt-get`. The failures arrived as separate notifications over about 90 minutes, and the CI observer ended by itself before the rerun finished.
+## ODF-492 — A checkpoint go-ahead did not let the session push the release tag
 
-### Occurrences
-- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
-  - Timestamp: 2026-11-11T23:32:09+08:00
-  - Tool: Claude Code
-  - Model: claude-fable-5-2
-  - Open Dough release: 0.3.96
-  - Evidence: CI runs 43049319481 and 43053073660 (attempts 1 to 3); failed step durations of about 3,046 seconds; `Temporary failure resolving 'azure.archive.ubuntu.com'`; attempt 2 lost one runner during the same step.
-  - Observed effect: Eleven failed jobs per run with no test executed; five diagnosis rounds for one cause; green evidence for the product commit came about eight hours after its push.
-  - Inference: The outage was outside the repository. The repository's part is that the install step has no shorter limit of its own, so a mirror outage holds each runner for the default limit. Whether a shorter limit is wanted is the owner's call.
-
-## DD-486 — A checkpoint go-ahead did not let the session push the release tag
-
-The plan's human checkpoint said one go-ahead covers the landing, the release and the publications. After the owner's "go ahead", the host refused the release tag push as a production deployment, and the session had to stop and ask again.
-
-### Occurrences
-- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
-  - Timestamp: 2026-11-12T08:27:00+08:00
-  - Tool: Claude Code
-  - Model: claude-fable-5-2
-  - Open Dough release: 0.3.96
-  - Evidence: Coordinator conversation: the denied `git push origin refs/tags/v1.3.72`, the second attention message, and the owner's reply "I authorize you to do these".
-  - Observed effect: One extra stop and owner turn between the landing and the release; the landing and trunk CI were already done.
-  - Inference: The host's permission check does not read the plan's checkpoint wording. A checkpoint message that asks for the release and publication permission in the host's own terms might avoid the second stop; this was not tried.
+Former local code: DD-486. The host required separate production-deployment authorization for the release tag after the story checkpoint had been answered. The release took one additional owner turn. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-492.md#odf-492). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L604).

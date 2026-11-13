@@ -12,3 +12,4 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Bound CI system package installation](seeds/SEED-129-bounded-ci-package-setup.md#bound-ci-system-package-installation) — SEED-129#bound-ci-system-package-installation
