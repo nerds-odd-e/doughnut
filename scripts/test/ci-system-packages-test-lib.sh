@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared stand-ins and assertions for scripts/test/ci-system-packages.sh.test.
+# Shared stand-ins and assertions for ci-system-packages canvas boundary tests.
 # Not discovered by run_all_script_tests.sh (only *.test).
 
 CANVAS_PACKAGES=(
@@ -37,7 +37,7 @@ EOS
 }
 
 # Stand-in apt-get: honors Acquire::Retries for one simulated transient install
-# failure, optional delay, and optional past-budget hang. Logs every call.
+# failure, optional delay, optional hang, and hard install failure.
 write_fake_apt_get() {
 	local fake_bin=$1
 	{
@@ -51,6 +51,7 @@ retries=0
 delay_seconds="${APT_GET_DELAY_SECONDS:-0}"
 hang="${APT_GET_HANG:-0}"
 fail_once="${APT_GET_FAIL_ONCE:-0}"
+fail_install="${APT_GET_FAIL_INSTALL:-0}"
 
 args=("$@")
 echo "apt-get $*" >>"$APT_GET_LOG"
@@ -88,6 +89,10 @@ install)
 	attempt_file="$APT_STATE_DIR/install_attempts"
 	attempt=$(($(cat "$attempt_file" 2>/dev/null || echo 0) + 1))
 	echo "$attempt" >"$attempt_file"
+	if [[ $fail_install == 1 ]]; then
+		echo "apt-get: install failed (forced)" >&2
+		exit 1
+	fi
 	if [[ $fail_once == 1 && $attempt -eq 1 ]]; then
 		# Simulate APT acquisition retry inside one install invocation.
 		if ((retries >= 1)); then

@@ -12,7 +12,7 @@ SCRIPT="$REPO_ROOT/scripts/ci-system-packages.sh"
 source "$REPO_ROOT/scripts/test/ci-system-packages-test-lib.sh"
 
 clear_fixture_env() {
-	unset APT_GET_HANG APT_GET_DELAY_SECONDS APT_GET_FAIL_ONCE \
+	unset APT_GET_HANG APT_GET_DELAY_SECONDS APT_GET_FAIL_ONCE APT_GET_FAIL_INSTALL \
 		CI_SYSTEM_PACKAGES_BUDGET_SECONDS CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS || true
 }
 

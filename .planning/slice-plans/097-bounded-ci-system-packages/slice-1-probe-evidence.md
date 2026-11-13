@@ -86,3 +86,12 @@ Literal APT options and timeout invocation matched the production defaults in `p
 Approach usable: APT `Error-Mode=any`, timeout/kill cleanup, real package install, and job skipping worked together on ubuntu-latest. Dependent slices 2–3 may proceed.
 
 Main `ci.yml` for the same SHA remains under the attached observer (`await-revision`); mark slice 1 `done` only after that progress observation settles.
+
+## Probe deletion sweep (slice 3, one-time reading)
+
+After transferring regressions into `scripts/test/ci-system-packages*.test`, deleted
+`.github/workflows/ci-system-packages-probe.yml` and `scripts/ci-system-packages-probe.sh`.
+Search of `scripts/` and `.github/` for `ci-system-packages-probe`, `purpose_probe_`,
+`probe-env`, `probe-bad-mirror`, `probe-stalled-transfer`, `probe-transient-recovery`,
+`probe-healthy-package` returned no matches. Residual planning mentions only in this
+file and PLAN proof history. No absence-assertion test added.
