@@ -33,9 +33,9 @@ probe has no source commitment allocated to it.
 | C10 | C10 — Grade: The grade remains with the answered prompt. | slice 9 | |
 | C11 | C11 — Outcome: The outcome remains with the answered prompt. | slice 9 | |
 | C12 | C12 — Ambiguity exclusion: The ambiguity exclusion remains with the answered prompt. | slice 9 | |
-| C13 | C13 — Tracker deletion: Removing a tracker removes its prompts. | slice 8 | |
-| C14 | C14 — Question deletion: Removing a tracker removes its prompts’ questions. | slice 8 | |
-| C15 | C15 — Deletion ownership: Deletion remains application-owned. | slice 8 | |
+| C13 | C13 — Tracker deletion: Removing a tracker removes its prompts. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: real tracker controller deletion, fresh prompt ID removal |
+| C14 | C14 — Question deletion: Removing a tracker removes its prompts’ questions. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: real tracker deletion removes selected question while note remains |
+| C15 | C15 — Deletion ownership: Deletion remains application-owned. | slice 8 | observed: tracker-lifecycle-verification.md: shared transactional lifecycle selects IDs before removal; current-note deletion retains original input note, no schema change |
 | C16 | C16 — Note attribution: A question’s note is its tracker’s current note. | slice 2 | observed: RecallPrompt.getNote derives requireMemoryTracker().getNote(); RecallPromptAnswerControllerTest.attributesTheAnswerToTheTrackersCurrentNote observes current topology ID after real reification; full backend pass 2026-11-13 01:57 UTC. |
 | C17 | C17 — Recall history: Recall history uses the tracker’s current note. | slice 2 | observed: MemoryTrackerRecallHistoryControllerTest.readsAnsweredHistoryAlongsideTheTrackersCurrentNote observes current note through showMemoryTracker plus retained answered MCQ in history after real reification; final full backend pass. |
 | C18 | C18 — Connected assistant answers: Connected assistant recall answers use the tracker’s current note. | slice 9 | |
@@ -98,7 +98,7 @@ probe has no source commitment allocated to it.
 | C72 | C72 — OpenAPI document: Regenerate `open_api_docs.yaml`. | slice 6 | observed: question-bank-verification.md#accepted-backend-and-generator-proof: source-generated OpenAPI/client and passing validation/backend consumer proof |
 | C73 | C73 — Generated API package: Regenerate `packages/generated/donut-backend-api`. | slice 6 | observed: question-bank-verification.md#accepted-backend-and-generator-proof: source-generated OpenAPI/client and passing validation/backend consumer proof |
 | Q04 | Q04 — Ownership cardinality: One question belongs to one tracker. | slice 9 | |
-| Q05 | Q05 — Prompt sharing qualification: That ownership rule does not independently forbid multiple prompts on the same tracker from referring to that question. | slice 8 | |
+| Q05 | Q05 — Prompt sharing qualification: That ownership rule does not independently forbid multiple prompts on the same tracker from referring to that question. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: same-tracker answered/unanswered shared question survives partial cleanup then ends with final tracker |
 | C74 | C74 — Cross-learner export fixtures: Fixtures that share a question across learners must instead use separate tracker-owned questions. | slice 3 | observed: QuestionPrivacyTest.newerOtherLearnerAttemptDoesNotSubstitute and PropertyPrivacyTests.focusedRequestUsesLatestOwnAnswerAndKeepsCompleteAppendixOutsideBudget arrange distinct MCQs for each learner tracker; full backend pass. |
 | C75 | C75 — Fixture privacy: Those fixtures preserve privacy. | slice 3 | observed: QuestionPrivacyTest and PropertyPrivacyTests observe own selections, other-answer non-disclosure, guest behavior and access refusal through real export; full backend pass. |
 | C76 | C76 — Tracker identities: Keep existing tracker identities. | slice 9 | |
@@ -106,8 +106,8 @@ probe has no source commitment allocated to it.
 | C78 | C78 — Answer identities: Keep existing answer identities. | slice 9 | |
 | C79 | C79 — Log identities: Keep existing log identities. | slice 9 | |
 | C80 | C80 — Prompt boundary: Reuse the existing prompt persistence boundary. |  | G1 |
-| C81 | C81 — Note boundary: Reuse the existing note deletion boundary. | slice 8 | |
-| C82 | C82 — Tracker boundary: Reuse the existing tracker deletion boundary. | slice 8 | |
+| C81 | C81 — Note boundary: Reuse the existing note deletion boundary. | slice 8 | observed: tracker-lifecycle-verification.md: NoteService.permanentlyRemove invokes shared tracker lifecycle; real note/folder/Git/reduction routes inspected and full suite passed |
+| C82 | C82 — Tracker boundary: Reuse the existing tracker deletion boundary. | slice 8 | observed: tracker-lifecycle-verification.md: existing MemoryTrackerService deletion facades delegate to shared lifecycle; real controller deletion and unanswered cases passed |
 | E01 | E01 — Relationship reduction journey: A learner answers MCQ index 2 incorrectly on relationship note R’s note-level tracker; the owner reduces R to a property of source S; R is permanently removed. | slice 9 | |
 | E02 | E02 — History result for that journey: Recall history still shows the question under S. | slice 9 | |
 | E03 | E03 — Assistant result for that journey: `list_recall_answers` still shows the question under S. | slice 9 | |
@@ -119,9 +119,9 @@ probe has no source commitment allocated to it.
 | E09 | E09 — Conversation journey: Following E01, opening a conversation about the moved tracker’s question uses S. | slice 9 | |
 | E10 | E10 — Export journey: Following E01, exporting S with recent questions includes the moved tracker’s answered question. | slice 9 | |
 | E11 | E11 — Exported choice: That export includes the learner’s choice. | slice 9 | |
-| E12 | E12 — Unmoved tracker journey: Removing a note whose tracker never moved removes that tracker. | slice 8 | |
-| E13 | E13 — Unmoved tracker prompts: That removal removes its prompts. | slice 8 | |
-| E14 | E14 — Unmoved tracker questions: That removal removes its questions. | slice 8 | |
+| E12 | E12 — Unmoved tracker journey: Removing a note whose tracker never moved removes that tracker. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: canonical unmoved note, real trash/permanent-delete actions, fresh tracker ID removal |
+| E13 | E13 — Unmoved tracker prompts: That removal removes its prompts. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: same real unmoved note deletion observes fresh prompt ID removal |
+| E14 | E14 — Unmoved tracker questions: That removal removes its questions. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: same unmoved note deletion observes selected question removal; moved-current-note sibling retains original input note |
 | X01 | X01 — Lost production questions: Restoring the 2,197 lost questions is outside scope; production has no copy. | slice 10 | |
 | X02 | X02 — Merged tracker history: Merging relationship-note tracker history that reduction drops because the learner already tracks that focus is outside scope. | slice 10 | |
 | X03 | X03 — Scheduling changes: Changing scheduling is outside scope. | slice 10 | |
@@ -130,7 +130,7 @@ probe has no source commitment allocated to it.
 | X06 | X06 — Content revisions: Add no content revision system. | slice 10 | |
 | X07 | X07 — Database cascades: Add no new database cascade. | slice 10 | |
 | C83 | C83 — Instance compatibility: Preserve compatibility between two app instances during rollout. | slice 10 | |
-| C84 | C84 — Compatibility attribution: The compatibility release derives attribution through the tracker. | slice 8 |  |
+| C84 | C84 — Compatibility attribution: The compatibility release derives attribution through the tracker. |  | G2 |
 | C85 | C85 — Compatibility write: That release retains a scalar note-ID write. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation plus selected-question-verification.md#inspected-controller-observations: persisted current input re-observed through the new writer and actual regeneration after flush/clear; checkpoint A remains slice 8 |
 | Q06 | Q06 — Compatibility consumer: The retained write serves the original eager ORM readers. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation: current fresh read and matching persisted scalar/input/joined note; original-binary launch explicitly unobserved, checkpoint A remains slice 8 |
 | C86 | C86 — Mapping removal timing: After the compatibility release is fully deployed, remove the mapping. | slice 9 | |

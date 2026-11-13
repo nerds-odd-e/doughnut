@@ -149,6 +149,9 @@ Checkpoint A must confirm every active instance before slice 9.
 
 [Detailed implementation brief](implementation-briefs.md#delete-learning-questions-through-their-tracker-lifecycle).
 
+[Accepted local lifecycle proof and retained rollout obligation](tracker-lifecycle-verification.md).
+[Checkpoint A preparation and dated production baseline](release-checkpoints.md).
+
 ### 9. Preserve answered questions across tracker moves and old-note deletion
 Type: Behavior
 Status: planned
@@ -190,3 +193,15 @@ Reported: slice 7 — "The new payload/cardinality cases use the inherited outer
 Story clause: "Generation must persist the selected question with its prompt, rather than leave discarded candidates behind."
 Disposition: proved by slice 7: selected-question-verification.md#application-owned-atomicity; NOT_SUPPORTED controller call reaches a real SQL fault and a separate committed count retains its baseline, 1/1 in the final full suite
 Commitment: C80
+
+
+### G2. Observe checkpoint A compatibility rollout
+Reported: slice 8 — "Checkpoint A still requires the reviewed retained landing and exact stable-tag go-ahead, then actual publication and all-active-instance compatibility evidence."
+Story clause: "Use a compatibility release that derives attribution through the tracker while retaining a scalar note ID write for original readers."
+Disposition: return
+Commitment: C84
+
+### G3. Retain note deletion proof through compatibility retirement
+Reported: slice 8 — "NoteDependentRowsControllerTestBase still counts MCQ rows through physical note_id; that compatibility consumer must change when mapping and writes retire."
+Story clause: "A question's note is its tracker's note."
+Disposition: receiving slice 9

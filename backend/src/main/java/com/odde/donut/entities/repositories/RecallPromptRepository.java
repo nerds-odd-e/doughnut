@@ -37,6 +37,21 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   List<RecallPrompt> findAllUnansweredByMemoryTrackerId(
       @Param("memoryTrackerId") Integer memoryTrackerId);
 
+  @Query(
+      "SELECT DISTINCT prompt.mcq.id FROM RecallPrompt prompt "
+          + "WHERE prompt.memoryTracker.id IN :memoryTrackerIds AND prompt.mcq IS NOT NULL")
+  List<Integer> findQuestionIdsByMemoryTrackerIds(
+      @Param("memoryTrackerIds") List<Integer> memoryTrackerIds);
+
+  @Query(
+      value =
+          "SELECT DISTINCT rp.mcq_id"
+              + unansweredByMemoryTrackerFrom
+              + " AND rp.mcq_id IS NOT NULL",
+      nativeQuery = true)
+  List<Integer> findUnansweredQuestionIdsByMemoryTrackerId(
+      @Param("memoryTrackerId") Integer memoryTrackerId);
+
   List<RecallPrompt> findAllByMemoryTracker_IdOrderByIdDesc(Integer memoryTrackerId);
 
   List<RecallPrompt> findAllByAnswerIn(List<Answer> answers);
@@ -82,8 +97,6 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       nativeQuery = true)
   List<Integer> findUserIdsWithAnsweredRecallsInTimeRange(
       @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
-
-  void deleteByMemoryTracker_Id(Integer memoryTrackerId);
 
   /**
    * Answered MCQ choice indexes for one learner, newest first per attempt (answer time, then answer

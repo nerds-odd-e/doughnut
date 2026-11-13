@@ -2,11 +2,18 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.Mcq;
 import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface McqRepository extends CrudRepository<Mcq, Integer> {
+  @Modifying(flushAutomatically = true)
+  @Query(
+      "DELETE FROM Mcq question WHERE question.id IN :questionIds "
+          + "AND NOT EXISTS (SELECT prompt.id FROM RecallPrompt prompt WHERE prompt.mcq = question)")
+  void deleteUnreferencedByIds(@Param("questionIds") List<Integer> questionIds);
+
   @Query(
       value =
           """

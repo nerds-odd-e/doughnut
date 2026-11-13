@@ -123,6 +123,15 @@ invoke the same tracker lifecycle owner; unanswered cleanup already detaches
 conversation subjects before removing prompts. The representative fixtures
 populate answers/logs, batch requests, conversations/messages and corrections.
 
+The 240-line `MemoryTrackerService` keeps its public deletion facade. Move its
+existing tracker/prompt deletion and conversation-detachment responsibility
+into a focused lifecycle collaborator before adding question cleanup. Keep
+grading, assimilation and history in their present homes; the collaborator
+owns scalar selection, removal/flush and unreferenced-question cleanup through
+one transactional lifecycle. The note boundary invokes that same owner.
+This cohesive current-responsibility seam keeps all edited homes under 250
+lines and preserves existing controller proof; it is not a new fixture framework.
+
 Checkpoint A follows: publish the complete compatible application through the
 [release checkpoint procedure](operational-policy.md#release-checkpoints-and-execution-authority). Stop before slice 9 until every active
 instance runs this scalar-write/current-note-reader version.
@@ -135,6 +144,10 @@ prompts/trackers before deleting prompts, then clean those unreferenced question
 Its current native join through `mcq.note_id` cannot identify the new writes.
 Preserve committed-fixture isolation and collect IDs before their ownership links
 are destroyed; do not add a parallel cleanup framework.
+Also settle G3's `NoteDependentRowsControllerTestBase` consumer: preserve its
+ordinary deletion/retry observations using tracker/prompt ownership rather than
+the physical question-note field. Keep complete fixture evidence and active
+deletion assertions; add no retired-column absence proof.
 Ship a compatible migration dropping `fk_mcq_note`, while retaining nullable
 physical `note_id` for checkpoint A binaries during overlap. Questions now
 survive reduction/reification and old-note removal through one ownership rule.

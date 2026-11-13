@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NoteService {
@@ -20,6 +21,7 @@ public class NoteService {
   private final TestabilitySettings testabilitySettings;
   private final NoteReferenceHandling noteReferenceHandling;
   private final NoteReferenceService noteReferenceService;
+  private final MemoryTrackerService memoryTrackerService;
 
   public NoteService(
       NoteRepository noteRepository,
@@ -28,11 +30,13 @@ public class NoteService {
       AuthorizationService authorizationService,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      PropertyMemoryTrackerService propertyMemoryTrackerService) {
+      PropertyMemoryTrackerService propertyMemoryTrackerService,
+      MemoryTrackerService memoryTrackerService) {
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteReferenceService = noteReferenceService;
+    this.memoryTrackerService = memoryTrackerService;
     this.noteReferenceHandling =
         new NoteReferenceHandling(
             noteReferenceService,
@@ -111,15 +115,17 @@ public class NoteService {
 
   /**
    * Permanently removes {@code note} and its complete dependent data. The note row is hard-deleted;
-   * note-owned dependents (memory_tracker, recall_prompt, mcq, conversation, and
-   * authored_note_reference source rows) are removed by their ON DELETE CASCADE foreign keys. The
-   * reference-handling contract is applied first so authored inbound text in referrer notes is
-   * preserved for {@link NoteTrashReferenceHandling#LEAVE_DEAD_LINKS}.
+   * tracker lifecycle removes learning data before note-owned conversations and authored reference
+   * source rows are removed by their ON DELETE CASCADE foreign keys. The reference-handling
+   * contract is applied first so authored inbound text in referrer notes is preserved for {@link
+   * NoteTrashReferenceHandling#LEAVE_DEAD_LINKS}.
    */
+  @Transactional
   public void permanentlyRemove(
       Note note, NoteTrashReferenceHandling referenceHandling, User viewer) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     applyNoteReferenceHandling(note, referenceHandling, viewer, currentUTCTimestamp);
+    memoryTrackerService.deleteForNote(note);
     entityPersister.remove(note);
   }
 

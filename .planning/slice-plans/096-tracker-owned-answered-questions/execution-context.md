@@ -33,10 +33,15 @@
 - Accepted slice 5 increment on that
   same target: `dae402dfcf6a4c64865b5e14a6885dc5832842af`; managed delivery
   reused the recorded observer after formatting and the check-only hook passed.
-- Accepted slice 6 increment / published base / current candidate on that
+- Accepted slice 6 increment on that
   same target: `6fec446d97126241cb814e4a0d82acf1b2906514`; selective formatting,
   independent check-only hook, managed publication and new-observer registration
   passed without reconciliation.
+- Accepted slice 7 increment / published base / current candidate on that
+  same target: `c4ff03f0e9bbf4ac2727d6970121565506f07e82`; selective formatting,
+  independent check-only hook, managed publication and existing-observer
+  registration passed without reconciliation. G1 is proved by current
+  outside-harness controller atomicity; G2 owns checkpoint A in slice 8.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt

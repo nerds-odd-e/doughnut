@@ -4,7 +4,7 @@ import com.odde.donut.entities.Note;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/** Row counts across a note's dependent closure, for deletion/retry absence and survival proofs. */
+/** Selected learning and conversation row counts for note deletion/retry proofs. */
 abstract class NoteDependentRowsControllerTestBase extends NotebookControllerTestBase {
   @Autowired EntityManager entityManager;
 
@@ -44,7 +44,7 @@ abstract class NoteDependentRowsControllerTestBase extends NotebookControllerTes
         .longValue();
   }
 
-  /** Aggregates the complete note-dependent closure counts for absence/survival assertions. */
+  /** Aggregates selected learning and conversation counts for deletion/survival assertions. */
   protected DependentCounts dependentCounts(Note note) {
     return new DependentCounts(
         countRowsByNoteId("memory_tracker", note.getId()),
@@ -55,7 +55,7 @@ abstract class NoteDependentRowsControllerTestBase extends NotebookControllerTes
         countRowsByNoteId("conversation_note_correction", note.getId()));
   }
 
-  /** Snapshot of the complete note-dependent row counts used by deletion/retry proofs. */
+  /** Snapshot of selected learning and conversation counts used by deletion/retry proofs. */
   protected record DependentCounts(
       long memoryTracker,
       long recallPrompt,

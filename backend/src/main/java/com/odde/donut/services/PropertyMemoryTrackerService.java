@@ -89,10 +89,10 @@ public class PropertyMemoryTrackerService {
   /**
    * Moves every learner's note-level understanding tracker on {@code relationNote} onto {@code
    * focus} of {@code sourceNote}, unless that learner already tracks that focus there. Every other
-   * tracker on {@code relationNote} (spelling, commissioned, or property-level) is left for the DB
-   * {@code ON DELETE CASCADE} to remove with the relationship note; those are detached here so
-   * Hibernate's persistence context does not keep a managed reference to a note about to be removed
-   * (its own pre-flush transient-dependency check does not know about that DB-level cascade).
+   * tracker on {@code relationNote} (spelling, commissioned, or property-level) remains for the
+   * note's tracker lifecycle to remove; those are detached here so Hibernate's persistence context
+   * does not keep a managed reference to a note about to be removed before that deletion boundary
+   * runs.
    */
   public void rehomeNoteLevelTrackersToProperty(
       Note relationNote, Note sourceNote, PropertyFocus focus) {

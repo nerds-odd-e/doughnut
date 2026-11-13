@@ -12,7 +12,6 @@ import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.AssimilationSequenceSkipRepository;
-import com.odde.donut.entities.repositories.ConversationRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
@@ -35,7 +34,7 @@ public class MemoryTrackerService {
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final RecallPromptRepository recallPromptRepository;
   private final RecallLogRepository recallLogRepository;
-  private final ConversationRepository conversationRepository;
+  private final MemoryTrackerLifecycle lifecycle;
   private final MemoryTrackerAssimilation assimilation;
   private final SpellingRecallGrading spellingRecallGrading;
 
@@ -45,7 +44,7 @@ public class MemoryTrackerService {
       MemoryTrackerRepository memoryTrackerRepository,
       RecallPromptRepository recallPromptRepository,
       RecallLogRepository recallLogRepository,
-      ConversationRepository conversationRepository,
+      MemoryTrackerLifecycle lifecycle,
       WikiLinkResolver wikiLinkResolver,
       AssimilationSequenceSkipRepository skipRepository) {
     this.entityPersister = entityPersister;
@@ -53,7 +52,7 @@ public class MemoryTrackerService {
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.recallPromptRepository = recallPromptRepository;
     this.recallLogRepository = recallLogRepository;
-    this.conversationRepository = conversationRepository;
+    this.lifecycle = lifecycle;
     this.assimilation = new MemoryTrackerAssimilation(entityPersister, userService, skipRepository);
     this.spellingRecallGrading =
         new SpellingRecallGrading(entityPersister, recallPromptRepository, wikiLinkResolver, this);
@@ -167,7 +166,11 @@ public class MemoryTrackerService {
   }
 
   public void delete(MemoryTracker memoryTracker) {
-    entityPersister.remove(memoryTracker);
+    lifecycle.delete(memoryTracker);
+  }
+
+  public void deleteForNote(Note note) {
+    lifecycle.deleteForNote(note);
   }
 
   public RecallPrompt answerSpelling(
@@ -191,17 +194,7 @@ public class MemoryTrackerService {
   }
 
   public void deleteUnansweredRecallPrompts(MemoryTracker memoryTracker) {
-    List<RecallPrompt> unansweredPrompts =
-        recallPromptRepository.findAllUnansweredByMemoryTrackerId(memoryTracker.getId());
-    if (!unansweredPrompts.isEmpty()) {
-      conversationRepository
-          .findBySubjectRecallPromptIn(unansweredPrompts)
-          .forEach(conversation -> {
-            conversation.getSubject().setRecallPrompt(null);
-            conversationRepository.save(conversation);
-          });
-    }
-    unansweredPrompts.forEach(entityPersister::remove);
+    lifecycle.deleteUnansweredRecallPrompts(memoryTracker);
   }
 
   @Transactional
