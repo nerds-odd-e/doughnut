@@ -91,13 +91,15 @@ ordering, the learner’s own choice and privacy.
 
 ### 4. Keep test setup stable while separating its domain responsibilities
 Type: Structure
-Status: planned
+Status: done
 Proof: unchanged testability facade through the affected conversation, relationship and recall feature journeys.
 
 Split note/relationship seeding and conversation setup along existing domain
 seams; keep the facade stable and every edited module under 250 lines.
 
 [Detailed implementation brief](implementation-briefs.md#keep-test-setup-stable-while-separating-its-domain-responsibilities).
+
+[Accepted setup-seam proof](testability-verification.md).
 
 ### 5. Keep Git move and learning-identity proof in cohesive test homes
 Type: Structure

@@ -2,21 +2,20 @@
 // @ts-check
 import type { Randomization } from '@generated/donut-backend-api'
 import type ServiceMocker from '../support/ServiceMocker'
-import type { NoteTestData } from '@generated/donut-backend-api'
 import type { McqsTestData } from '@generated/donut-backend-api'
-import type { NotesTestDataWritable } from '@generated/donut-backend-api'
-import {
-  ConversationMessageController,
-  TestabilityRestController,
-  TextContentController,
-} from '@generated/donut-backend-api/sdk.gen'
+import { TestabilityRestController } from '@generated/donut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
-import { noteIdFromUrl } from './noteIdFromUrl'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
 import { bazaarTestabilityMethods } from './testabilityBazaar'
 import { bookTestabilityMethods } from './testabilityBook'
 import { notebookGitTestabilityMethods } from './testabilityNotebookGit'
 import { notebookStructureTestabilityMethods } from './testabilityNotebookStructure'
+import {
+  injectedNoteIdMapAliasName,
+  noteTestabilityMethods,
+} from './testabilityNote'
+import { relationshipTestabilityMethods } from './testabilityRelationship'
+import { conversationTestabilityMethods } from './testabilityConversation'
 import { recallTestabilityMethods } from './testabilityRecall'
 import { timeTravelTestabilityMethods } from './testabilityTimeTravel'
 import { unwrapData } from './unwrapApi'
@@ -47,73 +46,6 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
     )
 }
 
-const injectedNoteIdMapAliasName = 'injectedNoteIdMap'
-
-const conversationIdAlias = (noteTitle: string) =>
-  `conversationId_${noteTitle.replace(/\s+/g, '_')}`
-
-/** Same kebab-case rule as relation type options / app compose. */
-function relationKebabFromLabel(label: string): string {
-  const t = label.trim()
-  if (!t) {
-    return relationKebabFromLabel('related to')
-  }
-  return t.toLowerCase().replace(/\s+/g, '-')
-}
-
-/** Same title shape as relationship notes created in the app (150 char cap). */
-function relationshipNoteTitle(
-  sourceTitle: string,
-  relationLabel: string,
-  targetTitle: string
-): string {
-  const UNTITLED = 'Untitled'
-  const RELATED_TO_LABEL = 'related to'
-  const seg = (s: string, fallback: string) => {
-    const x = s.trim()
-    return x === '' ? fallback : x
-  }
-  const source = seg(sourceTitle, UNTITLED)
-  const relation = seg(relationLabel, RELATED_TO_LABEL)
-  const target = seg(targetTitle, UNTITLED)
-  const composed = `${source} ${relation} ${target}`.trim()
-  if (composed === '') {
-    return UNTITLED
-  }
-  const MAX_TITLE_LENGTH = 150
-  if (composed.length > MAX_TITLE_LENGTH) {
-    return composed.slice(0, MAX_TITLE_LENGTH)
-  }
-  return composed
-}
-
-/** Same markdown shape as new relationship notes from the app (frontmatter plus optional body). */
-function relationshipNoteMarkdown(
-  relationLabel: string,
-  sourceTitle: string,
-  targetTitle: string,
-  bodySuffix?: string
-): string {
-  const relationKebab = relationKebabFromLabel(relationLabel)
-  const UNTITLED = 'Untitled'
-  const sourceDisplay =
-    sourceTitle.trim() === '' ? UNTITLED : sourceTitle.trim()
-  const targetDisplay =
-    targetTitle.trim() === '' ? UNTITLED : targetTitle.trim()
-  const sourceLink = `[[${sourceDisplay}]]`
-  const targetLink = `[[${targetDisplay}]]`
-  const yamlEscape = (s: string) =>
-    s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-  const suffix = bodySuffix?.trim() ? `\n${bodySuffix.trim()}\n` : ''
-  return `---
-type: Relationship
-relation: ${relationKebab}
-source: "${yamlEscape(sourceLink)}"
-target: "${yamlEscape(targetLink)}"
----
-${suffix}`
-}
-
 const testability = () => {
   return {
     cleanDBAndResetTestabilitySettings() {
@@ -131,93 +63,8 @@ const testability = () => {
       )
     },
 
-    injectNotes(
-      noteTestData: NoteTestData[],
-      externalIdentifier: string,
-      notebookName: string,
-      circleName: string | null = null
-    ) {
-      const requestBody: NotesTestDataWritable = {
-        externalIdentifier,
-        notebookName,
-        circleName: circleName ?? undefined,
-        noteTestData,
-      }
+    ...noteTestabilityMethods,
 
-      return cy
-        .wrap(externalIdentifier)
-        .as('injectNotesExternalIdentifier')
-        .then(() =>
-          cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
-            return cy
-              .wrap(
-                TestabilityRestController.injectNotes({
-                  body: requestBody,
-                }).then((response) => {
-                  const data = unwrapData<Record<string, number>>(response)
-                  const expectedCount = noteTestData.length
-                  const actualCount = Object.keys(data).length
-                  expect(
-                    actualCount,
-                    `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
-                  ).to.equal(expectedCount)
-                  return { ...existingMap, ...data }
-                }),
-                { log: false }
-              )
-              .as(injectedNoteIdMapAliasName)
-          })
-        )
-    },
-
-    injectNoteWithContent(
-      noteTitle: string,
-      content: string,
-      externalIdentifier: string,
-      notebookName: string,
-      folder?: string
-    ) {
-      const note: NoteTestData = { Title: noteTitle, Content: content }
-      if (folder !== undefined) {
-        note.Folder = folder
-      }
-      return this.injectNotes([note], externalIdentifier, notebookName)
-    },
-
-    rememberUiCreatedNote(noteTitle: string) {
-      return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
-        return cy.url().then((url) => {
-          const m =
-            url.match(/\/n(\d+)/) ??
-            url.match(/\/n\/(\d+)/) ??
-            url.match(/\/d\/n\/(\d+)/)
-          expect(
-            m,
-            `could not parse note id from URL (expected /n<id>, /n/<id>, or legacy /d/n/<id>): ${url}`
-          ).to.not.be.null
-          const noteId = Number(m![1])
-          const map = existingMap as Record<string, number>
-          return cy
-            .wrap({ ...map, [noteTitle]: noteId })
-            .as(injectedNoteIdMapAliasName)
-        })
-      })
-    },
-
-    injectNumberNotes(
-      notebook: string,
-      numberOfNotes: number,
-      creatorId: string
-    ) {
-      const notes: Record<string, string>[] = [
-        { Title: notebook },
-        ...new Array(numberOfNotes).fill(0).map((_, index) => ({
-          Title: `Note about ${index}`,
-          Folder: notebook,
-        })),
-      ]
-      return this.injectNotes(notes, creatorId, notebook)
-    },
     injectMcqsToNotebook(mcqsTestData: McqsTestData) {
       return cy
         .wrap(
@@ -261,75 +108,7 @@ const testability = () => {
         )
         .then(() => this.shareToBazaar(notebook))
     },
-    injectRelationshipNote(
-      notebookName: string,
-      relationTypeLabel: string,
-      fromNoteTopic: string,
-      toNoteTopic: string,
-      bodySuffix?: string
-    ) {
-      return cy
-        .get<string>('@injectNotesExternalIdentifier')
-        .then((externalIdentifier) => {
-          const title = relationshipNoteTitle(
-            fromNoteTopic,
-            relationTypeLabel,
-            toNoteTopic
-          )
-          const content = relationshipNoteMarkdown(
-            relationTypeLabel,
-            fromNoteTopic,
-            toNoteTopic,
-            bodySuffix
-          )
-          return this.injectNotes(
-            [{ Title: title, Content: content }],
-            externalIdentifier,
-            notebookName
-          )
-        })
-    },
-
-    getInjectedNoteIdByTitle(noteTopology: string) {
-      return cy
-        .get(`@${injectedNoteIdMapAliasName}`)
-        .then((injectedNoteIdMap) => {
-          expect(
-            injectedNoteIdMap,
-            `"${noteTopology}" is not in the injected note. Did you created during the test?`
-          ).to.have.property(noteTopology)
-          return injectedNoteIdMap[noteTopology]
-        })
-    },
-
-    setInjectedNoteContent(noteTitle: string, content: string) {
-      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
-        cy.wrap(
-          TextContentController.updateNoteContent({
-            path: { note: noteId },
-            body: { content },
-          }),
-          { log: false }
-        )
-      )
-    },
-
-    renameInjectedNoteTitleForNoteOnPage(newTitle: string) {
-      return cy.url().then((url) => {
-        const noteId = noteIdFromUrl(url)
-        return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
-          const map = existingMap as Record<string, number>
-          const oldKey = Object.keys(map).find((key) => map[key] === noteId)
-          if (!oldKey || oldKey === newTitle) {
-            return
-          }
-          const { [oldKey]: _removed, ...rest } = map
-          return cy
-            .wrap({ ...rest, [newTitle]: noteId })
-            .as(injectedNoteIdMapAliasName)
-        })
-      })
-    },
+    ...relationshipTestabilityMethods,
 
     ...assimilateTestabilityMethods,
     ...bazaarTestabilityMethods,
@@ -339,40 +118,7 @@ const testability = () => {
     ...recallTestabilityMethods,
     ...timeTravelTestabilityMethods,
 
-    startConversationAboutNote(noteTitle: string, message: string) {
-      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
-        cy
-          .wrap(
-            ConversationMessageController.startConversationAboutNote({
-              path: { note: noteId },
-              body: message,
-            }),
-            { log: false }
-          )
-          .then((conversation) => {
-            cy.wrap(conversation.id).as(conversationIdAlias(noteTitle))
-          })
-      )
-    },
-
-    replyToConversationAboutNote(
-      noteTitle: string,
-      messages: readonly string[]
-    ) {
-      return cy
-        .get<number>(`@${conversationIdAlias(noteTitle)}`)
-        .then((conversationId) => {
-          cy.wrap(messages).each((message: string) => {
-            cy.wrap(
-              ConversationMessageController.replyToConversation({
-                path: { conversationId },
-                body: message,
-              }),
-              { log: false }
-            )
-          })
-        })
-    },
+    ...conversationTestabilityMethods,
 
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
       const requestBody: Randomization = { choose: strategy, seed }

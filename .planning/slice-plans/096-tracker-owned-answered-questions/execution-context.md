@@ -21,18 +21,23 @@
   registered the accepted revision. A staged whitespace stop before commit
   was resolved by trimming terminal blank lines in three new records and
   retrying guarded preparation; semantic proof was unchanged.
-- Accepted slice 3 increment / published base / current candidate on that
+- Accepted slice 3 increment on that
   same target: `8de9ca4b2849f2cfb988aeb65b119165ec88e511`; managed delivery
-  reused the recorded observer. Slice 4 has not started implementation.
-- CI repair pause: run `43353619099`, attempt `1`, job `131650296573`
+  reused the recorded observer.
+- Accepted CI repair / published base / current candidate on that same target:
+  `9124093716d69beca4f5903460d71a27e1d8f48f`; the existing observer registered
+  it. Default-worker hosted CI remains pending observation.
+- CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
   follow-up found only that failed job; its parser identity gap is manually
   reconciled by source/log line 198 and exact focused reproduction. Repair
-  proof and remaining delivery/restoration: [verification](ci-repair-verification.md).
+  proof and delivery/restoration: [verification](ci-repair-verification.md).
   All local writers had returned with no command outstanding and the tree
   was clean. Preservation receipt (`status: clean`, no stash OID):
   `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/dough-ci-repair-stash-xoQpQO/record.json`.
+  Restoration returned `resumed`, OID null, no application or dropped entry.
+  Forward execution resumes at slice 4.
 - Separate integration/default checkout: `/Users/terryyin/git/doughnut`;
   this execution has not mutated it.
 - Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh` passed its

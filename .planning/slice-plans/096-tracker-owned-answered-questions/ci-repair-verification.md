@@ -68,4 +68,7 @@ Independent refactoring returned `none — already clean` and
 `## REFACTOR COMPLETE`, with no edits or test rerun. It confirmed fixture
 lifecycle, copies, API rebinding, credentials, cleanup and retained assertions;
 all changed files are under 250 lines and whitespace passed. Managed
-publication and receipt restoration are the remaining repair boundaries.
+publication accepted `9124093716d69beca4f5903460d71a27e1d8f48f` on the story
+branch and reused its observer. Restoration returned `resumed`, OID null,
+`applied: false`, no dropped entry; no unfinished work was missing. Forward
+execution resumes at slice 4 while hosted CI remains observed asynchronously.
