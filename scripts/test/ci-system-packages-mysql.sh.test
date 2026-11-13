@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+#
+# Real Bash-boundary proof for scripts/ci-system-packages.sh mysql.
+# Exercises production run_bounded_phase with the real timeout binary; only
+# sudo/apt-get/curl are stand-ins. MakeMe=false, pageObjects=false.
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SCRIPT="$REPO_ROOT/scripts/ci-system-packages.sh"
+# shellcheck source=ci-system-packages-test-lib.sh
+source "$REPO_ROOT/scripts/test/ci-system-packages-test-lib.sh"
+# shellcheck source=ci-system-packages-mysql-test-lib.sh
+source "$REPO_ROOT/scripts/test/ci-system-packages-mysql-test-lib.sh"
+
+clear_fixture_env() {
+	unset APT_GET_HANG APT_GET_DELAY_SECONDS APT_GET_FAIL_ONCE APT_GET_FAIL_INSTALL \
+		CURL_FAIL CURL_FAIL_ONCE \
+		CI_SYSTEM_PACKAGES_BUDGET_SECONDS CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS || true
+}
+
+# --- MySQL: compatibility download failure ---
+test_mysql_compat_download_failure() {
+	require_timeout
+	local work status out
+	work=$(mktemp -d)
+	setup_mysql_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	export CURL_FAIL=1
+	export CI_SYSTEM_PACKAGES_BUDGET_SECONDS=8
+	export CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2
+	unset CURL_FAIL_ONCE APT_GET_FAIL_INSTALL APT_GET_HANG || true
+
+	set +e
+	run_mysql_under_fakes "$work"
+	status=$?
+	set -e
+	out=$(cat "$work/out")
+
+	((status != 0)) || fail "expected nonzero status on compat download failure; out=$out"
+	[[ $out == *"phase=mysql"* ]] || fail "expected phase=mysql diagnostic; out=$out"
+	[[ $out == *"budget=8s"* ]] || fail "expected budget in diagnostic; out=$out"
+	grep -q 'curl: download failed' "$work/out" || fail "expected original curl failure retained; out=$out"
+	[[ ! -s $APT_GET_LOG ]] || fail "apt-get must not run after download failure; log=$(cat "$APT_GET_LOG")"
+
+	clear_fixture_env
+	trap - RETURN
+	rm -rf "$work"
+}
+
+# --- MySQL: APT install failure after successful downloads ---
+test_mysql_apt_failure() {
+	require_timeout
+	local work status out
+	work=$(mktemp -d)
+	setup_mysql_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	export APT_GET_FAIL_INSTALL=1
+	export CI_SYSTEM_PACKAGES_BUDGET_SECONDS=8
+	export CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2
+	unset CURL_FAIL CURL_FAIL_ONCE APT_GET_HANG || true
+
+	set +e
+	run_mysql_under_fakes "$work"
+	status=$?
+	set -e
+	out=$(cat "$work/out")
+
+	((status != 0)) || fail "expected nonzero status on MySQL APT failure; out=$out"
+	[[ $out == *"phase=mysql"* ]] || fail "expected phase=mysql diagnostic; out=$out"
+	[[ $out == *"budget=8s"* ]] || fail "expected budget in diagnostic; out=$out"
+	assert_mysql_compat_downloads "$CURL_LOG"
+	grep -q 'apt-get: install failed' "$work/out" || fail "expected original apt failure retained; out=$out"
+
+	clear_fixture_env
+	trap - RETURN
+	rm -rf "$work"
+}
+
+# --- MySQL: healthy combined downloads + APT install ---
+test_mysql_healthy_combined() {
+	require_timeout
+	local work status out package
+	work=$(mktemp -d)
+	setup_mysql_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	export CI_SYSTEM_PACKAGES_BUDGET_SECONDS=8
+	export CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2
+	unset CURL_FAIL CURL_FAIL_ONCE APT_GET_FAIL_INSTALL APT_GET_HANG APT_GET_FAIL_ONCE || true
+
+	set +e
+	run_mysql_under_fakes "$work"
+	status=$?
+	set -e
+	out=$(cat "$work/out")
+
+	((status == 0)) || fail "expected healthy MySQL phase success; status=$status out=$out"
+	[[ $out == *"phase=mysql completed"* ]] || fail "expected completed diagnostic; out=$out"
+	assert_mysql_compat_downloads "$CURL_LOG"
+	assert_mysql_packages_in_install "$APT_GET_LOG"
+	grep -q 'Acquire::Retries=2' "$APT_GET_LOG" || fail "expected Acquire::Retries=2 on apt-get"
+	for package in "${MYSQL_COMPAT_DEB_PACKAGES[@]}"; do
+		[[ -f $RUNNER_TEMP/$package.deb ]] || fail "expected downloaded $package.deb under RUNNER_TEMP"
+	done
+
+	clear_fixture_env
+	trap - RETURN
+	rm -rf "$work"
+}
+
+# --- MySQL: retry recovery on transient curl acquire failure ---
+test_mysql_transient_download_recovery() {
+	require_timeout
+	local work status out attempts
+	work=$(mktemp -d)
+	setup_mysql_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	export CURL_FAIL_ONCE=1
+	export CI_SYSTEM_PACKAGES_BUDGET_SECONDS=15
+	export CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2
+	unset CURL_FAIL APT_GET_FAIL_INSTALL APT_GET_HANG || true
+
+	set +e
+	run_mysql_under_fakes "$work"
+	status=$?
+	set -e
+	out=$(cat "$work/out")
+
+	((status == 0)) || fail "expected success after MySQL download retry recovery; status=$status out=$out"
+	[[ $out == *"phase=mysql completed"* ]] || fail "expected completed diagnostic; out=$out"
+	grep -q 'transient acquire failure; retrying' "$CURL_LOG" || fail "expected transient curl failure then retry"
+	assert_mysql_packages_in_install "$APT_GET_LOG"
+	attempts=$(cat "$CURL_STATE_DIR/download_attempts")
+	((attempts >= 2)) || fail "expected download attempt_count>=2, got $attempts"
+
+	clear_fixture_env
+	trap - RETURN
+	rm -rf "$work"
+}
+
+main() {
+	[[ -x $SCRIPT ]] || fail "script missing or not executable: $SCRIPT"
+	require_timeout
+
+	test_mysql_compat_download_failure
+	test_mysql_apt_failure
+	test_mysql_healthy_combined
+	test_mysql_transient_download_recovery
+
+	echo "ok ci-system-packages.sh mysql boundary tests"
+}
+
+main "$@"

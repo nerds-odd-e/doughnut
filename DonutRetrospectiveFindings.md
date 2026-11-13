@@ -68,13 +68,11 @@ Moved from [DearDough](DearDough.md) on 2026-11-10; the source entry is recovera
   - Current execution proof: six runner cases, real Nix cold/reuse with host features disabled, and public worktree setup passed. The corrected full backend suite ran 3,093 tests with no failures (two existing skips), including production-YAML E2E unset/supplied and Development-unset configuration cases. All six held-stack cases passed, including both synthetic-token choices. A clean-shell invocation with neither token nor Nix-feature exports passed all seven refinement/question-contest scenarios; its owned services shut down, and its new `sut.log` had no credential-precondition error.
   - This verifies the repair under the selected reproductions. A later agent execution must supply non-recurrence evidence; none is claimed here. The original dated observations and Open Dough 0.3.92 provenance above remain unchanged.
 
-## Queued
-
 <a id="dd-485"></a>
 
 ### DD-485 — CI jobs waited about 50 minutes each on a package mirror that did not resolve
 
-Two story-branch CI runs failed in every job that installs system packages, each after about 50 minutes inside `apt-get`. The failures arrived as separate notifications over about 90 minutes. [The shared observer facet](DearDough.md#dd-485) covers the same execution.
+Two story-branch CI runs failed in every job that installs system packages, each after about 50 minutes inside `apt-get`. The failures arrived as separate notifications over about 90 minutes. [The shared observer facet](DearDough.md#dd-485) covers the same execution. This entry owns Donut’s system-package setup bound; the shared CI-observation facet stays in DearDough.
 
 #### Occurrences
 - Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
@@ -85,8 +83,10 @@ Two story-branch CI runs failed in every job that installs system packages, each
   - Evidence: CI runs 43049319481 and 43053073660 (attempts 1 to 3); failed step durations of about 3,046 seconds; `Temporary failure resolving 'azure.archive.ubuntu.com'`; attempt 2 lost one runner during the same step.
   - Observed effect: Eleven failed jobs per run with no test executed; five diagnosis rounds for one cause; green evidence for the product commit came about eight hours after its push.
   - Inference: The mirror outage was external. At `4059ac2353`, Donut’s [Node/Cypress setup](.github/setup_nodejs_with_cache/action.yml) and [MySQL setup](.github/mysql_binaries/action.yml) run package installs without an explicit shorter bound. The backend unit-test job passed in both affected runs without using these package steps. See `aa17aab044:.planning/slice-plans/001-save-pronunciations-as-note-properties/PLAN.md` for the job and attempt distinctions; the full combined source is at `4059ac2353:DearDough.md`.
+- Verified response (2026-11-13, SEED-129#bound-ci-system-package-installation): shared `scripts/ci-system-packages.sh` bounds canvas and MySQL system-library phases to 600s with 10s kill-after and two acquisition retries; both setup actions call it. Disposable Linux probe `43410926122` showed bad-mirror DNS failure in 3s with phase/budget diagnosis and skipped downstream, stalled TERM-ignore cleanup at 25s (`status=137`), transient recovery, and healthy install in 11s. Surviving shell fixtures and push CI on product SHA `281dd13820f8aa2d6c426fdac20ee153171c524c` (run `43418396664`) accepted the wiring. Intent Coverage Caught on phase/budget enrichment (`281dd138`).
+  - This verifies the repair under the selected reproductions. A later agent execution must supply non-recurrence evidence against a real mirror outage; none is claimed here. The original dated observations and Open Dough 0.3.96 provenance above remain unchanged.
 
-Queued in [SEED-129](.planning/seeds/SEED-129-bounded-ci-package-setup.md#bound-ci-system-package-installation). The delay affected eleven jobs per initial run and outlasted useful test feedback.
+## Queued
 
 ## Open, not queued
 
