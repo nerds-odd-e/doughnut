@@ -21,8 +21,8 @@ import {
 } from './notebookPull.testHelpers.js'
 import {
   filled,
+  installLfsCheckoutFixture,
   interceptGitLfs,
-  lfsCheckout,
 } from './notebookPull.lfs.testHelpers.js'
 
 vi.mock('node:child_process', async () => {
@@ -47,6 +47,8 @@ describe('notebook pull (LFS checkout fill-in)', () => {
     vi.unstubAllEnvs()
     vi.mocked(childProcess.spawnSync).mockReset()
   })
+
+  const lfsCheckout = installLfsCheckoutFixture()
 
   test.each([
     {

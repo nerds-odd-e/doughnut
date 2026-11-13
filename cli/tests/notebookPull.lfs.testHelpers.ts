@@ -1,8 +1,9 @@
 import * as childProcess from 'node:child_process'
 import type { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { vi } from 'vitest'
+import { afterAll, beforeEach, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { runGit } from './notebookClone.testHelpers.js'
 import {
@@ -60,7 +61,7 @@ export function interceptGitLfs(options: { failPull?: boolean } = {}) {
   }
 }
 
-export function lfsCheckout(workDir: string) {
+function createLfsCheckout(workDir: string) {
   const source = buildLfsSourceRepo(workDir)
   commitPointerAttachment(realSpawnSync, source, 'a.bin', OID_A, 4, 'image')
   const directory = cloneAsBoundCheckout(
@@ -75,6 +76,35 @@ export function lfsCheckout(workDir: string) {
     directory
   )
   return { source, directory }
+}
+
+/** Prepares immutable history once; each test owns copies of both Git repositories. */
+export function installLfsCheckoutFixture() {
+  let baseRoot: string | undefined
+  let preparedApiOrigin: string
+  beforeEach(() => {
+    if (baseRoot === undefined) {
+      baseRoot = fs.mkdtempSync(join(tmpdir(), 'donut-cli-lfs-base-'))
+      preparedApiOrigin = getApiConfig().apiBaseUrl
+      createLfsCheckout(baseRoot)
+    }
+  })
+  afterAll(() => {
+    if (baseRoot !== undefined)
+      fs.rmSync(baseRoot, { recursive: true, force: true })
+  })
+  return (workDir: string) => {
+    const source = join(workDir, 'lfs-source')
+    const directory = join(workDir, 'checkout')
+    const copyOptions = { recursive: true, force: false, errorOnExist: true }
+    fs.cpSync(join(baseRoot!, 'lfs-source'), source, copyOptions)
+    fs.cpSync(join(baseRoot!, 'checkout'), directory, copyOptions)
+    const apiOrigin = getApiConfig().apiBaseUrl
+    if (apiOrigin !== preparedApiOrigin) {
+      runGit(['config', '--local', 'donut.api-origin', apiOrigin], directory)
+    }
+    return { source, directory }
+  }
 }
 
 export const filled = (oid: string) => `filled\n${formatLfsPointer(oid, 4)}`
