@@ -35,6 +35,10 @@ import org.eclipse.jgit.transport.BundleWriter;
  * serializing a chosen head into bundle bytes, for tests that need to construct a specific
  * tree/history shape rather than one produced by the product's own save path. These do not depend
  * on the notebook/JPA fixtures {@link NotebookGitControllerTestBase} adds on top.
+ *
+ * <p>Accepted cost: parent count, first-parent ancestry and author identity need real JGit
+ * repositories and history, so tests craft and inspect real commits; a shared writer mirror would
+ * duplicate this seam without a demonstrated saving (2026-09-20, unmeasured).
  */
 abstract class NotebookGitCommitFixtureTestSupport extends NoteDependentRowsControllerTestBase {
 

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-128#speed-up-the-slowest-e2e-scenarios",
+  "title": "Speed up the slowest E2E scenarios",
+  "completedAt": "2026-11-13T01:08:49.914Z",
+  "developer": "Terry Yin",
+  "agent": "Tsukasa-chan",
+  "host": "claude",
+  "model": "claude-opus-5-5",
+  "intentCoverage": {
+    "report": "Dough Intent Coverage: SEED-128#speed-up-the-slowest-e2e-scenarios at f93e5f01be81b226f38656d57340897ef4628cd2\n\nVerdict: Caught. The cut-down large-notebook fixture (2,250 notes under a long folder path; listing 1,329,818 bytes, 2,251 entries) still catches the original regression.\n\nPromise: \"The installed CLI publishes small commits on a notebook whose full Git listing exceeds 1 MiB, and a fresh clone receives them.\"\n\nFault (scratch worktree only, reverted): in cli/src/commands/notebook/notebookPublishLfsSelection.ts, added a full-tree `git ls-tree -r -z <proposedHead>` through runSystemGitOrThrow (spawnSync with Node's default 1 MiB maxBuffer), consulted by selectRequiredLfsObjectIds on every publish — the same shape as the attachmentBlobIds full-tree scan removed in 7c96542978. Fixtures and assertions unchanged.\n\nCheck: e2e_test/features/cli/cli_notebook_large_publication.feature (@bundleCliE2eInstall; the run bundled the CLI from the faulted sources). Caught by \"When I publish the cloned checkout using the installed CLI\" (cy.task('runInstalledCli') fails on non-zero exit) on both attempts: \"donut: git is required but could not be run: spawnSync git ENOBUFS\", before any bundle was submitted — the CLI 0.5.9 failure on the intended path. Clone and the above-1-MiB listing check passed first.\n\nOverlap: cli/tests/notebookPublish.largeTree.suite.ts (1,500 notes, 1,113,000-byte listing) also catches this fault (~8.6s); the other CLI publish tests (44/45) do not. The E2E adds the installed bundle, the real backend round trip and the fresh clone.\n\nRestoration: file reverted; scratch status clean at f93e5f01be; restored E2E rebuilt the bundle and passed; scratch worktree removed and pruned.\n\nRuntimes (measured, load ~23–38): baseline 41s Cypress / 186s wall; faulted 58s / 239s (2 attempts); restored 16s / 82s. Human effort: unavailable. Agent effort: unavailable. Invocation-to-report elapsed: 762,032 ms (measured).\n\nWrap-up disposition (checked revision f93e5f01be81b226f38656d57340897ef4628cd2): Caught — no follow-up. The CLI unit/E2E overlap is noted for the owner without a decision; the E2E's real-backend and fresh-clone acceptance at large scale stays its unique protection.\n"
+  }
+}

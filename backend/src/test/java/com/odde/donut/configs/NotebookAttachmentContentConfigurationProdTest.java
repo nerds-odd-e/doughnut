@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+// Accepted cost: this profile needs its own Spring context boot (~1s, 2026-09-26); it is kept
+// to the narrow prod attachment wiring.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = {NotebookAttachmentContentConfiguration.class},

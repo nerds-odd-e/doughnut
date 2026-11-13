@@ -35,6 +35,9 @@ export function sutServiceArgs(target, backendReload = true) {
   // script; the difference is whether `LOCAL_LB_VITE_UPSTREAM` is set, which
   // `runtimeTargetProcessEnv` omits for the built target. Either name works;
   // `local:lb` documents the no-Vite intent.
+  // Accepted cost: local batches keep Vite (HMR) by the owner's 2026-09-25
+  // decision, paying ~0.7–1s on each web scenario's first page load; built
+  // assets were estimated (unmeasured) to save 15–25s across 14 CLI features.
   args.push(target.built ? 'local:lb' : 'local:lb:vite')
   if (!target.built) args.push('frontend:sut')
   return args

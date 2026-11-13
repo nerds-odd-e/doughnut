@@ -31,6 +31,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+// Accepted cost: this profile needs its own Spring context boot (~1s, 2026-09-26); only it
+// proves dev sign-in, stored sessions and cookies.
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = UnitTestDatasource.URL_PROPERTY)
