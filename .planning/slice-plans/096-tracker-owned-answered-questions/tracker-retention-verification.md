@@ -177,3 +177,8 @@ byte-for-byte; all executable proof and consumer dispositions remain applicable.
 Changed-source selection, actual handwritten size limits and whitespace checks
 passed. The 272-line generated ERD stays generator-owned. No tests were rerun,
 and the review returned `REFACTOR COMPLETE` with G4 still open.
+
+The local progress increment published as `66f4cced...`; applicable branch CI
+`43409981854`/1 succeeded. The subsequent records-only preparation merge
+`6ffb35cf...` returned successful applicable-basis observation. This closes the
+pre-review CI gate, with actual production B and G4 still unobserved.

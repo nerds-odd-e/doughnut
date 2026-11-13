@@ -94,6 +94,17 @@
   publication reused the replacement observer without reconciliation. The exact
   preservation helper then returned `resumed`, OID null, applied false and no
   dropped entry. Forward execution resumes at 12 from this accepted base.
+- Accepted slice 12 progress increment:
+  `66f4ccedeea2607a9bdcc7a99416f2ba1553935f`; local full red/green retention,
+  schema 357 and ERD proof, fresh refactor, formatter and hook are accepted.
+  G4 keeps actual checkpoint B open; 12 remains planned.
+- Accepted preparation merge:
+  `6ffb35cfa9124026e15aebe00f77c8706fe1433d`, parents `66f4cced...` and
+  `ac95447ab4ac1c38dde128d4455bab95cc43ec67`. The backlog adapter preserves
+  both Taken entries and imports only SEED-129 preparation/Take records.
+  Applicable branch CI `43409981854`/1 succeeded for code `66f4cced...`;
+  exact merge observation returned success on that ignored-only basis.
+  [Checkpoint B review and next authorized operations](checkpoint-b-preparation.md).
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
