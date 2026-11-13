@@ -155,18 +155,50 @@ Checkpoint A must confirm every active instance before slice 9.
 Compatible publication and all-active/schema/public probes are observed;
 the developer's manual login confirmation settles G2 and checkpoint A.
 
-### 9. Preserve answered questions across tracker moves and old-note deletion
+### 9. Keep recall history proof in cohesive test homes
+Type: Structure
+Status: done
+Proof: all 14 existing recall-history export scenarios retain their bodies/assertions and pass in the full backend suite.
+
+Separate recall-event content/state from export envelope/access/daily probes,
+sharing only existing setup and `answerMcqAtDay`. Enables Behavior 12.
+
+[Detailed implementation brief](implementation-briefs.md#keep-recall-history-proof-in-cohesive-test-homes).
+
+[Accepted scenario-preservation and full-suite proof](recall-history-test-homes-verification.md).
+
+### 10. Create test questions through their tracker and prompt
+Type: Structure
+Status: planned
+Proof: all creation-fixture consumers retain current ownership, authorization, payload and committed-isolation observations in the full backend suite.
+
+Retire note-only builder/helper inputs while keeping production compatibility
+mapping/writes and the prompt builder's scalar fallback/save. Enables Behavior 12.
+
+[Detailed implementation brief](implementation-briefs.md#create-test-questions-through-their-tracker-and-prompt).
+
+### 11. Keep destruction proof tied to the selected questions
+Type: Structure
+Status: planned
+Proof: capture question IDs before destruction and observe those same IDs across deletion, retry, rollback and committed fixture cleanup; full backend suite stays green.
+
+Settle G3 and fixture cleanup through tracker/prompt ownership while production
+mapping/writes/FK remain unchanged. Enables Behavior 12.
+
+[Detailed implementation brief](implementation-briefs.md#keep-destruction-proof-tied-to-the-selected-questions).
+
+### 12. Preserve answered questions across tracker moves and old-note deletion
 Type: Behavior
 Status: planned
 Proof: reproduce both move/delete/read journeys red, then green through history, MCP and export; preserve grading/schedule/exclusion payload and ordinary deletion proof.
 
 Remove compatibility writes/mapping and drop the question-note FK, retaining
 the nullable physical column. Prove both real move/delete/read journeys.
-Checkpoint B must confirm all binaries and applied migration before slice 10.
+Checkpoint B must confirm all binaries and applied migration before slice 13.
 
 [Detailed implementation brief](implementation-briefs.md#preserve-answered-questions-across-tracker-moves-and-old-note-deletion).
 
-### 10. Preserve learner evidence through the final schema upgrade
+### 13. Preserve learner evidence through the final schema upgrade
 Type: Behavior
 Status: planned
 Proof: populated isolated-engine migration safety and retained move/history/MCP/export/deletion behavior; checkpoint C confirms application of the contract migration.
@@ -206,4 +238,4 @@ Commitment: C84
 ### G3. Retain note deletion proof through compatibility retirement
 Reported: slice 8 — "NoteDependentRowsControllerTestBase still counts MCQ rows through physical note_id; that compatibility consumer must change when mapping and writes retire."
 Story clause: "A question's note is its tracker's note."
-Disposition: receiving slice 9
+Disposition: receiving slice 11

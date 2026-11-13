@@ -108,7 +108,7 @@ a discarded candidate. Preserve regeneration behavior without saved intermediate
 questions. Delete the intermediate-row lookup/assertions in
 `McqTest.AutoEvaluateAndRegenerate`; keep the selected question result and the
 controller proof for regeneration of an actually asked prompt. Keep the
-compatibility scalar write until slice 9.
+compatibility scalar write until slice 12.
 
 ## Delete learning questions through their tracker lifecycle
 
@@ -136,25 +136,81 @@ Checkpoint A follows: publish the complete compatible application through the
 [release checkpoint procedure](operational-policy.md#release-checkpoints-and-execution-authority). Stop before slice 9 until every active
 instance runs this scalar-write/current-note-reader version.
 
+## Keep recall history proof in cohesive test homes
+
+Enables Behavior 12 with unchanged export behavior. Split the 358-line
+`UserRecallHistoryExportControllerTest` into recall-event content/state and
+export envelope/access/daily-probe homes. Put existing common setup and
+`answerMcqAtDay` in one focused shared base; retain all 14 existing test bodies
+and assertions: seven event cases in `UserRecallHistoryEventsExportControllerTest`,
+seven envelope/access/probe cases in the existing class, and common setup in
+`UserRecallHistoryExportControllerTestBase`. Keep every home under 250 lines. Add no fixture framework or
+product behavior. Budget 3–5 minutes editing/cleanup plus full backend proof.
+
+## Create test questions through their tracker and prompt
+
+Enables Behavior 12 with unchanged behavior. Remove `McqBuilder.forNote`,
+`RecallPromptBuilder.withMcqForNote` and exclusive Note parameters in
+`MemoryTrackerControllerTestBase` prompt helpers and
+`RecallPromptControllerTestBase.mcqPrompt`; adapt every consumer (41
+`withMcqForNote` homes and 14 `forNote` homes overlap). Keep production
+mapping/writer/FK/column unchanged. Retain `RecallPromptBuilder`'s compatibility
+scalar fallback **and save** while mapping exists; prompts created before actual
+moves naturally keep their old input. Preserve the two opposite-ownership
+fixtures in `AuthorizationServiceTest:52–68` with local explicit compatibility
+scalar setup until Behavior 12. Do not erase their current-note access proof.
+Check committed raw-MCQ fixtures stay isolated or have owning prompts; introduce
+no orphan. Budget 5–8 minutes editing/cleanup plus full backend proof.
+
+## Keep destruction proof tied to the selected questions
+
+Enables Behavior 12; settles G3 while production stays unchanged. Adapt the
+70-line `NoteDependentRowsControllerTestBase`, its 12 external Git/note/folder/
+retry/atomic readers and `NotebookGitDeletionPublicationControllerTest:207`.
+Capture specific question IDs through trackers/prompts **before** destruction;
+carry the same IDs into after-delete/retry/rollback observations. Discovery after
+deletion is vacuous. Use explicit inputs, with no lazy cache or snapshot that
+silently captures after deletion. Preserve complete dependent fixture proof.
+`CommittedUserCleanup` captures distinct selected IDs before prompt deletion,
+then deletes only those with no surviving prompt. Preserve its current cleanup
+order/conversation semantics and committed-fixture isolation. Add no absence
+guard or parallel fixture framework. Budget 5–8 minutes editing/cleanup plus
+full backend proof.
+
 ## Preserve answered questions across tracker moves and old-note deletion
 
-Remove scalar note mapping/writes and remaining compatibility-only dependencies.
-Adapt `CommittedUserCleanup` at this boundary: capture question IDs through
-prompts/trackers before deleting prompts, then clean those unreferenced questions.
-Its current native join through `mcq.note_id` cannot identify the new writes.
-Preserve committed-fixture isolation and collect IDs before their ownership links
-are destroyed; do not add a parallel cleanup framework.
-Also settle G3's `NoteDependentRowsControllerTestBase` consumer: preserve its
-ordinary deletion/retry observations using tracker/prompt ownership rather than
-the physical question-note field. Keep complete fixture evidence and active
-deletion assertions; add no retired-column absence proof.
-Ship a compatible migration dropping `fk_mcq_note`, while retaining nullable
-physical `note_id` for checkpoint A binaries during overlap. Questions now
-survive reduction/reification and old-note removal through one ownership rule.
-The retention promise is accepted after the FK-drop migration is confirmed;
-ApplicationReadyEvent means startup/health alone is insufficient evidence.
-Checkpoint B follows: stop before slice 10 until every active instance has no
-question-note mapping/writes and the FK migration is applied.
+Before production transition, add maintained red/green regressions for both
+journeys and obtain the red full-suite result with compatibility mapping/FK
+still in place; then change production/migration and obtain green. Exercise the
+real journeys: reduce answered relationship R to source S's property (R is
+deleted), and reify answered S property to relationship R, then really trash/
+permanently delete S. Flush/clear before real history, MCP and export reads.
+Observe original tracker/prompt/answer/log IDs, question/choices/index `2`, wrong
+grade/outcome, ambiguity exclusion and schedule; canonical payload once, inverse
+delta separately. Retain current-note authorization/context and ordinary deletion
+proof. A focused MCP class reuses `ListRecallAnswersMcpEndpointTestBase` (91
+lines). `NoteExportController` stays package-private: use existing MockMvc and
+bearer GET `/api/notes/{id}/ai-context-markdown`, without widening visibility.
+
+Remove scalar mapping/writer and remaining exclusive Note input in
+`GeneratedQuestionPostProcessor`, `AiQuestionGenerator` and batch callers.
+Retire fixture fallback/save, explicit authorization physical setup and selected-
+write getter assertions while retaining surviving payload/access proof. Drop
+**only** `fk_mcq_note` in a collision-checked migration above actual tip
+`300000356`; keep nullable physical column/index. Check both SQL/Java migration
+tips and collision sources at execution. Fresh unmapped questions get
+NULL `note_id`: green fresh rows alone cannot prove the legacy FK transition.
+Observe a positive populated legacy asked row with nonnull original `note_id`
+through real move/delete/read on the migrated schema, using a disposable
+migration observation or pending fixture. Retire that physical fixture after
+checkpoint B and before 13; create no permanent column/FK absence assertion.
+Run full backend red/green, `backend:verify` and explicit worktree-schema ERD
+regeneration. Budget 8–10 minutes editing/cleanup; stop/refine on edit overrun.
+
+Checkpoint B follows the human-reviewed retained landing and exact new stable
+tag/SHA. Stop before 13 until actual publication, every active unmapped binary,
+applied FK drop and production smokes are observed. ApplicationReadyEvent makes
+health/startup insufficient. Retention acceptance waits for that migration.
 
 ## Preserve learner evidence through the final schema upgrade
 
@@ -169,3 +225,8 @@ after applied-migration confirmation. Retain the pending migration safety harnes
 until that confirmation, then delete the spent harness/placeholder configuration
 under the migration lifecycle. Regenerate the ERD. Checkpoint C and the sweep
 complete the story; do not call an intermediate release final acceptance.
+Checkpoint C's human go-ahead covers deliberate gate enablement, the reviewed
+retained landing and exact stable tag/SHA. Record production selection count,
+full FK closure and readiness before enablement; observe actual publication,
+applied migration on every active instance and smoke results before final
+acceptance. Keep the populated safety harness pending until that observation.

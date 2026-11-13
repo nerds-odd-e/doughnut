@@ -58,6 +58,12 @@
   `4059ac2353c590f33c971f5d531cf3853dacd4a8`. Developer `LGTM` now settles
   the requested manual login smoke and checkpoint A; slice 8's closing
   records can be delivered before slice 9 starts.
+- Accepted slice 8 closing increment / current published base:
+  `e5b8aca1c605f59775f8cc607ea5f08095a9348e`. Slice 8 is done; G2 is proved
+  by the retained actual checkpoint A publication and developer manual login
+  confirmation. The existing branch observer below remains owned by execution.
+  Remaining preparation is refined in place; the original landing context was
+  consumed and recorded at A, and later B/C landings carry no context.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
