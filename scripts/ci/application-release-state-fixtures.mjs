@@ -94,10 +94,10 @@ export async function runStateCommand(
     response.writeHead(200, { 'Content-Type': 'application/json' })
     response.end(JSON.stringify(payload))
   })
+  if (unavailable) server.on('connection', (socket) => socket.destroy())
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
   t.after(() => server.close())
   const apiBase = `http://127.0.0.1:${server.address().port}`
-  if (unavailable) await new Promise((resolve) => server.close(resolve))
   const outputPath = join(repository || fixture.repository, 'state-output')
   const child = spawn(process.execPath, [command, ...args], {
     cwd: repository || fixture.repository,

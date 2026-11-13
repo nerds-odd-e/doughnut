@@ -76,6 +76,17 @@
   reconciliation. A check-only Spotless failure exposed stale formatting output;
   forced recomputation identified wrapping changes, then renewed guarded
   formatting and the real commit hook passed. [Accepted proof and repair](tracker-creation-fixtures-verification.md).
+- Accepted slice 11 increment:
+  `2ac7cd705315394be7dab50ebee451b3bb7a8e2e`; G3 is proved by pre-action
+  question selection, same-ID destruction/retry/rollback observations and the
+  committed-fixture graph. Full red/green, fresh refactor, one formatter pass,
+  recomputed Spotless check and guarded retry passed before managed publication.
+  The existing observer registered the accepted SHA without reconciliation.
+- Local backlog-adapter merge `3b80788b5654b8441f1fb3c27a2ce73c4ba1521d`
+  incorporates pinned trunk `c2305a93943ee83228ac919e2af4bec9056d4353` while
+  retaining the published story history. It changes only the four incoming
+  backlog/retrospective records. The slice 11 script-test CI repair carries this
+  combined owned suffix from accepted publication base `2ac7cd...`.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
@@ -102,8 +113,17 @@
 - Observer key:
   `ci-watch-execution:nerds-odd-e/doughnut:codex/keep-answered-questions-with-their-tracker:nao-tracker-60c866c4`;
   coordinator: `nao-tracker-60c866c4`; directory:
-  `/tmp/dough-ci-501/watch-kxc0PK`; PID: `31924`; stream session: `86510`;
-  yielded cell: `g59:5`; checkout: the owned workspace above.
+  `/tmp/dough-ci-501/watch-PaZAdI`; PID: `86657`; stream session: `13407`;
+  yielded cell: `g4:8`; checkout: the owned workspace above.
+- Server-restart recovery after slice 11 confirmed the clean published checkout
+  before any merge retry. The matching former stream `/tmp/dough-ci-501/watch-kxc0PK`
+  returned `stopped`, zero unread, with slice 11 CI pending/unobserved; its
+  `result.json` agreed and sole `ps` check confirmed PID `31924` had exited.
+  The same coordinator armed the replacement above. It delivered run
+  `43402490623`/1's Other Unit Tests failure for accepted slice 11; its
+  [owned fixture-isolation repair and proof](release-state-fixture-verification.md)
+  precede 12. Preservation receipt was `clean`,
+  OID null, at `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/dough-ci-repair-stash-vPH5Kg/record.json`.
 - The preceding branch observer `/tmp/dough-ci-501/watch-TP3o9D` stopped
   for the manual-smoke handoff, zero unread; PID `44192` exit was confirmed.
   It observed the records-only progress increment through the successful
