@@ -1,0 +1,88 @@
+# Temporary branch-scoped probe for SEED-129 slice 1.
+# Disposable Linux mutations only (ADR 0007). Delete after slices 2–3 absorb proof.
+#
+# Literal production budget defaults exercised here:
+#   timeout --kill-after=10s 600s bash -euo pipefail -c 'sudo -n env DEBIAN_FRONTEND=noninteractive …'
+#   apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 \
+#     -o Acquire::https::Timeout=30 -o APT::Update::Error-Mode=any …
+# Stalled case overrides budget to 15s (kill-after remains 10s).
+#
+# Observe via Jobs API (not YAML text): job/step conclusions, elapsed wall time,
+# skipped downstream step after bad-mirror failure, and stalled child cleanup.
+
+name: CI system packages probe
+
+on:
+  push:
+    branches:
+      - cursor/bound-ci-system-package-installation
+  workflow_dispatch:
+
+concurrency:
+  group: ci-system-packages-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # Fail package phase on isolated .invalid mirror; next step must skip.
+  bad-mirror:
+    name: probe bad-mirror
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Record runner / APT environment
+        run: bash scripts/ci-system-packages.sh probe-env
+      - name: Bad-mirror package phase (expect failure within budget)
+        id: packages
+        run: bash scripts/ci-system-packages.sh probe-bad-mirror
+      - name: Downstream checks (must skip after package failure)
+        if: success()
+        run: |
+          echo "ci-system-packages-probe: downstream ran unexpectedly after bad-mirror" >&2
+          exit 1
+
+  # Short budget vs hanging acquisition child that ignores TERM.
+  stalled-transfer:
+    name: probe stalled-transfer
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Record runner / APT environment
+        run: bash scripts/ci-system-packages.sh probe-env
+      - name: Stalled transfer (expect nonzero within budget + kill-after)
+        id: stalled
+        env:
+          CI_SYSTEM_PACKAGES_BUDGET_SECONDS: "15"
+          CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS: "10"
+        run: |
+          set +e
+          bash scripts/ci-system-packages.sh probe-stalled-transfer
+          status=$?
+          set -e
+          echo "stalled_exit=${status}"
+          if [[ "$status" -eq 0 ]]; then
+            echo "ci-system-packages-probe: stalled-transfer unexpectedly succeeded" >&2
+            exit 1
+          fi
+          # GNU timeout → 124 on expiry; 137 if SIGKILL visible with preserve-status.
+          echo "ci-system-packages-probe: stalled-transfer failed as required (status=${status})"
+
+  # Separate success jobs: transient recovery + healthy install under 600/10.
+  transient-recovery:
+    name: probe transient-recovery
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Record runner / APT environment
+        run: bash scripts/ci-system-packages.sh probe-env
+      - name: Transient recovery within acquire retries
+        run: bash scripts/ci-system-packages.sh probe-transient-recovery
+
+  healthy-package:
+    name: probe healthy-package
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Record runner / APT environment
+        run: bash scripts/ci-system-packages.sh probe-env
+      - name: Healthy package install under 600s budget
+        run: bash scripts/ci-system-packages.sh probe-healthy-package

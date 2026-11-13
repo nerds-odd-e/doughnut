@@ -2,6 +2,7 @@
 
 **Identity:** SEED-129#bound-ci-system-package-installation
 **Source:** [selected story](../../seeds/SEED-129-bounded-ci-package-setup.md#bound-ci-system-package-installation)
+**Source review:** [source-review.md](source-review.md)
 
 ## Outcome and boundaries
 
@@ -97,6 +98,8 @@ Type: Behavior
 Status: planned
 Proof: a disposable CI run establishes the Linux-specific premises above, with
 terminal job/step outcomes, wall time and child cleanup rather than YAML text assertions.
+Pre-publish local and outstanding hosted receipts:
+[slice-1-probe-evidence.md](slice-1-probe-evidence.md).
 
 Behavior: given an execution-owned branch on the configured Linux runner, run
 isolated bad-mirror, stalled-transfer, transient-recovery and healthy-package
@@ -194,3 +197,51 @@ explicit probe, whose negative result stops dependent execution. No disputed
 constraint or pre-Take human decision remains. The focused 5–8 minute estimates
 include edits/tests/cleanup; the >5 minute cases were scrutinized above. At
 10 minutes stop and decompose unless the named external-wait exception applies.
+
+## Story obligations
+
+### X1. Open Dough CI observation unchanged
+Reported: slice 1 — "source review exclusion"
+Story clause: "this story does not change Open Dough's CI observation"
+Disposition: excluded "this story does not change Open Dough's CI observation"
+Commitment: X1
+### X2. Does not select new mirrors
+Reported: slice 1 — "source review exclusion"
+Story clause: "select new mirrors"
+Disposition: excluded "select new mirrors"
+Commitment: X2
+### X3. No cross-job retry coordination
+Reported: slice 1 — "source review exclusion"
+Story clause: "add cross-job retry coordination"
+Disposition: excluded "add cross-job retry coordination"
+Commitment: X3
+### X4. Node/pnpm/Cypress policy unchanged
+Reported: slice 1 — "source review exclusion"
+Story clause: "change Node/pnpm/Cypress"
+Disposition: excluded "change Node/pnpm/Cypress"
+Commitment: X4
+### X5. MySQL archive policy unchanged beyond system libraries
+Reported: slice 1 — "source review exclusion"
+Story clause: "MySQL archive"
+Disposition: excluded "MySQL archive"
+Commitment: X5
+### X6. Docker setup policy unchanged
+Reported: slice 1 — "source review exclusion"
+Story clause: "Docker"
+Disposition: excluded "Docker"
+Commitment: X6
+### X7. Java setup policy unchanged
+Reported: slice 1 — "source review exclusion"
+Story clause: "Java"
+Disposition: excluded "Java"
+Commitment: X7
+### X8. Cloud VM setup policy unchanged
+Reported: slice 1 — "source review exclusion"
+Story clause: "Cloud VM setup policies"
+Disposition: excluded "Cloud VM setup policies"
+Commitment: X8
+### X9. Release publication not required to prove setup
+Reported: slice 1 — "source review exclusion"
+Story clause: "Existing downstream release work is preserved; proving setup does not require publishing a release."
+Disposition: excluded "Existing downstream release work is preserved; proving setup does not require publishing a release."
+Commitment: X9
