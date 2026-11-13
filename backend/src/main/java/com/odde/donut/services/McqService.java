@@ -41,9 +41,9 @@ public class McqService {
     return aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcq);
   }
 
-  public QuestionContestResult contest(Mcq mcq) {
+  public QuestionContestResult contest(Note note, Mcq mcq) {
     QuestionEvaluation questionContestResult =
-        aiQuestionGenerator.getQuestionContestResult(mcq.getNote(), mcq);
+        aiQuestionGenerator.getQuestionContestResult(note, mcq);
     if (questionContestResult == null) {
       return null;
     }
@@ -70,7 +70,7 @@ public class McqService {
     entityPersister.save(result);
 
     for (int i = 0; i < regenerationTimes; i++) {
-      QuestionContestResult contestResult = contest(result);
+      QuestionContestResult contestResult = contest(note, result);
 
       if (contestResult == null || contestResult.rejected) {
         return result;

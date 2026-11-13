@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.controllers.dto.ConversationListItem;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,21 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
 
 class ConversationListingControllerTest extends ConversationMessageControllerTestBase {
+
+  @Test
+  void titlesRecallConversationsWithTheTrackersCurrentNote() throws Exception {
+    Note original =
+        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Original").please();
+    var tracker = makeMe.aMemoryTrackerFor(original).please();
+    RecallPrompt prompt =
+        makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcqForNote(original).please();
+    controller.startConversationAboutRecallPrompt(prompt);
+    reifyTrackedProperty(tracker, "Current");
+
+    assertThat(
+        controller.getConversationsOfCurrentUser().getFirst().subject(),
+        equalTo("Original related Current"));
+  }
 
   @Nested
   class ConversationOrdering {

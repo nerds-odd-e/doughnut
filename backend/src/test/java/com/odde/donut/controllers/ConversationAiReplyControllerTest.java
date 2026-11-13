@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
@@ -28,6 +29,36 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 class ConversationAiReplyControllerTest extends ConversationMessageControllerTestBase {
   @Autowired EntityManager entityManager;
   @Autowired NoteRepository noteRepository;
+
+  @Test
+  void usesTheTrackersCurrentNoteForAiContextAndCorrections() throws Exception {
+    Note original = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    var tracker = makeMe.aMemoryTrackerFor(original).please();
+    RecallPrompt prompt =
+        makeMe.aRecallPrompt().withMcqForNote(original).forMemoryTracker(tracker).please();
+    Conversation conversation = controller.startConversationAboutRecallPrompt(prompt);
+    Note current = reifyTrackedProperty(tracker, "Current conversation evidence");
+    new OpenAiResponseStreamMocker(officialClient)
+        .withToolCall("NoteContentCompletion", "{\"content\":\"Clarified\",\"reason\":\"Reason\"}")
+        .mockStreamResponse();
+
+    controller.getAiReply(conversation);
+
+    String context =
+        lastRequestSentToAi()
+            .input()
+            .flatMap(input -> input.response())
+            .orElseThrow()
+            .getFirst()
+            .easyInputMessage()
+            .orElseThrow()
+            .content()
+            .asTextInput();
+    assertThat(context, containsString("<focus_note>\nTitle: " + current.getTitle() + "\n"));
+    assertThat(
+        controller.getConversationCorrections(conversation).getFirst().getNote().getId(),
+        equalTo(current.getId()));
+  }
 
   @ParameterizedTest
   @CsvSource({

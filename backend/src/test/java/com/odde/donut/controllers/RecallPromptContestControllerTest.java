@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -82,6 +83,23 @@ class RecallPromptContestControllerTest extends RecallPromptControllerTestBase {
     verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
     assertThat(
         paramsCaptor.getValue().rawParams().model().orElseThrow().asString(), equalTo("gpt-new"));
+  }
+
+  @Test
+  void contestsAgainstTheTrackersCurrentNote() throws UnexpectedNoAccessRightException {
+    Note current =
+        reifyTrackedProperty(recallPrompt.getMemoryTracker(), "Current contest evidence");
+    openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
+
+    controller.contest(recallPrompt);
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    ArgumentCaptor<StructuredResponseCreateParams<QuestionEvaluation>> paramsCaptor =
+        ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+    verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
+    assertThat(
+        paramsCaptor.getValue().rawParams().input().flatMap(input -> input.text()).orElse(""),
+        containsString("<focus_note>\nTitle: " + current.getTitle() + "\n"));
   }
 
   @Test

@@ -90,7 +90,7 @@ public class AuthorizationService {
   private void assertReadAuthorizationRecallPrompt(User user, RecallPrompt object)
       throws UnexpectedNoAccessRightException {
     if (object.getMcq() != null) {
-      assertReadAuthorizationMcq(user, object.getMcq());
+      assertReadAuthorization(user, object.getNote());
     }
   }
 

@@ -18,6 +18,21 @@ import org.springframework.web.server.ResponseStatusException;
 class MemoryTrackerRecallHistoryControllerTest extends MemoryTrackerControllerTestBase {
 
   @Test
+  void readsAnsweredHistoryAlongsideTheTrackersCurrentNote()
+      throws UnexpectedNoAccessRightException {
+    Note original = ownedNote();
+    MemoryTracker tracker = ownedTracker(original);
+    RecallPrompt answered = answeredPromptFor(tracker, original);
+    Note current = reifyTrackedProperty(tracker, "Current");
+
+    List<RecallHistoryItem> history = controller.getRecallHistory(tracker);
+
+    assertThat(controller.showMemoryTracker(tracker).getNote().getId(), equalTo(current.getId()));
+    assertThat(
+        history.getFirst().getRecallPrompt().getMcq().getId(), equalTo(answered.getMcq().getId()));
+  }
+
+  @Test
   void pairsARecallLogWithThePromptThatSharesItsAnswer() throws UnexpectedNoAccessRightException {
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);

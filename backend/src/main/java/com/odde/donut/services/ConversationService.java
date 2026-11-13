@@ -167,16 +167,7 @@ public class ConversationService {
   }
 
   public String getConversationSubject(Conversation conversation) {
-    Note note = conversation.getSubject().getNote();
-    if (note != null) {
-      return note.getTitle();
-    }
-
-    RecallPrompt recallPrompt = conversation.getSubject().getRecallPrompt();
-    if (recallPrompt != null && recallPrompt.getMcq() != null) {
-      return recallPrompt.getMcq().getNote().getTitle();
-    }
-
-    return "Unknown Subject";
+    Note note = conversation.getSubjectNote();
+    return note != null ? note.getTitle() : "Unknown Subject";
   }
 }

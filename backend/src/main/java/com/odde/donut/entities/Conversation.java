@@ -60,7 +60,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
 
     RecallPrompt recallPrompt = subject.getRecallPrompt();
     if (recallPrompt != null && recallPrompt.getMcq() != null) {
-      return recallPrompt.getMcq().getNote();
+      return recallPrompt.getNote();
     }
 
     return null;

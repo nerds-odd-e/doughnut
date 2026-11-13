@@ -70,5 +70,14 @@ class ConversationStartControllerTest extends ConversationMessageControllerTestB
       assertThat(conversation.getSubject().getRecallPrompt(), equalTo(recallPrompt));
       assertThat(conversation.getAccessOwnership(), equalTo(currentUser.getUser().getOwnership()));
     }
+
+    @Test
+    void usesTheTrackersCurrentNoteAsSubject() throws UnexpectedNoAccessRightException {
+      Note current = reifyTrackedProperty(recallPrompt.getMemoryTracker(), "Current");
+
+      Conversation conversation = controller.startConversationAboutRecallPrompt(recallPrompt);
+
+      assertThat(conversation.getSubjectNote().getId(), equalTo(current.getId()));
+    }
   }
 }

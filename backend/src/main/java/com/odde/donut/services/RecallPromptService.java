@@ -96,7 +96,7 @@ public class RecallPromptService {
   }
 
   public QuestionContestResult contest(RecallPrompt recallPrompt) {
-    return mcqService.contest(recallPrompt.getMcq());
+    return mcqService.contest(recallPrompt.getNote(), recallPrompt.getMcq());
   }
 
   public RecallPrompt answer(

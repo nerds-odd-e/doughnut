@@ -90,17 +90,11 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   }
 
   public Note getNote() {
-    if (getMcq() != null) {
-      return getMcq().getNote();
-    }
-    if (getMemoryTracker() != null) {
-      return getMemoryTracker().getNote();
-    }
-    return null;
+    return requireMemoryTracker().getNote();
   }
 
   public Notebook getNotebook() {
-    return getMemoryTracker().getNote().getNotebook();
+    return getNote().getNotebook();
   }
 
   public Boolean getIsContested() {
@@ -114,12 +108,12 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     if (questionType != QuestionType.SPELLING) {
       return null;
     }
-    Note note = memoryTracker.getNote();
+    Note note = getNote();
     String stem = note.createMaskedContentForRecall().maskedContentAsMarkdown();
     return new SpellingQuestion(stem, getNotebook());
   }
 
   public boolean isNoteEditedSinceAnswer() {
-    return memoryTracker.getNote().getUpdatedAt().after(getAnswerTime());
+    return getNote().getUpdatedAt().after(getAnswerTime());
   }
 }

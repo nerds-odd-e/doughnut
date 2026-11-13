@@ -36,12 +36,12 @@ probe has no source commitment allocated to it.
 | C13 | C13 — Tracker deletion: Removing a tracker removes its prompts. | slice 8 | |
 | C14 | C14 — Question deletion: Removing a tracker removes its prompts’ questions. | slice 8 | |
 | C15 | C15 — Deletion ownership: Deletion remains application-owned. | slice 8 | |
-| C16 | C16 — Note attribution: A question’s note is its tracker’s current note. | slice 2 | |
-| C17 | C17 — Recall history: Recall history uses the tracker’s current note. | slice 2 | |
+| C16 | C16 — Note attribution: A question’s note is its tracker’s current note. | slice 2 | observed: RecallPrompt.getNote derives requireMemoryTracker().getNote(); RecallPromptAnswerControllerTest.attributesTheAnswerToTheTrackersCurrentNote observes current topology ID after real reification; full backend pass 2026-11-13 01:57 UTC. |
+| C17 | C17 — Recall history: Recall history uses the tracker’s current note. | slice 2 | observed: MemoryTrackerRecallHistoryControllerTest.readsAnsweredHistoryAlongsideTheTrackersCurrentNote observes current note through showMemoryTracker plus retained answered MCQ in history after real reification; final full backend pass. |
 | C18 | C18 — Connected assistant answers: Connected assistant recall answers use the tracker’s current note. | slice 9 | |
-| C19 | C19 — Prompt conversations: Conversations about a prompt use the tracker’s current note. | slice 2 | |
-| C20 | C20 — Contest context: Contest context uses the tracker’s current note. | slice 2 | |
-| C21 | C21 — Regeneration context: Regeneration context uses the tracker’s current note. | slice 2 | |
+| C19 | C19 — Prompt conversations: Conversations about a prompt use the tracker’s current note. | slice 2 | observed: ConversationStartControllerTest.usesTheTrackersCurrentNoteAsSubject; ConversationListingControllerTest.titlesRecallConversationsWithTheTrackersCurrentNote; ConversationAiReplyControllerTest.usesTheTrackersCurrentNoteForAiContextAndCorrections observes exact focus-note title and correction note ID after real reification; final full backend pass. |
+| C20 | C20 — Contest context: Contest context uses the tracker’s current note. | slice 2 | observed: RecallPromptContestControllerTest.contestsAgainstTheTrackersCurrentNote observes exact focus_note title in mocked external AI request after real reification; final full backend pass. |
+| C21 | C21 — Regeneration context: Regeneration context uses the tracker’s current note. | slice 2 | observed: RecallPromptRegenerateControllerTest.shouldPassOldQuestionAndContestResultToOpenAiApi observes exact current focus_note title and retained regeneration inputs after real reification; final full backend pass. |
 | C22 | C22 — Recent-question attribution: A note export’s recent questions use the tracker’s current note. | slice 3 | |
 | C23 | C23 — Export selection: Recent-question export lists questions asked through trackers currently on the exported note. | slice 3 | |
 | Q01 | Q01 — Property focus: Recent-question export keeps property focus unchanged. | slice 3 | |
@@ -130,7 +130,7 @@ probe has no source commitment allocated to it.
 | X06 | X06 — Content revisions: Add no content revision system. | slice 10 | |
 | X07 | X07 — Database cascades: Add no new database cascade. | slice 10 | |
 | C83 | C83 — Instance compatibility: Preserve compatibility between two app instances during rollout. | slice 10 | |
-| C84 | C84 — Compatibility attribution: The compatibility release derives attribution through the tracker. | slice 2 | |
+| C84 | C84 — Compatibility attribution: The compatibility release derives attribution through the tracker. | slice 8 |  |
 | C85 | C85 — Compatibility write: That release retains a scalar note-ID write. | slice 6 | |
 | Q06 | Q06 — Compatibility consumer: The retained write serves the original eager ORM readers. | slice 6 | |
 | C86 | C86 — Mapping removal timing: After the compatibility release is fully deployed, remove the mapping. | slice 9 | |

@@ -37,6 +37,15 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   }
 
   @Test
+  void attributesTheAnswerToTheTrackersCurrentNote() throws UnexpectedNoAccessRightException {
+    Note current = reifyTrackedProperty(memoryTracker, "Current");
+
+    AnsweredQuestion result = controller.answer(recallPrompt, answerDTO);
+
+    assertThat(result.getRecalledNote().getNoteTopology().getId(), equalTo(current.getId()));
+  }
+
+  @Test
   void shouldValidateTheAnswer() throws UnexpectedNoAccessRightException {
     AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
     assertThat(answerResult.getAnswer().getCorrect(), is(true));

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Circle;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.SpringTestBase;
@@ -47,6 +48,29 @@ class AuthorizationServiceTest extends SpringTestBase {
 
   @Nested
   class readAuthority {
+    @Test
+    void readsAPromptUsingItsTrackersCurrentNote() throws UnexpectedNoAccessRightException {
+      Note original = makeMe.aNote().please();
+      Note current = makeMe.aNote().notebookOwnedBy(user).please();
+      var tracker = makeMe.aMemoryTrackerFor(current).please();
+      RecallPrompt prompt =
+          makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcqForNote(original).please();
+
+      authorizationService.assertReadAuthorization(user, prompt);
+    }
+
+    @Test
+    void refusesAPromptWhoseCurrentNoteIsPrivateToAnotherUser() {
+      Note original = makeMe.aNote().notebookOwnedBy(user).please();
+      var tracker = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).please();
+      RecallPrompt prompt =
+          makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcqForNote(original).please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> authorizationService.assertReadAuthorization(user, prompt));
+    }
+
     @Test
     void anonymousUserCannotRead() {
       Note note = makeMe.aNote().please();

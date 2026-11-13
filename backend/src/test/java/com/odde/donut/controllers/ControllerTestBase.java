@@ -9,8 +9,10 @@ import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.RecallHistoryItem;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallLog;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +20,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class ControllerTestBase extends SpringTestBase {
   @Autowired private MemoryTrackerController recallHistoryController;
+  @Autowired private NoteController noteController;
+  @Autowired private NoteReferenceService noteReferenceService;
+
+  protected Note reifyTrackedProperty(MemoryTracker tracker, String targetTitle)
+      throws UnexpectedNoAccessRightException {
+    Note source = tracker.getNote();
+    makeMe.aNote(targetTitle).underSameNotebookAs(source).please();
+    makeMe
+        .theNote(source)
+        .content("---\nrelated: \"[[" + targetTitle + "]]\"\n---\n" + source.getContent())
+        .please();
+    tracker.setPropertyKey("related");
+    makeMe.entityPersister.save(tracker);
+    noteReferenceService.refreshDerivedIndexesForNote(source);
+    return noteController.reifyProperty(source, "related").getNote();
+  }
 
   protected List<RecallLog> recallLogsOf(MemoryTracker tracker)
       throws UnexpectedNoAccessRightException {

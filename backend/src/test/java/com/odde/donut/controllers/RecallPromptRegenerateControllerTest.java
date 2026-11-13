@@ -66,6 +66,8 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
   @Test
   void shouldPassOldQuestionAndContestResultToOpenAiApi()
       throws JsonProcessingException, UnexpectedNoAccessRightException {
+    Note current =
+        reifyTrackedProperty(recallPrompt.getMemoryTracker(), "Current regeneration evidence");
     makeMe
         .anMcq()
         .mcq(recallPrompt.getMcq())
@@ -93,6 +95,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
 
     String inputText =
         paramsCaptor.getValue().rawParams().input().flatMap(input -> input.text()).orElse("");
+    assertThat(inputText, containsString("<focus_note>\nTitle: " + current.getTitle() + "\n"));
     String previousQuestionJson =
         new ObjectMapperConfig()
             .objectMapper()
