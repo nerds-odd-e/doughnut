@@ -105,8 +105,10 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
         inCommittedTransaction(
             transactionManager,
             () -> noteRepository.findById(companion.getId()).orElseThrow().getUpdatedAt());
+    List<Integer> questionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(deleted));
     DependentCounts deletedDependentsBefore =
-        inCommittedTransaction(transactionManager, () -> dependentCounts(deleted));
+        inCommittedTransaction(transactionManager, () -> dependentCounts(deleted, questionIds));
     Timestamp movedTrackerNextRecallAt = movedTracker.getNextRecallAt();
 
     ObjectId acceptedHeadId = ObjectId.fromString(acceptedHead);
@@ -160,7 +162,7 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
           Note reloadedDeleted = noteRepository.findById(deleted.getId()).orElseThrow();
           assertThat(reloadedDeleted.getTitle(), is("Deleted"));
           assertThat(reloadedDeleted.getContent(), equalTo(DELETED_ORIGINAL));
-          assertThat(dependentCounts(deleted), equalTo(deletedDependentsBefore));
+          assertThat(dependentCounts(deleted, questionIds), equalTo(deletedDependentsBefore));
           MemoryTracker reloadedDeletedTracker =
               memoryTrackerRepository.findById(deletedTracker.getId()).orElseThrow();
           assertThat(reloadedDeletedTracker.isActive(), equalTo(true));

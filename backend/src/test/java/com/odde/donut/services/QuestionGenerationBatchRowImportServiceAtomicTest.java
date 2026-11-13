@@ -16,6 +16,7 @@ import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.services.ai.GeneratedMcq;
@@ -46,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 class QuestionGenerationBatchRowImportServiceAtomicTest {
 
   @Autowired MakeMe makeMe;
+  @Autowired McqRepository mcqRepository;
   @Autowired QuestionGenerationBatchRowImportService rowImportService;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired RecallPromptRepository recallPromptRepository;
@@ -57,7 +59,9 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
     FAIL_ON_RECALL_PROMPT_SAVE.set(false);
     inCommittedTransaction(
         transactionManager,
-        () -> deleteByUserExternalIdentifierLike(entityManager, "batch-import-atomic-%"));
+        () ->
+            deleteByUserExternalIdentifierLike(
+                entityManager, mcqRepository, "batch-import-atomic-%"));
   }
 
   @Test

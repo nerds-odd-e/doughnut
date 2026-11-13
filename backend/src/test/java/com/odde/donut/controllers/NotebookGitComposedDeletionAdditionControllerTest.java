@@ -117,6 +117,9 @@ class NotebookGitComposedDeletionAdditionControllerTest extends NotebookGitContr
       proposalBytes = bundleBytesForHead(repository, tip);
     }
 
+    List<Integer> questionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(deleted));
+
     String publishedHead =
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
@@ -126,7 +129,7 @@ class NotebookGitComposedDeletionAdditionControllerTest extends NotebookGitContr
     assertThat(storedNotes, hasSize(3));
     assertThat(noteRepository.findById(deleted.getId()).isPresent(), equalTo(false));
     assertThat(
-        inCommittedTransaction(transactionManager, () -> dependentCounts(deleted)),
+        inCommittedTransaction(transactionManager, () -> dependentCounts(deleted, questionIds)),
         equalTo(DependentCounts.allAbsent()));
     assertThat(
         memoryTrackerRepository.findById(deletedTracker.getId()).isPresent(), equalTo(false));

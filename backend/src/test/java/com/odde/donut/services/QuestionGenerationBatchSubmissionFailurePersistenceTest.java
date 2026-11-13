@@ -75,7 +75,7 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest extends SpringTest
   void cleanupCommittedState() {
     inCommittedTransaction(() ->
         CommittedUserCleanup.deleteByUserExternalIdentifierLike(
-            entityManager, COMMITTED_USER_PREFIX + "%"));
+            entityManager, mcqRepository, COMMITTED_USER_PREFIX + "%"));
   }
 
   @Nested

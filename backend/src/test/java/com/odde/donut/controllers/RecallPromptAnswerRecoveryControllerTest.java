@@ -78,7 +78,9 @@ class RecallPromptAnswerRecoveryControllerTest extends RecallPromptAnswerRecover
       currentUser.setUser(owner);
       inCommittedTransaction(
           transactionManager,
-          () -> deleteByUserExternalIdentifierLike(entityManager, other.getExternalIdentifier()));
+          () ->
+              deleteByUserExternalIdentifierLike(
+                  entityManager, mcqRepository, other.getExternalIdentifier()));
     }
   }
 }

@@ -53,6 +53,8 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControl
         makeMe.aNote().notebook(notebook).title("Original").content(ORIGINAL_CONTENT).please();
     makeMe.aNote().notebook(notebook).title("Retained").content(RETAINED_CONTENT).please();
     MemoryTracker tracker = attachLearningClosure(original);
+    List<Integer> questionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(original));
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
     ObjectId tip;
@@ -89,7 +91,7 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControl
     assertThat(
         memoryTrackerRepository.findById(tracker.getId()).orElseThrow().isActive(), equalTo(true));
     assertThat(
-        inCommittedTransaction(transactionManager, () -> dependentCounts(original)),
+        inCommittedTransaction(transactionManager, () -> dependentCounts(original, questionIds)),
         not(equalTo(DependentCounts.allAbsent())));
   }
 
@@ -99,6 +101,8 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControl
         makeMe.aNote().notebook(notebook).title("Target").content(ORIGINAL_CONTENT).please();
     makeMe.aNote().notebook(notebook).title("Retained").content(RETAINED_CONTENT).please();
     MemoryTracker tracker = attachLearningClosure(original);
+    List<Integer> questionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(original));
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
     ObjectId tip;
@@ -129,7 +133,7 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControl
     assertThat(publishedHead, equalTo(tip.getName()));
     assertThat(noteRepository.findById(original.getId()).isPresent(), equalTo(false));
     assertThat(
-        inCommittedTransaction(transactionManager, () -> dependentCounts(original)),
+        inCommittedTransaction(transactionManager, () -> dependentCounts(original, questionIds)),
         equalTo(DependentCounts.allAbsent()));
     assertThat(memoryTrackerRepository.findById(tracker.getId()).isPresent(), equalTo(false));
 

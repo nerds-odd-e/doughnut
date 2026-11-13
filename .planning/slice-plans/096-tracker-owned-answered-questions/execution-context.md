@@ -68,7 +68,14 @@
   `337b8f323ba9a17148a99a8684bdbdd1a6022904`; scenario-preserving export test
   homes and the ready 13-leaf remaining-plan refinement published together.
   Formatter, check-only hook and existing-observer registration passed with
-  no reconciliation. The next fixture-creation proof uses this accepted base.
+  no reconciliation. Fixture-creation proof started from this accepted base.
+- Accepted slice 10 increment:
+  `6863f1e6b3ae22941728c36cb9a45284a636641c`; tracker-owned creation fixtures
+  retain their payload, ownership and isolation observations in the full backend
+  suite. The existing observer registered the accepted revision with no
+  reconciliation. A check-only Spotless failure exposed stale formatting output;
+  forced recomputation identified wrapping changes, then renewed guarded
+  formatting and the real commit hook passed. [Accepted proof and repair](tracker-creation-fixtures-verification.md).
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt

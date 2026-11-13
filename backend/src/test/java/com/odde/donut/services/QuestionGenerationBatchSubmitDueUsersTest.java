@@ -96,6 +96,6 @@ class QuestionGenerationBatchSubmitDueUsersTest extends SpringTestBase {
 
   private void deleteCommittedDueUserFixtures() {
     CommittedUserCleanup.deleteByUserExternalIdentifierLike(
-        entityManager, COMMITTED_USER_PREFIX + "%");
+        entityManager, mcqRepository, COMMITTED_USER_PREFIX + "%");
   }
 }

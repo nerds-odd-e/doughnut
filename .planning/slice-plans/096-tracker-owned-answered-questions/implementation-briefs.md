@@ -172,10 +172,20 @@ carry the same IDs into after-delete/retry/rollback observations. Discovery afte
 deletion is vacuous. Use explicit inputs, with no lazy cache or snapshot that
 silently captures after deletion. Preserve complete dependent fixture proof.
 `CommittedUserCleanup` captures distinct selected IDs before prompt deletion,
-then deletes only those with no surviving prompt. Preserve its current cleanup
-order/conversation semantics and committed-fixture isolation. Add no absence
-guard or parallel fixture framework. Budget 5–8 minutes editing/cleanup plus
-full backend proof.
+then deletes only those with no surviving prompt. Its affected graph includes
+matching tracker users **or** trackers on matching users' owned notes: later
+note deletion cascades other learners' trackers too. Share one native FROM/
+predicate between question preselection and prompt deletion; left-join optional
+note/ownership paths so circle-owned or nullable-note trackers keep coverage.
+Reuse `McqRepository.deleteUnreferencedByIds` at the existing question step;
+inject it through `SpringTestBase` and thread it into the twelve cleanup callers.
+Keep the remaining cleanup order/conversation semantics. Add one focused cleanup
+graph case (red/green full suite): target learner on an external circle note,
+another learner on a target-owned note, and an unrelated surviving question.
+Give the second question a surviving input-note scalar to expose cleanup without
+FK masking; retire that physical fixture in 12. Preserve committed isolation;
+add no absence guard or fixture framework. Budget 5–8 minutes editing/cleanup;
+full-suite red/green waits are the stated indivisible proof exception.
 
 ## Preserve answered questions across tracker moves and old-note deletion
 
@@ -194,7 +204,7 @@ bearer GET `/api/notes/{id}/ai-context-markdown`, without widening visibility.
 
 Remove scalar mapping/writer and remaining exclusive Note input in
 `GeneratedQuestionPostProcessor`, `AiQuestionGenerator` and batch callers.
-Retire fixture fallback/save, explicit authorization physical setup and selected-
+Retire fixture fallback/save, explicit authorization/cleanup physical setup and selected-
 write getter assertions while retaining surviving payload/access proof. Drop
 **only** `fk_mcq_note` in a collision-checked migration above actual tip
 `300000356`; keep nullable physical column/index. Check both SQL/Java migration

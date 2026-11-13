@@ -65,16 +65,19 @@ class NotebookGitDeletionPublicationRetryControllerTest extends NotebookGitContr
         proposalBundleBytes(
             initialBinding, List.of(new NotebookGitProposalFile("Retained.md", ORIGINAL_CONTENT)));
 
+    List<Integer> questionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(target));
+
     String publishedHead =
         controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
-    PublicationState stateAfterPublication = publicationState(notebook, target);
+    PublicationState stateAfterPublication = publicationState(notebook, target, questionIds);
 
     testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-06-01 00:00:00"));
     String retriedHead =
         controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
 
     assertThat(retriedHead, equalTo(publishedHead));
-    PublicationState stateAfterRetry = publicationState(notebook, target);
+    PublicationState stateAfterRetry = publicationState(notebook, target, questionIds);
     assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
     assertThat(
         stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
@@ -90,7 +93,8 @@ class NotebookGitDeletionPublicationRetryControllerTest extends NotebookGitContr
     assertThat(noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
   }
 
-  private PublicationState publicationState(Notebook notebook, Note note) throws Exception {
+  private PublicationState publicationState(Notebook notebook, Note note, List<Integer> questionIds)
+      throws Exception {
     AcceptedHistory acceptedHistory = acceptedHistory(notebook);
     return inCommittedTransaction(
         transactionManager,
@@ -103,7 +107,7 @@ class NotebookGitDeletionPublicationRetryControllerTest extends NotebookGitContr
               binding.getUpdatedAt(),
               acceptedHistory,
               notePresent,
-              dependentCounts(note));
+              dependentCounts(note, questionIds));
         });
   }
 

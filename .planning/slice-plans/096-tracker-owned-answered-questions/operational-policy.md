@@ -16,7 +16,7 @@ Removal acceptance is the separate sweep reading below, never an absence test.
 | Upgrading schema preserves asked questions and their learner evidence | 13 | Temporary migration safety harness on populated isolated MySQL: default-off gate, enabled selection count, pre-DDL refusal and retained question/prompt/answer/log graph. No permanent test of missing bank rows, endpoints or columns. |
 | Recall export content/state, envelope/access and daily-probe behavior stays unchanged | 9 | All 14 existing history-export scenario bodies/assertions retained across cohesive homes; full backend proof. |
 | Creation fixtures retain current-note access, asked payload and isolation | 10 | Every builder/helper consumer retains its observations, including both opposite-ownership authorization cases with temporary local scalar setup and committed fixture isolation; full backend proof. |
-| Destruction and committed cleanup preserve selected-question observations | 11 | Preselect distinct question IDs through trackers/prompts; carry the same IDs through delete/retry/rollback. Committed cleanup deletes only selected unreferenced questions; full backend proof. |
+| Destruction and committed cleanup preserve selected-question observations | 11 | Preselect distinct question IDs through trackers/prompts; carry the same IDs through delete/retry/rollback. Cleanup shares its matching tracker-user/owned-note prompt scope, then deletes only selected unreferenced questions. One graph case proves both roots and an unrelated survivor; full backend red/green proof. |
 
 ## Release checkpoints and execution authority
 
@@ -134,3 +134,10 @@ Fresh unmapped NULL note IDs cannot stand in for legacy retention: 12 requires
 a positive populated legacy asked-row observation on the migrated schema, then
 retires that temporary physical fixture after B and before 13. Local planning
 neither observes these future gates nor marks any new slice executed.
+
+Before 11, a narrow cleanup reading exposed both existing deletion roots:
+matching learner trackers and matching users' owned notes, whose FK cascade
+also removes other learners' trackers. Nullable note/circle ownership paths
+need optional joins. The shared selection/deletion predicate and one focused
+graph case clarify 11's existing fixture-isolation proof; boundaries and story
+scope stay unchanged. Full-suite red/green waits remain separately owned.

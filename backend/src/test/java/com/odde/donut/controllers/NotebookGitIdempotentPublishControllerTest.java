@@ -134,9 +134,12 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
       proposalBytes = bundleBytesForHead(repository, tip);
     }
 
+    List<Integer> questionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(deleted));
+
     String publishedHead =
         controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
-    PublicationState stateAfterPublication = publicationState(notebook, deleted);
+    PublicationState stateAfterPublication = publicationState(notebook, deleted, questionIds);
     assertThat(publishedHead, equalTo(tip.getName()));
     assertThat(stateAfterPublication.notes(), hasSize(2));
     assertThat(stateAfterPublication.deletedPresent(), equalTo(false));
@@ -172,7 +175,7 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
         controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
 
     assertThat(retriedHead, equalTo(publishedHead));
-    PublicationState stateAfterRetry = publicationState(notebook, deleted);
+    PublicationState stateAfterRetry = publicationState(notebook, deleted, questionIds);
     assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
     assertThat(
         stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
@@ -181,7 +184,8 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
     assertThat(stateAfterRetry.dependentCounts(), equalTo(stateAfterPublication.dependentCounts()));
   }
 
-  private PublicationState publicationState(Notebook notebook, Note deleted) {
+  private PublicationState publicationState(
+      Notebook notebook, Note deleted, List<Integer> questionIds) {
     return inCommittedTransaction(
         transactionManager,
         () -> {
@@ -201,7 +205,7 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
                           note.getUpdatedAt()))
                   .toList(),
               noteRepository.findById(deleted.getId()).isPresent(),
-              dependentCounts(deleted));
+              dependentCounts(deleted, questionIds));
         });
   }
 

@@ -40,18 +40,21 @@ class NotebookFolderPermanentDeleteControllerTest extends NoteDependentRowsContr
     Note survivor = trackedNoteIn(sibling, "Survivor");
     makeMe.entityPersister.flushAndClear();
 
+    List<Integer> cellsQuestionIds = questionIdsForNote(cells);
+    List<Integer> nucleusQuestionIds = questionIdsForNote(nucleus);
+
     folderController.permanentlyDeleteFolder(reloaded(notebook), reloaded(topic));
 
     assertThat(folderRepository.findById(topic.getId()).isPresent(), equalTo(false));
     assertThat(folderRepository.findById(nested.getId()).isPresent(), equalTo(false));
     assertThat(noteRepository.findById(cells.getId()).isPresent(), equalTo(false));
     assertThat(noteRepository.findById(nucleus.getId()).isPresent(), equalTo(false));
-    assertThat(dependentCounts(cells), equalTo(DependentCounts.allAbsent()));
-    assertThat(dependentCounts(nucleus), equalTo(DependentCounts.allAbsent()));
+    assertThat(dependentCounts(cells, cellsQuestionIds), equalTo(DependentCounts.allAbsent()));
+    assertThat(dependentCounts(nucleus, nucleusQuestionIds), equalTo(DependentCounts.allAbsent()));
     assertThat(rootNoteTitles(notebook), contains("Root"));
     assertThat(folderRepository.findById(sibling.getId()).isPresent(), equalTo(true));
     assertThat(reloaded(survivor).getFolder().getId(), equalTo(sibling.getId()));
-    assertThat(dependentCounts(survivor).memoryTracker(), equalTo(1L));
+    assertThat(countRowsByNoteId("memory_tracker", survivor.getId()), equalTo(1L));
   }
 
   @Test
@@ -62,12 +65,14 @@ class NotebookFolderPermanentDeleteControllerTest extends NoteDependentRowsContr
     Note cells = trackedNoteIn(topic, "Cells");
     makeMe.entityPersister.flushAndClear();
 
+    List<Integer> cellsQuestionIds = questionIdsForNote(cells);
+
     folderController.permanentlyDeleteFolder(reloaded(notebook), reloaded(trash));
 
     assertThat(folderRepository.findById(trash.getId()).isPresent(), equalTo(false));
     assertThat(folderRepository.findById(topic.getId()).isPresent(), equalTo(false));
     assertThat(noteRepository.findById(cells.getId()).isPresent(), equalTo(false));
-    assertThat(dependentCounts(cells), equalTo(DependentCounts.allAbsent()));
+    assertThat(dependentCounts(cells, cellsQuestionIds), equalTo(DependentCounts.allAbsent()));
     assertThat(rootNoteTitles(notebook), empty());
   }
 

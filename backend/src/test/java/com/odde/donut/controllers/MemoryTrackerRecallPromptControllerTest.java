@@ -99,14 +99,16 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
       String leakedSetupUser = currentUser.getUser().getExternalIdentifier();
       inCommittedTransaction(
           transactionManager,
-          () -> deleteByUserExternalIdentifierLike(entityManager, leakedSetupUser));
+          () -> deleteByUserExternalIdentifierLike(entityManager, mcqRepository, leakedSetupUser));
     }
 
     @AfterEach
     void cleanupCommittedState() {
       inCommittedTransaction(
           transactionManager,
-          () -> deleteByUserExternalIdentifierLike(entityManager, FIXTURE_PREFIX + "%"));
+          () ->
+              deleteByUserExternalIdentifierLike(
+                  entityManager, mcqRepository, FIXTURE_PREFIX + "%"));
     }
 
     private MemoryTracker trackerTrackingTransactionActivityDuringOpenAiCalls(

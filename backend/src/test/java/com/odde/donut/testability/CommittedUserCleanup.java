@@ -1,32 +1,41 @@
 package com.odde.donut.testability;
 
+import com.odde.donut.entities.repositories.McqRepository;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 
 /** Deletes a committed user and the fixture graph hanging off that user. */
 public final class CommittedUserCleanup {
 
+  private static final String AFFECTED_PROMPTS =
+      """
+      FROM recall_prompt rp
+      JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id
+      JOIN user tracker_user ON mt.user_id = tracker_user.id
+      LEFT JOIN note n ON mt.note_id = n.id
+      LEFT JOIN notebook nb ON n.notebook_id = nb.id
+      LEFT JOIN ownership o ON nb.ownership_id = o.id
+      LEFT JOIN user note_owner ON o.user_id = note_owner.id
+      WHERE (tracker_user.external_identifier LIKE :like
+             OR note_owner.external_identifier LIKE :like)
+      """;
+
   private CommittedUserCleanup() {}
 
   public static void deleteByUserExternalIdentifierLike(
-      EntityManager entityManager, String externalIdentifierLike) {
+      EntityManager entityManager, McqRepository mcqRepository, String externalIdentifierLike) {
+    List<Integer> questionIds =
+        entityManager
+            .createNativeQuery(
+                "SELECT DISTINCT rp.mcq_id " + AFFECTED_PROMPTS + " AND rp.mcq_id IS NOT NULL",
+                Integer.class)
+            .setParameter("like", externalIdentifierLike)
+            .getResultList();
     entityManager
-        .createNativeQuery(
-            "DELETE rp FROM recall_prompt rp "
-                + "INNER JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
-                + "INNER JOIN user u ON mt.user_id = u.id "
-                + "WHERE u.external_identifier LIKE :like")
+        .createNativeQuery("DELETE rp " + AFFECTED_PROMPTS)
         .setParameter("like", externalIdentifierLike)
         .executeUpdate();
-    entityManager
-        .createNativeQuery(
-            "DELETE mcq FROM mcq "
-                + "INNER JOIN note n ON mcq.note_id = n.id "
-                + "INNER JOIN notebook nb ON n.notebook_id = nb.id "
-                + "INNER JOIN ownership o ON nb.ownership_id = o.id "
-                + "INNER JOIN user u ON o.user_id = u.id "
-                + "WHERE u.external_identifier LIKE :like")
-        .setParameter("like", externalIdentifierLike)
-        .executeUpdate();
+    mcqRepository.deleteUnreferencedByIds(questionIds);
     entityManager
         .createNativeQuery(
             "DELETE qgr FROM question_generation_batch_request qgr "

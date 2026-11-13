@@ -44,7 +44,8 @@ class NoteLevelIndexServiceConcurrencyTest extends SpringTestBase {
   void cleanupCommittedState() {
     inCommittedTransaction(
         transactionManager,
-        () -> deleteByUserExternalIdentifierLike(entityManager, FIXTURE_PREFIX + "%"));
+        () ->
+            deleteByUserExternalIdentifierLike(entityManager, mcqRepository, FIXTURE_PREFIX + "%"));
   }
 
   @Test

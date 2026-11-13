@@ -132,14 +132,17 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
     void removeCommittedSetupUser() {
       String setupUser = currentUser.getUser().getExternalIdentifier();
       inCommittedTransaction(
-          transactionManager, () -> deleteByUserExternalIdentifierLike(entityManager, setupUser));
+          transactionManager,
+          () -> deleteByUserExternalIdentifierLike(entityManager, mcqRepository, setupUser));
     }
 
     @AfterEach
     void cleanupCommittedState() {
       inCommittedTransaction(
           transactionManager,
-          () -> deleteByUserExternalIdentifierLike(entityManager, FIXTURE_PREFIX + "%"));
+          () ->
+              deleteByUserExternalIdentifierLike(
+                  entityManager, mcqRepository, FIXTURE_PREFIX + "%"));
     }
 
     @Test

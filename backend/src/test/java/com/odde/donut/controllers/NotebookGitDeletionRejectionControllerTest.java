@@ -171,7 +171,7 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitControllerTe
         () -> {
           Note surviving = noteRepository.findById(original.getId()).orElseThrow();
           assertThat(surviving.getContent(), equalTo(SUBSTANTIAL_ORIGINAL_BODY));
-          assertThat(dependentCounts(surviving).memoryTracker(), equalTo(1L));
+          assertThat(countRowsByNoteId("memory_tracker", surviving.getId()), equalTo(1L));
           assertThat(
               memoryTrackerRepository.findById(trackerId).orElseThrow().getNote().getId(),
               equalTo(original.getId()));

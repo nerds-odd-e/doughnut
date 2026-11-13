@@ -3,6 +3,7 @@ package com.odde.donut.testability;
 import com.odde.donut.controllers.currentUser.CurrentUser;
 import com.odde.donut.controllers.currentUser.ThreadLocalCurrentUser;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.GithubService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Import(SqlStatementCallLogDataSourceConfig.class)
 public abstract class SpringTestBase {
   @Autowired protected MakeMe makeMe;
+  @Autowired protected McqRepository mcqRepository;
   @Autowired protected AuthorizationService authorizationService;
   @Autowired protected TestabilitySettings testabilitySettings;
 

@@ -90,10 +90,16 @@ class NotebookGitDeletionPublicationAtomicControllerTest extends NotebookGitCont
         inCommittedTransaction(
             transactionManager,
             () -> noteRepository.findById(retained.getId()).orElseThrow().getUpdatedAt());
+    List<Integer> deletedAQuestionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(deletedA));
+    List<Integer> deletedBQuestionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(deletedB));
     DependentCounts deletedADependentsBefore =
-        inCommittedTransaction(transactionManager, () -> dependentCounts(deletedA));
+        inCommittedTransaction(
+            transactionManager, () -> dependentCounts(deletedA, deletedAQuestionIds));
     DependentCounts deletedBDependentsBefore =
-        inCommittedTransaction(transactionManager, () -> dependentCounts(deletedB));
+        inCommittedTransaction(
+            transactionManager, () -> dependentCounts(deletedB, deletedBQuestionIds));
     byte[] proposal =
         proposalBundleBytes(
             binding, List.of(new NotebookGitProposalFile("Retained.md", EDITED_CONTENT)));
@@ -139,9 +145,11 @@ class NotebookGitDeletionPublicationAtomicControllerTest extends NotebookGitCont
               reloadedTracker.getRemovedFromTracking(),
               equalTo(deletedATracker.getRemovedFromTracking()));
           // The complete dependent closure (recall_prompt, mcq, conversation + messages)
-          // was CASCADE-deleted inside the publication transaction and restored by its rollback.
-          assertThat(dependentCounts(deletedA), equalTo(deletedADependentsBefore));
-          assertThat(dependentCounts(deletedB), equalTo(deletedBDependentsBefore));
+          // was deleted inside the publication transaction and restored by its rollback.
+          assertThat(
+              dependentCounts(deletedA, deletedAQuestionIds), equalTo(deletedADependentsBefore));
+          assertThat(
+              dependentCounts(deletedB, deletedBQuestionIds), equalTo(deletedBDependentsBefore));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });

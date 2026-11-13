@@ -40,8 +40,11 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
   void publishesTrashThenAlternateActivePathRetainingIdentityDependentsAndAncestry()
       throws Exception {
     SeededCells seed = seedBiologyCellsWithLearning();
+    List<Integer> questionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(seed.cells()));
     DependentCounts dependentsBefore =
-        inCommittedTransaction(transactionManager, () -> dependentCounts(seed.cells()));
+        inCommittedTransaction(
+            transactionManager, () -> dependentCounts(seed.cells(), questionIds));
     ComposedTrashRange range =
         composeTrashThenFinal(
             acceptedBundleBytes(seed.notebook()),
@@ -73,7 +76,8 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
     assertThat(learned.isActive(), is(true));
     assertThat(learned.getDifficulty(), equalTo(seed.tracker().getDifficulty()));
     assertThat(
-        inCommittedTransaction(transactionManager, () -> dependentCounts(seed.cells())),
+        inCommittedTransaction(
+            transactionManager, () -> dependentCounts(seed.cells(), questionIds)),
         equalTo(dependentsBefore));
     assertAcceptedIntermediateAncestry(seed.notebook(), seed.acceptedHead(), range);
   }
@@ -81,6 +85,8 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
   @Test
   void publishesTrashThenReturnToOriginalPathRetainingIdentityNotRecreation() throws Exception {
     SeededCells seed = seedBiologyCellsWithLearning();
+    List<Integer> questionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(seed.cells()));
     ComposedTrashRange range =
         composeTrashThenFinal(
             acceptedBundleBytes(seed.notebook()),
@@ -105,7 +111,8 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
         memoryTrackerRepository.findById(seed.tracker().getId()).orElseThrow().getNote().getId(),
         equalTo(seed.cells().getId()));
     assertThat(
-        inCommittedTransaction(transactionManager, () -> dependentCounts(seed.cells())),
+        inCommittedTransaction(
+            transactionManager, () -> dependentCounts(seed.cells(), questionIds)),
         not(equalTo(DependentCounts.allAbsent())));
   }
 

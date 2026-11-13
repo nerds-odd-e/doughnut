@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import com.odde.donut.entities.Note;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /** Selected learning and conversation row counts for note deletion/retry proofs. */
@@ -44,12 +45,30 @@ abstract class NoteDependentRowsControllerTestBase extends NotebookControllerTes
         .longValue();
   }
 
+  protected List<Integer> questionIdsForNote(Note note) {
+    return entityManager
+        .createQuery(
+            "SELECT DISTINCT prompt.mcq.id FROM RecallPrompt prompt "
+                + "WHERE prompt.memoryTracker.note = :note AND prompt.mcq IS NOT NULL",
+            Integer.class)
+        .setParameter("note", note)
+        .getResultList();
+  }
+
+  protected long countQuestionsByIds(List<Integer> questionIds) {
+    return entityManager
+        .createQuery(
+            "SELECT COUNT(question) FROM Mcq question WHERE question.id IN :ids", Long.class)
+        .setParameter("ids", questionIds)
+        .getSingleResult();
+  }
+
   /** Aggregates selected learning and conversation counts for deletion/survival assertions. */
-  protected DependentCounts dependentCounts(Note note) {
+  protected DependentCounts dependentCounts(Note note, List<Integer> questionIds) {
     return new DependentCounts(
         countRowsByNoteId("memory_tracker", note.getId()),
         countRecallPromptsByNoteId(note.getId()),
-        countRowsByNoteId("mcq", note.getId()),
+        countQuestionsByIds(questionIds),
         countRowsByNoteId("conversation", note.getId()),
         countConversationMessagesByNoteId(note.getId()),
         countRowsByNoteId("conversation_note_correction", note.getId()));

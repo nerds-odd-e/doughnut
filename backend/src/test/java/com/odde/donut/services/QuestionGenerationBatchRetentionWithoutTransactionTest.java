@@ -89,7 +89,7 @@ class QuestionGenerationBatchRetentionWithoutTransactionTest extends SpringTestB
   private void deleteCommittedPruneFixtures() {
     inCommittedTransaction(() ->
         CommittedUserCleanup.deleteByUserExternalIdentifierLike(
-            entityManager, FIXTURE_PREFIX + "%"));
+            entityManager, mcqRepository, FIXTURE_PREFIX + "%"));
   }
 
   private <T> T inCommittedTransaction(java.util.function.Supplier<T> action) {

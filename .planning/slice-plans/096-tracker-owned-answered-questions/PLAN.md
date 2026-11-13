@@ -181,13 +181,15 @@ mapping/writes and the prompt builder's scalar fallback/save. Enables Behavior 1
 
 ### 11. Keep destruction proof tied to the selected questions
 Type: Structure
-Status: planned
+Status: done
 Proof: capture question IDs before destruction and observe those same IDs across deletion, retry, rollback and committed fixture cleanup; full backend suite stays green.
 
 Settle G3 and fixture cleanup through tracker/prompt ownership while production
 mapping/writes/FK remain unchanged. Enables Behavior 12.
 
 [Detailed implementation brief](implementation-briefs.md#keep-destruction-proof-tied-to-the-selected-questions).
+
+[Accepted selected-ID and committed-graph proof](selected-question-destruction-proof.md).
 
 ### 12. Preserve answered questions across tracker moves and old-note deletion
 Type: Behavior
@@ -240,4 +242,4 @@ Commitment: C84
 ### G3. Retain note deletion proof through compatibility retirement
 Reported: slice 8 — "NoteDependentRowsControllerTestBase still counts MCQ rows through physical note_id; that compatibility consumer must change when mapping and writes retire."
 Story clause: "A question's note is its tracker's note."
-Disposition: receiving slice 11
+Disposition: proved by slice 11: selected-question-destruction-proof.md; pre-action distinct IDs remain the question observations through deletion, retry and rollback, and full red/green committed-graph cleanup preserves unrelated learning

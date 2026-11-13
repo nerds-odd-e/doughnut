@@ -179,7 +179,8 @@ class RecallPromptSpellingAnswerRecoveryControllerTest extends RecallPromptAnswe
                 .theNote(entityManager.find(Note.class, match.getId()))
                 .notebookOwnership(owner)
                 .please();
-            deleteByUserExternalIdentifierLike(entityManager, other.getExternalIdentifier());
+            deleteByUserExternalIdentifierLike(
+                entityManager, mcqRepository, other.getExternalIdentifier());
           });
     }
   }

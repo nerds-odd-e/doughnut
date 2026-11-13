@@ -8,6 +8,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,10 +41,12 @@ class NoteControllerPermanentDeleteTests extends NoteDependentRowsControllerTest
     authorReferencingContent(referrer, REFERRER_CONTENT);
     makeMe.entityPersister.flushAndClear();
 
+    List<Integer> questionIds = questionIdsForNote(cells);
+
     noteController.permanentlyDeleteNote(reload(cells.getId()));
 
     assertThat(noteRepository.findById(cells.getId()).isPresent(), equalTo(false));
-    assertThat(dependentCounts(cells), equalTo(DependentCounts.allAbsent()));
+    assertThat(dependentCounts(cells, questionIds), equalTo(DependentCounts.allAbsent()));
     assertThat(noteRepository.findById(peer.getId()).isPresent(), equalTo(true));
     assertThat(reload(referrer.getId()).getContent(), equalTo(REFERRER_CONTENT));
   }

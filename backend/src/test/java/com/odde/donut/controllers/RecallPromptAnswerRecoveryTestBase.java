@@ -39,7 +39,8 @@ abstract class RecallPromptAnswerRecoveryTestBase extends RecallPromptController
   void committedOwner() {
     String setupUser = currentUser.getUser().getExternalIdentifier();
     inCommittedTransaction(
-        transactionManager, () -> deleteByUserExternalIdentifierLike(entityManager, setupUser));
+        transactionManager,
+        () -> deleteByUserExternalIdentifierLike(entityManager, mcqRepository, setupUser));
     currentUser.setUser(
         inCommittedTransaction(transactionManager, () -> makeMe.aUser(fixtureUser).please()));
   }
@@ -56,7 +57,7 @@ abstract class RecallPromptAnswerRecoveryTestBase extends RecallPromptController
                       Integer.class)
                   .setParameter("owner", fixtureUser)
                   .getResultList();
-          deleteByUserExternalIdentifierLike(entityManager, fixtureUser);
+          deleteByUserExternalIdentifierLike(entityManager, mcqRepository, fixtureUser);
           answerIds.forEach(id -> entityManager.remove(entityManager.find(Answer.class, id)));
         });
   }

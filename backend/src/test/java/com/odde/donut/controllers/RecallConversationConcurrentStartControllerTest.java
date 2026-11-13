@@ -39,7 +39,8 @@ class RecallConversationConcurrentStartControllerTest
   void replaceCommittedSetupUser() {
     String setupUser = currentUser.getUser().getExternalIdentifier();
     inCommittedTransaction(
-        transactionManager, () -> deleteByUserExternalIdentifierLike(entityManager, setupUser));
+        transactionManager,
+        () -> deleteByUserExternalIdentifierLike(entityManager, mcqRepository, setupUser));
     currentUser.setUser(
         inCommittedTransaction(transactionManager, () -> makeMe.aUser(fixtureUser).please()));
   }
@@ -54,7 +55,7 @@ class RecallConversationConcurrentStartControllerTest
                   "DELETE FROM Conversation c WHERE c.conversationInitiator.externalIdentifier = :user")
               .setParameter("user", fixtureUser)
               .executeUpdate();
-          deleteByUserExternalIdentifierLike(entityManager, fixtureUser);
+          deleteByUserExternalIdentifierLike(entityManager, mcqRepository, fixtureUser);
         });
   }
 

@@ -88,6 +88,11 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
       assertThat(proposedCommit.parent(), equalTo(acceptedHead));
     }
 
+    List<Integer> deletedAQuestionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(deletedA));
+    List<Integer> deletedBQuestionIds =
+        inCommittedTransaction(transactionManager, () -> questionIdsForNote(deletedB));
+
     String publishedHead =
         controller.publishNotebookGitProposal(
             notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
@@ -97,8 +102,8 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
     assertThat(storedNotes, hasSize(1));
     assertThat(storedNotes.getFirst().getId(), equalTo(retained.getId()));
     // Both learned and unlearned deleted notes are permanently gone with their dependents.
-    assertPermanentlyRemovedWithDependents(deletedA, deletedATracker);
-    assertPermanentlyRemovedWithDependents(deletedB, null);
+    assertPermanentlyRemovedWithDependents(deletedA, deletedATracker, deletedAQuestionIds);
+    assertPermanentlyRemovedWithDependents(deletedB, null, deletedBQuestionIds);
     Note reloadedRetained = noteRepository.findById(retained.getId()).orElseThrow();
     assertThat(reloadedRetained.getContent(), equalTo(EDITED_CONTENT));
     assertThat(
@@ -197,13 +202,14 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
                 .please());
   }
 
-  private void assertPermanentlyRemovedWithDependents(Note note, MemoryTracker tracker) {
+  private void assertPermanentlyRemovedWithDependents(
+      Note note, MemoryTracker tracker, List<Integer> questionIds) {
     inCommittedTransaction(
         transactionManager,
         () -> {
           assertThat(noteRepository.findById(note.getId()).isPresent(), equalTo(false));
           assertThat(countRowsByNoteId("memory_tracker", note.getId()), equalTo(0L));
-          assertThat(countRowsByNoteId("mcq", note.getId()), equalTo(0L));
+          assertThat(countQuestionsByIds(questionIds), equalTo(0L));
           assertThat(countRowsByNoteId("conversation", note.getId()), equalTo(0L));
           assertThat(countRecallPromptsByNoteId(note.getId()), equalTo(0L));
           if (tracker != null) {

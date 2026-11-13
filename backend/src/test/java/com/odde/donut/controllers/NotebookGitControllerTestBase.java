@@ -47,8 +47,9 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
   @BeforeEach
   void replaceDefaultFixtureWithCommittedUser() {
     String defaultUserExternalIdentifier = currentUser.getUser().getExternalIdentifier();
-    committed(
-        () -> deleteByUserExternalIdentifierLike(entityManager, defaultUserExternalIdentifier));
+    committed(() ->
+        deleteByUserExternalIdentifierLike(
+            entityManager, mcqRepository, defaultUserExternalIdentifier));
     testFixturePrefix = FIXTURE_PREFIX + UUID.randomUUID() + "-";
     committed(() -> currentUser.setUser(makeMe.aUser(testFixturePrefix + "owner").please()));
   }
@@ -68,7 +69,7 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
                   + "OR owner.external_identifier LIKE :like")
           .setParameter("like", fixtureUsers)
           .executeUpdate();
-      deleteByUserExternalIdentifierLike(entityManager, fixtureUsers);
+      deleteByUserExternalIdentifierLike(entityManager, mcqRepository, fixtureUsers);
     });
   }
 
