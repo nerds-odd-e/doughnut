@@ -158,7 +158,7 @@ cleanup. Preserve shared rows/history. Enables Behavior 14.
 
 ### 14. Require deliberate cleanup readiness while preserving asked evidence
 Type: Behavior
-Status: planned
+Status: done
 Proof: real populated MySQL default-off refusal/no-op, enabled retry and exact asked-graph preservation; full backend verification.
 
 Guard cleanup readiness before the separate gated DML records success. Keep
@@ -166,6 +166,8 @@ all profile defaults off and preserve every prompt-referenced question.
 Stop safely after branch publication; no intermediate production release.
 
 [Detailed implementation brief and settled isolated-engine setup](final-schema-briefs.md#require-deliberate-cleanup-readiness-while-preserving-asked-evidence).
+
+[Accepted populated cleanup proof](cleanup-readiness-verification.md).
 
 ### 15. Preserve learner evidence through guarded physical schema retirement
 Type: Behavior
@@ -235,7 +237,7 @@ Disposition: receiving slice 15
 ### G6. Establish populated cleanup proof after the shared-catalog failure
 Reported: slice 13 — "Full-suite native 34545 stopped both new cases before DML because unrelated promptless rows existed; populated cleanup preservation remains unobserved."
 Story clause: "Then clean unreferenced questions and drop the column."
-Disposition: receiving slice 14
+Disposition: proved by slice 14: cleanup-readiness-verification.md; real canonical default-off no-op/refusal, enabled repair/retry, exact selected IDs and complete asked graph passed in full backend native 6621
 
 ### G7. Observe hosted isolated-catalog capability
 Reported: slice 13 — "The local owned-catalog proof and YAML checks do not observe GitHub root authentication, named-account bootstrap, credential transfer and catalog grant/revoke/drop."

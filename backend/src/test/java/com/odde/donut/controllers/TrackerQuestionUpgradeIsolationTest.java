@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.donut.testability.SpringTestBase;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import java.util.Map;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class TrackerQuestionUpgradeIsolationTest extends SpringTestBase {
           sharedJdbc.queryForList("SELECT * FROM flyway_schema_history ORDER BY installed_rank");
       try (var upgrade =
           new TrackerQuestionUpgradeFixture(applicationFlyway, entityManager, transactionManager)) {
-        Map<String, Integer> graph =
+        Map<String, List<Integer>> graph =
             upgrade.withTargetCatalog(
                 () -> {
                   var user = makeMe.aUser("upgrade-learner").please();
@@ -65,15 +66,15 @@ class TrackerQuestionUpgradeIsolationTest extends SpringTestBase {
                       makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcq(question).please();
                   return Map.of(
                       "user",
-                      user.getId(),
+                      List.of(user.getId()),
                       "note",
-                      note.getId(),
+                      List.of(note.getId()),
                       "memory_tracker",
-                      tracker.getId(),
+                      List.of(tracker.getId()),
                       "mcq",
-                      question.getId(),
+                      List.of(question.getId()),
                       "recall_prompt",
-                      prompt.getId());
+                      List.of(prompt.getId()));
                 },
                 ids -> {
                   Number matched =
@@ -96,11 +97,11 @@ class TrackerQuestionUpgradeIsolationTest extends SpringTestBase {
                                       + upgrade.catalog
                                       + "`.user u ON u.id=t.user_id "
                                       + "WHERE p.id=:prompt AND q.id=:question AND t.id=:tracker AND n.id=:note AND u.id=:user")
-                              .setParameter("prompt", ids.get("recall_prompt"))
-                              .setParameter("question", ids.get("mcq"))
-                              .setParameter("tracker", ids.get("memory_tracker"))
-                              .setParameter("note", ids.get("note"))
-                              .setParameter("user", ids.get("user"))
+                              .setParameter("prompt", ids.get("recall_prompt").getFirst())
+                              .setParameter("question", ids.get("mcq").getFirst())
+                              .setParameter("tracker", ids.get("memory_tracker").getFirst())
+                              .setParameter("note", ids.get("note").getFirst())
+                              .setParameter("user", ids.get("user").getFirst())
                               .getSingleResult();
                   assertThat(matched.intValue(), equalTo(1));
                 });
@@ -110,7 +111,7 @@ class TrackerQuestionUpgradeIsolationTest extends SpringTestBase {
             containsString("Which evidence?"));
         assertThat(
             ((Number) before.get("recall_prompt").getFirst().get("mcq_id")).intValue(),
-            equalTo(graph.get("mcq")));
+            equalTo(graph.get("mcq").getFirst()));
 
         upgrade.migrations("300000357").migrate();
 

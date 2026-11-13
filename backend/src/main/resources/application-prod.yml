@@ -40,6 +40,8 @@ spring:
       leak-detection-threshold: 60000
   flyway:
     clean-disabled: true
+    placeholders:
+      questioncleanup: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false

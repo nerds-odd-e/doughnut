@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,20 +106,60 @@ final class TrackerQuestionUpgradeFixture implements AutoCloseable {
   }
 
   Flyway migrations(String target) {
+    return migrations(target, Map.of());
+  }
+
+  Flyway migrations(String target, Map<String, String> overrides) {
+    var placeholders = new LinkedHashMap<>(applicationFlyway.getConfiguration().getPlaceholders());
+    placeholders.putAll(overrides);
     return Flyway.configure()
         .configuration(applicationFlyway.getConfiguration())
         .dataSource(jdbc.getDataSource())
         .schemas(catalog)
         .defaultSchema(catalog)
         .target(target)
+        .placeholders(placeholders)
         .load();
   }
 
-  Map<String, List<Map<String, Object>>> snapshot(Map<String, Integer> graph) {
+  Map<String, List<Map<String, Object>>> snapshot(Map<String, List<Integer>> graph) {
     Map<String, List<Map<String, Object>>> result = new LinkedHashMap<>();
-    graph.forEach((table, id) ->
-        result.put(table, jdbc.queryForList("SELECT * FROM " + table + " WHERE id = ?", id)));
+    graph.forEach((table, ids) -> {
+      String columns =
+          table.equals("mcq")
+              ? "id,created_at,raw_json_question,correct_answer_index,is_contested,context_seed,tested_focus,validation_rationale"
+              : "*";
+      result.put(
+          table,
+          jdbc.queryForList(
+              "SELECT "
+                  + columns
+                  + " FROM "
+                  + table
+                  + " WHERE id IN ("
+                  + placeholders(ids)
+                  + ") ORDER BY id",
+              ids.toArray()));
+    });
     return result;
+  }
+
+  List<Integer> questionIds(List<Integer> ids) {
+    return jdbc.queryForList(
+        "SELECT id FROM mcq WHERE id IN (" + placeholders(ids) + ") ORDER BY id",
+        Integer.class,
+        ids.toArray());
+  }
+
+  List<Integer> cleanupCandidates() {
+    return jdbc.queryForList(
+        "SELECT id FROM mcq q WHERE NOT EXISTS "
+            + "(SELECT 1 FROM recall_prompt p WHERE p.mcq_id=q.id) ORDER BY id",
+        Integer.class);
+  }
+
+  private static String placeholders(List<Integer> ids) {
+    return String.join(",", Collections.nCopies(ids.size(), "?"));
   }
 
   @Override

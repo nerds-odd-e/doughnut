@@ -221,3 +221,11 @@
   default E2E path settle G7. The same observer remains live. Ordinary 13 done
   delivery is records-only; next14 may restore the compatible parked cleanup
   logic using the verified isolated fixture after that accepted transition.
+
+- Behavior 14 full backend native `6621` passed 644 classes/3,201 tests,
+  zero failures/errors, two skips. The actual populated no-op/refusal/retry
+  preserves the complete asked graph and deletes exactly two owned promptless
+  questions. ERD `91196` succeeded unchanged. G6 is proved; G5/15 still owns
+  physical retirement and actual C. Earlier wrapper-oracle failure `44825`
+  and invalid unchanged retry `16319` remain separate failed evidence.
+  [Exact setup, proof and delivery boundary](cleanup-readiness-verification.md).
