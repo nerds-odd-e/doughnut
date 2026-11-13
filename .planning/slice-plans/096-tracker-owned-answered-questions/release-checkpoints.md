@@ -2,11 +2,12 @@
 
 ## Checkpoint A preparation
 
-G2 retains the required go-ahead for a reviewed Dough Land `--keep-worktree`
+Preparation required a go-ahead for a reviewed Dough Land `--keep-worktree`
 increment and its exact immutable stable application tag/SHA, followed by
 actual publication, all-instance and smoke/schema observations. Slice 8 stays
-planned until those observations settle. No release tag or production write
-has been performed by this execution.
+planned until those observations settle. At the 06:07 pre-release baseline
+below, this execution had performed no release tag or production write.
+The subsequent approved publication is recorded in the observation section.
 
 Read [release-application](../../../.agents/skills/release-application/SKILL.md),
 its [canonical runbook](../../../docs/gcp/conditional-backend-deploy.md) and
@@ -64,3 +65,84 @@ consistent snapshot. They read the engine/database/read-only flag, version
 354 and latest three Flyway records, table existence, nullable column and
 existing FK rule, then rolled back. No operational health result is being
 substituted for checkpoint A's future all-active-binary observation.
+
+## Checkpoint A publication and observation
+
+The developer answered `yes` to the reviewed checkpoint handoff covering
+Dough Land `--keep-worktree` and immutable `v1.3.74` at
+`4059ac2353c590f33c971f5d531cf3853dacd4a8`, conditional on main CI/artifacts.
+The retained-increment completion check correctly reports unfinished slices
+8–10 and G2/G3. No assignment, plan, worktree or execution branch was retired.
+
+### Landing and release identity
+
+- Installed history-preserving publication accepted that exact SHA on
+  `origin/main`; no candidate rewrite or rejected push occurred. The fetched
+  suffix base was `9baf479ddac80f7e0b8bf27390f876109b0ff4d9`. The queued-closure
+  guard passed; exact-identity guards prevented a different merge candidate.
+- The first trunk publication used the supplied launch landing context.
+  Capture is recorded: delivery `676fe139-0526-4b73-8316-86e725be0d5a`, receipt
+  `0990e918-fe44-41bf-af5c-3249d5ed7c02`, at `2026-11-13T07:05:35.260Z`.
+  Result: `/tmp/donut-tracker-delivery-60c866c4/land-checkpoint-a-result.json`.
+- The supplied default checkout was clean on main and advanced safely to
+  `4059ac2353c590f33c971f5d531cf3853dacd4a8`. The execution workspace remains
+  on its original story branch. There was nothing new to commit for landing.
+- Exact main-push `donut CI` run `43383257124`, attempt 1, succeeded. The
+  main-target completion receipt has exact evidence and confirmed shutdown.
+  Required unexpired artifacts: backend `14017787128` (210,179,950 bytes,
+  digest `94f2c34df7e420275a7d0ed8389afaca00a05bad7c25b300a4ab799ef963424f`)
+  and frontend-dist `14017672606` (4,453,735 bytes,
+  digest `e79561f511803ab8c9bb97c8ab39c1e26c631e72ddfd65e46021d8468bf7ae01`).
+- Rechecked unused/increasing version, fetched tags, then created and pushed
+  annotated `v1.3.74`; raw OID `137cc2b8d0b31e47320c52ca8cd86fb4d27affe5`,
+  peeled SHA equal to the approved commit. The tag was not moved or retried.
+- [Application Release run 43384379117](https://github.com/nerds-odd-e/doughnut/actions/runs/43384379117),
+  attempt 1, succeeded. Admission job `131749314613` reported `ready` for
+  that tag/raw OID/release SHA, build SHA equal to release SHA and main CI
+  `43383257124`/1. Actual deployment job `131749515563`, including artifact
+  validation and `Publish application to GCS and MIG`, succeeded.
+  The release record independently reports the same identities and
+  `outcome: succeeded`. No workflow rerun or automatic patch bump occurred.
+
+### Production observations and remaining smoke
+
+The reviewed disposable probe ran with
+`./scripts/run.sh python3 /tmp/donut-tracker-delivery-60c866c4/checkpoint-a-postrelease.py`
+and reached native terminal 0. Raw protocol, literal command metadata, hashes,
+UTC times and schema output are in
+`/tmp/donut-tracker-delivery-60c866c4/checkpoint-a-observed-0ciqvmq6/`.
+Observation window: `2026-11-13T07:21:44.784348Z`–`07:22:26.888045Z`.
+
+Fresh before/after MIG discovery found the same complete active membership:
+one member at the current target size, all healthy/running, action NONE,
+group stable and version target reached. Member `doughnut-app-group-qk27`,
+ID `5334386849658087999`, reports localhost health profile `prod` and exact
+build `4059ac2353c590f33c971f5d531cf3853dacd4a8`. Each discovered member was
+checked; the previous one-instance count was not a fixed test assumption.
+Authenticated GCP guest attributes supplied its rotated ED25519 fingerprint
+`SHA256:PvwmjUaN8IDYlaPukZxR9Q4YkQV2Ys7Tyda9j5lLIXI`; a separate temporary
+trust file and strict SSH checking reused the existing OS Login user/key.
+
+At `2026-11-13 07:22:08.317726 UTC`, MySQL `8.4.11-google`, database
+`doughnut`, read-only flag 1: V354 succeeded and its correction table exists;
+latest applied versions 356/355/354 all succeeded. `mcq.note_id` remains
+nullable and `fk_mcq_note` remains CASCADE to note. The copied bounded
+read-only protocol preserves its earlier provenance; no private question
+data or database write was used. The source's scalar write has unchanged
+accepted local normal/regeneration proof in slices 6/7.
+
+Public LB HTML and `/assets/main-DHEN45RN.js` match bytes from the exact
+approved GCS frontend prefix. HTML SHA-256:
+`63bc0cb74e2543836c29d45e3e5d06fe94301603993164ae3ea9abbfd82f8956`;
+asset SHA-256:
+`01cee794b8a3f304241c4eb835ddab7472548c89a2d888d94a73320ff0f62982`.
+LB health reports the same production build. The public CLI URL matches the
+frontend-bucket object generation `1794314872038666`, 2,037,020 bytes and
+`text/javascript` media type.
+
+Actual interactive login remains unobserved. CUA reported the browser access
+host unavailable before any UI action; that CUA part was closed with its
+failure summary. The developer has been asked asynchronously to sign in and
+confirm reaching notebooks. This is a missing smoke observation, not another
+release approval. G2 and slice 8 remain open pending that result; slice 9
+has not started. Automated success does not stand in for authentication.

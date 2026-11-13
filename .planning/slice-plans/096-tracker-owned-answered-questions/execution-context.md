@@ -37,11 +37,21 @@
   same target: `6fec446d97126241cb814e4a0d82acf1b2906514`; selective formatting,
   independent check-only hook, managed publication and new-observer registration
   passed without reconciliation.
-- Accepted slice 7 increment / published base / current candidate on that
+- Accepted slice 7 increment on that
   same target: `c4ff03f0e9bbf4ac2727d6970121565506f07e82`; selective formatting,
   independent check-only hook, managed publication and existing-observer
   registration passed without reconciliation. G1 is proved by current
   outside-harness controller atomicity; G2 owns checkpoint A in slice 8.
+- Accepted slice 8 progress increment / published base:
+  `4059ac2353c590f33c971f5d531cf3853dacd4a8`; slice 8 stays planned until
+  checkpoint A's remaining login smoke is observed. Code proof, fresh refactor,
+  formatter, check-only hook and publication passed. That exact commit then
+  landed on main after the developer's checkpoint go-ahead; capture receipt
+  `0990e918-fe44-41bf-af5c-3249d5ed7c02` records the original launch.
+  Default checkout advanced safely to the same SHA. Application `v1.3.74`
+  is deployed; exact main CI `43383257124`/1 and Application Release
+  `43384379117`/1, actual publication job `131749515563`, succeeded.
+  [Dated rollout, schema, public smoke and remaining login evidence](release-checkpoints.md#checkpoint-a-publication-and-observation).
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
@@ -54,19 +64,31 @@
   Restoration returned `resumed`, OID null, no application or dropped entry.
   Forward execution resumed at slice 4 after that repair.
 - Separate integration/default checkout: `/Users/terryyin/git/doughnut`;
-  this execution has not mutated it.
+  the approved checkpoint A landing safely advanced its clean main checkout
+  to `4059ac2353c590f33c971f5d531cf3853dacd4a8`.
 - Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh` passed its
   locked pnpm install. Applicable command `./scripts/run.sh pnpm exec tsc
   --version` passed with `6.0.3` in this checkout.
 - Replanning retains existing planned authority; no `--no-replan` was supplied.
 - CI source: GitHub Actions `ci.yml`, verified workflow `donut CI`, ID `5208694`.
-  Future increments use the story-branch observer below. The claim’s separate
-  trunk publication has `pendingCi: unobserved`.
+  Future increments use the current story-branch observer below while live;
+  after a stop recover its receipt and arm only after confirmed exit.
+  The original claim's separate trunk receipt retained `pendingCi: unobserved`;
+  checkpoint A's exact main CI has since validated the integrated snapshot.
 - Observer key:
   `ci-watch-execution:nerds-odd-e/doughnut:codex/keep-answered-questions-with-their-tracker:nao-tracker-60c866c4`;
   coordinator: `nao-tracker-60c866c4`; directory:
-  `/tmp/dough-ci-501/watch-GhQDNm`; PID: `59821`; stream session: `89935`;
-  yielded cell: `11`; checkout: the owned workspace above.
+  `/tmp/dough-ci-501/watch-TP3o9D`; PID: `44192`; stream session: `20945`;
+  yielded cell: `g53:49`; checkout: the owned workspace above.
+- The preceding branch observer `/tmp/dough-ci-501/watch-GhQDNm` was stopped
+  at the checkpoint approval handoff;
+  PID `59821` exit was confirmed, zero unread. Exact branch CI
+  `43380932753`/1 succeeded for `4059ac2353c590f33c971f5d531cf3853dacd4a8`.
+  A separate main observer was armed before landing: coordinator
+  `nao-tracker-main-a-60c866c4`, directory `/tmp/dough-ci-501/watch-1q13DX`,
+  PID `61551`, native stream `2371`, cell `g53:7`. It registered only the
+  accepted main SHA and completed with exact CI success and confirmed
+  shutdown. The story execution's branch/mode/destination remain unchanged.
 - Native server recovery during slice 6: local and remote execution branch
   remained at `dae402dfcf6a4c64865b5e14a6885dc5832842af`, with only expected
   uncommitted slice edits and no active proof worker. The former observer

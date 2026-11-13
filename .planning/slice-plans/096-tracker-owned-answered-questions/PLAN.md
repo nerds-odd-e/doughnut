@@ -152,6 +152,9 @@ Checkpoint A must confirm every active instance before slice 9.
 [Accepted local lifecycle proof and retained rollout obligation](tracker-lifecycle-verification.md).
 [Checkpoint A preparation and dated production baseline](release-checkpoints.md).
 
+Compatible publication and all-active/schema/public probes are observed.
+G2 awaits the remaining interactive login smoke before this slice and checkpoint settle.
+
 ### 9. Preserve answered questions across tracker moves and old-note deletion
 Type: Behavior
 Status: planned
