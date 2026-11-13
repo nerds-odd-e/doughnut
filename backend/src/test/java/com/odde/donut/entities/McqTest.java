@@ -102,7 +102,7 @@ class McqTest extends SpringTestBase {
 
       Mcq contestedOriginal = null;
       for (Mcq mcq : mcqRepository.findAll()) {
-        if (mcq.getNote().getId().equals(note.getId()) && mcq.isContested()) {
+        if (note.getId().equals(mcq.getCompatibilityNoteId()) && mcq.isContested()) {
           contestedOriginal = mcq;
           break;
         }

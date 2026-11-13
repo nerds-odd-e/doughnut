@@ -31,7 +31,7 @@ inviting AI …” step belongs to
 `e2e_test/features/messages/conversation_about_a_note.feature`. Starting instead
 at `conversationAboutNotePage.ts`, trace
 `replyToConversationAndInviteAiToReply` through
-`noteConversationAndQuestionMethods.ts`'s `sendMessageToAI` to that step and
+`noteActionsMethods.ts`'s `sendMessageToAI` to that step and
 feature. Run the shared selector for the feature; keep the original support
 path and this owner evidence in the brief. No feature edit is required.
 

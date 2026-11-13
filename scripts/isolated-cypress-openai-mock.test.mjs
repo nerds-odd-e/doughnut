@@ -171,11 +171,11 @@ test('before:run does not start a second private mock for a confirmed selection'
   assert.equal(mockStarts, 1)
 })
 
-test('the registry admits exactly the assessed OpenAI-mock inventory and each declares a private-mock requirement', () => {
+test('the registry admits the current OpenAI-mock inventory and each declares a private-mock requirement', () => {
   // The registry (`APPROVED_ISOLATED_CYPRESS_SPECS` exposed via
   // `SUPPORTED_ISOLATED_CYPRESS_SPECS`) is the single authority for which
   // specs require a private OpenAI mock — not a parallel inventory list.
-  // The assessed inventory is 13 files (one representative plus the 12
+  // The current inventory is 12 files (one representative plus the 11
   // remaining active OpenAI-mock features admitted through
   // `ACTIVE_OPEN_AI_MOCK_SPECS`); every admitted OpenAI-mock spec must
   // declare `requiresPrivateOpenAiMock: true`.
@@ -185,8 +185,8 @@ test('the registry admits exactly the assessed OpenAI-mock inventory and each de
   )
   assert.equal(
     openAiMockSpecs.length,
-    13,
-    'assessed OpenAI-mock inventory is 13 files admitted by the registry'
+    12,
+    'current OpenAI-mock inventory is 12 files admitted by the registry'
   )
   // A mixed OpenAI-mock + application batch unions to a mock requirement.
   const mixed = assertSupportedIsolatedCypressSpecs([
@@ -208,7 +208,6 @@ test('scenario-level mock tag is admitted via the registry requirement, not infe
   // placement.
   for (const spec of [
     'e2e_test/features/recall/property_memory_tracker.feature',
-    'e2e_test/features/note_creation_and_update/mcq_management.feature',
   ]) {
     assert.equal(
       SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(spec),

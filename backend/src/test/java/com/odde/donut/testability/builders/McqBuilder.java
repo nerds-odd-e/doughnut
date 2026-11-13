@@ -9,22 +9,17 @@ import java.util.List;
 
 public class McqBuilder extends EntityBuilder<Mcq> {
   public McqBuilder(MakeMe makeMe) {
-    super(makeMe, null);
-  }
-
-  @Override
-  protected void beforeCreate(boolean needPersist) {
-    if (entity == null) {
-      forNote(makeMe.aNote().please(needPersist));
-    }
-  }
-
-  public McqBuilder forNote(Note note) {
-    entity = new Mcq();
-    entity.setNote(note);
+    super(makeMe, new Mcq());
     entity.setQuestionStem("a default question stem");
     entity.setResponseChoices(List.of("choice1", "choice2", "choice3"));
     entity.setCorrectAnswerIndex(0);
+  }
+
+  @Override
+  protected void beforeCreate(boolean needPersist) {}
+
+  public McqBuilder forNote(Note note) {
+    entity.setCompatibilityNoteId(note.getId());
     return this;
   }
 

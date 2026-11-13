@@ -3,7 +3,6 @@
 // @ts-check
 
 import {
-  type DataTable,
   Then,
   When,
   defineParameterType,
@@ -23,21 +22,6 @@ defineParameterType({
   transformer(s: string) {
     return new NotePath(s)
   },
-})
-
-When(
-  'I add the following question for the note {string}:',
-  (noteTopology: string, data: DataTable) => {
-    expect(data.hashes().length, 'please add one question at a time.').to.equal(
-      1
-    )
-    start.jumpToNotePage(noteTopology).addQuestion(data.hashes()[0]!)
-  }
-)
-
-When('I refine the question in the form:', (data: DataTable) => {
-  expect(data.hashes().length, 'please add one question at a time.').to.equal(1)
-  start.assumeNotePage().refineQuestionInForm(data.hashes()[0]!)
 })
 
 When('I type {string} in the title', (content: string) => {
@@ -97,25 +81,6 @@ When(
 
 When('I route to the note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
-})
-
-Then(
-  'I should see the questions in the question list of the note {string}:',
-  (_noteTopology: string, data: DataTable) => {
-    start.assumeNotePage().expectQuestionsInList(data.hashes())
-  }
-)
-
-When('I generate a question with AI for note {string}', (noteName: string) => {
-  start
-    .jumpToNotePage(noteName)
-    .openQuestionList()
-    .addQuestionPage()
-    .generateQuestionWithAI()
-})
-
-Then('the question in the form becomes:', (data: DataTable) => {
-  start.assumeNotePage().expectQuestionInForm(data.hashes()[0]!)
 })
 
 // This step definition is for demo purpose

@@ -45,6 +45,11 @@ cohesive split and proof owned by slice 5; the remaining observed Git homes are
 focused classes; avoid enlarging the 245/248-line export test homes. Recheck
 other touched files as they emerge.
 
+Slice 6's wrapper-consumer closure exposed the 377-line
+`NoteQuestionGenerationRequestTests` before editing. Its general request and
+property-type instruction seams, direct existing-builder contract and preserved
+full-suite proof are settled in the slice brief. No size exception is needed.
+
 Backend changes run all unit tests (`CURSOR_DEV=true nix develop -c pnpm
 backend:test_only`); schema changes use `pnpm backend:verify` under the same
 prefix and the worktree's isolated database. Frontend changes require the full

@@ -4,11 +4,9 @@ import {
   assimilationModesSelector,
 } from './assimilationPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
-import { addQuestionPage } from './addQuestionPage'
-import { questionListPage } from './questionListPage'
 import { toolbarButton } from './toolbarButton'
 
-export const noteConversationAndQuestionMethods = () => ({
+export const noteActionsMethods = () => ({
   trashNote() {
     this.moreOptions().trashNote()
   },
@@ -26,29 +24,6 @@ export const noteConversationAndQuestionMethods = () => ({
   },
   deleteNoteAndReduceToSourceProperty() {
     this.moreOptions().deleteNoteAndReduceToSourceProperty()
-  },
-  openQuestionList() {
-    return this.moreOptions().openQuestionList()
-  },
-  addQuestion(row: Record<string, string>) {
-    this.openQuestionList().addQuestionPage().addQuestion(row)
-  },
-  refineQuestionInForm(row: Record<string, string>) {
-    addQuestionPage().refineQuestion(row)
-    return this
-  },
-  expectQuestionInForm(expected: Record<string, string>) {
-    addQuestionPage().expectQuestionInForm(expected)
-    return this
-  },
-  expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
-    cy.get('body').then(($body) => {
-      if ($body.find('.mcq-table').length > 0) {
-        questionListPage().expectQuestions(expectedQuestions)
-      } else {
-        this.openQuestionList().expectQuestions(expectedQuestions)
-      }
-    })
   },
   startAConversationAboutNote() {
     toolbarButton('Start a conversation about this note').click()

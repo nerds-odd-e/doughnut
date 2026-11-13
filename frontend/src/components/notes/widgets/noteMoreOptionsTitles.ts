@@ -25,7 +25,6 @@ export const noteMoreOptionsTitles = {
   wiki: "Wiki link or relationship (Ctrl+Shift+F / Cmd+Shift+F)",
   conversation: "Start a conversation about this note",
   export: "Export... (e)",
-  mcqs: "Questions for the note",
   refine: "Refine note",
   voiceInput: noteVoiceInputTitles.start,
   assimilation: "Assimilate",

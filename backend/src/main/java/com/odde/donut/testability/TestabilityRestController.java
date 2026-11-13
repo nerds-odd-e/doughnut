@@ -11,7 +11,6 @@ import com.odde.donut.services.BazaarService;
 import com.odde.donut.services.CircleService;
 import com.odde.donut.services.GithubService;
 import com.odde.donut.services.UserService;
-import com.odde.donut.testability.model.McqsTestData;
 import com.odde.donut.testability.model.NotesTestData;
 import com.odde.donut.utils.TimestampOperations;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -101,14 +100,6 @@ class TestabilityRestController {
     }
     User user = getUserModelByExternalIdentifier(notesTestData.getExternalIdentifier());
     return injectNotesWorker.inject(notesTestData, user);
-  }
-
-  @PostMapping("/inject-mcqs")
-  @Transactional
-  public List<Mcq> injectMcq(@RequestBody McqsTestData mcqsTestData) {
-    List<Mcq> mcqs = mcqsTestData.buildMcqs(this.noteRepository);
-    mcqs.forEach(question -> entityPersister.save(question));
-    return mcqs;
   }
 
   @PostMapping("/share_to_bazaar")

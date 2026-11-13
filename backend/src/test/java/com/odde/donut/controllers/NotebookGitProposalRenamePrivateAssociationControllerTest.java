@@ -7,13 +7,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.donut.entities.Conversation;
-import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.ConversationRepository;
-import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -26,7 +24,6 @@ class NotebookGitProposalRenamePrivateAssociationControllerTest
   private static final String MATCHING_CONTENT = "---\ntype: Note\n---\nmatching learned content";
 
   @Autowired ConversationRepository conversationRepository;
-  @Autowired McqRepository mcqRepository;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   private Integer conversationId;
@@ -58,11 +55,10 @@ class NotebookGitProposalRenamePrivateAssociationControllerTest
             transactionManager,
             () -> {
               Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
-              Mcq mcq = makeMe.anMcq().forNote(reloaded).please();
               Conversation conversation =
                   makeMe.aConversation().forANote(reloaded).from(currentUser.getUser()).please();
               conversationId = conversation.getId();
-              return new RenamedNoteAssociations(mcq.getId(), conversation.getId());
+              return new RenamedNoteAssociations(conversation.getId());
             });
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposalBytes =
@@ -79,9 +75,7 @@ class NotebookGitProposalRenamePrivateAssociationControllerTest
     MemoryTracker reloadedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
     assertThat(reloadedTracker.getNote().getId(), equalTo(note.getId()));
     assertThat(reloadedTracker.getNextRecallAt(), equalTo(tracker.getNextRecallAt()));
-    assertThat(
-        mcqRepository.findById(associations.mcqId()).orElseThrow().getNote().getId(),
-        equalTo(note.getId()));
+
     assertThat(
         conversationRepository
             .findById(associations.conversationId())
@@ -123,7 +117,6 @@ class NotebookGitProposalRenamePrivateAssociationControllerTest
             transactionManager,
             () -> {
               Note reloadedRenamed = noteRepository.findById(renamedNote.getId()).orElseThrow();
-              Mcq mcq = makeMe.anMcq().forNote(reloadedRenamed).please();
               Conversation conversation =
                   makeMe
                       .aConversation()
@@ -131,7 +124,7 @@ class NotebookGitProposalRenamePrivateAssociationControllerTest
                       .from(currentUser.getUser())
                       .please();
               conversationId = conversation.getId();
-              return new RenamedNoteAssociations(mcq.getId(), conversation.getId());
+              return new RenamedNoteAssociations(conversation.getId());
             });
 
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
@@ -171,12 +164,10 @@ class NotebookGitProposalRenamePrivateAssociationControllerTest
         reloadedTrackerForUntouched.getNextRecallAt(),
         equalTo(trackerForUntouched.getNextRecallAt()));
 
-    Mcq mcq = mcqRepository.findById(associations.mcqId()).orElseThrow();
-    assertThat(mcq.getNote().getId(), equalTo(renamedNote.getId()));
     Conversation conversation =
         conversationRepository.findById(associations.conversationId()).orElseThrow();
     assertThat(conversation.getSubject().getNote().getId(), equalTo(renamedNote.getId()));
   }
 
-  private record RenamedNoteAssociations(Integer mcqId, Integer conversationId) {}
+  private record RenamedNoteAssociations(Integer conversationId) {}
 }

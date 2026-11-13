@@ -54,11 +54,6 @@ public class QuestionGenerationRequestBuilder {
     this.authorizationService = authorizationService;
   }
 
-  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationResponseRequest(
-      Note note, String additionalMessage, Long contextSeed) {
-    return buildQuestionGenerationResponseRequest(note, additionalMessage, contextSeed, null);
-  }
-
   @Transactional(readOnly = true)
   public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {

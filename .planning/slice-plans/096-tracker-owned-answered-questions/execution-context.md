@@ -27,9 +27,12 @@
 - Accepted CI repair on that same target:
   `9124093716d69beca4f5903460d71a27e1d8f48f`; the existing observer registered
   it. Default-worker hosted CI remains pending observation.
-- Accepted slice 4 increment / published base / current candidate on that
+- Accepted slice 4 increment on that
   same target: `35e2b46e4af08c47f378432d3f12746b2eaa7c14`; selective formatting,
   check-only hook, publication and existing-observer registration passed.
+- Accepted slice 5 increment / published base / current candidate on that
+  same target: `dae402dfcf6a4c64865b5e14a6885dc5832842af`; managed delivery
+  reused the recorded observer after formatting and the check-only hook passed.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
@@ -40,7 +43,7 @@
   was clean. Preservation receipt (`status: clean`, no stash OID):
   `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/dough-ci-repair-stash-xoQpQO/record.json`.
   Restoration returned `resumed`, OID null, no application or dropped entry.
-  Forward execution resumes at slice 4.
+  Forward execution resumed at slice 4 after that repair.
 - Separate integration/default checkout: `/Users/terryyin/git/doughnut`;
   this execution has not mutated it.
 - Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh` passed its
@@ -53,5 +56,17 @@
 - Observer key:
   `ci-watch-execution:nerds-odd-e/doughnut:codex/keep-answered-questions-with-their-tracker:nao-tracker-60c866c4`;
   coordinator: `nao-tracker-60c866c4`; directory:
-  `/tmp/dough-ci-501/watch-5yEKPn`; PID: `53444`; stream session: `22422`;
-  yielded cell: `g312:13`; checkout: the owned workspace above.
+  `/tmp/dough-ci-501/watch-GhQDNm`; PID: `59821`; stream session: `89935`;
+  yielded cell: `11`; checkout: the owned workspace above.
+- Native server recovery during slice 6: local and remote execution branch
+  remained at `dae402dfcf6a4c64865b5e14a6885dc5832842af`, with only expected
+  uncommitted slice edits and no active proof worker. The former observer
+  `/tmp/dough-ci-501/watch-5yEKPn` matched its recorded target/root/owner;
+  its coordinator-replacement stop returned `stopped`, one event recorded and
+  delivered, zero unread, `pendingCi: unobserved`; `result.json` agreed and
+  PID `53444` exited. The same coordinator then armed the new stream above.
+  Backend output showed a successful full run, but its native command handle
+  was lost. Replacement proof ownership re-establishes that command before
+  acceptance; frontend, browser and compatibility observations were pending
+  at that recovery boundary. Their accepted results are retained in
+  [slice 6 verification](question-bank-verification.md).

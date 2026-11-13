@@ -23,7 +23,6 @@ class QuestionEvaluationTest {
     mcq =
         makeMe
             .anMcq()
-            .forNote(null)
             .stem("What is the capital of France?")
             .choices("Paris", "London", "Berlin")
             .correctAnswerIndex(0)
@@ -70,8 +69,7 @@ class QuestionEvaluationTest {
   @Test
   void shouldQuoteUnknownWhenStoredCorrectIndexIsInvalid() {
     questionEvaluation.feasibleQuestion = true;
-    Mcq mcqWithUnknownCorrectChoice =
-        makeMe.anMcq().forNote(null).correctAnswerIndex(3).inMemoryPlease();
+    Mcq mcqWithUnknownCorrectChoice = makeMe.anMcq().correctAnswerIndex(3).inMemoryPlease();
     QuestionContestResult result =
         questionEvaluation.getQuestionContestResult(mcqWithUnknownCorrectChoice);
     assertThat(
@@ -86,7 +84,6 @@ class QuestionEvaluationTest {
     Mcq mcqWithNullChoices =
         makeMe
             .anMcq()
-            .forNote(null)
             .stem("What is the capital of France?")
             .choices((List<String>) null)
             .correctAnswerIndex(0)

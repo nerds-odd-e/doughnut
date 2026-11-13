@@ -6,7 +6,7 @@ import { noteMoreOptions } from './noteMoreOptionsForm'
 import { toolbarButton } from './toolbarButton'
 import voiceInputPage from './voiceInputPage'
 import { noteContentEditingMethods } from './noteContentEditingMethods'
-import { noteConversationAndQuestionMethods } from './noteConversationAndQuestionMethods'
+import { noteActionsMethods } from './noteActionsMethods'
 import {
   findNoteContentRegion,
   noteContentRegion,
@@ -228,6 +228,6 @@ export const assumeNotePage = (
     ...noteRichPropertyAssimilationMethods(),
     ...noteRelationshipMethods(),
     ...sidebarChildNotePageMethods(),
-    ...noteConversationAndQuestionMethods(),
+    ...noteActionsMethods(),
   }
 }

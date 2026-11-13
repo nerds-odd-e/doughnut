@@ -23,14 +23,6 @@ public class AiQuestionGenerator {
     this.generatedQuestionPostProcessor = generatedQuestionPostProcessor;
   }
 
-  public Mcq getAiGeneratedQuestion(Note note, String additionalMessage) {
-    return getAiGeneratedQuestion(note, additionalMessage, null, null);
-  }
-
-  public Mcq getAiGeneratedQuestion(Note note, String additionalMessage, Long contextSeed) {
-    return getAiGeneratedQuestion(note, additionalMessage, contextSeed, null);
-  }
-
   public Mcq getAiGeneratedQuestion(
       Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
     try {
@@ -41,13 +33,6 @@ public class AiQuestionGenerator {
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public Mcq getAiGeneratedRefineQuestion(Note note, Mcq mcq) {
-    return noteQuestionGenerationService
-        .refineQuestion(note, mcq)
-        .map(question -> generatedQuestionPostProcessor.assembleMcq(question, note, null))
-        .orElse(null);
   }
 
   public QuestionEvaluation getQuestionContestResult(Note note, Mcq mcq) {

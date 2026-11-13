@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class QuestionGenerationRequestBuilderTests extends SpringTestBase {
-  @Autowired NoteQuestionGenerationService noteQuestionGenerationService;
   @Autowired QuestionGenerationRequestBuilder questionGenerationRequestBuilder;
 
   private User user;
@@ -52,8 +51,8 @@ class QuestionGenerationRequestBuilderTests extends SpringTestBase {
     Note focus = propertyFocusNote();
 
     StructuredResponseCreateParams<GeneratedMcq> request =
-        noteQuestionGenerationService.buildQuestionGenerationRequest(
-            focus, null, new PropertyFocus("a part of", ""));
+        questionGenerationRequestBuilder.buildQuestionGenerationResponseRequest(
+            focus, null, null, new PropertyFocus("a part of", ""));
 
     assertThat(
         instructionText(request),
@@ -79,8 +78,8 @@ class QuestionGenerationRequestBuilderTests extends SpringTestBase {
             .please();
 
     StructuredResponseCreateParams<GeneratedMcq> request =
-        noteQuestionGenerationService.buildQuestionGenerationRequest(
-            focus, null, new PropertyFocus("example of", "[[run]]"));
+        questionGenerationRequestBuilder.buildQuestionGenerationResponseRequest(
+            focus, null, null, new PropertyFocus("example of", "[[run]]"));
 
     String focusContext = inputText(request);
     assertThat(focusContext, containsString("Property key: example of"));

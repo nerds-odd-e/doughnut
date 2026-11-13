@@ -29,7 +29,6 @@ class GeneratedQuestionPostProcessorTest {
     Note note = new Note();
     Mcq result = postProcessor.assembleMcq(originalQuestion, note, 37L);
 
-    assertThat(result.getNote(), equalTo(note));
     assertThat(result.getQuestionStem(), equalTo(originalQuestion.getQuestionStem()));
     assertThat(
         result.getResponseChoices(),

@@ -34,7 +34,13 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     if (entity == null) {
       entity = new RecallPrompt();
       if (entity.getQuestionType() != QuestionType.SPELLING) {
-        Mcq mcq = mcqBuilder.please(needPersist);
+        Mcq mcq = mcqBuilder.please(false);
+        if (mcq.getCompatibilityNoteId() == null) {
+          mcq.setCompatibilityNoteId(memoryTracker.getNote().getId());
+        }
+        if (needPersist) {
+          makeMe.entityPersister.save(mcq);
+        }
         entity.setMcq(mcq);
         entity.setQuestionType(QuestionType.MCQ);
       }

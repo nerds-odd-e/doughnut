@@ -6,7 +6,6 @@ export const NOTE_TOOLBAR_MORE_OPTIONS_ORDER = [
   "conversation",
   "edit",
   "export",
-  "mcqs",
   "refine",
   "voiceInput",
   "assimilation",

@@ -115,7 +115,7 @@ focused sibling, preserving all existing move/identity proof under 250 lines.
 
 ### 6. Keep ordinary recall and note actions through question-bank deletion
 Type: Behavior
-Status: planned
+Status: done
 Proof: surviving mounted action tests, full frontend suite/types, API regeneration and affected mocked E2E journeys.
 
 Delete the bank transitively while retaining ordinary recall/note actions. Use
@@ -123,6 +123,8 @@ the minimum scalar compatibility write, keeping its FK and physical column.
 Stop and refine before continuing if editing exceeds ten minutes.
 
 [Detailed implementation brief](implementation-briefs.md#keep-ordinary-recall-and-note-actions-through-question-bank-deletion).
+
+[Accepted recall/action proof, compatibility observation and removal reading](question-bank-verification.md).
 
 ### 7. Persist each selected question with its prompt
 Type: Behavior

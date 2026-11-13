@@ -109,30 +109,6 @@ public class AiToolFactory {
     return new InstructionAndSchema(messageBody, QuestionEvaluation.class);
   }
 
-  public static InstructionAndSchema questionRefineAiTool(Mcq question) {
-    String messageBody =
-"""
-Please assume the role of a Memory Assistant, which involves helping me recall and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
-
-      1. Examine the below MCQ, which may be incomplete or incorrect. It was written against hidden Markdown context that includes the focus note and linked or referencing notes.
-      2. The user does not see that hidden context; the stem and choices must stand alone.
-      3. Provide one correct answer and exactly three plausible, independent distractors that are safe to reorder.
-      4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
-      5. Provide a better question based on my question and the note. Please correct any grammar.
-
-      Note: The specific focus note and retrieved neighbors are not shown to the user. Focus on memory reinforcement and recall across various subjects.
-%s
-
-"""
-            .formatted(
-                new ObjectMapperConfig()
-                    .objectMapper()
-                    .valueToTree(question.withoutSolution())
-                    .toString());
-
-    return new InstructionAndSchema(messageBody, GeneratedMcq.class);
-  }
-
   public static InstructionAndSchema generateNoteRefinementLayoutAiTool(
       NoteRefinementQuestionContextDTO questionContext) {
     return NoteRefinementAiToolFactory.generateNoteRefinementLayoutAiTool(questionContext);

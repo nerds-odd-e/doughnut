@@ -28,10 +28,9 @@ import lombok.EqualsAndHashCode;
   "responseChoices"
 })
 public class Mcq extends EntityIdentifiedByIdOnly {
-  @ManyToOne(cascade = CascadeType.DETACH)
-  @JoinColumn(name = "note_id", referencedColumnName = "id")
+  @Column(name = "note_id")
   @JsonIgnore
-  private Note note;
+  private Integer compatibilityNoteId;
 
   @JsonIgnore
   @Column(name = "raw_json_question")

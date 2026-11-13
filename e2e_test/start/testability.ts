@@ -2,7 +2,6 @@
 // @ts-check
 import type { Randomization } from '@generated/donut-backend-api'
 import type ServiceMocker from '../support/ServiceMocker'
-import type { McqsTestData } from '@generated/donut-backend-api'
 import { TestabilityRestController } from '@generated/donut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
@@ -65,49 +64,6 @@ const testability = () => {
 
     ...noteTestabilityMethods,
 
-    injectMcqsToNotebook(mcqsTestData: McqsTestData) {
-      return cy
-        .wrap(
-          TestabilityRestController.injectMcq({
-            body: mcqsTestData,
-          }),
-          { log: false }
-        )
-        .then((response) => {
-          const data = unwrapData<Record<string, unknown>>(response)
-          expect(Object.keys(data).length).to.equal(
-            mcqsTestData.mcqTestData?.length
-          )
-        })
-    },
-    injectYesNoQuestionsForNumberNotes(
-      notebook: string,
-      numberOfNotes: number
-    ) {
-      const mcq: Record<string, string>[] = new Array(numberOfNotes)
-        .fill(0)
-        .map((_, index) => ({
-          'Note Title': `Note about ${index}`,
-          Question: `Is ${index} * ${index} = ${index * index}?`,
-          Answer: 'Yes',
-          'One Wrong Choice': 'No',
-        }))
-      return this.injectMcqsToNotebook({
-        notebookName: notebook,
-        mcqTestData: mcq,
-      })
-    },
-    injectNumbersNotebookWithQuestions(
-      notebook: string,
-      numberOfQuestion: number,
-      creatorId: string
-    ) {
-      return this.injectNumberNotes(notebook, numberOfQuestion, creatorId)
-        .then(() =>
-          this.injectYesNoQuestionsForNumberNotes(notebook, numberOfQuestion)
-        )
-        .then(() => this.shareToBazaar(notebook))
-    },
     ...relationshipTestabilityMethods,
 
     ...assimilateTestabilityMethods,

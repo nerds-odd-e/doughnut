@@ -5,7 +5,6 @@ import com.odde.donut.entities.*;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.AiQuestionGenerator;
 import com.odde.donut.services.ai.QuestionEvaluation;
-import java.sql.Timestamp;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,20 +24,6 @@ public class McqService {
     this.entityPersister = entityPersister;
     this.aiQuestionGenerator = aiQuestionGenerator;
     this.regenerationTimes = regenerationTimes;
-  }
-
-  public Mcq addQuestion(Note note, Mcq mcq) {
-    mcq.setNote(note);
-
-    Notebook parentNotebook = note.getNotebook();
-    parentNotebook.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-    entityPersister.save(parentNotebook);
-    entityPersister.save(mcq);
-    return mcq;
-  }
-
-  public Mcq refineAIQuestion(Note note, Mcq mcq) {
-    return aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcq);
   }
 
   public QuestionContestResult contest(Note note, Mcq mcq) {

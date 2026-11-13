@@ -25,18 +25,6 @@
       </PopButton>
     </DropdownMenuItem>
 
-    <DropdownMenuItem v-if="showMenuAction('mcqs')">
-      <PopButton :btn-class="dropdownMenuButtonClass" :title="titles.mcqs">
-        <template #button_face>
-          <MessageCircleQuestion class="shrink-0" :size="20" aria-hidden="true" />
-          <span>{{ titles.mcqs }}</span>
-        </template>
-        <template #default>
-          <Mcqs v-bind="{ note }" />
-        </template>
-      </PopButton>
-    </DropdownMenuItem>
-
     <template v-for="action in plainActions" :key="action.id">
       <DropdownMenuItem
         v-if="showMenuAction(action.id) && action.available && !action.pressed"
@@ -62,19 +50,6 @@
       </template>
       <template #default="{ closer }">
         <NoteExportForm :note="note" @close-dialog="closer" />
-      </template>
-    </PopButton>
-
-    <PopButton
-      v-if="showToolbarAction('mcqs')"
-      :title="titles.mcqs"
-      :aria-label="titles.mcqs"
-    >
-      <template #button_face>
-        <MessageCircleQuestion class="w-6 h-6" aria-hidden="true" />
-      </template>
-      <template #default>
-        <Mcqs v-bind="{ note }" />
       </template>
     </PopButton>
 
@@ -115,8 +90,7 @@
 import type { Note } from "@generated/donut-backend-api"
 import { hasNoteContent } from "@/utils/hasNoteContent"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
-import Mcqs from "@/components/notes/Mcqs.vue"
-import { MessageCircleQuestion, Upload } from "@lucide/vue"
+import { Upload } from "@lucide/vue"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import RefineNoteModal from "@/components/recall/RefineNoteModal.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"

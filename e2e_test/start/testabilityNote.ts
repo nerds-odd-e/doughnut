@@ -105,21 +105,6 @@ export const noteTestabilityMethods = {
       })
   },
 
-  injectNumberNotes(
-    this: NoteInjectionContext,
-    notebook: string,
-    numberOfNotes: number,
-    creatorId: string
-  ) {
-    const notes: NoteTestData[] = [
-      { Title: notebook },
-      ...new Array(numberOfNotes).fill(0).map((_, index) => ({
-        Title: `Note about ${index}`,
-        Folder: notebook,
-      })),
-    ]
-    return this.injectNotes(notes, creatorId, notebook)
-  },
   getInjectedNoteIdByTitle(noteTopology: string) {
     return cy
       .get<Record<string, number>>(`@${injectedNoteIdMapAliasName}`)

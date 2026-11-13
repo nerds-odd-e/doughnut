@@ -109,7 +109,6 @@ class QuestionGenerationBatchRowImportServiceTest extends SpringTestBase {
       assertThat(recallPrompt.getMemoryTracker().getId(), is(memoryTracker.getId()));
 
       Mcq mcq = recallPrompt.getMcq();
-      assertThat(mcq.getNote().getId(), is(memoryTracker.getNote().getId()));
       assertThat(mcq.getContextSeed(), is(outputReadyRequest.getContextSeed()));
       assertThat(mcq.isContested(), is(false));
 

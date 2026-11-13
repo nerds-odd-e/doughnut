@@ -4,13 +4,11 @@ import {
   assimilationModesSelector,
 } from './assimilationPage'
 import { clickToolbarOverflowAction, noteToolbar } from './noteToolbarOverflow'
-import { questionListPage } from './questionListPage'
 
 const titles = {
   assimilation: 'Assimilate',
   trash: 'Trash note (d)',
   permanentDelete: 'Permanently delete note (d)',
-  questions: 'Questions for the note',
 } as const
 
 const clickMoreOption = clickToolbarOverflowAction
@@ -55,10 +53,6 @@ export const noteMoreOptions = () => {
     },
     deleteNoteAndReduceToSourceProperty() {
       trashNoteWithConfirmation(/^Reduce to a property of the source/)
-    },
-    openQuestionList() {
-      clickMoreOption(titles.questions)
-      return questionListPage()
     },
     openAssimilationPanel() {
       cy.document().then((doc) => {

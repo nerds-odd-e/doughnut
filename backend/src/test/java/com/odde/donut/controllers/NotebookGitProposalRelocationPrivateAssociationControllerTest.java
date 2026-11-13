@@ -65,9 +65,7 @@ class NotebookGitProposalRelocationPrivateAssociationControllerTest
             .getNote()
             .getId(),
         equalTo(untouchedNote.getId()));
-    assertThat(
-        mcqRepository.findById(associations.mcqId()).orElseThrow().getNote().getId(),
-        equalTo(relocatedNote.getId()));
+
     assertThat(
         conversationRepository
             .findById(associations.conversationId())

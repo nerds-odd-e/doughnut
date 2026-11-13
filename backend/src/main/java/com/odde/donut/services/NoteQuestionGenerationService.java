@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
-import com.odde.donut.entities.User;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.ai.QuestionEvaluation;
-import com.odde.donut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.donut.services.ai.tools.AiToolFactory;
 import com.odde.donut.services.ai.tools.InstructionAndSchema;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
@@ -45,27 +43,6 @@ public class NoteQuestionGenerationService {
     return generateQuestionWithResponses(note, additionalMessage, contextSeed, propertyFocus);
   }
 
-  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
-      Note note, String additionalMessage) {
-    return buildQuestionGenerationRequest(note, additionalMessage, null);
-  }
-
-  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
-      Note note, String additionalMessage, PropertyFocus propertyFocus) {
-    return requestBuilder.buildQuestionGenerationResponseRequest(
-        note, additionalMessage, null, propertyFocus);
-  }
-
-  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
-      Note note,
-      String additionalMessage,
-      Long contextSeed,
-      PropertyFocus propertyFocus,
-      User viewer) {
-    return requestBuilder.buildQuestionGenerationResponseRequest(
-        note, additionalMessage, contextSeed, propertyFocus, viewer);
-  }
-
   private GeneratedMcq generateQuestionWithResponses(
       Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
     StructuredResponseCreateParams<GeneratedMcq> responseRequest =
@@ -76,18 +53,6 @@ public class NoteQuestionGenerationService {
         .requestAndGetStructuredResponseResult(responseRequest)
         .flatMap(this::validQuestion)
         .orElse(null);
-  }
-
-  public Optional<GeneratedMcq> refineQuestion(Note note, Mcq question) {
-    InstructionAndSchema tool = AiToolFactory.questionRefineAiTool(question);
-    OpenAIResponseRequestBuilder<GeneratedMcq> responseRequestBuilder =
-        requestBuilder.openAiResponseRequestForQuestionGeneration(
-            GeneratedMcq.class, note, null, null);
-    responseRequestBuilder.addInstruction(tool.getMessageBody());
-
-    return openAiApiHandler
-        .requestAndGetStructuredResponseResult(responseRequestBuilder.build())
-        .flatMap(this::validQuestion);
   }
 
   private Optional<GeneratedMcq> validQuestion(GeneratedMcq question) {

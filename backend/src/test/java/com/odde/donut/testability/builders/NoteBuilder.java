@@ -16,7 +16,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter notebookTestNameCounter =
       new TestObjectCounter(n -> "notebook" + n);
 
-  private List<McqBuilder> mcqBuilders = new ArrayList<>();
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
   private Folder folder;
   private final NoteFrontmatterLists frontmatterLists = new NoteFrontmatterLists();
@@ -104,7 +103,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
   @Override
   protected void afterCreate(boolean needPersist) {
     childrenBuilders.forEach(bu -> bu.please(needPersist));
-    mcqBuilders.forEach(bu -> bu.please(needPersist));
     if (needPersist
         && frontmatterLists.shouldRefreshAliasIndex()
         && makeMe.noteAliasIndexService != null) {
@@ -217,12 +215,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder level(int i) {
     pendingLevel = i;
-    return this;
-  }
-
-  public NoteBuilder hasAnMcq() {
-    McqBuilder mcqBuilder = makeMe.anMcq().forNote(entity);
-    this.mcqBuilders.add(mcqBuilder);
     return this;
   }
 

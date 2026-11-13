@@ -45,58 +45,58 @@ probe has no source commitment allocated to it.
 | C22 | C22 — Recent-question attribution: A note export’s recent questions use the tracker’s current note. | slice 3 | observed: NoteExportControllerMovedQuestionsTest.exportsTheMovedTrackersQuestionAndOwnChoiceOnItsCurrentNote: real reification then numbered question and recorded selection from current-note export; full backend pass. |
 | C23 | C23 — Export selection: Recent-question export lists questions asked through trackers currently on the exported note. | slice 3 | observed: McqRepository.findRecentForNote uses prompt/current-tracker EXISTS; RecentQuestionsTest.anotherNotesQuestionsAreExcluded and PropertyHistoryTests observe note/focus membership through export; full backend pass. |
 | Q01 | Q01 — Property focus: Recent-question export keeps property focus unchanged. | slice 3 | observed: NoteExportControllerPropertyHistoryTests exact key/value binary matching and distinct-newest-ten plus PropertyTests duplicate-occurrence/shared-history HTTP observations; full backend pass. |
-| C24 | C24 — Bank removal: Delete the note question bank transitively. | slice 6 | |
-| C25 | C25 — Add Question: Delete the bank’s Add Question capability. | slice 6 | |
-| C26 | C26 — Questions list: Delete the note’s Questions list. | slice 6 | |
-| Q02 | Q02 — Owner’s stated rationale: No learner is ever asked the note-bank questions. | slice 6 | |
-| Q03 | Q03 — Resulting representation: With the bank removed, no question needs its own note. | slice 6 | |
-| C27 | C27 — Questions entry: Delete the frontend Questions entry in `NoteMoreOptionsActions.vue`. | slice 6 | |
-| C28 | C28 — MCQ page: Delete `Mcqs.vue`. | slice 6 | |
-| C29 | C29 — Add-question component: Delete `NoteAddQuestion.vue`. | slice 6 | |
-| C30 | C30 — Export dialog: Delete `QuestionExportDialog.vue`. | slice 6 | |
-| C31 | C31 — Generation-request export: Delete the generation-request export that lives only on that page. | slice 6 | |
-| C32 | C32 — Removed frontend specifications: Delete the removed bank frontend’s specifications. | slice 6 | |
-| C33 | C33 — MCQ test support: Delete `mcqsTestSupport.ts`. | slice 6 | |
-| C34 | C34 — Component declarations: Delete the corresponding `components.d.ts` entries. | slice 6 | |
-| C35 | C35 — Controller: Delete `McqController`. | slice 6 | |
-| C36 | C36 — List endpoint: Delete its list operation. | slice 6 | |
-| C37 | C37 — Add endpoint: Delete its add operation. | slice 6 | |
-| C38 | C38 — Refine endpoint: Delete its refine operation. | slice 6 | |
-| C39 | C39 — Generate endpoint: Delete its generate operation. | slice 6 | |
-| C40 | C40 — Export endpoint: Delete its export operation. | slice 6 | |
-| C41 | C41 — Exclusive dependencies: Delete dependencies used exclusively by the removed bank. | slice 6 | |
-| C42 | C42 — Add service method: Delete `McqService.addQuestion`. | slice 6 | |
-| C43 | C43 — Refinement service method: Delete `McqService.refineAIQuestion`. | slice 6 | |
-| C44 | C44 — AI refinement method: Delete `AiQuestionGenerator.getAiGeneratedRefineQuestion`. | slice 6 | |
-| C45 | C45 — Refinement generation method: Delete `NoteQuestionGenerationService.refineQuestion`. | slice 6 | |
-| C46 | C46 — Refinement prompt: Delete its prompt. | slice 6 | |
-| C47 | C47 — Unused generation overloads: Delete unused `getAiGeneratedQuestion` overloads. | slice 6 | |
-| C48 | C48 — Note collection: Delete `Note.mcqs`. | slice 6 | |
+| C24 | C24 — Bank removal: Delete the note question bank transitively. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C25 | C25 — Add Question: Delete the bank’s Add Question capability. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C26 | C26 — Questions list: Delete the note’s Questions list. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| Q02 | Q02 — Owner’s stated rationale: No learner is ever asked the note-bank questions. | slice 6 | observed: RecallPromptService.generateNewRecallPrompt plus question-bank-verification.md#browser-and-compatibility-observation: ordinary recall generates and asks its tracker question; owner rationale retained in selected source |
+| Q03 | Q03 — Resulting representation: With the bank removed, no question needs its own note. | slice 6 | observed: Mcq scalar compatibility mapping and RecallPrompt.getNote current-tracker attribution; question-bank-verification.md#browser-and-compatibility-observation; later storage retirement remains slices 9/10 |
+| C27 | C27 — Questions entry: Delete the frontend Questions entry in `NoteMoreOptionsActions.vue`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C28 | C28 — MCQ page: Delete `Mcqs.vue`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C29 | C29 — Add-question component: Delete `NoteAddQuestion.vue`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C30 | C30 — Export dialog: Delete `QuestionExportDialog.vue`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C31 | C31 — Generation-request export: Delete the generation-request export that lives only on that page. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C32 | C32 — Removed frontend specifications: Delete the removed bank frontend’s specifications. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C33 | C33 — MCQ test support: Delete `mcqsTestSupport.ts`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C34 | C34 — Component declarations: Delete the corresponding `components.d.ts` entries. | slice 6 | observed: question-bank-verification.md#frontend-proof: Vite-generated declarations, full mounted suite and final typechecks |
+| C35 | C35 — Controller: Delete `McqController`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C36 | C36 — List endpoint: Delete its list operation. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C37 | C37 — Add endpoint: Delete its add operation. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C38 | C38 — Refine endpoint: Delete its refine operation. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C39 | C39 — Generate endpoint: Delete its generate operation. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C40 | C40 — Export endpoint: Delete its export operation. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C41 | C41 — Exclusive dependencies: Delete dependencies used exclusively by the removed bank. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C42 | C42 — Add service method: Delete `McqService.addQuestion`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C43 | C43 — Refinement service method: Delete `McqService.refineAIQuestion`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C44 | C44 — AI refinement method: Delete `AiQuestionGenerator.getAiGeneratedRefineQuestion`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C45 | C45 — Refinement generation method: Delete `NoteQuestionGenerationService.refineQuestion`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C46 | C46 — Refinement prompt: Delete its prompt. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C47 | C47 — Unused generation overloads: Delete unused `getAiGeneratedQuestion` overloads. | slice 6 | observed: AiQuestionGenerator.java: retained four-argument generation entry; retired overload consumer conversion inspected with full backend proof in question-bank-verification.md |
+| C48 | C48 — Note collection: Delete `Note.mcqs`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
 | C49 | C49 — Note-based repository query: Delete `McqRepository.findTop10ByNote_Id…`. | slice 3 | observed: Retained current-tracker query/controller selection and ordering proof; consumer-trace directed inspection and separate retirement reading recorded in recent-question-verification.md. |
-| C50 | C50 — Controller tests: Delete `McqControllerTests`. | slice 6 | |
-| C51 | C51 — Refinement controller tests: Delete `McqRefinementControllerTests`. | slice 6 | |
-| C52 | C52 — Transactional ratchet entries: Delete `McqController` entries in `OpenAiTransactionalRatchetTest`. | slice 6 | |
-| C53 | C53 — Stored note mapping: Delete `Mcq.note`. | slice 6 | |
+| C50 | C50 — Controller tests: Delete `McqControllerTests`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C51 | C51 — Refinement controller tests: Delete `McqRefinementControllerTests`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C52 | C52 — Transactional ratchet entries: Delete `McqController` entries in `OpenAiTransactionalRatchetTest`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C53 | C53 — Stored note mapping: Delete `Mcq.note`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
 | C54 | C54 — Stored note column: Delete `mcq.note_id` through the stated rollout sequence. | slice 10 | |
 | C55 | C55 — Stored note foreign key: Delete its foreign key through the stated rollout sequence. | slice 9 | |
 | C56 | C56 — Unreferenced-question migration: Before dropping the column, migrate by deleting questions no prompt uses. | slice 10 | |
 | C57 | C57 — Generation input: Generation takes the tracker’s note as input. | slice 7 | |
 | C58 | C58 — Question representation: Generation does not store its own note on the question. | slice 9 | |
-| C59 | C59 — MCQ injection: Delete testability/E2E `injectMcq`. | slice 6 | |
-| C60 | C60 — MCQ test data: Delete `McqsTestData`. | slice 6 | |
-| C61 | C61 — Notebook injection: Delete `injectMcqsToNotebook`. | slice 6 | |
-| C62 | C62 — Number-note injection: Delete unused `injectYesNoQuestionsForNumberNotes`. | slice 6 | |
-| C63 | C63 — Management feature: Delete `mcq_management.feature`. | slice 6 | |
-| C64 | C64 — Add-question page object: Delete `addQuestionPage.ts`. | slice 6 | |
-| C65 | C65 — Related steps: Delete related steps. | slice 6 | |
-| C66 | C66 — Related page methods: Delete related page methods. | slice 6 | |
-| C67 | C67 — Isolated Cypress selection: Delete related isolated-Cypress spec selection. | slice 6 | |
-| C68 | C68 — Mock references: Delete related mock references. | slice 6 | |
-| C69 | C69 — Optimization candidate: Delete `mcq-creation-journey` from `TEST-OPTIMIZATION-CANDIDATES.md`. | slice 6 | |
-| C70 | C70 — Product documentation: Remove documentation describing the bank. | slice 6 | |
-| C71 | C71 — Agent guidance: Remove agent guidance describing the bank. | slice 6 | |
-| C72 | C72 — OpenAPI document: Regenerate `open_api_docs.yaml`. | slice 6 | |
-| C73 | C73 — Generated API package: Regenerate `packages/generated/donut-backend-api`. | slice 6 | |
+| C59 | C59 — MCQ injection: Delete testability/E2E `injectMcq`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C60 | C60 — MCQ test data: Delete `McqsTestData`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C61 | C61 — Notebook injection: Delete `injectMcqsToNotebook`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C62 | C62 — Number-note injection: Delete unused `injectYesNoQuestionsForNumberNotes`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C63 | C63 — Management feature: Delete `mcq_management.feature`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C64 | C64 — Add-question page object: Delete `addQuestionPage.ts`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C65 | C65 — Related steps: Delete related steps. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C66 | C66 — Related page methods: Delete related page methods. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C67 | C67 — Isolated Cypress selection: Delete related isolated-Cypress spec selection. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C68 | C68 — Mock references: Delete related mock references. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C69 | C69 — Optimization candidate: Delete `mcq-creation-journey` from `TEST-OPTIMIZATION-CANDIDATES.md`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C70 | C70 — Product documentation: Remove documentation describing the bank. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C71 | C71 — Agent guidance: Remove agent guidance describing the bank. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
+| C72 | C72 — OpenAPI document: Regenerate `open_api_docs.yaml`. | slice 6 | observed: question-bank-verification.md#accepted-backend-and-generator-proof: source-generated OpenAPI/client and passing validation/backend consumer proof |
+| C73 | C73 — Generated API package: Regenerate `packages/generated/donut-backend-api`. | slice 6 | observed: question-bank-verification.md#accepted-backend-and-generator-proof: source-generated OpenAPI/client and passing validation/backend consumer proof |
 | Q04 | Q04 — Ownership cardinality: One question belongs to one tracker. | slice 9 | |
 | Q05 | Q05 — Prompt sharing qualification: That ownership rule does not independently forbid multiple prompts on the same tracker from referring to that question. | slice 8 | |
 | C74 | C74 — Cross-learner export fixtures: Fixtures that share a question across learners must instead use separate tracker-owned questions. | slice 3 | observed: QuestionPrivacyTest.newerOtherLearnerAttemptDoesNotSubstitute and PropertyPrivacyTests.focusedRequestUsesLatestOwnAnswerAndKeepsCompleteAppendixOutsideBudget arrange distinct MCQs for each learner tracker; full backend pass. |
@@ -131,8 +131,8 @@ probe has no source commitment allocated to it.
 | X07 | X07 — Database cascades: Add no new database cascade. | slice 10 | |
 | C83 | C83 — Instance compatibility: Preserve compatibility between two app instances during rollout. | slice 10 | |
 | C84 | C84 — Compatibility attribution: The compatibility release derives attribution through the tracker. | slice 8 |  |
-| C85 | C85 — Compatibility write: That release retains a scalar note-ID write. | slice 6 | |
-| Q06 | Q06 — Compatibility consumer: The retained write serves the original eager ORM readers. | slice 6 | |
+| C85 | C85 — Compatibility write: That release retains a scalar note-ID write. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation: current fresh read and matching persisted scalar/input/joined note; original-binary launch explicitly unobserved, checkpoint A remains slice 8 |
+| Q06 | Q06 — Compatibility consumer: The retained write serves the original eager ORM readers. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation: current fresh read and matching persisted scalar/input/joined note; original-binary launch explicitly unobserved, checkpoint A remains slice 8 |
 | C86 | C86 — Mapping removal timing: After the compatibility release is fully deployed, remove the mapping. | slice 9 | |
 | C87 | C87 — Write removal timing: At that stage, remove the scalar write. | slice 9 | |
 | C88 | C88 — Foreign-key removal timing: At that stage, drop the foreign key. | slice 9 | |

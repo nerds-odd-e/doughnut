@@ -6,30 +6,25 @@ import static org.hamcrest.Matchers.*;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.focusContext.FocusContextConstants;
 import com.odde.donut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTestBase {
 
   @Autowired StructuredResponseCreateParamsSerializer paramsSerializer;
+  @Autowired QuestionGenerationRequestBuilder requestBuilder;
 
   @Test
   void shouldBuildRequestWithNoteDescription() {
     StructuredResponseCreateParams<GeneratedMcq> request =
-        service.buildQuestionGenerationRequest(testNote, null);
+        requestBuilder.buildQuestionGenerationResponseRequest(testNote, null, null, null);
 
     assertThat(request, is(notNullValue()));
     assertThat(modelName(request), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
@@ -41,7 +36,8 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
   void shouldBuildRequestWithNoteInstructions() {
     assertThat(
         instructionContains(
-            service.buildQuestionGenerationRequest(testNote, null), "Question Designer"),
+            requestBuilder.buildQuestionGenerationResponseRequest(testNote, null, null, null),
+            "Question Designer"),
         is(true));
   }
 
@@ -50,7 +46,7 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
     Note noteInScope = noteWithQuestionGenerationInstructions("SCOPED_QGEN_MARKER", null);
 
     StructuredResponseCreateParams<GeneratedMcq> request =
-        service.buildQuestionGenerationRequest(noteInScope, null);
+        requestBuilder.buildQuestionGenerationResponseRequest(noteInScope, null, null, null);
 
     List<String> userBodies = userMessageContentStrings(request);
     assertThat(
@@ -92,7 +88,7 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
             .please();
 
     StructuredResponseCreateParams<GeneratedMcq> request =
-        service.buildQuestionGenerationRequest(note, null);
+        requestBuilder.buildQuestionGenerationResponseRequest(note, null, null, null);
 
     List<String> userBodies = userMessageContentStrings(request);
     String instructionMessage = userBodies.get(0);
@@ -118,175 +114,14 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
         lessThan(instructionMessage.indexOf("NOTE_INSTRUCTION")));
   }
 
-  @Nested
-  class InstructionsByPropertyType {
-    static final String PART_OF_LABEL =
-        "Instruction from notebook \"Anatomy\" for property \"a part of\":";
-
-    Note note;
-
-    @BeforeEach
-    void setup() {
-      note = noteWithPartOfAndSimilarTo(notebookWithMap("a part of: PART_OF_INSTRUCTION"));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"a part of 2,''", "a part of,[[X]]"})
-    void propertyOfMatchingTypeCarriesTheEntryAfterTheGeneralInstruction(String key, String value) {
-      String instructionMessage = firstUserMessage(note, new PropertyFocus(key, value));
-
-      assertThat(instructionMessage, containsString(PART_OF_LABEL + "\nPART_OF_INSTRUCTION"));
-      assertThat(
-          instructionMessage.indexOf("GENERAL_INSTRUCTION"),
-          lessThan(instructionMessage.indexOf(PART_OF_LABEL)));
-    }
-
-    @Test
-    void wholeNoteQuestionHasOnlyTheGeneralInstruction() {
-      String instructionMessage = firstUserMessage(note, null);
-
-      assertThat(instructionMessage, containsString("GENERAL_INSTRUCTION"));
-      assertThat(instructionMessage, not(containsString("PART_OF_INSTRUCTION")));
-    }
-
-    @Test
-    void mapKeyMatchesIgnoringCase() {
-      Note inOther = noteWithPartOfAndSimilarTo(notebookWithMap("A Part Of: PART_OF_INSTRUCTION"));
-
-      assertThat(
-          firstUserMessage(inOther, new PropertyFocus("a part of", "")),
-          containsString(PART_OF_LABEL + "\nPART_OF_INSTRUCTION"));
-    }
-
-    @Test
-    void blankEntryAddsNothing() {
-      Note inOther = noteWithPartOfAndSimilarTo(notebookWithMap("a part of: \"  \""));
-
-      String instructionMessage = firstUserMessage(inOther, new PropertyFocus("a part of", ""));
-
-      assertThat(instructionMessage, containsString("GENERAL_INSTRUCTION"));
-      assertThat(instructionMessage, not(containsString("for property")));
-    }
-
-    @Test
-    void propertyOfOtherTypeHasOnlyTheGeneralInstruction() {
-      String instructionMessage = firstUserMessage(note, new PropertyFocus("similar to", ""));
-
-      assertThat(instructionMessage, containsString("GENERAL_INSTRUCTION"));
-      assertThat(instructionMessage, not(containsString("for property")));
-    }
-
-    @Test
-    void noteInNotebookWithoutTheMapHasOnlyTheGeneralInstruction() {
-      Notebook other = makeMe.aNotebook().please();
-      makeMe
-          .theNotebook(other)
-          .readmeContent("---\nquestion_generation_instruction: GENERAL_INSTRUCTION\n---\n")
-          .please();
-
-      String instructionMessage =
-          firstUserMessage(noteWithPartOfAndSimilarTo(other), new PropertyFocus("a part of", ""));
-
-      assertThat(instructionMessage, containsString("GENERAL_INSTRUCTION"));
-      assertThat(instructionMessage, not(containsString("PART_OF_INSTRUCTION")));
-    }
-
-    @Test
-    void relationshipNoteCarriesTheEntryForItsRelation() {
-      Note relationship = relationshipNote(note.getNotebook(), "a-part-of");
-
-      String instructionMessage = firstUserMessage(relationship, null);
-
-      assertThat(instructionMessage, containsString(PART_OF_LABEL + "\nPART_OF_INSTRUCTION"));
-      assertThat(
-          instructionMessage.indexOf("GENERAL_INSTRUCTION"),
-          lessThan(instructionMessage.indexOf(PART_OF_LABEL)));
-    }
-
-    @Test
-    void relationshipNoteOfOtherRelationHasOnlyTheGeneralInstruction() {
-      String instructionMessage =
-          firstUserMessage(relationshipNote(note.getNotebook(), "similar-to"), null);
-
-      assertThat(instructionMessage, containsString("GENERAL_INSTRUCTION"));
-      assertThat(instructionMessage, not(containsString("for property")));
-    }
-
-    @Test
-    void anExampleOfRelationCarriesTheExampleOfEntry() {
-      Note relationship =
-          relationshipNote(notebookWithMap("example of: EXAMPLE_OF_INSTRUCTION"), "an-example-of");
-
-      assertThat(
-          firstUserMessage(relationship, null),
-          containsString(
-              "Instruction from notebook \"Anatomy\" for property \"example of\":"
-                  + "\nEXAMPLE_OF_INSTRUCTION"));
-    }
-
-    @Test
-    void relationshipNoteUsesItsOwnNotebooksMap() {
-      Notebook other = makeMe.aNotebook().please();
-      makeMe
-          .theNotebook(other)
-          .readmeContent("---\nquestion_generation_instruction: GENERAL_INSTRUCTION\n---\n")
-          .please();
-
-      String instructionMessage = firstUserMessage(relationshipNote(other, "a-part-of"), null);
-
-      assertThat(instructionMessage, containsString("GENERAL_INSTRUCTION"));
-      assertThat(instructionMessage, not(containsString("PART_OF_INSTRUCTION")));
-    }
-
-    private Note relationshipNote(Notebook nb, String relation) {
-      return makeMe
-          .aNote()
-          .notebook(nb)
-          .content(
-              "---\ntype: Relationship\nrelation: "
-                  + relation
-                  + "\nsource: \"[[Hand]]\"\ntarget: \"[[Body]]\"\n---\n")
-          .please();
-    }
-
-    private Notebook notebookWithMap(String mapEntry) {
-      Notebook nb = makeMe.aNotebook().name("Anatomy").please();
-      makeMe
-          .theNotebook(nb)
-          .readmeContent(
-              "---\nquestion_generation_instruction: GENERAL_INSTRUCTION\n"
-                  + "question_generation_instructions_by_property:\n  "
-                  + mapEntry
-                  + "\n---\n")
-          .please();
-      return nb;
-    }
-
-    private Note noteWithPartOfAndSimilarTo(Notebook nb) {
-      return makeMe
-          .aNote()
-          .notebook(nb)
-          .content(
-              "---\na part of: \"[[Body]]\"\na part of 2: \"[[Arm]]\"\n"
-                  + "similar to: \"[[Leg]]\"\n---\nHand")
-          .please();
-    }
-
-    private String firstUserMessage(Note focus, PropertyFocus propertyFocus) {
-      return userMessageContentStrings(
-              service.buildQuestionGenerationRequest(focus, null, propertyFocus))
-          .get(0);
-    }
-  }
-
   @Test
   void shouldOrderUserMessagesScopedInstructionThenFocusThenAdditional() {
     Note noteInScope = noteWithQuestionGenerationInstructions("SCOPED_QGEN_MARKER", null);
 
     List<String> userBodies =
         userMessageContentStrings(
-            service.buildQuestionGenerationRequest(
-                noteInScope, "Generate a question about the capital city"));
+            requestBuilder.buildQuestionGenerationResponseRequest(
+                noteInScope, "Generate a question about the capital city", null, null));
 
     assertThat(userBodies, hasSize(3));
     assertThat(userBodies.get(2), containsString("Generate a question about the capital city"));
@@ -295,8 +130,8 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
   @Test
   void shouldIncludeAdditionalMessageWhenNoScopedInstruction() {
     StructuredResponseCreateParams<GeneratedMcq> request =
-        service.buildQuestionGenerationRequest(
-            testNote, "Generate a question about the capital city");
+        requestBuilder.buildQuestionGenerationResponseRequest(
+            testNote, "Generate a question about the capital city", null, null);
 
     assertThat(
         userMessageContains(request, "Generate a question about the capital city"), is(true));
@@ -308,7 +143,7 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
   @Test
   void shouldNotIncludeRelationTypeSpecialInstructionForRegularNote() {
     StructuredResponseCreateParams<GeneratedMcq> request =
-        service.buildQuestionGenerationRequest(testNote, null);
+        requestBuilder.buildQuestionGenerationResponseRequest(testNote, null, null, null);
 
     assertThat(instructionContains(request, "Special Instruction for Relation Note"), is(false));
   }
@@ -316,7 +151,7 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
   @Test
   void omitsReasoningForNonReasoningModel() {
     StructuredResponseCreateParams<GeneratedMcq> request =
-        service.buildQuestionGenerationRequest(testNote, null);
+        requestBuilder.buildQuestionGenerationResponseRequest(testNote, null, null, null);
     Map<String, Object> body = paramsSerializer.toBodyMap(request);
 
     assertThat(body.containsKey("reasoning"), is(false));
@@ -330,7 +165,7 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
         .setKeyValue(makeMe.aTimestamp().please(), "o3-mini");
 
     StructuredResponseCreateParams<GeneratedMcq> request =
-        service.buildQuestionGenerationRequest(testNote, null);
+        requestBuilder.buildQuestionGenerationResponseRequest(testNote, null, null, null);
     Map<String, Object> body = paramsSerializer.toBodyMap(request);
 
     assertThat(body.get("max_output_tokens"), is(2000));
@@ -348,11 +183,6 @@ class NoteQuestionGenerationRequestTests extends NoteQuestionGenerationServiceTe
   private boolean userMessageContains(
       StructuredResponseCreateParams<GeneratedMcq> request, String text) {
     return inputText(request).contains(text);
-  }
-
-  private List<String> userMessageContentStrings(
-      StructuredResponseCreateParams<GeneratedMcq> request) {
-    return Arrays.asList(inputText(request).split("\n\n\n", -1));
   }
 
   private Note noteWithQuestionGenerationInstructions(

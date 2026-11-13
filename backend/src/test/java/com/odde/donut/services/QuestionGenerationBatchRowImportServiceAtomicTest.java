@@ -82,7 +82,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
                   .findAllByMemoryTracker_IdOrderByIdDesc(fixture.memoryTrackerId())
                   .size(),
               is(0));
-          assertThat(countMcqsForNote(fixture.noteId()), is(0L));
+          assertThat(countMcqsForContextSeed(fixture.contextSeed()), is(0L));
         });
 
     FAIL_ON_RECALL_PROMPT_SAVE.set(false);
@@ -97,7 +97,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
                   .findAllByMemoryTracker_IdOrderByIdDesc(fixture.memoryTrackerId())
                   .size(),
               is(1));
-          assertThat(countMcqsForNote(fixture.noteId()), is(1L));
+          assertThat(countMcqsForContextSeed(fixture.contextSeed()), is(1L));
         });
   }
 
@@ -127,30 +127,33 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
 
             GeneratedMcq committedMcq = makeMe.aGeneratedMcq().please();
 
+            long contextSeed = UUID.randomUUID().getMostSignificantBits();
             QuestionGenerationBatchRequest request =
                 makeMe
                     .aQuestionGenerationBatchRequest()
                     .batch(batch)
                     .memoryTracker(committedMemoryTracker)
+                    .contextSeed(contextSeed)
                     .status(QuestionGenerationBatchRequestStatus.OUTPUT_READY)
                     .please();
             request.setRawSuccessPayload(batchSuccessLine(request.getCustomId(), committedMcq));
             batchRequestRepository.saveAndFlush(request);
 
             return new CommittedImportFixture(
-                request.getId(), committedMemoryTracker.getId(), note.getId());
+                request.getId(), committedMemoryTracker.getId(), contextSeed);
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }
         });
   }
 
-  private long countMcqsForNote(int noteId) {
+  private long countMcqsForContextSeed(long contextSeed) {
     return entityManager
-        .createQuery("SELECT COUNT(mcq) FROM Mcq mcq WHERE mcq.note.id = :noteId", Long.class)
-        .setParameter("noteId", noteId)
+        .createQuery(
+            "SELECT COUNT(mcq) FROM Mcq mcq WHERE mcq.contextSeed = :contextSeed", Long.class)
+        .setParameter("contextSeed", contextSeed)
         .getSingleResult();
   }
 
-  private record CommittedImportFixture(int requestId, int memoryTrackerId, int noteId) {}
+  private record CommittedImportFixture(int requestId, int memoryTrackerId, long contextSeed) {}
 }

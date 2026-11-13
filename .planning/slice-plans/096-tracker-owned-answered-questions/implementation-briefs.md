@@ -80,6 +80,17 @@ scalar ID from the tracker/generation input. Replace the removed-note query in
 atomic import/retry outcome. These are consumer closure, not absence tests.
 Keep shared conversation, assimilation, recall generation and export behavior.
 
+Execution closure found `NoteQuestionGenerationService.buildQuestionGenerationRequest`
+has only test callers after bank export deletion; runtime generation and batch
+rendering call `QuestionGenerationRequestBuilder` directly. Delete those wrappers
+and the bank-export shape comparison. Before editing the 377-line
+`NoteQuestionGenerationRequestTests`, separate general request context/model/scoped
+instructions from its property-type instruction scenarios into cohesive sibling
+homes under 250 lines. Both use the existing request builder directly; preserve
+every surviving input/assertion, reuse existing setup, add no production API or
+fixture framework. Update the other request-test callers and run the full backend
+suite. This is required consumer closure within slice 6, not new behavior.
+
 Replace `Mcq.note`/`Note.mcqs` with the minimum temporary scalar mapping of
 `note_id`, populated from the generation input for original binaries. It must
 not hydrate a Note or act as attribution. Retain the FK/physical column here.

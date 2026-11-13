@@ -28,6 +28,7 @@ class AiOpenAiAssistantFactoryWithDBTest extends SpringTestBase {
   @Nested
   class ContestQuestion {
     Mcq mcq;
+    Note note;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -36,7 +37,7 @@ class AiOpenAiAssistantFactoryWithDBTest extends SpringTestBase {
       questionEvaluation.feasibleQuestion = true;
       questionEvaluation.improvementAdvices = "what a horrible question!";
 
-      Note note = makeMe.aNote().please();
+      note = makeMe.aNote().please();
       mcq =
           makeMe
               .anMcq()
@@ -64,9 +65,7 @@ class AiOpenAiAssistantFactoryWithDBTest extends SpringTestBase {
     }
 
     private QuestionContestResult contest() {
-      return aiQuestionGenerator
-          .getQuestionContestResult(mcq.getNote(), mcq)
-          .getQuestionContestResult(mcq);
+      return aiQuestionGenerator.getQuestionContestResult(note, mcq).getQuestionContestResult(mcq);
     }
   }
 }

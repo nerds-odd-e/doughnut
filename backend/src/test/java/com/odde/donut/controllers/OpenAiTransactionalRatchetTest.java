@@ -8,7 +8,6 @@ import com.odde.donut.controllers.dto.NoteRefinementLayoutSelectionRequestDTO;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.Conversation;
-import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -68,8 +67,6 @@ class OpenAiTransactionalRatchetTest {
               // NoteConversationAiReplyService (streaming) call chain
               method(ConversationMessageController.class, "getAiReply", Conversation.class),
               // NoteQuestionGenerationService.generateQuestion call chain
-              method(McqController.class, "generate", Note.class),
-              method(McqController.class, "refine", Note.class, Mcq.class),
               method(
                   RecallPromptController.class,
                   "regenerate",
@@ -82,7 +79,7 @@ class OpenAiTransactionalRatchetTest {
               method(BookService.class, "suggestLayoutReorganization", Notebook.class)));
 
   // Candidates that are currently, knowingly, @Transactional across an OpenAI HTTP call:
-  // contest/regenerate, McqController.refine, conversation/AI controllers, AiController's
+  // contest/regenerate, conversation/AI controllers, AiController's
   // AI-editing endpoints, and the book layout suggestion read. Shrink this list as each site
   // stops holding a transaction across the OpenAI call.
   private static final Set<Method> ALLOWLIST =
@@ -104,7 +101,6 @@ class OpenAiTransactionalRatchetTest {
               NoteRefinementLayoutSelectionRequestDTO.class),
           method(AiAudioController.class, "audioToText", AudioUploadDTO.class),
           method(ConversationMessageController.class, "getAiReply", Conversation.class),
-          method(McqController.class, "refine", Note.class, Mcq.class),
           method(
               RecallPromptController.class,
               "regenerate",

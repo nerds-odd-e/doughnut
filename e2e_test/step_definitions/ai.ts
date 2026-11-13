@@ -53,15 +53,6 @@ Given('An OpenAI response is unavailable', () => {
 
 Given('OpenAI generates this question:', stubOpenAiMcqFromSingleRowTable)
 
-Given(
-  'OpenAI will return these questions in order:',
-  (questionTable: DataTable) => {
-    start
-      .questionGenerationService()
-      .stubAskingMCQSequence(questionTable.hashes())
-  }
-)
-
 const defaultReplacementMcq = {
   'Question Stem': 'Second question',
   'Correct Choice': 'Rescue Diver',

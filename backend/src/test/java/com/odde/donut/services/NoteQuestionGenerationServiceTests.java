@@ -47,26 +47,6 @@ class NoteQuestionGenerationServiceTests extends NoteQuestionGenerationServiceTe
     }
 
     @Test
-    void shouldUseSameRequestShapeAsExportedQuestionGenerationRequest()
-        throws JsonProcessingException {
-      GeneratedMcq generatedMcq = makeMe.aGeneratedMcq().please();
-      openAiStructuredResponseMock.stubStructuredResponse(generatedMcq);
-
-      StructuredResponseCreateParams<GeneratedMcq> exportedRequest =
-          service.buildQuestionGenerationRequest(testNote, "Generate a focused question");
-
-      service.generateQuestion(testNote, "Generate a focused question");
-
-      ArgumentCaptor<StructuredResponseCreateParams<GeneratedMcq>> paramsCaptor =
-          responseParamsCaptor();
-      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      StructuredResponseCreateParams<GeneratedMcq> runtimeRequest = paramsCaptor.getValue();
-      assertThat(modelName(runtimeRequest), is(modelName(exportedRequest)));
-      assertThat(inputText(runtimeRequest), is(inputText(exportedRequest)));
-      assertThat(instructionText(runtimeRequest), is(instructionText(exportedRequest)));
-    }
-
-    @Test
     void shouldReturnNullWhenStructuredResponseIsAbsent() throws JsonProcessingException {
       openAiStructuredResponseMock.stubStructuredResponse(null);
 

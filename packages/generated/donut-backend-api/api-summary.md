@@ -55,7 +55,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `setOpenAiToken`: POST `/api/testability/open_ai_token` -> `SetOpenAiTokenResponse` (request: `SetOpenAiTokenData`; body: Record<string, string>; response body: void)
 - `injectNotes`: POST `/api/testability/inject_notes` -> `InjectNotesResponse` (request: `InjectNotesData`; body: NotesTestData; response body: Record<string, number>)
 - `injectCircle`: POST `/api/testability/inject_circle` -> `InjectCircleResponse` (request: `InjectCircleData`; body: Record<string, string>; response body: string)
-- `injectMcq`: POST `/api/testability/inject-mcqs` -> `InjectMcqResponse` (request: `InjectMcqData`; body: McqsTestData; response body: Array<Mcq>)
 - `getFeatureToggle`: GET `/api/testability/feature_toggle` -> `GetFeatureToggleResponse` (request: none; response body: boolean)
 - `enableFeatureToggle`: POST `/api/testability/feature_toggle` -> `EnableFeatureToggleResponse` (request: `EnableFeatureToggleData`; body: Record<string, string>; response body: Array<unknown>)
 - `resetDBAndTestabilitySettings`: POST `/api/testability/clean_db_and_reset_testability_settings` -> `ResetDbAndTestabilitySettingsResponse` (request: none; response body: string)
@@ -178,14 +177,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getRecentlyRecalled`: GET `/api/memory-trackers/recently-recalled` -> `GetRecentlyRecalledResponse` (request: none; response body: Array<MemoryTracker>)
 - `getRecentMemoryTrackers`: GET `/api/memory-trackers/recent` -> `GetRecentMemoryTrackersResponse` (request: none; response body: Array<MemoryTracker>)
 - `deleteUnansweredRecallPrompts`: DELETE `/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered` -> `DeleteUnansweredRecallPromptsResponse` (request: `DeleteUnansweredRecallPromptsData`; path: memoryTracker; response body: void)
-
-## Mcq Controller
-
-- `list`: GET `/api/mcqs/{note}` -> `ListResponse` (request: `ListData`; path: note; response body: Array<Mcq>)
-- `add`: POST `/api/mcqs/{note}` -> `AddResponse` (request: `AddData`; path: note; body: Mcq; response body: Mcq)
-- `refine`: POST `/api/mcqs/{note}/refine` -> `RefineResponse` (request: `RefineData`; path: note; body: Mcq; response body: Mcq)
-- `generate`: POST `/api/mcqs/generate` -> `GenerateResponse` (request: `GenerateData`; query: note; response body: Mcq)
-- `export`: GET `/api/mcqs/{note}/export` -> `ExportResponse` (request: `ExportData`; path: note; response body: Record<string, unknown>)
 
 ## Learning Session Controller
 

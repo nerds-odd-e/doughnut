@@ -43,10 +43,9 @@ class AiQuestionGeneratorTests extends SpringTestBase {
     openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
     Note note = noteReadyForQuestionGeneration();
-    Mcq result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+    Mcq result = aiQuestionGenerator.getAiGeneratedQuestion(note, null, null, null);
 
     assertThat(result.getQuestionStem(), equalTo("What is the first color in the rainbow?"));
-    assertThat(result.getNote(), equalTo(note));
   }
 
   @Test
@@ -56,7 +55,8 @@ class AiQuestionGeneratorTests extends SpringTestBase {
     openAiStructuredResponseMock.stubStructuredResponse(invalidQuestion);
 
     assertThat(
-        aiQuestionGenerator.getAiGeneratedQuestion(noteReadyForQuestionGeneration(), null),
+        aiQuestionGenerator.getAiGeneratedQuestion(
+            noteReadyForQuestionGeneration(), null, null, null),
         nullValue());
   }
 
@@ -67,6 +67,6 @@ class AiQuestionGeneratorTests extends SpringTestBase {
 
     assertThrows(
         OpenAiNotAvailableException.class,
-        () -> aiQuestionGenerator.getAiGeneratedQuestion(note, null));
+        () -> aiQuestionGenerator.getAiGeneratedQuestion(note, null, null, null));
   }
 }

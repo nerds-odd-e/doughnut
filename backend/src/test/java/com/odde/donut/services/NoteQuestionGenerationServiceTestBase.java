@@ -5,6 +5,8 @@ import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.responses.StructuredResponseCreateParams;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,10 @@ abstract class NoteQuestionGenerationServiceTestBase extends SpringTestBase {
 
   String inputText(StructuredResponseCreateParams<GeneratedMcq> request) {
     return request.rawParams().input().flatMap(input -> input.text()).orElse("");
+  }
+
+  List<String> userMessageContentStrings(StructuredResponseCreateParams<GeneratedMcq> request) {
+    return Arrays.asList(inputText(request).split("\n\n\n", -1));
   }
 
   String modelName(StructuredResponseCreateParams<GeneratedMcq> request) {

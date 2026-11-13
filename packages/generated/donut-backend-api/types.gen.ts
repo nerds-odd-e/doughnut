@@ -157,28 +157,6 @@ export type NotesTestData = {
     notebookName: string;
 };
 
-export type McqTestData = {
-    'Note Title'?: string;
-    Question?: string;
-    Answer?: string;
-    'One Wrong Choice'?: string;
-};
-
-export type McqsTestData = {
-    notebookName?: string;
-    mcqTestData?: Array<McqTestData>;
-};
-
-export type Mcq = {
-    id: number;
-    correctAnswerIndex?: number;
-    contextSeed?: number;
-    testedFocus?: string;
-    validationRationale?: string;
-    questionStem: string;
-    responseChoices: Array<string>;
-};
-
 export type AcceptLfsAttachmentTipRequest = {
     notebookName: string;
     filename: string;
@@ -303,6 +281,16 @@ export type RecallBacklogForecast = {
 export type QuestionContestResult = {
     advice?: string;
     rejected?: boolean;
+};
+
+export type Mcq = {
+    id: number;
+    correctAnswerIndex?: number;
+    contextSeed?: number;
+    testedFocus?: string;
+    validationRationale?: string;
+    questionStem: string;
+    responseChoices: Array<string>;
 };
 
 export type RecallPrompt = {
@@ -1941,22 +1929,6 @@ export type InjectCircleResponses = {
 
 export type InjectCircleResponse = InjectCircleResponses[keyof InjectCircleResponses];
 
-export type InjectMcqData = {
-    body: McqsTestData;
-    path?: never;
-    query?: never;
-    url: '/api/testability/inject-mcqs';
-};
-
-export type InjectMcqResponses = {
-    /**
-     * OK
-     */
-    200: Array<Mcq>;
-};
-
-export type InjectMcqResponse = InjectMcqResponses[keyof InjectMcqResponses];
-
 export type GetFeatureToggleData = {
     body?: never;
     path?: never;
@@ -2831,78 +2803,6 @@ export type ReEnableResponses = {
 };
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
-
-export type ListData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/mcqs/{note}';
-};
-
-export type ListResponses = {
-    /**
-     * OK
-     */
-    200: Array<Mcq>;
-};
-
-export type ListResponse = ListResponses[keyof ListResponses];
-
-export type AddData = {
-    body: Mcq;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/mcqs/{note}';
-};
-
-export type AddResponses = {
-    /**
-     * OK
-     */
-    200: Mcq;
-};
-
-export type AddResponse = AddResponses[keyof AddResponses];
-
-export type RefineData = {
-    body: Mcq;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/mcqs/{note}/refine';
-};
-
-export type RefineResponses = {
-    /**
-     * OK
-     */
-    200: Mcq;
-};
-
-export type RefineResponse = RefineResponses[keyof RefineResponses];
-
-export type GenerateData = {
-    body?: never;
-    path?: never;
-    query: {
-        note: number;
-    };
-    url: '/api/mcqs/generate';
-};
-
-export type GenerateResponses = {
-    /**
-     * OK
-     */
-    200: Mcq;
-};
-
-export type GenerateResponse = GenerateResponses[keyof GenerateResponses];
 
 export type RecordData = {
     body: RecordLearningSessionRequest;
@@ -4459,26 +4359,6 @@ export type GetRecentMemoryTrackersResponses = {
 };
 
 export type GetRecentMemoryTrackersResponse = GetRecentMemoryTrackersResponses[keyof GetRecentMemoryTrackersResponses];
-
-export type ExportData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/mcqs/{note}/export';
-};
-
-export type ExportResponses = {
-    /**
-     * OK
-     */
-    200: {
-        [key: string]: unknown;
-    };
-};
-
-export type ExportResponse = ExportResponses[keyof ExportResponses];
 
 export type RequestData = {
     body?: never;

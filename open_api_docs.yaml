@@ -471,26 +471,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/inject-mcqs:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: injectMcq
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/McqsTestData"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Mcq"
   /api/testability/feature_toggle:
     get:
       tags:
@@ -1553,91 +1533,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
-  /api/mcqs/{note}:
-    get:
-      tags:
-      - mcq-controller
-      operationId: list
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Mcq"
-    post:
-      tags:
-      - mcq-controller
-      operationId: add
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Mcq"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Mcq"
-  /api/mcqs/{note}/refine:
-    post:
-      tags:
-      - mcq-controller
-      operationId: refine
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Mcq"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Mcq"
-  /api/mcqs/generate:
-    post:
-      tags:
-      - mcq-controller
-      operationId: generate
-      parameters:
-      - name: note
-        in: query
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Mcq"
   /api/learning-sessions/record:
     post:
       tags:
@@ -3472,25 +3367,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MemoryTracker"
-  /api/mcqs/{note}/export:
-    get:
-      tags:
-      - mcq-controller
-      operationId: export
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: {}
   /api/learning-sessions/request:
     get:
       tags:
@@ -4293,52 +4169,6 @@ components:
           type: string
       required:
       - notebookName
-    McqTestData:
-      type: object
-      properties:
-        Note Title:
-          type: string
-        Question:
-          type: string
-        Answer:
-          type: string
-        One Wrong Choice:
-          type: string
-    McqsTestData:
-      type: object
-      properties:
-        notebookName:
-          type: string
-        mcqTestData:
-          type: array
-          items:
-            $ref: "#/components/schemas/McqTestData"
-    Mcq:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        correctAnswerIndex:
-          type: integer
-          format: int32
-        contextSeed:
-          type: integer
-          format: int64
-        testedFocus:
-          type: string
-        validationRationale:
-          type: string
-        questionStem:
-          type: string
-        responseChoices:
-          type: array
-          items:
-            type: string
-      required:
-      - id
-      - questionStem
-      - responseChoices
     AcceptLfsAttachmentTipRequest:
       type: object
       properties:
@@ -4582,6 +4412,32 @@ components:
           type: string
         rejected:
           type: boolean
+    Mcq:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        correctAnswerIndex:
+          type: integer
+          format: int32
+        contextSeed:
+          type: integer
+          format: int64
+        testedFocus:
+          type: string
+        validationRationale:
+          type: string
+        questionStem:
+          type: string
+        responseChoices:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - questionStem
+      - responseChoices
     RecallPrompt:
       type: object
       properties:

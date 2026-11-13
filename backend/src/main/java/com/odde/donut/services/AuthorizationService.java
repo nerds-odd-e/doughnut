@@ -68,7 +68,6 @@ public class AuthorizationService {
       case Notebook obj -> assertReadAuthorizationNotebook(user, obj);
       case Subscription obj -> assertReadAuthorization(user, obj);
       case RecallPrompt obj -> assertReadAuthorizationRecallPrompt(user, obj);
-      case Mcq obj -> assertReadAuthorizationMcq(user, obj);
       case MemoryTracker obj -> assertReadAuthorizationMemoryTracker(user, obj);
       case User obj -> assertAuthorizationUser(user, obj);
       default ->
@@ -80,11 +79,6 @@ public class AuthorizationService {
   private void assertReadAuthorizationMemoryTracker(User user, MemoryTracker object)
       throws UnexpectedNoAccessRightException {
     assertAuthorizationUser(user, object.getUser());
-  }
-
-  private void assertReadAuthorizationMcq(User user, Mcq mcq)
-      throws UnexpectedNoAccessRightException {
-    assertReadAuthorization(user, mcq.getNote());
   }
 
   private void assertReadAuthorizationRecallPrompt(User user, RecallPrompt object)

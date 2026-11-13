@@ -116,11 +116,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Timestamp updatedAt;
 
-  @OneToMany(mappedBy = "note")
-  @Getter
-  @JsonIgnore
-  private List<Mcq> mcqs = new ArrayList<>();
-
   /**
    * Source-owned authored-reference children (ADR 0001 Wiki link), replaced wholesale by {@link
    * #replaceContent}. Persistence rows only — never exposed outside the note-reference boundary;

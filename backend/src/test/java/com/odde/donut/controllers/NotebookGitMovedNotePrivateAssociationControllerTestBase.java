@@ -3,11 +3,9 @@ package com.odde.donut.controllers;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 
 import com.odde.donut.entities.Conversation;
-import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.ConversationRepository;
-import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ abstract class NotebookGitMovedNotePrivateAssociationControllerTestBase
     extends NotebookGitControllerTestBase {
 
   @Autowired ConversationRepository conversationRepository;
-  @Autowired McqRepository mcqRepository;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   private Integer conversationId;
@@ -45,18 +42,14 @@ abstract class NotebookGitMovedNotePrivateAssociationControllerTestBase
               makeMe
                   .aMemoryTrackerFor(noteRepository.findById(untouched.getId()).orElseThrow())
                   .please();
-          Mcq mcq = makeMe.anMcq().forNote(reloaded).please();
           Conversation conversation =
               makeMe.aConversation().forANote(reloaded).from(currentUser.getUser()).please();
           conversationId = conversation.getId();
           return new RelocatedNoteAssociations(
-              relocatedTracker, untouchedTracker, mcq.getId(), conversation.getId());
+              relocatedTracker, untouchedTracker, conversation.getId());
         });
   }
 
   record RelocatedNoteAssociations(
-      MemoryTracker relocatedTracker,
-      MemoryTracker untouchedTracker,
-      Integer mcqId,
-      Integer conversationId) {}
+      MemoryTracker relocatedTracker, MemoryTracker untouchedTracker, Integer conversationId) {}
 }

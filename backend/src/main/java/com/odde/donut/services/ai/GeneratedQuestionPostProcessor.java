@@ -27,7 +27,7 @@ public class GeneratedQuestionPostProcessor {
         testabilitySettings.getRandomizer().shuffle(taggedChoices(original));
 
     Mcq mcq = new Mcq();
-    mcq.setNote(note);
+    mcq.setCompatibilityNoteId(note.getId());
     mcq.setQuestionStem(original.getQuestionStem());
     mcq.setResponseChoices(choices.stream().map(TaggedChoice::text).toList());
     mcq.setCorrectAnswerIndex(correctAnswerIndex(choices));

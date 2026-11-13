@@ -10,16 +10,13 @@ import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Conversation;
-import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.ConversationRepository;
-import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import java.util.List;
-import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +30,6 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitControllerTestBas
   @Autowired NoteController noteController;
   @Autowired ConversationMessageController conversationMessageController;
   @Autowired ConversationRepository conversationRepository;
-  @Autowired McqRepository mcqRepository;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   private Integer conversationId;
@@ -80,7 +76,7 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitControllerTestBas
             .map(MemoryTracker::getId)
             .toList(),
         contains(associations.trackerId()));
-    assertThat(mcqIdsForNote(reloadedOriginal), contains(associations.mcqId()));
+
     assertThat(
         conversationMessageController.getConversationsAboutNote(reloadedOriginal).stream()
             .map(Conversation::getId)
@@ -128,7 +124,7 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitControllerTestBas
           assertThat(
               memoryTrackerRepository.findById(associations.trackerId()).isPresent(),
               equalTo(false));
-          assertThat(mcqRepository.findById(associations.mcqId()).isPresent(), equalTo(false));
+
           assertThat(
               conversationRepository.findById(associations.conversationId()).isPresent(),
               equalTo(false));
@@ -168,7 +164,7 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitControllerTestBas
 
   private void assertHasNoPrivateAssociations(Note note) throws Exception {
     assertThat(noteController.getNoteInfo(note).getMemoryTrackers(), empty());
-    assertThat(mcqIdsForNote(note), empty());
+
     assertThat(conversationMessageController.getConversationsAboutNote(note), empty());
   }
 
@@ -178,7 +174,6 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitControllerTestBas
         () -> {
           Note reloadedOriginal = noteRepository.findById(original.getId()).orElseThrow();
           MemoryTracker tracker = makeMe.aMemoryTrackerFor(reloadedOriginal).please();
-          Mcq mcq = makeMe.anMcq().forNote(reloadedOriginal).please();
           Conversation conversation =
               makeMe
                   .aConversation()
@@ -187,16 +182,9 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitControllerTestBas
                   .from(currentUser.getUser())
                   .please();
           conversationId = conversation.getId();
-          return new OriginalAssociations(tracker.getId(), mcq.getId(), conversation.getId());
+          return new OriginalAssociations(tracker.getId(), conversation.getId());
         });
   }
 
-  private List<Integer> mcqIdsForNote(Note note) {
-    return StreamSupport.stream(mcqRepository.findAll().spliterator(), false)
-        .filter(question -> question.getNote().getId().equals(note.getId()))
-        .map(Mcq::getId)
-        .toList();
-  }
-
-  private record OriginalAssociations(Integer trackerId, Integer mcqId, Integer conversationId) {}
+  private record OriginalAssociations(Integer trackerId, Integer conversationId) {}
 }

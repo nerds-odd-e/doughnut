@@ -33,7 +33,7 @@ const mcqReplyJson = (record: Record<string, string>) =>
   )
 
 /** Question Designer / Memory Assistant MCQ stubs (excludes contest regeneration). */
-const stubQuestionDesignerMcqOutputTexts = async (...outputTexts: string[]) => {
+const stubQuestionDesignerMcqOutput = async (outputText: string) => {
   await mock_services
     .openAi()
     .responses()
@@ -45,7 +45,7 @@ const stubQuestionDesignerMcqOutputTexts = async (...outputTexts: string[]) => {
       role: 'user',
       content: 'Previously generated non-feasible question',
     })
-    .stubOutputTextSequence(...outputTexts)
+    .stubOutputText(outputText)
 }
 
 type QuestionEvaluation = {
@@ -83,21 +83,12 @@ const stubEvaluationOutput = (record: QuestionEvaluation) => {
 }
 
 export const questionGenerationService = () => {
-  const stubAskingMCQSequence = (records: Record<string, string>[]) => {
-    if (records.length < 1) {
-      throw new Error('stubAskingMCQSequence requires at least one MCQ row')
-    }
-    cy.then(async () => {
-      await stubQuestionDesignerMcqOutputTexts(...records.map(mcqReplyJson))
-    })
-  }
-
   return {
     resetAndStubAskingMCQByResponses: (record: Record<string, string>) => {
-      stubAskingMCQSequence([record])
+      cy.then(async () => {
+        await stubQuestionDesignerMcqOutput(mcqReplyJson(record))
+      })
     },
-
-    stubAskingMCQSequence,
 
     stubRegeneratedQuestion: (record: Record<string, string>) => {
       cy.then(async () => {

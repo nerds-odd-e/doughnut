@@ -10,14 +10,12 @@ import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.Folder;
-import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.ConversationRepository;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
@@ -45,7 +43,6 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
 
   @Autowired ConversationRepository conversationRepository;
   @Autowired FolderRepository folderRepository;
-  @Autowired McqRepository mcqRepository;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   private Integer conversationId;
@@ -78,11 +75,10 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
             transactionManager,
             () -> {
               Note reloaded = noteRepository.findById(original.getId()).orElseThrow();
-              Mcq mcq = makeMe.anMcq().forNote(reloaded).please();
               Conversation conversation =
                   makeMe.aConversation().forANote(reloaded).from(currentUser.getUser()).please();
               conversationId = conversation.getId();
-              return new LearnedAssociations(mcq.getId(), conversation.getId());
+              return new LearnedAssociations(conversation.getId());
             });
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
@@ -126,9 +122,7 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
     MemoryTracker reloadedTracker = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
     assertThat(reloadedTracker.getNote().getId(), equalTo(original.getId()));
     assertThat(reloadedTracker.getNextRecallAt(), equalTo(tracker.getNextRecallAt()));
-    assertThat(
-        mcqRepository.findById(associations.mcqId()).orElseThrow().getNote().getId(),
-        equalTo(original.getId()));
+
     assertThat(
         conversationRepository
             .findById(associations.conversationId())
@@ -246,5 +240,5 @@ class NotebookGitComposedMoveEditControllerTest extends NotebookGitControllerTes
         .orElseThrow();
   }
 
-  private record LearnedAssociations(Integer mcqId, Integer conversationId) {}
+  private record LearnedAssociations(Integer conversationId) {}
 }
