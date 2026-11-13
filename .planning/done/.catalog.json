@@ -444,30 +444,6 @@
       "identity": "SEED-073#story-2",
       "completedAt": "2026-10-14T04:14:32.210Z",
       "blob": "7e2e98f4f44d45aaf6be6d0d1549aa40ce5aefe8"
-    },
-    {
-      "fileName": "SEED-073_story-9.json",
-      "identity": "SEED-073#story-9",
-      "completedAt": "2026-10-13T23:56:49.876Z",
-      "blob": "09131bd76a2a8584a78ad8d89e0fae9eb11219bc"
-    },
-    {
-      "fileName": "SEED-073_story-8.json",
-      "identity": "SEED-073#story-8",
-      "completedAt": "2026-10-13T23:09:04.748Z",
-      "blob": "405602fd062cfede4118b5df023c72a8ddb553f4"
-    },
-    {
-      "fileName": "SEED-073_manual-ambiguity-exclusion-evaluation.json",
-      "identity": "SEED-073#manual-ambiguity-exclusion-evaluation",
-      "completedAt": "2026-10-13T22:41:06.101Z",
-      "blob": "241b27760be7e9ede2b18f8f3b0b7cfd8ae7e4f2"
-    },
-    {
-      "fileName": "SEED-073_story-7.json",
-      "identity": "SEED-073#story-7",
-      "completedAt": "2026-10-13T21:50:12.770Z",
-      "blob": "d4e1e7c83dd07e8266da64b04ef9f09eb5209a70"
     }
   ],
   "unreadable": []
