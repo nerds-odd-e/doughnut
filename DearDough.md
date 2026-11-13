@@ -544,33 +544,15 @@ Exact equality with the saved tree classified every merged file as unapplied whe
   - Open Dough release: unknown
   - Evidence: 2026-11-10; affected snapshot c371659ac7121d1e83128c616fa1c0b391ac0867; ci-repair-stash restore/drop for OID266306cfa8064e45118b76c6581083a63bbcb2fd; unfinished dashboard receipt57246283-fdda-482d-8908-b608c63f8e4b; user requested fixing and retrying; repair b3ed6f70ea538888919593b2a13fb9a14b0e9c4f.
   - Observed effect: all draft edits were preserved, but the helper returned applied:none and then unapplied. New real-Git regression reproduced it. The local fix identifies actual unmerged paths as partial and supplies an explicit reviewed-OID resolution with checkout/index/conflict guards; ordinary no-apply refusal remains. Three recovery tests and25 CI-proof tests passed, and the retained real entry resolved/dropped by exact OID. A later CI pause restored its five saved paths and dropped only its own entry automatically.
-  - Inference: tree inequality proves a merge differs, not that nothing applied. The local repair is delivered; propagation through the shared guidance release remains outside this product execution.
+  - Inference: tree inequality proves a merge differs, not that nothing applied. The repair was delivered locally in `b3ed6f70ea` and moved to the project-owned recovery path in `5d974f8eae` ([current recovery guide](docs/ci-repair-restoration.md)). Propagation to the shared workflow remains open.
 
-## DD-480 — An HTTP fixture invented the meaning of an empty assimilation value
+<a id="dd-480"></a>
 
-The frontend treated any supplied propertyValue, including empty string, as a list item and wrote a passing blank-item fixture. The existing backend explicitly uses empty string for scalar units.
+DD-480 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-480).
 
-### Occurrences
-- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown; execution-time snapshot fa51f486fca13f9f3c85eaebbec2ed93be8e8522
-  - Evidence: 2026-11-10; CI run42762324814/attempt1 E2E job129650701015, Skip expected /n6/p/topic but received /n6/p/topic/i/1/~; backend PropertyFocus/AssimilationUnit documentation; repair c371659ac7121d1e83128c616fa1c0b391ac0867.
-  - Observed effect: selected mocked proof and list continuation E2E passed before the existing scalar walkthrough failed. Positive scalar-empty red reproduced the defect; nonempty raw values retain item routing and manual blank selection remains a separate input path. The corrected workspace fixture,37 focused tests, both types and10 real E2E scenarios passed.
-  - Inference: reuse of the key/value shape did not establish the wire sentinel. Read the producing contract before choosing a branch or manufacturing fixture variants; one observed execution does not establish recurrence.
+<a id="dd-481"></a>
 
-## DD-481 — Full local frontend proof lost the browser connection despite fewer workers
-
-A two-worker full frontend run ended before all files loaded. The existing CI configuration already serializes file imports and uses an orchestrator GC reporter; selecting that configuration completed the full required proof without assertion retries.
-
-### Occurrences
-- Execution: SEED-120#export-a-note-from-the-highlighted-property / 401bc9ff4a2bf02f4c4e922f2b87b1fb8b4e030f
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown; execution guidance snapshot 884a4fe8e463a1ea32120c7589cf808a82162285
-  - Evidence: 2026-11-10 execution conversation; `/tmp/export-property-frontend-tests.log` (start18:17:41 Asia/Singapore), `/tmp/export-property-frontend-tests-serial.log`, `/tmp/export-ui-frontend.log`; retained acceptance at `7df14ec0c6:.planning/slice-plans/089-export-a-note-from-the-highlighted-property/source-review.md`; `frontend/vitest.config.ts` fileParallelism/orchestratorGcReporter.
-  - Observed effect: `./scripts/run.sh pnpm frontend:test --maxWorkers=2` ended after259/408 files and1,950 passing tests with VITEST_BROWSER_CONNECTION_CLOSED (114.11s), without an assertion failure. `CI=true ./scripts/run.sh pnpm frontend:test --maxWorkers=2 --retry=0` then passed408files/2,521tests in262.65s and the next slice passed409files/2,528tests in245.98s. All runs were headless on the shared16CPU/48GiB local host; no production or test behavior was changed to obtain those passes.
-  - Inference: worker reduction alone did not prevent this documented orchestrator failure mode. The existing serialized-import/GC mode is a supported bounded alternative for full local proof on a busy host. One failed run does not establish recurrence or a universal memory threshold; consider documenting the invocation in project testing guidance.
+DD-481 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-481).
 
 ## DD-482 — An unterminated landed plan tail made appended evidence resemble a source conflict
 
@@ -585,19 +567,9 @@ Source freshness's three-way containment check treated coordinator-owned observa
   - Observed effect: extra source checks/inspection and record relayout. Preserving landed bytes and placing new obligations before existing G1 produced an unchanged comparison; no source scope, accepted proof or product behavior changed.
   - Inference: the unterminated tail and same-EOF additions explain this instance; other source-conflict behavior was not investigated. Coordinator condensation also complicated the first comparison and was partly reversed; exact cost is unmeasured.
 
-## DD-483 — One backend Intent Coverage probe repeats the complete suite three times
+<a id="dd-483"></a>
 
-The project backend rule requires the entire suite even for a targeted scratch break check. The measured check caught the selected fault, but three full runs and scratch setup exceeded its original five-to-ten-minute estimate. Assess a supported proportionate proof route with the project owner; this observation changes no installed rule or default.
-
-### Occurrences
-- Execution: SEED-122#prefer-note-titles-in-wiki-links / e257b144d1e9120528922da0f5dc045acb6c9d6d
-  - Timestamp: 2026-11-11T17:42:34.664+08:00
-  - Tool: Codex
-  - Model: gpt-6.1-sol
-  - Open Dough release: unknown; guidance retained at f6d89e3470a6ed3064443c324763a074bd5bc884
-  - Evidence: Native worker /root/intent_coverage_live, checked implementation e257b144d1; verbatim report and wrap-up disposition in the SEED-122 Done record; raw evidence /tmp/dough-intent-coverage-122-1794389081/.
-  - Observed effect: One worker ran baseline/fault/restored commands across3111 maintained tests (plus one temporary independent witness in the fault run). Full command wall times315.751/162.748/218.847s total697.346s. Invocation-to-report1073.664s includes setup, reads, runs and verified retirement. The union fault caused six maintained failures and independently observed ambiguous controller results; baseline/restored suites and cleanup passed.
-  - Inference: Whole-suite repetition is required by the current backend instructions, rather than a worker decision to broaden proof. Shared-host contention and cold scratch caches also contributed; the17.9-minute elapsed cannot all be attributed to the suite policy. Native blocking waits and bounded overdue checks retained one worker without restart or duplicate probing.
+DD-483 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-483).
 
 ## DD-484 — The source review of a small story gave 137 rows that were typed and recorded one at a time
 
@@ -613,19 +585,21 @@ The source-only reviewer returned 137 numbered commitments for a story with two 
   - Observed effect: About 140 `record` calls over eight slices; 39 rows for slice 1 alone. Roughly a third of the rows were qualifications or reasons with no result of their own to observe.
   - Inference: The review did catch one promise the plan had no proof for (a one-kana reading hidden inside other words). The cost is in the row count and the hand transfer, not in having the review. Token cost was not measured.
 
-## DD-485 — CI jobs waited about 50 minutes each on a package mirror that did not resolve
+<a id="dd-485"></a>
 
-Two story-branch CI runs failed in every job that installs system packages, each after about 50 minutes inside `apt-get`. The failures arrived as separate notifications over about 90 minutes, and the CI observer ended by itself before the rerun finished.
+## DD-485 — GitHub Actions observation ended before a rerun finished
+
+The Open Dough observer stopped while GitHub Actions was still running an attempt. The coordinator checked the following successful attempt directly. [Donut’s package-install facet](DonutRetrospectiveFindings.md#dd-485) explains why the jobs took so long.
 
 ### Occurrences
 - Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
-  - Timestamp: 2026-11-11T23:32:09+08:00
+  - Timestamp: 2026-11-11T23:32:09+08:00 (incident timestamp in the original report; exact observer exit time unknown)
   - Tool: Claude Code
   - Model: claude-fable-5-2
   - Open Dough release: 0.3.96
-  - Evidence: CI runs 43049319481 and 43053073660 (attempts 1 to 3); failed step durations of about 3,046 seconds; `Temporary failure resolving 'azure.archive.ubuntu.com'`; attempt 2 lost one runner during the same step.
-  - Observed effect: Eleven failed jobs per run with no test executed; five diagnosis rounds for one cause; green evidence for the product commit came about eight hours after its push.
-  - Inference: The outage was outside the repository. The repository's part is that the install step has no shorter limit of its own, so a mirror outage holds each runner for the default limit. Whether a shorter limit is wanted is the owner's call.
+  - Evidence: `aa17aab044b566aee939ce8dac1adfeec4a91652:.planning/slice-plans/001-save-pronunciations-as-note-properties/PLAN.md`, CI runs 43049319481 and 43053073660. The plan names `/tmp/dough-ci-501/watch-gNNSef`; that directory was absent when reviewed. The original combined report is at `4059ac2353:DearDough.md`.
+  - Observed effect: The observer ended while attempt 2 of run 43053073660 was active. The coordinator read attempt 3 with `gh run view`; successful evidence for the product commit arrived about eight hours after its push across the runner outage and reruns.
+  - Inference: GitHub Actions execution lost observer coverage across attempts. The retained plan does not establish the cause of observer exit or whether its time budget expired.
 
 ## DD-486 — A checkpoint go-ahead did not let the session push the release tag
 

@@ -68,6 +68,26 @@ Moved from [DearDough](DearDough.md) on 2026-11-10; the source entry is recovera
   - Current execution proof: six runner cases, real Nix cold/reuse with host features disabled, and public worktree setup passed. The corrected full backend suite ran 3,093 tests with no failures (two existing skips), including production-YAML E2E unset/supplied and Development-unset configuration cases. All six held-stack cases passed, including both synthetic-token choices. A clean-shell invocation with neither token nor Nix-feature exports passed all seven refinement/question-contest scenarios; its owned services shut down, and its new `sut.log` had no credential-precondition error.
   - This verifies the repair under the selected reproductions. A later agent execution must supply non-recurrence evidence; none is claimed here. The original dated observations and Open Dough 0.3.92 provenance above remain unchanged.
 
+## Queued
+
+<a id="dd-485"></a>
+
+### DD-485 — CI jobs waited about 50 minutes each on a package mirror that did not resolve
+
+Two story-branch CI runs failed in every job that installs system packages, each after about 50 minutes inside `apt-get`. The failures arrived as separate notifications over about 90 minutes. [The shared observer facet](DearDough.md#dd-485) covers the same execution.
+
+#### Occurrences
+- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
+  - Timestamp: 2026-11-11T23:32:09+08:00
+  - Tool: Claude Code
+  - Model: claude-fable-5-2
+  - Open Dough release: 0.3.96
+  - Evidence: CI runs 43049319481 and 43053073660 (attempts 1 to 3); failed step durations of about 3,046 seconds; `Temporary failure resolving 'azure.archive.ubuntu.com'`; attempt 2 lost one runner during the same step.
+  - Observed effect: Eleven failed jobs per run with no test executed; five diagnosis rounds for one cause; green evidence for the product commit came about eight hours after its push.
+  - Inference: The mirror outage was external. At `4059ac2353`, Donut’s [Node/Cypress setup](.github/setup_nodejs_with_cache/action.yml) and [MySQL setup](.github/mysql_binaries/action.yml) run package installs without an explicit shorter bound. The backend unit-test job passed in both affected runs without using these package steps. See `aa17aab044:.planning/slice-plans/001-save-pronunciations-as-note-properties/PLAN.md` for the job and attempt distinctions; the full combined source is at `4059ac2353:DearDough.md`.
+
+Queued in [SEED-129](.planning/seeds/SEED-129-bounded-ci-package-setup.md#bound-ci-system-package-installation). The delay affected eleven jobs per initial run and outlasted useful test feedback.
+
 ## Open, not queued
 
 ### DD-161 — A `.venv-mineru` whose Python was garbage-collected had to be rebuilt by hand
@@ -86,6 +106,60 @@ Moved from [DearDough](DearDough.md) on 2026-11-10; the source entry is recovera
 
 - SEED-100#story-1 / `cede42a579`, 2026-11-03 (exact time unknown, between slice 1 acceptance and push), Claude Code/claude-opus-5-5, Open Dough 0.3.82. Springdoc mapped nested `RecallHistoryExport.Answer` to entity `Answer`, losing three fields in a published increment (`cede42a579:open_api_docs.yaml`, `Event.answer`; `1e5c2b8e1b:.planning/slice-plans/001-recall-history-export/source-review.md` row 2a.3 and PLAN.md G1).
 - `6932a70eb6` repaired the export with explicit schema names `RecallHistoryAnswer`, `RecallHistoryEvent` and `RecallHistoryDailyProbe`, still present at `5f2be9874c`. The repair cost one implementer round trip and regeneration. A generation-time collision check could protect other nested records with common simple names. No wider collision search was done. The shared proof facet is [ODF-413, formerly DD-334](DearDough.md#odf-413--a-commitment-was-recorded-as-observed-before-its-output-was-inspected).
+
+<a id="dd-481"></a>
+
+### DD-481 — Full local frontend proof lost the browser connection despite fewer workers
+
+A two-worker full frontend run ended before all files loaded. The existing CI configuration already serializes file imports and uses an orchestrator GC reporter; selecting that configuration completed the full required proof without assertion retries.
+
+#### Occurrences
+- Execution: SEED-120#export-a-note-from-the-highlighted-property / 401bc9ff4a2bf02f4c4e922f2b87b1fb8b4e030f
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown; execution guidance snapshot 884a4fe8e463a1ea32120c7589cf808a82162285
+  - Evidence: 2026-11-10 execution conversation; `/tmp/export-property-frontend-tests.log` (start18:17:41 Asia/Singapore), `/tmp/export-property-frontend-tests-serial.log`, `/tmp/export-ui-frontend.log`; retained acceptance at `7df14ec0c6:.planning/slice-plans/089-export-a-note-from-the-highlighted-property/source-review.md`; `frontend/vitest.config.ts` fileParallelism/orchestratorGcReporter.
+  - Observed effect: `./scripts/run.sh pnpm frontend:test --maxWorkers=2` ended after259/408 files and1,950 passing tests with VITEST_BROWSER_CONNECTION_CLOSED (114.11s), without an assertion failure. `CI=true ./scripts/run.sh pnpm frontend:test --maxWorkers=2 --retry=0` then passed408files/2,521tests in262.65s and the next slice passed409files/2,528tests in245.98s. All runs were headless on the shared16CPU/48GiB local host; no production or test behavior was changed to obtain those passes.
+  - Inference: worker reduction alone did not prevent this documented orchestrator failure mode. The existing serialized-import/GC mode is a supported bounded alternative for full local proof on a busy host. One failed run does not establish recurrence or a universal memory threshold; consider documenting the invocation in project testing guidance.
+
+Ownership: Donut’s local frontend runner and proof guidance. The serial configuration completed two full runs in the same execution. The failure has not recurred in the evidence reviewed; keep the recorded command as an available route.
+
+<a id="dd-483"></a>
+
+### DD-483 — One backend Intent Coverage probe repeats the complete suite three times
+
+The project backend rule requires the entire suite even for a targeted scratch break check. The measured check caught the selected fault, but three full runs and scratch setup exceeded its original five-to-ten-minute estimate. Assess a supported proportionate proof route with the project owner; this observation changes no installed rule or default.
+
+#### Occurrences
+- Execution: SEED-122#prefer-note-titles-in-wiki-links / e257b144d1e9120528922da0f5dc045acb6c9d6d
+  - Timestamp: 2026-11-11T17:42:34.664+08:00
+  - Tool: Codex
+  - Model: gpt-6.1-sol
+  - Open Dough release: unknown; guidance retained at f6d89e3470a6ed3064443c324763a074bd5bc884
+  - Evidence: Native worker /root/intent_coverage_live, checked implementation e257b144d1; verbatim report and wrap-up disposition in the SEED-122 Done record; raw evidence /tmp/dough-intent-coverage-122-1794389081/.
+  - Observed effect: One worker ran baseline/fault/restored commands across3111 maintained tests (plus one temporary independent witness in the fault run). Full command wall times315.751/162.748/218.847s total697.346s. Invocation-to-report1073.664s includes setup, reads, runs and verified retirement. The union fault caused six maintained failures and independently observed ambiguous controller results; baseline/restored suites and cleanup passed.
+  - Inference: Whole-suite repetition is required by the current backend instructions, rather than a worker decision to broaden proof. Shared-host contention and cold scratch caches also contributed; the17.9-minute elapsed cannot all be attributed to the suite policy. Native blocking waits and bounded overdue checks retained one worker without restart or duplicate probing.
+
+Ownership: Donut’s [backend skill](.agents/skills/backend/SKILL.md) still requires all backend tests. A scoped exception needs evidence that a focused check preserves the selected promise and a project decision about the full-suite rule. Keep the measured case open.
+
+## Repaired in the originating execution
+
+<a id="dd-480"></a>
+
+### DD-480 — An HTTP fixture invented the meaning of an empty assimilation value
+
+The frontend treated any supplied propertyValue, including empty string, as a list item and wrote a passing blank-item fixture. The existing backend explicitly uses empty string for scalar units.
+
+#### Occurrences
+- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown; execution-time snapshot fa51f486fca13f9f3c85eaebbec2ed93be8e8522
+  - Evidence: 2026-11-10; CI run42762324814/attempt1 E2E job129650701015, Skip expected /n6/p/topic but received /n6/p/topic/i/1/~; backend PropertyFocus/AssimilationUnit documentation; repair c371659ac7121d1e83128c616fa1c0b391ac0867.
+  - Observed effect: selected mocked proof and list continuation E2E passed before the existing scalar walkthrough failed. Positive scalar-empty red reproduced the defect; nonempty raw values retain item routing and manual blank selection remains a separate input path. The corrected workspace fixture,37 focused tests, both types and10 real E2E scenarios passed.
+  - Inference: reuse of the key/value shape did not establish the wire sentinel. Read the producing contract before choosing a branch or manufacturing fixture variants; one observed execution does not establish recurrence.
+
+Ownership: Donut’s frontend fixture contradicted its backend wire contract. The exact scalar failure was reproduced and repaired in the originating execution. Recover the combined source at `4059ac2353:DearDough.md`; no follow-up is supported by this one repaired case.
 
 ## Useful project practice
 
