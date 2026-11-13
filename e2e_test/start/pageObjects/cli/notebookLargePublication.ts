@@ -5,10 +5,18 @@ import { unwrapData } from '../../unwrapApi'
 import { donutNotebookContent } from '../../donutNotebookContent'
 import { notebookCloneCheckout } from './notebookCloneCheckout'
 
-const noteCount = 11000
+// The accepted Git listing must exceed one MiB, Node's default subprocess
+// buffer. Long folder and title names reach that with few notes: their bare
+// paths alone exceed it.
+const noteCount = 2250
 const batchSize = 250
+const folderSegments = ['Large-notebook-shelf-', 'Large-notebook-drawer-'].map(
+  (segment) => segment.repeat(9)
+)
+const folder = folderSegments.join('/')
 const title = (index: number) =>
-  `${'Accepted-note-'.repeat(7)}${String(index).padStart(5, '0')}`
+  `${'Accepted-note-'.repeat(10)}${String(index).padStart(5, '0')}`
+const relativePath = (index: number) => `${folder}/${title(index)}.md`
 const body = (index: number) => `Published small edit ${index}`
 
 export const notebookLargePublication = {
@@ -18,6 +26,7 @@ export const notebookLargePublication = {
         const index = batch * batchSize + offset
         return {
           Title: title(index),
+          Folder: folder,
           Content: `---\ntype: Note\n---\nAccepted body ${index}\n`,
         }
       })
@@ -75,7 +84,7 @@ export const notebookLargePublication = {
     return notebookCloneCheckout()
       .commitRelatedNoteChanges(
         Array.from({ length: 3 }, (_, index) => ({
-          relativePath: `${title(index)}.md`,
+          relativePath: relativePath(index),
           content: `---\ntype: Note\n---\n${body(index)}`,
         }))
       )
@@ -127,7 +136,7 @@ export const notebookLargePublication = {
         .then((noteId) => {
           donutNotebookContent.expectNoteByIdAt(
             noteId,
-            [notebookName, title(index)],
+            [notebookName, ...folderSegments, title(index)],
             body(index)
           )
         })

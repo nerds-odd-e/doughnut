@@ -35,6 +35,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+// Accepted cost: this profile needs its own Spring context boot (~1s, 2026-09-26); merging the
+// injected failure into the shared context would spread mutable failure state, and a mock would
+// lose the transaction rollback proof.
 @SpringBootTest
 @ActiveProfiles({"test", "batch-row-import-atomic-test"})
 @Import(QuestionGenerationBatchRowImportAtomicTestSupport.FailingRecallPromptImportConfig.class)

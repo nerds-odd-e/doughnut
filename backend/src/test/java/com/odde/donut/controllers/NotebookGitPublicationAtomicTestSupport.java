@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
+// Accepted cost: the notebook-git-publication-atomic-test profile needs its own Spring context
+// boot (~1s, 2026-09-26); merging the injected failure into the shared context would spread
+// mutable failure state, and a mock would lose the transaction rollback proof.
 final class NotebookGitPublicationAtomicTestSupport {
 
   static final AtomicBoolean FAIL_ON_BINDING_SAVE = new AtomicBoolean(false);

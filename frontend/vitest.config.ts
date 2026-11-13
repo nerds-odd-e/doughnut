@@ -105,6 +105,9 @@ const config = defineConfig({
     setupFiles: ["./tests/setupVitest.ts"],
     include: ["./**/*.spec.{ts,tsx}"],
     exclude: [...testExcludes, touchSpecs],
+    // Accepted cost: Vitest's default per-file isolation gives each spec its own
+    // browser/global state at ~190–280ms per file (2026-09-19). Without it 216
+    // of 339 files failed through shared state and the run was ~5x slower.
     browser: {
       enabled: true,
       headless: true,

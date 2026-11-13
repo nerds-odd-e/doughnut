@@ -19,6 +19,7 @@ import com.odde.donut.testability.model.NotesTestData;
 import com.odde.donut.testability.model.NotesTestData.NoteTestData;
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,7 +59,7 @@ class InjectNotesWorker {
 
     Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(currentUTCTimestamp);
     notesTestData.buildNoteTree(notebook, currentUTCTimestamp, titleNoteMap, this.entityPersister);
-    applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
+    applyExplicitFolderPlacements(notebook, injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     for (Note note : titleNoteMap.values()) {
       note.replaceContent(
@@ -70,14 +71,19 @@ class InjectNotesWorker {
   }
 
   private void applyExplicitFolderPlacements(
-      List<NoteTestData> injections, Map<String, Note> titleNoteMap, Timestamp now) {
+      Notebook notebook,
+      List<NoteTestData> injections,
+      Map<String, Note> titleNoteMap,
+      Timestamp now) {
+    Map<String, Folder> folderByPath = new HashMap<>();
     for (NoteTestData injection : injections) {
       if (Strings.isBlank(injection.getFolder())) {
         continue;
       }
-      Note note = titleNoteMap.get(injection.title);
-      Folder folder = resolveOrCreateFolderPath(note.getNotebook(), injection.getFolder(), now);
-      note.setFolder(folder);
+      Folder folder =
+          folderByPath.computeIfAbsent(
+              injection.getFolder(), path -> resolveOrCreateFolderPath(notebook, path, now));
+      titleNoteMap.get(injection.title).setFolder(folder);
     }
   }
 
