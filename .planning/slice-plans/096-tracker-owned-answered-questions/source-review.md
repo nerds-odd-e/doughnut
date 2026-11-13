@@ -77,9 +77,9 @@ probe has no source commitment allocated to it.
 | C51 | C51 — Refinement controller tests: Delete `McqRefinementControllerTests`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
 | C52 | C52 — Transactional ratchet entries: Delete `McqController` entries in `OpenAiTransactionalRatchetTest`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
 | C53 | C53 — Stored note mapping: Delete `Mcq.note`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
-| C54 | C54 — Stored note column: Delete `mcq.note_id` through the stated rollout sequence. | slice 13 |  |
+| C54 | C54 — Stored note column: Delete `mcq.note_id` through the stated rollout sequence. | slice 15 |  |
 | C55 | C55 — Stored note foreign key: Delete its foreign key through the stated rollout sequence. | slice 12 | observed: checkpoint-b-verification.md#every-active-backend-and-applied-migration: actual successful production357 and all-active unmapped rollout after A |
-| C56 | C56 — Unreferenced-question migration: Before dropping the column, migrate by deleting questions no prompt uses. | slice 13 |  |
+| C56 | C56 — Unreferenced-question migration: Before dropping the column, migrate by deleting questions no prompt uses. | slice 15 |  |
 | C57 | C57 — Generation input: Generation takes the tracker’s note as input. | slice 7 | observed: MemoryTrackerQuestionPersistenceControllerTest.persistsTheSelectedQuestionWithItsCurrentTracker: real property reification, exact current-title AI input, and flushed/cleared selected question/input reload; selected-question-verification.md |
 | C58 | C58 — Question representation: Generation does not store its own note on the question. | slice 12 | observed: tracker-retention-verification.md#source-result-and-implementation: hidden mapping/writer and exclusive Note argument deleted, meaningful generation input retained; full generation/batch proof GREEN57947 and separate whole-product retired-API reading |
 | C59 | C59 — MCQ injection: Delete testability/E2E `injectMcq`. | slice 6 | observed: question-bank-verification.md#removal-reading: inspected transitive deletion and classified whole-product reading, with retained behavior proof in the same record |
@@ -122,14 +122,14 @@ probe has no source commitment allocated to it.
 | E12 | E12 — Unmoved tracker journey: Removing a note whose tracker never moved removes that tracker. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: canonical unmoved note, real trash/permanent-delete actions, fresh tracker ID removal |
 | E13 | E13 — Unmoved tracker prompts: That removal removes its prompts. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: same real unmoved note deletion observes fresh prompt ID removal |
 | E14 | E14 — Unmoved tracker questions: That removal removes its questions. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: same unmoved note deletion observes selected question removal; moved-current-note sibling retains original input note |
-| X01 | X01 — Lost production questions: Restoring the 2,197 lost questions is outside scope; production has no copy. | slice 13 |  |
-| X02 | X02 — Merged tracker history: Merging relationship-note tracker history that reduction drops because the learner already tracks that focus is outside scope. | slice 13 |  |
-| X03 | X03 — Scheduling changes: Changing scheduling is outside scope. | slice 13 |  |
-| X04 | X04 — Statistics changes: Changing statistics is outside scope. | slice 13 |  |
-| X05 | X05 — Archive: Add no archive. | slice 13 |  |
-| X06 | X06 — Content revisions: Add no content revision system. | slice 13 |  |
-| X07 | X07 — Database cascades: Add no new database cascade. | slice 13 |  |
-| C83 | C83 — Instance compatibility: Preserve compatibility between two app instances during rollout. | slice 13 |  |
+| X01 | X01 — Lost production questions: Restoring the 2,197 lost questions is outside scope; production has no copy. | slice 16 |  |
+| X02 | X02 — Merged tracker history: Merging relationship-note tracker history that reduction drops because the learner already tracks that focus is outside scope. | slice 16 |  |
+| X03 | X03 — Scheduling changes: Changing scheduling is outside scope. | slice 16 |  |
+| X04 | X04 — Statistics changes: Changing statistics is outside scope. | slice 16 |  |
+| X05 | X05 — Archive: Add no archive. | slice 16 |  |
+| X06 | X06 — Content revisions: Add no content revision system. | slice 16 |  |
+| X07 | X07 — Database cascades: Add no new database cascade. | slice 16 |  |
+| C83 | C83 — Instance compatibility: Preserve compatibility between two app instances during rollout. | slice 15 |  |
 | C84 | C84 — Compatibility attribution: The compatibility release derives attribution through the tracker. |  | G2 |
 | C85 | C85 — Compatibility write: That release retains a scalar note-ID write. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation plus selected-question-verification.md#inspected-controller-observations: persisted current input re-observed through the new writer and actual regeneration after flush/clear; checkpoint A remains slice 8 |
 | Q06 | Q06 — Compatibility consumer: The retained write serves the original eager ORM readers. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation: current fresh read and matching persisted scalar/input/joined note; original-binary launch explicitly unobserved, checkpoint A remains slice 8 |
@@ -137,18 +137,18 @@ probe has no source commitment allocated to it.
 | C87 | C87 — Write removal timing: At that stage, remove the scalar write. | slice 12 | observed: release-checkpoints.md#checkpoint-a-publication-and-observation plus tracker-retention-verification.md#source-result-and-implementation: observed all-active A precedes mapping/writer retirement; checkpoint B remains G4 |
 | C88 | C88 — Foreign-key removal timing: At that stage, drop the foreign key. | slice 12 | observed: checkpoint-b-verification.md: actual357 applied after compatible A and unmapped B publication |
 | C89 | C89 — Interim physical column: Retain the physical nullable column until all mapped binaries have been replaced. | slice 12 | observed: checkpoint-b-verification.md#every-active-backend-and-applied-migration: every active B backend exact unmapped build; nullable physical column/index retained |
-| C90 | C90 — Final question cleanup: Then clean unreferenced questions. | slice 13 |  |
-| C91 | C91 — Final column cleanup: Then drop the column. | slice 13 |  |
+| C90 | C90 — Final question cleanup: Then clean unreferenced questions. | slice 15 |  |
+| C91 | C91 — Final column cleanup: Then drop the column. | slice 15 |  |
 | Q07 | Q07 — Source’s retention qualification: The source explicitly makes full retention acceptance dependent on confirmed foreign-key migration. | slice 12 | observed: checkpoint-b-verification.md: actual successful357, production/all-active/schema/public evidence and developer login confirmation complete retention rollout acceptance |
-| Q08 | Q08 — Source’s final cleanup stage: The source identifies column drop as the final cleanup stage. | slice 13 |  |
-| C92 | C92 — Temporary representation: Delete the temporary compatibility representation in that sequence. | slice 13 |  |
-| X08 | X08 — Final compatibility guidance: Retain no final product guidance about that temporary representation. | slice 13 |  |
-| X09 | X09 — Absence tests for compatibility: Retain no final tests asserting that representation’s absence. | slice 13 |  |
-| C93 | C93 — Transitive cleanup: Perform removal transitively. | slice 13 |  |
-| C94 | C94 — Product sweep: Sweep the whole product. | slice 13 |  |
-| X10 | X10 — Absence tests: Retain no tests asserting removed things are absent. | slice 13 |  |
-| X11 | X11 — Runtime guards: Retain no runtime guards against removed things. | slice 13 |  |
-| X12 | X12 — Replacement history notes: Retain no replacement history notes about removed things. | slice 13 |  |
-| C95 | C95 — Surviving-behavior proof: Use proof of surviving behavior. | slice 13 |  |
-| C96 | C96 — Sweep reading: Use one acceptance sweep reading alongside that proof. | slice 13 |  |
-| C97 | C97 — Dated evidence: Preserve dated evidence in `.planning/done` as recorded. | slice 13 |  |
+| Q08 | Q08 — Source’s final cleanup stage: The source identifies column drop as the final cleanup stage. | slice 15 |  |
+| C92 | C92 — Temporary representation: Delete the temporary compatibility representation in that sequence. | slice 15 |  |
+| X08 | X08 — Final compatibility guidance: Retain no final product guidance about that temporary representation. | slice 16 |  |
+| X09 | X09 — Absence tests for compatibility: Retain no final tests asserting that representation’s absence. | slice 16 |  |
+| C93 | C93 — Transitive cleanup: Perform removal transitively. | slice 16 |  |
+| C94 | C94 — Product sweep: Sweep the whole product. | slice 16 |  |
+| X10 | X10 — Absence tests: Retain no tests asserting removed things are absent. | slice 16 |  |
+| X11 | X11 — Runtime guards: Retain no runtime guards against removed things. | slice 16 |  |
+| X12 | X12 — Replacement history notes: Retain no replacement history notes about removed things. | slice 16 |  |
+| C95 | C95 — Surviving-behavior proof: Use proof of surviving behavior. | slice 16 |  |
+| C96 | C96 — Sweep reading: Use one acceptance sweep reading alongside that proof. | slice 16 |  |
+| C97 | C97 — Dated evidence: Preserve dated evidence in `.planning/done` as recorded. | slice 16 |  |

@@ -224,19 +224,4 @@ health/startup insufficient. Retention acceptance waits for that migration.
 
 ## Preserve learner evidence through the final schema upgrade
 
-Clean MCQs unreferenced by any prompt, then drop physical `note_id` and its
-exclusive index. Use new migration versions above the current tip at execution.
-Follow the migration skill's default-off DML placeholder in every profile,
-production selection count, full FK-closure reading and temporary safety harness.
-Check cleanup readiness before DDL; gate-off with remaining cleanup work fails
-before DDL rather than silently accepting incomplete conversion. Obtain the
-operator's deliberate gate enablement for this release and remove its override
-after applied-migration confirmation. Retain the pending migration safety harness
-until that confirmation, then delete the spent harness/placeholder configuration
-under the migration lifecycle. Regenerate the ERD. Checkpoint C and the sweep
-complete the story; do not call an intermediate release final acceptance.
-Checkpoint C's human go-ahead covers deliberate gate enablement, the reviewed
-retained landing and exact stable tag/SHA. Record production selection count,
-full FK closure and readiness before enablement; observe actual publication,
-applied migration on every active instance and smoke results before final
-acceptance. Keep the populated safety harness pending until that observation.
+[Refined cleanup, guarded retirement and post-application lifecycle briefs](final-schema-briefs.md).

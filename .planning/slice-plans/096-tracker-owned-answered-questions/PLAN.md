@@ -19,25 +19,13 @@ merge histories of trackers reduction discards, or change grading/statistics.
 One tracker per question does not impose one prompt per question on that tracker.
 Do not preserve export fixtures that share a question across different trackers.
 
-## Architecture and reuse
+## Supporting context
 
-[Reusable boundaries and Accepted architectural constraints](operational-policy.md#architecture-and-reuse).
-
-## Execution resume context
-
-[Retained workspace, revisions, setup and observer identity](execution-context.md#execution-resume-context).
-
-## Decisive premises and observation
-
-[Preparation observations, provenance, results and limits](preparation-evidence.md#decisive-premises-and-observation).
-
-### Disposable probe protocol and limits
-
-[Literal protocol, fixture observations and restoration](preparation-evidence.md#disposable-probe-protocol-and-limits).
-
-## Outside-in proof ownership
-
-[The complete promise/proof-owner table](operational-policy.md#outside-in-proof-ownership) applies to every slice.
+- [Reuse and Accepted architecture](operational-policy.md#architecture-and-reuse).
+- [Execution identity, setup and observation](execution-context.md#execution-resume-context).
+- [Decisive premises and dated observations](preparation-evidence.md#decisive-premises-and-observation).
+- [Disposable protocol and limits](preparation-evidence.md#disposable-probe-protocol-and-limits).
+- [Outside-in promise/proof owners](operational-policy.md#outside-in-proof-ownership), applying to every slice.
 
 ## Ordered slices
 
@@ -46,9 +34,6 @@ Type: Behavior
 Status: done
 Proof: early read-only probe of actual prompt ownership, retained with time/revision/profile and aggregate counts only.
 
-The read-only production probe must establish zero cross-tracker question sharing
-before the ownership transition; nonzero sharing stops dependent work.
-
 [Detailed implementation brief](implementation-briefs.md#establish-stored-question-ownership-before-changing-persistence). [Accepted production observation](ownership-observation.md).
 
 ### 2. Use the current tracker note for prompt context
@@ -56,18 +41,12 @@ Type: Behavior
 Status: done
 Proof: history/conversation and contest/regenerate controller boundaries in the proof table.
 
-Derive prompt history, conversation and AI context/read authorization through
-the tracker’s current note while retaining the compatibility storage write.
-
 [Detailed implementation brief](implementation-briefs.md#use-the-current-tracker-note-for-prompt-context). [Accepted implementation proof](current-note-verification.md).
 
 ### 3. Export recent questions from trackers currently on the note
 Type: Behavior
 Status: done
 Proof: export controller cases for note/property membership, newest ordering and the learner's own choice/privacy.
-
-Export through prompts/current trackers and property focus, retaining recent
-ordering, the learner’s own choice and privacy.
 
 [Detailed implementation brief](implementation-briefs.md#export-recent-questions-from-trackers-currently-on-the-note).
 
@@ -78,9 +57,6 @@ Type: Structure
 Status: done
 Proof: unchanged testability facade through the affected conversation, relationship and recall feature journeys.
 
-Split note/relationship seeding and conversation setup along existing domain
-seams; keep the facade stable and every edited module under 250 lines.
-
 [Detailed implementation brief](implementation-briefs.md#keep-test-setup-stable-while-separating-its-domain-responsibilities).
 
 [Accepted setup-seam proof](testability-verification.md).
@@ -90,9 +66,6 @@ Type: Structure
 Status: done
 Proof: unchanged notebook Git proposal controller tests in the full backend suite.
 
-Split the two private-learning identity scenarios and their support into a
-focused sibling, preserving all existing move/identity proof under 250 lines.
-
 [Detailed implementation brief](implementation-briefs.md#keep-git-move-and-learning-identity-proof-in-cohesive-test-homes).
 
 [Accepted Git identity proof](git-identity-verification.md).
@@ -101,10 +74,6 @@ focused sibling, preserving all existing move/identity proof under 250 lines.
 Type: Behavior
 Status: done
 Proof: surviving mounted action tests, full frontend suite/types, API regeneration and affected mocked E2E journeys.
-
-Delete the bank transitively while retaining ordinary recall/note actions. Use
-the minimum scalar compatibility write, keeping its FK and physical column.
-Stop and refine before continuing if editing exceeds ten minutes.
 
 [Detailed implementation brief](implementation-briefs.md#keep-ordinary-recall-and-note-actions-through-question-bank-deletion).
 
@@ -189,15 +158,48 @@ Checkpoint B must confirm all binaries and applied migration before slice 13.
 [Local retention/schema proof](tracker-retention-verification.md).
 [Accepted checkpoint B publication and observation](checkpoint-b-verification.md).
 
-### 13. Preserve learner evidence through the final schema upgrade
+### 13. Isolate the populated migration proof from shared test fixtures
+Type: Structure
+Status: planned
+Proof: canonical pre-C engine replay and committed MakeMe graph in an owned catalog, unchanged backend behavior, actual backend CI resource capability.
+
+Reuse the test datasource/transaction seams with owned catalog allocation and
+cleanup. Preserve shared rows/history. Enables Behavior 14.
+
+[Detailed isolation brief and failed-premise evidence](final-schema-briefs.md#isolate-the-populated-migration-proof-from-shared-test-fixtures).
+
+### 14. Require deliberate cleanup readiness while preserving asked evidence
 Type: Behavior
 Status: planned
-Proof: populated isolated-engine migration safety and retained move/history/MCP/export/deletion behavior; checkpoint C confirms application of the contract migration.
+Proof: real populated MySQL default-off refusal/no-op, enabled retry and exact asked-graph preservation; full backend verification.
 
-Use the default-off gated cleanup and pre-DDL refusal, then retire the physical
-column/index. Confirm checkpoint C, regenerate the ERD and perform the final sweep.
+Guard cleanup readiness before the separate gated DML records success. Keep
+all profile defaults off and preserve every prompt-referenced question.
+Stop safely after branch publication; no intermediate production release.
 
-[Detailed implementation brief](implementation-briefs.md#preserve-learner-evidence-through-the-final-schema-upgrade).
+[Detailed implementation brief and settled isolated-engine setup](final-schema-briefs.md#require-deliberate-cleanup-readiness-while-preserving-asked-evidence).
+
+### 15. Preserve learner evidence through guarded physical schema retirement
+Type: Behavior
+Status: planned
+Proof: complete canonical populated upgrade, pre-ALTER refusal and retained graph/product behavior; actual checkpoint C publication/all-active/schema/smokes.
+
+Guard the physical column/index drop, extend the same pending harness, and
+regenerate the ERD. Review exact C landing/tag plus deliberate production gate
+enablement before live action. Retain pending tooling through actual C.
+
+[Detailed implementation brief](final-schema-briefs.md#preserve-learner-evidence-through-guarded-physical-schema-retirement).
+
+### 16. Keep normal startup and fresh upgrades after cleanup
+Type: Behavior
+Status: planned
+Proof: fresh/current-schema replay and retained product behavior after spent-tool retirement; observed neutral-startup publication and final sweep reading.
+
+After C, retire the spent cleanup guard/DML, harness and profile placeholder;
+restore normal production startup. Keep the immutable DDL migration, verify
+fresh upgrades and observe the reviewed cleanup publication before closure.
+
+[Detailed implementation brief and lifecycle](final-schema-briefs.md#keep-normal-startup-and-fresh-upgrades-after-cleanup).
 
 ## Release checkpoints and execution authority
 
@@ -236,3 +238,13 @@ Disposition: proved by slice 11: selected-question-destruction-proof.md; pre-act
 Reported: slice 12 — "B remains ROOT-OWNED/unobserved: human-reviewed exact retained landing/tag/SHA, actual publication/every active unmapped binary, production applied FK migration and smokes."
 Story clause: "Full retention acceptance includes confirmation of the FK-drop migration"
 Disposition: proved by slice 12: checkpoint-b-verification.md; approved exact retained landing/tag, actual publication, every active unmapped backend, applied migration 357 and public/manual login smokes
+
+### G5. Observe checkpoint C guarded schema rollout
+Reported: slice 13 — "Acceptance reading: physical retirement, deliberate production enablement and actual checkpoint C are not observed by the local cleanup-readiness slice."
+Story clause: "Then clean unreferenced questions and drop the column."
+Disposition: receiving slice 15
+
+### G6. Establish populated cleanup proof after the shared-catalog failure
+Reported: slice 13 — "Full-suite native 34545 stopped both new cases before DML because unrelated promptless rows existed; populated cleanup preservation remains unobserved."
+Story clause: "Then clean unreferenced questions and drop the column."
+Disposition: receiving slice 14

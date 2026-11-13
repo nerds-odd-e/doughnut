@@ -33,7 +33,7 @@ Removal acceptance is the separate sweep reading below, never an absence test.
 | Both move/delete journeys retain identities, question, choices, index, grade, outcome, exclusion and schedule | 12 | Maintained regressions in a focused MCP sibling reusing `ListRecallAnswersMcpEndpointTestBase`: actual reduction/reification then old-note permanent deletion, flush/clear, history and export through existing MockMvc/bearer access. The existing controller move suites retain their own mechanics proof. Canonical index-2 wrong-answer payload once; inverse delta separately. Observe a positive populated legacy asked row through move/delete/read on the migrated schema too. |
 | Deleting a tracker removes its owned learning questions; other trackers' history and conversation rules survive | 8, 11, 12 | Extend `MemoryTrackerDeleteControllerTest`, unanswered-prompt recovery and note hard-delete boundary tests with complete FK-closure fixtures, including answer/log/conversation/correction rows. Slice 11 carries pre-destruction selected question IDs into deletion/retry/rollback; 12 retains that proof through compatibility retirement. |
 | Ordinary recall and note actions remain usable | 6 | Mounted toolbar/action tests plus existing mocked recall, contest, property recall and conversation E2E journeys; delete bank-only tests rather than negate them. |
-| Upgrading schema preserves asked questions and their learner evidence | 13 | Temporary migration safety harness on populated isolated MySQL: default-off gate, enabled selection count, pre-DDL refusal and retained question/prompt/answer/log graph. No permanent test of missing bank rows, endpoints or columns. |
+| Upgrading schema preserves asked questions and their learner evidence | 13–16 | Isolated-catalog resource proof precedes the temporary populated-engine safety harness proves default-off readiness, enabled retry/selection, pre-DDL refusal and exact asked graph; C observes the complete upgrade; post-application retirement preserves fresh/current operation and neutral startup. No permanent absence assertions. |
 | Recall export content/state, envelope/access and daily-probe behavior stays unchanged | 9 | All 14 existing history-export scenario bodies/assertions retained across cohesive homes; full backend proof. |
 | Creation fixtures retain current-note access, asked payload and isolation | 10 | Every builder/helper consumer retains its observations, including both opposite-ownership authorization cases with temporary local scalar setup and committed fixture isolation; full backend proof. |
 | Destruction and committed cleanup preserve selected-question observations | 11 | Preselect distinct question IDs through trackers/prompts; carry the same IDs through delete/retry/rollback. Cleanup shares its matching tracker-user/owned-note prompt scope, then deletes only selected unreferenced questions. One graph case proves both roots and an unrelated survivor; full backend red/green proof. |
@@ -104,10 +104,13 @@ actual wait separately. It does not excuse an edit overrun or an independent
 second outcome. Current remaining edit/cleanup budgets are 3–5 minutes for 9,
 5–8 each for 10/11 and 8–10 for 12. All require a green full-backend boundary.
 Slice 12's red/green, schema verification and ERD form one retention proof loop;
-13's populated migration safety/verification/ERD form one upgrade proof loop.
+13 owns isolated-engine setup and actual CI capability; 14's cleanup, 15's
+complete upgrade/C and 16's lifecycle each own a cohesive verification loop.
 Those indivisible proof waits and human/release waiting are stated exceptions;
 editing/cleanup beyond ten minutes must stop and refine, never consume the wait
-exception. Slice 13's bounded cleanup/gate/DDL edit is estimated 5–8 minutes.
+exception. Remaining editing estimates are 5–8 minutes for Structure 13,
+8–10 for cleanup 14, 5–8 for contract 15 and 4–6 for lifecycle 16; concrete setup/teardown and stopping boundaries are in the
+[final schema briefs](final-schema-briefs.md).
 
 Each slice wraps through Jidoka, a fresh post-change-refactor agent, required
 generation, coordinator `./scripts/run.sh pnpm format:changed` once, plan update,
@@ -161,3 +164,15 @@ also removes other learners' trackers. Nullable note/circle ownership paths
 need optional joins. The shared selection/deletion predicate and one focused
 graph case clarify 11's existing fixture-isolation proof; boundaries and story
 scope stay unchanged. Full-suite red/green waits remain separately owned.
+
+## Final schema refinement after observed B
+
+After B and slice 12 closure `0f1d1f5b...`, local source inspection exposed the
+omitted populated-engine and production-override lifecycle work. The
+[final schema briefs](final-schema-briefs.md#readiness-and-boundary-decision)
+record the initial split and subsequent actual shared-catalog failure.
+Structure 13 now proves owned-catalog MakeMe isolation and CI administration
+before cleanup 14, contract/C 15 and lifecycle 16. The cumulative model/source
+outcome stay unchanged; 16 slices remain. Story resplit is recommended under
+the refinement skill; the optional developer choice remains pending.
+Completed slices and dated observations above retain their original provenance.

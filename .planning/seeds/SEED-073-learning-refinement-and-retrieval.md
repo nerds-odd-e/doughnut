@@ -63,7 +63,7 @@ The [2026-10-12 assessment](learning-refinement-and-retrieval-evidence.md#learni
 
 **Identity:** SEED-073#keep-answered-questions-with-their-tracker
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/096-tracker-owned-answered-questions/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7b2bd9eff5c2eb1c5bfde0453cb0bcb779a0f2c58e341bda88776a42fc65cb0e","plan":"5120a978449e6dda9adaea24c41dec123f673bdb498e6af3eafe42ec93c73ae5"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/096-tracker-owned-answered-questions/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"49309953db02bde88912ccfa5248f3e8c865a55ecc1313b8af4db343263d3ad2","plan":"aad01dcd313cc7cfa019873667edf12126d519eb28331d8cdfb751955a0761b5"}}
 ```
 
 **Goal.** As a Donut learner, every question I answered stays with the memory
@@ -202,7 +202,7 @@ MySQL test-profile observations reached both real move/delete/history/MCP/export
 journeys, scalar compatibility persistence with a fresh ORM load, and all three
 question-deletion consumers with dependent rows. Inputs, results, failed legacy
 consumers, restoration and limits are recorded in the
-[active plan](../slice-plans/096-tracker-owned-answered-questions/PLAN.md#decisive-premises-and-observation).
+[active plan](../slice-plans/096-tracker-owned-answered-questions/preparation-evidence.md#decisive-premises-and-observation).
 The plan includes the newly observed Git test reorganization and consumer
 closure. The selected goal, scope, examples and production rollout checkpoints
 remain the preparation input.

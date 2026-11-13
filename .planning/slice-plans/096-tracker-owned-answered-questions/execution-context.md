@@ -115,6 +115,17 @@
   (642 classes/3,198 tests, zero failures/errors, two skips), preserving both
   permanent journeys. Its ordinary closure delivery owns the done transition.
   No C operation was performed.
+- Accepted slice 12 closure `0f1d1f5bfd5ffd6b6b9ae98e9c188fa4a8405afb`
+  published without reconciliation. Fresh refactor, coordinator formatting and
+  independent hook passed; the managed publisher reused the current branch
+  observer. G4/source commitments and the ordinary done transition are settled.
+- Remaining old 13 was refined into Behaviors 13–15 after concrete omission
+  and retry/lifecycle findings. The [final schema briefs](final-schema-briefs.md)
+  own the same-catalog committed MakeMe proof setup and release stop points.
+  The recorder reassessed the reviewed 15-slice plan ready; the existing
+  execution instruction supplies authority. Only 13 is currently selected;
+  14's exact C enablement/landing/tag and 15's neutral-startup publication
+  retain their concrete human review gates.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
@@ -183,3 +194,13 @@
   acceptance; frontend, browser and compatibility observations were pending
   at that recovery boundary. Their accepted results are retained in
   [slice 6 verification](question-bank-verification.md).
+
+- Actual full-suite 34545 disproved the new shared-catalog assumption before
+  either DML case ran. The exact six owned files are safely parked under
+  `/tmp/donut-question-cleanup-parked`; no shared rows were deleted. Compatible
+  algorithm/fixture work remains recoverable. The refined Structure 13 proves
+  owned-catalog allocation/routing/cleanup and actual CI capability, immediately
+  enabling cleanup 14; contract/C is 15 and post-C lifecycle is 16. Original
+  attempt cost/failure provenance and selected PFE are in the final briefs.
+  The 16-slice resplit recommendation has an optional developer question;
+  current story authority continues the bounded setup pending that preference.
