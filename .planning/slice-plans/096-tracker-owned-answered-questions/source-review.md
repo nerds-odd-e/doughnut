@@ -144,7 +144,7 @@ probe has no source commitment allocated to it.
 | C92 | C92 — Temporary representation: Delete the temporary compatibility representation in that sequence. | slice 15 |  |
 | X08 | X08 — Final compatibility guidance: Retain no final product guidance about that temporary representation. | slice 16 |  |
 | X09 | X09 — Absence tests for compatibility: Retain no final tests asserting that representation’s absence. | slice 16 |  |
-| C93 | C93 — Transitive cleanup: Perform removal transitively. | slice 16 |  |
+| C93 | C93 — Transitive cleanup: Perform removal transitively. | slice 16 | G8 |
 | C94 | C94 — Product sweep: Sweep the whole product. | slice 16 |  |
 | X10 | X10 — Absence tests: Retain no tests asserting removed things are absent. | slice 16 |  |
 | X11 | X11 — Runtime guards: Retain no runtime guards against removed things. | slice 16 |  |

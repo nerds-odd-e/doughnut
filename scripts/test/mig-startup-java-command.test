@@ -26,6 +26,8 @@ assert_startup_script_command() {
 	local before_jar="${command%% -jar *}"
 	[[ "$before_jar" == *" -Dspring.datasource.url="* ]] \
 		|| fail "$script must pass datasource properties before -jar"
+	[[ "$before_jar" == *" -Dspring.flyway.placeholders.questioncleanup=1=1 "* ]] \
+		|| fail "$script must deliberately enable question cleanup before -jar"
 }
 
 main() {

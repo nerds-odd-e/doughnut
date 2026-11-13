@@ -178,7 +178,7 @@ Guard the physical column/index drop, extend the same pending harness, and
 regenerate the ERD. Review exact C landing/tag plus deliberate production gate
 enablement before live action. Retain pending tooling through actual C.
 
-[Detailed implementation brief](final-schema-briefs.md#preserve-learner-evidence-through-guarded-physical-schema-retirement).
+[Implementation brief](final-schema-briefs.md#preserve-learner-evidence-through-guarded-physical-schema-retirement). [Accepted local proof](contract-retirement-verification.md).
 
 ### 16. Keep normal startup and fresh upgrades after cleanup
 Type: Behavior
@@ -203,7 +203,6 @@ fresh upgrades and observe the reviewed cleanup publication before closure.
 
 [Retained refinement decisions, consumer ownership and unobserved production gates](operational-policy.md#plan-concern-review).
 
-
 ## Story obligations
 
 ### G1. Observe application-owned question and prompt atomicity
@@ -211,7 +210,6 @@ Reported: slice 7 — "The new payload/cardinality cases use the inherited outer
 Story clause: "Generation must persist the selected question with its prompt, rather than leave discarded candidates behind."
 Disposition: proved by slice 7: selected-question-verification.md#application-owned-atomicity; NOT_SUPPORTED controller call reaches a real SQL fault and a separate committed count retains its baseline, 1/1 in the final full suite
 Commitment: C80
-
 
 ### G2. Observe checkpoint A compatibility rollout
 Reported: slice 8 — "Checkpoint A still requires the reviewed retained landing and exact stable-tag go-ahead, then actual publication and all-active-instance compatibility evidence."
@@ -222,7 +220,6 @@ Commitment: C84
 Reported: slice 8 — "NoteDependentRowsControllerTestBase still counts MCQ rows through physical note_id; that compatibility consumer must change when mapping and writes retire."
 Story clause: "A question's note is its tracker's note."
 Disposition: proved by slice 11: selected-question-destruction-proof.md; pre-action distinct IDs remain the question observations through deletion, retry and rollback, and full red/green committed-graph cleanup preserves unrelated learning
-
 
 ### G4. Observe checkpoint B retention rollout
 Reported: slice 12 — "B remains ROOT-OWNED/unobserved: human-reviewed exact retained landing/tag/SHA, actual publication/every active unmapped binary, production applied FK migration and smokes."
@@ -243,3 +240,10 @@ Disposition: proved by slice 14: cleanup-readiness-verification.md; real canonic
 Reported: slice 13 — "The local owned-catalog proof and YAML checks do not observe GitHub root authentication, named-account bootstrap, credential transfer and catalog grant/revoke/drop."
 Story clause: "Then clean unreferenced questions and drop the column."
 Disposition: proved by slice 13: upgrade-isolation-verification.md#hosted-resource-proof; exact run 43429706691/1 backend job 131899854654 and its uploaded isolation-file case prove the hosted setup and target lifecycle
+
+
+### G8. Retire applied cleanup tooling and observe neutral startup
+Reported: slice 15 — "Prepared C uses an enabled JVM gate; spent guard, DML, harness, profiles, exclusive CI capability and the running override still need post-application retirement."
+Story clause: "Then clean unreferenced questions and drop the column."
+Disposition: receiving slice 16
+Commitment: C93

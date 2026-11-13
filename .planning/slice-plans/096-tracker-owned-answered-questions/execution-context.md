@@ -229,3 +229,12 @@
   physical retirement and actual C. Earlier wrapper-oracle failure `44825`
   and invalid unchanged retry `16319` remain separate failed evidence.
   [Exact setup, proof and delivery boundary](cleanup-readiness-verification.md).
+
+- Local Behavior 15 native `89695` passed 645 classes/3,202 tests, zero
+  failures/errors, two skips, including complete populated 358–360 preservation
+  and active pre-ALTER refusal. ERD `36837` and read-only catalog `26902` passed.
+  The single progressing proof took 16m26 under host load; edits were 2–3min.
+  G5 retains actual C; new G8/C93 retains spent-tool/neutral-startup lifecycle
+  in 16. Existing story execution continues; no resplit was adopted. Progress
+  publication must keep 15 planned until actual C and fresh login are observed.
+  [Exact local proof and remaining gates](contract-retirement-verification.md).

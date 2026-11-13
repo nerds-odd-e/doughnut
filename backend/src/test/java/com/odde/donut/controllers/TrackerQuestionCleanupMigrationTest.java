@@ -61,7 +61,7 @@ class TrackerQuestionCleanupMigrationTest extends SpringTestBase {
           containsString("requires deliberate enablement"));
       assertThat(upgrade.questionIds(graph.questions()), equalTo(graph.questions()));
       assertThat(upgrade.snapshot(graph.rows()), equalTo(before));
-      Flyway enabled = upgrade.migrations("300000359", Map.of("questioncleanup", "1=1"));
+      Flyway enabled = upgrade.migrations("300000360", Map.of("questioncleanup", "1=1"));
       enabled.repair();
       enabled.migrate();
 
