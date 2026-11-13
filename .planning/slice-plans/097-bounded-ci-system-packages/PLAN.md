@@ -149,10 +149,9 @@ MySQL keeps its existing behavior until slice 3.
 
 ### 3. Give MySQL system libraries the same bounded setup outcome
 Type: Behavior
-Status: planned
-Proof: `ci-system-packages.sh.test` + `ci-system-packages-mysql.sh.test` ok;
-mysql action wires script; probe deleted (sweep: no `ci-system-packages-probe*` /
-`purpose_probe_*` under `scripts/`/`.github/`). Push CI outstanding (progress).
+Status: done
+Proof: shell fixtures ok; mysql action wired; probe deleted (sweep clean under
+`scripts/`/`.github/`). Push CI exact success SHA `281dd138` (run `43418396664`).
 
 Behavior: the MySQL setup action requests its compatibility libraries → the
 two `.deb` downloads and APT install consume one shared phase deadline/retry
