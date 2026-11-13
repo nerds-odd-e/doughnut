@@ -10,7 +10,9 @@ runs:
           sudo ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
         fi
         mysql_archive=mysql-8.4.3-linux-glibc2.17-x86_64-minimal
-        curl --fail --location --retry 3 "https://cdn.mysql.com/archives/mysql-8.4/$mysql_archive.tar.xz" -o "$RUNNER_TEMP/mysql.tar.xz"
+        curl --fail --location --retry 3 --retry-all-errors \
+          --retry-max-time 300 --connect-timeout 10 --max-time 120 \
+          "https://cdn.mysql.com/archives/mysql-8.4/$mysql_archive.tar.xz" -o "$RUNNER_TEMP/mysql.tar.xz"
         tar -xJf "$RUNNER_TEMP/mysql.tar.xz" -C "$RUNNER_TEMP"
         "$RUNNER_TEMP/$mysql_archive/bin/mysqld" --version
         "$RUNNER_TEMP/$mysql_archive/bin/mysql" --version

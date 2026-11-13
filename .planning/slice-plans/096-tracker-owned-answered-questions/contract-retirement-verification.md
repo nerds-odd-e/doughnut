@@ -95,3 +95,40 @@ exact retained landing/tag/SHA and deliberate gate. After approval, observe
 actual publication, every active binary/JVM, applied versions, public and fresh
 login smokes. Keep the harness/config/resources through C. Only then may 16
 retire spent tooling and prepare its separately reviewed neutral publication.
+
+## Owned CI acquisition repair before C review
+
+Progress `eb226190fbe4ae8cc55063dd956c3216d31ee241` passed the normal hook,
+but exact CI `43440672011`/1 failed. Await `43327` reported failure, not green.
+The sole failed job `131937153380` stopped in the MySQL archive acquisition:
+at 14:14:51 UTC a 58.5MB transfer reached 93% then curl returned 56, connection
+reset. Package setup had succeeded; lint/types were skipped. The diagnostic's
+unrecognized-failure gap was settled by the full job log and actual source.
+There is no infrastructure exception or automatic passing rerun.
+
+The action's `--retry 3` did not include receive error 56. The repair retains
+that finite retry count and fixed archive/extraction, adding all-error retry,
+10s connection, 120s transfer and 300s retry-budget limits. The latter checks
+before an attempt; a final attempt can exceed it, roughly bounding 420s total.
+The existing 600s package phase does not cover this later download.
+
+The new test executes the actual complete action against real curl and a
+controlled server: partial bytes plus TCP reset, then a valid archive. It
+observes the complete bytes, real extraction, executable versions and exported
+MYSQL_BASEDIR. It is wired into the existing CI-proof group. Red `56713`
+reproduced actual curl 56; green `76220` passed 8/8; actual wired group `86436`
+passed 30/30. All commands are terminal, with no backend rerun. The coordinator
+read the setup/assertions/logs and matched all three source hashes.
+
+All 55 traced readers have dispositions, eight run and 47 purpose exclusions.
+Exact commands/evidence: `/tmp/donut-ci-mysql-reset-handoff.md` and its linked
+trace, manifests and logs. Actual edits were about two minutes; conservative
+inspection/edit/trace closure 6–7 minutes. Freshness `62770` returned unchanged.
+The clean repair receipt has no stash OID; no shared stash was touched. Product,
+schema and startup proof above retains its exact code/boundaries. Repaired
+hosted CI remains required, and G5 still prevents presenting C as ready.
+
+Fresh repair refactoring returned none already clean, with unchanged repair and
+product source hashes and passing documented whitespace. No tests were rerun.
+Report: `/tmp/donut-ci-mysql-reset-refactor.md`. Final freshness `28100`
+returned unchanged and the eight-obligation/131-commitment check passed.
