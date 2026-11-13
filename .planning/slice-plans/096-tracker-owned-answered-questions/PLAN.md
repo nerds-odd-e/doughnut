@@ -177,7 +177,7 @@ mapping/writes/FK remain unchanged. Enables Behavior 12.
 
 ### 12. Preserve answered questions across tracker moves and old-note deletion
 Type: Behavior
-Status: planned
+Status: done
 Proof: reproduce both move/delete/read journeys red, then green through history, MCP and export; preserve grading/schedule/exclusion payload and ordinary deletion proof.
 
 Remove compatibility writes/mapping and drop the question-note FK, retaining
@@ -186,7 +186,8 @@ Checkpoint B must confirm all binaries and applied migration before slice 13.
 
 [Detailed implementation brief](implementation-briefs.md#preserve-answered-questions-across-tracker-moves-and-old-note-deletion).
 
-[Local retention/schema proof; checkpoint B remains open](tracker-retention-verification.md).
+[Local retention/schema proof](tracker-retention-verification.md).
+[Accepted checkpoint B publication and observation](checkpoint-b-verification.md).
 
 ### 13. Preserve learner evidence through the final schema upgrade
 Type: Behavior
@@ -234,5 +235,4 @@ Disposition: proved by slice 11: selected-question-destruction-proof.md; pre-act
 ### G4. Observe checkpoint B retention rollout
 Reported: slice 12 — "B remains ROOT-OWNED/unobserved: human-reviewed exact retained landing/tag/SHA, actual publication/every active unmapped binary, production applied FK migration and smokes."
 Story clause: "Full retention acceptance includes confirmation of the FK-drop migration"
-Disposition: return
-Commitment: C55, C88, C89, Q07
+Disposition: proved by slice 12: checkpoint-b-verification.md; approved exact retained landing/tag, actual publication, every active unmapped backend, applied migration 357 and public/manual login smokes

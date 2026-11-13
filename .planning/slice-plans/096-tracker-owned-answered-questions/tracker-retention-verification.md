@@ -1,8 +1,8 @@
 # Tracker-move retention verification
 
 Local Behavior 12 proof, observed 2026-11-13 in the established worktree from
-`b7213b7465b3ee84d26fd7d679a7a03735ac9776`. Checkpoint B remains open: local
-proof does not establish production publication or application of the migration.
+`b7213b7465b3ee84d26fd7d679a7a03735ac9776`. Checkpoint B was open at this
+local observation; its later production acceptance is linked below.
 
 ## Source result and implementation
 
@@ -182,3 +182,40 @@ The local progress increment published as `66f4cced...`; applicable branch CI
 `43409981854`/1 succeeded. The subsequent records-only preparation merge
 `6ffb35cf...` returned successful applicable-basis observation. This closes the
 pre-review CI gate, with actual production B and G4 still unobserved.
+
+## Post-B fixture retirement and maintained proof
+
+[Actual checkpoint B evidence](checkpoint-b-verification.md) now proves G4,
+including the developer's requested sign-in/notebook-list confirmation.
+After B, the temporary native write/read/helper and its exclusive local
+EntityManager injection/import were deleted: one helper file, 20 deletions.
+Both concrete maintained journey bodies and assertions remain byte-identical.
+The earlier positive populated legacy observation retains its original action
+and provenance in the accepted RED/GREEN archives above.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm backend:test_only > /tmp/donut-slice12-close-backend.log 2>&1
+```
+
+Native `75672` exited 0: 642 classes, 3,198 tests, zero failures/errors,
+two skips; both concrete move/delete/read journeys pass. Fresh test starts
+span 11:29:28.698–11:35:19.306 UTC; XML mtimes span
+11:35:21.957106–11:35:22.113155 UTC. The coordinator independently counted
+all XML and inspected the unchanged concrete assertions and the helper diff.
+Archive: `/tmp/donut-slice12-close`; literal command, setup, all 36 individual
+source correspondences and results: `/tmp/donut-slice12-close-handoff.md`.
+
+All 110 consumer-trace readers are disposed in
+`/tmp/donut-slice12-close-consumer-observations.md`. The direct subclass is
+the sole affected behavior reader; independent shared persistence/UI/identifier
+uses remain. Separate one-time product reading found zero retired helper names;
+no absence checker was added. API/ERD generation is inapplicable to this
+test-only retirement. Editing took under one minute; the 7m26s full-suite
+wait was live/progressing and retained its sole owner through terminal.
+
+Fresh independent refactoring returned `REFACTOR COMPLETE`, none already clean.
+The selector included the implicated concrete test, owned file sizes and
+whitespace passed, and current Java sources matched the accepted 75672 archive.
+No edits or test reruns were needed. Report:
+`/tmp/donut-slice12-close-refactor.md`. Final source freshness remained unchanged
+at pinned main `34cf85c27b97876419039d6dbb5dc1cb922997d8`.

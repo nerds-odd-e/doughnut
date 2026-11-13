@@ -4,6 +4,10 @@ Prepared 2026-11-13. Local Behavior 12 proof is accepted in
 [tracker retention verification](tracker-retention-verification.md). G4 remains
 open; production B is unobserved and slice 13 has not started.
 
+This is the pre-approval preparation record. The later accepted landing,
+publication, all-active/schema/public observations and developer login
+confirmation are retained in [checkpoint B verification](checkpoint-b-verification.md).
+
 ## Reviewed implementation and CI
 
 - Code/proof increment `66f4ccedeea2607a9bdcc7a99416f2ba1553935f` published

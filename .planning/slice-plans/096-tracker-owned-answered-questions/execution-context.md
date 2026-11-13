@@ -105,6 +105,16 @@
   Applicable branch CI `43409981854`/1 succeeded for code `66f4cced...`;
   exact merge observation returned success on that ignored-only basis.
   [Checkpoint B review and next authorized operations](checkpoint-b-preparation.md).
+- Checkpoint B accepted retained landing/tag: `v1.3.75` at
+  `34cf85c27b97876419039d6dbb5dc1cb922997d8`; exact main CI
+  `43413409754`/1 and actual publication `43415091457`/1 succeeded.
+  Every actual active backend, applied migration 357 and public paths were
+  observed; the developer's subsequent `LGTM` confirms the requested fresh
+  sign-in/notebook-list smoke. [Accepted dated proof](checkpoint-b-verification.md).
+  G4 is proved; post-B fixture retirement passed full backend native `75672`
+  (642 classes/3,198 tests, zero failures/errors, two skips), preserving both
+  permanent journeys. Its ordinary closure delivery owns the done transition.
+  No C operation was performed.
 - CI repair history: run `43353619099`, attempt `1`, job `131650296573`
   (Other Unit Tests), failed CLI LFS conflict-recovery test deadline. Exact
   diagnostic: `/tmp/donut-tracker-ci-43353619099-1.json`. Completed-attempt
@@ -131,8 +141,14 @@
 - Observer key:
   `ci-watch-execution:nerds-odd-e/doughnut:codex/keep-answered-questions-with-their-tracker:nao-tracker-60c866c4`;
   coordinator: `nao-tracker-60c866c4`; directory:
-  `/tmp/dough-ci-501/watch-PaZAdI`; PID: `86657`; stream session: `13407`;
-  yielded cell: `g4:8`; checkout: the owned workspace above.
+  `/tmp/dough-ci-501/watch-iD99Qe`; PID: `40491`; stream session: `4611`;
+  yielded cell: `g53:4`; checkout: the owned workspace above.
+- Prior branch observer `/tmp/dough-ci-501/watch-PaZAdI` stopped at B's
+  approval handoff, zero unread; PID 86657 exit was confirmed. B's separate
+  main observer `/tmp/dough-ci-501/watch-b1oH21`, coordinator
+  `nao-tracker-main-b-60c866c4`, completed normally with exact main CI
+  success and confirmed shutdown. On resume the same branch coordinator
+  recovered the stopped receipt and armed the current stream above.
 - Server-restart recovery after slice 11 confirmed the clean published checkout
   before any merge retry. The matching former stream `/tmp/dough-ci-501/watch-kxc0PK`
   returned `stopped`, zero unread, with slice 11 CI pending/unobserved; its

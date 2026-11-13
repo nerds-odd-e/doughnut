@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.NoteReferenceService;
-import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,7 +16,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 abstract class MovedTrackerRecallAnswerTestBase extends ListRecallAnswersMcpEndpointTestBase {
   @Autowired NoteReferenceService noteReferenceService;
-  @Autowired EntityManager entityManager;
 
   Asked answerAndExclude(Note input, String propertyKey) throws Exception {
     currentUser.setUser(personalUser);
@@ -66,25 +64,7 @@ abstract class MovedTrackerRecallAnswerTestBase extends ListRecallAnswersMcpEndp
     JsonNode schedule = json(get("/api/memory-trackers/{id}", trackerId));
     assertThat(schedule.at("/note/id").asInt(), equalTo(originalId));
     assertThat(schedule.path("propertyKey").asText(), equalTo(propertyKey));
-    legacyAskedInput(questionId, originalId);
     return new Asked(originalId, trackerId, promptId, questionId, before, schedule);
-  }
-
-  void legacyAskedInput(int questionId, int originalId) {
-    makeMe.entityPersister.flushAndClear();
-    entityManager
-        .createNativeQuery("UPDATE mcq SET note_id = :inputId WHERE id = :questionId")
-        .setParameter("inputId", originalId)
-        .setParameter("questionId", questionId)
-        .executeUpdate();
-    Number stored =
-        (Number)
-            entityManager
-                .createNativeQuery("SELECT note_id FROM mcq WHERE id = :questionId")
-                .setParameter("questionId", questionId)
-                .getSingleResult();
-    assertThat(stored.intValue(), equalTo(originalId));
-    entityManager.clear();
   }
 
   void retained(Asked asked, int noteId, String propertyKey) throws Exception {
