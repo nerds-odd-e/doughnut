@@ -71,6 +71,18 @@ Record from `probe-env` step logs: `os_release_*`, `apt-get --version`, `timeout
 - `CI_SYSTEM_PACKAGES_BUDGET_SECONDS=5 CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS=2` `probe-stalled-transfer` → exit 137 in ~7s (Darwin/nix)
 - `probe-transient-recovery` → success, `attempt_count=2` (Darwin/nix)
 
-## Hosted progress proof (after publish)
+## Hosted probe receipts (run 43410926122 on SHA 510f94debc5f44bb6f072ed70f6049451bf413e8)
 
-Outstanding until Jobs API receipts for this branch's `ci-system-packages-probe.yml` run cover the table above.
+Runner: Ubuntu 24.04.5 LTS (noble), apt 2.8.3, GNU timeout 9.4, nproc=4, mem_total_kb=16367524.
+Literal APT options and timeout invocation matched the production defaults in `probe-env`.
+
+| Job | Result |
+| --- | --- |
+| probe bad-mirror | Package step `failure` in 3s (`status=100`); retained `Could not resolve 'archive.ubuntu.invalid'`; phase/budget line emitted; Downstream checks `skipped`. Job conclusion `failure` is expected. |
+| probe stalled-transfer | Child ignored TERM; `elapsed=25s` `status=137` under 15s budget + 10s kill-after; step asserted nonzero and passed. |
+| probe transient-recovery | `success`; `attempt_count=2`; phase elapsed 1s. |
+| probe healthy-package | `success`; phase `elapsed=11s` under 600s budget (headroom holds). |
+
+Approach usable: APT `Error-Mode=any`, timeout/kill cleanup, real package install, and job skipping worked together on ubuntu-latest. Dependent slices 2–3 may proceed.
+
+Main `ci.yml` for the same SHA remains under the attached observer (`await-revision`); mark slice 1 `done` only after that progress observation settles.

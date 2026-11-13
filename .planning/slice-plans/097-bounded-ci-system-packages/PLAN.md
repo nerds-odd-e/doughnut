@@ -95,11 +95,12 @@ commands, elapsed times, diagnostics and terminal receipts with execution proof.
 
 ### 1. Validate bounded package failure on the actual Linux runner
 Type: Behavior
-Status: planned
-Proof: a disposable CI run establishes the Linux-specific premises above, with
-terminal job/step outcomes, wall time and child cleanup rather than YAML text assertions.
-Pre-publish local and outstanding hosted receipts:
-[slice-1-probe-evidence.md](slice-1-probe-evidence.md).
+Status: done
+Proof: accepted — probe run `43410926122` on SHA `510f94debc` (Ubuntu 24.04.5 /
+apt 2.8.3 / timeout 9.4): bad-mirror fails in 3s with DNS diagnostic + skipped
+downstream; stalled `status=137` at 25s; transient `attempt_count=2`; healthy
+elapsed 11s ≪ 600s. Main `ci.yml` exact success on same SHA (`43410926092`).
+Receipts: [slice-1-probe-evidence.md](slice-1-probe-evidence.md). Approach usable.
 
 Behavior: given an execution-owned branch on the configured Linux runner, run
 isolated bad-mirror, stalled-transfer, transient-recovery and healthy-package
