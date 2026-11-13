@@ -1,6 +1,6 @@
 # DearDough Process Findings
 
-Shared findings reviewed 2026-11-10 (Asia/Singapore). The linked catalog records
+Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
@@ -533,18 +533,13 @@ Former local code: DD-445. A repair publication started before an `amended` fres
 
 Former local code: DD-447. A slice was published without its source-review observations. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-478.md).
 
-## DD-479 — Merged repair restores were misclassified as wholly unapplied
+<a id="dd-479"></a>
+<a id="dd-479--merged-repair-restores-were-misclassified-as-wholly-unapplied"></a>
+<a id="odf-487"></a>
 
-Exact equality with the saved tree classified every merged file as unapplied when each also contained accepted repair edits. The restore had actually auto-merged draft content and reported a conflict. Its stored false-none then blocked exact stash cleanup and required a user-triggered resume.
+## ODF-487 — Merged repair restores were misclassified as wholly unapplied
 
-### Occurrences
-- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: 2026-11-10; affected snapshot c371659ac7121d1e83128c616fa1c0b391ac0867; ci-repair-stash restore/drop for OID266306cfa8064e45118b76c6581083a63bbcb2fd; unfinished dashboard receipt57246283-fdda-482d-8908-b608c63f8e4b; user requested fixing and retrying; repair b3ed6f70ea538888919593b2a13fb9a14b0e9c4f.
-  - Observed effect: all draft edits were preserved, but the helper returned applied:none and then unapplied. New real-Git regression reproduced it. The local fix identifies actual unmerged paths as partial and supplies an explicit reviewed-OID resolution with checkout/index/conflict guards; ordinary no-apply refusal remains. Three recovery tests and25 CI-proof tests passed, and the retained real entry resolved/dropped by exact OID. A later CI pause restored its five saved paths and dropped only its own entry automatically.
-  - Inference: tree inequality proves a merge differs, not that nothing applied. The repair was delivered locally in `b3ed6f70ea` and moved to the project-owned recovery path in `5d974f8eae` ([current recovery guide](docs/ci-repair-restoration.md)). Propagation to the shared workflow remains open.
+Former local code: DD-479. A merged CI repair restore was reported as wholly unapplied when the retained draft had in fact been applied in part. Donut delivered its own exact-OID recovery, now in the [project recovery guide](docs/ci-repair-restoration.md). The shared helper remains open. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-487.md#odf-487). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L536).
 
 <a id="dd-480"></a>
 
@@ -554,63 +549,36 @@ DD-480 is a Donut project finding. [Evidence and disposition](DonutRetrospective
 
 DD-481 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-481).
 
-## DD-482 — An unterminated landed plan tail made appended evidence resemble a source conflict
+<a id="dd-482"></a>
+<a id="dd-482--an-unterminated-landed-plan-tail-made-appended-evidence-resemble-a-source-conflict"></a>
+<a id="odf-489"></a>
 
-Source freshness's three-way containment check treated coordinator-owned observations appended after an identical landed, unterminated final disposition as overlapping source edits. No new human story/plan amendment existed. Keep the substantive conflict gate; assess newline-aware comparison or clearer record-edit diagnostics without weakening it.
+## ODF-489 — An unterminated landed plan tail made appended evidence resemble a source conflict
 
-### Occurrences
-- Execution: SEED-121#publish-large-notebooks-without-losing-history
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: 2026-11-10 slice14 acceptance; Take0715d7d1b2b25d0ca224a3909e14cdf43fad0d42, landed plan0019fa5e4ada4cc630b90131580dadd83fb84d8a, accepted record59db9d970d2be39e5d7825e26118bbc455e52a0f; source-freshness-comparison.mjs compareThreeWay/compareRecord and source-freshness.mjs fromContainedBase. Raw coordinator results retained three conflict refusals; read-only git merge-file localized the conflict to the same G6 disposition's EOF plus appended G7–G9.
-  - Observed effect: extra source checks/inspection and record relayout. Preserving landed bytes and placing new obligations before existing G1 produced an unchanged comparison; no source scope, accepted proof or product behavior changed.
-  - Inference: the unterminated tail and same-EOF additions explain this instance; other source-conflict behavior was not investigated. Coordinator condensation also complicated the first comparison and was partly reversed; exact cost is unmeasured.
+Former local code: DD-482. An unterminated plan tail made appended observations look like a source conflict. Moving the observations away from the end let the original comparison pass. The execution found no substantive source amendment. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-489.md#odf-489). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L557).
 
 <a id="dd-483"></a>
 
 DD-483 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-483).
 
-## DD-484 — The source review of a small story gave 137 rows that were typed and recorded one at a time
+<a id="dd-484"></a>
+<a id="dd-484--the-source-review-of-a-small-story-gave-137-rows-that-were-typed-and-recorded-one-at-a-time"></a>
+<a id="odf-481"></a>
 
-The source-only reviewer returned 137 numbered commitments for a story with two small product changes and a one-time content conversion. The coordinator retyped the whole table into `source-review.md`, because the reviewer's transcript must not be read, and then recorded one observation per row with one script call each.
+## ODF-481 — The source review of a small story gave 137 rows that were typed and recorded one at a time
 
-### Occurrences
-- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
-  - Timestamp: 2026-11-11T23:05:00+08:00
-  - Tool: Claude Code
-  - Model: claude-fable-5-2
-  - Open Dough release: 0.3.96
-  - Evidence: `source-review.md` at e9f109c3c2 and its later revisions through 3a79a9d489; coordinator conversation before the first delegation and at each acceptance.
-  - Observed effect: About 140 `record` calls over eight slices; 39 rows for slice 1 alone. Roughly a third of the rows were qualifications or reasons with no result of their own to observe.
-  - Inference: The review did catch one promise the plan had no proof for (a one-kana reading hidden inside other words). The cost is in the row count and the hand transfer, not in having the review. Token cost was not measured.
+Former local code: DD-484. In a single execution on Open Dough 0.3.96, a source review returned 137 rows and the coordinator made about 140 recording calls. The review caught a missing promise, and many rows were qualifications without an independent result. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-481.md#odf-481). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L574).
 
 <a id="dd-485"></a>
 
 ## DD-485 — GitHub Actions observation ended before a rerun finished
 
-The Open Dough observer stopped while GitHub Actions was still running an attempt. The coordinator checked the following successful attempt directly. [Donut’s package-install facet](DonutRetrospectiveFindings.md#dd-485) explains why the jobs took so long.
+The SEED-124 pronunciation execution on Open Dough 0.3.96 lost story-branch observation after the GitHub Jobs API returned HTTP 502 for run 43053073660, attempt 2. The coordinator read successful attempt 3 directly. The same execution later lost trunk observation to a TLS handshake timeout. The [retained observer evidence](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-121.md#odf-121) identifies both transport failures. See the [original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L590) and [Donut’s package-install facet](DonutRetrospectiveFindings.md#dd-485).
 
-### Occurrences
-- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
-  - Timestamp: 2026-11-11T23:32:09+08:00 (incident timestamp in the original report; exact observer exit time unknown)
-  - Tool: Claude Code
-  - Model: claude-fable-5-2
-  - Open Dough release: 0.3.96
-  - Evidence: `aa17aab044b566aee939ce8dac1adfeec4a91652:.planning/slice-plans/001-save-pronunciations-as-note-properties/PLAN.md`, CI runs 43049319481 and 43053073660. The plan names `/tmp/dough-ci-501/watch-gNNSef`; that directory was absent when reviewed. The original combined report is at `4059ac2353:DearDough.md`.
-  - Observed effect: The observer ended while attempt 2 of run 43053073660 was active. The coordinator read attempt 3 with `gh run view`; successful evidence for the product commit arrived about eight hours after its push across the runner outage and reruns.
-  - Inference: GitHub Actions execution lost observer coverage across attempts. The retained plan does not establish the cause of observer exit or whether its time budget expired.
+<a id="dd-486"></a>
+<a id="dd-486--a-checkpoint-go-ahead-did-not-let-the-session-push-the-release-tag"></a>
+<a id="odf-492"></a>
 
-## DD-486 — A checkpoint go-ahead did not let the session push the release tag
+## ODF-492 — A checkpoint go-ahead did not let the session push the release tag
 
-The plan's human checkpoint said one go-ahead covers the landing, the release and the publications. After the owner's "go ahead", the host refused the release tag push as a production deployment, and the session had to stop and ask again.
-
-### Occurrences
-- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
-  - Timestamp: 2026-11-12T08:27:00+08:00
-  - Tool: Claude Code
-  - Model: claude-fable-5-2
-  - Open Dough release: 0.3.96
-  - Evidence: Coordinator conversation: the denied `git push origin refs/tags/v1.3.72`, the second attention message, and the owner's reply "I authorize you to do these".
-  - Observed effect: One extra stop and owner turn between the landing and the release; the landing and trunk CI were already done.
-  - Inference: The host's permission check does not read the plan's checkpoint wording. A checkpoint message that asks for the release and publication permission in the host's own terms might avoid the second stop; this was not tried.
+Former local code: DD-486. The host required separate production-deployment authorization for the release tag after the story checkpoint had been answered. The release took one additional owner turn. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-492.md#odf-492). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L604).
