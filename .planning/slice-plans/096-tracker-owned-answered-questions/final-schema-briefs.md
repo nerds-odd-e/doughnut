@@ -146,8 +146,14 @@ baseline. Existing repair-before-migrate handles deleted applied versions;
 their version numbers remain reserved. The retained DDL still transforms a
 fresh historical baseline, with no missing placeholder dependency.
 
-Prove fresh/current-schema replay and retained move/history/MCP/export/deletion
-behavior through full backend:verify and the assigned catalog. Perform the
+Prove current replay and retained move/history/MCP/export/deletion behavior
+locally through full backend:verify on the assigned catalog, preserving its
+rows/history. Publish as progress; fresh canonical baseline-to-360 replay and
+the default named-account setup belong to the actual backend CI job's new
+MySQL container, migrateTestDB step and retained case artifact. Observe those
+steps/cases before treating hosted freshness as proved; no replacement harness
+or local shared-row reset is needed. This is the selected proof composition.
+Perform the
 one-time whole-product removal sweep separately from proof, classifying
 immutable historical migrations and dated evidence as the existing policy
 requires. Preserve .planning/done provenance; add no absence checker, guard

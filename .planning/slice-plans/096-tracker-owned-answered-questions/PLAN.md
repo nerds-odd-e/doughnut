@@ -183,13 +183,13 @@ enablement before live action. Retain pending tooling through actual C.
 ### 16. Keep normal startup and fresh upgrades after cleanup
 Type: Behavior
 Status: planned
-Proof: fresh/current-schema replay and retained product behavior after spent-tool retirement; observed neutral-startup publication and final sweep reading.
+Proof: current local and fresh hosted canonical replay with retained product behavior; observed neutral-startup publication and separate final sweep reading.
 
 After C, retire the spent cleanup guard/DML, harness and profile placeholder;
 restore normal production startup. Keep the immutable DDL migration, verify
 fresh upgrades and observe the reviewed cleanup publication before closure.
 
-[Detailed implementation brief and lifecycle](final-schema-briefs.md#keep-normal-startup-and-fresh-upgrades-after-cleanup).
+[Detailed implementation brief and lifecycle](final-schema-briefs.md#keep-normal-startup-and-fresh-upgrades-after-cleanup); [prepared local proof and remaining observations](neutral-startup-verification.md).
 
 ## Release checkpoints and execution authority
 

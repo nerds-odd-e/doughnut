@@ -26,9 +26,6 @@ spring:
     username: ${db.user}
     password: ${db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  flyway:
-    placeholders:
-      questioncleanup: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -114,8 +111,6 @@ spring:
       leak-detection-threshold: 60000
   flyway:
     clean-disabled: true
-    placeholders:
-      questioncleanup: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -168,9 +163,6 @@ spring:
     username: ${db.user}
     password: ${db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  flyway:
-    placeholders:
-      questioncleanup: "1=0"
   jpa:
     generate-ddl: false
     show-sql: true

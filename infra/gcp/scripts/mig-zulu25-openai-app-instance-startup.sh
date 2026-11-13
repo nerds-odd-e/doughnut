@@ -145,7 +145,6 @@ export JAVA_OPTS="-XX:InitialRAMPercentage=40.0 \
 bash -c "java ${JAVA_OPTS} \
         -Dspring-boot.run.profiles=prod \
         -Dspring.profiles.active=prod \
-        -Dspring.flyway.placeholders.questioncleanup=1=1 \
         -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true' \
         -Dlogging.level.com.zaxxer.hikari=WARN \
         -Dlogging.level.com.zaxxer.hikari.HikariConfig=WARN \
