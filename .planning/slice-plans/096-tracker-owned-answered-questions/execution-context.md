@@ -238,3 +238,8 @@
   in 16. Existing story execution continues; no resplit was adopted. Progress
   publication must keep 15 planned until actual C and fresh login are observed.
   [Exact local proof and remaining gates](contract-retirement-verification.md).
+
+- Approved C landed/tagged `v1.3.76`/`1a865045...`; actual publication,
+  every-active enabled JVM, applied358–360 and public/schema checks passed.
+  [C proof](checkpoint-c-verification.md) retains timestamps/receipts and the
+  pending fresh sign-in/notebook-list observation. G5/15 stays open; G8/16 waits.

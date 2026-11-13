@@ -178,7 +178,7 @@ Guard the physical column/index drop, extend the same pending harness, and
 regenerate the ERD. Review exact C landing/tag plus deliberate production gate
 enablement before live action. Retain pending tooling through actual C.
 
-[Implementation brief](final-schema-briefs.md#preserve-learner-evidence-through-guarded-physical-schema-retirement). [Accepted local proof](contract-retirement-verification.md).
+[Implementation brief](final-schema-briefs.md#preserve-learner-evidence-through-guarded-physical-schema-retirement). [Local proof](contract-retirement-verification.md). [C rollout](checkpoint-c-verification.md).
 
 ### 16. Keep normal startup and fresh upgrades after cleanup
 Type: Behavior
