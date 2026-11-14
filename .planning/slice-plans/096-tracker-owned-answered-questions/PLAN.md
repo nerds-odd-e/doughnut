@@ -197,11 +197,7 @@ fresh upgrades and observe the reviewed cleanup publication before closure.
 
 ## Execution gates, sizing and cleanup
 
-[Full local proof commands, overrun limits, required reorganization, consumer trace, delivery order and final sweep](operational-policy.md#execution-gates-sizing-and-cleanup).
-
-## Plan concern review
-
-[Retained refinement decisions, consumer ownership and unobserved production gates](operational-policy.md#plan-concern-review).
+[Full local proof commands, overrun limits, required reorganization, consumer trace, delivery order and final sweep](operational-policy.md#execution-gates-sizing-and-cleanup); [retained refinement decisions and consumer ownership](operational-policy.md#plan-concern-review).
 
 ## Story obligations
 
@@ -247,3 +243,7 @@ Reported: slice 15 — "Prepared C uses an enabled JVM gate; spent guard, DML, h
 Story clause: "Then clean unreferenced questions and drop the column."
 Disposition: proved by slice 16: neutral-startup-verification.md; prepared local/current and actual hosted fresh replay, exact approved neutral landing/tag, actual publication/every-active neutral JVM/schema/public observations and developer-confirmed fresh sign-in/notebook list
 Commitment: C93
+
+## Execution complete
+
+Product advice: no change
