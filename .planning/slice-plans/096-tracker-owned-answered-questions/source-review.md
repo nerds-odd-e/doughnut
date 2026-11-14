@@ -122,13 +122,13 @@ probe has no source commitment allocated to it.
 | E12 | E12 — Unmoved tracker journey: Removing a note whose tracker never moved removes that tracker. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: canonical unmoved note, real trash/permanent-delete actions, fresh tracker ID removal |
 | E13 | E13 — Unmoved tracker prompts: That removal removes its prompts. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: same real unmoved note deletion observes fresh prompt ID removal |
 | E14 | E14 — Unmoved tracker questions: That removal removes its questions. | slice 8 | observed: tracker-lifecycle-verification.md#inspected-setup-and-observations: same unmoved note deletion observes selected question removal; moved-current-note sibling retains original input note |
-| X01 | X01 — Lost production questions: Restoring the 2,197 lost questions is outside scope; production has no copy. | slice 16 |  |
-| X02 | X02 — Merged tracker history: Merging relationship-note tracker history that reduction drops because the learner already tracks that focus is outside scope. | slice 16 |  |
-| X03 | X03 — Scheduling changes: Changing scheduling is outside scope. | slice 16 |  |
-| X04 | X04 — Statistics changes: Changing statistics is outside scope. | slice 16 |  |
-| X05 | X05 — Archive: Add no archive. | slice 16 |  |
-| X06 | X06 — Content revisions: Add no content revision system. | slice 16 |  |
-| X07 | X07 — Database cascades: Add no new database cascade. | slice 16 |  |
+| X01 | X01 — Lost production questions: Restoring the 2,197 lost questions is outside scope; production has no copy. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X02 | X02 — Merged tracker history: Merging relationship-note tracker history that reduction drops because the learner already tracks that focus is outside scope. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X03 | X03 — Scheduling changes: Changing scheduling is outside scope. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X04 | X04 — Statistics changes: Changing statistics is outside scope. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X05 | X05 — Archive: Add no archive. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X06 | X06 — Content revisions: Add no content revision system. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X07 | X07 — Database cascades: Add no new database cascade. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
 | C83 | C83 — Instance compatibility: Preserve compatibility between two app instances during rollout. | slice 15 | observed: checkpoint-c-verification.md#every-active-binary-gate-and-applied-schema |
 | C84 | C84 — Compatibility attribution: The compatibility release derives attribution through the tracker. |  | G2 |
 | C85 | C85 — Compatibility write: That release retains a scalar note-ID write. | slice 6 | observed: question-bank-verification.md#browser-and-compatibility-observation plus selected-question-verification.md#inspected-controller-observations: persisted current input re-observed through the new writer and actual regeneration after flush/clear; checkpoint A remains slice 8 |
@@ -142,13 +142,13 @@ probe has no source commitment allocated to it.
 | Q07 | Q07 — Source’s retention qualification: The source explicitly makes full retention acceptance dependent on confirmed foreign-key migration. | slice 12 | observed: checkpoint-b-verification.md: actual successful357, production/all-active/schema/public evidence and developer login confirmation complete retention rollout acceptance |
 | Q08 | Q08 — Source’s final cleanup stage: The source identifies column drop as the final cleanup stage. | slice 15 | observed: checkpoint-c-verification.md#every-active-binary-gate-and-applied-schema |
 | C92 | C92 — Temporary representation: Delete the temporary compatibility representation in that sequence. | slice 15 | observed: checkpoint-c-verification.md#every-active-binary-gate-and-applied-schema |
-| X08 | X08 — Final compatibility guidance: Retain no final product guidance about that temporary representation. | slice 16 |  |
-| X09 | X09 — Absence tests for compatibility: Retain no final tests asserting that representation’s absence. | slice 16 |  |
+| X08 | X08 — Final compatibility guidance: Retain no final product guidance about that temporary representation. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X09 | X09 — Absence tests for compatibility: Retain no final tests asserting that representation’s absence. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
 | C93 | C93 — Transitive cleanup: Perform removal transitively. | slice 16 | G8 |
-| C94 | C94 — Product sweep: Sweep the whole product. | slice 16 |  |
-| X10 | X10 — Absence tests: Retain no tests asserting removed things are absent. | slice 16 |  |
-| X11 | X11 — Runtime guards: Retain no runtime guards against removed things. | slice 16 |  |
-| X12 | X12 — Replacement history notes: Retain no replacement history notes about removed things. | slice 16 |  |
-| C95 | C95 — Surviving-behavior proof: Use proof of surviving behavior. | slice 16 |  |
-| C96 | C96 — Sweep reading: Use one acceptance sweep reading alongside that proof. | slice 16 |  |
-| C97 | C97 — Dated evidence: Preserve dated evidence in `.planning/done` as recorded. | slice 16 |  |
+| C94 | C94 — Product sweep: Sweep the whole product. | slice 16 | observed: neutral-startup-verification.md#one-time-acceptance-reading |
+| X10 | X10 — Absence tests: Retain no tests asserting removed things are absent. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X11 | X11 — Runtime guards: Retain no runtime guards against removed things. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| X12 | X12 — Replacement history notes: Retain no replacement history notes about removed things. | slice 16 | observed: neutral-startup-verification.md#remaining-contract-and-observation-owner |
+| C95 | C95 — Surviving-behavior proof: Use proof of surviving behavior. | slice 16 | observed: neutral-startup-verification.md#actual-hosted-fresh-replay |
+| C96 | C96 — Sweep reading: Use one acceptance sweep reading alongside that proof. | slice 16 | observed: neutral-startup-verification.md#one-time-acceptance-reading |
+| C97 | C97 — Dated evidence: Preserve dated evidence in `.planning/done` as recorded. | slice 16 | observed: neutral-startup-verification.md#one-time-acceptance-reading |
