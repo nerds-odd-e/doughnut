@@ -70,8 +70,18 @@ It shows which changes address specific examples. Current generator behavior,
 learner benefit, and how well the findings generalize remain questions for
 validation. Missing prompts from intentionally reduced relationship nodes
 were outside the review. Visible relationship questions can serve as controls.
-While the private evidence is available, use `offline-replay/results.md` and
-`offline-replay/question-pairs.md` in the analysis cache described below.
+
+<a id="local-recall-evidence"></a>
+
+### Local recall evidence
+
+Refine and execute these stories on the machine that holds the private
+evidence. The cache is in `.planning/tmp/recall-history/` in the default
+checkout at `~/git/doughnut`. From any linked worktree, use the default
+checkout's cache. The folder is local and Git-ignored. Start with
+`offline-replay/results.md` and `offline-replay/question-pairs.md` for the
+reviewed cases, and use `recall-answers-100d.json` to resolve the original
+attempt rows.
 
 Each story below is a **proposal with a hypothesis**. Complete it by recording
 the evidence and recommending whether to proceed to design, narrow and
@@ -117,7 +127,8 @@ its own using the baseline and examples.
   story if needed. A clean baseline is a valid result.
 - **Effort hypothesis.** M, medium confidence. A focused baseline and replay
   are bounded if the current generation and grading paths can be observed.
-- **Cleanup reminder.** Apply the [shared evidence closeout](#close-out-temporary-recall-evidence).
+- **Evidence and cleanup.** Use the [local recall evidence](#local-recall-evidence)
+  and apply the [shared closeout](#close-out-temporary-recall-evidence).
 
 <a id="validate-spelling-objectives"></a>
 
@@ -148,7 +159,8 @@ its own using the baseline and examples.
   alternatives before implementation. Scope a follow-up story if needed.
 - **Effort hypothesis.** S, medium confidence for a small paired review using
   existing examples.
-- **Cleanup reminder.** Apply the [shared evidence closeout](#close-out-temporary-recall-evidence).
+- **Evidence and cleanup.** Use the [local recall evidence](#local-recall-evidence)
+  and apply the [shared closeout](#close-out-temporary-recall-evidence).
 
 <a id="validate-short-recall-lessons"></a>
 
@@ -178,7 +190,8 @@ its own using the baseline and examples.
   follow-up story if needed.
 - **Effort hypothesis.** L, low confidence. Preparation can be small, but
   the validation needs learner participation and an elapsed follow-up.
-- **Cleanup reminder.** Apply the [shared evidence closeout](#close-out-temporary-recall-evidence).
+- **Evidence and cleanup.** Use the [local recall evidence](#local-recall-evidence)
+  and apply the [shared closeout](#close-out-temporary-recall-evidence).
 
 <a id="validate-source-backed-note-edits"></a>
 
@@ -207,7 +220,8 @@ its own using the baseline and examples.
   approval before implementation. Scope a follow-up story if needed.
 - **Effort hypothesis.** M, medium confidence. A few authored examples and
   accessible source material are enough for the first review.
-- **Cleanup reminder.** Apply the [shared evidence closeout](#close-out-temporary-recall-evidence).
+- **Evidence and cleanup.** Use the [local recall evidence](#local-recall-evidence)
+  and apply the [shared closeout](#close-out-temporary-recall-evidence).
 
 <a id="validate-within-note-objectives"></a>
 
@@ -236,7 +250,8 @@ its own using the baseline and examples.
   stays connected to the note before implementation. Scope a follow-up
   story if needed.
 - **Effort hypothesis.** S, medium confidence for a small annotated replay.
-- **Cleanup reminder.** Apply the [shared evidence closeout](#close-out-temporary-recall-evidence).
+- **Evidence and cleanup.** Use the [local recall evidence](#local-recall-evidence)
+  and apply the [shared closeout](#close-out-temporary-recall-evidence).
 
 <a id="validate-question-generation-purpose"></a>
 
@@ -266,7 +281,8 @@ its own using the baseline and examples.
   if needed.
 - **Effort hypothesis.** S, medium confidence for an offline set with and
   without explicit catalog goals.
-- **Cleanup reminder.** Apply the [shared evidence closeout](#close-out-temporary-recall-evidence).
+- **Evidence and cleanup.** Use the [local recall evidence](#local-recall-evidence)
+  and apply the [shared closeout](#close-out-temporary-recall-evidence).
 
 ### Ordering and scope reduction
 
@@ -290,9 +306,10 @@ removing the shared cache. A decision to stop releases that story's use.
 
 Once the validation stories are settled and remaining approved use is
 finished or covered by a minimal de-identified handoff, remove
-`.planning/tmp/recall-history/` from the recall-history analysis worktree
-and any temporary copies created for this investigation. This includes raw
-MCP exports, derived datasets, reports, reviewer packets, and scratch scripts.
+`.planning/tmp/recall-history/` from the default checkout at
+`~/git/doughnut` and any temporary copies created for this investigation.
+This includes raw MCP exports, derived datasets, reports, reviewer packets,
+and scratch scripts.
 Keep only the non-sensitive conclusions and minimal de-identified examples
 needed for approved work or maintained regression tests. Verify the temporary
 files are gone and record the closeout. The product's notes and recall
