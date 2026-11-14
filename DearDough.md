@@ -124,6 +124,14 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
   - Observed effect: both passes returned none, already clean, without edits or new tests. The workers estimated five and eight–ten active minutes, chiefly context, consumer tracing and accepted-proof correspondence; final product edits were estimated three–four active minutes. These are worker estimates, not measured wall-clock or token savings.
   - Inference: this repeats the fixed per-slice review cost in ODF-141. The record supports considering review overhead in slice sizing; it does not establish that independent review can always be omitted or that any one tracing step caused the whole cost.
 
+- Execution: SEED-073#keep-answered-questions-with-their-tracker
+  - Timestamp: 2026-11-14T00:22:13.108Z
+  - Tool: Codex
+  - Open Dough release: unknown; execution-time guidance retained at c763797a3cb3449d628cf57788221b37d66faeec
+  - Evidence: native session 01a1d285-5f73-77a1-9c74-724be6436d35; neutral_records_refactor launch/return 00:22:13–00:25:55 UTC, neutral_manual_closure_refactor 00:34:41–00:38:07, execution_record_refactor 00:47:53–00:50:40; records-only commits 46f2da4676, ebc2904820 and c763797a3c. The three returns traced 31/37/28 readers and reported none, already clean.
+  - Observed effect: three fresh passes made no edits or product-test runs. Their launch-to-return spans were about 222/205/168 seconds; these include waiting and overlap with coordinator work, not measured active effort or saved time.
+  - Inference: this repeats ODF-141's fixed review work on small accepted records. AGENTS.md:48 requires a fresh refactor agent, while deliver-the-change.md:48–63 offers a records-only disposition; the coordinator followed the stricter repository interpretation. This is rule-or-interpretation churn, not evidence of disobeying the human instruction or permission to bypass it. No policy change was adopted.
+
 <a id="odf-208"></a>
 
 ## ODF-208 — Observer worker exits without a recorded cause
@@ -265,6 +273,14 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
   - Evidence: 2026-11-12 resumed coordinator tool results combined complete Execute Plan/PLAN/execution-evidence reads, then PLAN/source-review reads; responses reported original token counts 16,942 and 10,030 with truncation, followed by targeted retrieval. A later closure-context batch also reported 10,063 tokens with truncation. Completed source/proof is recoverable at ff63ab95acb61440011f76081ac49f9ed988078d:.planning/slice-plans/092-read-notes-through-mcp-by-portable-path/PLAN.md.
   - Observed effect: broad batches exceeded the output budget and caused extra passage retrieval despite retained resume context and targeted-reading guidance. Required product evidence was subsequently inspected; no delivered defect was established.
   - Inference: this is another coordinator retrieval deviation under ODF-264. Repeated retrieval is observed; saved time/tokens from a narrower first read were not measured.
+
+- Execution: SEED-073#keep-answered-questions-with-their-tracker
+  - Timestamp: 2026-11-13T23:44:47.005Z
+  - Tool: Codex
+  - Open Dough release: unknown; execution-time guidance retained at c763797a3cb3449d628cf57788221b37d66faeec
+  - Evidence: native session 01a1d285-5f73-77a1-9c74-724be6436d35 JSONL response-item lines 14923–14955. A five-result batch combined two complete skill bodies, unit-testing/agent-map, the removal sweep, consumer dispositions and proof; its result reported original 17,745 tokens with truncation. The coordinator then reread the refactor skill alone at 23:44:53 UTC and the complete sweep at 23:45:22.
+  - Observed effect: required context already requested in the broad batch had to be retrieved again in separate results. The bounded readings subsequently supported accepted proof; no delivered defect was established.
+  - Inference: the concrete truncation/retrieval pattern repeats ODF-264 despite existing boundary-specific reading guidance. Avoidable repeated retrieval is observed; saved time or tokens from a narrower first query were not measured.
 
 <a id="odf-265"></a>
 

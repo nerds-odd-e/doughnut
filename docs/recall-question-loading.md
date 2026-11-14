@@ -1,5 +1,22 @@
 # Recall question loading
 
+## Question ownership and lifetime
+
+Each question belongs to the memory tracker through which it was asked. Its
+note context comes from that tracker's current note. Questions and their
+recorded answers, choices, grades and ambiguity exclusions follow the tracker
+when it moves between a relationship note and a source property. Deleting a
+note the tracker moved away from preserves that evidence.
+
+Recall history, assistant recall answers, prompt conversations, contest and
+regeneration context, and recent-question exports use the current tracked note.
+Exported choices remain specific to the learner who answered.
+
+Generation atomically persists the selected question with its prompt. Clearing
+unanswered prompts preserves a question that an answered prompt still uses.
+Removing a tracker removes its prompts and their questions through the shared
+application-owned lifecycle.
+
 ## Shared due list order
 
 Eligible due work for web and CLI comes from the shared due list. Order is

@@ -27,15 +27,15 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 * SQL migrations: `backend/src/main/resources/db/migration/`
 * Java migrations: `backend/src/main/java/db/migration/`
 * Files follow the naming convention: `V{version}__{description}.sql` (or `.java`)
-    * Example: `V300000352__rename_a_column.sql` (version must exceed **`300000351`**)
+    * Example: `V300000361__rename_a_column.sql` (version must exceed **`300000360`**)
 
 ## Version Numbering
 
 * Versions use a numerical format
 
-The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; the upgrade migrations after it run in order on every install, and **`V300000351__db_migration_placeholder.sql`** is the newest file: a no-op tip placeholder above every version ever applied. Versions **`300000330`**, **`300000339`**, and **`300000350`** are retired — their migrations were deleted after production applied them — and stay reserved in `flyway_schema_history`.
+The project uses versioned SQL and Java migrations. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; the upgrade migrations after it run in order on every install. The newest retained migration version is **`300000360`**. Versions **`300000330`**, **`300000339`**, and **`300000350`** are retired — their migrations were deleted after production applied them — and stay reserved in `flyway_schema_history`.
 
-New migrations need to use a **greater** version number than **`300000351`**.
+New migrations need to use a **greater** version number than **`300000360`**. Check both migration directories and applied history before allocating a version; deleted versions stay reserved.
 
 ### Migration Process
 
@@ -46,7 +46,7 @@ New migrations need to use a **greater** version number than **`300000351`**.
 ### Release safety
 
 * `FlyWayFreeVersionRealMigration` runs on `ApplicationReadyEvent`, **after** the instance is ready, so new code can serve requests before its own migrations finish. Ship a schema change that code must not see early in two releases: first the compatible schema change (for example relaxing a column to nullable while code still writes it), then the code that relies on it.
-* A migration that throws there closes the application context and the JVM exits; production instance-group autohealing then restarts it in a loop, retrying after `repair()`, until the data is fixed. Production runs two instances and the deploy replaces them one at a time (`--max-surge 0 --max-unavailable 1`), so the other instance keeps serving; on a single instance the same failure is an outage.
+* A migration that throws there closes the application context and the JVM exits; production instance-group autohealing then restarts it in a loop, retrying after `repair()`, until the data is fixed. Serving capacity depends on actual group membership. The replacement policy is `--max-surge 0 --max-unavailable 1`; a single-instance group has no serving fallback during a failing restart. Inspect stable, healthy membership before relying on another instance.
 * A destructive migration that must only run when data is ready should check that precondition first and throw before any DDL, as `V300000338__DropNotebookGitBindingBundleBytes` does.
 
 ## Migration file structure
