@@ -10,3 +10,9 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Validate recall question integrity](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-recall-question-integrity) — SEED-073#validate-recall-question-integrity
+- [Validate spelling objectives and cues](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-spelling-objectives) — SEED-073#validate-spelling-objectives
+- [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons
+- [Validate source-backed note edits from recall](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits) — SEED-073#validate-source-backed-note-edits
+- [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
+- [Validate when question generation should abstain](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-question-generation-purpose) — SEED-073#validate-question-generation-purpose
