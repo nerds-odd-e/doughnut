@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-073_keep-answered-questions-with-their-tracker.json",
+      "identity": "SEED-073#keep-answered-questions-with-their-tracker",
+      "completedAt": "2026-11-14T01:23:43.404Z",
+      "blob": "606cd0a59b14a0547890c49e45658c2b6fe6254a"
+    },
+    {
       "fileName": "SEED-129_bound-ci-system-package-installation.json",
       "identity": "SEED-129#bound-ci-system-package-installation",
       "completedAt": "2026-11-13T11:54:17.927Z",
@@ -438,12 +444,6 @@
       "identity": "SEED-073#story-4",
       "completedAt": "2026-10-17T05:07:11.599Z",
       "blob": "d0d80a709d54708b5ea3a079db3d913dff7a0315"
-    },
-    {
-      "fileName": "SEED-073_reviewed-title-sidebar-refresh.json",
-      "identity": "SEED-073#reviewed-title-sidebar-refresh",
-      "completedAt": "2026-10-14T12:27:21.883Z",
-      "blob": "3621992103d229556e32819b73fd0583f4e75351"
     }
   ],
   "unreadable": []
