@@ -1,8 +1,8 @@
 # Normal startup and replay after the applied cleanup
 
 2026-11-14 Singapore; SEED-073#keep-answered-questions-with-their-tracker.
-Behavior 16 is in progress. Hosted fresh replay and actual neutral publication
-are proved; G8 still owns the developer-operated fresh sign-in/notebook list.
+Hosted fresh replay, actual neutral publication and the developer-operated
+fresh sign-in/notebook list are proved. G8 is settled; ordinary16 closure follows.
 
 ## Prepared local result
 
@@ -172,7 +172,15 @@ evidence remains as observed; final compatibility guidance and negation tests
 were not introduced. The complete source sweep and maintained surviving proof
 above cover the removal reading; their boundary stayed unchanged after37a314.
 
-The developer-operated fresh sign-in/notebook-list check was requested
-asynchronously after the actual neutral observations passed. It is unobserved.
-Keep16 planned and G8/C93 open until that actual response is accepted; then
-ordinary completion, retrospective and Story Wrap Up remain coordinator-owned.
+## Developer-operated smoke
+
+After actual neutral publication and independent production checks, the
+developer was asked once for fresh sign-out/sign-in and expected notebook list.
+They replied LGTM on2026-11-14 Singapore, confirming both requested outcomes.
+Read-only acceptance `20942` exited0: current GCS succeeded77/raw e3db556f/
+release and build37a314 and public prod health still matched00:33:31–00:33:33 UTC.
+This establishes applicability of the reported observation to the same release.
+Manual observation report: Good. G8/C93 is proved; ordinary16 delivery,
+retrospective and Story Wrap Up follow in the same retained workspace.
+Exact response/applicability: `checkpoint-neutral-manual-acceptance.json`
+beneath the private delivery directory; no learner credentials were copied.

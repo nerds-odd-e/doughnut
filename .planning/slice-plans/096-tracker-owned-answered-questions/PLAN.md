@@ -182,7 +182,7 @@ enablement before live action. Retain pending tooling through actual C.
 
 ### 16. Keep normal startup and fresh upgrades after cleanup
 Type: Behavior
-Status: planned
+Status: done
 Proof: current local and fresh hosted canonical replay with retained product behavior; observed neutral-startup publication and separate final sweep reading.
 
 After C, retire the spent cleanup guard/DML, harness and profile placeholder;
@@ -245,5 +245,5 @@ Disposition: proved by slice 13: upgrade-isolation-verification.md#hosted-resour
 ### G8. Retire applied cleanup tooling and observe neutral startup
 Reported: slice 15 — "Prepared C uses an enabled JVM gate; spent guard, DML, harness, profiles, exclusive CI capability and the running override still need post-application retirement."
 Story clause: "Then clean unreferenced questions and drop the column."
-Disposition: receiving slice 16
+Disposition: proved by slice 16: neutral-startup-verification.md; prepared local/current and actual hosted fresh replay, exact approved neutral landing/tag, actual publication/every-active neutral JVM/schema/public observations and developer-confirmed fresh sign-in/notebook list
 Commitment: C93

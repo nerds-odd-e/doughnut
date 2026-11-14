@@ -152,8 +152,8 @@
 - Observer key:
   `ci-watch-execution:nerds-odd-e/doughnut:codex/keep-answered-questions-with-their-tracker:nao-tracker-60c866c4`;
   coordinator: `nao-tracker-60c866c4`; directory:
-  `/tmp/dough-ci-501/watch-V1N5mi`; PID: `24405`; stream session: `64324`;
-  yielded cell: `g124:67`; checkout: the owned workspace above.
+  `/tmp/dough-ci-501/watch-7ZGLI8`; PID: `58897`; stream session: `37057`;
+  yielded cell: `g129:5`; checkout: the owned workspace above.
 - Prior branch observer `/tmp/dough-ci-501/watch-PaZAdI` stopped at B's
   approval handoff, zero unread; PID 86657 exit was confirmed. B's separate
   main observer `/tmp/dough-ci-501/watch-b1oH21`, coordinator
@@ -246,4 +246,4 @@
   43532415838/1 passed. Every active JVM is neutral, active360/schema/public
   checks passed; higher raw DELETE358/359 ranks are expected repair evidence.
   [Final lifecycle proof](neutral-startup-verification.md) retains exact receipts.
-  Fresh sign-in/notebook list is pending; keep16 planned and G8/C93 open.
+  Developer LGTM confirms fresh sign-in/notebook list; G8/C93 is proved.
