@@ -5,6 +5,7 @@ own the occurrence evidence and current responses. See the [watch list](https://
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
 - Highest allocated local number: 486. Removed numbers are never reused.
+- Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
 - [Source before the 2026-11-10 compaction](https://github.com/nerds-odd-e/doughnut/blob/d3eb0ef73aca13a5ed229738f92dbe44ee12bf95/DearDough.md); its rows are retained at the [Open Dough catalog](https://github.com/terryyin/open-dough/tree/5afe6fee8fe34322752e9e44911d72eb31dd4991/docs/maintainer/findings). DD-443 (disposable break checks) was pruned as successful practice, not a problem.
@@ -59,16 +60,7 @@ Former local code: DD-138. An absolute changed-file size check conflicts with an
 
 Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-189.md).
 
-
-### Occurrences
-- Execution: SEED-122#prefer-note-titles-in-wiki-links / e257b144d1e9120528922da0f5dc045acb6c9d6d
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: gpt-6.1-sol
-  - Open Dough release: unknown; guidance retained at f6d89e3470a6ed3064443c324763a074bd5bc884
-  - Evidence: 2026-11-11 coordinator/refactor history; implementation e257b144d1 retains PLAN.md and preparation-evidence.md in .planning/slice-plans/001-prefer-note-titles-in-wiki-links/. Refactor agent returned no product edits and approximately four active minutes.
-  - Observed effect: Execution evidence grew the plan from227 to327 lines. The every-diff-file250-line gate required relocating129 lines of unchanged preparation observations; the plan became210 lines before final review records. No product proof changed or reran.
-  - Inference: This is a records-only instance of the existing size-extraction finding. The four-minute effort is the agent estimate, not a measured isolated cost. Guidance could distinguish long-lived product modules from disposable evidence without weakening product cohesion checks.
+Retained the records-only extraction and its estimated effort. [Updated occurrence evidence](https://github.com/terryyin/open-dough/blob/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings/ODF-189.md#odf-189).
 
 <a id="odf-190"></a>
 
@@ -76,15 +68,7 @@ Former local code: DD-144. A small addition crosses the numeric file-size ceilin
 
 Former local code: DD-145. Planning names an observation route or log source that is not available to the executing project, causing owner probing or loss of the intended proof. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-190.md).
 
-### Occurrences
-- Execution: SEED-073#retrieve-my-recall-answer-history-through-mcp / c525e797bbf3f7d7e596f974137f1f29077b62b1
-  - Timestamp: 2026-11-12T15:43:36Z
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.97
-  - Evidence: Plan 093 slice 1 (production database read through the owner's `gcloud`) and slice 8's missing-question case depended on it; every `gcloud` call in the session failed with "Reauthentication failed. cannot prompt during non-interactive execution"; dashboard unfinished receipt 4da1fe1d; the owner then moved that work to SEED-073#report-recall-answers-whose-question-is-gone.
-  - Observed effect: Slices 2–7, 9 and 10 completed out of order around the blocked probe; execution stopped once for the owner, who split the story rather than sign in.
-  - Inference: The plan did say to ask the owner to sign in, but nothing checked the credential at Take or start, so the gap surfaced only after eight slices. Checking an owner-held observation route at start, or keeping such a probe in its own story from refinement, would likely have avoided the stop.
+Retained the blocked 0.3.97 recall-history proof. The source plan’s owner-held route failed non-interactive reauthentication. [Updated occurrence evidence](https://github.com/terryyin/open-dough/blob/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings/ODF-190.md#odf-190).
 
 <a id="odf-195"></a>
 
@@ -98,39 +82,7 @@ Former local code: DD-160. Two refactor passes within one story treat barely tou
 
 Former local code: DD-176. Every small slice launches a fresh full refactor agent even when the accepted diff needs no further changes, creating substantial repeated cost. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-141.md).
 
-### Occurrences
-- Execution: SEED-118#export-a-note-with-recent-quiz-questions (first implementation `7089269e2e`)
-  - Timestamp: 2026-11-10T15:48:00+08:00
-  - Tool: Cursor
-  - Open Dough release: 0.3.94
-  - Evidence: plan `089-export-recent-note-questions` slices 1–4; published SHAs `7089269e2e`, `1c6d3e9945`, `011385133d`, `52e74feaa5`; refactor agents `0ae1c0d1` (slice 1, 15:48), `7fe03ae0` (slice 2, 16:03), `56d8503d` (slice 3, 16:15), `c7d4aaa4` (slice 4, 16:28) under parent `75e2007b-148e-453a-91c5-435dd0684d36`
-  - Observed effect: four consecutive post-slice refactor agents. Slices 1–2 returned `none — already clean` / no edits. Slice 3 collocated latest-selection folding into `RecallPromptRepository` and synced OpenAPI description. Slice 4 trimmed sibling test assertions only (production unchanged).
-  - Inference: same fixed per-slice refactor launch cost as ODF-141; two empty passes and one test-doc-only pass paid the full agent cost. Slice 3’s cohesion edit shows the pass is not always empty. Token/time cost of the empty passes was not separately measured here.
-
-- Execution: SEED-126#use-shared-test-guidance / 78a6275f59584502829c57b1f3ca204fac1e88ba
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: gpt-6.1-sol
-  - Open Dough release: unknown; execution guidance retained at 924d9293c767d15f7247402d387ebb7fc8654f85
-  - Evidence: 2026-11-12 launch 728cbb5c-718a-4147-b0af-60b8616da3d3; `refactor_makeme` and `refactor_browser` returns; source and plan recoverable at `924d9293c767d15f7247402d387ebb7fc8654f85:.planning/slice-plans/094-use-shared-test-guidance/PLAN.md`.
-  - Observed effect: both guidance slices launched fresh refactor agents and both returned `none — already clean`, no edits and no tests. Each return estimated three active minutes; accepted guidance/selector proof remained unchanged.
-  - Inference: the two no-edit passes repeat ODF-141's fixed per-slice review cost. Their combined six active minutes are an estimate from worker reports, not a measured wall-clock or token saving; this occurrence does not establish that independent review can always be omitted.
-
-- Execution: SEED-125#read-notes-through-mcp-by-portable-path / 5c60263a1405f2a510458f7a540fa61a8fdc5eb9
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown; unchanged execution/refactor guidance is recoverable at 2ce2cef04add07a7459f44c08d70521055b45b42
-  - Evidence: 2026-11-12 coordinator history, fresh refactor9/refactor10 returns; source and proof recoverable at ff63ab95acb61440011f76081ac49f9ed988078d:.planning/slice-plans/092-read-notes-through-mcp-by-portable-path/execution-evidence.md. Their classified traces inspected 113 and 221 consumers respectively.
-  - Observed effect: both passes returned none, already clean, without edits or new tests. The workers estimated five and eight–ten active minutes, chiefly context, consumer tracing and accepted-proof correspondence; final product edits were estimated three–four active minutes. These are worker estimates, not measured wall-clock or token savings.
-  - Inference: this repeats the fixed per-slice review cost in ODF-141. The record supports considering review overhead in slice sizing; it does not establish that independent review can always be omitted or that any one tracing step caused the whole cost.
-
-- Execution: SEED-073#keep-answered-questions-with-their-tracker
-  - Timestamp: 2026-11-14T00:22:13.108Z
-  - Tool: Codex
-  - Open Dough release: unknown; execution-time guidance retained at c763797a3cb3449d628cf57788221b37d66faeec
-  - Evidence: native session 01a1d285-5f73-77a1-9c74-724be6436d35; neutral_records_refactor launch/return 00:22:13–00:25:55 UTC, neutral_manual_closure_refactor 00:34:41–00:38:07, execution_record_refactor 00:47:53–00:50:40; records-only commits 46f2da4676, ebc2904820 and c763797a3c. The three returns traced 31/37/28 readers and reported none, already clean.
-  - Observed effect: three fresh passes made no edits or product-test runs. Their launch-to-return spans were about 222/205/168 seconds; these include waiting and overlap with coordinator work, not measured active effort or saved time.
-  - Inference: this repeats ODF-141's fixed review work on small accepted records. AGENTS.md:48 requires a fresh refactor agent, while deliver-the-change.md:48–63 offers a records-only disposition; the coordinator followed the stricter repository interpretation. Donut’s stricter rule is a [local facet](DonutRetrospectiveFindings.md#records-only-refactor-reviews) of this execution. No policy change was adopted.
+Retained four executions. The tracker-question review followed [Donut’s stricter wrap-up rule](DonutRetrospectiveFindings.md#records-only-refactor-reviews). [Updated occurrence evidence](https://github.com/terryyin/open-dough/blob/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings/ODF-141.md#odf-141).
 
 <a id="odf-208"></a>
 
@@ -228,59 +180,7 @@ Former local code: DD-231. A slice proof table omits explicit story end conditio
 
 Former local code: DD-233. Broad whole-reference and metadata batches exceeded the response budget and truncated required context before delegation, forcing repeated retrieval despite existing targeted-reading guidance. Execution provenance and counts remain with the linked evidence owner; savings are unmeasured. This agent deviation is distinct from ODF-158’s required-reference cost. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-264.md).
 
-### Occurrences
-- Execution: SEED-117#find-the-note-and-property-after-recall; first implementation 8b9e70d9fb0f6ec7f11b30595278c29c6709f2c4
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: launch 5a2c1855-2aed-40c0-bd75-6e21ae06957b conversation, 2026-11-10; startup combined unit-testing/agent-map/plan/package read returned original token count 11774 with truncation; subsequent combined plan/seed/trace/backlog read returned 12465 with truncation. Retrospective combined full ADR read repeated the problem (12411 tokens).
-  - Observed effect: coordinator retrieved missing source/guidance again; targeted passages were sufficient when used.
-  - Inference: avoidable agent retrieval deviation recurred despite targeted-reading guidance; token/time savings are unmeasured.
-
-### Occurrences
-- Execution: SEED-121#publish-large-notebooks-without-losing-history
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: 2026-11-10 resumed execution; coordinator tool results combined whole Execute Plan finish/CI/source/obligation references, then aggregate retrospective traces, exceeding output budgets and requiring targeted retrieval. Git recovery:59db9d970d2be39e5d7825e26118bbc455e52a0f retains the reviewed source/proof homes.
-  - Observed effect: multiple truncated responses and repeated reads during an otherwise settled owner journey; no measured token/time saving is claimed.
-  - Inference: coordinator batching repeated this known deviation despite targeted-reading guidance; the product outcome remained independently verified.
-
-
-### Occurrences
-- Execution: SEED-122#prefer-note-titles-in-wiki-links / e257b144d1e9120528922da0f5dc045acb6c9d6d
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: gpt-6.1-sol
-  - Open Dough release: unknown; guidance retained at f6d89e3470a6ed3064443c324763a074bd5bc884
-  - Evidence: 2026-11-11 coordinator tool results: startup row batch returned original15975 tokens with truncation; pre-delegation batch11677 tokens also truncated; closure evidence listing accidentally included all XML filenames and returned original63280 tokens.
-  - Observed effect: Required missing guidance was fetched again in targeted passages; the late unbounded file inventory obscured the recording reference and required narrower retrieval.
-  - Inference: This repeats the coordinator retrieval deviation despite targeted-reading instructions. Savings are unmeasured; restrict inventory queries before emitting output and keep boundary rows separate.
-
-- Execution: SEED-126#use-shared-test-guidance / 78a6275f59584502829c57b1f3ca204fac1e88ba
-  - Timestamp: unknown
-  - Tool: Codex
-  - Model: gpt-6.1-sol
-  - Open Dough release: unknown; execution guidance retained at 924d9293c767d15f7247402d387ebb7fc8654f85
-  - Evidence: 2026-11-12 launch 728cbb5c-718a-4147-b0af-60b8616da3d3 coordinator/tool history; startup/context batches reported original token counts 11,386 and 16,418 with truncation. A later full consumer-trace read reported 57,802 tokens and truncated; the coordinator then selected the relevant guidance/disposition rows. This deferred review's initial combined log read also truncated at 7,458 original tokens before targeted section retrieval.
-  - Observed effect: required delegation guidance and relevant consumer observations were retrieved again in narrower passages after broad output obscured them. Product proof was accepted through the bounded readings; no delivered defect was established.
-  - Inference: this repeats ODF-264's agent retrieval deviation despite existing targeted-reading guidance. The avoidable repeated retrieval is observed; time/token savings from a bounded-first query are unmeasured.
-
-- Execution: SEED-125#read-notes-through-mcp-by-portable-path / 5c60263a1405f2a510458f7a540fa61a8fdc5eb9
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown; execution guidance is recoverable at 2ce2cef04add07a7459f44c08d70521055b45b42
-  - Evidence: 2026-11-12 resumed coordinator tool results combined complete Execute Plan/PLAN/execution-evidence reads, then PLAN/source-review reads; responses reported original token counts 16,942 and 10,030 with truncation, followed by targeted retrieval. A later closure-context batch also reported 10,063 tokens with truncation. Completed source/proof is recoverable at ff63ab95acb61440011f76081ac49f9ed988078d:.planning/slice-plans/092-read-notes-through-mcp-by-portable-path/PLAN.md.
-  - Observed effect: broad batches exceeded the output budget and caused extra passage retrieval despite retained resume context and targeted-reading guidance. Required product evidence was subsequently inspected; no delivered defect was established.
-  - Inference: this is another coordinator retrieval deviation under ODF-264. Repeated retrieval is observed; saved time/tokens from a narrower first read were not measured.
-
-- Execution: SEED-073#keep-answered-questions-with-their-tracker
-  - Timestamp: 2026-11-13T23:44:47.005Z
-  - Tool: Codex
-  - Open Dough release: unknown; execution-time guidance retained at c763797a3cb3449d628cf57788221b37d66faeec
-  - Evidence: native session 01a1d285-5f73-77a1-9c74-724be6436d35 JSONL response-item lines 14923–14955. A five-result batch combined two complete skill bodies, unit-testing/agent-map, the removal sweep, consumer dispositions and proof; its result reported original 17,745 tokens with truncation. The coordinator then reread the refactor skill alone at 23:44:53 UTC and the complete sweep at 23:45:22.
-  - Observed effect: required context already requested in the broad batch had to be retrieved again in separate results. The bounded readings subsequently supported accepted proof; no delivered defect was established.
-  - Inference: the concrete truncation/retrieval pattern repeats ODF-264 despite existing boundary-specific reading guidance. Avoidable repeated retrieval is observed; saved time or tokens from a narrower first query were not measured.
+Retained six executions, their distinct truncation effects and release limits. [Updated occurrence evidence](https://github.com/terryyin/open-dough/blob/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings/ODF-264.md#odf-264).
 
 <a id="odf-265"></a>
 
@@ -324,14 +224,7 @@ Former local code: DD-239. The required obligation vocabulary could not keep a g
 
 Former local code: DD-240. Acceptance reasoned that a repeat confirmation stayed stable despite the return naming two exclusions on one tracker as untested. Their interaction restored an earlier excluded attempt’s effect. An independent aggregate review found the branch defect and the owner authorized slice 11’s repair. One SEED-073#story-7 execution, release unknown; relationship to ODF-223 remains uncertain. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-271.md).
 
-### Occurrences
-- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: modified; review snapshot88061832511d83ae3b7cc0197c827bfd57d145de; base release unknown
-  - Evidence: 2026-11-10, isolated cached-note review `/tmp/seed119-cache-review-result.log`, G8/refinement1eab56a4becd601c665bcbd05cdc113058177325, maintained NoteTextContent.propertyHistoryNoteChange.spec.ts.
-  - Observed effect: original eight slices,407files/2514 tests and exact branch CI passed, then a mounted Cancel/note-reuse check deleted prior-note11 instead of current22. Related same-note history after Cancel also bypassed a new warning. The inherited guard memoization had no correct note/action lifetime; this execution exposed it through item removal. The original completion judgment was withdrawn and one bounded same-story leaf restored the matching-history promise with pending-only reads and three regressions;408files/2517 tests and both types passed.
-  - Inference: the prior per-slice proof omitted reused-editor/current-history continuation. This establishes an inherited weakness reached by the feature, not that this execution introduced the original cache.
+Retained the later cached-note review and bounded repair. [Updated occurrence evidence](https://github.com/terryyin/open-dough/blob/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings/ODF-271.md#odf-271).
 
 <a id="odf-272"></a>
 
@@ -415,14 +308,7 @@ Former local code: DD-274. Consumer discovery treated execution-evidence Identit
 
 Former local code: DD-319. Acceptance traced the unchanged transport API but not the existing E2E journeys whose preconditions the explicit question-load recovery changed; seven failures reached CI in SEED-081#story-2 and were repaired in the execution. Distinct from ODF-272 and ODF-310. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-150.md).
 
-### Occurrences
-- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: modified; execution revision 8ab86f53f02c4cdb243ff0a2b34567d3a7f6c8a8; base release unknown
-  - Evidence: 2026-11-10; CI run42770072237/attempt1 frontend job129675536405, autosaveTrash expected3 saves/got2; local deterministic red and repair c5134729baf5379be70bb458200128998793efd8.
-  - Observed effect: stricter unknown-history refusal reached ordinary Markdown frontmatter removal in an existing mounted autosave/trash case omitted from slice7's indirect-consumer proof. Missing getNoteInfo data blocked its third save. Known-empty-history HTTP setup repaired the test; original expectations and exact third payload passed, with no production workaround.
-  - Inference: symbol-based tracing did not expose the indirect edit-to-property-removal path. The owned CI repair restored proof; shared prevention remains unestablished.
+Retained the indirect Markdown autosave/trash consumer and its CI repair. [Updated occurrence evidence](https://github.com/terryyin/open-dough/blob/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings/ODF-150.md#odf-150).
 
 <a id="odf-323"></a>
 
