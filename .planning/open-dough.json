@@ -2,6 +2,7 @@
   "intentCoverage": true,
   "ciWorkflow": "ci.yml",
   "skipProcessRetrospective": false,
+  "nerds": true,
   "intent": {
     "locations": [
       {
