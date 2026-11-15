@@ -45,6 +45,16 @@ the environment, so it stays shared. The other additions concern shared
 planning, delegation, proof and delivery. DD-161, DD-159 and DD-335 have no
 new occurrences.
 
+<a id="records-only-refactor-reviews"></a>
+
+In [ODF-141's tracker-question execution](DearDough.md#odf-141), three
+records-only refactor passes returned no edits or product-test runs. The launch
+spans were about 222, 205 and 168 seconds and include overlap and waiting. At
+`c763797a3c`, Donut's `AGENTS.md` required a fresh wrap-up refactor agent;
+installed `deliver-the-change.md` allowed a records-only disposition. Donut
+owns its stricter wrap-up rule. This is the same execution as the shared
+occurrence and its active cost was unmeasured. No local policy change is queued.
+
 ## Implemented, awaiting observation
 
 <a id="dd-439"></a>
@@ -141,25 +151,6 @@ The project backend rule requires the entire suite even for a targeted scratch b
   - Inference: Whole-suite repetition is required by the current backend instructions, rather than a worker decision to broaden proof. Shared-host contention and cold scratch caches also contributed; the17.9-minute elapsed cannot all be attributed to the suite policy. Native blocking waits and bounded overdue checks retained one worker without restart or duplicate probing.
 
 Ownership: Donut’s [backend skill](.agents/skills/backend/SKILL.md) still requires all backend tests. A scoped exception needs evidence that a focused check preserves the selected promise and a project decision about the full-suite rule. Keep the measured case open.
-
-## Repaired in the originating execution
-
-<a id="dd-480"></a>
-
-### DD-480 — An HTTP fixture invented the meaning of an empty assimilation value
-
-The frontend treated any supplied propertyValue, including empty string, as a list item and wrote a passing blank-item fixture. The existing backend explicitly uses empty string for scalar units.
-
-#### Occurrences
-- Execution: SEED-119#highlight-and-link-to-a-specific-property-item / 3349feafb0163ea7c0a72d54562b5638a9fa1b52
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown; execution-time snapshot fa51f486fca13f9f3c85eaebbec2ed93be8e8522
-  - Evidence: 2026-11-10; CI run42762324814/attempt1 E2E job129650701015, Skip expected /n6/p/topic but received /n6/p/topic/i/1/~; backend PropertyFocus/AssimilationUnit documentation; repair c371659ac7121d1e83128c616fa1c0b391ac0867.
-  - Observed effect: selected mocked proof and list continuation E2E passed before the existing scalar walkthrough failed. Positive scalar-empty red reproduced the defect; nonempty raw values retain item routing and manual blank selection remains a separate input path. The corrected workspace fixture,37 focused tests, both types and10 real E2E scenarios passed.
-  - Inference: reuse of the key/value shape did not establish the wire sentinel. Read the producing contract before choosing a branch or manufacturing fixture variants; one observed execution does not establish recurrence.
-
-Ownership: Donut’s frontend fixture contradicted its backend wire contract. The exact scalar failure was reproduced and repaired in the originating execution. Recover the combined source at `4059ac2353:DearDough.md`; no follow-up is supported by this one repaired case.
 
 ## Useful project practice
 

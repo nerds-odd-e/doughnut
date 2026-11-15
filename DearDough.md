@@ -130,7 +130,7 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
   - Open Dough release: unknown; execution-time guidance retained at c763797a3cb3449d628cf57788221b37d66faeec
   - Evidence: native session 01a1d285-5f73-77a1-9c74-724be6436d35; neutral_records_refactor launch/return 00:22:13–00:25:55 UTC, neutral_manual_closure_refactor 00:34:41–00:38:07, execution_record_refactor 00:47:53–00:50:40; records-only commits 46f2da4676, ebc2904820 and c763797a3c. The three returns traced 31/37/28 readers and reported none, already clean.
   - Observed effect: three fresh passes made no edits or product-test runs. Their launch-to-return spans were about 222/205/168 seconds; these include waiting and overlap with coordinator work, not measured active effort or saved time.
-  - Inference: this repeats ODF-141's fixed review work on small accepted records. AGENTS.md:48 requires a fresh refactor agent, while deliver-the-change.md:48–63 offers a records-only disposition; the coordinator followed the stricter repository interpretation. This is rule-or-interpretation churn, not evidence of disobeying the human instruction or permission to bypass it. No policy change was adopted.
+  - Inference: this repeats ODF-141's fixed review work on small accepted records. AGENTS.md:48 requires a fresh refactor agent, while deliver-the-change.md:48–63 offers a records-only disposition; the coordinator followed the stricter repository interpretation. Donut’s stricter rule is a [local facet](DonutRetrospectiveFindings.md#records-only-refactor-reviews) of this execution. No policy change was adopted.
 
 <a id="odf-208"></a>
 
@@ -559,7 +559,8 @@ Former local code: DD-479. A merged CI repair restore was reported as wholly una
 
 <a id="dd-480"></a>
 
-DD-480 is a Donut project finding. [Evidence and disposition](DonutRetrospectiveFindings.md#dd-480).
+DD-480 was a Donut fixture defect, retired after direct scalar-routing proof on
+the adopted `c371659ac7` repair. [Original project evidence](https://github.com/nerds-odd-e/doughnut/blob/e144d6f2c5b2d78305defe9d02d69e899e6a22e6/DonutRetrospectiveFindings.md#dd-480).
 
 <a id="dd-481"></a>
 
