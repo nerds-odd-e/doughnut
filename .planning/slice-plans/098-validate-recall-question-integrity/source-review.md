@@ -30,14 +30,14 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | S3a | ...and which sound questions it flags | slice 5 | observed: PLAN.md slice 5 result (sound questions each check flags: check 3 12 of 22, census 9 of 15) |
 | S3b.1 | Check: repeated-choice comparison | slice 3 | observed: PLAN.md slice 3 result, `integrity/census-table.md` (check 1 flags rows 8518, 8719) |
 | S3b.2 | Check: key taken from the named answer | slice 2 | observed: PLAN.md slice 2 result (removes position errors by construction; detects nothing at runtime) |
-| S3b.3 | Check: the verifier | slice 6 | |
+| S3b.3 | Check: the verifier | slice 6 | observed: PLAN.md slice 6 result (5 of 8 defects flagged, 12 of 26 sound flagged) |
 | S3b.4 | Check: comparison of a wrong selection with answers credited for the same note | slice 3 | observed: PLAN.md slice 3 result (20 flagged, all wrong; reach 932 of 963) |
 | S3b.5 | Check: the learner's contest | slice 4 | observed: PLAN.md slice 4 result (1,468 contested by generation month) |
 | S3b.6 | Check: the exclusion after an answer | slice 4 | observed: PLAN.md slice 4 result (1 excluded attempt) |
 | S3b.7 | Check: deletion of a tracker's unanswered questions | slice 7 | |
 | S3c | Include how often the learner used contest and exclusion in the same period | slice 4 | observed: PLAN.md slice 4 result (30 contested generated and 1 exclusion in the MCP period) |
-| S4 | Measure the verifier with the key hidden on the named cases and the controls | slice 6 | |
-| S4a | ...separately for questions the learner missed and questions the learner answered correctly | slice 6 | |
+| S4 | Measure the verifier with the key hidden on the named cases and the controls | slice 6 | observed: PLAN.md slice 6 result table |
+| S4a | ...separately for questions the learner missed and questions the learner answered correctly | slice 6 | observed: PLAN.md slice 6 result (missed and answered-correctly rows separate) |
 | S5 | For each failure that still reaches a learner, record what the learner saw and could do at each step | slice 7 | |
 | S5.1 | Step: the question | slice 7 | |
 | S5.2 | Step: the result | slice 7 | |
@@ -48,7 +48,7 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | R1 | Write nothing to Production; every replay runs outside Production (a contest marks the question contested and replaces it; ADR 0007) | slice 8 | |
 | R2 | Keep private recall evidence in the local cache | slice 8 | |
 | R2a | Planning files hold counts, dates, row numbers, and de-identified examples only (shared constraints and closeout) | slice 8 | |
-| R3 | Make paid model calls only under the owner's authorization for a stated maximum (agent map rule for paid OpenAI use) | slice 6 | |
+| R3 | Make paid model calls only under the owner's authorization for a stated maximum (agent map rule for paid OpenAI use) | slice 6 | observed: integrity/sent-log.jsonl 60 lines, within the authorized 60 |
 | R4 | Use the local recall evidence and apply the shared closeout | slice 8 | |
 | R5 | Choices the validation informs are the owner's to make after the evidence; the story favors none (verify before shown; verify after a miss only; keep showing stored older questions; check stored question when shown; discard stored questions older than a protection) | slice 8 | |
 | R6 | Recovery after a miss stays the learner-confirmed excluded attempt; an automatic exclusion is not examined | slice 7 | |
@@ -64,9 +64,9 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | E1 | Repeated choices, newly generated: apology question (row 8719) with two identical choices → replayed as generator output at current revision → generation rejects it and stores nothing; record says this failure stops at generation since 2026-08-22 | slice 2 | observed: PLAN.md slice 2 result; scratch `ScratchRepeatedChoiceRoutesTest`/`BatchTest` assertions (no question stored on either generating route) |
 | E2 | Repeated choices, stored: question with two identical choices stored before 2026-08-22 → tracker comes due → shown, and learner's selection marked wrong though its text equals the key's (row 8518); count of such stored questions decides whether this still reaches a learner | slice 4 | observed: PLAN.md slice 4 result (10 stored with repeated choices, 3 served next); slice 2 stored-route grading |
 | E3 | Key against rationale: among attempts answered from 2026-08-23, 23 marked wrong have a rationale naming another choice and not the key → each reviewed with key hidden → recorded as real disagreement or wording difference; no real disagreement is a clean result for this class | slice 5 | observed: PLAN.md slice 5 result (22 reviewed key-hidden: 2 real disagreements, 12 wording) |
-| E4 | Old stored question: location-particle question (row 3748) generated 2025-02-06, three choices, two defensible → tracker came due 2026-10-06 → shown and graded with no check; record names the stored route and the verifier's outcome | slice 6 | |
-| E5 | Two defensible answers from current generator: row 4917 (generated 2026-09-20) → verifier answers with key hidden → selecting both answers counts as detected; selecting only the key counts as missed, with the verifier's stated reason | slice 6 | |
-| E6 | Sound difficult controls: PIT bytecode (row 1943), ことだから/ことから contrast (row 4032), credited kendō (row 8739) → verifier answers each with key hidden → upholding is correct; a flag counts as a false flag with its stated reason | slice 6 | |
+| E4 | Old stored question: location-particle question (row 3748) generated 2025-02-06, three choices, two defensible → tracker came due 2026-10-06 → shown and graded with no check; record names the stored route and the verifier's outcome | slice 6 | observed: PLAN.md slice 6 result (3748 stored route, flagged) |
+| E5 | Two defensible answers from current generator: row 4917 (generated 2026-09-20) → verifier answers with key hidden → selecting both answers counts as detected; selecting only the key counts as missed, with the verifier's stated reason | slice 6 | observed: PLAN.md slice 6 result (4917 both selected, detected) |
+| E6 | Sound difficult controls: PIT bytecode (row 1943), ことだから/ことから contrast (row 4032), credited kendō (row 8739) → verifier answers each with key hidden → upholding is correct; a flag counts as a false flag with its stated reason | slice 6 | observed: PLAN.md slice 6 result (1943, 4032 upheld; 8739 false flag on feasibility) |
 | E7 | Answer credited elsewhere: kendō selection marked wrong in rows 9229 and 9350 is the key of row 8739 with same stem → comparison flags both; row 4917 has no twin and is not flagged; record states how many attempts the comparison can reach | slice 3 | observed: PLAN.md slice 3 result (9229, 9350 flagged; 8739, 4917 not; reach stated) |
 | E8 | No authorization for paid calls: owner does not authorize verifier replay → verifier rows read "not measured" and the recommendation covers only what the unpaid evidence supports | slice 1 | observed: not triggered — owner authorized 2026-11-16 (PLAN.md Decision before Take); slice 1 result sent 1 call |
 | W1 | Selected direction (approach, not a promise of result): run the census first, measure the comparison inside it, then replay the verifier on what the census cannot decide | slice 8 | |

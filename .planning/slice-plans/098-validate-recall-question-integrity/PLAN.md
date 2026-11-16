@@ -364,7 +364,7 @@ all 47. `integrity/slice5/compare5.py` wrote `labels.md`:
 
 ### 6. Measure the verifier on labelled cases and controls
 Type: Behavior
-Status: planned
+Status: done
 Proof: for each question sent, the verifier's selected choices, feasibility
 flag, and uphold or flag beside the label and the stored key; counts of
 detected failures and false flags, separately for questions the learner
@@ -377,6 +377,48 @@ record states which labelled failures the verifier flags, which sound
 questions it flags and why, and the limit that it saw the focus note only.
 If slice 1 recorded "not authorized" or stopped, record "not measured" for
 every row and send nothing. Revert the scratch test.
+
+Result, 2026-11-16: 59 calls sent (60 of 60 with slice 1's; all HTTP
+200, largest output 269 tokens). Selection: 44 slice 5 items (all but row
+1943, reused from slice 1, and rows 548 and 718, dropped to fit the
+budget) and 15 questions generated from 2026-08-22 11:32 that the learner
+answered correctly (`random.Random(20261117)`, pool 5,419). Every focus
+note came from a read-only `GET /api/notes/{id}`; none was unavailable.
+Commands: `…/integrity/slice6/build6.py`; the slice 1 test to render (60
+bodies, each checked for model and token cap);
+`zsh -i -c '…/integrity/slice6/send_all.sh'`; the test again to decide;
+`…/integrity/slice6/score6.py`. The scratch test was removed again.
+Summary: `integrity/slice6-summary.md`.
+
+The product upholds only when the verifier's choices equal the key and it
+judges the question feasible; anything else is a flag.
+
+| Learner | Label | Items | Flagged | Choices differ from key | Feasibility only |
+| --- | --- | --- | --- | --- | --- |
+| Missed | Real key disagreement | 3 | 1 (8586); missed 5347, 8471 | 1 | 0 |
+| Missed | More than one defensible answer | 5 | 4 (3748, 4917, 8518, 7893); missed 5037 | 3 | 1 (7893) |
+| Missed | Sound | 25 | 11 false flags | 1 (9797) | 10 |
+| Missed | Unresolved | 11 | 5 | 3 | 2 |
+| Correct | Sound control 8739 | 1 | 1 false flag | 0 | 1 |
+| Correct | Unlabelled sample | 15 | 10 | 0 | 10 |
+
+- Detected 5 of 8 defects (4 of 8 by its choices alone). It missed the only
+  post-change real key disagreement (5347) and one post-change two-answer
+  question (5037).
+- 12 of 26 sound questions and 10 of the 15 correctly answered sample were
+  flagged, almost all on feasibility with the key chosen. The reasons it
+  gave: the stem gives the answer away, the distractors are easy to rule
+  out, the stem reveals the note title, or the question tests a linked note.
+  Only 6 of 32 flags came from its choices differing from the key.
+- Choices against the key, all 60: equal 52, key plus others 5, excluding
+  the key 2, no choice 1; `feasibleQuestion` false on 31.
+- Named cases: row 3748 (stored route) flagged, detected; row 4917 selected
+  both answers, detected; controls 1943 and 4032 upheld, 8739 a false flag
+  on feasibility.
+- Limits: the verifier saw the focus note's current content only, without
+  linked notes; 24 of the 59 notes changed after their question was
+  generated; labels are the slice 5 reviewers' judgments; one sample per
+  question, reported as counts.
 
 ### 7. Record what the learner saw for each failure that still reaches recall
 Type: Behavior
@@ -414,7 +456,7 @@ recall evidence, as the shared closeout requires.
 - Execution: Story Branch Mode, workspace
   `/Users/terryyin/git/doughnut/.worktrees/validate-recall-question-integrity`,
   branch `claude/validate-recall-question-integrity`, remote `origin`, target
-  `main`, claim published at `27a1b72cce`. Paid calls sent so far: 1 of 60
+  `main`, claim published at `27a1b72cce`. Paid calls sent: 60 of 60 (budget spent)
   (`integrity/sent-log.jsonl` is the count of record).
 - The owner's `OPENAI_API_TOKEN` comes from `~/.zshrc`, not from the Nix
   shell: a send inside `nix develop -c` failed with a missing variable before
