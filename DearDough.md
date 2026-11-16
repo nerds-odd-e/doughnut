@@ -182,6 +182,16 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
 
 Retained six executions, their distinct truncation effects and release limits. [Updated occurrence evidence](https://github.com/terryyin/open-dough/blob/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings/ODF-264.md#odf-264).
 
+### Occurrences
+
+- Execution: SEED-130#rebalance-ci-e2e-shards / c594b3d5a135462865708ce7d3aedddaf9a074aa
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: 2026-11-16 execution conversation, startup tool results combining execution-location/runtime-setup and delegation/source-review/execution-decisions were marked truncated; the coordinator then retrieved story-obligations lines 68–200 and other required passages again.
+  - Observed effect: required startup context was retrieved repeatedly before first implementation delegation. Later a broad consumer-trace dump was also truncated before a directed consumer read.
+  - Inference: the batches exceeded the tool response budget despite existing targeted-retrieval guidance; this is an agent deviation. Additional reads are observed; their time and token cost were not measured.
+
 <a id="odf-265"></a>
 
 ## ODF-265 — A comparison of empty captures was printed as a match

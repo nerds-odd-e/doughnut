@@ -26,6 +26,10 @@ directory `/tmp/dough-ci-501/watch-xmPoc4`, PID `42830`, stream session `60226`,
 yielded cell `g581:5`. The initial trunk claim has `pendingCi: unobserved`;
 this observer owns subsequent execution-branch delivery only.
 
+Closure observer after confirmed execution shutdown: coordinator `seed130-stanly`,
+directory `/tmp/dough-ci-501/watch-5bRNhI`, PID15286, session61032, cell `g581:112`;
+same execution branch / GitHub `ci.yml`.
+
 ## Goal and scope
 
 Contributors receive complete eligible E2E feedback, and maintainers can repeat
