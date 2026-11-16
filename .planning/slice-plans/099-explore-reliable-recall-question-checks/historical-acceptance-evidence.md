@@ -56,19 +56,7 @@ default-checkout maintenance was not applicable.
 
 ### Slice 1 original proof contract
 
-Proof: With the token absent the sender exits before sending. With a
-scratch ledger of 500 lines, and separately one totalling USD 5, the sender
-refuses. One paid replay of an existing historical request returns HTTP
-200 and adds one ledger line with latency, tokens and cost. One on-demand
-and one batch generation request for one Production note with its linked
-notes are rendered to the cache without being sent.
-
-Behavior: the execution shell holds the token → the sender is asked for
-one call → the call is sent, the response is stored, and the ledger holds
-one line; at either limit nothing is sent. Early probe: a missing token or
-a generation request that cannot be rendered with real linked context
-stops the dependent slices (all paid slices; slice 7) and changes this
-plan. The paid replay counts toward the cap; its question is now unscored.
+See [the preserved original Proof and Behavior](completed-slice-contracts.md#slice-1-original-proof-contract).
 
 ## Slice 2 acceptance observations
 
@@ -110,17 +98,7 @@ slice 2 done and confirmed remote story-branch acceptance at
 
 ### Slice 2 original proof contract
 
-Proof: `pilot/historical-labels.json` in the cache lists each of the 47
-earlier-labelled questions with both reviewers' key-hidden judgments, the
-outcome (wrong key, more than one defensible answer, sound, note at fault,
-unresolved), whether the note changed after generation, and any missing
-historical content. The count of scored questions is recorded. No ledger
-line is added.
-
-Behavior: the 47 questions with their notes and required linked evidence
-read read-only → two fresh reviewers label them with the key hidden → the
-scored historical set (about 40) is fixed. Example: reviewers disagree on a
-question → it is listed unresolved and scored nowhere.
+See [the preserved original Proof and Behavior](completed-slice-contracts.md#slice-2-original-proof-contract).
 
 ## Slice 3 unpaid preparation and approved continuation
 
@@ -182,12 +160,4 @@ no experimental proof changed.
 
 ### Slice 3 original proof contract
 
-Proof: Per scored historical question, a table of 3 product decisions and
-3 choice readings against the key, with the 2-of-3 verdict for each check;
-the ledger holds 3 lines per question (123). Totals by label for
-detected, false flag and same-verdict-in-all-runs. Row 8739 appears under
-sound with three results; row 5347 remains a separate unscored diagnostic.
-
-Behavior: scored historical questions and the product's verifier request →
-each is sent 3 times → detection, false flags and repeat agreement are
-recorded for the deployed rule and for choices-only.
+See [the preserved original Proof and Behavior](completed-slice-contracts.md#slice-3-original-proof-contract).

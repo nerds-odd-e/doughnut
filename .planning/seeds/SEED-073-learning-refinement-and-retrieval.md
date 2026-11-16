@@ -27,7 +27,7 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 **Identity:** SEED-073#explore-reliable-recall-question-checks
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/099-explore-reliable-recall-question-checks/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0be3f81589944b2744b2e65b26f54d850f0af62b511a74091badeab6b2f70185","plan":"26622ddb9c3d2be9250a4c32e6377ede02da9821abd36f2ad6bb7540b1bb1049"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/099-explore-reliable-recall-question-checks/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e176a8d9df4ea7879d87818eaeb1992aea2840f0f6f913391f43c36fe11b0b5d","plan":"61f4d7b7dc12cbcaee65a64c0f2e3cb4de515413595fff3b27f3fac79230b380"}}
 ```
 
 **Goal.** A learner needs a wrong mark to reflect a wrong answer, rather

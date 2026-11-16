@@ -86,13 +86,13 @@ It is not a second run ledger.
 | Promise | Owner | Observable signal |
 | --- | --- | --- |
 | Every paid call is counted and the run stops at 500 calls or USD 5 | 1 | Ledger line per call; a scratch ledger at the cap makes the sender refuse without sending |
-| Labels come from the note with the key hidden; disagreements unscored; changed notes marked | 2, 5, 7 | Label files in the cache list both reviewers' judgments, the outcome, and the note-changed mark for every question |
+| Labels come from the note with the key hidden; disagreements unscored; changed notes marked | 2, 5, 8 | Label files in the cache list both reviewers' judgments, the outcome, and the note-changed mark for every question |
 | Deployed verifier and choices-only compared on 3 repeats | 3 | Per-question table of 3 decisions and 3 choice readings; ledger shows 3 calls per question |
 | One narrower prompt, frozen before held-out | 4 | `candidate-prompt.txt` time and hash precede the first held-out ledger line |
 | Held-out result judged against the pass mark | 6 | Counts for the three pass-mark terms and the resulting recommendation |
-| Fresh questions from both current routes checked | 7 | 24 generation ledger lines by route; per-question label and both checks' decisions |
-| Report separates wrong keys, multiple answers, sound false flags, unresolved, repeat agreement, latency, tokens, cost; by historical, held-out, fresh; with route, age, note context | 8 | The dated evidence section and its figures match the cache's result files |
-| Budget reached leaves the unfinished part named as unmeasured | 8 | The report's limits name any part the ledger shows unsent |
+| Fresh questions from both current routes checked | 7, 8 | Generation attempts and any fallback ledger lines by actual route; per-question label and both checks' decisions |
+| Report separates wrong keys, multiple answers, sound false flags, unresolved, repeat agreement, latency, tokens, cost; by historical, held-out, fresh; with route, age, note context | 9 | The dated evidence section and its figures match the cache's result files |
+| Budget reached leaves the unfinished part named as unmeasured | 9 | The report's limits name any part the ledger shows unsent |
 
 ## Slice 1 acceptance observations
 
@@ -223,4 +223,13 @@ ended. Freshness unchanged at trunk/base `0d7e42bc761929115900e1668f10879150425e
 Fresh `/root/heldout_measurement_refactor` moved the completed slice 3
 contract verbatim to its historical home. File sizes, 23 links, selector,
 whitespace, obligations and 31 consumer dispositions passed; all experimental
-proof was unchanged and reused. Guarded delivery remains pending.
+proof was unchanged and reused. Guarded fresh delivery accepted
+`be6d4ba666ec5ff3fa61164627bbf87040a59511` on the remote story branch,
+suffix base `edb06c313337976abc04abc157b6ebc5502d7ed4`; the same observer
+was reused. Slice 6 is done.
+
+## Slice 7 generation evidence and in-progress refinement
+
+See [the preserved outcome, source qualification, attempt limit and original
+combined proof contract](fresh-generation-evidence.md). Root's source freshness
+check remained unchanged at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`.
