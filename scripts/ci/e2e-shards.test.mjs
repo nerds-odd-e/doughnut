@@ -70,13 +70,9 @@ function fixture(t) {
 
 test('new directories join the remainder while explicit groups and exclusions retain ownership', (t) => {
   const { root, write } = fixture(t)
-  const explicit = [
-    'assimilation',
-    'bazaar',
-    'note_creation_and_update',
-    'note_topology',
-    'recall',
-  ].map((folder) => `e2e_test/features/${folder}/example.feature`)
+  const explicit = explicitGroups.map(([pattern]) =>
+    pattern.replace('/**', '/example.feature')
+  )
   explicit.forEach((path) => write(path))
   const remainder = 'e2e_test/features/new_capability/example.feature'
   write(remainder)

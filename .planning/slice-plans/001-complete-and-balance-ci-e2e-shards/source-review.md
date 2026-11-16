@@ -39,7 +39,7 @@ Launch/input: Fresh source-only agent `/root/source_review`; the full Goal, Scop
 | C31 | Keep unknown costs visible. | slice 3 | |
 | C32 | Check elapsed job times separately. | slice 3 | |
 | C33 | Distinguish forecasts from measured results. | slice 3 | |
-| C34 | Apply only timing moves supported by comparable evidence. | slice 3 | |
+| C34 | Apply only timing moves supported by comparable evidence. |  | G3 |
 | C35 | Report an evidence gap when proof is unavailable, incomplete, incompatible, or leaves decisive timing costs unknown. | slice 3 | |
 | C36 | Under those evidence-gap conditions, leave timing-based assignments unchanged. | slice 3 | |
 | C37 | Deliver the coverage guarantee independently of whether an initial timing move is supported. | slice 1 | observed: scripts/ci/e2e-shards.test.mjs: actual CLI checkout/fixture partition, installed Cucumber tags and workflow-wrapper/proof agreement; validator and runner suites passed (slice 1 evidence) |

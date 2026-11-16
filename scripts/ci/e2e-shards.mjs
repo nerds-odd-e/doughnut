@@ -14,7 +14,7 @@ export const explicitGroups = [
     'note_view',
   ],
   ['bazaar', 'book_reading', 'folder_organization', 'notebooks'],
-  ['note_creation_and_update'],
+  ['cli'],
   ['note_topology', 'relationships', 'circles'],
   ['recall', 'wikidata', 'mcp'],
 ].map((folders) => folders.map((folder) => `e2e_test/features/${folder}/**`))

@@ -184,6 +184,13 @@ reads, identities, six-row reconciliation and incompatible-workload disposition.
 Creator quick_validate and whitespace passed; no timing assignments changed.
 Coordinator inspected skill routing, evidence handling and validation table.
 
+## Slice 3 provisional candidate
+
+[Initial balance assessment](initial-balance.md) records two comparable current
+E2E attempts and a six-row candidate: isolate CLI in shard 3 and move note
+creation/update into remainder 6. Selector/workflow proof passed (34 cases).
+Elapsed retention remains open until normal candidate CI (G3).
+
 ## Verification and delivery
 
 Run repo commands under `CURSOR_DEV=true nix develop -c` per `AGENTS.md`.
@@ -221,4 +228,11 @@ Disposition: proved by slice 1: dashboard ci-proof 43789649141/1 at c594b3d5, si
 ### G2. Exact hosted image versions
 Reported: slice 2 — "Exact hosted Chrome/OS image versions were not inspected."
 Story clause: "Name repository, runs, attempts, revisions, their actual selections and runner conditions."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: initial-balance.md actual shard-six image/browser/OS observations and explicit variability
+
+
+### G3. Candidate elapsed retention
+Reported: slice 3 — "Recorded-time estimates support the two-folder reassignment; actual candidate elapsed behavior is not observed yet."
+Story clause: "Apply only timing moves supported by comparable evidence."
+Disposition: return
+Commitment: C34
