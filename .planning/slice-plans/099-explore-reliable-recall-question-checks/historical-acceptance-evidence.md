@@ -179,3 +179,15 @@ proof was reused. Guarded fresh delivery confirmed remote story-branch acceptanc
 `1baf636d9a14d853de81cd67081e47c3e2ad96be`; the retained observer was reused.
 Two trailing blank lines were mechanically repaired during guarded preparation;
 no experimental proof changed.
+
+### Slice 3 original proof contract
+
+Proof: Per scored historical question, a table of 3 product decisions and
+3 choice readings against the key, with the 2-of-3 verdict for each check;
+the ledger holds 3 lines per question (123). Totals by label for
+detected, false flag and same-verdict-in-all-runs. Row 8739 appears under
+sound with three results; row 5347 remains a separate unscored diagnostic.
+
+Behavior: scored historical questions and the product's verifier request →
+each is sent 3 times → detection, false flags and repeat agreement are
+recorded for the deployed rule and for choices-only.

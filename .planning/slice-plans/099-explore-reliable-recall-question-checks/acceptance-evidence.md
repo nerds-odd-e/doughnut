@@ -184,4 +184,43 @@ and reviewers finished. Source freshness unchanged at trunk/base
 `/root/heldout_label_refactor` moved the completed slice 2 contract verbatim
 to its historical home; sizes, selector, whitespace, 21 links, source
 navigation, obligations and 31 consumer dispositions passed. All experimental
+proof was unchanged and reused. Guarded fresh delivery accepted
+`edb06c313337976abc04abc157b6ebc5502d7ed4` on the remote story branch,
+suffix base `47de7e5341dccdaba3ebd5b138b3accad171a2b4`; the same observer
+was reused. Slice 5 is done.
+
+## Slice 6 acceptance observations
+
+The first held-out send at `2026-11-16T13:54:38.721112+00:00` followed
+freeze `12:53:40.523238` and labels `13:26:13.919160`. All 144 calls passed
+HTTP 200/completion/schema checks with no retry: 72 verifier, 72 candidate,
+zero additional choices-only calls. Candidate hash stayed
+`3591bc73411b7cf0eb14ae8f0e48b959d9c539f93bbbca8255913e9dc42944a5`.
+Both `CURSOR_DEV=true nix develop -c pnpm backend:test_only` runs passed
+3,199 tests, zero failures/errors, two skips. The retained scratch source
+renders/audits 24 real product requests and separately decodes 72 paid outputs
+through `evaluateQuestion`/`getQuestionContestResult`; all baseline bodies
+stay immutable. None of the 24 focus inputs was truncated. An unpaid shape
+assertion was corrected for the real fixture-ID field; a missing-audit
+sender preflight refused before transport. Neither changed paid observations.
+`send_heldout.py` (session 59185 exit 0), `summarize_heldout.py` (exit 0),
+their full command/terminal records and observing signals are retained in
+`pilot/heldout-evaluation-terminal-observations.md`. Coordinator inspected
+strict parsing, source joins, 2-of-3 aggregation and the literal decision
+rule: stop if worse than choices-only; otherwise require sample minima,
+false flags ×10 ≤ sound, catches ×3 ≥ defects ×2 and unanimity ×10 ≥ N ×9.
+Results: candidate 1/1 wrong key, 5/5 multiple, 0/18 false flags, 24/24
+unanimous; choices-only 1/1, 4/5, 0/18, 24/24; deployed 1/1, 5/5,
+10/18, 22/24. All pass-mark terms are true: proceed to design, within the
+declared input/label limits. This grants no design/implementation authority.
+`heldout-evaluation-results.json` retains all run/source/body hashes; summary
+records 174,159 input/12,079 output tokens, USD 0.469108; total 391 calls,
+USD 1.207214. Prior 247 rows, 774 artifacts and 24 sent bodies are unchanged.
+G9's held-out reuse is observed; fresh/report owners remain. G6/G8/G10 and
+G12 retain qualifications. Scratch was retained privately and removed.
+Conservative active bound: 625.84 seconds, below 15 minutes; all commands
+ended. Freshness unchanged at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`.
+Fresh `/root/heldout_measurement_refactor` moved the completed slice 3
+contract verbatim to its historical home. File sizes, 23 links, selector,
+whitespace, obligations and 31 consumer dispositions passed; all experimental
 proof was unchanged and reused. Guarded delivery remains pending.

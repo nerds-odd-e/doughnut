@@ -83,15 +83,9 @@ Status: done
 Accepted: all 123 calls and product decoding passed; deployed caught 8/8
 defects with 13/33 sound false flags, choices-only 7/8 with 0/33. See
 [slice 3 observations](acceptance-evidence.md#slice-3-paid-observations).
-Proof: Per scored historical question, a table of 3 product decisions and
-3 choice readings against the key, with the 2-of-3 verdict for each check;
-the ledger holds 3 lines per question (123). Totals by label for
-detected, false flag and same-verdict-in-all-runs. Row 8739 appears under
-sound with three results; row 5347 remains a separate unscored diagnostic.
 
-Behavior: scored historical questions and the product's verifier request →
-each is sent 3 times → detection, false flags and repeat agreement are
-recorded for the deployed rule and for choices-only.
+Proof contract: [original Proof and Behavior](historical-acceptance-evidence.md#slice-3-original-proof-contract)
+remain verbatim with the completed observations.
 
 ### 4. One narrower answer check is frozen and measured on three repeats
 
@@ -132,7 +126,10 @@ and the pass mark's "narrow and retest" bound applies in slice 6.
 ### 6. The held-out result is judged against the pass mark
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted: the candidate caught 6/6 defects, flagged 0/18 sound and was
+unanimous on 24/24; the fixed rule yields proceed to design. See
+[slice 6 observations](acceptance-evidence.md#slice-6-acceptance-observations).
 Proof: The ledger's first held-out line is later than the freeze. Per
 held-out question, 3 runs of each paid check (at most 144 lines) and the
 choices reading. A result file states the three pass-mark counts for the
@@ -245,3 +242,8 @@ Disposition: receiving slice 8
 Reported: slice 5 — "The declaration phrase earliest row is subordinate to its recorded seeded tie; selection is fixed before outcomes."
 Story clause: "reproducible comparison of three checks"
 Disposition: no user cost "reproducible comparison of three checks": the unchanged export, declared seed, executable ranking and pre-review row manifest reproduce all 32 rows and order. The original phrase and clarification remain in private provenance; no selected row, label or scored-set rule changed after outcomes.
+
+### G12. Held-out renderer metadata distinguishes source from scored records
+Reported: slice 6 — "The original proof field renderedRecords=32 names the source collection size; actual items/scoredRecords and request audit are 24."
+Story clause: "reproducible comparison of three checks"
+Disposition: no user cost "reproducible comparison of three checks": the 24 selected request files and semantic audit, 72 product-decoded outputs and 144 paid ledger rows match the fixed scored cohort. The original scalar and its clarification are retained; scored consumers use the exact cohort and per-run records.
