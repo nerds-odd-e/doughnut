@@ -70,12 +70,15 @@ describe("markdownizer markdownToHtml", () => {
         )
       })
 
-      it("renders nested ordered list item", () => {
+      it.each([
+        ["adjacent first item", "* level1\n  1. item1"],
+        ["separated item starting at two", "* level1\n\n  2. item1"],
+      ])("renders nested ordered list with %s", (_, markdown) => {
         expect(
-          toHtmlElement("* level1\n  2. item1").querySelector(
-            "li[data-list='ordered']"
-          )
-        ).not.toBeNull()
+          toHtmlElement(markdown).querySelector(
+            "li.ql-indent-1[data-list='ordered']"
+          )?.textContent
+        ).toBe("item1")
       })
 
       it("renders nested list with ql-indent class", () => {

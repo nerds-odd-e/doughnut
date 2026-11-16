@@ -109,7 +109,7 @@ keep their original provenance and limitations.
 
 ### 1. Complete eligible coverage across six selections
 Type: Behavior
-Status: planned
+Status: done
 Proof: Selector CLI partition/exclusion cases, workflow contract, existing
 Gherkin validation and positive-path runner cases; six hosted proof parts.
 
@@ -183,7 +183,26 @@ the installed preprocessor, positive runner selection and workflow/proof agreeme
 assertions and wrapper call; consumer dispositions retained at
 `/tmp/seed130-coverage-consumer-trace.md`. Implementation active work: ~6 minutes.
 Current discoverable partition: 11/17/6/15/16/33, total 98; Cucumber owns tags.
-Hosted browser execution is G1, requiring progress publication before acceptance.
+Hosted proof 43789649141/1 at `c594b3d5a135462865708ce7d3aedddaf9a074aa`
+contains all six case parts, 383 passed cases, zero failed/other/untimed, 94
+timed files; learning-session contributes four passed cases / 8.559 recorded
+seconds. G1 is proved. The overall run failed only the frontend Markdown
+fixture below; its E2E proof remains applicable to the test-only repair.
+
+Independent coverage refactor: none, already clean. Formatter mechanically
+repaired three files; coordinator changed empty event callbacks to explicit
+undefined and removed a trailing blank line after guarded preparation stopped.
+No behavioral proof was invalidated.
+
+CI repair 43789649141/1: sole failure was nested ordered-list fixture using
+paragraph-continuation syntax. Pre-edit focused run reproduced 18 pass/1 fail.
+Valid adjacent1 and separated2 fixtures now assert nested ordered item text.
+`./scripts/run.sh pnpm frontend:test tests/components/form/markdownizer` passed
+63 tests/3 files; both frontend vue-tsc and tsc `--noEmit` passed. Consumer trace
+`/tmp/seed130-execution/markdown-repair-consumer-trace.md` found no consumers;
+fresh independent refactor found no changes. Active repair ~5 minutes.
+The final diagnostic found no other failed jobs; full frontend log resolved
+the diagnostic parser's no-recognized-failure gap. All writers are quiescent.
 
 ## Verification and delivery
 
@@ -217,5 +236,4 @@ refresh time-sensitive CI evidence. No pre-Take human decision remains.
 ### G1. Hosted six-shard execution
 Reported: slice 1 — "Local selector, tag and runner proof passes; real browser execution and all six hosted case parts require normal delivery CI."
 Story clause: "Across the six selections, every eligible file belongs once."
-Disposition: return
-Commitment: J01c
+Disposition: proved by slice 1: dashboard ci-proof 43789649141/1 at c594b3d5, six present case parts,383 passed cases,94 files including learning_session; local CLI fixture proves new directories
