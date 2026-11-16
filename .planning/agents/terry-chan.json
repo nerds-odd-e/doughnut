@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "terry-chan",
-  "email": "terry-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-130#rebalance-ci-e2e-shards",
-  "host": "codex",
-  "model": "gpt-6.1-sol"
-}
