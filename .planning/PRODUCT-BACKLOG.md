@@ -8,9 +8,10 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
+- [Validate recall question integrity](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-recall-question-integrity) — SEED-073#validate-recall-question-integrity ([plan](slice-plans/098-validate-recall-question-integrity/PLAN.md))
+
 ## Backlog list
 
-- [Validate recall question integrity](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-recall-question-integrity) — SEED-073#validate-recall-question-integrity
 - [Validate spelling objectives and cues](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-spelling-objectives) — SEED-073#validate-spelling-objectives
 - [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons
 - [Validate source-backed note edits from recall](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits) — SEED-073#validate-source-backed-note-edits
