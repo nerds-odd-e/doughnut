@@ -234,9 +234,6 @@ overrides:
 
 packageExtensionsChecksum: sha256-E7Cci1c7RII7uQbBWBCSDIn5m5iFwi+BxEDdK9b4Yj8=
 
-patchedDependencies:
-  daisyui@5.7.50: 8851ce09c60cb0780695718414c9ad6893041ce0dbd45702af5b9984cdbdb254
-
 importers:
 
   .:
@@ -485,8 +482,8 @@ importers:
         specifier: 2.5.1
         version: 2.5.1(@vue/compiler-dom@3.5.45)(@vue/server-renderer@3.5.45)(vue@3.5.45(typescript@6.0.3))
       daisyui:
-        specifier: 5.7.50
-        version: 5.7.50(patch_hash=8851ce09c60cb0780695718414c9ad6893041ce0dbd45702af5b9984cdbdb254)
+        specifier: 5.8.1
+        version: 5.8.1
       donut-test-fixtures:
         specifier: workspace:*
         version: link:../packages/donut-test-fixtures
@@ -2951,8 +2948,8 @@ packages:
     resolution: {integrity: sha512-MOqHvMWF9/9MX6nza0KgvFH4HpMU0EF5uUDXqX/BtxtU8NfB0QzRtJ8Oe/6SuS4kbhyzVJwjd97EA4PKrzJ8bw==}
     engines: {node: '>=0.12'}
 
-  daisyui@5.7.50:
-    resolution: {integrity: sha512-+/LRqnTCoc7s/bJEKKwtJSwzeXCVdAmRdNmZeZzgHCaQ9PJyl7j+2V2U32GQDMyD+VDkP9e/+JGoC72Y1hLk7w==}
+  daisyui@5.8.1:
+    resolution: {integrity: sha512-ptP4WHOJ6WltNnA5zwkg3GypOLhsyUM2FHuXCckWVEpWviioInFKsjnShCWYGYHsQ5P9bUCOH1tn45cKLeTUpg==}
 
   dashdash@1.14.1:
     resolution: {integrity: sha512-jRFi8UDGo6j+odZiEpjazZaWqEal3w/basFjQHQEwVtZJGDpxbH1MeYluwCS8Xq5wmLJooDlMgvVarmWfGM44g==}
@@ -8509,7 +8506,7 @@ snapshots:
       es5-ext: 0.10.64
       type: 2.7.3
 
-  daisyui@5.7.50(patch_hash=8851ce09c60cb0780695718414c9ad6893041ce0dbd45702af5b9984cdbdb254): {}
+  daisyui@5.8.1: {}
 
   dashdash@1.14.1:
     dependencies:

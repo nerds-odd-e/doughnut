@@ -119,7 +119,7 @@ minimumReleaseAgeExclude:
   - '@vue/runtime-dom@3.5.40'
   - '@vue/server-renderer@3.5.40'
   - '@vue/shared@3.5.40'
-  - daisyui@5.7.0
+  - daisyui@5.7.0 || 5.8.1
   - tmp@0.2.6
   - vue-router@5.2.0 || 5.5.1
   - vue@3.5.40
@@ -134,5 +134,3 @@ minimumReleaseAgeExclude:
   - storybook@10.6.5
   - cypress@16.2.1
 
-patchedDependencies:
-  daisyui@5.7.50: patches/daisyui@5.7.50.patch

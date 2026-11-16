@@ -50,7 +50,7 @@
     "@vue/compiler-core": "3.5.45",
     "@vue/server-renderer": "3.5.45",
     "@vue/test-utils": "2.5.1",
-    "daisyui": "5.7.50",
+    "daisyui": "5.8.1",
     "donut-test-fixtures": "workspace:*",
     "es-toolkit": "1.53.2",
     "esbuild": "0.28.2",
