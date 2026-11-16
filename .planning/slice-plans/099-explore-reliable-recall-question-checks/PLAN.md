@@ -116,7 +116,7 @@ remain unscored. Labels precede exactly one verifier and one frozen-candidate
 call per accepted draft (at most 48); choices-only uses the same verifier output.
 The actual product decoder, frozen hash, ledger, note timing and per-route
 results reconcile. No fresh repeat agreement is claimed.
-[Observed comparison proof](fresh-comparison-evidence.md) awaits acceptance.
+[Accepted comparison proof](fresh-comparison-evidence.md) retains the observations.
 
 Behavior: slice 7's preserved drafts and post-read evidence → reviewers label
 them independently and each paid check runs once → the fresh semantic comparison
@@ -125,9 +125,9 @@ is available with source timing, cohort overlap and transport limitations.
 ### 9. The owner has the comparison and a recommendation
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: A dated section in the
-[dated evidence](../../seeds/learning-refinement-and-retrieval-evidence.md)
+[dated evidence](../../seeds/learning-refinement-and-retrieval-evidence.md#reliable-recall-question-checks-2026-11-17)
 gives inputs, actions, counts and limits: detection separately for wrong
 keys and multiple answers, sound false flags, unresolved labels, repeat
 agreement, latency, tokens and actual cost; historical, held-out and fresh
@@ -142,7 +142,7 @@ whether the temporary evidence is still needed.
 
 Behavior: the result files and ledger → the report is written and the
 scratch test is absent from the checkout → the owner can review the
-recommendation.
+recommendation. [Accepted report observations](comparison-report-evidence.md) retain the proof.
 
 ## Learnings
 
@@ -171,7 +171,7 @@ Disposition: no user cost "built by the product code in a unit-test environment"
 ### G3. Report preserves the owner accounting basis
 Reported: slice 1 — "Rates remain the owner-fixed accounting basis."
 Story clause: "Cost is computed from each response's token usage"
-Disposition: receiving slice 9
+Disposition: proved by slice 9: reliable-recall-question-checks-evidence.md#usage-and-latency states actual response usage, owner-fixed rates, Batch half price and aggregator/not-invoice provenance; report9-figure-source-audit.json reconciles every row.
 
 ### G4. Fresh row 5347 finding conflicts with the source example
 Reported: slice 2 — "Both fresh reviewers classify row 5347 as note-at-fault/unscored, with its focus note unchanged since generation; the paid probe is outside the scored comparison."
@@ -186,7 +186,7 @@ Disposition: owner changed "246 historical checks"
 ### G6. Report current-evidence and route limitations
 Reported: slice 2 — "Eighteen focus notes changed after generation, thirteen remain scoreable against current evidence; seventeen questions have edited linked context, historical versions were not reconstructed, and route labels retain the original minute-zero heuristic."
 Story clause: "with route, question age and note context"
-Disposition: receiving slice 9
+Disposition: proved by slice 9: reliable-recall-question-checks-evidence.md#route-age-and-context preserves historical changed focus/linked counts, missing historical versions, scored/current evidence conditions and minute-zero route uncertainty.
 
 ### G7. Render the two missing historical verifier requests
 Reported: slice 2 — "Rows 548 and 718 need verifier requests rendered; other retained historical focus contents match fetched current contents."
@@ -196,17 +196,17 @@ Disposition: proved by slice 3: pilot/historical-verifier-preparation-summary.js
 ### G8. Report the verifier input condition and truncation
 Reported: slice 3 — "The pilot supplies focus-only fixtures, while Production's shared retriever may include linked context; row 3748 receives the product's marked truncated focus-note prefix."
 Story clause: "with route, question age and note context"
-Disposition: receiving slice 9
+Disposition: proved by slice 9: reliable-recall-question-checks-evidence.md#method-and-reproduction names focus-only fixtures versus Production retriever, marked row3748 prefix, full candidate context and the joint prompt/context limitation.
 
 ### G9. Observe the frozen candidate's later consumers
 Reported: slice 4 — "Held-out/fresh/report consumers are future slices and untested here."
 Story clause: "One narrower answer-checking prompt"
-Disposition: receiving slice 9
+Disposition: proved by slice 9: report method and report9-figure-source-audit.json observe the unchanged frozen hash/template across all41 historical24 held-out24 fresh requests; actual held-out/fresh calls and final reporting reuse are recorded without retuning.
 
 ### G10. Report held-out context timing and overlap
 Reported: slice 5 — "Current evidence only; 22 selected focus questions changed since generation, historical versions were not reconstructed, and three linked-note IDs overlap historical evidence."
 Story clause: "with route, question age and note context"
-Disposition: receiving slice 9
+Disposition: proved by slice 9: reliable-recall-question-checks-evidence.md#route-age-and-context records22/24 focus20/24 linked edits, unavailable historical content and three linked-ID overlaps despite held-out focus exclusion.
 
 ### G11. Selection wording is clarified by its fixed executable record
 Reported: slice 5 — "The declaration phrase earliest row is subordinate to its recorded seeded tie; selection is fixed before outcomes."
@@ -226,9 +226,9 @@ Disposition: proved by slice 8: pilot/fresh-20261116/qualified-labels.json, fres
 ### G14. Report the actual fresh transport and cohort conditions
 Reported: slice 7 — "Batch completed zero rows and 12 batch-rendered bodies used synchronous fallback; all 24 focus notes overlap held-out notes, outside 155 historical IDs; 113 reconstructed snapshots omit original folders and other retrieval candidates."
 Story clause: "with route, question age and note context"
-Disposition: receiving slice 9
+Disposition: proved by slice 9: report route/context section records zero asynchronous outputs,12 same-body sync fallbacks,24 held-out focus overlaps,113 reconstructed snapshots and missing original folders/other retrieval candidates; quality/per-row Batch latency remain unmeasured.
 
 ### G15. Fresh24 carries the older linked generation input qualification
 Reported: slice 7 — "One linked snapshot changed before generation but generation used the earlier captured content. Post-read reviewer/candidate content differs; the prepared fresh24 packet must carry that condition before launch."
 Story clause: "with route, question age and note context"
-Disposition: receiving slice 9
+Disposition: proved by slice 9: report route/context minimal example preserves the older supplied link and pre-generation edit versus post-read reviewer/candidate evidence, both qualified packets and request-creation/completion distinction; qualified fresh consumers were observed in slice8.

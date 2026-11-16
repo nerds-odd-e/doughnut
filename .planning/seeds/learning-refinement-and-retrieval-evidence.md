@@ -141,3 +141,16 @@ above; it adds no new observation or paid run.
   The completed validation keeps its Done record. Its private evidence is
   retained for this follow-up under the shared cleanup agreement; no product
   change or stored-question policy is selected by this summary.
+
+<a id="reliable-recall-question-checks-2026-11-17"></a>
+
+## 2026-11-17 SGT: reliable recall question check comparison
+
+The [full dated comparison](reliable-recall-question-checks-evidence.md#comparison-2026-11-17)
+reports 2026-11-16 UTC measurements separately for historical, held-out and fresh
+questions. The fixed held-out rule recommends **proceed to bounded design**:
+candidate caught 6/6 defects, flagged 0/18 sound controls and was unanimous on
+24/24. Total: 475 attempts, USD 1.536172 at the owner-fixed token rates. The
+report retains context, source-timing, route and small-sample limits. This
+exploration releases its own evidence use; five queued validations remain
+unsettled, so the shared cache stays under the last-owner closeout contract.

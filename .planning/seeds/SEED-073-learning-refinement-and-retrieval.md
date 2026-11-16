@@ -88,18 +88,18 @@ routes. Trustworthy wrong marks in the product belong to a later design story.
   cost. Separate historical, held-out and fresh results, with route, question
   age and note context. Relate them to checking before display versus after
   a miss, including the stored route. Publish counts and minimal de-identified
-  examples in the [dated evidence](learning-refinement-and-retrieval-evidence.md).
+  examples in the [dated comparison](reliable-recall-question-checks-evidence.md#comparison-2026-11-17).
   State remaining uncertainty; mixed or inconclusive results are valid.
 - **Scope limits.** No product behavior, Production data change or
   stored-question policy. No population error rate from a selected pilot
   and no age-based discard policy from verifier scores. A second model, a
   second candidate prompt and any spending beyond the budget need a
   separately bounded decision.
-- **Evidence and cleanup.** Keep new private packets and run outputs in
-  `.planning/tmp/recall-history/integrity/` in the default checkout, beside
-  the original inputs and paid responses. Apply the
-  [shared closeout](#close-out-temporary-recall-evidence) when the
-  follow-up is settled or stopped.
+- **Evidence and cleanup.** This exploration releases its own raw-evidence use;
+  [the report disposition](reliable-recall-question-checks-evidence.md#temporary-evidence-disposition)
+  creates no new approved raw-evidence follow-up. Five other queued validations
+  remain unsettled and need the private default-checkout cache; retain it under
+  [shared last-owner closeout](#close-out-temporary-recall-evidence).
 
 **Key examples.**
 
