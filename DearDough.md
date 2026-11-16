@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 486. Removed numbers are never reused.
+- Highest allocated local number: 488. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -495,3 +495,29 @@ The SEED-124 pronunciation execution on Open Dough 0.3.96 lost story-branch obse
 ## ODF-492 — A checkpoint go-ahead did not let the session push the release tag
 
 Former local code: DD-486. The host required separate production-deployment authorization for the release tag after the story checkpoint had been answered. The release took one additional owner turn. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-492.md#odf-492). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L604).
+
+## DD-487 — A combined, unlabelled command output was misread as an environment fact
+The coordinator ran three environment probes in one shell command whose outputs carried no labels, then recorded in the plan that the Nix shell supplies `OPENAI_API_TOKEN`. The variable came from the interactive zsh profile instead.
+
+### Occurrences
+- Execution: SEED-073#validate-recall-question-integrity, plan 098, first commit 57115c1329
+  - Timestamp: unknown (before 2026-11-16T07:48:31Z, the first paid send)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: plan "Decision before Take" edit in 57115c1329's parent working state; slice 1 return; corrected in 57115c1329 ("Current decisions")
+  - Observed effect: the slice 1 agent's first send failed with a missing variable before any request; no charge; one plan correction.
+  - Inference: labelling each probe's output, or one probe per call, would have avoided the false premise.
+
+## DD-488 — Coordinator recheck of a subagent's summary figure before it reached the recommendation
+The slice 6 agent reported that 6 of 32 verifier flags came from its choices differing from the key. Rereading the agent's own per-row JSON before writing the recommendation showed 8 of 32 (24 feasibility-only), and the plan was corrected.
+
+### Occurrences
+- Execution: SEED-073#validate-recall-question-integrity, plan 098, first commit 57115c1329
+  - Timestamp: unknown (2026-11-16, between c1becf0562 and cd2eba2373)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: `PLAN.md` slice 6 result ("corrected at slice 8 from `slice6-summary.json`"), commit cd2eba2373
+  - Observed effect: a wrong count was kept out of the owner-facing recommendation; the correction also exposed the choices-only rule (4 of 8 defects, 1 sound flag) that the recommendation relies on.
+  - Inference: a useful practice for validation stories, where a subagent's prose summary feeds an owner decision.
