@@ -10,6 +10,7 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Keep all E2E specs covered and rebalance the six CI shards](seeds/SEED-130-ci-e2e-sharding.md#rebalance-ci-e2e-shards) — SEED-130#rebalance-ci-e2e-shards
 - [Validate recall question integrity](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-recall-question-integrity) — SEED-073#validate-recall-question-integrity
 - [Validate spelling objectives and cues](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-spelling-objectives) — SEED-073#validate-spelling-objectives
 - [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons
