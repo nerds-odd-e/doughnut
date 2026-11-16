@@ -314,7 +314,7 @@ tracker), with the counts today's keyless generation checks would reject:
 
 ### 5. Label the flagged attempts with the key hidden
 Type: Behavior
-Status: planned
+Status: done
 Proof: two reviewers' key-hidden answers and the comparison with the stored
 keys, kept in the cache; each question gets one label.
 
@@ -327,6 +327,40 @@ independent reviewers shuffled questions without keys, rationales, or
 recorded answers → each question is labelled a real key disagreement, more
 than one defensible answer, or sound, and reviewer disagreement is recorded
 as unresolved.
+
+Result, 2026-11-16: `integrity/slice5/prepare5.py` built 47 items: the
+15 census rows; the 22 wrong-marked attempts answered from 2026-08-23 that
+check 3 flags without case folding (6 overlap the census rows); rows 3748,
+4917 and 9797 (multiple choice); controls 1943, 4032 and 8739; and 10
+unflagged wrong-marked attempts generated from 2026-11-04 (seed 20261116,
+from a pool of 42). It wrote two packets, in different orders, with stem
+and choices only. Two fresh reviewers, each given only its packet, answered
+all 47. `integrity/slice5/compare5.py` wrote `labels.md`:
+
+| Label | Items | Rows, route and generation time (SGT) |
+| --- | --- | --- |
+| Real key disagreement | 3 | 5347 batch 2026-09-18; 8471 batch 2026-08-22 03:00; 8586 on demand 2026-08-22 07:56 |
+| More than one defensible answer | 5 | 4917 batch 2026-09-21; 5037 batch 2026-09-20; 7893 on demand 2026-08-28; 3748 on demand 2025-02-07 (stored, answered 2026-10-06); 8518 batch 2026-08-22 03:00 (twin key) |
+| Sound | 28 | including all three controls and row 9797 |
+| Unresolved | 11 | 6 where both reviewers found no defensible choice without the note (300, 6606, 7408, 7634, 7894, 8458); 7232 where both chose two choices other than the key; 21, 562, 6453 and 6860 where they differ |
+
+- Since the 2026-08-22 change (generated after 11:32), the key-hidden review
+  finds 1 real key disagreement (5347, batch) and 3 questions with more than
+  one defensible answer (4917 and 5037 batch, 7893 on demand). Rows 8471,
+  8518 and 8586 were generated that morning by the old generator.
+- Key against rationale: of the 22 rationale-flagged wrong attempts, 2 are
+  real disagreements (5347, 8471), 2 have two defensible answers, 12 are
+  sound (wording differences), and 6 are unresolved. Check 3 is a weak
+  signal.
+- Census flags among the 15 wrong-marked rows: 9 sound, 1 real
+  disagreement, 1 two-answer, 4 unresolved. Check 4 (credited elsewhere)
+  flagged 8 of them; 5 are sound.
+- Unflagged recent sample: 7 sound, 3 unresolved, none defective.
+- Missed against answered correctly: 46 missed (3, 5, 27, 11 by label);
+  the one answered correctly (8739) is sound.
+- Limits: the reviewers saw no note, so a question that depends on note
+  context reads as having no answer; labels are AI judgments, not the
+  owner's.
 
 ### 6. Measure the verifier on labelled cases and controls
 Type: Behavior
