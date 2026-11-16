@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#validate-recall-question-integrity
 **Source:** [selected story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#validate-recall-question-integrity)
+**Source review:** [source-review.md](source-review.md)
 
 ## Outcome and boundaries
 
@@ -33,13 +34,9 @@ of keys that are wrong because the note is wrong.
 
 ## Decision before Take
 
-**Owner: Terry.** Authorize at most 60 paid verifier calls on
-`gpt-6.1-sol` (each capped at 500 output tokens) and supply
-`OPENAI_API_TOKEN` to the execution shell, or decline. The token is not in
-the agent's environment (`printenv` shows none, 2026-11-16). Slices 1 and 6
-wait for this answer. On a decline they record "not measured", the other
-six slices run unchanged, and the recommendation covers only what the
-unpaid evidence supports.
+**Owner: Terry. Answered 2026-11-16: authorized.** At most 60 paid verifier
+calls on `gpt-6.1-sol`, each capped at 500 output tokens, using the owner's
+`OPENAI_API_TOKEN`. Slices 1 and 6 run.
 
 ## Architecture and reuse
 
@@ -115,7 +112,7 @@ hold the full results.
 
 ### 1. Prove one verifier request end to end
 Type: Behavior
-Status: planned
+Status: done
 Proof: the provider's response for one control question parses as a
 `QuestionEvaluation`, and the record shows the request's model,
 instruction, and the uphold or flag it produces.
@@ -134,6 +131,27 @@ the route. If the body cannot be rendered or the provider rejects it, stop
 slice 6 and replan it against that evidence. Without authorization, record
 "not authorized" and continue with slice 2. One paid call counts toward the
 60.
+
+Result, 2026-11-16: route proven. Row 1943's focus note (read-only
+`GET /api/notes/{id}`, content identical to the export) went into
+`integrity/questions.json`. `CURSOR_DEV=true nix develop -c pnpm
+backend:test:worktree --tests '*ScratchVerifierRequestTest'` exited 0 and
+wrote `integrity/requests/row1943.json`: model `gpt-6.1-sol`,
+`max_output_tokens` 500, low reasoning effort, strict `QuestionEvaluation`
+schema, the product's evaluator instruction with the question embedded
+without its key, and a focus context holding the focus note only.
+`zsh -i -c 'python3 -I …/integrity/send_one.py row1943'` returned HTTP 200
+(1,021 input and 31 output tokens). Rerunning the same test parsed the
+response through the product's structured-response handler:
+`correctChoices` [1], `feasibleQuestion` true, stored key 1 →
+`getQuestionContestResult` upheld the question (`decisions/row1943.json`).
+Reuse for slice 6: restore `integrity/ScratchVerifierRequestTest.java` to
+`backend/src/test/java/com/odde/donut/services/`, add entries to
+`questions.json`, run the test to render, send each id with `send_one.py`
+(it refuses a resend and logs every paid call), run the test again to
+decide, then delete the test. Limits: the replay note sits in a new
+notebook outside its folder, and the instruction carries a test-database
+question id.
 
 ### 2. Replay the repeated-choice payload through each route
 Type: Behavior
@@ -251,6 +269,15 @@ has; and record whether an approved follow-up still needs the temporary
 recall evidence, as the shared closeout requires.
 
 ## Current decisions
+
+- Execution: Story Branch Mode, workspace
+  `/Users/terryyin/git/doughnut/.worktrees/validate-recall-question-integrity`,
+  branch `claude/validate-recall-question-integrity`, remote `origin`, target
+  `main`, claim published at `27a1b72cce`. Paid calls sent so far: 1 of 60
+  (`integrity/sent-log.jsonl` is the count of record).
+- The owner's `OPENAI_API_TOKEN` comes from `~/.zshrc`, not from the Nix
+  shell: a send inside `nix develop -c` failed with a missing variable before
+  any request. Send through `zsh -i -c '…'`.
 
 - The census uses the existing 100-day MCP export as its fixed input, so
   its counts stay comparable with the 2026-11-14 replay.
