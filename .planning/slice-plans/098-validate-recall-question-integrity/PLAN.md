@@ -203,7 +203,7 @@ key = choice 4 with two identical distractors.
 
 ### 3. Count every check's flags by route and generation period
 Type: Behavior
-Status: planned
+Status: done
 Proof: a table in the cache, reproducible from one script, whose totals
 equal the 8,489 multiple-choice rows of the MCP export.
 
@@ -218,6 +218,51 @@ other than four, a rationale that names another choice and not the key, and
 a wrong selection that is a key credited for the same note → the table
 gives, per check, route, and period, the flagged attempts and how many were
 marked wrong, and lists the flagged row numbers for slice 5.
+
+Result, 2026-11-16: `python3 -I …/integrity/census.py` (input: the MCP
+export and `integrity/recall-history-export.json`, fetched read-only
+2026-11-16T07:56Z, 122,671 multiple-choice answers) joins all 8,489 rows
+by second, none unmatched or ambiguous; the table is
+`integrity/census-table.md`, flagged rows `integrity/census-flags.json`.
+Attempts (marked wrong) by route and generation period:
+
+| Route | before 2025 | 2025-01-01..2026-05-15 | 2026-05-16..2026-08-21 | from 2026-08-22 | Total |
+| --- | --- | --- | --- | --- | --- |
+| batch | 3 (0) | 1 (0) | 1,637 (162) | 5,517 (614) | 7,158 (776) |
+| on demand | 277 (52) | 104 (19) | 275 (36) | 675 (80) | 1,331 (187) |
+
+Flags, flagged (marked wrong), totals per route:
+
+| Check | Batch | On demand | Periods |
+| --- | --- | --- | --- |
+| 1 repeated choice text | 1 (1) | 1 (1) | row 8518 batch, generated 2026-08-22 03:00; row 8719 on demand, 05-16..08-21 |
+| 2 choice count other than four | 2 (0) | 142 (29) | all generated before 2026-05-16 |
+| 3 rationale names another choice and not the key | 78 (9) | 12 (3) | 20 (5) before 2026-08-22, 70 (7) from it |
+| 4 wrong selection is a key credited for the same note | 11 (11) | 9 (9) | 12 before 2026-08-22, 8 from it |
+
+- Served from storage past a protection (generated before 2026-08-22,
+  answered from 2026-08-23): 332 attempts, 60 marked wrong; flags: check 1
+  none, check 2 99 (20 wrong), check 3 1 (1), check 4 3 (3).
+- Answer credited elsewhere: rows 9229 and 9350 are flagged by check 4
+  (their selection is the credited key of rows 5615, 8534, 8739 and 8977,
+  8739 with the same stem), and also by check 3; row 8739 is unflagged;
+  row 4917 (batch, generated 2026-09-21) is flagged by no check. Reach: 932
+  of 963 wrong attempts have another credited attempt on the same note, 879
+  one with a different key.
+- Definitions: text compared after NFKC, whitespace collapsing and case
+  folding. Check 3: non-empty rationale that does not contain the key and
+  contains another choice. Check 4: wrong, selection not its own key, equal
+  to the key of a correct attempt on the same note (`portablePath`).
+- Limits: check 3 is a text heuristic (without case folding it flags 133
+  answered from 2026-08-23, 22 wrong, close to refinement's 23; no script
+  for refinement's figures was kept). Route labels before the batch code
+  (first commit 2026-06-16) are chance (about 1.7% of on-demand questions
+  fall in an hour's first minute). The period boundary is the calendar
+  date: 94 attempts in "from 2026-08-22" were generated that morning
+  before the 11:19 and 11:32 commits, including rows 8458, 8518 and 8586.
+- For slice 5: 15 wrong-marked flagged attempts generated from 2026-08-22
+  (`slice5Rows`): 559, 716, 942, 1410, 1711, 2073, 2135, 3711, 6860, 7232,
+  7241, 7634, 8458, 8518, 8586.
 
 ### 4. Count stored unanswered questions and recovery use in Production
 Type: Behavior
@@ -313,6 +358,10 @@ recall evidence, as the shared closeout requires.
 - The full read of stored questions uses the application's read-only
   requests. A read-only database query through the app VM is an equal
   substitute when the owner has renewed the local `gcloud` login.
+- Slice 5 also reviews the wrong-marked attempts answered from 2026-08-23
+  that check 3 flags without case folding (22), so the story's "key against
+  rationale" example covers refinement's set, not only the narrower census
+  definition. The set stays under 60 questions.
 - This story adds no test. A route without a maintained test of repeated
   choices is named in the recommendation.
 

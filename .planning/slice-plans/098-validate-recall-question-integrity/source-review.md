@@ -28,10 +28,10 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | S2a | ...and how many of them today's generation checks would reject | slice 4 | |
 | S3 | For each check, record which failures it detects | slice 8 | |
 | S3a | ...and which sound questions it flags | slice 5 | |
-| S3b.1 | Check: repeated-choice comparison | slice 3 | |
+| S3b.1 | Check: repeated-choice comparison | slice 3 | observed: PLAN.md slice 3 result, `integrity/census-table.md` (check 1 flags rows 8518, 8719) |
 | S3b.2 | Check: key taken from the named answer | slice 2 | observed: PLAN.md slice 2 result (removes position errors by construction; detects nothing at runtime) |
 | S3b.3 | Check: the verifier | slice 6 | |
-| S3b.4 | Check: comparison of a wrong selection with answers credited for the same note | slice 3 | |
+| S3b.4 | Check: comparison of a wrong selection with answers credited for the same note | slice 3 | observed: PLAN.md slice 3 result (20 flagged, all wrong; reach 932 of 963) |
 | S3b.5 | Check: the learner's contest | slice 4 | |
 | S3b.6 | Check: the exclusion after an answer | slice 4 | |
 | S3b.7 | Check: deletion of a tracker's unanswered questions | slice 7 | |
@@ -67,6 +67,6 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | E4 | Old stored question: location-particle question (row 3748) generated 2025-02-06, three choices, two defensible → tracker came due 2026-10-06 → shown and graded with no check; record names the stored route and the verifier's outcome | slice 6 | |
 | E5 | Two defensible answers from current generator: row 4917 (generated 2026-09-20) → verifier answers with key hidden → selecting both answers counts as detected; selecting only the key counts as missed, with the verifier's stated reason | slice 6 | |
 | E6 | Sound difficult controls: PIT bytecode (row 1943), ことだから/ことから contrast (row 4032), credited kendō (row 8739) → verifier answers each with key hidden → upholding is correct; a flag counts as a false flag with its stated reason | slice 6 | |
-| E7 | Answer credited elsewhere: kendō selection marked wrong in rows 9229 and 9350 is the key of row 8739 with same stem → comparison flags both; row 4917 has no twin and is not flagged; record states how many attempts the comparison can reach | slice 3 | |
+| E7 | Answer credited elsewhere: kendō selection marked wrong in rows 9229 and 9350 is the key of row 8739 with same stem → comparison flags both; row 4917 has no twin and is not flagged; record states how many attempts the comparison can reach | slice 3 | observed: PLAN.md slice 3 result (9229, 9350 flagged; 8739, 4917 not; reach stated) |
 | E8 | No authorization for paid calls: owner does not authorize verifier replay → verifier rows read "not measured" and the recommendation covers only what the unpaid evidence supports | slice 1 | observed: not triggered — owner authorized 2026-11-16 (PLAN.md Decision before Take); slice 1 result sent 1 call |
 | W1 | Selected direction (approach, not a promise of result): run the census first, measure the comparison inside it, then replay the verifier on what the census cannot decide | slice 8 | |
