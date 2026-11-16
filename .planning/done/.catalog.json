@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-130_rebalance-ci-e2e-shards.json",
+      "identity": "SEED-130#rebalance-ci-e2e-shards",
+      "completedAt": "2026-11-16T02:49:51.929Z",
+      "blob": "c15d9daea234414523117cd17135c0a606928ffc"
+    },
+    {
       "fileName": "SEED-073_keep-answered-questions-with-their-tracker.json",
       "identity": "SEED-073#keep-answered-questions-with-their-tracker",
       "completedAt": "2026-11-14T01:23:43.404Z",
