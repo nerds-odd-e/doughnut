@@ -409,7 +409,11 @@ judges the question feasible; anything else is a flag.
   flagged, almost all on feasibility with the key chosen. The reasons it
   gave: the stem gives the answer away, the distractors are easy to rule
   out, the stem reveals the note title, or the question tests a linked note.
-  Only 6 of 32 flags came from its choices differing from the key.
+  Only 8 of 32 flags came from its choices differing from the key
+  (corrected at slice 8 from `slice6-summary.json`; 24 were feasibility only).
+- Choices alone (ignoring feasibility): 4 of 8 defects flagged (8586,
+  3748, 4917, 8518), 1 of 26 sound (9797, a second reading), 0 of the 15
+  correctly answered sample.
 - Choices against the key, all 60: equal 52, key plus others 5, excluding
   the key 2, no choice 1; `feasibleQuestion` false on 31.
 - Named cases: row 3748 (stored route) flagged, detected; row 4917 selected
@@ -489,7 +493,7 @@ Limits: the walkthrough uses today's code, not the code live at each answer.
 
 ### 8. Recommend a decision for each failure class and route
 Type: Behavior
-Status: planned
+Status: done
 Proof: a dated result section in the seed's evidence file and the story's
 recommendation, with one row per failure class and route, every story
 result covered, and no stem, choice, or note text.
@@ -501,6 +505,16 @@ example for each justified regression proof and any route without a
 maintained test; state the evidence each choice in the story's table now
 has; and record whether an approved follow-up still needs the temporary
 recall evidence, as the shared closeout requires.
+
+Result, 2026-11-16: the
+[validation results](../../seeds/learning-refinement-and-retrieval-evidence.md#recall-question-integrity-results)
+section and the story's "Validation result and recommendation" record one
+row per failure class and route: repeated choices stop on both generating
+routes; the key and two-answer classes narrow and retest on both
+generating routes; the stored route proceeds to design as one owner
+decision. The examples and the closeout disposition (keep `integrity/`
+until the owner decides) are in the story. No stem, choice or note text
+was written to a planning file.
 
 ## Current decisions
 

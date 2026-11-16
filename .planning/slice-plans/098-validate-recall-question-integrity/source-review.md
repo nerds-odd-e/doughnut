@@ -6,27 +6,27 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| G1 | Goal: a learner needs a wrong mark on a multiple-choice recall question to mean they chose a wrong answer | slice 8 | |
-| G2 | Product owner needs to know which question defects can still reach a learner today | slice 8 | |
-| G2a | ...by which route (generated on demand, generated ahead by the hourly batch, stored earlier and shown when its tracker next comes due) | slice 8 | |
-| G2b | ...and which existing protections stop them | slice 8 | |
-| G3 | Story delivers that evidence with a recommendation for each defect | slice 8 | |
-| G3.1 | Recommendation alternative: proceed to design | slice 8 | |
-| G3.2 | Recommendation alternative: narrow and retest | slice 8 | |
-| G3.3 | Recommendation alternative: stop | slice 8 | |
-| G4 | Contributes to epic by settling whether a recorded miss is trustworthy evidence before later stories build on misses | slice 8 | |
-| G5 | Changes no product behavior | slice 8 | |
-| H1 | Hypothesis (to be tested, not promised): checking option uniqueness and agreement with an independently verified answer would catch defects that still reach recall, while keeping useful single-answer items | slice 8 | |
-| S1 | For each failure class and each route, record whether the failure can still reach a learner today and the evidence for it | slice 8 | |
-| S1a.1 | Failure class: repeated choices | slice 8 | |
-| S1a.2 | Failure class: a unique correct answer rejected by the stored key | slice 8 | |
-| S1a.3 | Failure class: more than one defensible answer | slice 8 | |
-| S1b.1 | Route: generated on demand | slice 8 | |
-| S1b.2 | Route: generated ahead by the hourly batch | slice 8 | |
-| S1b.3 | Route: stored earlier and shown when tracker comes due | slice 8 | |
+| G1 | Goal: a learner needs a wrong mark on a multiple-choice recall question to mean they chose a wrong answer | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G2 | Product owner needs to know which question defects can still reach a learner today | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G2a | ...by which route (generated on demand, generated ahead by the hourly batch, stored earlier and shown when its tracker next comes due) | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G2b | ...and which existing protections stop them | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G3 | Story delivers that evidence with a recommendation for each defect | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G3.1 | Recommendation alternative: proceed to design | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G3.2 | Recommendation alternative: narrow and retest | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G3.3 | Recommendation alternative: stop | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G4 | Contributes to epic by settling whether a recorded miss is trustworthy evidence before later stories build on misses | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| G5 | Changes no product behavior | slice 8 | observed: commits 57115c13..slice 8 change .planning files only; scratch tests removed each slice |
+| H1 | Hypothesis (to be tested, not promised): checking option uniqueness and agreement with an independently verified answer would catch defects that still reach recall, while keeping useful single-answer items | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S1 | For each failure class and each route, record whether the failure can still reach a learner today and the evidence for it | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S1a.1 | Failure class: repeated choices | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S1a.2 | Failure class: a unique correct answer rejected by the stored key | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S1a.3 | Failure class: more than one defensible answer | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S1b.1 | Route: generated on demand | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S1b.2 | Route: generated ahead by the hourly batch | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S1b.3 | Route: stored earlier and shown when tracker comes due | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
 | S2 | Count stored unanswered questions by generation period | slice 4 | observed: PLAN.md slice 4 result table (8,254 by period) |
 | S2a | ...and how many of them today's generation checks would reject | slice 4 | observed: PLAN.md slice 4 result table (1,675 rejected by keyless checks) |
-| S3 | For each check, record which failures it detects | slice 8 | |
+| S3 | For each check, record which failures it detects | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
 | S3a | ...and which sound questions it flags | slice 5 | observed: PLAN.md slice 5 result (sound questions each check flags: check 3 12 of 22, census 9 of 15) |
 | S3b.1 | Check: repeated-choice comparison | slice 3 | observed: PLAN.md slice 3 result, `integrity/census-table.md` (check 1 flags rows 8518, 8719) |
 | S3b.2 | Check: key taken from the named answer | slice 2 | observed: PLAN.md slice 2 result (removes position errors by construction; detects nothing at runtime) |
@@ -42,25 +42,25 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | S5.1 | Step: the question | slice 7 | observed: PLAN.md slice 7 result, Question column |
 | S5.2 | Step: the result | slice 7 | observed: PLAN.md slice 7 result, Result column |
 | S5.3 | Step: any recovery offered | slice 7 | observed: PLAN.md slice 7 result, recovery columns |
-| S6 | Keep the smallest de-identified examples for each regression proof the evidence justifies | slice 8 | |
-| S7 | Recommend a decision for each failure class and route | slice 8 | |
-| S7a | Qualification: a clean baseline is a valid result | slice 8 | |
-| R1 | Write nothing to Production; every replay runs outside Production (a contest marks the question contested and replaces it; ADR 0007) | slice 8 | |
-| R2 | Keep private recall evidence in the local cache | slice 8 | |
-| R2a | Planning files hold counts, dates, row numbers, and de-identified examples only (shared constraints and closeout) | slice 8 | |
+| S6 | Keep the smallest de-identified examples for each regression proof the evidence justifies | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S7 | Recommend a decision for each failure class and route | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| S7a | Qualification: a clean baseline is a valid result | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| R1 | Write nothing to Production; every replay runs outside Production (a contest marks the question contested and replaces it; ADR 0007) | slice 8 | observed: only read-only GETs and search reads (slices 1, 3, 4, 6); verifier replay built in the unit-test environment and sent to the provider directly |
+| R2 | Keep private recall evidence in the local cache | slice 8 | observed: private evidence only under the cache's integrity/ folder |
+| R2a | Planning files hold counts, dates, row numbers, and de-identified examples only (shared constraints and closeout) | slice 8 | observed: planning diffs hold counts, dates, row numbers and the abstract examples only |
 | R3 | Make paid model calls only under the owner's authorization for a stated maximum (agent map rule for paid OpenAI use) | slice 6 | observed: integrity/sent-log.jsonl 60 lines, within the authorized 60 |
-| R4 | Use the local recall evidence and apply the shared closeout | slice 8 | |
-| R5 | Choices the validation informs are the owner's to make after the evidence; the story favors none (verify before shown; verify after a miss only; keep showing stored older questions; check stored question when shown; discard stored questions older than a protection) | slice 8 | |
+| R4 | Use the local recall evidence and apply the shared closeout | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| R5 | Choices the validation informs are the owner's to make after the evidence; the story favors none (verify before shown; verify after a miss only; keep showing stored older questions; check stored question when shown; discard stored questions older than a protection) | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
 | R6 | Recovery after a miss stays the learner-confirmed excluded attempt; an automatic exclusion is not examined | slice 7 | observed: PLAN.md slice 7 result (exclusion is learner-confirmed, never automatic) |
-| R7 | Switching the verifier on in Production is a product change — a possible outcome, not a validation | slice 8 | |
-| D1 | Deferred: any product change, each following the owner's review as its own story | slice 8 | |
-| D1.1 | ...a repair | slice 8 | |
-| D1.2 | ...an age limit for stored questions | slice 8 | |
-| D1.3 | ...running the verifier when a question is generated | slice 8 | |
-| D1.4 | ...an experience for a flagged question | slice 8 | |
-| D2 | Deferred: an error rate for the deployed generator; story shows whether a failure still occurs; observed counts reported as counts | slice 8 | |
-| D3 | Deferred: spelling questions (owned by Validate spelling objectives and cues) | slice 8 | |
-| D4 | Deferred: a key wrong because the note is wrong (owned by Validate source-backed note edits from recall); verifier reads the same note, so agreement cannot show this | slice 8 | |
+| R7 | Switching the verifier on in Production is a product change — a possible outcome, not a validation | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
+| D1 | Deferred: any product change, each following the owner's review as its own story | slice 8 | observed: no product change made; each recommended change is left to the owner's review |
+| D1.1 | ...a repair | slice 8 | observed: no repair made |
+| D1.2 | ...an age limit for stored questions | slice 8 | observed: no age limit added; stored route left as an owner decision |
+| D1.3 | ...running the verifier when a question is generated | slice 8 | observed: verifier not enabled at generation |
+| D1.4 | ...an experience for a flagged question | slice 8 | observed: no flagged-question experience built |
+| D2 | Deferred: an error rate for the deployed generator; story shows whether a failure still occurs; observed counts reported as counts | slice 8 | observed: results reported as counts, not rates (evidence Limitations) |
+| D3 | Deferred: spelling questions (owned by Validate spelling objectives and cues) | slice 8 | observed: spelling trackers and rows excluded from every count |
+| D4 | Deferred: a key wrong because the note is wrong (owned by Validate source-backed note edits from recall); verifier reads the same note, so agreement cannot show this | slice 8 | observed: no judgment of note correctness; verifier limit stated |
 | E1 | Repeated choices, newly generated: apology question (row 8719) with two identical choices → replayed as generator output at current revision → generation rejects it and stores nothing; record says this failure stops at generation since 2026-08-22 | slice 2 | observed: PLAN.md slice 2 result; scratch `ScratchRepeatedChoiceRoutesTest`/`BatchTest` assertions (no question stored on either generating route) |
 | E2 | Repeated choices, stored: question with two identical choices stored before 2026-08-22 → tracker comes due → shown, and learner's selection marked wrong though its text equals the key's (row 8518); count of such stored questions decides whether this still reaches a learner | slice 4 | observed: PLAN.md slice 4 result (10 stored with repeated choices, 3 served next); slice 2 stored-route grading |
 | E3 | Key against rationale: among attempts answered from 2026-08-23, 23 marked wrong have a rationale naming another choice and not the key → each reviewed with key hidden → recorded as real disagreement or wording difference; no real disagreement is a clean result for this class | slice 5 | observed: PLAN.md slice 5 result (22 reviewed key-hidden: 2 real disagreements, 12 wording) |
@@ -69,4 +69,4 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | E6 | Sound difficult controls: PIT bytecode (row 1943), ことだから/ことから contrast (row 4032), credited kendō (row 8739) → verifier answers each with key hidden → upholding is correct; a flag counts as a false flag with its stated reason | slice 6 | observed: PLAN.md slice 6 result (1943, 4032 upheld; 8739 false flag on feasibility) |
 | E7 | Answer credited elsewhere: kendō selection marked wrong in rows 9229 and 9350 is the key of row 8739 with same stem → comparison flags both; row 4917 has no twin and is not flagged; record states how many attempts the comparison can reach | slice 3 | observed: PLAN.md slice 3 result (9229, 9350 flagged; 8739, 4917 not; reach stated) |
 | E8 | No authorization for paid calls: owner does not authorize verifier replay → verifier rows read "not measured" and the recommendation covers only what the unpaid evidence supports | slice 1 | observed: not triggered — owner authorized 2026-11-16 (PLAN.md Decision before Take); slice 1 result sent 1 call |
-| W1 | Selected direction (approach, not a promise of result): run the census first, measure the comparison inside it, then replay the verifier on what the census cannot decide | slice 8 | |
+| W1 | Selected direction (approach, not a promise of result): run the census first, measure the comparison inside it, then replay the verifier on what the census cannot decide | slice 8 | observed: SEED-073 story 'Validation result and recommendation' and evidence 'Recall question integrity: validation results' |
