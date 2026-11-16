@@ -58,7 +58,7 @@
     "marked": "18.2.0",
     "optionator": "^0.9.4",
     "pdfjs-dist": "6.5.438",
-    "playwright": "1.65.0",
+    "playwright": "1.65.1",
     "sass": "1.108.2",
     "storybook": "10.6.7",
     "tailwindcss": "4.3.5",
