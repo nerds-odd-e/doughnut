@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#validate-recall-question-integrity",
+  "title": "Validate recall question integrity",
+  "completedAt": "2026-11-16T09:30:17.491Z",
+  "developer": "Terry Yin",
+  "agent": "viktor-chan",
+  "host": "claude"
+}
