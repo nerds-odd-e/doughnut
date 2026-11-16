@@ -19,6 +19,7 @@ import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import { composeCypressPluginEvents } from './composeCypressPluginEvents.mjs'
 import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { validateCucumberFeatures } from './validateCucumberFeatures.mjs'
+import { e2eSpecPatterns } from './e2eSpecDiscovery.mjs'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { E2E_APP_BASE_URL } from './constants'
 import { notebookPublicationProfileTasks } from './notebookPublicationProfile'
@@ -192,12 +193,7 @@ const commonConfig = {
       return config
     },
     supportFile: 'e2e_test/support/e2e.ts',
-    specPattern: 'e2e_test/features/**/*.feature',
-    excludeSpecPattern: [
-      '**/*.{js,ts}',
-      '**/__snapshots__/*',
-      '**/__image_snapshots__/*',
-    ],
+    ...e2eSpecPatterns,
   },
 }
 
