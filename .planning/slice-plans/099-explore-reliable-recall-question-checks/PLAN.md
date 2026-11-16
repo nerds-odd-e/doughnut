@@ -2,33 +2,30 @@
 
 **Source:** [Explore reliable recall question checks with paid experiments](../../seeds/SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks)
 
+**Source review:** [Independent commitments](source-review.md)
+
 **Identity:** SEED-073#explore-reliable-recall-question-checks
 
 ## Goal and scope
 
-Give the owner a reproducible comparison of three checks for defective
-multiple-choice recall questions (the deployed verifier, its choices alone,
-and one narrower answer-checking prompt) and a recommendation to proceed to
-design, narrow and retest, or stop.
-
-Included: note-backed labels, 3 repeats per paid check on a historical and
-a held-out set, 24 freshly generated questions checked once, and a
-de-identified report in the
-[dated evidence](../../seeds/learning-refinement-and-retrieval-evidence.md).
-
-Excluded: product behavior, Production data changes, the stored-question
-policy, a population error rate, an age-based discard policy, a second
-model, a second candidate prompt, and spending beyond the budget.
-
-Assumptions: the execution runs on the machine holding the private cache at
-`~/git/doughnut/.planning/tmp/recall-history/integrity/` (below, "the
-cache"). Private packets, requests, responses and run outputs stay in the
-cache. Scratch tests and scripts are never committed; the only committed
-product of this plan is the report in the dated evidence and this plan's
-status.
+Give the owner a reproducible comparison of checks for defective multiple-choice questions:
+the deployed verifier, its choices alone and one narrower prompt; recommend proceeding to design, narrowing and retesting, or stopping.
+Include note-backed labels; three repeats per paid check on historical and held-out sets;
+24 fresh questions checked once; a de-identified [dated report](../../seeds/learning-refinement-and-retrieval-evidence.md).
+Exclude product behavior, Production writes, stored-question policy, population
+error rates, age-based discard policy, additional models/prompts and overspending.
+Run on the machine holding `~/git/doughnut/.planning/tmp/recall-history/integrity/`
+(“the cache”); keep private packets, requests, responses and outputs there.
+Never commit scratch tests/scripts. The report and plan status are the committed outcome.
 
 ## Current decisions
 
+- **Execution.** Established Story Branch Mode, agent `aki-chan`, publisher
+  `dashboard-territory.local-doughnut`, remote `origin`, trunk `main`; accepted
+  claim/candidate `0d7e42bc761929115900e1668f10879150425eb1`. Full workspace,
+  branch, start revision, checkout roles, successful setup and observer identity
+  are in the [established context](acceptance-evidence.md#established-execution-context).
+  Replanning retains existing planned-work authority; no overrun override.
 - **Budget (owner, 2026-11-16).** At most 500 paid calls or USD 5,
   whichever is reached first. Allocation: 240 historical checks, 144
   held-out checks, 24 generations, 48 fresh checks, 24 for wording the
@@ -78,31 +75,29 @@ status.
 | Premise | Consuming operation | Observation | Result | Unverified remainder |
 | --- | --- | --- | --- | --- |
 | The product's verifier request and decision can be rendered for a stored question in a unit-test environment | Slices 3, 4, 6, 7: `ScratchVerifierRequestTest` in the cache, run in the backend test profile | Retained: 2026-11-16, revisions `27a1b72cce`–`b70a5b7513`, 60 requests rendered and 60 decisions read through `QuestionEvaluation.getQuestionContestResult`. `git log b70a5b7513..7d98900b4e -- backend/src/main` lists no commit | Settled | none |
-| The sender reaches the provider and stops at a cap | Slices 1, 3, 4, 6, 7: `python3 -I send_one.py <id>` in the cache | Retained: 2026-11-16, 60 calls, all HTTP 200, sixty-first refused by `send_all.sh` | Settled for the earlier cap; the 500-call and USD 5 ledger is new work in slice 1 | none |
-| `OPENAI_API_TOKEN` is set in the execution shell | Every paid call | 2026-11-16, this preparation session: `CURSOR_DEV=true nix develop -c sh -c 'test -n "$OPENAI_API_TOKEN"'` in the workspace and in `~/git/doughnut` reported it absent | Open; owner-held credential, bounded by slice 1 | The owner supplies the token in the execution shell |
-| The current on-demand and batch generation requests can be rendered in a unit-test environment for a Production note with its linked context | Slice 7: a scratch test calling the product's question generation request builder for each route | Retained: 2026-11-16, the cache's `slice2-ScratchRepeatedChoiceRoutesTest.java` and `slice2-ScratchRepeatedChoiceBatchTest.java` ran both routes with constructed notes | Open for a Production note with linked notes loaded; needs the owner's read token, bounded by slice 1 | Rendering with real linked context |
+| The sender reaches the provider and stops at a cap | Slices 1, 3, 4, 6, 7: `python3 -I send_one.py <id>` in the cache | Retained: 2026-11-16, 60 calls, all HTTP 200, sixty-first refused by `send_all.sh` | Settled in slice 1: pilot sender guards and paid replay; prior-cap observation retained | none |
+| `OPENAI_API_TOKEN` is set in the execution shell | Every paid call | 2026-11-16, this preparation session: `CURSOR_DEV=true nix develop -c sh -c 'test -n "$OPENAI_API_TOKEN"'` in the workspace and in `~/git/doughnut` reported it absent | Settled in slice 1: execution-shell presence check and paid replay; prior absence retained | none |
+| The current on-demand and batch generation requests can be rendered in a unit-test environment for a Production note with its linked context | Slice 7: a scratch test calling the product's question generation request builder for each route | Retained: 2026-11-16, the cache's `slice2-ScratchRepeatedChoiceRoutesTest.java` and `slice2-ScratchRepeatedChoiceBatchTest.java` ran both routes with constructed notes | Settled in slice 1: product builder and batch renderer included fetched linked-note content; reconstructed context limitation G2 | none |
 | Enough held-out misses exist outside the historical notes | Slice 5 selection | Retained: 2026-11-16 results: 963 misses in the 100-day export, 46 reviewed, 932 comparable by the same-note-key signal | Settled for the pool; the number of labelled defects in it is the slice's finding | none |
 | A 12-row Batch API job finishes within an hour | Slice 7 | Not observed; paid | Open; bounded by the batch route decision above | Completion time |
 
 ## Outside-in proof
 
-| Promise | Owner | Observable signal |
-| --- | --- | --- |
-| Every paid call is counted and the run stops at 500 calls or USD 5 | 1 | Ledger line per call; a scratch ledger at the cap makes the sender refuse without sending |
-| Labels come from the note with the key hidden; disagreements unscored; changed notes marked | 2, 5, 7 | Label files in the cache list both reviewers' judgments, the outcome, and the note-changed mark for every question |
-| Deployed verifier and choices-only compared on 3 repeats | 3 | Per-question table of 3 decisions and 3 choice readings; ledger shows 3 calls per question |
-| One narrower prompt, frozen before held-out | 4 | `candidate-prompt.txt` time and hash precede the first held-out ledger line |
-| Held-out result judged against the pass mark | 6 | Counts for the three pass-mark terms and the resulting recommendation |
-| Fresh questions from both current routes checked | 7 | 24 generation ledger lines by route; per-question label and both checks' decisions |
-| Report separates wrong keys, multiple answers, sound false flags, unresolved, repeat agreement, latency, tokens, cost; by historical, held-out, fresh; with route, age, note context | 8 | The dated evidence section and its figures match the cache's result files |
-| Budget reached leaves the unfinished part named as unmeasured | 8 | The report's limits name any part the ledger shows unsent |
+See [proof ownership](acceptance-evidence.md#outside-in-proof-ownership); each slice specifies its signals.
 
 ## Slices
 
 ### 1. The paid route counts every call and stops at the limit
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted (2026-11-16): the three sender guards refused before transport;
+one row 5347 replay returned HTTP 200 (USD 0.00282); both product generation
+routes included the fetched linked-note evidence. The full backend suite
+passed (3,199 tests, zero failures/errors, two skips). Reuse row 5347 run 1;
+[inspected setup, commands and evidence](acceptance-evidence.md#slice-1-acceptance-observations)
+retain the exact proof. Independent refactoring passed; delivery pending.
+
 Proof: With the token absent the sender exits before sending. With a
 scratch ledger of 500 lines, and separately one totalling USD 5, the sender
 refuses. One paid replay of an existing historical request returns HTTP
@@ -231,19 +226,25 @@ Behavior: the result files and ledger → the report is written and the
 scratch test is absent from the checkout → the owner can review the
 recommendation.
 
-## Refinement and concerns
-
-Slice-plan refinement was not needed: each slice has one outcome and one
-proof loop, and the plan holds eight slices.
-
-No slice-specific concern remains from this review. The token and the
-generation request rendered with real linked context are bounded by slice
-1, and the batch completion time by the batch route decision.
-
 ## Learnings
 
-None yet.
+Eight slices each have one outcome and proof loop; no refinement was needed.
+Slice 1 settled credential, cap and linked-context premises; linked acceptance
+evidence retains the observations. Slice 7 owns batch submission and its timing bound.
 
 ## Story obligations
 
-**Source:** [Explore reliable recall question checks with paid experiments](../../seeds/SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks)
+### G1. Batch submission and per-row accounting remain with fresh generation
+Reported: slice 1 — "No batch job was submitted; slice 7 must reserve/count each batch row in this same ledger before submission and settle discounted usage."
+Story clause: "12 questions through the current on-demand request and 12 through the current batch request"
+Disposition: receiving slice 7
+
+### G2. Context probe reconstructs the required evidence
+Reported: slice 1 — "The context probe reconstructs fetched notes and notebook readmes, rather than every Production folder sibling."
+Story clause: "built by the product code in a unit-test environment"
+Disposition: no user cost "built by the product code in a unit-test environment": the probe's request-builder and batch-renderer paths actually retrieve the reconstructed wiki-link target and both assertions observe its complete fetched content. This establishes the bounded real-linked-context premise; it does not claim an exact replay of all Production retrieval candidates. Fresh selection must retain its actual supplied context and report its limits.
+
+### G3. Report preserves the owner accounting basis
+Reported: slice 1 — "Rates remain the owner-fixed accounting basis."
+Story clause: "Cost is computed from each response's token usage"
+Disposition: receiving slice 8
