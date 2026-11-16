@@ -106,3 +106,8 @@ preserved scope and all named remaining obligations. Slice 8 reuses completed
 request preparation and product decoder; slice 9 reconciles the report. The
 in-progress split is ready for continued authorized execution, without a new
 story, claim or scope decision.
+
+Guarded fresh delivery accepted `b36962bb1f32635f3fa63d824aac0f9d61f449df`
+on the remote story branch, suffix base `be6d4ba666ec5ff3fa61164627bbf87040a59511`.
+It ran the one selective formatter, check-only commit hook and managed observer
+attachment successfully; slice 7 is done and the same observer is reused.

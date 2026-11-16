@@ -109,13 +109,14 @@ outcomes and their actual transport/context conditions are available for review.
 ### 8. Fresh drafts carry independent labels and one verdict from each check
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Two fresh key-hidden reviews cover all accepted drafts as in slice 2,
 including fresh24's older supplied linked snapshot qualification; disagreements
 remain unscored. Labels precede exactly one verifier and one frozen-candidate
 call per accepted draft (at most 48); choices-only uses the same verifier output.
 The actual product decoder, frozen hash, ledger, note timing and per-route
 results reconcile. No fresh repeat agreement is claimed.
+[Observed comparison proof](fresh-comparison-evidence.md) awaits acceptance.
 
 Behavior: slice 7's preserved drafts and post-read evidence → reviewers label
 them independently and each paid check runs once → the fresh semantic comparison
@@ -200,7 +201,7 @@ Disposition: receiving slice 9
 ### G9. Observe the frozen candidate's later consumers
 Reported: slice 4 — "Held-out/fresh/report consumers are future slices and untested here."
 Story clause: "One narrower answer-checking prompt"
-Disposition: interim until slices 8, 9
+Disposition: receiving slice 9
 
 ### G10. Report held-out context timing and overlap
 Reported: slice 5 — "Current evidence only; 22 selected focus questions changed since generation, historical versions were not reconstructed, and three linked-note IDs overlap historical evidence."
@@ -220,7 +221,7 @@ Disposition: no user cost "reproducible comparison of three checks": the 24 sele
 ### G13. Fresh semantic comparison remains unmeasured at the original attempt limit
 Reported: slice 7 — "Generation evidence is complete; original slice 7 remains incomplete. No reviewers or fresh paid checks were started."
 Story clause: "labelled the same way, then checked once by each paid check"
-Disposition: receiving slice 8
+Disposition: proved by slice 8: pilot/fresh-20261116/qualified-labels.json, fresh-evaluation-results.json, fresh-evaluation-proof.json and actual product decode; two independent qualified reviews, all24 sound, 48 once-per-check completed calls, choices-only from same responses and backend3199 pass.
 
 ### G14. Report the actual fresh transport and cohort conditions
 Reported: slice 7 — "Batch completed zero rows and 12 batch-rendered bodies used synchronous fallback; all 24 focus notes overlap held-out notes, outside 155 historical IDs; 113 reconstructed snapshots omit original folders and other retrieval candidates."
@@ -230,4 +231,4 @@ Disposition: receiving slice 9
 ### G15. Fresh24 carries the older linked generation input qualification
 Reported: slice 7 — "One linked snapshot changed before generation but generation used the earlier captured content. Post-read reviewer/candidate content differs; the prepared fresh24 packet must carry that condition before launch."
 Story clause: "with route, question age and note context"
-Disposition: interim until slices 8, 9
+Disposition: receiving slice 9
