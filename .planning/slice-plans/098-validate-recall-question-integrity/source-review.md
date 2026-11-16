@@ -24,18 +24,18 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | S1b.1 | Route: generated on demand | slice 8 | |
 | S1b.2 | Route: generated ahead by the hourly batch | slice 8 | |
 | S1b.3 | Route: stored earlier and shown when tracker comes due | slice 8 | |
-| S2 | Count stored unanswered questions by generation period | slice 4 | |
-| S2a | ...and how many of them today's generation checks would reject | slice 4 | |
+| S2 | Count stored unanswered questions by generation period | slice 4 | observed: PLAN.md slice 4 result table (8,254 by period) |
+| S2a | ...and how many of them today's generation checks would reject | slice 4 | observed: PLAN.md slice 4 result table (1,675 rejected by keyless checks) |
 | S3 | For each check, record which failures it detects | slice 8 | |
 | S3a | ...and which sound questions it flags | slice 5 | |
 | S3b.1 | Check: repeated-choice comparison | slice 3 | observed: PLAN.md slice 3 result, `integrity/census-table.md` (check 1 flags rows 8518, 8719) |
 | S3b.2 | Check: key taken from the named answer | slice 2 | observed: PLAN.md slice 2 result (removes position errors by construction; detects nothing at runtime) |
 | S3b.3 | Check: the verifier | slice 6 | |
 | S3b.4 | Check: comparison of a wrong selection with answers credited for the same note | slice 3 | observed: PLAN.md slice 3 result (20 flagged, all wrong; reach 932 of 963) |
-| S3b.5 | Check: the learner's contest | slice 4 | |
-| S3b.6 | Check: the exclusion after an answer | slice 4 | |
+| S3b.5 | Check: the learner's contest | slice 4 | observed: PLAN.md slice 4 result (1,468 contested by generation month) |
+| S3b.6 | Check: the exclusion after an answer | slice 4 | observed: PLAN.md slice 4 result (1 excluded attempt) |
 | S3b.7 | Check: deletion of a tracker's unanswered questions | slice 7 | |
-| S3c | Include how often the learner used contest and exclusion in the same period | slice 4 | |
+| S3c | Include how often the learner used contest and exclusion in the same period | slice 4 | observed: PLAN.md slice 4 result (30 contested generated and 1 exclusion in the MCP period) |
 | S4 | Measure the verifier with the key hidden on the named cases and the controls | slice 6 | |
 | S4a | ...separately for questions the learner missed and questions the learner answered correctly | slice 6 | |
 | S5 | For each failure that still reaches a learner, record what the learner saw and could do at each step | slice 7 | |
@@ -62,7 +62,7 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | D3 | Deferred: spelling questions (owned by Validate spelling objectives and cues) | slice 8 | |
 | D4 | Deferred: a key wrong because the note is wrong (owned by Validate source-backed note edits from recall); verifier reads the same note, so agreement cannot show this | slice 8 | |
 | E1 | Repeated choices, newly generated: apology question (row 8719) with two identical choices → replayed as generator output at current revision → generation rejects it and stores nothing; record says this failure stops at generation since 2026-08-22 | slice 2 | observed: PLAN.md slice 2 result; scratch `ScratchRepeatedChoiceRoutesTest`/`BatchTest` assertions (no question stored on either generating route) |
-| E2 | Repeated choices, stored: question with two identical choices stored before 2026-08-22 → tracker comes due → shown, and learner's selection marked wrong though its text equals the key's (row 8518); count of such stored questions decides whether this still reaches a learner | slice 4 | |
+| E2 | Repeated choices, stored: question with two identical choices stored before 2026-08-22 → tracker comes due → shown, and learner's selection marked wrong though its text equals the key's (row 8518); count of such stored questions decides whether this still reaches a learner | slice 4 | observed: PLAN.md slice 4 result (10 stored with repeated choices, 3 served next); slice 2 stored-route grading |
 | E3 | Key against rationale: among attempts answered from 2026-08-23, 23 marked wrong have a rationale naming another choice and not the key → each reviewed with key hidden → recorded as real disagreement or wording difference; no real disagreement is a clean result for this class | slice 5 | |
 | E4 | Old stored question: location-particle question (row 3748) generated 2025-02-06, three choices, two defensible → tracker came due 2026-10-06 → shown and graded with no check; record names the stored route and the verifier's outcome | slice 6 | |
 | E5 | Two defensible answers from current generator: row 4917 (generated 2026-09-20) → verifier answers with key hidden → selecting both answers counts as detected; selecting only the key counts as missed, with the verifier's stated reason | slice 6 | |

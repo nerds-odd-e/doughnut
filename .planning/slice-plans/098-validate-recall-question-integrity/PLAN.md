@@ -266,7 +266,7 @@ Flags, flagged (marked wrong), totals per route:
 
 ### 4. Count stored unanswered questions and recovery use in Production
 Type: Behavior
-Status: planned
+Status: done
 Proof: totals from a read of all non-spelling trackers, with the command,
 start and end time, and the number of trackers read.
 
@@ -278,6 +278,39 @@ have a choice count other than four or repeated choice text, the contested
 questions by month, and the excluded attempts from the recall history
 export. Run it outside the owner's recall sessions. The read is command
 time; the active work is the script and the summary.
+
+Result, 2026-11-16: `python3 -I …/integrity/stored-census.py read`, then
+`… summarize`, 08:03:13Z to 08:53:16Z. It used only read-only GETs. Before
+the run, a code reading confirmed `getRecallPrompts` is a repository read
+that cannot generate. It read 14,301 of 14,301 non-spelling trackers with 0
+errors; 2 reads over five seconds (longest 36.1 s) each paused the workers.
+12,668 trackers hold 130,837 stored questions. Summary:
+`integrity/stored-census.md`.
+
+Unanswered, uncontested stored questions (all / served next, the newest per
+tracker), with the counts today's keyless generation checks would reject:
+
+| Generated | All | Count not four | Repeated text | Served next | Of those rejected |
+| --- | --- | --- | --- | --- | --- |
+| before 2025 | 6,971 | 1,067 | 10 | 1,580 | 255 |
+| 2025-01-01..2026-05-15 | 602 | 599 | 0 | 389 | 386 |
+| 2026-05-16..2026-08-21 | 150 | 0 | 0 | 150 | 0 |
+| 2026-08-22 before 11:32 | 0 | 0 | 0 | 0 | 0 |
+| from 2026-08-22 11:32 | 531 | 0 | 0 | 531 | 0 |
+| total | 8,254 | 1,666 | 10 | 2,650 | 641 |
+
+- Repeated choices, stored: 10 questions, all generated 2023-10 to 2024-01;
+  3 are their tracker's next question. None generated from 2025 repeats a
+  choice.
+- Contest: 1,468 contested questions (1,445 unanswered, 23 answered); 30
+  were generated within the MCP period. The API exposes no contest time, so
+  they are counted by generation month (`stored-census.md`).
+- Exclusion: 1 excluded attempt ever, in 2026-10, inside the MCP period
+  (recall history export; the export carries no contest events).
+- Limits: a snapshot; trackers outside the 36,500-day `recalling` window and
+  the 9 commissioned ones were not read; checks that need the key cannot be
+  applied to unanswered stored questions; whether the owner was recalling
+  during the read is unknown.
 
 ### 5. Label the flagged attempts with the key hidden
 Type: Behavior
