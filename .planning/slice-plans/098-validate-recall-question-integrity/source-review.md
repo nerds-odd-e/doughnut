@@ -34,14 +34,14 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | S3b.4 | Check: comparison of a wrong selection with answers credited for the same note | slice 3 | observed: PLAN.md slice 3 result (20 flagged, all wrong; reach 932 of 963) |
 | S3b.5 | Check: the learner's contest | slice 4 | observed: PLAN.md slice 4 result (1,468 contested by generation month) |
 | S3b.6 | Check: the exclusion after an answer | slice 4 | observed: PLAN.md slice 4 result (1 excluded attempt) |
-| S3b.7 | Check: deletion of a tracker's unanswered questions | slice 7 | |
+| S3b.7 | Check: deletion of a tracker's unanswered questions | slice 7 | observed: PLAN.md slice 7 result (deletion detects nothing; per tracker, on request) |
 | S3c | Include how often the learner used contest and exclusion in the same period | slice 4 | observed: PLAN.md slice 4 result (30 contested generated and 1 exclusion in the MCP period) |
 | S4 | Measure the verifier with the key hidden on the named cases and the controls | slice 6 | observed: PLAN.md slice 6 result table |
 | S4a | ...separately for questions the learner missed and questions the learner answered correctly | slice 6 | observed: PLAN.md slice 6 result (missed and answered-correctly rows separate) |
-| S5 | For each failure that still reaches a learner, record what the learner saw and could do at each step | slice 7 | |
-| S5.1 | Step: the question | slice 7 | |
-| S5.2 | Step: the result | slice 7 | |
-| S5.3 | Step: any recovery offered | slice 7 | |
+| S5 | For each failure that still reaches a learner, record what the learner saw and could do at each step | slice 7 | observed: PLAN.md slice 7 step table |
+| S5.1 | Step: the question | slice 7 | observed: PLAN.md slice 7 result, Question column |
+| S5.2 | Step: the result | slice 7 | observed: PLAN.md slice 7 result, Result column |
+| S5.3 | Step: any recovery offered | slice 7 | observed: PLAN.md slice 7 result, recovery columns |
 | S6 | Keep the smallest de-identified examples for each regression proof the evidence justifies | slice 8 | |
 | S7 | Recommend a decision for each failure class and route | slice 8 | |
 | S7a | Qualification: a clean baseline is a valid result | slice 8 | |
@@ -51,7 +51,7 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | R3 | Make paid model calls only under the owner's authorization for a stated maximum (agent map rule for paid OpenAI use) | slice 6 | observed: integrity/sent-log.jsonl 60 lines, within the authorized 60 |
 | R4 | Use the local recall evidence and apply the shared closeout | slice 8 | |
 | R5 | Choices the validation informs are the owner's to make after the evidence; the story favors none (verify before shown; verify after a miss only; keep showing stored older questions; check stored question when shown; discard stored questions older than a protection) | slice 8 | |
-| R6 | Recovery after a miss stays the learner-confirmed excluded attempt; an automatic exclusion is not examined | slice 7 | |
+| R6 | Recovery after a miss stays the learner-confirmed excluded attempt; an automatic exclusion is not examined | slice 7 | observed: PLAN.md slice 7 result (exclusion is learner-confirmed, never automatic) |
 | R7 | Switching the verifier on in Production is a product change — a possible outcome, not a validation | slice 8 | |
 | D1 | Deferred: any product change, each following the owner's review as its own story | slice 8 | |
 | D1.1 | ...a repair | slice 8 | |

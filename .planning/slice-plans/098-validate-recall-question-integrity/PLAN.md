@@ -422,7 +422,7 @@ judges the question feasible; anything else is a flag.
 
 ### 7. Record what the learner saw for each failure that still reaches recall
 Type: Behavior
-Status: planned
+Status: done
 Proof: a step table per failure and route that slices 2 to 6 found still
 reaching a learner; each step cites the component or feature that shows it.
 
@@ -435,6 +435,57 @@ questions in `frontend/src/components/recall/`,
 record for each failure what the learner sees at the question and at the
 result, which recovery is offered at each step, and whether the named rows
 were contested or excluded.
+
+Result, 2026-11-16, code reading at `c1becf0562` (frontend paths under
+`frontend/src/`); contest and exclusion state from the slice 3 export and the
+slice 4 snapshot.
+
+Common to every route:
+
+- Served: `GET /api/memory-trackers/{id}/recall-prompt` →
+  `RecallPromptService.generateAQuestion` returns the tracker's newest
+  unanswered, uncontested stored question unchecked
+  (`RecallPromptRepository.findUnansweredByMemoryTracker`). Production does
+  not run the verifier at generation: `question.regeneration.times` is 0 in
+  `application-prod.yml`, and 1 only in the e2e profile, which is the only
+  place `question_contest.feature`'s first scenario holds.
+- Question: stem and choices without key (`Mcq.withoutSolution`); every
+  choice is its own button, so identical texts both show
+  (`QuestionChoices.vue`). The only control is "Doesn't make sense?"
+  (`ContestableQuestion.vue`), unanswered questions only.
+- Contest: `POST /api/recall-prompts/{id}/contest` runs the verifier. Upheld
+  → the advice is shown, the question stays, and nothing is stored. Flagged
+  → the question is marked contested and a replacement is generated through
+  `GeneratedMcq.isValid` (`question_contest.feature` scenario 2). No
+  contest exists after answering.
+- Result: grading compares positions (`Mcq.checkAnswer`). A wrong answer
+  opens the result: the note, the key green, the selection red, and the
+  stored "Why the answer fits" rationale when present (`QuestionDisplay.vue`).
+- After answering: "Get private help" may lead the AI to propose
+  `AmbiguousQuestionExclusionProposal`, allowed only when the selected
+  answer is also defensible (`ConversationAiRequestBuilder`). Confirm
+  (`ToolCallHandler.vue` → `exclude-as-ambiguous`) removes the attempt from
+  scheduling, keeps the wrong mark visible, and leaves the question
+  uncontested. It is learner-confirmed, never automatic
+  (`ambiguous_question_exclusion.feature`).
+- Deletion: the tracker page's "Delete Unanswered Prompts"
+  (`MemoryTrackerPageView.vue`, `MemoryTrackerLifecycle.deleteUnansweredRecallPrompts`)
+  deletes all of a tracker's unanswered, uncontested questions on request.
+  It detects nothing; the learner must open that tracker. No e2e feature
+  covers it.
+- An answered question is never served again.
+
+| Failure (route) | Question | Before answering | Result | After answering |
+| --- | --- | --- | --- | --- |
+| Repeated choices (stored only: 10 from 2023–24) | twins shown as two buttons | contest; verifier flagged the measured twin case (8518); or delete the tracker's unanswered questions | the twin of the key is red, the key green | ambiguity exclusion if proposed |
+| Unique answer rejected by the key (batch since the change, e.g. 5347; stored older) | nothing suggests a fault | contest only on suspicion; verifier caught 1 of 3 | the correct choice red, the wrong key green, the rationale argues for the key | no contest and no key correction; the exclusion is meant for ambiguity only |
+| More than one defensible answer (batch 4917, 5037; on demand 7893; stored 3748) | nothing suggests a fault | contest; verifier caught 4 of 5 | the defensible choice red | the exclusion is designed for this; confirmed by the learner |
+
+Named rows 3748, 4917, 5037, 5347, 7893, 8471, 8518, 8586 and 8719: none
+excluded, none contested. An upheld contest leaves no trace, and the API
+gives no contest time; the tracker of 3748 holds two contested questions
+generated minutes before it, which suggests a replacement after a contest.
+Limits: the walkthrough uses today's code, not the code live at each answer.
 
 ### 8. Recommend a decision for each failure class and route
 Type: Behavior
