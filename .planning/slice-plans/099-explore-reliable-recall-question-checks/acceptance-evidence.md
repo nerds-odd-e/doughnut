@@ -96,142 +96,52 @@ It is not a second run ledger.
 
 ## Slice 1 acceptance observations
 
-Accepted observations (2026-11-16): cache `pilot/check_sender.py`, invoked as
-`CURSOR_DEV=true nix develop -c python3 -I
-/Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/check_sender.py`,
-observed all three refusals before transport (`sender-proof.json`); the real
-CLI with the credential removed exited 1 and left the ledger unchanged
-(`missing-token-cli-proof.json`). `CURSOR_DEV=true nix develop -c python3 -I
-/Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/send.py
-historical-verifier row5347 1
-/Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/requests/row5347.json` returned HTTP
-200 and wrote the sole ledger row: 940 input/94 output tokens, 8.127283 s,
-USD 0.00282. After the approved fresh label, this remains an unscored diagnostic.
-`pilot/protocol.json` fixes the pass mark, model and owner accounting basis.
-The sender reserves a conservative maximum cost before each call, persists
-a pending row before transport, settles usage afterward, serializes sends,
-and refuses duplicate identities. Inspection connected its entry point,
-guards, response persistence and ledger continuation to those observations.
-
-Read-only Production GETs supplied focus 8512, linked target 8511 and an
-incoming referrer. The privately retained
-`pilot/ScratchPilotGenerationRequestTest.java` drove the real request builder
-and batch JSONL renderer with reconstructed notes/readmes and derived links.
-Its assertions observe the fetched target's full content in both inputs;
-`generation-render-proof.json` records model `gpt-6.1-sol`, output limit 1000,
-and input lengths 2605. `CURSOR_DEV=true nix develop -c pnpm
-backend:test_only` passed (3,199 tests, zero failures/errors, two existing
-skips; `generation-render.log` and `generation-render-test.xml`). Scratch
-source was retained in the cache and removed from the checkout. No persistent
-product consumer changed; private consumer traces are in the cache. Active
-implementation approximately six minutes, excluding command waits. Local
-proof was sequenced on Territory.local (51 GB RAM, load approximately 5–8,
-49% free memory at launch), with no other owned heavy proof; reconsider on
-contention or failure. Rates remain the fixed accounting basis, and actual
-batch submission belongs to slice 7.
-
-Acceptance: the source commitments' credential, model, fixed pass mark,
-budget and private-location conditions match the inspected sender/protocol,
-signals and retained artifacts above. Source freshness returned `unchanged`
-at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`; no incoming sibling
-change exists at this boundary. Fresh `/root/preflight_refactor` completed the
-independent pass, extracting this cohesive evidence record from the plan;
-all accepted proof remained unchanged. Whitespace, shared test selection
-and the slice 1 obligations check passed; no tests rerun. Guarded fresh delivery
-ran selective formatting once and the independent commit hook, marked slice 1
-done, and confirmed remote story-branch acceptance at
-`ab7f298a81ebd58f8563ddc945af6b64c32625d3`, suffix base
-`0d7e42bc761929115900e1668f10879150425eb1`. The retained observer was reused;
-default-checkout maintenance was not applicable.
+See [historical acceptance evidence](historical-acceptance-evidence.md#slice-1-acceptance-observations).
 
 ## Slice 2 acceptance observations
 
-On 2026-11-16 `/root/historical_labels` retained all 47 prior slice 5 manifest
-and label entries. Its literal preparation/scoring commands were
-`CURSOR_DEV=true nix develop -c python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/prepare_historical.py`
-and the same command with `score_historical.py`. Both passed. GET-only
-retrieval supplied 38 focus notes and 117 directly linked notes, all HTTP 200.
-`historical-review-provenance.json` retains the two actual isolated
-`fork_turns:none` launches, packet paths/hashes, restrictions and output paths;
-both returned all 47 judgments. Inspection of the preparer and scorer's
-recursive allow-lists confirmed keys, earlier labels, rationales and row
-identities were excluded; joins occurred only after both complete returns.
-`historical-preparation-proof.json`, `historical-label-summary.json` and
-`historical-acceptance-proof.json` observe 41 scoreable: 33 sound, 6 multiple
-answers, 2 wrong keys; 3 note-at-fault and 3 unresolved (two disagreements).
-The inspected scorer excludes disagreements, note-at-fault and insufficient
-answers, and checks both reviewers' judgeability before scoring changed notes.
-Eighteen focus notes changed, thirteen remain scoreable against current
-evidence, and seventeen questions have changed linked evidence. Historical
-versions are unverified. The retained records include generation/update/read
-times and explicit current-evidence scope. Original route heuristics persist.
-The ledger remained one row with before/after SHA-256
-`3eb249f01f7ca35606527925520ed9c6ecd6f18db8abae91a5a507363de45b0a`;
-no paid call occurred. Product code is unchanged. Active implementation was
-approximately ten minutes, excluding command/reviewer waits. Source freshness
-was `unchanged` at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`.
-Both reviewers' row 5347 note-at-fault finding and the 41-question allocation
-conflict were retained as G4/G5; the owner subsequently approved using the
-fresh labels and six reserve calls for all 41 scoreable questions. G6 owns
-reporting limitations; G7 is proved by the unpaid preparation below.
-Fresh `/root/historical_label_refactor` completed the independent review and
-cohesive protocol extraction. Exact protocol comparison, whitespace, shared
-test selection and slice 2 obligations passed; accepted experimental proof
-remained unchanged and no tests were rerun. Guarded fresh delivery marked
-slice 2 done and confirmed remote story-branch acceptance at
-`1baf636d9a14d853de81cd67081e47c3e2ad96be`, suffix base
-`ab7f298a81ebd58f8563ddc945af6b64c32625d3`; the observer was reused.
+See [historical acceptance evidence](historical-acceptance-evidence.md#slice-2-acceptance-observations).
 
 ## Slice 3 unpaid preparation and approved continuation
 
-The owner's “go ahead” accepts the fresh labels, row 5347 note-at-fault,
-and six reserve calls to cover 41 questions under the unchanged hard caps.
-`pilot/historical-verifier-preparation-summary.json` and its request audit
-retain 47 rendered current requests, including rows 548/718; 45 earlier
-inputs match exactly, modulo fixture IDs in embedded questions. Settings
-are `gpt-6.1-sol`, low reasoning, 500 output tokens. Inspected scratch
-assertions compare current note titles/content prefixes and parsed question
-fields; the product decoded only the existing row 5347 probe (both checks
-upheld it). `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
-3,199 tests, zero failures/errors, two skips. Two earlier scratch assertions
-were corrected for JSON escaping and legitimate product truncation; their
-failed logs remain private. The literal audit command was
-`CURSOR_DEV=true nix develop -c python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/audit_historical_verifier.py`.
-It passed; the ledger hash stayed unchanged, and scratch source was retained
-privately and removed from the checkout. Paid repeats/majority observations
-remain outstanding. Active implementation used 11 minutes; four remain for
-this attempt, excluding command waits. G8 retains the focus-only input and
-row 3748 truncation qualifications. Source/model/code/setup proof is reusable;
-the owner amendment changes cohort allocation/classification, not producers.
+See [historical acceptance evidence](historical-acceptance-evidence.md#slice-3-unpaid-preparation-and-approved-continuation).
 
 ## Slice 3 paid observations
 
-`CURSOR_DEV=true nix develop -c python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/send_historical_verifier.py`
-completed 123 cohort calls (no errors/retries), using immutable rendered
-bodies and the capped sender. `historical-verifier-send-summary.json` records
-109,308 input/13,969 output tokens, USD 0.358306; total ledger 124 calls,
-USD 0.361126 including the diagnostic. Mean/median/max latency was
-5.053/4.402/9.483 seconds. `ScratchPilotHistoricalDecisionTest.java` supplied
-each paid output to `service.evaluateQuestion`, inspected the parsed choices
-and `getQuestionContestResult`, and wrote all 123 run decisions. The literal
-`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed 3,199 tests,
-zero failures/errors, two skips. The private source was retained and removed
-from the checkout; its audit confirms every sent body hash is unchanged.
-`CURSOR_DEV=true nix develop -c python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/summarize_historical_verifier.py`
-passed: inspected aggregation requires runs 1/2/3 per question, flags on
-at least two votes and records unanimity. `historical-verifier-results.json`
-and summary show deployed 2/2 wrong keys, 6/6 multiple answers, 13/33 sound
-false flags and 38/41 unanimous; choices-only 2/2, 5/6, 0/33 and 40/41.
-Row 8739 was flagged on feasibility in all three runs with choices equal
-to its key; row 5347 remains unscored. Ledger SHA-256 after these calls:
-`fb91c0b8c1d06ec09cb58ae21ec9f8775fc2721b58f5846ca4153eeab6413b29`.
-Coordinator inspected the decoder, scoring, summary and observing signals;
-all slice 3 promises match those observations. Source freshness is unchanged
-at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`. Source reorganization
-preserved six identities/state blocks, original anchor destinations and
-dated text; `pilot/source-alignment-audit.json` checks 56 links and readHome.
-Active implementation reached 15 minutes including the prior preparation;
-all commands ended. Fresh `/root/historical_measurement_refactor` completed
-the independent review with no edits: file seams/sizes, selector, whitespace,
-obligations and 46 consumer dispositions were checked; unchanged experimental
-proof was reused. Guarded delivery remains pending.
+See [historical acceptance evidence](historical-acceptance-evidence.md#slice-3-paid-observations).
+
+## Slice 4 acceptance observations
+
+The one candidate was frozen at `2026-11-16T12:53:40.523238+00:00`, SHA-256
+`3591bc73411b7cf0eb14ae8f0e48b959d9c539f93bbbca8255913e9dc42944a5`.
+`pilot/candidate-prompt.txt` includes instructions/schema/settings; its manifest
+records historical-only development, zero wording calls and all source/body
+hashes. First measurement was `12:54:15.766732+00:00`. Coordinator compared
+baseline/candidate settings: model, low reasoning, 500 output tokens and low
+verbosity match. Inputs explicitly carry full current focus and direct links;
+they contain no stored key, labels, rationales or prior verdicts.
+The literal `./scripts/run.sh python3 -I` commands with cache paths
+`pilot/prepare_candidate.py`, `pilot/send_historical_candidate.py` and
+`pilot/summarize_historical_candidate.py` passed. The sender session 65210
+terminated exit 0 after 123 HTTP 200 completed calls, with no retries. The
+inspected scorer reconstructs every allow-listed payload, validates schema,
+converts the key to 0-based positions, requires three runs, and aggregates
+at least two flags; `historical-candidate-results.json` retains all decisions.
+Candidate: 2/2 wrong keys, 6/6 multiple answers, 0/33 sound false flags,
+41/41 unanimous and exact reviewer-support agreement in every run. Usage:
+176,880 input/2,322 output tokens, USD 0.376980; mean/median/max latency
+2.870/2.651/9.092 seconds. Total ledger: 247 calls, USD 0.738106.
+Coordinator directly ran `./scripts/run.sh python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/audit_candidate.py`
+to a terminal exit 0: all 124 prior rows and 171 old files unchanged, hash
+unchanged, freeze before every call, and exact cost reconciliation passed.
+Context counts are question instances: 41 full focuses, 126 linked entries
+over 36 questions; 13 focus and 15 linked contexts were edited after generation.
+These are historical development results with different context from baseline,
+not held-out performance or an instruction-only effect. G6/G8 and G9 retain
+later reporting/reuse observations. No product/scratch test changed; active
+implementation was eight minutes, no product suite required. Freshness was
+unchanged at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`.
+Fresh `/root/candidate_refactor` completed the record review, moving the
+completed slice 1 contract to its historical evidence home. All 19 links,
+file sizes, selector, whitespace, obligations and 64 consumer dispositions
+passed; experimental proof was unchanged and reused. Delivery remains pending.

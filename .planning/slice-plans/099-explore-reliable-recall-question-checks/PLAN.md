@@ -60,19 +60,8 @@ passed (3,199 tests, zero failures/errors, two skips). Row 5347 is diagnostic;
 [inspected setup, commands and evidence](acceptance-evidence.md#slice-1-acceptance-observations)
 retain the exact proof. Independent refactoring and delivery passed.
 
-Proof: With the token absent the sender exits before sending. With a
-scratch ledger of 500 lines, and separately one totalling USD 5, the sender
-refuses. One paid replay of an existing historical request returns HTTP
-200 and adds one ledger line with latency, tokens and cost. One on-demand
-and one batch generation request for one Production note with its linked
-notes are rendered to the cache without being sent.
-
-Behavior: the execution shell holds the token → the sender is asked for
-one call → the call is sent, the response is stored, and the ledger holds
-one line; at either limit nothing is sent. Early probe: a missing token or
-a generation request that cannot be rendered with real linked context
-stops the dependent slices (all paid slices; slice 7) and changes this
-plan. The paid replay counts toward the cap; its question is now unscored.
+Proof contract: [original Proof and Behavior](historical-acceptance-evidence.md#slice-1-original-proof-contract)
+remain verbatim with the completed observations.
 
 ### 2. Historical questions carry note-backed labels
 
@@ -116,7 +105,10 @@ recorded for the deployed rule and for choices-only.
 ### 4. One narrower answer check is frozen and measured on three repeats
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted: the frozen candidate caught 8/8 defects, flagged 0/33 sound and
+was unanimous on 41/41; [slice 4 proof](acceptance-evidence.md#slice-4-acceptance-observations)
+retains its hash, timing, isolation, costs and historical-only limits.
 Proof: `pilot/candidate-prompt.txt` and its SHA-256 exist; wording used at
 most 18 ledger lines and only historical questions. After the freeze, 3
 runs per scored historical question (123 lines) give the same
@@ -244,3 +236,8 @@ Disposition: proved by slice 3: pilot/historical-verifier-preparation-summary.js
 Reported: slice 3 — "The pilot supplies focus-only fixtures, while Production's shared retriever may include linked context; row 3748 receives the product's marked truncated focus-note prefix."
 Story clause: "with route, question age and note context"
 Disposition: receiving slice 8
+
+### G9. Observe the frozen candidate's later consumers
+Reported: slice 4 — "Held-out/fresh/report consumers are future slices and untested here."
+Story clause: "One narrower answer-checking prompt"
+Disposition: interim until slices 6, 7, 8
