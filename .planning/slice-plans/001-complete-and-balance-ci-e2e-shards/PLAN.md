@@ -191,9 +191,9 @@ E2E attempts and a six-row candidate: isolate CLI in shard 3 and move note
 creation/update into remainder 6. Selector/workflow proof passed (34 cases).
 Exact candidate CI 43792611347/1 at `754ce93f` passed; 94 timed files /
 383 cases survived. Retain the grouping: longest wrapper 215 seconds versus
-341/257/314 across three normal baselines; longest job 363 versus476/372/442.
+341/257/314 across three normal baselines; longest job 363 versus 476/372/442.
 One candidate sample does not establish repeatable causal savings (G3 proved).
-Independent refactor was clean; final assessment is records-only; active work8minutes.
+Independent refactor was clean; final assessment is records-only; active work: 8 minutes.
 
 ## Verification and delivery
 
@@ -239,3 +239,6 @@ Disposition: proved by slice 3: initial-balance.md actual shard-six image/browse
 Reported: slice 3 — "Recorded-time estimates support the two-folder reassignment; actual candidate elapsed behavior is not observed yet."
 Story clause: "Apply only timing moves supported by comparable evidence."
 Disposition: proved by slice 3: initial-balance.md exact43792611347/1 full proof and elapsed comparison supporting retention
+## Execution complete
+
+Product advice: no change.
