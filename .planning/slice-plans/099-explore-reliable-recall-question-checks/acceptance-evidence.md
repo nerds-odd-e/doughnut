@@ -8,9 +8,10 @@ It is not a second run ledger.
 ## Fixed experiment protocol
 
 - **Budget (owner, 2026-11-16).** At most 500 paid calls or USD 5,
-  whichever is reached first. Allocation: 240 historical checks, 144
-  held-out checks, 24 generations, 48 fresh checks, 24 for wording the
-  narrower prompt, 20 for retries and fallback. A batch row is one call.
+  whichever is reached first. Owner-approved allocation after fresh labels:
+  246 historical checks, 144 held-out checks, 24 generations, 48 fresh checks,
+  18 for wording the narrower prompt, 20 for retries/probes/fallback. The
+  already-spent unscored probe consumes one of those 20. A batch row is one call.
   The earlier 60 calls are outside this budget.
 - **Ledger.** One file in the cache, `pilot/ledger.jsonl`, gets one line
   per paid call before the next call is sent: purpose, item, run number,
@@ -71,8 +72,11 @@ It is not a second run ledger.
   (`donut CI`), push trigger includes this story branch. Coordinator
   `aki-chan`, execution checkout above, directory
   `/tmp/dough-ci-501/watch-1Xif4m`, PID 96938, stream session 75615,
-  yielded cell `g632:13`. It observes the remote story branch; the Take on
-  trunk has `pendingCi: unobserved`.
+  yielded cell `g632:13`. Its human-decision stop was confirmed with no unread
+  evidence; CI remained unobserved. On the owner's resume the same checkout
+  rearmed observation for the same target/coordinator: directory
+  `/tmp/dough-ci-501/watch-LL9VQk`, PID 64567, session 25615, cell `g647:6`.
+  The Take on trunk has `pendingCi: unobserved`.
 - **Initial preflight.** On 2026-11-16 the execution-shell presence check
   found `OPENAI_API_TOKEN` present; its value was not printed. The private
   cache exists. No pilot calls have yet been sent.
@@ -102,7 +106,7 @@ CLI with the credential removed exited 1 and left the ledger unchanged
 historical-verifier row5347 1
 /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/requests/row5347.json` returned HTTP
 200 and wrote the sole ledger row: 940 input/94 output tokens, 8.127283 s,
-USD 0.00282. Reuse that response as slice 3's row 5347 run 1.
+USD 0.00282. After the approved fresh label, this remains an unscored diagnostic.
 `pilot/protocol.json` fixes the pass mark, model and owner accounting basis.
 The sender reserves a conservative maximum cost before each call, persists
 a pending row before transport, settles usage afterward, serializes sends,
@@ -167,9 +171,67 @@ no paid call occurred. Product code is unchanged. Active implementation was
 approximately ten minutes, excluding command/reviewer waits. Source freshness
 was `unchanged` at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`.
 Both reviewers' row 5347 note-at-fault finding and the 41-question allocation
-conflict are retained as G4/G5; the owner question is pending before further
-paid comparisons. G6 owns reporting limitations, G7 missing request rendering.
+conflict were retained as G4/G5; the owner subsequently approved using the
+fresh labels and six reserve calls for all 41 scoreable questions. G6 owns
+reporting limitations; G7 is proved by the unpaid preparation below.
 Fresh `/root/historical_label_refactor` completed the independent review and
 cohesive protocol extraction. Exact protocol comparison, whitespace, shared
 test selection and slice 2 obligations passed; accepted experimental proof
-remained unchanged and no tests were rerun. Delivery remains pending.
+remained unchanged and no tests were rerun. Guarded fresh delivery marked
+slice 2 done and confirmed remote story-branch acceptance at
+`1baf636d9a14d853de81cd67081e47c3e2ad96be`, suffix base
+`ab7f298a81ebd58f8563ddc945af6b64c32625d3`; the observer was reused.
+
+## Slice 3 unpaid preparation and approved continuation
+
+The owner's “go ahead” accepts the fresh labels, row 5347 note-at-fault,
+and six reserve calls to cover 41 questions under the unchanged hard caps.
+`pilot/historical-verifier-preparation-summary.json` and its request audit
+retain 47 rendered current requests, including rows 548/718; 45 earlier
+inputs match exactly, modulo fixture IDs in embedded questions. Settings
+are `gpt-6.1-sol`, low reasoning, 500 output tokens. Inspected scratch
+assertions compare current note titles/content prefixes and parsed question
+fields; the product decoded only the existing row 5347 probe (both checks
+upheld it). `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+3,199 tests, zero failures/errors, two skips. Two earlier scratch assertions
+were corrected for JSON escaping and legitimate product truncation; their
+failed logs remain private. The literal audit command was
+`CURSOR_DEV=true nix develop -c python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/audit_historical_verifier.py`.
+It passed; the ledger hash stayed unchanged, and scratch source was retained
+privately and removed from the checkout. Paid repeats/majority observations
+remain outstanding. Active implementation used 11 minutes; four remain for
+this attempt, excluding command waits. G8 retains the focus-only input and
+row 3748 truncation qualifications. Source/model/code/setup proof is reusable;
+the owner amendment changes cohort allocation/classification, not producers.
+
+## Slice 3 paid observations
+
+`CURSOR_DEV=true nix develop -c python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/send_historical_verifier.py`
+completed 123 cohort calls (no errors/retries), using immutable rendered
+bodies and the capped sender. `historical-verifier-send-summary.json` records
+109,308 input/13,969 output tokens, USD 0.358306; total ledger 124 calls,
+USD 0.361126 including the diagnostic. Mean/median/max latency was
+5.053/4.402/9.483 seconds. `ScratchPilotHistoricalDecisionTest.java` supplied
+each paid output to `service.evaluateQuestion`, inspected the parsed choices
+and `getQuestionContestResult`, and wrote all 123 run decisions. The literal
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed 3,199 tests,
+zero failures/errors, two skips. The private source was retained and removed
+from the checkout; its audit confirms every sent body hash is unchanged.
+`CURSOR_DEV=true nix develop -c python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/summarize_historical_verifier.py`
+passed: inspected aggregation requires runs 1/2/3 per question, flags on
+at least two votes and records unanimity. `historical-verifier-results.json`
+and summary show deployed 2/2 wrong keys, 6/6 multiple answers, 13/33 sound
+false flags and 38/41 unanimous; choices-only 2/2, 5/6, 0/33 and 40/41.
+Row 8739 was flagged on feasibility in all three runs with choices equal
+to its key; row 5347 remains unscored. Ledger SHA-256 after these calls:
+`fb91c0b8c1d06ec09cb58ae21ec9f8775fc2721b58f5846ca4153eeab6413b29`.
+Coordinator inspected the decoder, scoring, summary and observing signals;
+all slice 3 promises match those observations. Source freshness is unchanged
+at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`. Source reorganization
+preserved six identities/state blocks, original anchor destinations and
+dated text; `pilot/source-alignment-audit.json` checks 56 links and readHome.
+Active implementation reached 15 minutes including the prior preparation;
+all commands ended. Fresh `/root/historical_measurement_refactor` completed
+the independent review with no edits: file seams/sizes, selector, whitespace,
+obligations and 46 consumer dispositions were checked; unchanged experimental
+proof was reused. Guarded delivery remains pending.

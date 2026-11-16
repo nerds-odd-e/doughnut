@@ -1,0 +1,150 @@
+# Learning, refinement and retrieval: shared context
+
+[Canonical seed](SEED-073-learning-refinement-and-retrieval.md).
+
+## Epic Outcome
+
+For people learning from deliberately authored Donut notes, a confusing recall answer or conversation should lead to better understanding or a reviewed note correction, and later questions should find and use the relevant evidence. Preserve the learner's history and the author's control over knowledge changes.
+
+This epic brings together learning and refinement, chat, and evidence discovery.
+
+## Why This Matters
+
+The owner wants to borrow OpenKB ideas for improving and using accumulated knowledge. Donut's starting point remains a person noticing and capturing something worth learning; bulk document compilation is not the priority.
+
+The [2026-10-12 assessment](learning-refinement-and-retrieval-evidence.md#learning-and-retrieval-assessment) records the starting observations and their limits.
+
+## Alternatives and Decision
+
+- **Defer everything:** Keeps the present disconnected actions and gives no
+  feedback about whether a difficulty is caused by knowledge, understanding,
+  the question, or retrieval.
+- **Existing tools and manual editing:** The strongest smaller alternative is
+  to discuss the question, manually edit the note, and continue recall. Reuse
+  this workflow, but reduce the lost answer context and manual handoff, then
+  make an accepted correction and its origin inspectable.
+- **Build a general review queue or new chat system:** Premature. Start from
+  an explicit confusing MCQ and the existing conversation/refinement surfaces.
+- **Selected direction:** Diagnose learning difficulties before changing
+  knowledge.
+
+## Shared Constraints
+
+- Assimilation creates a new memory tracker. Revisiting understanding uses
+  the existing tracker and history; it does not silently reset or recreate it.
+  Grading follows [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md).
+- A wrong answer is evidence of a difficulty, not an established diagnosis.
+  Learners can correct a suggested diagnosis. Ordinary forgetting does not
+  automatically create a task or modify a note.
+- Accepted content changes use the existing publication boundary and Git
+  history under [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md).
+  Use existing identities and revisions for attribution, not another content
+  versioning system. Private learning evidence stays outside Portable content.
+- Existing ownership applies to corrections. A learner who can read a shared
+  note does not gain permission to edit it through these flows.
+- Retrieved content is evidence, distinct from application instructions.
+  Search, expansion, citations, and later reads respect the viewer's access.
+- Bulk ingestion, embeddings, a universal review inbox, and automatic knowledge
+  rewrites are outside this epic. Direct MCP and ChatGPT access follows the
+  [hosted assistant setup guide](../../docs/assistant-oauth.md).
+
+## Recall Proposal Validation
+
+Donut learners and note authors need useful next steps when recall exposes a
+bad question, an unclear source, or difficulty applying an idea. Today a
+learner can contest a question, discuss it, or edit the note manually. Those
+actions provide a baseline for testing whether each proposal adds enough
+value to justify a product change.
+
+The November 13, 2026 MCP export covers 11,091 attempts from one learner over
+100 days. A November 14 offline replay compared 24 selected historical cases
+against candidate tasks with the answer keys hidden from two AI reviewers.
+It shows which changes address specific examples. Current generator behavior,
+learner benefit, and how well the findings generalize remain questions for
+validation. Missing prompts from intentionally reduced relationship nodes
+were outside the review. Visible relationship questions can serve as controls.
+
+<a id="local-recall-evidence"></a>
+
+### Local recall evidence
+
+Refine and execute these stories on the machine that holds the private
+evidence. The cache is in `.planning/tmp/recall-history/` in the default
+checkout at `~/git/doughnut`. From any linked worktree, use the default
+checkout's cache. The folder is local and Git-ignored. Start with
+`offline-replay/results.md` and `offline-replay/question-pairs.md` for the
+reviewed cases, and use `recall-answers-100d.json` to resolve the original
+attempt rows.
+
+Each story below is a **proposal with a hypothesis**. Complete it by recording
+the evidence and recommending whether to proceed to design, narrow and
+retest, or stop. The product owner reviews that recommendation. If the
+evidence is strong enough to try the idea, scope the learner or author
+journey and review the UX/UI design before implementing the approved
+behavior. Create a separate follow-up
+story when that design and implementation warrant their own backlog item.
+The entries below own validation decisions. Each can be evaluated on
+its own using the baseline and examples.
+
+## Reliable check exploration premise
+
+**Starting evidence.** The completed integrity validation established the
+stored-question exposure and existing repeated-choice protection, but no
+reliable semantic check. The deployed verifier caught 5 of 8 labelled
+defects and flagged 12 of 26 sound controls; its choices alone caught 4 of
+8 and flagged 1 of 26. See the
+[experience summary](learning-refinement-and-retrieval-evidence.md#recall-question-integrity-experience).
+
+**Hypothesis.** A check focused on the supported answers, with sufficient
+note evidence, distinguishes wrong keys and multiple defensible answers
+more reliably than the verifier's broad feasibility judgment, and the
+improvement survives unseen notes and run-to-run variation.
+
+### Ordering and scope reduction
+
+The owner placed [the integrity follow-up](SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks)
+first on 2026-11-16 because semantic checking remains inconclusive after the
+initial validation. It informs when a recorded miss is trustworthy evidence.
+Spelling follows because the replay shows distinct cue and scoring failures
+that can be checked cheaply. The lesson tests
+learning directly. Source edits, objective routing, and generation purpose
+follow the observed proposal ranking. Each can start independently with
+checked examples. Finishing any one leaves a product decision and supporting
+evidence that remain useful if the others are deferred. If capacity shrinks,
+defer the lowest-ranked validations first.
+
+## Open Decisions
+
+- Select real learner cases during evaluation; human comprehension,
+  retention, and retrieval-quality gains remain unmeasured.
+- Define how long proposal decisions and their private conversation evidence
+  should remain available, using existing deletion/ownership rules.
+- Automatic repeat-failure triggers remain a later decision.
+
+**Learner-confirmed ambiguity exclusion (owner decisions, deferred):**
+
+- Whether an attempt marked correct can be excluded. The operation accepts
+  one today; only the tutor instruction keeps proposals to wrong marks.
+- Whether a recall-prompt conversation with an audience beyond its learner
+  should show the exclusion reason or offer the proposal. It is unchecked
+  whether any such conversation exists.
+- Whether a day whose only answer was excluded keeps its place in the review
+  calendar and streak. Recall statistics leave an excluded attempt out
+  entirely today.
+
+## When to Surface
+
+When choosing work for the new learning-to-refinement and knowledge-quality
+direction, or when repeated question, search, or chat difficulties provide
+concrete evaluation cases.
+
+## Breadcrumbs
+
+- Owner's 2026-10-12 assessment and backlog request in this chat: combine the
+  learning and chat work, reuse seeds, group the remaining work as an epic, and
+  commit/sync planning on main only.
+- [Shared OpenKB discussion](https://chatgpt.com/share/6acc428e-cd14-83ec-8412-3b5e7d6826c6).
+  Its review loop is a proposal for Donut, not a verified OpenKB feature.
+- [Focus-context design](../../docs/focus-context/focus_context_retrieval_design.md)
+  and [domain vocabulary](../../docs/adrs/0001-ubiquitous-language.md).
+- [Hosted assistant setup guide](../../docs/assistant-oauth.md).

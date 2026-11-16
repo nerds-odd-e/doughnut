@@ -1,89 +1,77 @@
-# Independent source review
+# Independent source review after owner amendment
 
-On 2026-11-16 the coordinator launched `/root/source_review` with
-`fork_turns: none`. Its input was the selected story's original Goal, Scope,
-Key examples, exclusions, baseline, effort hypothesis and shared closeout,
-copied into the launch message. It was instructed to use only that input,
-read no files, change nothing, derive independently observable promises and
-make no slice allocations or acceptance judgments. The launch input and
-unmodified numbered return are retained in this execution's conversation.
-
-The table retains every returned id and qualified result. Allocation and
-acceptance are the coordinator's work. Shared requirements also constrain
-later slices even where the first owning slice supplies their initial proof.
+On 2026-11-16 `/root/source_review_approved` was launched with `fork_turns: none`.
+It received only the selected original story and explicit owner amendments
+accepted by “go ahead”: fresh labels, row 5347 note-at-fault/unscored and
+41 historical questions with six reserve calls transferred under unchanged caps.
+It was instructed to read no files, change nothing and derive promises without
+plan, implementation, proof, suspected omission or slice ownership. The actual
+launch/input and numbered return are retained in this execution conversation.
+This replaces the prior source review after the human amendment; that review
+and its accepted observations remain in commits ab7f298a81 and 1baf636d9a.
+Compatible completed proof is retained in acceptance-evidence.md.
 
 ## Commitments
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | Give the owner a reproducible comparison of three checks. | slice 8 | |
-| 2 | Give a recommendation to “proceed to design, narrow and retest, or stop,” naming supported failure classes and routes. | slice 8 | |
-| 3 | Apply the deployed verifier’s own request and decision rule, focus note only. | slice 3 | |
-| 4 | Derive choices-only from the same responses, flagging when selected choices differ from the stored key, with no additional calls. | slice 3 | |
-| 5 | Compare one narrower answer-checking prompt, which may carry required linked evidence. | slice 4 | |
-| 6 | Use gpt-6.1-sol with the product’s settings for all paid calls, so only the prompt differs. | slice 1 | observed: pilot/send.py model guard; historical replay body; generation-render-proof.json product settings |
-| 7 | Reuse the private census, labels, requests and responses. | slice 2 | observed: pilot/historical-selection.json original manifest/label hashes, all47 preserved; historical-question-records.json current-match checks |
-| 8 | Have two fresh session reviewers judge each question against its note and required linked evidence, with the stored key hidden. | slice 2 | observed: pilot/historical-review-provenance.json two isolated launches and packet hashes; prepare_historical.py/score_historical.py recursive allow-list and complete47-item checks |
-| 9 | Separate an ambiguous or incorrect note from a bad question. | slice 2 | observed: pilot/historical-labels.json noteAtFault judgments; score_historical.py distinct note-at-fault classification |
-| 10 | Leave reviewer disagreements unresolved; for example, reviewers finding two versus one defensible answers. | slice 2 | observed: pilot/historical-labels.json disagreementFields; score_historical.py disagreement branch |
-| 11 | Exclude unresolved questions from detection and false-flag counts. | slice 2 | observed: pilot/historical-acceptance-proof.json unresolvedScored=0 and noteAtFaultScored=0; inspected scorer branch |
-| 12 | Record whether the note changed after question generation. | slice 2 | observed: pilot/historical-labels.json generatedAt/noteUpdatedAt/noteChangedAfterGeneration for every47 item |
-| 13 | Record missing historical content. | slice 2 | observed: pilot/historical-labels.json missingHistoricalContent and historicalContentBasis; per-linked update/read times |
-| 14 | Score a question whose note changed only when both reviewers can judge it from the content available. | slice 2 | observed: pilot/historical-acceptance-proof.json changedScoredBothJudgeable; both actual reviewer fields inspected via scorer;13 changed scored |
-| 15 | Make no paid call for labelling. | slice 2 | observed: pilot/historical-acceptance-proof.json ledger hash equals before3eb249f01f7ca35606527925520ed9c6ecd6f18db8abae91a5a507363de45b0a; one row unchanged |
-| 16 | Assemble about 40 scored historical questions from the 47 already labelled, relabelled as specified. | slice 2 | observed: pilot/historical-label-summary.json all47 reviewed,41 scoreable;33sound6multiple2wrong-key; no pruning |
-| 17 | Word the narrower prompt against the historical set only. | slice 4 | |
-| 18 | Assemble about 24 scored held-out questions from notes outside the historical set. | slice 5 | |
-| 19 | Label the held-out set before any call. | slice 5 | |
-| 20 | Include every labelled defect found plus sound controls in the held-out set. | slice 5 | |
-| 21 | Freeze the narrower prompt and record its text before the first held-out call. | slice 4 | |
-| 22 | Generate 12 questions through the current on-demand request and 12 through the current batch request, built by product code in a unit-test environment for notes outside the historical set. | slice 7 | |
-| 23 | Label fresh questions the same way, after generation and before checking. | slice 7 | |
-| 24 | Check each fresh question once by each paid check. | slice 7 | |
-| 25 | Send each historical and held-out question three times to the deployed verifier and three times to the narrower prompt. | slice 6 | |
-| 26 | Flag a historical or held-out question when at least two of a check’s three runs flag it. | slice 3 | |
-| 27 | Stop sending when 500 paid calls or USD 5 is reached, whichever comes first, including if fresh checks remain unfinished. | slice 1 | observed: pilot/sender-proof.json refusal cases; send.py cost reservation, persisted row and cap guards |
-| 28 | Count every generation, check, repeat and retry; a batch row counts as one call. | slice 1 | observed: pilot/ledger.jsonl sole replay row; send.py pending row before transport; G1 owns batch submission |
-| 29 | Compute cost from each response’s token usage at USD 2 per million input tokens and USD 10 per million output tokens; batch at half. | slice 1 | observed: pilot/sender-proof.json usage-ledger/batchHalfPrice arithmetic; ledger.jsonl 940/94 tokens USD0.00282 |
-| 30 | Obtain credentials from the execution shell. | slice 1 | observed: missing-token-cli-proof.json real CLI refusal; execution Nix token-presence check and paid HTTP200 |
-| 31 | Fix the pass mark before held-out results. | slice 1 | observed: pilot/protocol.json fixed owner pass mark before held-out work |
-| 32 | Recommend proceed to design only when the held-out narrower prompt flags at most 1 in 10 sound questions, catches at least two thirds of labelled defects, and agrees across all three runs for at least 9 in 10 questions. Source example: 6/8 defects caught, 1/16 sound flagged, unanimous on 22/24 → proceed. | slice 6 | |
-| 33 | Recommend stop when the narrower prompt catches fewer defects or flags more sound questions than choices-only. | slice 6 | |
-| 34 | Recommend narrow and retest for anything else, including fewer than six scored held-out defects or fifteen scored sound questions. Source example: four defects → report figures and recommend at most narrow and retest. | slice 6 | |
-| 35 | Report defect detection separately for wrong keys. For row 5347, show how many of each check’s three runs flagged it, counted under wrong keys. | slice 8 | |
-| 36 | Report defect detection separately for multiple answers. | slice 8 | |
-| 37 | Report sound-question false flags. For sound row 8739, count the deployed verifier’s feasibility flag as a false flag, choices-only as upheld, and score the narrower prompt on that same question. | slice 8 | |
-| 38 | Report unresolved labels. | slice 8 | |
-| 39 | Report agreement across repeats. | slice 8 | |
-| 40 | Report latency. | slice 8 | |
-| 41 | Report tokens. | slice 8 | |
-| 42 | Report actual cost. | slice 8 | |
-| 43 | Report historical, held-out and freshly generated questions separately. | slice 8 | |
-| 44 | Report route. | slice 8 | |
-| 45 | Report question age. | slice 8 | |
-| 46 | Report note context. | slice 8 | |
-| 47 | Relate findings to checking before display versus after a miss, including the stored route. | slice 8 | |
-| 48 | Publish counts in the dated evidence. | slice 8 | |
-| 49 | Publish minimal de-identified examples in the dated evidence. | slice 8 | |
-| 50 | State remaining uncertainty for a mixed or inconclusive result. | slice 8 | |
-| 51 | Name unfinished work as unmeasured when the budget stops execution. | slice 8 | |
-| 52 | Keep new private packets and run outputs in .planning/tmp/recall-history/integrity/ in the default checkout, beside original inputs and paid responses. | slice 1 | observed: pilot/slice1-summary.json private artifact index; checkout diff contains planning records only |
-| 53 | Apply shared closeout when settled or stopped: record whether approved follow-up still needs temporary evidence. | slice 8 | |
-| 54 | Before removing the shared cache, have the owner of the last story using it check other dispositions and any approved follow-up. | slice 8 | |
-| 55 | Treat a decision to stop as releasing that story’s use of the evidence. | slice 8 | |
-| 56 | Once validation stories are settled and remaining approved use is finished or covered by a minimal de-identified handoff, remove .planning/tmp/recall-history/ from ~/git/doughnut and investigation-created temporary copies, including raw exports, derived datasets, reports, reviewer packets and scratch scripts. | slice 8 | |
-| 57 | Retain only non-sensitive conclusions and minimal de-identified examples needed for approved work or maintained regression tests. | slice 8 | |
-| 58 | Verify the temporary files are gone. | slice 8 | |
-| 59 | Record the closeout. | slice 8 | |
+| 1 | Produce a reproducible comparison of the deployed verifier, choices-only interpretation, and one narrower answer-checking prompt. | slice 8 |  |
+| 2 | Run the deployed verifier with the product’s request and decision rule, using the focus note only. | slice 3 | observed: pilot/ScratchPilotHistoricalDecisionTest.java real evaluateQuestion and QuestionEvaluation.getQuestionContestResult for all123 paid outputs; backend3199 pass; current focus-only bodies and source-prefix audit |
+| 3 | Derive choices-only flags from the same responses, flagging selected choices that differ from the stored key without additional paid calls. A sound case such as row 8739 remains upheld by choices-only when the selected choice matches the key despite a deployed feasibility flag. | slice 3 | observed: pilot/historical-verifier-decisions.json same parsed correctChoices and key; row8739 correctChoices=[0] feasible=false in each run, deployed flagged and choices-only upheld without extra calls |
+| 4 | Allow the narrower prompt to carry linked evidence required to judge the question. | slice 4 |  |
+| 5 | Use gpt-6.1-sol and product settings for every paid call, with prompt as the experimental difference. | slice 1 | observed: pilot/send.py model guard, historical verifier47-body audit and product generation-render-proof.json settings |
+| 6 | Reuse the private census, requests, responses and prior labels as inputs, while establishing fresh labels for this comparison. | slice 2 | observed: pilot/historical-selection.json original manifest/label hashes and all47 retained; historical-question-records.json current context joins |
+| 7 | Have two fresh-session reviewers independently judge each question against its note and required linked evidence, with the stored key hidden. | slice 2 | observed: pilot/historical-review-provenance.json actual isolated launches and packet hashes; recursive allow-list and both complete47-item returns |
+| 8 | Distinguish ambiguous or incorrect source notes from defective questions. | slice 2 | observed: pilot/historical-labels.json reviewer noteAtFault judgments and distinct scoring branch |
+| 9 | Leave reviewer disagreements unresolved and exclude them from detection and false-flag scoring, including disagreement over two versus one defensible answers. | slice 2 | observed: pilot/historical-labels.json disagreementFields; historical-acceptance-proof.json unresolvedScored=0 |
+| 10 | Record whether each note changed since generation. | slice 2 | observed: pilot/historical-labels.json generation, note update/read times and changed flags for every47 item |
+| 11 | Record missing historical content. | slice 2 | observed: pilot/historical-labels.json missingHistoricalContent and basis; linked-context update/read times |
+| 12 | Score a question involving changed note content only when both reviewers can judge the available content. | slice 2 | observed: pilot/historical-acceptance-proof.json changedScoredBothJudgeable;13 changed items scoreable against current evidence |
+| 13 | Make no paid calls for labelling. | slice 2 | observed: pilot/historical-acceptance-proof.json ledger SHA256 unchanged, one row before/after labels |
+| 14 | Include all 41 scoreable historical questions from the 47-question historical collection, freshly labelled. | slice 2 | observed: pilot/historical-label-summary.json all47 reviewed,41 scoreable:33sound6multiple2wrong-key; no pruning |
+| 15 | Develop the narrower prompt against the historical set only. | slice 4 |  |
+| 16 | Establish approximately 24 scoreable held-out questions from notes outside the historical set, retaining every labelled defect found and sound controls, with labels established before calls. | slice 5 |  |
+| 17 | Freeze and record the narrower prompt’s text before the first held-out call. | slice 4 |  |
+| 18 | Generate 12 fresh questions using the current on-demand request built by product code in the unit-test environment, using notes outside the historical set. | slice 7 |  |
+| 19 | Generate 12 fresh questions using the current batch request under the same environment and note restriction. | slice 7 |  |
+| 20 | Label fresh questions by the same review procedure before checking them. | slice 7 |  |
+| 21 | Check each fresh question once with each paid check; derive choices-only from the corresponding responses. | slice 7 |  |
+| 22 | Run each historical and held-out question three times through the deployed verifier and three times through the narrower prompt. | slice 6 |  |
+| 23 | Assign aggregate flags when at least two of three runs flag. | slice 3 | observed: pilot/summarize_historical_verifier.py inspected run1/2/3 coverage and sum(flags)>=2; historical-verifier-results.json per-question votes, majorities and unanimity |
+| 24 | Classify row 5347 as note-at-fault and unscored. | slice 2 | observed: pilot/historical-labels.json row5347 both reviewers note-at-fault and scored=false |
+| 25 | Preserve row 5347’s existing paid probe as diagnostic evidence outside the scored comparison, counting its cost. | slice 3 | observed: pilot/historical-verifier-preparation-summary.json diagnostic probe decoded through product outside scored comparison; ledger.jsonl one call USD0.00282 |
+| 26 | Keep total paid usage within 500 calls or USD 5, whichever is reached first; count every generation, check, repeat, retry and batch row, including the already-spent probe. | slice 1 | observed: pilot/sender-proof.json cap refusals before transport; send.py durable reservations/counting; G1 owns batch-row submission |
+| 27 | Use the amended call allocation: 246 historical checks, 144 held-out checks, 24 generations, 48 fresh checks and 38 wording/retry calls, with the latter allocated as 18 wording and 20 retry/probe/fallback calls. | slice 3 | observed: owner-amended source budget and acceptance-evidence fixed protocol; ledger124 calls includes123 scored verifier calls plus separate diagnostic probe, USD0.361126; remaining historical candidate123 and other allocations retained |
+| 28 | Calculate actual cost from response token usage at USD 2/M input and USD 10/M output, with batch usage at half price. | slice 1 | observed: pilot/sender-proof.json token arithmetic and batch half price; original ledger940input94output USD0.00282 |
+| 29 | Obtain credentials from the execution shell. | slice 1 | observed: missing-token-cli-proof.json real CLI refusal and execution-shell paid probe HTTP200 |
+| 30 | Stop sending calls when either hard cap is reached and report unfinished work as unmeasured, including unfinished fresh checks. | slice 8 |  |
+| 31 | Recommend proceeding to design only when held-out narrower results flag at most one in ten sound questions, catch at least two-thirds of labelled defects, and agree across all three runs for at least nine in ten questions, subject to the minimum sample and choices-only comparison rules. | slice 6 |  |
+| 32 | Recommend stopping if the narrower check catches fewer defects or flags more sound questions than choices-only. | slice 6 |  |
+| 33 | Recommend narrowing and retesting for remaining outcomes, including fewer than six scored held-out defects or fifteen scored sound questions; four held-out defects cannot support proceeding. | slice 6 |  |
+| 34 | Report detection separately for wrong keys and multiple defensible answers. | slice 8 |  |
+| 35 | Report sound-question false flags, including deployed feasibility flags such as row 8739, and score the narrower check on the same question. | slice 8 |  |
+| 36 | Report unresolved labels. | slice 8 |  |
+| 37 | Report repeat agreement. | slice 8 |  |
+| 38 | Report latency. | slice 8 |  |
+| 39 | Report token usage. | slice 8 |  |
+| 40 | Report actual cost. | slice 8 |  |
+| 41 | Keep historical, held-out and fresh findings separate, with route, question age and note context. | slice 8 |  |
+| 42 | Relate findings to checking before display versus after a miss, including the stored-question route. | slice 8 |  |
+| 43 | Make the recommendation name the failure classes and routes supported by the evidence, stating remaining uncertainty for mixed or inconclusive findings. | slice 8 |  |
+| 44 | Publish counts and minimal deidentified examples in dated evidence. | slice 8 |  |
+| 45 | Place new private packets and run outputs in .planning/tmp/recall-history/integrity/ in the default checkout, beside original inputs and paid responses. | slice 1 | observed: pilot/slice1-summary.json and later private historical artifact indexes; tracked changes are planning records only |
+| 46 | At each validation closure, record whether approved follow-up still requires temporary evidence; stopping releases that story’s use. | slice 8 |  |
+| 47 | Before shared cache removal, have the last story owner check the other validation dispositions and approved follow-up uses. | slice 8 |  |
+| 48 | Once the validation stories are settled and remaining approved uses are finished or covered by a minimal deidentified handoff, remove .planning/tmp/recall-history/ from ~/git/doughnut and investigation-created copies, including raw exports, derived datasets, reports, packets and scratch scripts. | slice 8 |  |
+| 49 | Retain only nonsensitive conclusions and minimal deidentified examples needed for approved work or regression tests. | slice 8 |  |
+| 50 | Verify the cleanup files are gone and record shared closeout. | slice 8 |  |
 
 ## Unnumbered source context
 
-Identity: SEED-073#explore-reliable-recall-question-checks. Motivation,
-baseline (deployed 5/8 defects and 12/26 sound false flags; choices 4/8 and
-1/26), owner budget allocation and pass-mark provenance (2026-11-16), and
-M/low-confidence effort hypothesis are source context. Exclusions: product
-behavior, Production writes, stored-question policy, population error-rate
-or age-discard conclusions; additional models, prompts or budget require a
-separate bounded decision. Product notes and recall history are outside
-temporary-evidence cleanup. The full source and reviewer return remain in
-the launch/return transcript described above.
+The trustworthy wrong mark is a later product-design ambition; improved
+reliability is a hypothesis, not a promised result. Earlier measurements and
+the superseded allocation/row 5347 example are dated provenance. Exclusions:
+product behavior, Production writes, stored-question policy, population error
+rates and age-based discard conclusions. Additional model/prompt/budget needs
+a separately bounded decision. Product notes and recall history are outside
+cleanup. Effort remains M with low confidence.

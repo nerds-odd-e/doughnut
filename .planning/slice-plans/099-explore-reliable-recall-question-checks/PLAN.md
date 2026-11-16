@@ -29,8 +29,8 @@ Never commit scratch tests/scripts. The report and plan status are the committed
 - **Experiment protocol.** The [fixed owner protocol](acceptance-evidence.md#fixed-experiment-protocol)
   owns budget/allocation, ledger, model settings, pass mark, repeat verdicts,
   blind labels, freeze, batch fallback, read-only access and verification gates.
-  Read it with the slice before execution. G4/G5 hold the next paid comparison
-  pending the owner decisions; this extraction changes neither protocol nor scope.
+  Read it with the slice before execution. Owner approval on 2026-11-16 settles
+  G4/G5: use the fresh labels and all 41 scoreable historical questions.
 
 ## Decisive premises
 
@@ -56,7 +56,7 @@ Status: done
 Accepted (2026-11-16): the three sender guards refused before transport;
 one row 5347 replay returned HTTP 200 (USD 0.00282); both product generation
 routes included the fetched linked-note evidence. The full backend suite
-passed (3,199 tests, zero failures/errors, two skips). Reuse row 5347 run 1;
+passed (3,199 tests, zero failures/errors, two skips). Row 5347 is diagnostic;
 [inspected setup, commands and evidence](acceptance-evidence.md#slice-1-acceptance-observations)
 retain the exact proof. Independent refactoring and delivery passed.
 
@@ -72,7 +72,7 @@ one call → the call is sent, the response is stored, and the ledger holds
 one line; at either limit nothing is sent. Early probe: a missing token or
 a generation request that cannot be rendered with real linked context
 stops the dependent slices (all paid slices; slice 7) and changes this
-plan. The one paid replay counts as run 1 of that question in slice 3.
+plan. The paid replay counts toward the cap; its question is now unscored.
 
 ### 2. Historical questions carry note-backed labels
 
@@ -82,7 +82,7 @@ Accepted observations: 47 reviewed; 41 scoreable (33 sound, 6 multiple-answer,
 2 wrong-key), 3 note-at-fault and 3 unresolved. Independent key-hidden reviews,
 provenance, unchanged ledger and inspected scoring are retained in
 [slice 2 acceptance](acceptance-evidence.md#slice-2-acceptance-observations).
-The source-example and allocation decisions below hold the next paid stage.
+The owner accepted the fresh labels and revised historical allocation.
 
 Proof: `pilot/historical-labels.json` in the cache lists each of the 47
 earlier-labelled questions with both reviewers' key-hidden judgments, the
@@ -99,12 +99,15 @@ question → it is listed unresolved and scored nowhere.
 ### 3. The deployed verifier and its choices are measured on three repeats
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted: all 123 calls and product decoding passed; deployed caught 8/8
+defects with 13/33 sound false flags, choices-only 7/8 with 0/33. See
+[slice 3 observations](acceptance-evidence.md#slice-3-paid-observations).
 Proof: Per scored historical question, a table of 3 product decisions and
 3 choice readings against the key, with the 2-of-3 verdict for each check;
-the ledger holds 3 lines per question (at most 120). Totals by label for
-detected, false flag and same-verdict-in-all-runs. Row 5347 appears under
-wrong keys and row 8739 under sound, each with its three results.
+the ledger holds 3 lines per question (123). Totals by label for
+detected, false flag and same-verdict-in-all-runs. Row 8739 appears under
+sound with three results; row 5347 remains a separate unscored diagnostic.
 
 Behavior: scored historical questions and the product's verifier request →
 each is sent 3 times → detection, false flags and repeat agreement are
@@ -115,8 +118,8 @@ recorded for the deployed rule and for choices-only.
 Type: Behavior
 Status: planned
 Proof: `pilot/candidate-prompt.txt` and its SHA-256 exist; wording used at
-most 24 ledger lines and only historical questions. After the freeze, 3
-runs per scored historical question (at most 120 lines) give the same
+most 18 ledger lines and only historical questions. After the freeze, 3
+runs per scored historical question (123 lines) give the same
 table as slice 3 for the narrower prompt.
 
 Behavior: the historical labels and slice 3's results → one prompt that
@@ -220,12 +223,12 @@ Disposition: receiving slice 8
 ### G4. Fresh row 5347 finding conflicts with the source example
 Reported: slice 2 — "Both fresh reviewers classify row 5347 as note-at-fault/unscored, with its focus note unchanged since generation; the paid probe is outside the scored comparison."
 Story clause: "Row 5347's key rejects the unique correct answer"
-Disposition: receiving slice 3
+Disposition: owner changed "Row 5347 is note-at-fault and unscored"
 
 ### G5. Historical call allocation awaits the owner
 Reported: slice 2 — "Forty-one scored questions require 123 calls per paid check, exceeding each slice's parenthetical 120 estimate by three. No valid label was pruned."
 Story clause: "240 historical checks"
-Disposition: receiving slice 3
+Disposition: owner changed "246 historical checks"
 
 ### G6. Report current-evidence and route limitations
 Reported: slice 2 — "Eighteen focus notes changed after generation, thirteen remain scoreable against current evidence; seventeen questions have edited linked context, historical versions were not reconstructed, and route labels retain the original minute-zero heuristic."
@@ -235,4 +238,9 @@ Disposition: receiving slice 8
 ### G7. Render the two missing historical verifier requests
 Reported: slice 2 — "Rows 548 and 718 need verifier requests rendered; other retained historical focus contents match fetched current contents."
 Story clause: "the product's own request and decision rule, focus note only"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: pilot/historical-verifier-preparation-summary.json, request audit and retained scratch observations; 47 current requests including rows 548/718, settings and source matching; 3,199 backend tests passed, zero paid calls added.
+
+### G8. Report the verifier input condition and truncation
+Reported: slice 3 — "The pilot supplies focus-only fixtures, while Production's shared retriever may include linked context; row 3748 receives the product's marked truncated focus-note prefix."
+Story clause: "with route, question age and note context"
+Disposition: receiving slice 8
