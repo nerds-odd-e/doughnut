@@ -99,70 +99,121 @@ its own using the baseline and examples.
 
 **Identity:** SEED-073#explore-reliable-recall-question-checks
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/099-explore-reliable-recall-question-checks/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0be3f81589944b2744b2e65b26f54d850f0af62b511a74091badeab6b2f70185","plan":"26622ddb9c3d2be9250a4c32e6377ede02da9821abd36f2ad6bb7540b1bb1049"}}
 ```
 
-- **For / why.** A learner needs a wrong mark to reflect a wrong answer,
-  rather than a defective key or another defensible choice. The owner needs
-  evidence that a proposed check catches those defects without needlessly
-  replacing sound questions.
-- **Starting evidence.** The completed integrity validation established the
-  stored-question exposure and existing repeated-choice protection, but did
-  not establish a reliable semantic check. The deployed verifier caught
-  5 of 8 labelled defects and flagged 12 of 26 sound controls; its choices
-  alone caught 4 of 8 and flagged 1 of 26. See the
-  [experience summary](learning-refinement-and-retrieval-evidence.md#recall-question-integrity-experience)
-  for what the 60 paid calls resolved and why another experiment is needed.
-- **Hypothesis.** A check focused on the supported answers, with sufficient
-  note evidence, can distinguish wrong keys and multiple defensible answers
-  more reliably than the verifier's broad feasibility judgment. A small
-  repeated comparison should reveal whether that improvement survives new
-  cases and run-to-run variation.
-- **Explore first.** Reuse the private census, labels, requests and responses.
-  Review disputed labels against the note and required linked evidence, with
-  the stored key hidden during judgment. Separate an ambiguous or incorrect
-  note from a bad question; leave unresolved cases unscored. Record note
-  revisions and missing historical content rather than treating today's
-  content as the original input.
-- **Paid experiments.** Refine one capped pilot comparing the exact deployed
-  verifier, the choices-only interpretation of those same responses, and one
-  narrower answer-checking prompt. Include labelled wrong keys, two-answer
-  cases and sound controls. Repeat each paid configuration on the same
-  items to measure variation; three runs per item is the starting sizing
-  hypothesis. Freeze the candidate before evaluating separate held-out notes.
-  Include a small paid fresh-generation run using the current on-demand and
-  batch request paths, followed by checking its outputs, so the result is
-  not limited to selected historical misses. Count generation, verification,
-  any paid label adjudication, repeats, and retries in the same budget.
-- **Evaluate.** Compare defect detection separately for wrong keys and
-  multiple answers, sound-question false flags, unresolved labels, agreement
-  across repeats, latency, tokens and actual cost. Report historical,
-  held-out and freshly generated cases separately, with route, question age
-  and note context. Relate the tradeoff to checking before display versus
-  after a miss, including the stored route. Do not infer a population error
-  rate from a selected pilot or choose an age-based discard policy from
-  verifier scores.
-- **Decision / safe stopping point.** Deliver a reproducible comparison and
-  a recommendation to proceed to design, narrow and retest, or stop, naming
-  which failure classes and routes the evidence supports. Set the tolerable
-  false-flag tradeoff and sample/budget bounds during refinement before paid
-  runs. A mixed or inconclusive result is a valid outcome with a stated
-  remaining uncertainty; expand only through a separately bounded decision.
-  Product behavior, production data changes and the stored-question policy
-  remain outside this exploration.
-- **Paid-run scope.** More paid runs belong to this follow-up. The original
-  60-call allowance is exhausted. Before execution, settle the concrete
-  models, sample sizes, repeat counts, maximum calls and cost with the owner,
-  and use credentials from the execution shell. This backlog update runs no
-  paid experiment and allocates no new spending allowance.
-- **Effort hypothesis.** M, low confidence for one small capped pilot and
-  decision report; sample preparation and adjudication determine the bound.
-- **Evidence and cleanup.** This follow-up retains use of
-  `.planning/tmp/recall-history/integrity/` in the default checkout, including
-  the original inputs and paid responses. Keep new private packets and run
-  outputs there; publish only non-sensitive conclusions and minimal
-  de-identified examples. Apply the [shared closeout](#close-out-temporary-recall-evidence)
-  when the follow-up is settled or stopped.
+**Goal.** A learner needs a wrong mark to reflect a wrong answer, rather
+than a defective key or another defensible choice. This exploration gives
+the owner a reproducible comparison of three checks and a recommendation
+to proceed to design, narrow and retest, or stop, naming the failure
+classes and routes the evidence supports. The broader ambition, a
+trustworthy wrong mark in the product, stays with a later design story.
+
+**Starting evidence.** The completed integrity validation established the
+stored-question exposure and existing repeated-choice protection, but no
+reliable semantic check. The deployed verifier caught 5 of 8 labelled
+defects and flagged 12 of 26 sound controls; its choices alone caught 4 of
+8 and flagged 1 of 26. See the
+[experience summary](learning-refinement-and-retrieval-evidence.md#recall-question-integrity-experience).
+
+**Hypothesis.** A check focused on the supported answers, with sufficient
+note evidence, distinguishes wrong keys and multiple defensible answers
+more reliably than the verifier's broad feasibility judgment, and the
+improvement survives unseen notes and run-to-run variation.
+
+**Scope.**
+
+- **Compared checks.** (1) The deployed verifier: the product's own
+  request and decision rule, focus note only. (2) Choices-only: the same
+  responses, flagged when the selected choices differ from the stored key;
+  it costs no calls. (3) One narrower answer-checking prompt, which may
+  carry the linked evidence a question requires. All paid calls use
+  `gpt-6.1-sol` with the product's settings, so only the prompt differs.
+- **Labels before spending.** Reuse the private census, labels, requests
+  and responses. Two fresh session reviewers judge each question against
+  the note and its required linked evidence with the stored key hidden.
+  They separate an ambiguous or incorrect note from a bad question. A
+  disagreement stays unresolved and unscored. Record whether the note
+  changed after the question was generated and any missing historical
+  content. Labelling makes no paid call.
+- **Historical set.** About 40 scored questions from the 47 already
+  labelled, relabelled as above. The narrower prompt is worded against
+  this set only.
+- **Held-out set.** About 24 scored questions from notes outside the
+  historical set, labelled before any call and holding every labelled
+  defect found plus sound controls. The narrower prompt is frozen, with
+  its text recorded, before the first held-out call.
+- **Fresh generation.** 12 questions through the current on-demand
+  request and 12 through the current batch request, built by the product
+  code in a unit-test environment for notes outside the historical set,
+  labelled the same way, then checked once by each paid check.
+- **Repeats.** Each historical and held-out question goes 3 times to the
+  deployed verifier and 3 times to the narrower prompt. A check flags a
+  question when at least 2 of its 3 runs flag it.
+- **Budget (owner, 2026-11-16).** At most 500 paid calls or USD 5,
+  whichever is reached first: 240 historical checks, 144 held-out checks,
+  24 generations, 48 fresh checks, and 44 for wording the narrower prompt
+  and retries. Every generation, check, repeat and retry counts; a batch
+  row is one call. Cost is computed from each response's token usage at
+  USD 2 per million input and USD 10 per million output tokens (list price
+  as found on 2026-11-16, batch at half). Credentials come from the
+  execution shell.
+- **Pass mark (owner, 2026-11-16), fixed before held-out results.**
+  Recommend "proceed to design" only when, on the held-out set, the
+  narrower prompt flags at most 1 in 10 sound questions, catches at least
+  two thirds of labelled defects, and gives the same verdict in all 3 runs
+  for at least 9 in 10 questions. Catching fewer defects or flagging more
+  sound questions than choices-only means "stop". Anything else, including
+  fewer than 6 scored held-out defects or 15 scored sound questions, means
+  "narrow and retest".
+- **Report.** Defect detection separately for wrong keys and multiple
+  answers, sound-question false flags, unresolved labels, agreement across
+  repeats, latency, tokens and actual cost. Historical, held-out and
+  freshly generated questions are reported separately, with route,
+  question age and note context, and related to checking before display
+  versus after a miss, including the stored route. Publish counts and
+  minimal de-identified examples in the
+  [dated evidence](learning-refinement-and-retrieval-evidence.md); a mixed
+  or inconclusive result is a valid outcome with its remaining uncertainty
+  stated.
+- **Scope limits.** No product behavior, Production data change or
+  stored-question policy. No population error rate from a selected pilot
+  and no age-based discard policy from verifier scores. A second model, a
+  second candidate prompt and any spending beyond the budget need a
+  separately bounded decision.
+- **Evidence and cleanup.** Keep new private packets and run outputs in
+  `.planning/tmp/recall-history/integrity/` in the default checkout, beside
+  the original inputs and paid responses. Apply the
+  [shared closeout](#close-out-temporary-recall-evidence) when the
+  follow-up is settled or stopped.
+
+**Key examples.**
+
+- *Wrong key.* Row 5347's key rejects the unique correct answer and the
+  deployed verifier upheld it once → after the pilot, the report shows for
+  each check how many of its 3 runs flagged it, counted under wrong keys.
+- *Sound control.* Row 8739 is sound; the deployed verifier chose the key
+  and flagged it on feasibility → it counts as a false flag for the
+  deployed verifier and as upheld for choices-only; the narrower prompt
+  is scored on the same question.
+- *Reviewers disagree.* One reviewer finds two defensible answers and the
+  other finds one → the question is listed as unresolved and enters no
+  detection or false-flag count.
+- *Note changed since generation.* A question's note was edited after the
+  question was generated → the report marks it, and it is scored only
+  when both reviewers can judge it from the content available.
+- *Pass.* The held-out set holds 8 labelled defects and 16 sound
+  questions; the narrower prompt catches 6, flags 1 sound question and
+  gives one verdict in all 3 runs on 22 of 24 → "proceed to design".
+- *Too few defects.* Labelling finds 4 held-out defects → the held-out
+  figures are reported and the recommendation is at most "narrow and
+  retest".
+- *Budget reached.* The 500th call or USD 5 is reached before the fresh
+  checks finish → sending stops, and the report names the unfinished part
+  as unmeasured.
+
+**Effort hypothesis.** M, low confidence; sample preparation and labelling
+determine the bound.
 
 <a id="validate-spelling-objectives"></a>
 
