@@ -100,7 +100,7 @@
     "@biomejs/biome": "2.6.6",
     "@cucumber/cucumber": "13.3.0",
     "@hey-api/openapi-ts": "0.99.0",
-    "@hono/node-server": "2.1.6",
+    "@hono/node-server": "2.1.8",
     "@mbtest/mountebank": "2.9.5",
     "@modelcontextprotocol/sdk": "1.32.2",
     "@redocly/cli": "2.78.0",
