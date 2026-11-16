@@ -29,7 +29,7 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | S3 | For each check, record which failures it detects | slice 8 | |
 | S3a | ...and which sound questions it flags | slice 5 | |
 | S3b.1 | Check: repeated-choice comparison | slice 3 | |
-| S3b.2 | Check: key taken from the named answer | slice 2 | |
+| S3b.2 | Check: key taken from the named answer | slice 2 | observed: PLAN.md slice 2 result (removes position errors by construction; detects nothing at runtime) |
 | S3b.3 | Check: the verifier | slice 6 | |
 | S3b.4 | Check: comparison of a wrong selection with answers credited for the same note | slice 3 | |
 | S3b.5 | Check: the learner's contest | slice 4 | |
@@ -61,7 +61,7 @@ Launch: fresh general-purpose reviewer, no conversation inheritance, 2026-11-16.
 | D2 | Deferred: an error rate for the deployed generator; story shows whether a failure still occurs; observed counts reported as counts | slice 8 | |
 | D3 | Deferred: spelling questions (owned by Validate spelling objectives and cues) | slice 8 | |
 | D4 | Deferred: a key wrong because the note is wrong (owned by Validate source-backed note edits from recall); verifier reads the same note, so agreement cannot show this | slice 8 | |
-| E1 | Repeated choices, newly generated: apology question (row 8719) with two identical choices → replayed as generator output at current revision → generation rejects it and stores nothing; record says this failure stops at generation since 2026-08-22 | slice 2 | |
+| E1 | Repeated choices, newly generated: apology question (row 8719) with two identical choices → replayed as generator output at current revision → generation rejects it and stores nothing; record says this failure stops at generation since 2026-08-22 | slice 2 | observed: PLAN.md slice 2 result; scratch `ScratchRepeatedChoiceRoutesTest`/`BatchTest` assertions (no question stored on either generating route) |
 | E2 | Repeated choices, stored: question with two identical choices stored before 2026-08-22 → tracker comes due → shown, and learner's selection marked wrong though its text equals the key's (row 8518); count of such stored questions decides whether this still reaches a learner | slice 4 | |
 | E3 | Key against rationale: among attempts answered from 2026-08-23, 23 marked wrong have a rationale naming another choice and not the key → each reviewed with key hidden → recorded as real disagreement or wording difference; no real disagreement is a clean result for this class | slice 5 | |
 | E4 | Old stored question: location-particle question (row 3748) generated 2025-02-06, three choices, two defensible → tracker came due 2026-10-06 → shown and graded with no check; record names the stored route and the verifier's outcome | slice 6 | |

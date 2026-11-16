@@ -90,7 +90,7 @@ hold the full results.
 | Stored unanswered questions and their contested state can be read without an owner-held step | `GET /api/recalls/recalling?timezone=Asia/Singapore&dueindays=36500` listed 16,025 trackers, 14,301 not spelling. `GET /api/memory-trackers/{id}/recall-prompts` for 60 of them took 52.6 seconds and returned generation time, choices, and contested state; an unanswered question comes without its key or rationale. At four reads at a time the full read is about 52 minutes of command time. Production load during the full read is unobserved. | Slice 4 |
 | A focused backend test runs in this worktree | `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*Generat*'` exited 0 on 2026-11-16: 61 suites, 189 tests. The wrapper accepts one `--tests` pattern. | Slices 1, 2, 6 |
 | The maintained test of repeated choices fails without the check | Scratch edit removing the repeated-text rejection in `GeneratedMcq.isValid()`, then `pnpm backend:test:worktree --tests '*GeneratedMcqTest'`: 3 of 11 failed ("repeated distractor", "repeated distractor after stripping whitespace", "distractor duplicates correct answer after stripping whitespace"). Edit reverted. | Slice 2 |
-| Both generating routes have a maintained test of an invalid generated answer set | Read at this revision: `AiQuestionGeneratorTests.shouldRejectQuestionWithBlankCorrectAnswer` (on demand) and `QuestionGenerationBatchImportServiceTest.invalidSemanticAnswerSetFailsWithoutCreatingRecallPrompt` (batch); both passed in the run above. Neither uses repeated choice text; slice 2 observes that case on each route. | Slice 2 |
+| Both generating routes have a maintained test of an invalid generated answer set | Read at this revision: `AiQuestionGeneratorTests.shouldRejectQuestionWithBlankCorrectAnswer` (on demand) and `QuestionGenerationBatchImportServiceTest.invalidSemanticAnswerSetFailsWithoutCreatingRecallPrompt` (batch); both passed in the run above. Corrected by slice 2: the batch test already uses repeated text (a distractor equal to the key after trimming); only the on-demand route lacks a route-level repeated-choice test. | Slice 2 |
 | The verifier request can be captured in a test and sent to the model provider | A scratch test extending `NoteQuestionGenerationServiceTestBase` set the evaluation model, called `evaluateQuestion`, captured the request, and rendered it through `StructuredResponseCreateParamsSerializer.toBodyMap`; `pnpm backend:test:worktree --tests '*ScratchVerifierRequestTest'` exited 0 on 2026-11-16. The body holds `model` `gpt-6.1-sol`, `instructions`, `input`, `max_output_tokens` 500, low reasoning effort, and a JSON schema for `QuestionEvaluation`. The test was removed. Sending the body to the provider is paid and owner-held, so it is unobserved. | Slice 1 early probe |
 | Production evaluates with a known model | `GET /api/settings/current-model-version`, 2026-11-16: evaluation and question generation models are both `gpt-6.1-sol`. | Slices 1, 6 |
 | Two key-hidden reviewers can label questions | Retained 2026-11-14 offline replay in the cache: two AI reviewers solved 47 shuffled prompts without keys, and `compare.py` compared their answers with the stored payload. | Slice 5 |
@@ -155,7 +155,7 @@ question id.
 
 ### 2. Replay the repeated-choice payload through each route
 Type: Behavior
-Status: planned
+Status: done
 Proof: scratch backend tests show what each route does with the apology
 question's choices (row 8719), and the record names the maintained tests
 that hold the same case without private text.
@@ -171,6 +171,35 @@ results, the maintained tests that cover each case, and any route without
 one. Also record that the kendō failure's old form, a position that
 disagrees with the rationale, cannot be expressed in today's output, where
 the generator names the answer text. Revert the scratch tests.
+
+Result, 2026-11-16: `CURSOR_DEV=true nix develop -c pnpm
+backend:test:worktree --tests '*ScratchRepeatedChoice*'` exited 0, 9 scratch
+tests passing; copies kept as `integrity/slice2-*.java` and removed from the
+worktree. Row 8719 has four choices, choices 2 and 3 share their text, the
+key is one twin, and the rationale names choice 4. It was replayed as
+generator output twice: key = twin with the other twin as a distractor, and
+key = choice 4 with two identical distractors.
+
+- On demand: both forms rejected by `GeneratedMcq.isValid()`; the controller
+  answers 503 and the tracker holds no question. Regeneration takes the same
+  path (code reading only).
+- Batch: both forms rejected; the request ends `FAILED`, "invalid batch
+  success payload", no question stored.
+- Stored: a stored question with twin choices is served unchanged; answering
+  the twin of the key, or choice 4, is marked wrong, because
+  `Mcq.checkAnswer` compares positions only.
+- Maintained tests: `GeneratedMcqTest.rejectsInvalidSemanticAnswerSets`
+  (shared check) and
+  `QuestionGenerationBatchImportServiceTest.invalidSemanticAnswerSetFailsWithoutCreatingRecallPrompt`
+  (batch, neutral text). The on-demand route has no route-level
+  repeated-choice test, and the stored route no test of a stored question
+  with repeated choices.
+- Key taken from the named answer: since `1716fda6d3` (2026-08-22)
+  `GeneratedMcq` carries the answer text and distractors, and
+  `GeneratedQuestionPostProcessor` derives the position after shuffling, so
+  the kendō form (a position disagreeing with the rationale) cannot be
+  expressed. It detects nothing at runtime: a named answer that contradicts
+  the rationale or the note, or a second defensible answer, still passes.
 
 ### 3. Count every check's flags by route and generation period
 Type: Behavior
