@@ -26,49 +26,11 @@ Never commit scratch tests/scripts. The report and plan status are the committed
   branch, start revision, checkout roles, successful setup and observer identity
   are in the [established context](acceptance-evidence.md#established-execution-context).
   Replanning retains existing planned-work authority; no overrun override.
-- **Budget (owner, 2026-11-16).** At most 500 paid calls or USD 5,
-  whichever is reached first. Allocation: 240 historical checks, 144
-  held-out checks, 24 generations, 48 fresh checks, 24 for wording the
-  narrower prompt, 20 for retries and fallback. A batch row is one call.
-  The earlier 60 calls are outside this budget.
-- **Ledger.** One file in the cache, `pilot/ledger.jsonl`, gets one line
-  per paid call before the next call is sent: purpose, item, run number,
-  time sent, HTTP status, latency, input and output tokens, and cost at
-  USD 2 per million input and USD 10 per million output tokens (batch rows
-  at half). The sender refuses to send when the ledger holds 500 lines or
-  USD 5. The price is the list price found on 2026-11-16 from pricing
-  aggregators, not read from the provider's own page.
-- **Model (owner, 2026-11-16).** `gpt-6.1-sol` only, with each request's
-  product settings (the verifier request uses low reasoning and at most
-  500 output tokens).
-- **Pass mark (owner, 2026-11-16).** On the held-out set the narrower
-  prompt flags at most 1 in 10 sound questions, catches at least two
-  thirds of labelled defects, and gives the same verdict in all 3 runs for
-  at least 9 in 10 questions → "proceed to design". Catching fewer defects
-  or flagging more sound questions than choices-only → "stop". Anything
-  else, including fewer than 6 scored held-out defects or 15 scored sound
-  questions → "narrow and retest".
-- **Verdict from repeats.** A check flags a question when at least 2 of its
-  3 runs flag it. Choices-only is read from the deployed verifier's
-  responses in the same runs and costs no call.
-- **Labels.** Two fresh session reviewers judge each question against the
-  note and its required linked evidence with the stored key, the rationale
-  and the earlier labels hidden. They separate an ambiguous or incorrect
-  note from a bad question. A disagreement is unresolved and unscored.
-  Labelling makes no paid call.
-- **Freeze.** The narrower prompt's text and its SHA-256 are written to
-  `pilot/candidate-prompt.txt` in the cache before the first held-out or
-  fresh call. Held-out and fresh questions are not read while wording it.
-- **Batch route.** The 12 batch questions go as one Batch API job built by
-  the product's batch request code. If the job has not finished one hour
-  after submission, cancel it, count the rows it completed, send the
-  unfinished rows' same bodies synchronously from the retry allocation,
-  and record the route difference as a limitation.
-- **Reads of Production.** Read-only, through the owner's CLI token, for
-  note content and linked notes. Nothing is written to Production.
-- **Verification gates.** This plan changes no product code, so no product
-  test suite is a local gate. Each slice's proof is its recorded
-  observation.
+- **Experiment protocol.** The [fixed owner protocol](acceptance-evidence.md#fixed-experiment-protocol)
+  owns budget/allocation, ledger, model settings, pass mark, repeat verdicts,
+  blind labels, freeze, batch fallback, read-only access and verification gates.
+  Read it with the slice before execution. G4/G5 hold the next paid comparison
+  pending the owner decisions; this extraction changes neither protocol nor scope.
 
 ## Decisive premises
 
@@ -96,7 +58,7 @@ one row 5347 replay returned HTTP 200 (USD 0.00282); both product generation
 routes included the fetched linked-note evidence. The full backend suite
 passed (3,199 tests, zero failures/errors, two skips). Reuse row 5347 run 1;
 [inspected setup, commands and evidence](acceptance-evidence.md#slice-1-acceptance-observations)
-retain the exact proof. Independent refactoring passed; delivery pending.
+retain the exact proof. Independent refactoring and delivery passed.
 
 Proof: With the token absent the sender exits before sending. With a
 scratch ledger of 500 lines, and separately one totalling USD 5, the sender
@@ -115,7 +77,13 @@ plan. The one paid replay counts as run 1 of that question in slice 3.
 ### 2. Historical questions carry note-backed labels
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted observations: 47 reviewed; 41 scoreable (33 sound, 6 multiple-answer,
+2 wrong-key), 3 note-at-fault and 3 unresolved. Independent key-hidden reviews,
+provenance, unchanged ledger and inspected scoring are retained in
+[slice 2 acceptance](acceptance-evidence.md#slice-2-acceptance-observations).
+The source-example and allocation decisions below hold the next paid stage.
+
 Proof: `pilot/historical-labels.json` in the cache lists each of the 47
 earlier-labelled questions with both reviewers' key-hidden judgments, the
 outcome (wrong key, more than one defensible answer, sound, note at fault,
@@ -248,3 +216,23 @@ Disposition: no user cost "built by the product code in a unit-test environment"
 Reported: slice 1 — "Rates remain the owner-fixed accounting basis."
 Story clause: "Cost is computed from each response's token usage"
 Disposition: receiving slice 8
+
+### G4. Fresh row 5347 finding conflicts with the source example
+Reported: slice 2 — "Both fresh reviewers classify row 5347 as note-at-fault/unscored, with its focus note unchanged since generation; the paid probe is outside the scored comparison."
+Story clause: "Row 5347's key rejects the unique correct answer"
+Disposition: receiving slice 3
+
+### G5. Historical call allocation awaits the owner
+Reported: slice 2 — "Forty-one scored questions require 123 calls per paid check, exceeding each slice's parenthetical 120 estimate by three. No valid label was pruned."
+Story clause: "240 historical checks"
+Disposition: receiving slice 3
+
+### G6. Report current-evidence and route limitations
+Reported: slice 2 — "Eighteen focus notes changed after generation, thirteen remain scoreable against current evidence; seventeen questions have edited linked context, historical versions were not reconstructed, and route labels retain the original minute-zero heuristic."
+Story clause: "with route, question age and note context"
+Disposition: receiving slice 8
+
+### G7. Render the two missing historical verifier requests
+Reported: slice 2 — "Rows 548 and 718 need verifier requests rendered; other retained historical focus contents match fetched current contents."
+Story clause: "the product's own request and decision rule, focus note only"
+Disposition: receiving slice 3

@@ -22,16 +22,16 @@ later slices even where the first owning slice supplies their initial proof.
 | 4 | Derive choices-only from the same responses, flagging when selected choices differ from the stored key, with no additional calls. | slice 3 | |
 | 5 | Compare one narrower answer-checking prompt, which may carry required linked evidence. | slice 4 | |
 | 6 | Use gpt-6.1-sol with the product’s settings for all paid calls, so only the prompt differs. | slice 1 | observed: pilot/send.py model guard; historical replay body; generation-render-proof.json product settings |
-| 7 | Reuse the private census, labels, requests and responses. | slice 2 | |
-| 8 | Have two fresh session reviewers judge each question against its note and required linked evidence, with the stored key hidden. | slice 2 | |
-| 9 | Separate an ambiguous or incorrect note from a bad question. | slice 2 | |
-| 10 | Leave reviewer disagreements unresolved; for example, reviewers finding two versus one defensible answers. | slice 2 | |
-| 11 | Exclude unresolved questions from detection and false-flag counts. | slice 2 | |
-| 12 | Record whether the note changed after question generation. | slice 2 | |
-| 13 | Record missing historical content. | slice 2 | |
-| 14 | Score a question whose note changed only when both reviewers can judge it from the content available. | slice 2 | |
-| 15 | Make no paid call for labelling. | slice 2 | |
-| 16 | Assemble about 40 scored historical questions from the 47 already labelled, relabelled as specified. | slice 2 | |
+| 7 | Reuse the private census, labels, requests and responses. | slice 2 | observed: pilot/historical-selection.json original manifest/label hashes, all47 preserved; historical-question-records.json current-match checks |
+| 8 | Have two fresh session reviewers judge each question against its note and required linked evidence, with the stored key hidden. | slice 2 | observed: pilot/historical-review-provenance.json two isolated launches and packet hashes; prepare_historical.py/score_historical.py recursive allow-list and complete47-item checks |
+| 9 | Separate an ambiguous or incorrect note from a bad question. | slice 2 | observed: pilot/historical-labels.json noteAtFault judgments; score_historical.py distinct note-at-fault classification |
+| 10 | Leave reviewer disagreements unresolved; for example, reviewers finding two versus one defensible answers. | slice 2 | observed: pilot/historical-labels.json disagreementFields; score_historical.py disagreement branch |
+| 11 | Exclude unresolved questions from detection and false-flag counts. | slice 2 | observed: pilot/historical-acceptance-proof.json unresolvedScored=0 and noteAtFaultScored=0; inspected scorer branch |
+| 12 | Record whether the note changed after question generation. | slice 2 | observed: pilot/historical-labels.json generatedAt/noteUpdatedAt/noteChangedAfterGeneration for every47 item |
+| 13 | Record missing historical content. | slice 2 | observed: pilot/historical-labels.json missingHistoricalContent and historicalContentBasis; per-linked update/read times |
+| 14 | Score a question whose note changed only when both reviewers can judge it from the content available. | slice 2 | observed: pilot/historical-acceptance-proof.json changedScoredBothJudgeable; both actual reviewer fields inspected via scorer;13 changed scored |
+| 15 | Make no paid call for labelling. | slice 2 | observed: pilot/historical-acceptance-proof.json ledger hash equals before3eb249f01f7ca35606527925520ed9c6ecd6f18db8abae91a5a507363de45b0a; one row unchanged |
+| 16 | Assemble about 40 scored historical questions from the 47 already labelled, relabelled as specified. | slice 2 | observed: pilot/historical-label-summary.json all47 reviewed,41 scoreable;33sound6multiple2wrong-key; no pruning |
 | 17 | Word the narrower prompt against the historical set only. | slice 4 | |
 | 18 | Assemble about 24 scored held-out questions from notes outside the historical set. | slice 5 | |
 | 19 | Label the held-out set before any call. | slice 5 | |

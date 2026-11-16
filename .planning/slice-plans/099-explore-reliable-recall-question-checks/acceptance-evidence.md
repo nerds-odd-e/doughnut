@@ -1,8 +1,55 @@
 # Execution context and acceptance evidence
 
-This companion holds the established setup and inspected observations for the
-[active plan](PLAN.md). Slice statuses, decisions and obligations remain there;
-private artifacts remain in the cache. It is not a second run ledger.
+This companion holds the fixed experiment protocol, established setup and
+inspected observations for the [active plan](PLAN.md). Slice statuses, pending
+decisions and obligations remain there; private artifacts remain in the cache.
+It is not a second run ledger.
+
+## Fixed experiment protocol
+
+- **Budget (owner, 2026-11-16).** At most 500 paid calls or USD 5,
+  whichever is reached first. Allocation: 240 historical checks, 144
+  held-out checks, 24 generations, 48 fresh checks, 24 for wording the
+  narrower prompt, 20 for retries and fallback. A batch row is one call.
+  The earlier 60 calls are outside this budget.
+- **Ledger.** One file in the cache, `pilot/ledger.jsonl`, gets one line
+  per paid call before the next call is sent: purpose, item, run number,
+  time sent, HTTP status, latency, input and output tokens, and cost at
+  USD 2 per million input and USD 10 per million output tokens (batch rows
+  at half). The sender refuses to send when the ledger holds 500 lines or
+  USD 5. The price is the list price found on 2026-11-16 from pricing
+  aggregators, not read from the provider's own page.
+- **Model (owner, 2026-11-16).** `gpt-6.1-sol` only, with each request's
+  product settings (the verifier request uses low reasoning and at most
+  500 output tokens).
+- **Pass mark (owner, 2026-11-16).** On the held-out set the narrower
+  prompt flags at most 1 in 10 sound questions, catches at least two
+  thirds of labelled defects, and gives the same verdict in all 3 runs for
+  at least 9 in 10 questions → "proceed to design". Catching fewer defects
+  or flagging more sound questions than choices-only → "stop". Anything
+  else, including fewer than 6 scored held-out defects or 15 scored sound
+  questions → "narrow and retest".
+- **Verdict from repeats.** A check flags a question when at least 2 of its
+  3 runs flag it. Choices-only is read from the deployed verifier's
+  responses in the same runs and costs no call.
+- **Labels.** Two fresh session reviewers judge each question against the
+  note and its required linked evidence with the stored key, the rationale
+  and the earlier labels hidden. They separate an ambiguous or incorrect
+  note from a bad question. A disagreement is unresolved and unscored.
+  Labelling makes no paid call.
+- **Freeze.** The narrower prompt's text and its SHA-256 are written to
+  `pilot/candidate-prompt.txt` in the cache before the first held-out or
+  fresh call. Held-out and fresh questions are not read while wording it.
+- **Batch route.** The 12 batch questions go as one Batch API job built by
+  the product's batch request code. If the job has not finished one hour
+  after submission, cancel it, count the rows it completed, send the
+  unfinished rows' same bodies synchronously from the retry allocation,
+  and record the route difference as a limitation.
+- **Reads of Production.** Read-only, through the owner's CLI token, for
+  note content and linked notes. Nothing is written to Production.
+- **Verification gates.** This plan changes no product code, so no product
+  test suite is a local gate. Each slice's proof is its recorded
+  observation.
 
 ## Established execution context
 
@@ -86,4 +133,43 @@ at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`; no incoming sibling
 change exists at this boundary. Fresh `/root/preflight_refactor` completed the
 independent pass, extracting this cohesive evidence record from the plan;
 all accepted proof remained unchanged. Whitespace, shared test selection
-and the slice 1 obligations check passed; no tests rerun. Delivery pending.
+and the slice 1 obligations check passed; no tests rerun. Guarded fresh delivery
+ran selective formatting once and the independent commit hook, marked slice 1
+done, and confirmed remote story-branch acceptance at
+`ab7f298a81ebd58f8563ddc945af6b64c32625d3`, suffix base
+`0d7e42bc761929115900e1668f10879150425eb1`. The retained observer was reused;
+default-checkout maintenance was not applicable.
+
+## Slice 2 acceptance observations
+
+On 2026-11-16 `/root/historical_labels` retained all 47 prior slice 5 manifest
+and label entries. Its literal preparation/scoring commands were
+`CURSOR_DEV=true nix develop -c python3 -I /Users/terryyin/git/doughnut/.planning/tmp/recall-history/integrity/pilot/prepare_historical.py`
+and the same command with `score_historical.py`. Both passed. GET-only
+retrieval supplied 38 focus notes and 117 directly linked notes, all HTTP 200.
+`historical-review-provenance.json` retains the two actual isolated
+`fork_turns:none` launches, packet paths/hashes, restrictions and output paths;
+both returned all 47 judgments. Inspection of the preparer and scorer's
+recursive allow-lists confirmed keys, earlier labels, rationales and row
+identities were excluded; joins occurred only after both complete returns.
+`historical-preparation-proof.json`, `historical-label-summary.json` and
+`historical-acceptance-proof.json` observe 41 scoreable: 33 sound, 6 multiple
+answers, 2 wrong keys; 3 note-at-fault and 3 unresolved (two disagreements).
+The inspected scorer excludes disagreements, note-at-fault and insufficient
+answers, and checks both reviewers' judgeability before scoring changed notes.
+Eighteen focus notes changed, thirteen remain scoreable against current
+evidence, and seventeen questions have changed linked evidence. Historical
+versions are unverified. The retained records include generation/update/read
+times and explicit current-evidence scope. Original route heuristics persist.
+The ledger remained one row with before/after SHA-256
+`3eb249f01f7ca35606527925520ed9c6ecd6f18db8abae91a5a507363de45b0a`;
+no paid call occurred. Product code is unchanged. Active implementation was
+approximately ten minutes, excluding command/reviewer waits. Source freshness
+was `unchanged` at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`.
+Both reviewers' row 5347 note-at-fault finding and the 41-question allocation
+conflict are retained as G4/G5; the owner question is pending before further
+paid comparisons. G6 owns reporting limitations, G7 missing request rendering.
+Fresh `/root/historical_label_refactor` completed the independent review and
+cohesive protocol extraction. Exact protocol comparison, whitespace, shared
+test selection and slice 2 obligations passed; accepted experimental proof
+remained unchanged and no tests were rerun. Delivery remains pending.
