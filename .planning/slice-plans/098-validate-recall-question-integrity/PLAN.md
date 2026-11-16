@@ -544,3 +544,14 @@ was written to a planning file.
 Refinement was not needed: each slice has one outcome and one proof loop,
 and the plan holds eight slices. No remaining slice-specific concern was
 identified. The verifier route is bounded by the early probe in slice 1.
+
+## Execution complete
+
+Product advice: the owner reviews the story's recommendation. Repeated
+choices stop on both generating routes. The stored route goes to design as
+one decision: check a stored question when it is shown, or discard stored
+questions older than a protection. Wrong-key and two-answer questions from
+the current generator narrow and retest: a choices-only verifier rule on a
+larger sample of misses, which needs a new paid-call authorization, before
+choosing to verify before showing or after a miss. The retrospective found
+no correction; DearDough DD-487 and DD-488 record the process findings.
