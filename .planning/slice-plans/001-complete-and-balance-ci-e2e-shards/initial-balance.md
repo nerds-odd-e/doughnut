@@ -74,7 +74,7 @@ Shard 6 finished last at 02:09:34Z (A) and 02:21:39Z (B). The E2E interval
 from first job start to last finish was 476 / 373 seconds. Setup, browser,
 external-call and runner variation remain outside per-file estimates.
 
-## Candidate proof and remaining observation
+## Candidate proof and hosted assessment
 
 `./scripts/run.sh pnpm test:ci-proof` passed all 34 cases after the assignment
 edit. Actual CLI tests prove the current checkout partition and new-directory
@@ -83,12 +83,63 @@ the assertion checks ownership without freezing a timing assignment.
 No E2E scenario or file eligibility changed. Candidate selected files total
 98, with the same 94 timed files and 383 observed cases.
 
-Coordinator normal delivery CI must observe the candidate before retention.
-Compare all six exact-attempt case/file totals, recorded times, wrapper/job
-times and last finish with A/B. Retain only a supported elapsed result; an
-ineffective or regressing assignment is reverted while keeping complete
-coverage and the skill. No candidate elapsed saving is established yet.
+Normal delivery candidate
+[43792611347/1](https://github.com/nerds-odd-e/doughnut/actions/runs/43792611347)
+at `754ce93f987df343ad7f0375741426af6fdc50a3` completed successfully on
+2026-11-16 (D). Connected GitHub run/attempt-job reads confirm final attempt 1,
+exact revision and all six E2E jobs successful. Fresh dashboard proof has all
+six case parts, the same 94 timed files and 383 passed cases, and zero
+failed/other/untimed cases. Per-file case/time sums reconcile with every part
+under the published candidate selector. Shards 3/6 have 45/71 cases as proposed.
+
+The preceding normal skill-delivery run is an additional unchanged-assignment
+observation:
+[43791850516/1](https://github.com/nerds-odd-e/doughnut/actions/runs/43791850516)
+at `5cf220d2734a5b30ff0788c2b63985ba94346754`, overall success (C).
+It also reconciles six present parts, the identical 94 timed-file set and
+383 cases. From B through C to D, product/dependency/scenario sources are
+unchanged; only skill/records and the selector/test-fixture assignment differ.
+This third baseline was read after it completed, without triggering any run.
+
+| Shard | C recorded / wrapper / job seconds | D recorded / wrapper / job seconds |
+| --- | --- | --- |
+| 1 | 52.591 / 128 / 248 | 79.735 / 153 / 295 |
+| 2 | 125.527 / 211 / 320 | 120.576 / 210 / 349 |
+| 3 | 59.055 / 127 / 278 | 117.891 / 215 / 363 |
+| 4 | 127.177 / 220 / 343 | 101.839 / 167 / 272 |
+| 5 | 107.834 / 213 / 337 | 79.554 / 144 / 259 |
+| 6 | 197.978 / 314 / 442 | 91.019 / 170 / 278 |
+
+C's shard 6 finished last at 02:30:41Z, 442 seconds after the first E2E
+job began. D's shard 3 finished last at 02:36:48Z, 363 seconds after its
+02:30:45Z start. Candidate longest wrapper time was 215 seconds versus
+341/257/314 for A/B/C; longest whole job was 363 versus 476/372/442.
+The first-start-to-last-finish intervals were 363 versus 476/373/442.
+Candidate maximum recorded part time is 120.576 seconds, versus
+201.399/140.997/197.978. Total recorded time is 590.614 seconds, close to
+B's 590.062, while A/C totals are 691.103/670.162: file costs vary materially.
+
+Candidate jobs retain `ubuntu-latest`, built-target Chrome, the same discovery,
+CI tags and retry policy. Its shard-three log reports Ubuntu 24.04.5 image
+`20261111.127.1`, Cypress 16.3.0 and headless Chrome 157, matching B's sampled
+image/browser conditions. As with the baseline samples, this does not assert
+identical conditions across all runners.
+
+**Decision: retain the supported assignment.** The largest folder now runs
+alone; both pre-edit per-file forecasts lower the six-way maximum, complete
+coverage survives, and the normal candidate run's wrapper and last-finish
+observations support the change without regression. The candidate is only
+nine seconds below the fastest baseline whole job. One candidate sample,
+variable file costs, setup and runner conditions do not establish a causal or
+repeatable numerical saving. The observations support this initial grouping;
+the skill remains the means to reassess it as the suite changes. No timing
+revert or further experiment is warranted by this bounded assessment.
+
+No product edits followed the passing candidate run. The unchanged actual-CLI
+partition proof is reused; a records-only assessment update needs no test rerun.
 
 Raw dashboard/job evidence, throwaway analysis, six-row calculations and the
 dispositioned consumer trace remain in `/tmp/seed130-initial-balance/`.
-No profiling, local E2E, additional job or publication ran in this assessment.
+No profiling, local E2E or additional job ran in this assessment. Candidate
+publication and its normal CI were coordinator-owned. Initial analysis used
+about five active minutes; post-CI assessment used about three more.

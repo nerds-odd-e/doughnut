@@ -149,7 +149,7 @@ needed for prose instructions. Expected active work: 15 minutes.
 
 ### 3. Apply the supported initial balance and assess its result
 Type: Behavior
-Status: planned
+Status: done
 Proof: Delivered skill invocation, a six-row current/proposed workload comparison,
 partition checks after any move, and comparable normal CI job observations or
 an explicit evidence-based no-move result.
@@ -189,7 +189,11 @@ Coordinator inspected skill routing, evidence handling and validation table.
 [Initial balance assessment](initial-balance.md) records two comparable current
 E2E attempts and a six-row candidate: isolate CLI in shard 3 and move note
 creation/update into remainder 6. Selector/workflow proof passed (34 cases).
-Elapsed retention remains open until normal candidate CI (G3).
+Exact candidate CI 43792611347/1 at `754ce93f` passed; 94 timed files /
+383 cases survived. Retain the grouping: longest wrapper 215 seconds versus
+341/257/314 across three normal baselines; longest job 363 versus476/372/442.
+One candidate sample does not establish repeatable causal savings (G3 proved).
+Independent refactor was clean; final assessment is records-only; active work8minutes.
 
 ## Verification and delivery
 
@@ -234,5 +238,4 @@ Disposition: proved by slice 3: initial-balance.md actual shard-six image/browse
 ### G3. Candidate elapsed retention
 Reported: slice 3 — "Recorded-time estimates support the two-folder reassignment; actual candidate elapsed behavior is not observed yet."
 Story clause: "Apply only timing moves supported by comparable evidence."
-Disposition: return
-Commitment: C34
+Disposition: proved by slice 3: initial-balance.md exact43792611347/1 full proof and elapsed comparison supporting retention
