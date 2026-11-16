@@ -144,6 +144,14 @@ Behavior: the result files and ledger → the report is written and the
 scratch test is absent from the checkout → the owner can review the
 recommendation. [Accepted report observations](comparison-report-evidence.md) retain the proof.
 
+## Execution complete
+
+Product advice: Proceed to bounded design for note-supported wrong keys and
+multiple defensible answers, including stored questions. Preserve the report's
+context, AI-label, sample, transport and one-pass limits; no product policy or
+new mission is adopted. [Completed retrospective](comparison-report-evidence.md#execution-retrospective)
+retains provenance, process findings and the pending CI boundary.
+
 ## Learnings
 
 The in-progress slice 7 exhausted approximately 15 active minutes; exact active

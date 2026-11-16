@@ -114,3 +114,68 @@ awaiting-acceptance phrase. Obligations, selector, whitespace/EOF, 122 links,
 all file sizes and exact prior-evidence/commitment/shared-contract preservation
 passed. Its installed consumer trace disposed 37 consumers. Scientific proof,
 report bytes and conditional cleanup disposition stayed unchanged and were reused.
+
+## Execution retrospective
+
+Reviewed the original executable plan at claim `0d7e42bc76`, the unchanged
+goal and owner-approved 41-question/246-check and row5347 amendments, all nine
+delivered leaves and the final comparison. Planning kind is planned throughout.
+The in-progress split preserves original 7's combined contract and compatible
+generation evidence; no paid observation was discarded or repeated for sizing.
+
+| Accepted related revision | Attribution |
+| --- | --- |
+| `0d7e42bc761929115900e1668f10879150425eb1` | Take/ownership provenance |
+| `ab7f298a81ebd58f8563ddc945af6b64c32625d3` | Counted paid sender and linked generation premises |
+| `1baf636d9a14d853de81cd67081e47c3e2ad96be` | Independent note-backed historical labels |
+| `138a000a915839ed8b9341aeb1ba8dfd52984bdb` | Historical verifier/choices repeats and amended source |
+| `47de7e5341dccdaba3ebd5b138b3accad171a2b4` | Frozen candidate and historical repeats |
+| `edb06c313337976abc04abc157b6ebc5502d7ed4` | Fixed independently labelled held-out cohort |
+| `be6d4ba666ec5ff3fa61164627bbf87040a59511` | Held-out repeats and fixed pass-mark decision |
+| `b36962bb1f32635f3fa63d824aac0f9d61f449df` | Bounded actual Batch/fallback generation and refinement |
+| `5bed0c952cc3691e01b2f0578dce05f47af18ef2` | Qualified fresh labels, single checks and real decoder |
+| `567b50c642c17329d6344473d668d356f1093697` | Reconciled dated report and evidence-use disposition |
+
+The range is uncontaminated; preceding `c4d84156c9`, `7d98900b4e` and
+`69e6c70070` are preparation/queue provenance, not implementation. Net changes
+are planning/evidence only: no backend, frontend, CLI, E2E, scripts or guidance
+implementation changed. Existing request builders, decoder and answer-set
+rule remain coherent; no product refactoring residue or correction was found.
+ADR index/in-file Accepted statuses agree. Relevant ADR0001 recall/focus
+terminology, ADR0006 failure handling and ADR0007 unit/Production isolation are
+preserved; no architectural exception or supersession is needed.
+
+E2E did not drive this research-only execution. Read-only review of
+`question_contest.feature` and `recall_quiz_ai_question.feature` retains their
+navigation/contest/replacement/answer-feedback workflow observations.
+`RecallPromptContestControllerTest` separately covers ownership, current focus,
+settings and contest state; `QuestionEvaluationTest` covers detailed choice/advice
+cases at the domain boundary. No redundant case or measured saving warrants
+test cleanup. Paid response decoding and full backend observations are reused.
+
+Implementation, product and process reviews were selected. Automatic Intent
+Coverage is enabled but has no protection-risk trigger: no existing test,
+assertion or discovery was removed/rewritten, and no important promise's proof
+remains unsettled. The check is skipped, so process review ran here rather than
+being deferred. Existing conversation/tool results support the process review:
+`DearDough.md` adds one occurrence to ODF-141 and ODF-264 and creates DD-493 for
+uninstrumented active-time evidence, without claiming an actual overrun. The
+specific bounded process-log write preserved all prior content, 555 physical
+lines under its 1,000-line ceiling; no retention pruning occurred.
+
+Near-future direction remains unchanged: this study uses recall history and note
+evidence to inform trustworthy learning feedback while preserving human
+authorship/history. Product advice is the report's bounded design recommendation;
+it does not adopt a new mission or reprioritize the five queued validations.
+No correction plan or unresolved product/constraint decision blocks closure.
+Shared physical cleanup stays conditional with the future last owner.
+
+At review, story-branch CI observation remains pending on accepted
+`567b50c642c17329d6344473d668d356f1093697`, observer
+`/tmp/dough-ci-501/watch-LL9VQk`, coordinator `aki-chan`. Execution owns the
+completion operation after publishing this records-only completion; no passing
+CI or shutdown is inferred from the retrospective.
+
+Refactor disposition: records-only completion and supported process findings;
+accepted scientific implementation, setup, results and report remain unchanged.
+No new behavior or product proof is introduced by this completion commit.

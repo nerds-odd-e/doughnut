@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 488. Removed numbers are never reused.
+- Highest allocated local number: 493. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -83,6 +83,16 @@ Former local code: DD-160. Two refactor passes within one story treat barely tou
 Former local code: DD-176. Every small slice launches a fresh full refactor agent even when the accepted diff needs no further changes, creating substantial repeated cost. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-141.md).
 
 Retained four executions. The tracker-question review followed [Donut’s stricter wrap-up rule](DonutRetrospectiveFindings.md#records-only-refactor-reviews). [Updated occurrence evidence](https://github.com/terryyin/open-dough/blob/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings/ODF-141.md#odf-141).
+
+### Occurrences
+
+- Execution: SEED-073#explore-reliable-recall-question-checks / ab7f298a81ebd58f8563ddc945af6b64c32625d3
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: `/root/fresh_generation_refactor`, `/root/fresh_comparison_refactor` and `/root/comparison_report_refactor` completion returns; accepted commits b36962bb1f, 5bed0c952c and 567b50c642.
+  - Observed effect: three records-only independent passes reported approximately 12, 7 and 9 active minutes respectively; one extracted existing proof, one made no edit, and one corrected a stale acceptance phrase. All reused scientific proof.
+  - Inference: the required fresh-agent pass has visible fixed overhead for small evidence increments. These are worker estimates, not instrumented durations or measured token costs; the checks also supplied link and preservation evidence.
 
 <a id="odf-208"></a>
 
@@ -191,6 +201,14 @@ Retained six executions, their distinct truncation effects and release limits. [
   - Evidence: 2026-11-16 execution conversation, startup tool results combining execution-location/runtime-setup and delegation/source-review/execution-decisions were marked truncated; the coordinator then retrieved story-obligations lines 68–200 and other required passages again.
   - Observed effect: required startup context was retrieved repeatedly before first implementation delegation. Later a broad consumer-trace dump was also truncated before a directed consumer read.
   - Inference: the batches exceeded the tool response budget despite existing targeted-retrieval guidance; this is an agent deviation. Additional reads are observed; their time and token cost were not measured.
+
+- Execution: SEED-073#explore-reliable-recall-question-checks / ab7f298a81ebd58f8563ddc945af6b64c32625d3
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: resumed execution conversation on 2026-11-16, batch reading Execute Plan SKILL.md, PLAN.md and source-review.md reported a truncated 13,358-token result; the coordinator later reread skill lines 190–310.
+  - Observed effect: already-established guidance was retrieved again during the Batch wait; the broad output obscured part of the repeated skill read.
+  - Inference: another agent deviation from targeted retrieval and source-reuse guidance. Additional reading is observed; elapsed and token cost are unmeasured.
 
 <a id="odf-265"></a>
 
@@ -521,3 +539,17 @@ The slice 6 agent reported that 6 of 32 verifier flags came from its choices dif
   - Evidence: `PLAN.md` slice 6 result ("corrected at slice 8 from `slice6-summary.json`"), commit cd2eba2373
   - Observed effect: a wrong count was kept out of the owner-facing recommendation; the correction also exposed the choices-only rule (4 of 8 defects, 1 sound flag) that the recommendation relies on.
   - Inference: a useful practice for validation stories, where a subagent's prose summary feeds an owner decision.
+
+## DD-493 — An uninstrumented active-time estimate cannot establish the slice bound
+
+The fresh-generation attempt stopped with completed compatible evidence and an approximately 15-active-minute estimate, but no instrumented active/wait intervals. This leaves the original duration unverifiable; it does not establish an overrun. The coordinator preserved the evidence and split the remaining semantic comparison before continuing. Related to ODF-206, with a distinct timing-evidence gap rather than acceptance of a demonstrated overrun.
+
+### Occurrences
+
+- Execution: SEED-073#explore-reliable-recall-question-checks / ab7f298a81ebd58f8563ddc945af6b64c32625d3
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: [generation attempt and safe disposition](https://github.com/nerds-odd-e/doughnut/blob/b36962bb1f32635f3fa63d824aac0f9d61f449df/.planning/slice-plans/099-explore-reliable-recall-question-checks/fresh-generation-evidence.md#attempt-limit-and-safe-disposition); `/root/fresh_generation_checks` handback after 2026-11-16 UTC generation work. The exact limit-reaching time was not recorded.
+  - Observed effect: the original combined slice remained incomplete and was split into generation and semantic-comparison outcomes. Later comparison/report slices recorded 636.307 and 525.708 active seconds; those measurements cannot recover the earlier duration.
+  - Inference: host-clock active/wait intervals need to start with the attempt, counting concurrent authorship and unioning overlapping waits. Existing guidance required timing; this occurrence exposes missing execution evidence, not a need to change the product.
