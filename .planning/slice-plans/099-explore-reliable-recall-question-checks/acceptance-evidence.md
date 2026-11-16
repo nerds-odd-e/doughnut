@@ -144,4 +144,44 @@ unchanged at trunk/base `0d7e42bc761929115900e1668f10879150425eb1`.
 Fresh `/root/candidate_refactor` completed the record review, moving the
 completed slice 1 contract to its historical evidence home. All 19 links,
 file sizes, selector, whitespace, obligations and 64 consumer dispositions
-passed; experimental proof was unchanged and reused. Delivery remains pending.
+passed; experimental proof was unchanged and reused. Guarded fresh delivery
+accepted `47de7e5341dccdaba3ebd5b138b3accad171a2b4` on the remote story
+branch, suffix base `138a000a915839ed8b9341aeb1ba8dfd52984bdb`; the retained
+observer was reused. Slice 4 is done.
+
+## Slice 5 acceptance observations
+
+Selection's first pool read was `2026-11-16T13:19:16.634277+00:00`, after
+the frozen prompt. A declared 16 keyless-signal/16 seeded-control rule fixed
+32 distinct focus notes outside the entire 155-note historical evidence union.
+GET-only retrieval supplied 167 HTTP 200 snapshots. Two fresh isolated
+reviewers each returned all 32 allow-listed key-hidden cases; their five
+judgment fields agreed. Only afterward did the scorer join exact stored keys,
+retain all six defects and sample sound controls by its declared seed.
+Final cohort: 1 wrong key, 5 multiple-answer, 18 sound; two note-at-fault
+unscored, six sound reserves, no unresolved. Ledger remained 247 rows,
+USD 0.738106, SHA-256 `f16d94f159474f1b054b46ae31897a7a9bc15dc8c2e85f83e1dfeb3d8ba01cbe`.
+Literal commands and terminal exit-zero observations are retained in
+`pilot/heldout/terminal-observations.md`: `./scripts/run.sh python3 -I`
+with the complete paths for `heldout/prepare.py`, `recover_exact_keys.py`,
+`score.py` and `audit.py`. Coordinator inspected the key recovery's unique
+answer-ID/time join plus exact questionStem/choices match to stored indices,
+and the independent audit's 32 exact-key checks, 32 focus-date checks,
+104 linked temporal entries, selected-row replay and 32 consumer joins.
+Inspected scorer validates both packets/results, hides keys, leaves every
+judgment disagreement unresolved, excludes note-at-fault and requires both
+reviewers to judge changed content. `heldout-labels.json` and
+`heldout-question-records.json` preserve every candidate and selected flag.
+Private provenance retains the initial DTO-field recovery correction and
+scratch cost-string TypeError, both repaired before accepted outputs.
+22 selected focus-question contexts changed since generation; three linked
+note IDs overlap historical evidence, and historical versions are unverified.
+G10 owns those report limits; G11 preserves the harmless declaration wording
+clarification and exact pre-review selection evidence. Prompt hash unchanged,
+no paid calls or product tests. Approximately ten active minutes; all commands
+and reviewers finished. Source freshness unchanged at trunk/base
+`0d7e42bc761929115900e1668f10879150425eb1`. Fresh
+`/root/heldout_label_refactor` moved the completed slice 2 contract verbatim
+to its historical home; sizes, selector, whitespace, 21 links, source
+navigation, obligations and 31 consumer dispositions passed. All experimental
+proof was unchanged and reused. Guarded delivery remains pending.

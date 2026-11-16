@@ -73,17 +73,8 @@ provenance, unchanged ledger and inspected scoring are retained in
 [slice 2 acceptance](acceptance-evidence.md#slice-2-acceptance-observations).
 The owner accepted the fresh labels and revised historical allocation.
 
-Proof: `pilot/historical-labels.json` in the cache lists each of the 47
-earlier-labelled questions with both reviewers' key-hidden judgments, the
-outcome (wrong key, more than one defensible answer, sound, note at fault,
-unresolved), whether the note changed after generation, and any missing
-historical content. The count of scored questions is recorded. No ledger
-line is added.
-
-Behavior: the 47 questions with their notes and required linked evidence
-read read-only → two fresh reviewers label them with the key hidden → the
-scored historical set (about 40) is fixed. Example: reviewers disagree on a
-question → it is listed unresolved and scored nowhere.
+Proof contract: [original Proof and Behavior](historical-acceptance-evidence.md#slice-2-original-proof-contract)
+remain verbatim with the completed observations.
 
 ### 3. The deployed verifier and its choices are measured on three repeats
 
@@ -122,7 +113,10 @@ false flags and repeat agreement are recorded beside slice 3's.
 ### 5. A held-out set from other notes is labelled before any call
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted: 24 scored questions (1 wrong key, 5 multiple-answer, 18 sound),
+all six labelled defects retained; [slice 5 proof](acceptance-evidence.md#slice-5-acceptance-observations)
+retains independent labels, selection, exact keys and unchanged ledger.
 Proof: `pilot/heldout-labels.json` lists about 24 scored questions from
 notes absent from the historical set, with the same label fields as slice
 2, the selection rule and seed, and how many candidates were labelled to
@@ -241,3 +235,13 @@ Disposition: receiving slice 8
 Reported: slice 4 — "Held-out/fresh/report consumers are future slices and untested here."
 Story clause: "One narrower answer-checking prompt"
 Disposition: interim until slices 6, 7, 8
+
+### G10. Report held-out context timing and overlap
+Reported: slice 5 — "Current evidence only; 22 selected focus questions changed since generation, historical versions were not reconstructed, and three linked-note IDs overlap historical evidence."
+Story clause: "with route, question age and note context"
+Disposition: receiving slice 8
+
+### G11. Selection wording is clarified by its fixed executable record
+Reported: slice 5 — "The declaration phrase earliest row is subordinate to its recorded seeded tie; selection is fixed before outcomes."
+Story clause: "reproducible comparison of three checks"
+Disposition: no user cost "reproducible comparison of three checks": the unchanged export, declared seed, executable ranking and pre-review row manifest reproduce all 32 rows and order. The original phrase and clarification remain in private provenance; no selected row, label or scored-set rule changed after outcomes.

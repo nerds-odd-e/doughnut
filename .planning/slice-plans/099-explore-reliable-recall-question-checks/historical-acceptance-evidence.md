@@ -108,6 +108,20 @@ slice 2 done and confirmed remote story-branch acceptance at
 `1baf636d9a14d853de81cd67081e47c3e2ad96be`, suffix base
 `ab7f298a81ebd58f8563ddc945af6b64c32625d3`; the observer was reused.
 
+### Slice 2 original proof contract
+
+Proof: `pilot/historical-labels.json` in the cache lists each of the 47
+earlier-labelled questions with both reviewers' key-hidden judgments, the
+outcome (wrong key, more than one defensible answer, sound, note at fault,
+unresolved), whether the note changed after generation, and any missing
+historical content. The count of scored questions is recorded. No ledger
+line is added.
+
+Behavior: the 47 questions with their notes and required linked evidence
+read read-only → two fresh reviewers label them with the key hidden → the
+scored historical set (about 40) is fixed. Example: reviewers disagree on a
+question → it is listed unresolved and scored nowhere.
+
 ## Slice 3 unpaid preparation and approved continuation
 
 The owner's “go ahead” accepts the fresh labels, row 5347 note-at-fault,
