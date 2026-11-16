@@ -90,8 +90,79 @@ evidence is strong enough to try the idea, scope the learner or author
 journey and review the UX/UI design before implementing the approved
 behavior. Create a separate follow-up
 story when that design and implementation warrant their own backlog item.
-The six entries below own validation decisions. Each can be evaluated on
+The entries below own validation decisions. Each can be evaluated on
 its own using the baseline and examples.
+
+<a id="explore-reliable-recall-question-checks"></a>
+
+### Explore reliable recall question checks with paid experiments
+
+**Identity:** SEED-073#explore-reliable-recall-question-checks
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why.** A learner needs a wrong mark to reflect a wrong answer,
+  rather than a defective key or another defensible choice. The owner needs
+  evidence that a proposed check catches those defects without needlessly
+  replacing sound questions.
+- **Starting evidence.** The completed integrity validation established the
+  stored-question exposure and existing repeated-choice protection, but did
+  not establish a reliable semantic check. The deployed verifier caught
+  5 of 8 labelled defects and flagged 12 of 26 sound controls; its choices
+  alone caught 4 of 8 and flagged 1 of 26. See the
+  [experience summary](learning-refinement-and-retrieval-evidence.md#recall-question-integrity-experience)
+  for what the 60 paid calls resolved and why another experiment is needed.
+- **Hypothesis.** A check focused on the supported answers, with sufficient
+  note evidence, can distinguish wrong keys and multiple defensible answers
+  more reliably than the verifier's broad feasibility judgment. A small
+  repeated comparison should reveal whether that improvement survives new
+  cases and run-to-run variation.
+- **Explore first.** Reuse the private census, labels, requests and responses.
+  Review disputed labels against the note and required linked evidence, with
+  the stored key hidden during judgment. Separate an ambiguous or incorrect
+  note from a bad question; leave unresolved cases unscored. Record note
+  revisions and missing historical content rather than treating today's
+  content as the original input.
+- **Paid experiments.** Refine one capped pilot comparing the exact deployed
+  verifier, the choices-only interpretation of those same responses, and one
+  narrower answer-checking prompt. Include labelled wrong keys, two-answer
+  cases and sound controls. Repeat each paid configuration on the same
+  items to measure variation; three runs per item is the starting sizing
+  hypothesis. Freeze the candidate before evaluating separate held-out notes.
+  Include a small paid fresh-generation run using the current on-demand and
+  batch request paths, followed by checking its outputs, so the result is
+  not limited to selected historical misses. Count generation, verification,
+  any paid label adjudication, repeats, and retries in the same budget.
+- **Evaluate.** Compare defect detection separately for wrong keys and
+  multiple answers, sound-question false flags, unresolved labels, agreement
+  across repeats, latency, tokens and actual cost. Report historical,
+  held-out and freshly generated cases separately, with route, question age
+  and note context. Relate the tradeoff to checking before display versus
+  after a miss, including the stored route. Do not infer a population error
+  rate from a selected pilot or choose an age-based discard policy from
+  verifier scores.
+- **Decision / safe stopping point.** Deliver a reproducible comparison and
+  a recommendation to proceed to design, narrow and retest, or stop, naming
+  which failure classes and routes the evidence supports. Set the tolerable
+  false-flag tradeoff and sample/budget bounds during refinement before paid
+  runs. A mixed or inconclusive result is a valid outcome with a stated
+  remaining uncertainty; expand only through a separately bounded decision.
+  Product behavior, production data changes and the stored-question policy
+  remain outside this exploration.
+- **Paid-run scope.** More paid runs belong to this follow-up. The original
+  60-call allowance is exhausted. Before execution, settle the concrete
+  models, sample sizes, repeat counts, maximum calls and cost with the owner,
+  and use credentials from the execution shell. This backlog update runs no
+  paid experiment and allocates no new spending allowance.
+- **Effort hypothesis.** M, low confidence for one small capped pilot and
+  decision report; sample preparation and adjudication determine the bound.
+- **Evidence and cleanup.** This follow-up retains use of
+  `.planning/tmp/recall-history/integrity/` in the default checkout, including
+  the original inputs and paid responses. Keep new private packets and run
+  outputs there; publish only non-sensitive conclusions and minimal
+  de-identified examples. Apply the [shared closeout](#close-out-temporary-recall-evidence)
+  when the follow-up is settled or stopped.
 
 <a id="validate-spelling-objectives"></a>
 
@@ -249,9 +320,11 @@ its own using the baseline and examples.
 
 ### Ordering and scope reduction
 
-The [question integrity recommendation](#recall-question-integrity-recommendation)
-states when a recorded miss is trustworthy evidence. Spelling goes first because the replay shows distinct
-cue and scoring failures that can be checked cheaply. The lesson tests
+The owner placed [the integrity follow-up](#explore-reliable-recall-question-checks)
+first on 2026-11-16 because semantic checking remains inconclusive after the
+initial validation. It informs when a recorded miss is trustworthy evidence.
+Spelling follows because the replay shows distinct cue and scoring failures
+that can be checked cheaply. The lesson tests
 learning directly. Source edits, objective routing, and generation purpose
 follow the observed proposal ranking. Each can start independently with
 checked examples. Finishing any one leaves a product decision and supporting
@@ -299,11 +372,18 @@ history are outside this cleanup.
 
 <a id="recall-question-integrity-recommendation"></a>
 
-**Recall question integrity: recommendation awaiting the owner's review
-(validated 2026-11-16).** A wrong mark on a multiple-choice recall question
+**Recall question integrity: initial recommendation (validated 2026-11-16).**
+A wrong mark on a multiple-choice recall question
 should mean the learner chose a wrong answer. The [validation results](learning-refinement-and-retrieval-evidence.md#recall-question-integrity-results)
 hold the counts, commands and limits. A clean baseline holds for repeated
 choices on both generating routes; the other classes still reach a learner.
+
+**Owner disposition, 2026-11-16.** The semantic-checking result is inconclusive.
+Queue [further exploration with paid experiments](#explore-reliable-recall-question-checks)
+at the top of the product backlog. The initial recommendation below remains
+dated evidence; this disposition selects further investigation and leaves
+the product design and stored-question policy undecided. The follow-up owns
+continued use of the private integrity evidence.
 
 | Failure class | On demand | Batch | Stored |
 | --- | --- | --- | --- |

@@ -100,3 +100,44 @@ notes. Each question was sent once. Counts are counts, not rates. The route
 label is inferred from the generation minute and is chance before the batch
 code (2026-06-16). Contests are counted by generation month. The walkthrough
 of the learner's steps reads today's code.
+
+<a id="recall-question-integrity-experience"></a>
+
+## Recall question integrity: experience and next exploration
+
+Synthesis recorded on 2026-11-16 after the validation landed at
+`6e29c98c2cb408c145bceaac459b8515cbf20329`. This interprets the dated results
+above; it adds no new observation or paid run.
+
+- **What worked.** Counting routes before spending separated existing
+  repeated-choice protection from stored questions that bypass it. The
+  census found 8,254 waiting questions on 2,650 trackers, with 641 next
+  questions failing today's keyless checks. Those are concrete findings
+  even though semantic verification remains unresolved. Generation-only
+  checks cannot protect a question stored by an earlier generator.
+- **What the paid runs taught us.** All 60 authorized calls were used on
+  `gpt-6.1-sol`. The deployed rule caught 5 of 8 labelled defects but
+  flagged 12 of 26 sound controls, mostly through feasibility. Reinterpreting
+  the same responses by selected choices reduced false flags to 1 of 26
+  while catching 4 of 8 defects. That tradeoff suggests a narrower check is
+  worth exploring; it does not establish that such a check is reliable.
+- **Why the outcome is inconclusive.** The small selected sample cannot
+  estimate production error rates. Labels came from two AI reviewers without
+  the notes, with 11 of 47 unresolved. Each question had only one verifier
+  run. The verifier saw current focus-note content, including notes changed
+  after generation, and no linked notes. Fresh current-generator output,
+  independent held-out performance, repeatability and the cost of an
+  operational checking policy were not established.
+- **What to change in the next experiment.** Settle note-backed labels and
+  context first; compare the deployed baseline, choices-only interpretation
+  and one narrower semantic check under a fixed paid budget. Repeat runs,
+  reserve unseen notes and include a small paid current-generation sample.
+  Count every paid call and measure misses, false flags, variability,
+  latency and cost separately. Decide the acceptable tradeoff before looking
+  at the held-out results, rather than tuning to the known examples.
+- **Disposition.** The owner requested this follow-up at the top of the
+  product backlog on 2026-11-16. Its canonical home is
+  [Explore reliable recall question checks with paid experiments](SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks).
+  The completed validation keeps its Done record. Its private evidence is
+  retained for this follow-up under the shared cleanup agreement; no product
+  change or stored-question policy is selected by this summary.
