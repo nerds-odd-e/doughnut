@@ -13,7 +13,7 @@ hold the counts, commands and limits. A clean baseline holds for repeated
 choices on both generating routes; the other classes still reach a learner.
 
 **Owner disposition, 2026-11-16.** The semantic-checking result is inconclusive.
-Queue [further exploration with paid experiments](SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks)
+Queue [further exploration with paid experiments](https://github.com/nerds-odd-e/doughnut/blob/5e91080a952b5bd2d5b3aa6cb06ddf9c0f27a475/.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks)
 at the top of the product backlog. The initial recommendation below remains
 dated evidence; this disposition selects further investigation and leaves
 the product design and stored-question policy undecided. The follow-up owns

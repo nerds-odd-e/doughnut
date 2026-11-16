@@ -137,7 +137,7 @@ above; it adds no new observation or paid run.
   at the held-out results, rather than tuning to the known examples.
 - **Disposition.** The owner requested this follow-up at the top of the
   product backlog on 2026-11-16. Its canonical home is
-  [Explore reliable recall question checks with paid experiments](SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks).
+  [Explore reliable recall question checks with paid experiments](https://github.com/nerds-odd-e/doughnut/blob/5e91080a952b5bd2d5b3aa6cb06ddf9c0f27a475/.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks).
   The completed validation keeps its Done record. Its private evidence is
   retained for this follow-up under the shared cleanup agreement; no product
   change or stored-question policy is selected by this summary.

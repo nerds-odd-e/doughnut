@@ -86,23 +86,16 @@ story when that design and implementation warrant their own backlog item.
 The entries below own validation decisions. Each can be evaluated on
 its own using the baseline and examples.
 
-## Reliable check exploration premise
+## Recall question check evidence
 
-**Starting evidence.** The completed integrity validation established the
-stored-question exposure and existing repeated-choice protection, but no
-reliable semantic check. The deployed verifier caught 5 of 8 labelled
-defects and flagged 12 of 26 sound controls; its choices alone caught 4 of
-8 and flagged 1 of 26. See the
-[experience summary](learning-refinement-and-retrieval-evidence.md#recall-question-integrity-experience).
-
-**Hypothesis.** A check focused on the supported answers, with sufficient
-note evidence, distinguishes wrong keys and multiple defensible answers
-more reliably than the verifier's broad feasibility judgment, and the
-improvement survives unseen notes and run-to-run variation.
+The [paid comparison](reliable-recall-question-checks-evidence.md#comparison-2026-11-17)
+records the held-out result and bounded design recommendation, with source,
+route and reference-label limits. These findings inform how to judge whether
+an observed recall miss is trustworthy evidence for the remaining validations.
 
 ### Ordering and scope reduction
 
-The owner placed [the integrity follow-up](SEED-073-learning-refinement-and-retrieval.md#explore-reliable-recall-question-checks)
+The owner placed [the integrity follow-up](reliable-recall-question-checks-evidence.md#comparison-2026-11-17)
 first on 2026-11-16 because semantic checking remains inconclusive after the
 initial validation. It informs when a recorded miss is trustworthy evidence.
 Spelling follows because the replay shows distinct cue and scoring failures
