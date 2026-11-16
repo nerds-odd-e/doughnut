@@ -28,7 +28,7 @@ class CircleNoteBuilder extends Builder<CircleForUserView> {
     return {
       id: generateId(),
       name: '',
-      invitationCode: '',
+      invitationCode: 'invite-code',
       notebooks: {
         notebooks: notebooks.map((notebook) => ({ notebook })),
         catalogItems,
