@@ -18,23 +18,23 @@ Launch/input: Fresh source-only agent `/root/source_review`; the full Goal, Scop
 | C10 | Preserve existing CI tag filters. | slice 1 | observed: scripts/ci/e2e-shards.test.mjs: actual CLI checkout/fixture partition, installed Cucumber tags and workflow-wrapper/proof agreement; validator and runner suites passed (slice 1 evidence) |
 | C11 | Retain six matrix jobs. | slice 1 | observed: scripts/ci/e2e-shards.test.mjs: actual CLI checkout/fixture partition, installed Cucumber tags and workflow-wrapper/proof agreement; validator and runner suites passed (slice 1 evidence) |
 | C12 | Retain six expected case-proof parts. | slice 1 | observed: scripts/ci/e2e-shards.test.mjs: actual CLI checkout/fixture partition, installed Cucumber tags and workflow-wrapper/proof agreement; validator and runner suites passed (slice 1 evidence) |
-| C13 | Add a private, project-local Donut skill for on-demand rebalancing. | slice 2 | |
-| C14 | On every skill invocation, read recent comparable completed CI proof. | slice 2 | |
-| C15 | Prefer the controlling dashboard’s Intent → CI status when known and sufficient. | slice 2 | |
-| C16 | Use GitHub Actions artifacts as fallback or supplementary evidence. | slice 2 | |
-| C17 | Use job timing as fallback or supplementary evidence. | slice 2 | |
-| C18 | Reuse the existing proof format. | slice 2 | |
-| C19 | Keep downloaded evidence in temporary storage outside the checkout. | slice 2 | |
+| C13 | Add a private, project-local Donut skill for on-demand rebalancing. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C14 | On every skill invocation, read recent comparable completed CI proof. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C15 | Prefer the controlling dashboard’s Intent → CI status when known and sufficient. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C16 | Use GitHub Actions artifacts as fallback or supplementary evidence. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C17 | Use job timing as fallback or supplementary evidence. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C18 | Reuse the existing proof format. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C19 | Keep downloaded evidence in temporary storage outside the checkout. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
 | C20 | Use the skill for the initial balance. | slice 3 | |
-| C21 | Name the repository represented by the evidence. | slice 2 | |
-| C22 | Name the runs represented by the evidence. | slice 2 | |
-| C23 | Name the attempts represented by the evidence. | slice 2 | |
-| C24 | Name the revisions represented by the evidence. | slice 2 | |
-| C25 | Identify those runs’ actual selections. | slice 2 | |
-| C26 | Identify those runs’ runner conditions. | slice 2 | |
-| C27 | Reconcile files against all six groups before proposing moves. | slice 2 | |
-| C28 | Reconcile counts against all six groups before proposing moves. | slice 2 | |
-| C29 | Reconcile durations against all six groups before proposing moves. | slice 2 | |
+| C21 | Name the repository represented by the evidence. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C22 | Name the runs represented by the evidence. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C23 | Name the attempts represented by the evidence. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C24 | Name the revisions represented by the evidence. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C25 | Identify those runs’ actual selections. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C26 | Identify those runs’ runner conditions. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C27 | Reconcile files against all six groups before proposing moves. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C28 | Reconcile counts against all six groups before proposing moves. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| C29 | Reconcile durations against all six groups before proposing moves. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
 | C30 | Compare current and proposed per-group recorded-time estimates. | slice 3 | |
 | C31 | Keep unknown costs visible. | slice 3 | |
 | C32 | Check elapsed job times separately. | slice 3 | |
@@ -43,16 +43,16 @@ Launch/input: Fresh source-only agent `/root/source_review`; the full Goal, Scop
 | C35 | Report an evidence gap when proof is unavailable, incomplete, incompatible, or leaves decisive timing costs unknown. | slice 3 | |
 | C36 | Under those evidence-gap conditions, leave timing-based assignments unchanged. | slice 3 | |
 | C37 | Deliver the coverage guarantee independently of whether an initial timing move is supported. | slice 1 | observed: scripts/ci/e2e-shards.test.mjs: actual CLI checkout/fixture partition, installed Cucumber tags and workflow-wrapper/proof agreement; validator and runner suites passed (slice 1 evidence) |
-| C38 | Deliver a working skill independently of whether an initial timing move is supported. | slice 2 | |
+| C38 | Deliver a working skill independently of whether an initial timing move is supported. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
 | C39 | An initial invocation that cannot support a move reports that outcome. | slice 3 | |
 | C40 | Use normal delivery CI for the post-change observation. | slice 3 | |
 | Q01 | — C01, C07: Coverage concerns eligible files; existing runner exclusions remain operative. | slice 1 | observed: scripts/ci/e2e-shards.test.mjs: actual CLI checkout/fixture partition, installed Cucumber tags and workflow-wrapper/proof agreement; validator and runner suites passed (slice 1 evidence) |
 | Q02 | — C06: The sixth selection is the discoverable remainder after the five explicit groups. | slice 1 | observed: scripts/ci/e2e-shards.test.mjs: actual CLI checkout/fixture partition, installed Cucumber tags and workflow-wrapper/proof agreement; validator and runner suites passed (slice 1 evidence) |
 | Q03 | — C09–C10: A discovered file containing only excluded scenarios need not execute. | slice 1 | observed: scripts/ci/e2e-shards.test.mjs: actual CLI checkout/fixture partition, installed Cucumber tags and workflow-wrapper/proof agreement; validator and runner suites passed (slice 1 evidence) |
-| Q04 | — C14: Evidence must be recent, comparable, and completed. | slice 2 | |
-| Q05 | — C15: Dashboard preference applies when its controlling status is known and sufficient. | slice 2 | |
-| Q06 | — C16–C17: GitHub Actions artifacts and job timing may serve as fallback **or** supplement. | slice 2 | |
-| Q07 | — C27–C29: Reconciliation precedes proposing moves. | slice 2 | |
+| Q04 | — C14: Evidence must be recent, comparable, and completed. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| Q05 | — C15: Dashboard preference applies when its controlling status is known and sufficient. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| Q06 | — C16–C17: GitHub Actions artifacts and job timing may serve as fallback **or** supplement. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| Q07 | — C27–C29: Reconciliation precedes proposing moves. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
 | Q08 | — C30: Compared loads are recorded-time estimates, not automatically measured elapsed-time outcomes. | slice 3 | |
 | Q09 | — C34–C36: Timing changes depend on sufficient comparable evidence; the stated gap conditions constrain timing assignments. | slice 3 | |
 | Q10 | — C03, C39: An invocation with no supported move does not establish faster CI. | slice 3 | |
@@ -77,15 +77,15 @@ Launch/input: Fresh source-only agent `/root/source_review`; the full Goal, Scop
 | J04d | In these illustrative situations, the invocation names missing or incompatible evidence. | slice 3 | |
 | J04e | The invocation avoids treating unknown time as zero. | slice 3 | |
 | J04f | It leaves timing assignments unchanged when the gap prevents a supported decision. | slice 3 | |
-| X01 | No repository evidence cache. | slice 2 | |
-| X02 | No raw-proof files in the repository. | slice 2 | |
+| X01 | No repository evidence cache. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| X02 | No raw-proof files in the repository. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
 | X03 | No seventh job. | slice 3 | |
-| X04 | No automatic runtime scheduling. | slice 2 | |
+| X04 | No automatic runtime scheduling. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
 | X05 | No test rewrites. | slice 3 | |
 | X06 | No scenario rewrites. | slice 3 | |
 | X07 | No new profiling run. | slice 3 | |
-| X08 | No shared Open Dough distribution change. | slice 2 | |
-| X09 | No dashboard feature. | slice 2 | |
-| X10 | No new proof schema. | slice 2 | |
+| X08 | No shared Open Dough distribution change. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| X09 | No dashboard feature. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
+| X10 | No new proof schema. | slice 2 | observed: .agents/skills/donut-rebalance-e2e-shards/SKILL.md Read fresh evidence / Establish comparability / Compare all six; actual three-attempt workflow and six-row reconciliation in skill-validation.md; creator quick_validate passed |
 | X11 | No numerical speedup guarantee. | slice 3 | |
 | X12 | An unsupported initial move outcome is not a claim of faster CI. | slice 3 | |

@@ -128,7 +128,7 @@ Expected active work: one 15-minute slice; command time excluded.
 
 ### 2. Repeat a trustworthy on-demand shard assessment
 Type: Behavior
-Status: planned
+Status: done
 Proof: The private skill's actual evidence-reading workflow produces a
 provenance-bearing six-group comparison or a bounded gap report.
 
@@ -172,37 +172,17 @@ calling it a speedup. Do not trigger a profiling or paid local E2E run.
 Expected active analysis/edit work: 15 minutes; CI wait excluded. Reassess the
 plan rather than continuing repeated noisy experiments past that bound.
 
-## Slice 1 accepted local proof
+## Slice 1 accepted proof
 
-Actual CLI tests in `scripts/ci/e2e-shards.test.mjs` prove the checkout and
-new-directory partition, exclusions, unchanged CI/local tag treatment through
-the installed preprocessor, positive runner selection and workflow/proof agreement.
-`./scripts/run.sh pnpm test:ci-proof` (34), `./scripts/run.sh pnpm test:gherkin-validation`
-(5), `./scripts/run.sh pnpm test:browser-worktree-isolation` (142) and
-`scripts/check_diff_whitespace.sh` passed. Coordinator inspected the real setup,
-assertions and wrapper call; consumer dispositions retained at
-`/tmp/seed130-coverage-consumer-trace.md`. Implementation active work: ~6 minutes.
-Current discoverable partition: 11/17/6/15/16/33, total 98; Cucumber owns tags.
-Hosted proof 43789649141/1 at `c594b3d5a135462865708ce7d3aedddaf9a074aa`
-contains all six case parts, 383 passed cases, zero failed/other/untimed, 94
-timed files; learning-session contributes four passed cases / 8.559 recorded
-seconds. G1 is proved. The overall run failed only the frontend Markdown
-fixture below; its E2E proof remains applicable to the test-only repair.
+[Coverage and CI repair evidence](coverage-evidence.md) retains the local and
+hosted observations, refactor acceptance and exact Markdown repair proof.
 
-Independent coverage refactor: none, already clean. Formatter mechanically
-repaired three files; coordinator changed empty event callbacks to explicit
-undefined and removed a trailing blank line after guarded preparation stopped.
-No behavioral proof was invalidated.
+## Slice 2 accepted evidence
 
-CI repair 43789649141/1: sole failure was nested ordered-list fixture using
-paragraph-continuation syntax. Pre-edit focused run reproduced 18 pass/1 fail.
-Valid adjacent1 and separated2 fixtures now assert nested ordered item text.
-`./scripts/run.sh pnpm frontend:test tests/components/form/markdownizer` passed
-63 tests/3 files; both frontend vue-tsc and tsc `--noEmit` passed. Consumer trace
-`/tmp/seed130-execution/markdown-repair-consumer-trace.md` found no consumers;
-fresh independent refactor found no changes. Active repair ~5 minutes.
-The final diagnostic found no other failed jobs; full frontend log resolved
-the diagnostic parser's no-recognized-failure gap. All writers are quiescent.
+[Skill validation](skill-validation.md) retains the actual dashboard/GitHub
+reads, identities, six-row reconciliation and incompatible-workload disposition.
+Creator quick_validate and whitespace passed; no timing assignments changed.
+Coordinator inspected skill routing, evidence handling and validation table.
 
 ## Verification and delivery
 
@@ -237,3 +217,8 @@ refresh time-sensitive CI evidence. No pre-Take human decision remains.
 Reported: slice 1 — "Local selector, tag and runner proof passes; real browser execution and all six hosted case parts require normal delivery CI."
 Story clause: "Across the six selections, every eligible file belongs once."
 Disposition: proved by slice 1: dashboard ci-proof 43789649141/1 at c594b3d5, six present case parts,383 passed cases,94 files including learning_session; local CLI fixture proves new directories
+
+### G2. Exact hosted image versions
+Reported: slice 2 — "Exact hosted Chrome/OS image versions were not inspected."
+Story clause: "Name repository, runs, attempts, revisions, their actual selections and runner conditions."
+Disposition: receiving slice 3
