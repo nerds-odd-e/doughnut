@@ -145,6 +145,14 @@ Then(
   }
 )
 
+When('I add my spelling answer {string} as an alias', (answer: string) => {
+  start.assumeAnsweredQuestionPage().addSpellingAnswerAsAlias(answer)
+})
+
+Then('I should see that {string} is now an alias', (answer: string) => {
+  start.assumeAnsweredQuestionPage().expectSpellingAnswerIsAlias(answer)
+})
+
 Then(
   'I should see the reviewed note context containing {string}',
   (content: string) => {

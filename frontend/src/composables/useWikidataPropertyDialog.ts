@@ -5,10 +5,8 @@ import type { WikidataSearchEntity } from "@generated/donut-backend-api"
 import { WikidataController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import {
-  appendAliasToNoteContent,
-  calculateNewTitle,
-} from "@/utils/wikidataTitleActions"
+import { appendAliasToNoteContent } from "@/utils/appendAliasToNoteContent"
+import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
   validatePropertyRowsForRichEdit,

@@ -15,6 +15,11 @@
     </strong>
     <strong v-else>{{ alertMessage }}</strong>
   </div>
+  <AddSpellingAnswerAsAlias
+    v-if="!answeredQuestion.answer.correct"
+    :reviewed-note-id="answeredQuestion.recalledNote.noteTopology.id"
+    :answer="(spellingAnswer ?? '').trim()"
+  />
   <PopButton
     v-if="showResolveAccidentalMatchCta"
     title="Resolve accidental match"
@@ -45,6 +50,7 @@ import { computed, type PropType } from "vue"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"
+import AddSpellingAnswerAsAlias from "@/components/recall/AddSpellingAnswerAsAlias.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteContextReader from "@/components/notes/NoteContextReader.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"

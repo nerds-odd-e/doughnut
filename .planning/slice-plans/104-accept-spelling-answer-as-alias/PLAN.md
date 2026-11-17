@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#accept-spelling-answer-as-alias
 **Source:** [selected story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#accept-spelling-answer-as-alias)
+**Source review:** [source-review.md](source-review.md)
 
 ## Outcome and boundaries
 
@@ -22,7 +23,7 @@ spelling format, a poor-fit warning, removing an alias from the result.
 
 PFE: every part exists; the story adds one action to the answer result.
 
-- `appendAliasToNoteContent` (`frontend/src/utils/wikidataTitleActions.ts`,
+- `appendAliasToNoteContent` (`frontend/src/utils/appendAliasToNoteContent.ts`,
   used by the Wikidata flows) adds an item to frontmatter `aliases`, creating
   the frontmatter when absent, and returns `null` when the content would not
   change or `aliases` is not a list.
@@ -99,7 +100,7 @@ Preparation checkout: this workspace, revision
 
 ### 1. Add a wrong spelling answer as an alias from the answer result
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new E2E scenario passes with
 `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/recall_quiz_spelling_question.feature`;
 `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm vitest run tests/components/recall/AnsweredSpellingQuestion`
@@ -118,6 +119,16 @@ state derived from the reviewed note's current content.
 Interim behavior: after this slice the action may also appear on other
 wrong results (accidental match, read-only, invalid text); slice 2 replaces
 that with the full offer rule.
+
+Accepted (2026-11-17): `AddSpellingAnswerAsAlias.vue` beside the result's
+alert; E2E scenario "Accept a wrong spelling answer as an alias" and
+`AnsweredSpellingQuestionAddAnswerAsAlias.spec.ts` passed (recall component
+suite 189 tests; after refactor 315 tests incl. notes/composables, vue-tsc
+clean). Refactor moved `appendAliasToNoteContent` into its own module.
+Learning: the wrong answer on day 2 makes the note due on day 3. Learning
+for slice 2: the done state today means `appendAliasToNoteContent` returned
+`null`, which also happens for a scalar `aliases` or unparsable frontmatter
+(G2); the offer rule must tell "already an alias" from "cannot append".
 
 ### 2. Offer the alias only where it can apply
 Type: Behavior
@@ -139,3 +150,15 @@ Export the existing valid-alias-text rule from
 Refinement was not needed: two slices with separate proof loops, one offer
 rule, and no Structure. This review identified no remaining slice-specific
 concern.
+
+## Story obligations
+
+### G1. Alias action offered on every wrong result (first reported in slice 1)
+Reported: slice 1 — "the action also shows on accidental-match, read-only, blank and invalid-text answers. Slice 2 owns those cases."
+Story clause: "A wrong answer gets one offer, never both"
+Disposition: receiving slice 2
+
+### G2. Done state shown when the alias cannot be appended (first reported in slice 1)
+Reported: slice 1 — "the done state means `appendAliasToNoteContent` returned null. That also happens when the note's `aliases` is a single value rather than a list, or the frontmatter cannot be parsed, so those notes wrongly show \"is now an alias\"."
+Story clause: "Afterwards the result shows that the answer is now an alias"
+Disposition: receiving slice 2

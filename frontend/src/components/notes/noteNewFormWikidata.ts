@@ -1,9 +1,7 @@
 import type { WikidataSearchEntity } from "@generated/donut-backend-api"
 import type { Ref } from "vue"
-import {
-  appendAliasToNoteContent,
-  calculateNewTitle,
-} from "@/utils/wikidataTitleActions"
+import { appendAliasToNoteContent } from "@/utils/appendAliasToNoteContent"
+import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 import { contentWithWikidataFrontmatter } from "./noteNewFormSubmit"
 
 export function applyWikidataEntryToNewNoteForm(

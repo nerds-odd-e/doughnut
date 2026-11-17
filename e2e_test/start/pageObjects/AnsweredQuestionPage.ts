@@ -47,6 +47,18 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByText(`Your answer \`${answer}\` is incorrect.`).should('exist')
       return self
     },
+    addSpellingAnswerAsAlias(answer: string) {
+      cy.findByRole('button', { name: `Add \`${answer}\` as an alias` }).click()
+      waitUntilAppIsNotBusy()
+      return self
+    },
+    expectSpellingAnswerIsAlias(answer: string) {
+      cy.findByText(`\`${answer}\` is now an alias`).should('exist')
+      cy.findByRole('button', { name: `Add \`${answer}\` as an alias` }).should(
+        'not.exist'
+      )
+      return self
+    },
     expectNoteContextToContain(content: string) {
       cy.findByRole('article', { name: 'Note context' }).should(
         'contain.text',
