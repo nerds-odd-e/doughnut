@@ -27,6 +27,28 @@ open points listed there.
 - **Proposal hypothesis.** An optional lesson that contrasts the learner's
   answer with the intended idea leads to better delayed, unassisted
   application than ordinary feedback alone.
+- **Spelling mix-up count (2026-11-17).** From the November 13 private
+  export (August 5–November 13; 2,602 spelling answers on 784 notes):
+  - 402 answers were wrong. In 227 (56%) the typed answer was another of
+    the learner's notes; 57 were blank; 118 were other wrong answers.
+  - The 227 mix-ups cover 139 notes and 173 distinct pairs of expected and
+    typed word. 39 pairs recurred, taking 93 of the 227 answers. Nine pairs
+    were confused in both directions (下がる and 下る, 整う and 調う,
+    見つける and 見かける, 顧みる and 振り返る, 不備 and 欠如, 軽率 and
+    浅はか, にこやか and 和やか, 不快 and 気まずい, 拠点 and 本拠).
+  - Most repeated: 尚更 answered 更に (5), 含める answered 込める (4),
+    過ぎる answered 経つ (4). いかにも drew nine mix-ups across several
+    words (さも, 甚だしい, まるで).
+  - 209 of the 227 are in the Japanese notebook, 12 in English (meadow
+    answered pasture, 3).
+  - 32 further answers named a note already recorded as overlapping, so
+    the existing overlap record covers a small part of the pairs.
+  - Reading: recurring near-word pairs are the largest group of spelling
+    misses and give this validation ready items that isolate one
+    distinction, with a natural delayed check at the pair's next recall.
+  - Limits: a match with another note shows the words were confused, not
+    why; some pairs may be acceptable synonyms for the cue. Counts are
+    from one learner. Multiple-choice misses were not counted.
 - **Validate first.** Use independently checked items that isolate a real
   misunderstanding, such as explicit giver and recipient roles or the
   position of literals in RDF. Compare ordinary feedback with a short

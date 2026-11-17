@@ -164,6 +164,31 @@ answers to a question readers could not infer.
 - Phase 2 pools leaked likely answers (伝手).
 - 伝手に頼る and ～かかる remain open language questions.
 
+## Follow-up count and decisions (November 17, 2026)
+
+A count over the same export (2,602 spelling answers, 784 notes, 402 wrong)
+checked how often the two failing shapes cost the learner an answer.
+
+- **Several hidden forms (brine).** No wrong answer was the expected English
+  word with -s, -ed or -ing. The prompt hides those forms on purpose so they
+  do not reveal the title.
+- **Whole expressions (伝手を頼る).** About 36 of 784 notes; 24 wrong of 117
+  answers (21%) against 15% for one-word notes. About five of those misses
+  were a variant of the expected expression (draw a line, got a hold of,
+  伝手に頼る, つてをたよる, 目にあまる).
+- **Same word in another script or form.** About 15 of the 118 wrong answers
+  that were neither blank nor another note.
+- **Decisions.** The owner accepted the recommendation to drop a
+  several-answer spelling format and a warning for notes that fit spelling
+  poorly. Variants are handled by [accepting a wrong spelling answer as an alias](SEED-073-learning-refinement-and-retrieval.md#accept-spelling-answer-as-alias).
+  The paired objective, cue and rule design is not queued.
+- **Largest group.** 227 of the 402 wrong answers named another of the
+  learner's notes; the detail is with [short lessons after recall misses](learning-refinement-validation-approaches.md#validate-short-recall-lessons).
+- **Limits.** Note text is exported only for wrong answers, so hidden forms
+  could be rebuilt for 82 notes. The 118 other wrong answers were sorted by
+  reading, not by a rule. A cue hint that names another answer (コネ) could
+  not be counted.
+
 ## Temporary evidence disposition
 
 On November 17, 2026, this story releases its use of the shared cache

@@ -84,6 +84,9 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 - **Goal / hypothesis.** Help learners apply a distinction after a meaningful
   mistake. Test whether an optional contrastive lesson plus practice improves
   delayed, unassisted application over ordinary feedback.
+- **Why now.** In 100 days of spelling recall, 227 of 402 wrong answers
+  named another of the learner's notes, and 39 word pairs recurred; see
+  the count in the detailed proposal.
 - **Validation and decision.** See the [detailed proposal](learning-refinement-validation-approaches.md#validate-short-recall-lessons).
 - **Effort hypothesis.** L, low confidence; preparation can be small, but learner
   participation and an elapsed follow-up are needed.
