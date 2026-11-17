@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "mrsn-chan",
-  "email": "mrsn-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-131#label-every-property-link-in-references",
-  "host": "claude",
-  "model": "fable"
-}
