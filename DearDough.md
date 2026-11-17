@@ -618,7 +618,7 @@ In a validation study run with fresh AI reader contexts, the coordinator saved e
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: unknown
-  - Evidence: plan 103 slice 2 execution evidence; [retest report](.planning/seeds/fixed-skill-spelling-retest-evidence.md) "Provenance and method"; private `returns/C*-answer.md`/`C*-judge.md` (removed at closeout)
+  - Evidence: [plan 103 execution evidence](https://github.com/nerds-odd-e/doughnut/blob/6f02bb77ca188e4f19e1c33d510621c7a424090c/.planning/slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md#execution-evidence); [retest report](.planning/seeds/fixed-skill-spelling-retest-evidence.md) "Provenance and method"; private `returns/C*-answer.md`/`C*-judge.md` (removed at closeout)
   - Observed effect: a spot check of four decoded marks against the mapping matched, but no verbatim reader record existed for the report writer or acceptance; one reader's misreading (brine slot 6) survived only because the paraphrase kept its reason.
   - Inference: asking readers to write their own return file, or saving the hand-back text unchanged, would make the "trace each judgment to its packet" proof direct and cost nothing. Copying only one packet into an isolated per-reader directory was a useful practice for keeping contexts key-hidden.
 
@@ -632,6 +632,6 @@ Plan 103 placed private packets in "this execution worktree's Git-ignored `.plan
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: unknown
-  - Evidence: plan 103 "Inputs and decisive premises" paragraph; coordinator check before slice 1 delegation
+  - Evidence: [plan 103 "Inputs and decisive premises"](https://github.com/nerds-odd-e/doughnut/blob/6f02bb77ca188e4f19e1c33d510621c7a424090c/.planning/slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md#inputs-and-decisive-premises); coordinator check before slice 1 delegation
   - Observed effect: no private material was staged; the gap was caught before any sensitive file existed.
   - Inference: a privacy premise in a plan deserves the same literal observation as its input premises; the shared cache relies on its own inner `.gitignore` for the same reason.

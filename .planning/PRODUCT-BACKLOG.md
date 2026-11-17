@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Retest spelling objectives with one skill held fixed](seeds/SEED-073-learning-refinement-and-retrieval.md#retest-fixed-skill-spelling-objectives) — SEED-073#retest-fixed-skill-spelling-objectives ([plan](slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md))
-
 ## Backlog list
 
 - [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons
