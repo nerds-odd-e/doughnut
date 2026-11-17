@@ -2,26 +2,27 @@
 
 **Identity:** SEED-073#validate-spelling-objectives
 **Source:** [Refined story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#validate-spelling-objectives)
+**Source review:** [Independent commitments](source-review.md)
 
 ## Goal and scope
 
 Give the product owner a bounded recommendation: proceed to design, narrow and
 retest, or stop the objective-and-cue proposal. Compare the five selected case
 families using the existing key-hidden review, then evaluate answer variants
-against the stated skill. This is evidence work; all slices remain planned.
+against the stated skill. This is evidence work.
 
 Use the private cache at
 `/Users/terryyin/git/doughnut/.planning/tmp/recall-history/` directly from this
 worktree. Put private working matrices under that cache, not in Git. Publish
 only minimal de-identified examples and conclusions in
 `.planning/seeds/spelling-objectives-validation-evidence.md`, linked from the
-story. Preserve the provenance and limitations of the November 14 observations.
+story's permanent completion record at wrap-up. Preserve the provenance and
+limitations of the November 14 observations.
 
 No product code, UX/UI design, grader implementation, new objective model,
 history edits, scheduling changes, paid calls, or learner trial is included.
 The product owner's adoption decision follows the delivered recommendation;
-it is not a prerequisite for performing this validation. Do not take or
-execute the story as part of this preparation.
+it is not a prerequisite for performing this validation.
 
 ## Existing solutions and current decisions
 
@@ -113,12 +114,30 @@ new application test is needed for this evidence-only outcome.
 | Recommend proceed to design, narrow/retest, or stop, without claiming measured learner benefit. | Slice 2 | Public report compares the three approaches on the same criteria, cites observations and uncertainty, and names a bounded next question. A follow-up is a proposal for the owner, not silently queued or implemented. |
 | Retain non-sensitive evidence and settle this story's temporary-evidence use. | Slice 2 | Report records provenance, limits, other cache consumers, and this story's retention disposition; acceptance reading checks this work's disposable copies and publication contents. The shared cache remains while other consumers need it. |
 
+## Execution context
+
+Established 2026-11-17: Story Branch Mode; owned execution checkout
+`/Users/terryyin/git/doughnut/.worktrees/validate-spelling-objectives-and-cues`,
+branch `codex/validate-spelling-objectives-and-cues`, agent DavidKo-chan,
+publisher `dashboard-territory.local-doughnut`; origin/main is the authorized
+trunk. Starting revision `c115ab7b9862af6986f8d69d10f67a0bcf1ef84b`;
+published claim/base `0f7994a0d6b9f3fbc6b00c0cb2bda014a4f22200`.
+Default checkout `/Users/terryyin/git/doughnut` is separate; shared private
+evidence is read from it without mutating its Git state. Checkout setup and
+`./scripts/run.sh bash scripts/check_diff_whitespace.sh` passed. Existing
+planning authority permits in-scope refinement; no new scope is authorized.
+CI: GitHub `nerds-odd-e/doughnut`, verified `ci.yml` (`donut CI`), branch target
+`codex/validate-spelling-objectives-and-cues`. Codex stream coordinator
+`spelling-validation-260ab727`, directory `/tmp/dough-ci-501/watch-3tFqTn`.
+Claim CI on trunk is unobserved;
+this stream covers branch increments. No product generation is triggered.
+
 ## Ordered slices
 
 ### 1. Resolve the selected cue and scoring interpretations
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: The five-family matrix and report's case verdicts satisfy the Slice 1
 rows above; inspect the cited packet answers and historical cues directly.
 
@@ -151,7 +170,8 @@ with its limits and any proposed follow-up question.
 Preserve the dated review's provenance rather than rewriting its conclusions.
 If recommending design, identify what learners need to see and what authors
 must decide as questions for that later story, without designing or building
-it here. Add the evidence link to the selected story. Settle the cache
+it here. Carry the evidence link into the story's permanent completion record
+during wrap-up. Settle the cache
 disposition under the shared contract and remove this study's spent copies;
 do not erase sibling inputs. Expected to fit 15 active minutes with one
 report and no new trial. Standard execution refactoring, formatting, commit,
@@ -159,8 +179,37 @@ publication and wrap-up gates remain with their owning workflow.
 
 ## Plan review
 
+Execution placement decision: the 307-line source seed will fall below 250
+lines when wrap-up removes this completed story. Avoid a transient edit merely
+to add a link that closure would delete; retain the report link in the permanent
+done record instead. This changes no source promise or report content.
+
 Slice-plan refinement was not needed: two bounded Behavior slices own the
 case judgments and resulting decision, with one common comparison rubric.
 No remaining slice-specific concern was identified. Uncertain experimental
 results and linguistic adjudications are reportable outcomes of the study,
 not assumed product facts or claims of learning improvement.
+
+## Accepted observations and delivery
+
+Slice 1: accepted report case sections and private matrix mapping against the
+actual archived cues and 20 retained packet answers. Digest/mapping proof:
+`node .agents/skills/dough-execute-plan/scripts/slice-clock.mjs run --log /tmp/spelling-slice1-proof.log --exit-file /tmp/spelling-slice1-proof.exit -- ./scripts/run.sh python3 /Users/terryyin/git/doughnut/.planning/tmp/recall-history/spelling-objectives-matrix.py`
+passed (exit 0): ten recoverable cues, five primary/related families, twenty
+exact packet/answer/report mappings. Whitespace proof via the clock and
+`./scripts/run.sh bash scripts/check_diff_whitespace.sh` passed. Clock paused
+at 6.5 active minutes. Source freshness: unchanged on pinned trunk
+`0f7994a0d6`; no incoming sibling landing affects these evidence judgments.
+Consumer trace inspected report readers and excluded generic runtime filename
+matches: only human evidence/closure consumers change. Source-review IDs 1–16
+record the inspected expected/actual observations. No application tests or
+expensive checks apply to this report boundary.
+Independent refactor `/root/refactor_cases` completed: plan-only consistency
+edits, unchanged case proof reused, whitespace passed; no follow-ups.
+
+## Story obligations
+
+### G1. Exact particle collocation remains unresolved
+Reported: slice 1 — "The particle paper’s full PDF returned HTTP 429; 伝手に頼る remains unresolved, not rejected."
+Story clause: "Unsettled linguistic alternatives are findings for review, not automatic rejections."
+Disposition: proved by slice 1: report Connections table separates passing script from unresolved particle; its source-limit paragraph and U definition direct review without automatic rejection.
