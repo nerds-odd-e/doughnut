@@ -1,7 +1,9 @@
 package com.odde.donut.algorithms;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,7 +73,7 @@ public final class Frontmatter {
 
   /** Key names in insertion order. */
   public Set<String> keys() {
-    return Set.copyOf(data.keySet());
+    return Collections.unmodifiableSet(new LinkedHashSet<>(data.keySet()));
   }
 
   /** Supported scalar string values in key insertion order (YAML document order). */

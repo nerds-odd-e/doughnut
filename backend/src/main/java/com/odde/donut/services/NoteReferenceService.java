@@ -117,6 +117,15 @@ public class NoteReferenceService {
     return authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, viewer);
   }
 
+  /**
+   * Each referrer whose authored reference live-resolves to {@code target} for {@code viewer}, with
+   * its link texts and property types, ordered by referrer note id ascending.
+   */
+  public List<AuthoredNoteReferenceInboundFacade.InboundReference> inboundReferencesForViewer(
+      Note target, User viewer) {
+    return authoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer(target, viewer);
+  }
+
   /** Whether any authored reference live-resolves to {@code target} for {@code viewer}. */
   public boolean isReferencedForViewer(Note target, User viewer) {
     return authoredNoteReferenceInboundFacade.isReferencedForViewer(target, viewer);
@@ -130,9 +139,7 @@ public class NoteReferenceService {
    */
   public List<AuthoredNoteReferenceInboundFacade.InboundReference>
       editableInboundReferencesForViewer(Note target, User viewer) {
-    return authoredNoteReferenceInboundFacade
-        .distinctInboundReferencesForViewer(target, viewer)
-        .stream()
+    return inboundReferencesForViewer(target, viewer).stream()
         .filter(inbound -> viewer.owns(inbound.referrer().getNotebook()))
         .toList();
   }

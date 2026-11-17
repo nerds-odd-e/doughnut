@@ -2,6 +2,7 @@
 
 **Identity:** SEED-131#see-link-property-types-in-references
 **Source:** [selected story](../../seeds/SEED-131-reference-details.md#see-link-property-types-in-references)
+**Source review:** [source-review.md](source-review.md)
 
 ## Outcome and boundaries
 
@@ -75,7 +76,7 @@ revision `7445adb85364114fa309698387a6426f66772e87`, 2026-11-17.
 | Premise / consuming operation | Observation, result and limits | Owner |
 | --- | --- | --- |
 | The property index rows of a referring note point at the same cached reference row the inbound lookup selects for the target, for every indexed key | Scratch test in `com.odde.donut.entities.repositories`: Source authored with `prerequisite`, `prerequisite 2`, a `related` list item, `see also: "[[Other]] and [[Target]]"` and a body link, all to Target; `refreshDerivedIndexesForNote`; `findWikiCandidatesForNotebookScope` for Target returned one row; the index rows pointing at it had keys `prerequisite`, `prerequisite 2`, `related`. `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*ScratchInboundPropertyTypeTest'` exited 0. Test removed. `see also` did not point at it, which is the story's first deferred limit. | Slice 1 |
-| A focused backend test runs in this worktree | The same command, exit 0, about 70 seconds. | Slices 1, 3 |
+| A focused backend test runs in this worktree | The same command, exit 0, about 70 seconds. Slice 1 execution: each single-class run took 1 to 4 minutes; `backend:test:worktree` takes exactly one `--tests` pattern per run. | Slices 1, 3 |
 | `authorReferencingContent` alone leaves the index empty | The same scratch test without the refresh call failed with no keys. | Slices 1, 3 |
 | The label follows an accepted change | Read at this revision: every content write path calls `refreshDerivedIndexesForNote` (`AuthoredNoteDocumentPersistence`, `NoteConstructionService`, `NoteReferenceHandling`, `WikiLinkRewriteSupport`). Not run; slice 1 proves example 5 through the web content update. | Slice 1 |
 | Readers of the changed contracts | Searched at this revision. `inboundReferences` as strings: `GraphNavigationMcpEndpointTest` (reads `/focusNote/inboundReferences/0` as text), `FocusContextRetrievalInboundSamplingTest`, `docs/focus-context/focus_context_retrieval_design.md` lines 32 and 38, the `get_note_graph` description, the generated client. No frontend or CLI source reads it. `NoteRealm.references`: `NoteRealmServiceTest`, `NoteControllerShowTests`, `NoteRealmBuilder` fixture, `NoteShow.vue`, `NoteContextReader.vue`, `ConversationNoteCorrectionReview.vue` and `useNoteRemovalFlow.ts` (length only). | Slices 1, 3 |
@@ -96,7 +97,7 @@ revision `7445adb85364114fa309698387a6426f66772e87`, 2026-11-17.
 
 ### 1. Carry property types on a note's references
 Type: Behavior
-Status: planned
+Status: done
 Proof: `pnpm backend:test:worktree --tests '*NoteRealmServiceTest'` and the
 controller test for example 5 pass; `AuthoredNoteReferenceInboundFacadeTest`
 and `NoteControllerShowTests` stay green; the generated client is regenerated
@@ -112,6 +113,21 @@ The inbound reference gains its property types from the index rows that point
 at its surviving reference rows. The realm's References entries carry them.
 Regenerate the API client. The web page looks the same after this slice;
 slice 2 shows the types.
+
+Accepted (2026-11-17): `NoteReferenceEntry` (topology unwrapped plus
+`propertyTypes`, omitted when empty) in `NoteRealm.references`;
+`InboundReference.propertyTypes` from
+`AuthoredNoteReferenceRowRepository.findPropertyKeysByReferenceRowIds`, ordered
+by index row id. Proof: `NoteRealmServiceTest.ReferencePropertyTypes`
+(examples 1, 2, 3, 4, 6) and
+`NoteControllerShowTests.referencePropertyTypesFollowAcceptedContentChanges`
+(example 5); `*AuthoredNoteReferenceInboundFacadeTest`, `*Frontmatter*`,
+`*NotePropertyIndex*`, `*NoteContentMarkdown*`, `*TextContentControllerUpdate*`
+green; client regenerated, `vue-tsc` and the NoteShow and NoteContextReader
+specs pass. Learning: authored order needed `Frontmatter.keys()` to keep
+insertion order (it returned `Set.copyOf`); the index is rebuilt in that order.
+Test readers of referrer ids use `NoteRealmReferences.referrerIds`. Frontend
+specs run through `pnpm -C frontend test <spec>`.
 
 ### 2. Show property types in the References section
 Type: Behavior

@@ -1,9 +1,12 @@
 package com.odde.donut.services;
 
+import static com.odde.donut.testability.NoteRealmReferences.referrerIds;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
@@ -14,6 +17,7 @@ import com.odde.donut.testability.RelationshipNoteMarkdown;
 import com.odde.donut.testability.SpringTestBase;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -22,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class NoteRealmServiceTest extends SpringTestBase {
   @Autowired NoteRealmService noteRealmService;
+  @Autowired NoteReferenceService noteReferenceService;
 
   User user;
   Notebook notebook;
@@ -73,8 +78,7 @@ class NoteRealmServiceTest extends SpringTestBase {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getReferences(), hasSize(1));
-    assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
+    assertThat(referrerIds(realm), contains(carrier.getId()));
   }
 
   @Test
@@ -85,8 +89,7 @@ class NoteRealmServiceTest extends SpringTestBase {
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
-    assertThat(realm.getReferences(), hasSize(1));
-    assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
+    assertThat(referrerIds(realm), contains(carrier.getId()));
   }
 
   @Test
@@ -125,7 +128,7 @@ class NoteRealmServiceTest extends SpringTestBase {
 
     assertThat(realm.getReferences(), hasSize(expectedReferences));
     if (expectedReferences == 1) {
-      assertThat(realm.getReferences().get(0).getId(), equalTo(carrier.getId()));
+      assertThat(referrerIds(realm), contains(carrier.getId()));
     }
   }
 
@@ -147,6 +150,65 @@ class NoteRealmServiceTest extends SpringTestBase {
     makeMe.authorReferencingContent(carrier, "[[Focal]] and [[Focal|again]]");
 
     assertThat(noteRealmService.build(focal, user).getReferences(), hasSize(1));
+  }
+
+  @Nested
+  class ReferencePropertyTypes {
+    Note target;
+
+    @BeforeEach
+    void setup() {
+      target = makeMe.aNote().title("Target").notebook(notebook).please();
+    }
+
+    private Note sourceAuthoring(String content) {
+      Note source = makeMe.aNote().title("Source").notebook(notebook).please();
+      makeMe.authorReferencingContent(source, content);
+      noteReferenceService.refreshDerivedIndexesForNote(source);
+      return source;
+    }
+
+    @Test
+    void lists_the_property_type_holding_the_link() {
+      sourceAuthoring("---\nprerequisite: \"[[Target]]\"\n---\n");
+
+      assertThat(
+          noteRealmService.build(target, user).getReferences().getFirst().propertyTypes(),
+          contains("prerequisite"));
+    }
+
+    @Test
+    void lists_each_distinct_type_once_in_authored_order() {
+      sourceAuthoring(
+          "---\nrelated:\n  - \"[[Target]]\"\nprerequisite: \"[[Target]]\"\n"
+              + "prerequisite 2: \"[[Target]]\"\n---\nAlso [[Target]] in body.\n");
+
+      var references = noteRealmService.build(target, user).getReferences();
+      assertThat(references, hasSize(1));
+      assertThat(references.getFirst().propertyTypes(), contains("related", "prerequisite"));
+    }
+
+    @Test
+    void omits_types_for_a_body_link() {
+      sourceAuthoring("Links to [[Target]] in body.\n");
+
+      assertThat(
+          noteRealmService.build(target, user).getReferences().getFirst().propertyTypes(),
+          nullValue());
+    }
+
+    @Test
+    void labels_only_the_link_the_property_index_points_at() {
+      Note other = makeMe.aNote().title("Other").notebook(notebook).please();
+      sourceAuthoring("---\nsee also: \"[[Other]] and [[Target]]\"\n---\n");
+
+      assertThat(
+          noteRealmService.build(other, user).getReferences().getFirst().propertyTypes(),
+          contains("see also"));
+      var targetReferences = noteRealmService.build(target, user).getReferences();
+      assertThat(targetReferences, hasSize(1));
+      assertThat(targetReferences.getFirst().propertyTypes(), nullValue());
+    }
   }
 
   private void trashNote(Note note) {
