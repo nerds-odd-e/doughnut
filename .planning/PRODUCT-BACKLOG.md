@@ -8,9 +8,10 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
+- [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons ([plan](slice-plans/105-validate-short-recall-lessons/PLAN.md))
+
 ## Backlog list
 
-- [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons
 - [Validate source-backed note edits from recall](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits) — SEED-073#validate-source-backed-note-edits
 - [Renew a waiting question when its note changes](seeds/SEED-073-learning-refinement-and-retrieval.md#renew-waiting-question-when-note-changes) — SEED-073#renew-waiting-question-when-note-changes
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
