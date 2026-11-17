@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 497. Removed numbers are never reused.
+- Highest allocated local number: 498. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -607,3 +607,18 @@ The slice 3 refactor pass deleted the null stored-answer and out-of-range model 
   - Evidence: slice 3 refactor return ("Assumption to accept or reverse"); `V100000000__baseline.sql` `correct_answer_index` DEFAULT NULL; `RecallPromptContestControllerTest.Accepted.whenTheQuestionHasNoStoredAnswer` / `whenTheModelNamesAPositionOutsideTheChoices` in 58638c87e6
   - Observed effect: no regression shipped; the coordinator spent one extra check and two tests.
   - Inference: the refactor agent flagged its own assumption, which made the catch cheap; the rule against defensive code can be over-applied to data from storage or a model.
+
+## DD-498 — Wrap-up treats story scope limits as deferred promises
+
+Story wrap-up deletes a story section "after queuing its deferred promises as one new story unless the developer drops them". A story's scope limits phrased "each deliverable on its own later" name unrelated possible extensions with no beneficiary or evaluable outcome, so a bundled story would fail the backlog's admission rule; the coordinator had to judge that they were context, not promises, and kept a one-line note in the seed instead.
+
+### Occurrences
+- Execution: SEED-131#label-every-property-link-in-references
+  - Timestamp: 2026-11-17 (time unknown)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: seed SEED-131 section Scope "Scope limits, each deliverable on its own later" (before-cleanup commit); dough-story-wrap-up "Delete spent history"; dough-product-backlog "Add a feature story only with a named beneficiary and evaluable outcome"; the source-only reviewer also left those limits unnumbered.
+  - Observed effect: no story was queued; the limits survive as a note under the seed's Ordering and Scope Reduction.
+  - Inference: the wrap-up wording does not distinguish promises a story deferred from scope limits it never promised.
+

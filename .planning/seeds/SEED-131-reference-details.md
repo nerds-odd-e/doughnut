@@ -164,6 +164,11 @@ seen (125) stays as responsive as today.
 Neither story has a product prerequisite. If refinement finds that retrieval
 needs a separate rollout, revisit the story boundary.
 
+Property labels show on the web References section and the focus note's
+`inboundReferences` only. Showing them in the Markdown focus context, retrieval
+path steps, outgoing links or attachment page references, and grouping,
+filtering or sorting references by property type, are not yet stories.
+
 ## When to Surface
 
 Take up these stories when improving the evidence returned with note references.
