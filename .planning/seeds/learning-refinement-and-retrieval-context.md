@@ -86,6 +86,26 @@ story when that design and implementation warrant their own backlog item.
 The entries below own validation decisions. Each can be evaluated on
 its own using the baseline and examples.
 
+<a id="close-out-temporary-recall-evidence"></a>
+
+### Close out temporary recall evidence
+
+Each validation closeout records whether any approved follow-up still needs
+the temporary evidence. The owner of the last story still using that
+evidence checks the other dispositions and any approved follow-up before
+removing the shared cache. A decision to stop releases that story's use.
+
+Once the validation stories are settled and remaining approved use is
+finished or covered by a minimal de-identified handoff, remove
+`.planning/tmp/recall-history/` from the default checkout at
+`~/git/doughnut` and any temporary copies created for this investigation.
+This includes raw MCP exports, derived datasets, reports, reviewer packets,
+and scratch scripts.
+Keep only the non-sensitive conclusions and minimal de-identified examples
+needed for approved work or maintained regression tests. Verify the temporary
+files are gone and record the closeout. The product's notes and recall
+history are outside this cleanup.
+
 ## Recall question check evidence
 
 The [paid comparison](reliable-recall-question-checks-evidence.md#comparison-2026-11-17)

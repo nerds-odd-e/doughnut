@@ -47,26 +47,42 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 **Identity:** SEED-073#retest-fixed-skill-spelling-objectives
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"74e4f65c768b73a12e3214375cae0170fdf82c04e02ebbd54dc37aba41fe8584","plan":"e1ac5bbc94895693bad997ecdde0c6fcd778c36f13f6e72758b45fec2de1892e"}}
 ```
 
-- **Goal / hypothesis.** Give the product owner evidence for whether an
-  explicit objective and answer rule make spelling and written-form recall
-  fair without changing what the learner must retrieve. Approved by the
-  product owner on 2026-11-17 as the narrowed retest recommended by the
-  [spelling objectives validation](spelling-objectives-validation-evidence.md#comparison-and-decision).
-- **Question.** In the same five families (brine, 伝手, おっしゃる, the
-  ～かける inflection, meadow), with one intended skill held fixed per item,
-  can key-hidden readers agree on what remains to retrieve, credit defensible
-  variants and reject genuine form errors, without a rewrite supplying the
-  answer-bearing form?
-- **Scope.** Resolve the exact 伝手に頼る usage or record it as unresolved.
-  Keep meadow as an ambiguity control. Report per item whether the held skill
-  survived the rewrite. This delivers a validation decision, not a change to
-  live recall; learner benefit stays a hypothesis.
-- **Effort hypothesis.** S, medium confidence; reuse the five archived cues
-  and the retained response matrices.
-- **Evidence and cleanup.** Follow the [shared contract](#close-out-temporary-recall-evidence).
+- **Goal.** Give the product owner evidence to recommend proceeding to design,
+  narrowing and retesting, or stopping objective-and-cue review: can a clearer
+  cue and explicit answer rule make recall fair while preserving the skill?
+  The owner approved this narrowed retest on 2026-11-17 from the
+  [prior recommendation](spelling-objectives-validation-evidence.md#comparison-and-decision).
+
+**Scope**
+
+- Reuse the five archived families and response matrices. Before rewriting,
+  declare one intended skill per item, supplied information and remaining
+  retrieval, script permissions and blank boundaries. Record any departure
+  from the archived task; a changed skill is a result, not a successful repair.
+- Compare paired objective/cue/rule review with manual note/alias review and
+  broader acceptance under the original cue. Use two independent key-hidden
+  readers to answer, identify the remaining retrieval and judge response
+  variants; retain disagreement and genuine errors alongside agreement.
+- Resolve exact 伝手に頼る usage with attributable evidence or retain it as
+  unresolved. Keep meadow as an ambiguity control. Deliver a per-item skill
+  preservation judgment and bounded recommendation. Live recall changes,
+  product design and learner comprehension or retention trials are deferred.
+
+**Key examples**
+
+| Given the held skill | When a cue or rule is reviewed | Required result |
+| --- | --- | --- |
+| Brine word-family retrieval in the archived slots | A rewrite asks only for the material noun | Record the lost process/inflection demand; keep real spelling errors distinct. |
+| Natural whole-expression production for reliance on connections | A rewrite supplies 伝手 and asks for its reading | Record the skill change; judge script variants separately from unresolved usage. |
+| Honorific lexical written-form recall | A response varies script or omits small っ | Apply declared script permissions without crediting a genuine form error. |
+| Retrieval and formation of the near-death construction | A rewrite supplies ～かける or changes the blank ending | Identify supplied retrieval and changed completion demands rather than count agreement as preservation. |
+| Vocabulary retrieval from the meadow description | Readers find grassland or pasture defensible | Preserve the overlap as ambiguity, not an error inferred from a hidden name. |
+
+- **Effort hypothesis.** S, medium confidence; a bounded offline retest.
+- **Evidence and cleanup.** Use the [local evidence](#local-recall-evidence) and [shared contract](#close-out-temporary-recall-evidence); learner benefit remains a hypothesis.
 
 <a id="validate-short-recall-lessons"></a>
 
@@ -159,24 +175,7 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 [Owner ordering and scope reduction](learning-refinement-and-retrieval-context.md#ordering-and-scope-reduction) applies across these stories.
 
 <a id="close-out-temporary-recall-evidence"></a>
-
-### Close out temporary recall evidence
-
-Each validation closeout records whether any approved follow-up still needs
-the temporary evidence. The owner of the last story still using that
-evidence checks the other dispositions and any approved follow-up before
-removing the shared cache. A decision to stop releases that story's use.
-
-Once the validation stories are settled and remaining approved use is
-finished or covered by a minimal de-identified handoff, remove
-`.planning/tmp/recall-history/` from the default checkout at
-`~/git/doughnut` and any temporary copies created for this investigation.
-This includes raw MCP exports, derived datasets, reports, reviewer packets,
-and scratch scripts.
-Keep only the non-sensitive conclusions and minimal de-identified examples
-needed for approved work or maintained regression tests. Verify the temporary
-files are gone and record the closeout. The product's notes and recall
-history are outside this cleanup.
+[Shared temporary evidence closeout](learning-refinement-and-retrieval-context.md#close-out-temporary-recall-evidence) applies to each validation.
 
 <a id="open-decisions"></a>
 <a id="when-to-surface"></a>
