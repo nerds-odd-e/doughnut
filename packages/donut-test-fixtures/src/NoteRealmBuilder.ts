@@ -109,7 +109,14 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   }
 
   under(value: NoteRealm): NoteRealmBuilder {
-    value?.references?.push(this.data.note.noteTopology)
+    return this.referencing(value)
+  }
+
+  referencing(target: NoteRealm, ...propertyTypes: string[]): NoteRealmBuilder {
+    const topology = this.data.note.noteTopology
+    target.references?.push(
+      propertyTypes.length ? { ...topology, propertyTypes } : topology
+    )
     return this
   }
 

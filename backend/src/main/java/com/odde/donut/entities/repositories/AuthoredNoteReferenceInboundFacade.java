@@ -2,6 +2,7 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.NoteReferenceResolution;
+import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -47,18 +48,6 @@ public class AuthoredNoteReferenceInboundFacade {
     this.wikiLinkResolver = wikiLinkResolver;
   }
 
-  /**
-   * Distinct referrer notes whose authored reference live-resolves to {@code target} for {@code
-   * viewer}, ordered by referrer note id ascending.
-   */
-  public List<Note> distinctReferrerNotesForViewer(Note target, User viewer) {
-    List<Note> referrers = new ArrayList<>();
-    for (InboundReference inboundReference : distinctInboundReferencesForViewer(target, viewer)) {
-      referrers.add(inboundReference.referrer());
-    }
-    return referrers;
-  }
-
   /** Whether any referrer has an authored reference that live-resolves to {@code target}. */
   public boolean isReferencedForViewer(Note target, User viewer) {
     for (AuthoredNoteReferenceRow candidate : candidateRowsForTarget(target)) {
@@ -73,19 +62,21 @@ public class AuthoredNoteReferenceInboundFacade {
   /**
    * One referrer note plus the distinct authored link text(s) (in document order) it uses to refer
    * to the queried target. A referrer can carry more than one text when it authors several distinct
-   * references (wiki and/or note-ID URL) that all resolve to the same target.
+   * references (wiki and/or note-ID URL) that all resolve to the same target. {@code propertyTypes}
+   * are the distinct {@link PropertyKeyNaming#propertyType property types} (authored order) of the
+   * referrer's indexed properties that hold those references.
    */
-  public record InboundReference(Note referrer, List<String> authoredLinkTexts) {}
+  public record InboundReference(
+      Note referrer, List<String> authoredLinkTexts, List<String> propertyTypes) {}
 
   /**
-   * {@link #distinctReferrerNotesForViewer}, generalized to also carry each surviving candidate
-   * row's authored link text — the data a rewrite consumer ({@code WikiLinkRewriteService}) needs
-   * to locate and rewrite each referrer's inbound reference(s) to {@code target}, without a
-   * separate lookup into cached rows. Ordered by referrer note id ascending.
+   * Distinct referrers whose authored reference live-resolves to {@code target} for {@code viewer},
+   * each with its authored link texts and property types, ordered by referrer note id ascending.
    */
   public List<InboundReference> distinctInboundReferencesForViewer(Note target, User viewer) {
     LinkedHashMap<Integer, Note> referrersInOrder = new LinkedHashMap<>();
     Map<Integer, LinkedHashSet<String>> linkTextsByReferrerId = new LinkedHashMap<>();
+    Map<Integer, Integer> referrerIdByRowId = new LinkedHashMap<>();
     for (AuthoredNoteReferenceRow candidate : candidateRowsForTarget(target)) {
       Note sourceNote = candidate.getNote();
       Integer sourceNoteId = sourceNote.getId();
@@ -96,12 +87,27 @@ public class AuthoredNoteReferenceInboundFacade {
       linkTextsByReferrerId
           .computeIfAbsent(sourceNoteId, _ -> new LinkedHashSet<>())
           .add(candidate.toDomainReference().authoredLink());
+      referrerIdByRowId.put(candidate.getId(), sourceNoteId);
+    }
+    Map<Integer, LinkedHashSet<String>> propertyTypesByReferrerId = new LinkedHashMap<>();
+    if (!referrerIdByRowId.isEmpty()) {
+      for (Object[] rowIdAndKey :
+          authoredNoteReferenceRowRepository.findPropertyKeysByReferenceRowIds(
+              List.copyOf(referrerIdByRowId.keySet()))) {
+        propertyTypesByReferrerId
+            .computeIfAbsent(
+                referrerIdByRowId.get((Integer) rowIdAndKey[0]), _ -> new LinkedHashSet<>())
+            .add(PropertyKeyNaming.propertyType((String) rowIdAndKey[1]));
+      }
     }
     List<InboundReference> results = new ArrayList<>();
     for (var entry : referrersInOrder.entrySet()) {
       results.add(
           new InboundReference(
-              entry.getValue(), List.copyOf(linkTextsByReferrerId.get(entry.getKey()))));
+              entry.getValue(),
+              List.copyOf(linkTextsByReferrerId.get(entry.getKey())),
+              List.copyOf(
+                  propertyTypesByReferrerId.getOrDefault(entry.getKey(), new LinkedHashSet<>()))));
     }
     return results;
   }

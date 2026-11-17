@@ -8,7 +8,7 @@
     'md:grid-cols-1': columns === 2,
     'lg:grid-cols-2': columns === 2,
   }">
-    <div v-for="noteTopology in noteTopologies" :key="noteTopology.id">
+    <div v-for="noteTopology in noteTopologies" :key="noteTopology.id" class="min-w-0">
       <Card :note-topology="noteTopology">
         <template #button v-if="$slots.button">
           <slot name="button" :note-topology="noteTopology" />
@@ -20,11 +20,14 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteTopology } from "@generated/donut-backend-api"
+import type { NoteReferenceEntry } from "@generated/donut-backend-api"
 import Card from "./Card.vue"
 
 defineProps({
-  noteTopologies: { type: Array as PropType<NoteTopology[]>, required: true },
+  noteTopologies: {
+    type: Array as PropType<NoteReferenceEntry[]>,
+    required: true,
+  },
   columns: { type: Number, default: 4 },
 })
 </script>

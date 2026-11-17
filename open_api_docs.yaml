@@ -4298,7 +4298,7 @@ components:
         references:
           type: array
           items:
-            $ref: "#/components/schemas/NoteTopology"
+            $ref: "#/components/schemas/NoteReferenceEntry"
         wikiLinks:
           type: array
           items:
@@ -4322,6 +4322,31 @@ components:
       - id
       - note
       - notebookRealm
+    NoteReferenceEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+          minLength: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        propertyTypes:
+          type: array
+          description: "Distinct property types (key without numeric suffix), in the\
+            \ referring note's authored order, of the referring note's properties\
+            \ that link to the target. Omitted when none."
+          items:
+            type: string
+      required:
+      - id
+      - title
     NoteTopology:
       type: object
       properties:
@@ -6269,7 +6294,7 @@ components:
         inboundReferences:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/FocusContextInboundReference"
         sampleSiblings:
           type: array
           items:
@@ -6281,6 +6306,19 @@ components:
           type: string
         contentTruncated:
           type: boolean
+    FocusContextInboundReference:
+      type: object
+      properties:
+        link:
+          type: string
+          description: Wiki-style link string that selects the referring note.
+        referrerPropertyTypes:
+          type: array
+          description: "Distinct property types (key without numeric suffix), in authored\
+            \ order, of the referring note's own properties that link to the focus\
+            \ note. Omitted when none."
+          items:
+            type: string
     FocusContextNote:
       type: object
       properties:

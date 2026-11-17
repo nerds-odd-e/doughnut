@@ -220,7 +220,7 @@ export type Note = {
 export type NoteRealm = {
     id: number;
     note: Note;
-    references?: Array<NoteTopology>;
+    references?: Array<NoteReferenceEntry>;
     wikiLinks?: Array<WikiLink>;
     /**
      * Notebook chrome: entity plus optional catalog hints and optional notebook readme content.
@@ -234,6 +234,17 @@ export type NoteRealm = {
      * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */
     scopedReadmeContent?: string;
+};
+
+export type NoteReferenceEntry = {
+    id: number;
+    title: string;
+    createdAt?: string;
+    updatedAt?: string;
+    /**
+     * Distinct property types (key without numeric suffix), in the referring note's authored order, of the referring note's properties that link to the target. Omitted when none.
+     */
+    propertyTypes?: Array<string>;
 };
 
 export type NoteTopology = {
@@ -1219,11 +1230,22 @@ export type FocusContextFocusNote = {
     folderPath?: string;
     depth?: number;
     outgoingLinks?: Array<string>;
-    inboundReferences?: Array<string>;
+    inboundReferences?: Array<FocusContextInboundReference>;
     sampleSiblings?: Array<string>;
     createdAt?: string;
     content?: string;
     contentTruncated?: boolean;
+};
+
+export type FocusContextInboundReference = {
+    /**
+     * Wiki-style link string that selects the referring note.
+     */
+    link?: string;
+    /**
+     * Distinct property types (key without numeric suffix), in authored order, of the referring note's own properties that link to the focus note. Omitted when none.
+     */
+    referrerPropertyTypes?: Array<string>;
 };
 
 export type FocusContextNote = {

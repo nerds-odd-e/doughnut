@@ -1,10 +1,10 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.NoteRealmReferences.referrerIds;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.donut.controllers.dto.NoteTopology;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -70,9 +70,7 @@ class TextContentControllerUpdateNoteContentAliasCardinalityTests
     assertThat(
         noteController.showNote(source).getWikiLinks().getFirst().getDestinationNoteId(),
         equalTo(title.getId()));
-    assertThat(
-        noteController.showNote(title).getReferences().stream().map(NoteTopology::getId).toList(),
-        contains(source.getId()));
+    assertThat(referrerIds(noteController.showNote(title)), contains(source.getId()));
     assertThat(noteController.showNote(source).getNote().getContent(), equalTo(savedContent));
   }
 }

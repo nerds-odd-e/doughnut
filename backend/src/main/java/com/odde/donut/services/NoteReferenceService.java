@@ -110,11 +110,12 @@ public class NoteReferenceService {
   }
 
   /**
-   * Distinct referrer notes whose authored reference live-resolves to {@code target} for {@code
-   * viewer}, ordered by referrer note id ascending.
+   * Each referrer whose authored reference live-resolves to {@code target} for {@code viewer}, with
+   * its link texts and property types, ordered by referrer note id ascending.
    */
-  public List<Note> distinctReferrerNotesForViewer(Note target, User viewer) {
-    return authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, viewer);
+  public List<AuthoredNoteReferenceInboundFacade.InboundReference> inboundReferencesForViewer(
+      Note target, User viewer) {
+    return authoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer(target, viewer);
   }
 
   /** Whether any authored reference live-resolves to {@code target} for {@code viewer}. */
@@ -130,9 +131,7 @@ public class NoteReferenceService {
    */
   public List<AuthoredNoteReferenceInboundFacade.InboundReference>
       editableInboundReferencesForViewer(Note target, User viewer) {
-    return authoredNoteReferenceInboundFacade
-        .distinctInboundReferencesForViewer(target, viewer)
-        .stream()
+    return inboundReferencesForViewer(target, viewer).stream()
         .filter(inbound -> viewer.owns(inbound.referrer().getNotebook()))
         .toList();
   }
@@ -153,27 +152,29 @@ public class NoteReferenceService {
   }
 
   /**
-   * Inbound referrers for focus-context only, with authored-note-reference visibility (referrer's
+   * Inbound references for focus-context only, with authored-note-reference visibility (referrer's
    * notebook vs the focal notebook and {@link User#canReferTo}), distinct by referrer id, excluding
    * {@code excludeNoteIds}, capped in memory after sampling.
    */
-  public List<Note> sampledReferencesNotesForFocusContext(
-      Note focalNote,
-      User viewer,
-      Set<Integer> excludeNoteIds,
-      int cap,
-      Optional<Long> sampleSeed) {
+  public List<AuthoredNoteReferenceInboundFacade.InboundReference>
+      sampledInboundReferencesForFocusContext(
+          Note focalNote,
+          User viewer,
+          Set<Integer> excludeNoteIds,
+          int cap,
+          Optional<Long> sampleSeed) {
     if (cap <= 0 || focalNote.getId() == null) {
       return List.of();
     }
-    List<Note> candidates = new ArrayList<>();
-    for (Note referrer : distinctReferrerNotesForViewer(focalNote, viewer)) {
-      if (!excludeNoteIds.contains(referrer.getId())) {
-        candidates.add(referrer);
+    List<AuthoredNoteReferenceInboundFacade.InboundReference> candidates = new ArrayList<>();
+    for (var inbound : inboundReferencesForViewer(focalNote, viewer)) {
+      if (!excludeNoteIds.contains(inbound.referrer().getId())) {
+        candidates.add(inbound);
       }
     }
-    sampleSeed.ifPresent(
-        seed -> candidates.sort(Comparator.comparingLong(note -> crc32(note.getId(), seed))));
+    sampleSeed.ifPresent(seed ->
+        candidates.sort(
+            Comparator.comparingLong(inbound -> crc32(inbound.referrer().getId(), seed))));
     return candidates.size() <= cap
         ? List.copyOf(candidates)
         : List.copyOf(candidates.subList(0, cap));

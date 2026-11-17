@@ -5,11 +5,13 @@ import com.odde.donut.algorithms.FrontmatterQuestionGenerationInstruction;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.controllers.dto.NoteReferenceEntry;
 import com.odde.donut.controllers.dto.RealmNotebookSidebar;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.entities.repositories.NoteRepository;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,9 +45,21 @@ public class NoteRealmService {
     Note focus = hydrateNote(note);
     var wikiLinks = noteReferenceService.wikiLinksForViewer(focus, viewer);
     NoteRealm realm = new NoteRealm(focus, wikiLinks);
-    List<Note> refNotes =
-        hydrateNoteList(noteReferenceService.distinctReferrerNotesForViewer(focus, viewer));
-    realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
+    var inbound = noteReferenceService.inboundReferencesForViewer(focus, viewer);
+    Map<Integer, Note> hydratedReferrers =
+        hydratedNotesById(
+            inbound.stream()
+                .map(AuthoredNoteReferenceInboundFacade.InboundReference::referrer)
+                .toList());
+    realm.setReferences(
+        inbound.stream()
+            .map(reference ->
+                NoteReferenceEntry.of(
+                    hydratedReferrers
+                        .getOrDefault(reference.referrer().getId(), reference.referrer())
+                        .getNoteTopology(),
+                    reference.propertyTypes()))
+            .toList());
     RealmNotebookSidebar sidebar = realm.sidebar();
     sidebar.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
     sidebar.setAncestorFolders(FolderTrailSegment.of(focus.folderTrailFromRoot()));
@@ -159,15 +173,15 @@ public class NoteRealmService {
         .orElse(note);
   }
 
-  private List<Note> hydrateNoteList(List<Note> notes) {
+  private Map<Integer, Note> hydratedNotesById(List<Note> notes) {
+    Map<Integer, Note> byId = new LinkedHashMap<>();
     if (notes.isEmpty()) {
-      return notes;
+      return byId;
     }
     List<Integer> ids = notes.stream().map(Note::getId).distinct().toList();
-    Map<Integer, Note> byId = new LinkedHashMap<>();
     for (Note n : noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(ids)) {
       byId.putIfAbsent(n.getId(), n);
     }
-    return notes.stream().map(n -> byId.getOrDefault(n.getId(), n)).toList();
+    return byId;
   }
 }

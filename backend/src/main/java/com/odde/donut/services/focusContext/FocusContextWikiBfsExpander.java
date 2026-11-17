@@ -2,6 +2,7 @@ package com.odde.donut.services.focusContext;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.focusContext.FocusContextFolderPeerAppender.SiblingAnchor;
@@ -131,12 +132,16 @@ final class FocusContextWikiBfsExpander {
         }
       }
       List<Note> sampledInbound =
-          noteReferenceService.sampledReferencesNotesForFocusContext(
-              parent,
-              viewer,
-              inboundExclude,
-              FocusContextConstants.sampleCapAtGraphDepth(depth),
-              sampleSeed);
+          noteReferenceService
+              .sampledInboundReferencesForFocusContext(
+                  parent,
+                  viewer,
+                  inboundExclude,
+                  FocusContextConstants.sampleCapAtGraphDepth(depth),
+                  sampleSeed)
+              .stream()
+              .map(AuthoredNoteReferenceInboundFacade.InboundReference::referrer)
+              .toList();
 
       for (Note target : outgoing) {
         if (target.getId() == null || target.getId().equals(focusId)) {

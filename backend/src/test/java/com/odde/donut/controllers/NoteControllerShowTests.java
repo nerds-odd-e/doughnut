@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.NoteRealmReferences.referrerIds;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -68,8 +69,31 @@ class NoteControllerShowTests extends ControllerTestBase {
     textContentController.updateNoteContent(source, contentDto);
 
     NoteRealm targetRealm = controller.showNote(target);
-    assertThat(targetRealm.getReferences(), hasSize(1));
-    assertThat(targetRealm.getReferences().getFirst().getId(), equalTo(source.getId()));
+    assertThat(referrerIds(targetRealm), contains(source.getId()));
+  }
+
+  @Test
+  void referencePropertyTypesFollowAcceptedContentChanges()
+      throws UnexpectedNoAccessRightException {
+    Note target = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Target").please();
+    Note source = makeMe.aNote().underSameNotebookAs(target).please();
+    NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+
+    contentDto.setContent("---\nprerequisite: \"[[Target]]\"\n---\n");
+    textContentController.updateNoteContent(source, contentDto);
+    assertThat(
+        controller.showNote(target).getReferences().getFirst().propertyTypes(),
+        contains("prerequisite"));
+
+    contentDto.setContent("---\nfollows: \"[[Target]]\"\n---\n");
+    textContentController.updateNoteContent(source, contentDto);
+    assertThat(
+        controller.showNote(target).getReferences().getFirst().propertyTypes(),
+        contains("follows"));
+
+    contentDto.setContent("Now [[Target]] is in the body.\n");
+    textContentController.updateNoteContent(source, contentDto);
+    assertThat(controller.showNote(target).getReferences().getFirst().propertyTypes(), nullValue());
   }
 
   @Test
@@ -85,8 +109,7 @@ class NoteControllerShowTests extends ControllerTestBase {
 
     // Showing "Future" — without any refresh/re-save of "source" — already lists it as inbound.
     NoteRealm futureRealm = controller.showNote(future);
-    assertThat(futureRealm.getReferences(), hasSize(1));
-    assertThat(futureRealm.getReferences().getFirst().getId(), equalTo(source.getId()));
+    assertThat(referrerIds(futureRealm), contains(source.getId()));
   }
 
   @Test
@@ -98,9 +121,7 @@ class NoteControllerShowTests extends ControllerTestBase {
     authorWikiLinkTo(source, "Target");
 
     // Unique "Target" resolves: source appears inbound.
-    assertThat(controller.showNote(target).getReferences(), hasSize(1));
-    assertThat(
-        controller.showNote(target).getReferences().getFirst().getId(), equalTo(source.getId()));
+    assertThat(referrerIds(controller.showNote(target)), contains(source.getId()));
 
     // A namesake in a different folder of the same notebook makes "[[Target]]" ambiguous between
     // the two same-titled notes (a plain, non-path-shaped token doesn't pin a folder).

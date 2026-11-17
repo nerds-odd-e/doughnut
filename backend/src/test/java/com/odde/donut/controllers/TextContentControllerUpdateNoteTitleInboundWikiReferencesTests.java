@@ -1,7 +1,9 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
+import static com.odde.donut.testability.NoteRealmReferences.referrerIds;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -75,8 +77,7 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     titleDto.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
 
     NoteRealm response = controller.updateNoteTitle(inbound.target(), titleDto);
-    assertThat(response.getReferences(), hasSize(1));
-    assertThat(response.getReferences().getFirst().getId(), equalTo(inbound.carrier().getId()));
+    assertThat(referrerIds(response), contains(inbound.carrier().getId()));
 
     makeMe.refresh(inbound.carrier());
     assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget|custom label]]"));

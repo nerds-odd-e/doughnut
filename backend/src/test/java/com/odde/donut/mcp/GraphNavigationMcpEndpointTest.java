@@ -2,6 +2,7 @@ package com.odde.donut.mcp;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,9 +11,11 @@ import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.services.NoteReferenceService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +29,13 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
   private static final String OUTGOING_PATH = "Engineering:Links/Outgoing/" + ESCAPED_TITLE;
   private static final String INBOUND_PATH = "Engineering:Links/Inbound/" + ESCAPED_TITLE;
   private static final String PEER_PATH = "Engineering:/" + ESCAPED_TITLE;
+  @Autowired NoteReferenceService noteReferenceService;
+  private Notebook notebook;
   private String focusContent;
 
   @BeforeEach
   void graphWithFolderAndRootNamesakes() {
-    Notebook notebook =
-        makeMe.aNotebook().creatorAndOwner(personalUser).name("Engineering").please();
+    notebook = makeMe.aNotebook().creatorAndOwner(personalUser).name("Engineering").please();
     Folder links = makeMe.aFolder().notebook(notebook).name("Links").please();
     Folder outgoingFolder = makeMe.aFolder().parentFolder(links).name("Outgoing").please();
     Folder inboundFolder = makeMe.aFolder().parentFolder(links).name("Inbound").please();
@@ -59,10 +63,33 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
           case "inboundReferences" -> INBOUND_PATH;
           default -> PEER_PATH;
         };
-    String wiki = graph.at("/focusNote/" + collection + "/0").asText();
+    String entry = "/focusNote/" + collection + "/0";
+    String wiki =
+        graph.at(collection.equals("inboundReferences") ? entry + "/link" : entry).asText();
 
     assertThat(wiki, equalTo("[[" + expectedPath + "]]"));
     assertRoundTrip(wiki, content);
+  }
+
+  @Test
+  void inboundReferenceCarriesTheReferringNotesPropertyTypesBesideItsLink() throws Exception {
+    String sourceContent =
+        "---\nprerequisite: \"[[" + FOCUS_PATH + "]]\"\n---\nAlso [[" + FOCUS_PATH + "]].\n";
+    Note source = makeMe.aNote("Source").notebook(notebook).please();
+    makeMe.authorReferencingContent(source, sourceContent);
+    noteReferenceService.refreshDerivedIndexesForNote(source);
+    Note other = makeMe.aNote("Other").notebook(notebook).please();
+    makeMe.authorReferencingContent(other, "Other links to [[" + FOCUS_PATH + "]].");
+
+    JsonNode inbound = graph(FOCUS_PATH).at("/focusNote/inboundReferences");
+
+    assertThat(inbound.size(), equalTo(3));
+    assertThat(inbound.get(0).has("referrerPropertyTypes"), is(false));
+    assertThat(
+        inbound.get(1).get("referrerPropertyTypes").toString(), equalTo("[\"prerequisite\"]"));
+    assertRoundTrip(inbound.get(1).get("link").asText(), sourceContent);
+    assertThat(inbound.get(2).has("referrerPropertyTypes"), is(false));
+    assertRoundTrip(inbound.get(2).get("link").asText(), "Other links to [[" + FOCUS_PATH + "]].");
   }
 
   @ParameterizedTest

@@ -30,7 +30,7 @@ public class GetNoteGraphTool {
       Retrieves structured **focus context** for one note: the focus note plus related notes discovered through wiki links, inbound references, and sampled folder peers.
 
       What this returns (JSON):
-      - **focusNote** — The requested note (depth 0) with a reusable **portablePath**, title, notebook, folder path, truncated **content** when needed, and lightweight lists: **outgoingLinks** and **inboundReferences** (wiki-style link strings), plus **sampleSiblings** (a small capped sample of peers in the same folder or notebook root).
+      - **focusNote** — The requested note (depth 0) with a reusable **portablePath**, title, notebook, folder path, truncated **content** when needed, and lightweight lists: **outgoingLinks** (wiki-style link strings), **inboundReferences** (entries with a wiki-style **link** to each referring note and, when the referring note links through its own properties, **referrerPropertyTypes**: the types of those properties of the referring note, not of the focus note), plus **sampleSiblings** (a small capped sample of peers in the same folder or notebook root).
       - **relatedNotes** — Notes reached within the post-focus share of the combined token budget and max traversal depth. Each entry includes a reusable **portablePath**, **depth**, **retrievalPath** (how the note was reached from the focus), and truncated **content** when needed.
 
       Use cases:

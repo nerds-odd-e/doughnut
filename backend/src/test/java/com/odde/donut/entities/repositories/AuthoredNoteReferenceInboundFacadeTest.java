@@ -45,11 +45,8 @@ class AuthoredNoteReferenceInboundFacadeTest extends SpringTestBase {
             List.of(AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("Alpha"))));
     makeMe.entityPersister.flush();
 
-    List<Note> referrers =
-        authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, owner);
-
     assertThat(
-        referrers.stream().map(Note::getId).toList(),
+        referrerIds(target, owner),
         contains(sourceWithLowerId.getId(), sourceWithHigherId.getId()));
   }
 
@@ -65,10 +62,7 @@ class AuthoredNoteReferenceInboundFacadeTest extends SpringTestBase {
             List.of(AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("Beta"))));
     makeMe.entityPersister.flush();
 
-    List<Note> referrers =
-        authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, owner);
-
-    assertThat(referrers, empty());
+    assertThat(referrerIds(target, owner), empty());
   }
 
   // Regression test for the inbound title-lookup key NFKC-folding a title that outgoing
@@ -85,10 +79,7 @@ class AuthoredNoteReferenceInboundFacadeTest extends SpringTestBase {
             List.of(AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("how 手段／方法"))));
     makeMe.entityPersister.flush();
 
-    List<Note> referrers =
-        authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, owner);
-
-    assertThat(referrers.stream().map(Note::getId).toList(), contains(source.getId()));
+    assertThat(referrerIds(target, owner), contains(source.getId()));
   }
 
   // Only test covering the alias branch of wikiCandidateRowsForTarget (the alias lookup
@@ -105,9 +96,14 @@ class AuthoredNoteReferenceInboundFacadeTest extends SpringTestBase {
             List.of(AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("nickname"))));
     makeMe.entityPersister.flush();
 
-    List<Note> referrers =
-        authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, owner);
+    assertThat(referrerIds(target, owner), contains(source.getId()));
+  }
 
-    assertThat(referrers.stream().map(Note::getId).toList(), contains(source.getId()));
+  private List<Integer> referrerIds(Note target, User viewer) {
+    return authoredNoteReferenceInboundFacade
+        .distinctInboundReferencesForViewer(target, viewer)
+        .stream()
+        .map(inbound -> inbound.referrer().getId())
+        .toList();
   }
 }

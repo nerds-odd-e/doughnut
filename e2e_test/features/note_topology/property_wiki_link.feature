@@ -32,6 +32,36 @@ Feature: Property wiki links
       | Grammar |
       | Syntax  |
 
+  Scenario: References show the property types the referring note links through
+    Given I have a notebook "RefTypes NB"
+    And I have a note "RefTypes Target" under notebook "RefTypes NB" with content:
+      """
+      Target body.
+      """
+    And I have a note "RefTypes Source" under notebook "RefTypes NB" with content:
+      """
+      origin
+      """
+    And I have a note "RefTypes Other" under notebook "RefTypes NB" with content:
+      """
+      origin
+      """
+    When I update note "RefTypes Source" content using markdown to become:
+      """
+      ---
+      prerequisite: "[[RefTypes Target]]"
+      ---
+
+      Source body.
+      """
+    And I update note "RefTypes Other" content using markdown to become:
+      """
+      See [[RefTypes Target]].
+      """
+    And I visit note "RefTypes Target"
+    Then I should see "RefTypes Source" labelled "via its prerequisite" in the References section
+    And I should see "RefTypes Other" without a label in the References section
+
   Scenario: A saved list wiki link stays navigable with its property panel open
     Given I have a notebook "WikiList Expanded NB"
     And I have a note "Grammar" under notebook "WikiList Expanded NB" with content:

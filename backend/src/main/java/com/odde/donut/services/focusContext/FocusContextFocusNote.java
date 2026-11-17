@@ -14,7 +14,7 @@ public class FocusContextFocusNote {
   private final String folderPath;
   private final int depth;
   private final List<String> outgoingLinks;
-  private final List<String> inboundReferences;
+  private final List<FocusContextInboundReference> inboundReferences;
   private final List<String> sampleSiblings;
   private final Timestamp createdAt;
   private final String content;
@@ -27,7 +27,7 @@ public class FocusContextFocusNote {
       String folderPath,
       int depth,
       List<String> outgoingLinks,
-      List<String> inboundReferences,
+      List<FocusContextInboundReference> inboundReferences,
       List<String> sampleSiblings,
       Timestamp createdAt,
       String content,

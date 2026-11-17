@@ -11,11 +11,11 @@ import lombok.Setter;
 @JsonPropertyOrder({"id", "note", "references", "wikiLinks"})
 public class NoteRealm {
   /**
-   * Referring notes (live-resolved authored note references), as {@link NoteTopology}, deduplicated
-   * by referring note id and ordered by id, per {@link
-   * com.odde.donut.services.NoteReferenceService#distinctReferrerNotesForViewer}.
+   * Referring notes (live-resolved authored note references), as {@link NoteReferenceEntry},
+   * deduplicated by referring note id and ordered by id, per {@link
+   * com.odde.donut.services.NoteReferenceService#inboundReferencesForViewer}.
    */
-  @Getter @Setter private List<NoteTopology> references;
+  @Getter @Setter private List<NoteReferenceEntry> references;
 
   @NotNull @Getter private Note note;
 

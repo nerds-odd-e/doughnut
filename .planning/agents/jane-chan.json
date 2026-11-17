@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Jane-chan",
-  "email": "jane-chan@example.org",
-  "identity": "SEED-131#see-link-property-types-in-references",
-  "mode": "story-branch",
-  "branch": "claude/see-link-property-types-in-references",
-  "host": "claude"
-}

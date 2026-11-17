@@ -35,12 +35,15 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { NoteTopology } from "@generated/donut-backend-api"
+import type { NoteReferenceEntry } from "@generated/donut-backend-api"
 import Cards from "./Cards.vue"
 import { ChevronsUpDown } from "@lucide/vue"
 
 defineProps({
-  noteTopologies: { type: Array as PropType<NoteTopology[]>, required: true },
+  noteTopologies: {
+    type: Array as PropType<NoteReferenceEntry[]>,
+    required: true,
+  },
 })
 
 const internalExpandChildren = ref(true)
