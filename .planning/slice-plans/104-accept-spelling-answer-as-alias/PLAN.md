@@ -154,6 +154,14 @@ Learning: the answered-question view renders the reviewed note's
 frontmatter, so "no offer" assertions must look for the button or done text,
 not the word "alias".
 
+## Execution complete
+
+Product advice: no change. The story removes a measured cost (about 20 of
+402 wrong answers were same-word or expression variants); whether learners
+use the action is learned from ordinary use, and the remaining SEED-073
+stories keep their order. Process review is deferred into wrap-up with the
+intent-coverage check (slice 1's refactor relocated an existing spec).
+
 ## Refinement and concerns
 
 Refinement was not needed: two slices with separate proof loops, one offer
