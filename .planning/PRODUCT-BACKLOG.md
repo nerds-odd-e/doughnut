@@ -9,7 +9,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 ## Taken
 
 - [Retest spelling objectives with one skill held fixed](seeds/SEED-073-learning-refinement-and-retrieval.md#retest-fixed-skill-spelling-objectives) — SEED-073#retest-fixed-skill-spelling-objectives ([plan](slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md))
-- [Label every property link in references](seeds/SEED-131-reference-details.md#label-every-property-link-in-references) — SEED-131#label-every-property-link-in-references ([plan](slice-plans/103-label-every-property-link-in-references/PLAN.md))
 
 ## Backlog list
 
