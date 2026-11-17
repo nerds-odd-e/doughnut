@@ -15,6 +15,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.testability.RelationshipNoteMarkdown;
 import com.odde.donut.testability.SpringTestBase;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class NoteRealmServiceTest extends SpringTestBase {
   @Autowired NoteRealmService noteRealmService;
-  @Autowired NoteReferenceService noteReferenceService;
 
   User user;
   Notebook notebook;
@@ -164,7 +164,6 @@ class NoteRealmServiceTest extends SpringTestBase {
     private Note sourceAuthoring(String content) {
       Note source = makeMe.aNote().title("Source").notebook(notebook).please();
       makeMe.authorReferencingContent(source, content);
-      noteReferenceService.refreshDerivedIndexesForNote(source);
       return source;
     }
 
@@ -197,17 +196,68 @@ class NoteRealmServiceTest extends SpringTestBase {
           nullValue());
     }
 
+    private List<String> typesOnReferenceTo(Note referenced) {
+      var references = noteRealmService.build(referenced, user).getReferences();
+      assertThat(references, hasSize(1));
+      return references.getFirst().propertyTypes();
+    }
+
     @Test
-    void labels_only_the_link_the_property_index_points_at() {
+    void labels_every_link_a_value_holds() {
       Note other = makeMe.aNote().title("Other").notebook(notebook).please();
       sourceAuthoring("---\nsee also: \"[[Other]] and [[Target]]\"\n---\n");
 
-      assertThat(
-          noteRealmService.build(other, user).getReferences().getFirst().propertyTypes(),
-          contains("see also"));
-      var targetReferences = noteRealmService.build(target, user).getReferences();
-      assertThat(targetReferences, hasSize(1));
-      assertThat(targetReferences.getFirst().propertyTypes(), nullValue());
+      assertThat(typesOnReferenceTo(other), contains("see also"));
+      assertThat(typesOnReferenceTo(target), contains("see also"));
+    }
+
+    @Test
+    void labels_any_key() {
+      sourceAuthoring("---\noverlaps:\n  - \"[[Target]]\"\n---\n");
+
+      assertThat(typesOnReferenceTo(target), contains("overlaps"));
+    }
+
+    @Test
+    void labels_a_list_item_of_any_length() {
+      sourceAuthoring("---\nnotes:\n  - \"" + "x".repeat(300) + " [[Target]]\"\n---\n");
+
+      assertThat(typesOnReferenceTo(target), contains("notes"));
+    }
+
+    @Test
+    void labels_the_example_of_family_in_canonical_form() {
+      sourceAuthoring("---\nan example of: \"[[Target]]\"\n---\n");
+
+      assertThat(typesOnReferenceTo(target), contains("example of"));
+    }
+
+    @Test
+    void labels_relationship_keys_on_an_ordinary_note() {
+      sourceAuthoring("---\nsource: \"[[Target]]\"\n---\n");
+
+      assertThat(typesOnReferenceTo(target), contains("source"));
+    }
+
+    @Test
+    void omits_a_property_that_links_elsewhere() {
+      Note other = makeMe.aNote().title("Other").notebook(notebook).please();
+      sourceAuthoring("---\nprerequisite: \"[[Other]]\"\n---\nSee [[Target]].\n");
+
+      assertThat(typesOnReferenceTo(other), contains("prerequisite"));
+      assertThat(typesOnReferenceTo(target), nullValue());
+    }
+
+    @Test
+    void omits_types_for_a_relationship_notes_endpoints() {
+      Note subject = makeMe.aNote().title("Subject").notebook(notebook).please();
+      Note relation = makeMe.aNote().notebook(notebook).please();
+      makeMe.authorReferencingContent(
+          relation,
+          RelationshipNoteMarkdown.forEndpoints(relation, "derives from", subject, target, null));
+
+      assertThat(typesOnReferenceTo(subject), nullValue());
+      assertThat(typesOnReferenceTo(target), nullValue());
     }
   }
 

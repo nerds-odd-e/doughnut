@@ -57,14 +57,4 @@ interface AuthoredNoteReferenceRowRepository
       @Param("titleAndAliasLookupKeys") List<String> titleAndAliasLookupKeys,
       @Param("pathTitleSuffix") String pathTitleSuffix,
       @Param("pathMarkdownTitleSuffix") String pathMarkdownTitleSuffix);
-
-  /**
-   * The indexed property keys of the reference rows {@code referenceRowIds}, as {@code [reference
-   * row id, property key]} pairs in authored order (index rows are rebuilt in authored order).
-   */
-  @Query(
-      "SELECT i.authoredNoteReference.id, i.propertyKey FROM NotePropertyIndex i "
-          + "WHERE i.authoredNoteReference.id IN :referenceRowIds ORDER BY i.id ASC")
-  List<Object[]> findPropertyKeysByReferenceRowIds(
-      @Param("referenceRowIds") List<Integer> referenceRowIds);
 }

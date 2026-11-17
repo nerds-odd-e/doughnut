@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-131#label-every-property-link-in-references",
+  "title": "Label every property link in references",
+  "completedAt": "2026-11-17T14:44:37.619Z",
+  "developer": "Terry Yin",
+  "agent": "yilv-chan",
+  "host": "claude",
+  "intentCoverage": {
+    "report": "Verdict: Caught.\n\nThe maintained assertion NoteRealmServiceTest$ReferencePropertyTypes.omits_a_property_that_links_elsewhere, at its second assertion (NoteRealmServiceTest.java:248, `assertThat(typesOnReferenceTo(target), nullValue())`), failed on the wrong behavior. The claim covers only the path that test runs: build the note realm for a body-linked target when the referring note's frontmatter property links somewhere else.\n\nStory and revision: .planning/seeds/SEED-131-reference-details.md, \"Label every property link in references\", key example 6 (\"Only the property that holds this link\"). Revision c22450e95031431cc807c022751c1b077fdcf810 (branch claude/label-every-property-link-in-references). Plan: .planning/slice-plans/103-label-every-property-link-in-references/PLAN.md.\n\nFault: AuthoredNoteReferences.propertyTypesHolding — `.anyMatch(ref -> sourceLocalKeys.contains(ref.sourceLocalKey()))` changed to `.anyMatch(ref -> true)`; fixtures and assertions untouched.\n\nEvidence: baseline `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*NoteRealmServiceTest'` passed (10 + 10 nested tests, omits_a_property_that_links_elsewhere ran). With the fault: 1 failed — `omits_a_property_that_links_elsewhere() FAILED — Expected: null but: was <[prerequisite]>` at line 248; the Other assertion at line 247 passed, so the faulted path was reached. Other label tests passed under the fault, as expected (they hold only links to the target or no frontmatter).\n\nRestoration: verified. Edit undone by EXIT trap; `git status --porcelain` empty at c22450e950; restored run passed; scratch worktree removed.\n\nNext proof action: none needed for this promise on this path. Web and retrieval surfaces (`inboundReferences`) were not probed; this check makes no claim about them.\n\nCost: Gradle time ~4m 3s (baseline 2m 8s, faulted 1m 6s, restored 49s); human and agent effort unavailable; invocation-to-report elapsed 371793 ms (measured).\n\nWrap-up disposition: checked revision c22450e95031431cc807c022751c1b077fdcf810, verdict Caught, no follow-up.\n"
+  }
+}

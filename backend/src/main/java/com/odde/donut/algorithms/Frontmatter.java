@@ -93,16 +93,8 @@ public final class Frontmatter {
     List<String> out = new ArrayList<>();
     for (Object v : data.values()) {
       FrontmatterPropertyValues.fromYamlObject(v)
-          .ifPresent(pv -> {
-            switch (pv) {
-              case FrontmatterPropertyValue.Scalar s -> out.add(s.value());
-              case FrontmatterPropertyValue.ListItems l -> {
-                if (includeListItems) {
-                  out.addAll(l.items());
-                }
-              }
-            }
-          });
+          .filter(pv -> includeListItems || pv instanceof FrontmatterPropertyValue.Scalar)
+          .ifPresent(pv -> out.addAll(pv.strings()));
     }
     return List.copyOf(out);
   }

@@ -11,7 +11,6 @@ import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.services.NoteReferenceService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +28,6 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
   private static final String OUTGOING_PATH = "Engineering:Links/Outgoing/" + ESCAPED_TITLE;
   private static final String INBOUND_PATH = "Engineering:Links/Inbound/" + ESCAPED_TITLE;
   private static final String PEER_PATH = "Engineering:/" + ESCAPED_TITLE;
-  @Autowired NoteReferenceService noteReferenceService;
   private Notebook notebook;
   private String focusContent;
 
@@ -73,23 +71,24 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
 
   @Test
   void inboundReferenceCarriesTheReferringNotesPropertyTypesBesideItsLink() throws Exception {
-    String sourceContent =
-        "---\nprerequisite: \"[[" + FOCUS_PATH + "]]\"\n---\nAlso [[" + FOCUS_PATH + "]].\n";
+    String sourceContent = "---\nsee also: \"[[Elsewhere]] and [[" + FOCUS_PATH + "]]\"\n---\n";
     Note source = makeMe.aNote("Source").notebook(notebook).please();
     makeMe.authorReferencingContent(source, sourceContent);
-    noteReferenceService.refreshDerivedIndexesForNote(source);
-    Note other = makeMe.aNote("Other").notebook(notebook).please();
-    makeMe.authorReferencingContent(other, "Other links to [[" + FOCUS_PATH + "]].");
+    String relationContent =
+        "---\ntype: Relationship\nrelation: derives from\nsource: \"[[Source]]\"\ntarget: \"[["
+            + FOCUS_PATH
+            + "]]\"\n---\n";
+    Note relation = makeMe.aNote("Relation").notebook(notebook).please();
+    makeMe.authorReferencingContent(relation, relationContent);
 
     JsonNode inbound = graph(FOCUS_PATH).at("/focusNote/inboundReferences");
 
     assertThat(inbound.size(), equalTo(3));
     assertThat(inbound.get(0).has("referrerPropertyTypes"), is(false));
-    assertThat(
-        inbound.get(1).get("referrerPropertyTypes").toString(), equalTo("[\"prerequisite\"]"));
+    assertThat(inbound.get(1).get("referrerPropertyTypes").toString(), equalTo("[\"see also\"]"));
     assertRoundTrip(inbound.get(1).get("link").asText(), sourceContent);
     assertThat(inbound.get(2).has("referrerPropertyTypes"), is(false));
-    assertRoundTrip(inbound.get(2).get("link").asText(), "Other links to [[" + FOCUS_PATH + "]].");
+    assertRoundTrip(inbound.get(2).get("link").asText(), relationContent);
   }
 
   @ParameterizedTest

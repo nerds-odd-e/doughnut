@@ -59,6 +59,12 @@ public final class RelationshipNoteComposition {
     }
   }
 
+  /** Whether {@code frontmatter} has {@code type: Relationship} (ignoring case). */
+  public static boolean isRelationshipNote(Frontmatter frontmatter) {
+    return RELATIONSHIP_NOTE_TYPE.equalsIgnoreCase(
+        frontmatter.getString("type").map(String::trim).orElse(""));
+  }
+
   /**
    * The relationship in {@code content}: present when its frontmatter has {@code type:
    * Relationship} (ignoring case) and non-blank {@code source} and {@code target}.
@@ -67,8 +73,7 @@ public final class RelationshipNoteComposition {
     return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
         .flatMap(lf -> {
           Frontmatter fm = lf.frontmatter();
-          if (!RELATIONSHIP_NOTE_TYPE.equalsIgnoreCase(
-              fm.getString("type").map(String::trim).orElse(""))) {
+          if (!isRelationshipNote(fm)) {
             return Optional.empty();
           }
           Optional<String> source =

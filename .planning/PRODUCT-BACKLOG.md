@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Label every property link in references](seeds/SEED-131-reference-details.md#label-every-property-link-in-references) — SEED-131#label-every-property-link-in-references ([plan](slice-plans/103-label-every-property-link-in-references/PLAN.md))
-
 ## Backlog list
 
 - [Accept a wrong spelling answer as an alias](seeds/SEED-073-learning-refinement-and-retrieval.md#accept-spelling-answer-as-alias) — SEED-073#accept-spelling-answer-as-alias

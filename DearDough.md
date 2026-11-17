@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 499. Removed numbers are never reused.
+- Highest allocated local number: 500. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -635,3 +635,18 @@ Plan 103 placed private packets in "this execution worktree's Git-ignored `.plan
   - Evidence: [plan 103 "Inputs and decisive premises"](https://github.com/nerds-odd-e/doughnut/blob/6f02bb77ca188e4f19e1c33d510621c7a424090c/.planning/slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md#inputs-and-decisive-premises); coordinator check before slice 1 delegation
   - Observed effect: no private material was staged; the gap was caught before any sensitive file existed.
   - Inference: a privacy premise in a plan deserves the same literal observation as its input premises; the shared cache relies on its own inner `.gitignore` for the same reason.
+
+## DD-500 — Wrap-up treats story scope limits as deferred promises
+
+Story wrap-up deletes a story section "after queuing its deferred promises as one new story unless the developer drops them". A story's scope limits phrased "each deliverable on its own later" name unrelated possible extensions with no beneficiary or evaluable outcome, so a bundled story would fail the backlog's admission rule; the coordinator had to judge that they were context, not promises, and kept a one-line note in the seed instead.
+
+### Occurrences
+- Execution: SEED-131#label-every-property-link-in-references
+  - Timestamp: 2026-11-17 (time unknown)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: seed SEED-131 section Scope "Scope limits, each deliverable on its own later" (before-cleanup commit); dough-story-wrap-up "Delete spent history"; dough-product-backlog "Add a feature story only with a named beneficiary and evaluable outcome"; the source-only reviewer also left those limits unnumbered.
+  - Observed effect: no story was queued; the limits survive as a note under the seed's Ordering and Scope Reduction.
+  - Inference: the wrap-up wording does not distinguish promises a story deferred from scope limits it never promised.
+

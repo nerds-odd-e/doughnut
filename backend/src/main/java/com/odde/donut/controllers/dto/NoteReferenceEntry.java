@@ -7,7 +7,8 @@ import java.util.List;
 /**
  * One References entry: the referring note's topology plus the property types the referring note
  * holds its reference(s) to the target in. {@code propertyTypes} is null (omitted) when the
- * reference is held by no indexed property.
+ * reference is held by no property value (a body-only link, or a relationship note's structural
+ * keys).
  */
 public record NoteReferenceEntry(
     @JsonUnwrapped NoteTopology noteTopology,
