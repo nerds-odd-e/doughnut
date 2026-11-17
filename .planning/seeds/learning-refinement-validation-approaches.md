@@ -9,28 +9,9 @@ The full proposal wording and validation approaches remain with their linked
 
 [Story home](SEED-073-learning-refinement-and-retrieval.md#validate-spelling-objectives).
 
-- **For / why.** A learner practicing written form, reading, or vocabulary
-  needs to know which skill a prompt asks for and receive credit for answers
-  that satisfy it.
-- **Proposal hypothesis.** Stating one objective and using one intact cue
-  makes spelling tasks easier to interpret and grade fairly, while
-  preserving intentional distinctions in spelling and usage.
-- **Validate first.** Compare recoverable original cues and rewrites with
-  keys hidden. Replay legitimate alternatives, actual form errors, and close
-  semantic neighbors under each stated objective. Use examples such as the
-  solution versus process for *brine*, the reading of 伝手, and the small っ
-  in おっしゃる. Include a broad cue such as *meadow* where the answer rule
-  may still need review. Keep unavailable historical cues out of wording
-  judgments.
-- **Decision.** Show where the rewrite resolves the ambiguity, which valid
-  variants it accepts, and which intended errors it still distinguishes.
-  Identify any cases where the rewrite changes the skill tested. If
-  promising, design how learners see the objective and how authors review
-  alternatives before implementation. Scope a follow-up story if needed.
-- **Effort hypothesis.** S, medium confidence for a small paired review using
-  existing examples.
-- **Evidence and cleanup.** Use the [local recall evidence](SEED-073-learning-refinement-and-retrieval.md#local-recall-evidence)
-  and apply the [shared closeout](SEED-073-learning-refinement-and-retrieval.md#close-out-temporary-recall-evidence).
+The story home owns the refined goal, comparison, boundaries, key examples,
+and evidence disposition. The November 14 paired review remains dated
+evidence in the local cache linked there.
 
 <a id="validate-short-recall-lessons"></a>
 
