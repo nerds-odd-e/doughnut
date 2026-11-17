@@ -9,7 +9,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 ## Taken
 
 - [See link property types in references](seeds/SEED-131-reference-details.md#see-link-property-types-in-references) — SEED-131#see-link-property-types-in-references ([plan](slice-plans/100-see-link-property-types-in-references/PLAN.md))
-- [Judge a contested question by whether its answer is correct](seeds/SEED-073-learning-refinement-and-retrieval.md#judge-contested-question-by-answer-correctness) — SEED-073#judge-contested-question-by-answer-correctness ([plan](slice-plans/102-judge-contested-question-by-answer-correctness/PLAN.md))
 
 ## Backlog list
 
