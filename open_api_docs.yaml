@@ -6294,7 +6294,7 @@ components:
         inboundReferences:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/FocusContextInboundReference"
         sampleSiblings:
           type: array
           items:
@@ -6306,6 +6306,19 @@ components:
           type: string
         contentTruncated:
           type: boolean
+    FocusContextInboundReference:
+      type: object
+      properties:
+        link:
+          type: string
+          description: Wiki-style link string that selects the referring note.
+        referrerPropertyTypes:
+          type: array
+          description: "Distinct property types (key without numeric suffix), in authored\
+            \ order, of the referring note's own properties that link to the focus\
+            \ note. Omitted when none."
+          items:
+            type: string
     FocusContextNote:
       type: object
       properties:

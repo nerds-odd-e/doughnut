@@ -1230,11 +1230,22 @@ export type FocusContextFocusNote = {
     folderPath?: string;
     depth?: number;
     outgoingLinks?: Array<string>;
-    inboundReferences?: Array<string>;
+    inboundReferences?: Array<FocusContextInboundReference>;
     sampleSiblings?: Array<string>;
     createdAt?: string;
     content?: string;
     contentTruncated?: boolean;
+};
+
+export type FocusContextInboundReference = {
+    /**
+     * Wiki-style link string that selects the referring note.
+     */
+    link?: string;
+    /**
+     * Distinct property types (key without numeric suffix), in authored order, of the referring note's own properties that link to the focus note. Omitted when none.
+     */
+    referrerPropertyTypes?: Array<string>;
 };
 
 export type FocusContextNote = {

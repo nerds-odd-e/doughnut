@@ -6,13 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.NoteReferenceService;
+import com.odde.donut.services.focusContext.FocusContextInboundReference;
 import com.odde.donut.services.focusContext.FocusContextResult;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class NoteControllerGraphTests extends ControllerTestBase {
   @Autowired NoteController controller;
+  @Autowired NoteReferenceService noteReferenceService;
 
   Note rootNote;
 
@@ -47,6 +51,24 @@ class NoteControllerGraphTests extends ControllerTestBase {
     var related = result.getRelatedNotes().getFirst();
     assertThat(related.getDepth(), greaterThan(0));
     assertThat(related.getRetrievalPath(), is(notNullValue()));
+  }
+
+  @Test
+  void inboundReferencesCarryTheReferringNotesPropertyTypes()
+      throws UnexpectedNoAccessRightException {
+    Note source = makeMe.aNote("Source").underSameNotebookAs(rootNote).please();
+    makeMe.authorReferencingContent(
+        source, "---\nprerequisite: \"[[Root]]\"\n---\nAlso [[Root]] in body.\n");
+    noteReferenceService.refreshDerivedIndexesForNote(source);
+    Note other = makeMe.aNote("Other").underSameNotebookAs(rootNote).please();
+    makeMe.authorReferencingContent(other, "Links to [[Root]] in body.\n");
+
+    List<FocusContextInboundReference> inbound =
+        controller.getGraph(rootNote, 5000).getFocusNote().getInboundReferences();
+
+    assertThat(inbound, hasSize(2));
+    assertThat(inbound.get(0).referrerPropertyTypes(), contains("prerequisite"));
+    assertThat(inbound.get(1).referrerPropertyTypes(), nullValue());
   }
 
   @Test

@@ -39,7 +39,7 @@ PFE: the lookup, the index and both surfaces exist; the story extends them.
 - `NoteReferences.vue` and `Card.vue` render the section; `NoteRealm.references`
   feeds it on the note page and in note context.
 - `FocusContextRetrievalService` builds `inboundReferences` from
-  `NoteReferenceService.sampledReferencesNotesForFocusContext`, which
+  `NoteReferenceService.sampledInboundReferencesForFocusContext`, which
   `FocusContextWikiBfsExpander` also calls for traversal.
 
 Accepted decisions: [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md)
@@ -158,7 +158,7 @@ touches three features.
 
 ### 3. Carry property types on focus context inbound references
 Type: Behavior
-Status: planned
+Status: done
 Proof: `pnpm backend:test:worktree --tests '*GraphNavigationMcpEndpointTest'`
 and `--tests '*FocusContextRetrieval*'` pass; the generated client is
 regenerated and the frontend typecheck passes.
@@ -173,6 +173,16 @@ sampling are unchanged, and traversal through inbound references is unchanged.
 Update the `get_note_graph` description and
 `docs/focus-context/focus_context_retrieval_design.md` to the entry's shape,
 naming the types as the referring note's property.
+
+Accepted (2026-11-17): entries are `FocusContextInboundReference` (`link`,
+`referrerPropertyTypes` omitted when none);
+`NoteReferenceService.sampledInboundReferencesForFocusContext` samples inbound
+references with the same exclusion, seed order and cap. Proof:
+`GraphNavigationMcpEndpointTest.inboundReferenceCarriesTheReferringNotesPropertyTypesBesideItsLink`,
+`NoteControllerGraphTests.inboundReferencesCarryTheReferringNotesPropertyTypes`,
+`*FocusContext*` (cap and sampling unchanged),
+`*AuthoredNoteReferenceInboundFacadeTest`; client regenerated, `vue-tsc`
+passes. `backend:test:worktree` keeps only the last run's result XML.
 
 ## Concern evidence
 

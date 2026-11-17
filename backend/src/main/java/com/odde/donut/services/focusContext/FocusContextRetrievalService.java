@@ -86,16 +86,18 @@ public class FocusContextRetrievalService {
     if (focusId != null) {
       focusInboundExclude.add(focusId);
     }
-    List<String> inboundRefUris =
+    List<FocusContextInboundReference> inboundReferences =
         noteReferenceService
-            .sampledReferencesNotesForFocusContext(
+            .sampledInboundReferencesForFocusContext(
                 hydrated,
                 viewer,
                 focusInboundExclude,
                 FocusContextConstants.FOCUS_INBOUND_URI_CAP,
                 config.getSampleSeed())
             .stream()
-            .map(note -> wikiUri.of(note, viewer))
+            .map(inbound ->
+                FocusContextInboundReference.of(
+                    wikiUri.of(inbound.referrer(), viewer), inbound.propertyTypes()))
             .toList();
     int focusContentTokens = ApproximateUtf8TokenBudget.estimateApproxTokens(focusDetails);
     int relatedTotalBudget = Math.max(0, combinedContentBudget - focusContentTokens);
@@ -124,7 +126,7 @@ public class FocusContextRetrievalService {
             FocusContextConstants.folderPathOf(hydrated),
             0,
             outgoingLinkUris,
-            inboundRefUris,
+            inboundReferences,
             List.copyOf(sampleSiblingUris),
             hydrated.getCreatedAt(),
             focusDetails,

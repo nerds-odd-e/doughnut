@@ -48,18 +48,6 @@ public class AuthoredNoteReferenceInboundFacade {
     this.wikiLinkResolver = wikiLinkResolver;
   }
 
-  /**
-   * Distinct referrer notes whose authored reference live-resolves to {@code target} for {@code
-   * viewer}, ordered by referrer note id ascending.
-   */
-  public List<Note> distinctReferrerNotesForViewer(Note target, User viewer) {
-    List<Note> referrers = new ArrayList<>();
-    for (InboundReference inboundReference : distinctInboundReferencesForViewer(target, viewer)) {
-      referrers.add(inboundReference.referrer());
-    }
-    return referrers;
-  }
-
   /** Whether any referrer has an authored reference that live-resolves to {@code target}. */
   public boolean isReferencedForViewer(Note target, User viewer) {
     for (AuthoredNoteReferenceRow candidate : candidateRowsForTarget(target)) {
@@ -82,10 +70,8 @@ public class AuthoredNoteReferenceInboundFacade {
       Note referrer, List<String> authoredLinkTexts, List<String> propertyTypes) {}
 
   /**
-   * {@link #distinctReferrerNotesForViewer}, generalized to also carry each surviving candidate
-   * row's authored link text — the data a rewrite consumer ({@code WikiLinkRewriteService}) needs
-   * to locate and rewrite each referrer's inbound reference(s) to {@code target}, without a
-   * separate lookup into cached rows. Ordered by referrer note id ascending.
+   * Distinct referrers whose authored reference live-resolves to {@code target} for {@code viewer},
+   * each with its authored link texts and property types, ordered by referrer note id ascending.
    */
   public List<InboundReference> distinctInboundReferencesForViewer(Note target, User viewer) {
     LinkedHashMap<Integer, Note> referrersInOrder = new LinkedHashMap<>();
