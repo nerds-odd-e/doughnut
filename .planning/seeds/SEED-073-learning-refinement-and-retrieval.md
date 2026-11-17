@@ -21,6 +21,36 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 [Local recall evidence and validation workflow](learning-refinement-and-retrieval-context.md#local-recall-evidence) apply to each story below.
 
+<a id="judge-contested-question-by-answer-correctness"></a>
+
+### Judge a contested question by whether its answer is correct
+
+**Identity:** SEED-073#judge-contested-question-by-answer-correctness
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Beneficiary and outcome.** A learner who contests a recall question gets
+  a verdict on correctness alone: the contest is accepted when the stored
+  answer is wrong or more than one choice is defensible from the note, and
+  refused when exactly the stored answer is supported.
+- **Why.** Contesting asks "is this question correct and answerable?", while
+  the shared evaluation also asks "is this a good question under the
+  generation rules?". In the [comparison evidence](reliable-recall-question-checks-evidence.md#cohort-results)
+  that quality verdict flagged 30 of 75 sound questions; deciding from the
+  chosen answers alone flagged none and caught 12 of 14 defects.
+- **Scope.** The contest decision and its advice to the learner, asked
+  through one narrow instruction: name every choice the note supports. The
+  story deletes the broader question-quality evaluation and the checking and
+  replacing of a question while it is being generated, with their setting,
+  tests and documentation, then sweeps the product for what only they used.
+  Replacing a question after the learner's accepted contest stays.
+- **Known context.** Production already sends the contest check the focus
+  note and its retrieved related notes within the shared content budget; the
+  experiment's deployed baseline used the focus note only. The narrower
+  frozen instruction caught 14 of 14 defects and flagged no sound question.
+- **Effort hypothesis.** S to M, medium confidence.
+
 <a id="validate-spelling-objectives"></a>
 
 ### Validate spelling objectives and cues
