@@ -131,7 +131,7 @@ specs run through `pnpm -C frontend test <spec>`.
 
 ### 2. Show property types in the References section
 Type: Behavior
-Status: planned
+Status: done
 Proof: a mounted frontend test of the References section passes with the
 frontend typecheck, and
 `pnpm cy:run --spec e2e_test/features/note_topology/property_wiki_link.feature`
@@ -143,6 +143,18 @@ from Other through body text → a reader opens Target → Source's card shows
 shows no label; a source with several types shows them together; a long key
 does not break the card; the collapsed count is unchanged. Note context shows
 the same.
+
+Accepted (2026-11-17): `Card.vue` renders `via its <types>` as a `text-sm`,
+dimmed, truncated line with a `title` tooltip under the referring note's title;
+`NoteReferences` feeds the note page and note context. Proof:
+`frontend/tests/notes/NoteReferences.spec.ts` (several types together, no
+label, collapsed count) with `vue-tsc`, and the scenario "References show the
+property types the referring note links through" in `property_wiki_link.feature`
+(12 of 12, about 4.5 minutes). Test builder: `NoteRealmBuilder.referencing(target,
+...propertyTypes)`. Named follow-up from the refactor pass: the References
+section locators live in `e2e_test/step_definitions/wiki_link.ts`
+(`referencesSection`, `referenceCard`) rather than a page object; moving them
+touches three features.
 
 ### 3. Carry property types on focus context inbound references
 Type: Behavior

@@ -138,6 +138,30 @@ Then('I should see {string} in the References section', (noteTitle: string) => {
   referencesSection().should('contain.text', noteTitle)
 })
 
+const referenceCard = (noteTitle: string) =>
+  referencesSection()
+    .findAllByRole('link', { name: noteTitle })
+    .first()
+    .closest('[role="card"]')
+
+Then(
+  'I should see {string} labelled {string} in the References section',
+  (noteTitle: string, label: string) => {
+    referenceCard(noteTitle)
+      .find('[data-reference-property-types]')
+      .should('have.text', label)
+  }
+)
+
+Then(
+  'I should see {string} without a label in the References section',
+  (noteTitle: string) => {
+    referenceCard(noteTitle)
+      .find('[data-reference-property-types]')
+      .should('not.exist')
+  }
+)
+
 When('I open {string} from the References section', (noteTitle: string) => {
   referencesSection().findAllByRole('link', { name: noteTitle }).first().click()
 })

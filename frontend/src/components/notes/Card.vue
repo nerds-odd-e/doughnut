@@ -10,6 +10,12 @@
           <NoteTitleWithLink v-bind="{ noteTopology }" />
         </h5>
     </router-link>
+    <p
+      v-if="propertyTypesLabel"
+      data-reference-property-types
+      class="text-sm text-base-content/70 truncate"
+      :title="propertyTypesLabel"
+    >{{ propertyTypesLabel }}</p>
     <div class="daisy-card-actions justify-end" v-if="$slots.button">
       <slot name="button" :note-title="noteTopology" />
     </div>
@@ -20,13 +26,13 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed } from "vue"
-import type { NoteTopology } from "@generated/donut-backend-api"
+import type { NoteReferenceEntry } from "@generated/donut-backend-api"
 import { noteShowLocation as noteShowLocationForRoute } from "@/routes/noteShowLocation"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 
 const props = defineProps({
   noteTopology: {
-    type: Object as PropType<NoteTopology>,
+    type: Object as PropType<NoteReferenceEntry>,
     required: true,
   },
 })
@@ -34,4 +40,9 @@ const props = defineProps({
 const noteShowLocation = computed(() =>
   noteShowLocationForRoute(props.noteTopology.id)
 )
+
+const propertyTypesLabel = computed(() => {
+  const types = props.noteTopology.propertyTypes
+  return types?.length ? `via its ${types.join(", ")}` : undefined
+})
 </script>
