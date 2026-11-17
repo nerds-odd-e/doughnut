@@ -100,6 +100,27 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 - **Effort hypothesis.** M, medium confidence; a few authored examples and accessible sources.
 - **Evidence and cleanup.** Follow the [shared contract](#close-out-temporary-recall-evidence).
 
+<a id="renew-waiting-question-when-note-changes"></a>
+
+### Renew a waiting question when its note changes
+
+**Identity:** SEED-073#renew-waiting-question-when-note-changes
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Beneficiary and outcome.** A learner who has improved a note is asked
+  about the note as it now reads: a stored question still waiting to be
+  shown, generated before its note changed, is replaced by one made from
+  the current note.
+- **Why.** Refining notes through recall makes stored questions stale. In
+  the [reviewed samples](reliable-recall-question-checks-evidence.md#route-age-and-context)
+  18 of 47 and 22 of 24 focus notes had changed after their question was
+  generated, and [8,254 stored questions were waiting](learning-refinement-integrity-initial-recommendation.md#recall-question-integrity-recommendation).
+- **Open.** Which note changes make a question stale is untested; the
+  evidence supports no rule based on a question's age alone.
+- **Effort hypothesis.** S to M, low confidence.
+
 <a id="validate-within-note-objectives"></a>
 
 ### Validate follow-up by learning objective
