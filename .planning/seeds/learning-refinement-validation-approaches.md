@@ -1,17 +1,17 @@
 # Recall validation approaches
 
-The full proposal wording and validation approaches remain with their linked
+Active proposal wording and validation approaches remain with their linked
 [canonical story homes](SEED-073-learning-refinement-and-retrieval.md).
+Completed study sections link their retained evidence.
 
 <a id="validate-spelling-objectives"></a>
 
 ## Validate spelling objectives and cues
 
-[Story home](SEED-073-learning-refinement-and-retrieval.md#validate-spelling-objectives).
-
-The story home owns the refined goal, comparison, boundaries, key examples,
-and evidence disposition. The November 14 paired review remains dated
-evidence in the local cache linked there.
+The [validation evidence](spelling-objectives-validation-evidence.md) recommends
+narrowing and retesting the paired objective-and-cue proposal while retaining
+manual note and alias review as the smaller baseline. Its five-family comparison
+records the observed answerability, changed skills and remaining uncertainty.
 
 <a id="validate-short-recall-lessons"></a>
 
