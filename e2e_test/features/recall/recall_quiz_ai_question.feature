@@ -4,7 +4,6 @@ Feature: AI recall quiz
 
   Background:
     Given I am logged in as an existing user
-    And OpenAI evaluates the question as legitimate
 
   Scenario: AI generated question - incorrect answer
     Given I have a notebook "English practice" with notes:

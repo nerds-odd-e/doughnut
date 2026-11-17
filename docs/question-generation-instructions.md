@@ -39,6 +39,6 @@ whole-note question, gets no per-type entry. Only notebook readmes hold this
 map; the web edits a readme holding it in Markdown mode, and the map travels
 with the readme through Git synchronization like other author YAML.
 
-Generation, batch generation, and evaluation share this assembly
+Generation, batch generation, and the contest check share this assembly
 (`QuestionGenerationRequestBuilder`, `NoteRealmService.questionGenerationInstructionBlocks`).
 The learning-session request carries only the notebook's general instruction.

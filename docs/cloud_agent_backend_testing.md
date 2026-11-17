@@ -35,7 +35,7 @@ source /workspace/scripts/cloud_agent_setup.sh
 ./backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel
 
 # Run specific test
-./backend/gradlew -p backend test --tests "com.odde.donut.services.ai.QuestionEvaluationTest"
+./backend/gradlew -p backend test --tests "com.odde.donut.services.ai.GeneratedMcqTest"
 ```
 
 ### What the Setup Script Does
@@ -84,7 +84,7 @@ The setup script is designed to be idempotent - you can run it multiple times sa
 
 The backend has **unit tests** only (written in the "small test" style — `unit-testing` skill). Some need MySQL; some do not:
 
-1. **No database** — Use `MakeMeWithoutDB` for test data; can run without MySQL. Example: `QuestionEvaluationTest`.
+1. **No database** — Plain JUnit classes without the Spring context; can run without MySQL. Example: `GeneratedMcqTest`.
 
 2. **With database** — Extend `SpringTestBase` (or `ControllerTestBase` for controllers), which supplies the shared Spring context, the transaction, and `makeMe`; require MySQL. Example: `TextContentValidatorTest`, `NoteControllerShowTests`.
 

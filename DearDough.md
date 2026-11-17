@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 494. Removed numbers are never reused.
+- Highest allocated local number: 497. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -568,3 +568,42 @@ After all slices were done, the coordinator published the plan's execution-compl
   - Evidence: execution-complete publication accepted as fcd05a8199d1c5894e8b6010198fea84283ea127 on `claude/see-link-property-types-in-references` after the refused first attempt.
   - Observed effect: one refused invocation and a retry; no commit, push or file change from the refusal.
   - Inference: the finish-or-stop guidance names increment delivery for this record but does not say which slice a records-only completion commit names; the cost was one tool round-trip.
+
+## DD-495 — The plan's file-size premise skipped a document the story edits
+The plan stated that no expected edit touched a file over the 250-line check, but the story's ADR 0001 amendment edited a 253-line glossary. The coordinator found it only at slice 3 delegation and had to ask the owner mid-execution.
+
+### Occurrences
+- Execution: SEED-073#judge-contested-question-by-answer-correctness, plan 102, first commit 2b70e2f6d9
+  - Timestamp: unknown (2026-11-17, Asia/Singapore)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: plan 102 "Architecture and reuse" (file-size paragraph listed only Java files); `wc -l docs/adrs/0001-ubiquitous-language.md` = 253 at slice 3; owner answer recorded in the plan Learnings
+  - Observed effect: the ADR edit was held while the rest of slice 3 ran; one owner question; the owner allowed the file to stay over 250.
+  - Inference: the planning size check was applied to code files only; measuring every file the slices name, documents included, would have raised the question during planning.
+
+## DD-496 — A slice's proof named an `@ignore` feature that no runner admits
+Slice 2's proof command listed `cli_recall.feature`, which is tagged `@ignore` and `@interactiveCLI` and is refused by the isolated Cypress runner, so the five-spec command exited before running any test.
+
+### Occurrences
+- Execution: SEED-073#judge-contested-question-by-answer-correctness, plan 102, first commit 2b70e2f6d9
+  - Timestamp: unknown (2026-11-17, Asia/Singapore)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: plan 102 slice 2 Proof; slice 2 return (first run exit 1, rerun with four specs, 8 passing; `pnpm -s test:gherkin-validation` for the ignored file)
+  - Observed effect: one wasted proof launch; the ignored file's step removal is proven only by Gherkin validation.
+  - Inference: the planning premise run covered one feature; checking each named spec's tags would have caught it.
+
+## DD-497 — The refactor pass removed guards on reachable external data as "defensive programming"
+The slice 3 refactor pass deleted the null stored-answer and out-of-range model position handling from the contest verdict, citing "no defensive programming". The answer-index column is nullable and the model's positions have no upper bound, so a learner's contest could return a server error. The previous check had handled both cases. The coordinator restored both guards with controller tests.
+
+### Occurrences
+- Execution: SEED-073#judge-contested-question-by-answer-correctness, plan 102, first commit 2b70e2f6d9
+  - Timestamp: unknown (2026-11-17, Asia/Singapore)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: slice 3 refactor return ("Assumption to accept or reverse"); `V100000000__baseline.sql` `correct_answer_index` DEFAULT NULL; `RecallPromptContestControllerTest.Accepted.whenTheQuestionHasNoStoredAnswer` / `whenTheModelNamesAPositionOutsideTheChoices` in 58638c87e6
+  - Observed effect: no regression shipped; the coordinator spent one extra check and two tests.
+  - Inference: the refactor agent flagged its own assumption, which made the catch cheap; the rule against defensive code can be over-applied to data from storage or a model.

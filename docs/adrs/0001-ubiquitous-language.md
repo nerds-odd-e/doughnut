@@ -157,8 +157,8 @@ More detailed **Spaced repetition glossary** is in
 - **MCQ** — Multiple-choice note content (stem, choices, solution) a recall
   prompt may contain. AI-generated or manually added describes content origin,
   not a prompt kind.
-- **Contested** — Marks an MCQ as not feasible. Distinct from a kind of
-  recall prompt.
+- **Contested** — Marks an MCQ whose stored answer a contest found wrong or
+  not the only supported one. Distinct from a kind of recall prompt.
 - **Contest** — Challenge an MCQ shown in a recall prompt; the MCQ may be
   marked contested and replaced.
 - **Just review** — Recall by reviewing the note and self-evaluating

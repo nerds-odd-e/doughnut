@@ -1,13 +1,12 @@
 package com.odde.donut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.services.ai.GeneratedMcq;
-import com.odde.donut.services.ai.QuestionEvaluation;
-import com.odde.donut.services.ai.tools.AiToolFactory;
-import com.odde.donut.services.ai.tools.InstructionAndSchema;
+import com.odde.donut.services.ai.SupportedChoices;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.ReasoningEffort;
 import com.openai.models.responses.StructuredResponseCreateParams;
@@ -62,19 +61,20 @@ public class NoteQuestionGenerationService {
     return Optional.of(question);
   }
 
-  public Optional<QuestionEvaluation> evaluateQuestion(Note note, Mcq question)
-      throws JsonProcessingException {
-    return evaluateQuestionWithResponses(note, question);
-  }
-
-  private Optional<QuestionEvaluation> evaluateQuestionWithResponses(Note note, Mcq question) {
-    InstructionAndSchema tool = AiToolFactory.questionEvaluationAiTool(question);
-    var responseRequestBuilder =
-        requestBuilder.openAiResponseRequestForQuestionEvaluation(
-            QuestionEvaluation.class, note, null, null);
-    responseRequestBuilder.addInstruction(tool.getMessageBody());
-    StructuredResponseCreateParams<QuestionEvaluation> responseRequest =
-        responseRequestBuilder.reasoningEffort(ReasoningEffort.LOW).maxOutputTokens(500L).build();
+  public Optional<SupportedChoices> supportedChoices(Note note, Mcq question) {
+    StructuredResponseCreateParams<SupportedChoices> responseRequest =
+        requestBuilder
+            .openAiResponseRequestForContestCheck(SupportedChoices.class, note)
+            .addInstruction(SupportedChoices.INSTRUCTIONS)
+            .addUserMessage(
+                "Multiple-choice question:\n\n"
+                    + new ObjectMapperConfig()
+                        .objectMapper()
+                        .valueToTree(question.withoutSolution())
+                        .toString())
+            .reasoningEffort(ReasoningEffort.LOW)
+            .maxOutputTokens(500L)
+            .build();
 
     return openAiApiHandler.requestAndGetStructuredResponseResult(responseRequest);
   }

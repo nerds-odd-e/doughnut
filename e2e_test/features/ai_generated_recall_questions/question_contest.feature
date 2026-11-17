@@ -10,19 +10,8 @@ Feature: Contest AI-generated MCQs
       | First question | Rescue Diver   | Divemaster         | Open Water Diver   | Advanced Open Water Diver |
     And the note "Scuba Diving" was assimilated on day 1
 
-  Scenario Outline: Internally contested MCQs are replaced before recall
-    Given OpenAI evaluates the question as <Legitimate Question>
-    And a due recall prompt is ready on day 2
-    When I visit recall
-    Then I should be asked "<Current Question>"
-
-    Examples:
-      | Legitimate Question | Current Question |
-      | legitimate          | First question   |
-      | not legitimate      | Second question  |
-
   Scenario: Learner contests an MCQ and gets a replacement
-    Given OpenAI will accept the generated question then uphold a contest
+    Given OpenAI will uphold a contest
     And a due recall prompt is ready on day 2
     When I visit recall
     Then I should be asked "First question"

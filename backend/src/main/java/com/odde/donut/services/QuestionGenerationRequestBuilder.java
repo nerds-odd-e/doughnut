@@ -150,17 +150,11 @@ public class QuestionGenerationRequestBuilder {
         responseType, note, additionalMessage, contextSeed, modelName, propertyFocus, viewer);
   }
 
-  public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionEvaluation(
-      Class<T> responseType, Note note, String additionalMessage, Long contextSeed) {
+  public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForContestCheck(
+      Class<T> responseType, Note note) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     return openAiResponseRequestForQuestionGeneration(
-        responseType,
-        note,
-        additionalMessage,
-        contextSeed,
-        modelName,
-        null,
-        authorizationService.getCurrentUser());
+        responseType, note, null, null, modelName, null, authorizationService.getCurrentUser());
   }
 
   /**

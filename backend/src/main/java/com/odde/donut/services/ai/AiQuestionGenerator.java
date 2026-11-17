@@ -35,17 +35,8 @@ public class AiQuestionGenerator {
     }
   }
 
-  public QuestionEvaluation getQuestionContestResult(Note note, Mcq mcq) {
-    try {
-      return noteQuestionGenerationService.evaluateQuestion(note, mcq).orElse(null);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public Mcq regenerateQuestion(
-      QuestionContestResult contestResult, Note note, Mcq mcq, Long contextSeed) {
-    return regenerateQuestion(contestResult, note, mcq, contextSeed, null);
+  public SupportedChoices supportedChoices(Note note, Mcq mcq) {
+    return noteQuestionGenerationService.supportedChoices(note, mcq).orElse(null);
   }
 
   public Mcq regenerateQuestion(

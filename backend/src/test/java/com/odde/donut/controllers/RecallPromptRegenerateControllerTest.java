@@ -108,7 +108,8 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
                     List.of("Paris", "Berlin", "Madrid"),
                     "France's capital city",
                     "London is the stored correct choice"));
-    assertThat(inputText, containsString("Previously generated non-feasible question"));
+    assertThat(
+        inputText, containsString("Previously generated question, contested by the learner:"));
     assertThat(inputText, containsString("Improvement advice"));
     assertThat(inputText, containsString("test"));
     assertThat(

@@ -5,7 +5,7 @@ import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExtern
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.odde.donut.controllers.dto.Randomization;
@@ -14,7 +14,6 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.services.ai.GeneratedMcq;
-import com.odde.donut.services.ai.QuestionEvaluation;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import jakarta.persistence.EntityManager;
@@ -52,13 +51,7 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
         makeMe.aGeneratedMcq().stem("Selected question").correctAnswer("Selected answer").please();
     selected.setTestedFocus("Current tracker knowledge");
     selected.setValidationRationale("Selected answer follows the current focus");
-    QuestionEvaluation disagreement = new QuestionEvaluation();
-    disagreement.feasibleQuestion = false;
-    disagreement.correctChoices = new int[] {1};
-    disagreement.improvementAdvices = "Use the current focus";
-    openAiMock.enqueueStructuredResponse(makeMe.aGeneratedMcq().please());
-    openAiMock.enqueueStructuredResponse(disagreement);
-    openAiMock.enqueueStructuredResponse(selected);
+    openAiMock.stubStructuredResponse(selected);
     long questionsBefore = questionCount();
 
     var result = controller.getRecallPrompt(tracker);
@@ -82,7 +75,7 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
     @SuppressWarnings({"unchecked", "rawtypes"})
     ArgumentCaptor<StructuredResponseCreateParams<GeneratedMcq>> requests =
         ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-    verify(openAiMock.responseService(), atLeastOnce()).create(requests.capture());
+    verify(openAiMock.responseService(), times(1)).create(requests.capture());
     String firstInput =
         requests
             .getAllValues()

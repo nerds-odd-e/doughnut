@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.entities.Note;
-import com.odde.donut.services.ai.QuestionEvaluation;
+import com.odde.donut.services.ai.SupportedChoices;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.time.Instant;
@@ -91,18 +91,16 @@ class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAns
     assertThat(markdown, containsString("Learner's selected answer: selected-third"));
 
     var ai = new OpenAiStructuredResponseMock(officialClient);
-    QuestionEvaluation evaluation = new QuestionEvaluation();
-    evaluation.correctChoices = new int[] {0};
-    evaluation.feasibleQuestion = true;
-    evaluation.improvementAdvices = "";
-    ai.stubStructuredResponse(evaluation);
+    SupportedChoices supported = new SupportedChoices();
+    supported.supportedChoices = new int[] {0};
+    ai.stubStructuredResponse(supported);
     assertThat(
         json(post("/api/recall-prompts/{id}/contest", asked.promptId()))
             .path("rejected")
             .asBoolean(),
         equalTo(true));
     @SuppressWarnings({"unchecked", "rawtypes"})
-    ArgumentCaptor<StructuredResponseCreateParams<QuestionEvaluation>> capture =
+    ArgumentCaptor<StructuredResponseCreateParams<SupportedChoices>> capture =
         ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
     verify(ai.responseService()).create(capture.capture());
     String focus = "<focus_note>\nTitle: Code Review\n";
