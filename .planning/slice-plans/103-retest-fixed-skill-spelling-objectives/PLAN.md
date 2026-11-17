@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#retest-fixed-skill-spelling-objectives
 **Source:** [selected story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#retest-fixed-skill-spelling-objectives)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -111,7 +112,7 @@ format:changed`, agent commit and push sequence from `AGENTS.md` and
 ### 1. Freeze comparable tasks for the five spelling families
 
 Type: Structure
-Status: planned
+Status: done
 Proof: Inspect one private specification per family connecting archived slots,
 the held skill, supplied information, remaining retrieval, permitted scripts,
 blank boundaries and proposed accepted/rejected/unresolved controls. Check all
@@ -176,6 +177,22 @@ approved follow-up; remaining consumers retain it. Record actual cleanup in a
 separate one-time reading, not a maintained absence test. Target: 15 active
 minutes excluding reviewer/tool wait; if the bounded study overruns, follow
 the execution skill's sizing rule without dropping families or proof.
+
+## Execution evidence
+
+- Slice 1 (2026-11-17, 3.9 active minutes): private frozen specification,
+  six reader packets, mapping and pre-dispatch check under the ignored
+  `.planning/tmp/retest-fixed-skill/` (digest rechecked; shared cache only
+  read). C2 cues hold the archived skill in all five families: brine keeps
+  six numbered word-family slots (a multi-answer format the product cannot
+  take today); 伝手 keeps whole-expression production but cannot require
+  伝手 without supplying it, so other natural expressions may qualify;
+  おっしゃる drops the archived inflected example slots; ～かける keeps both
+  blanks without naming the suffix but describes the construction category;
+  meadow keeps the original description. C1 repairs aliases only, except
+  meadow's note text; alias lists are withheld from C1 judges because they
+  are the key. Archived shortcuts are retained, not introduced: visible
+  `[[curing]]`, コネ, partial honorific masks and the Chinese gloss.
 
 ## Current decisions and concerns
 
