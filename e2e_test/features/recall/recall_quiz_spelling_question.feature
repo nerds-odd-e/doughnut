@@ -26,6 +26,17 @@ Feature: Spelling recall quiz
     Then I should see that my spelling answer "sedation" is incorrect
     And I should see the reviewed note context containing "Sedition means incite violence"
 
+  Scenario: Accept a wrong spelling answer as an alias
+    Given the note "sedition" was assimilated as spelling on day 1
+    When I visit recall for a due recall prompt on day 2
+    And I type my answer "sedation"
+    And I add my spelling answer "sedation" as an alias
+    Then I should see that "sedation" is now an alias
+    And I should see the reviewed note context containing "sedation"
+    When I visit recall for a due recall prompt on day 3
+    And I type my answer "sedation"
+    Then I should see that my last answer to spelling question is correct
+
   @mockBrowserTime
   Scenario: Resume a spelling question ready for typing
     Given I have a notebook "More words" with notes:

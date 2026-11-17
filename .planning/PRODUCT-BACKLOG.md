@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Accept a wrong spelling answer as an alias](seeds/SEED-073-learning-refinement-and-retrieval.md#accept-spelling-answer-as-alias) — SEED-073#accept-spelling-answer-as-alias ([plan](slice-plans/104-accept-spelling-answer-as-alias/PLAN.md))
-
 ## Backlog list
 
 - [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons

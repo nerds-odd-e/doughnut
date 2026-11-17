@@ -1,4 +1,4 @@
-import { appendAliasToNoteContent } from "@/utils/wikidataTitleActions"
+import { appendAliasToNoteContent } from "@/utils/appendAliasToNoteContent"
 import { describe, expect, it } from "vitest"
 
 describe("appendAliasToNoteContent", () => {

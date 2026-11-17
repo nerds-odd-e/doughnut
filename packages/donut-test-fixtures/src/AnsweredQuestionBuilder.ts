@@ -70,6 +70,14 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
+  /** Incorrect spelling that names no other note. */
+  wrongSpelling(spellingAnswer: string): this {
+    this.questionType = 'SPELLING'
+    this.isCorrect = false
+    this.answerToUse = { id: generateId(), correct: false, spellingAnswer }
+    return this
+  }
+
   /** Incorrect spelling that accidentally matches other note title(s)/alias(es). */
   accidentalMatch(
     spellingAnswer: string,
