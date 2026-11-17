@@ -8,6 +8,8 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
+- [See link property types in references](seeds/SEED-131-reference-details.md#see-link-property-types-in-references) — SEED-131#see-link-property-types-in-references ([plan](slice-plans/100-see-link-property-types-in-references/PLAN.md))
+
 ## Backlog list
 
 - [Judge a contested question by whether its answer is correct](seeds/SEED-073-learning-refinement-and-retrieval.md#judge-contested-question-by-answer-correctness) — SEED-073#judge-contested-question-by-answer-correctness
@@ -16,5 +18,4 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 - [Validate source-backed note edits from recall](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits) — SEED-073#validate-source-backed-note-edits
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
 - [Validate when question generation should abstain](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-question-generation-purpose) — SEED-073#validate-question-generation-purpose
-- [See link property types in references](seeds/SEED-131-reference-details.md#see-link-property-types-in-references) — SEED-131#see-link-property-types-in-references
 - [See surrounding text in references](seeds/SEED-131-reference-details.md#see-surrounding-text-in-references) — SEED-131#see-surrounding-text-in-references
