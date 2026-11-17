@@ -142,7 +142,7 @@ all live product behavior remains unchanged. Target: 15 active minutes.
 ### 2. Deliver the fixed-skill comparison and recommendation
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Two independent key-hidden reader returns per condition, frozen before
 adjudication, support all five rows of the minimal final report. Trace each
 reported judgment to its packet and declared rule; distinguish fresh reader
@@ -193,6 +193,22 @@ the execution skill's sizing rule without dropping families or proof.
   meadow's note text; alias lists are withheld from C1 judges because they
   are the key. Archived shortcuts are retained, not introduced: visible
   `[[curing]]`, コネ, partial honorific masks and the Chinese gloss.
+
+- Slice 2 (2026-11-17, 8.2 active minutes excluding reader wait): six fresh
+  reader contexts (two per condition) answered, then judged a shuffled pool
+  under each rule without a key; a separate web source check left
+  伝手に頼る unresolved. Delivered
+  [fixed-skill retest evidence](../../seeds/fixed-skill-spelling-retest-evidence.md):
+  recommendation to proceed to design the paired objective/cue/rule, with
+  open points (several-answer brine format, unforced 伝手 noun, ～かかる,
+  meadow overlap). Learnings: the C1/C3 response pool revealed the 伝手
+  answer to readers who could not produce it; one C3 reader misread brine
+  slot 6; readers were often stricter than provisional marks.
+- Cleanup reading (2026-11-17, one-time): after the report retained the
+  conclusions, `rm -rf .planning/tmp/retest-fixed-skill` and the job's reader
+  copies were run; `ls .planning/tmp` then reported no such directory in the
+  execution worktree. The shared cache `~/git/doughnut/.planning/tmp/recall-history/`
+  was only read and remains for the four still-queued SEED-073 validations.
 
 ## Current decisions and concerns
 
