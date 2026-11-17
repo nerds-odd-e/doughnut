@@ -112,6 +112,33 @@ during generation.
 - **Effort hypothesis.** M, medium confidence: the behavior change is small,
   and the removal reaches many tests.
 
+<a id="retest-fixed-skill-spelling-objectives"></a>
+
+### Retest spelling objectives with one skill held fixed
+
+**Identity:** SEED-073#retest-fixed-skill-spelling-objectives
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal / hypothesis.** Give the product owner evidence for whether an
+  explicit objective and answer rule make spelling and written-form recall
+  fair without changing what the learner must retrieve. Approved by the
+  product owner on 2026-11-17 as the narrowed retest recommended by the
+  [spelling objectives validation](spelling-objectives-validation-evidence.md#comparison-and-decision).
+- **Question.** In the same five families (brine, 伝手, おっしゃる, the
+  ～かける inflection, meadow), with one intended skill held fixed per item,
+  can key-hidden readers agree on what remains to retrieve, credit defensible
+  variants and reject genuine form errors, without a rewrite supplying the
+  answer-bearing form?
+- **Scope.** Resolve the exact 伝手に頼る usage or record it as unresolved.
+  Keep meadow as an ambiguity control. Report per item whether the held skill
+  survived the rewrite. This delivers a validation decision, not a change to
+  live recall; learner benefit stays a hypothesis.
+- **Effort hypothesis.** S, medium confidence; reuse the five archived cues
+  and the retained response matrices.
+- **Evidence and cleanup.** Follow the [shared contract](#close-out-temporary-recall-evidence).
+
 <a id="validate-short-recall-lessons"></a>
 
 ### Validate short lessons after recall misses
