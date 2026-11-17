@@ -6,7 +6,6 @@ Feature: Ambiguous question exclusion
 
   Background:
     Given I am logged in as an existing user
-    And OpenAI evaluates the question as legitimate
 
   Scenario: The learner confirms the tutor's proposal to exclude an ambiguous attempt
     Given I have a notebook "English practice" with notes:

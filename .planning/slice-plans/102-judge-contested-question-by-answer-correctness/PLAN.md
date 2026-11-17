@@ -157,7 +157,7 @@ endpoints, which stay.
 ### 2. Recall features state only what they use
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec` for
 `e2e_test/features/cli/cli_recall.feature`,
 `e2e_test/features/note_topology/export_highlighted_property.feature`,
@@ -211,6 +211,11 @@ The CLI needs no change: it shows the returned advice.
   `MemoryTrackerQuestionPersistenceControllerTest.persistsTheSelectedQuestionWithItsCurrentTracker`
   (single generated question, context seed set, exactly one model request).
   `McqService` now holds only the contest.
+- Slice 2: `cli_recall.feature` is `@ignore` (`@interactiveCLI`), and the
+  isolated runner refuses it, so its two step removals are proven only by
+  `pnpm -s test:gherkin-validation`; the other four features ran green
+  (8 passing). After slice 2 the evaluation stubs left in
+  `questionGenerationService.ts` serve only "OpenAI will uphold a contest".
 - For slice 3: the four-argument `AiQuestionGenerator.regenerateQuestion`
   overload has no callers (unused before this story too); delete it with the
   contest check change.

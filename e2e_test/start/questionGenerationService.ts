@@ -54,12 +54,6 @@ type QuestionEvaluation = {
   improvementAdvices: string
 }
 
-const acceptedQuestionEvaluation: QuestionEvaluation = {
-  feasibleQuestion: true,
-  correctChoices: [0],
-  improvementAdvices: 'Yes, this is a good question!',
-}
-
 const rejectedQuestionEvaluation: QuestionEvaluation = {
   feasibleQuestion: false,
   correctChoices: [0],
@@ -102,10 +96,6 @@ export const questionGenerationService = () => {
           })
           .stubOutputText(reply)
       })
-    },
-
-    stubAcceptedEvaluation: () => {
-      stubEvaluationOutput(acceptedQuestionEvaluation)
     },
 
     stubRejectedEvaluation: () => {

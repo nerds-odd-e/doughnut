@@ -61,10 +61,6 @@ const defaultReplacementMcq = {
   'Incorrect Choice 3': 'Advanced Open Water Diver',
 }
 
-Given('OpenAI evaluates the question as legitimate', () => {
-  start.questionGenerationService().stubAcceptedEvaluation()
-})
-
 Given('OpenAI will uphold a contest', () => {
   start.questionGenerationService().stubRejectedEvaluation()
   start

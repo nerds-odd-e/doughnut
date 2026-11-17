@@ -24,7 +24,6 @@ Feature: Export the highlighted property
     Given OpenAI generates this question:
       | Question Stem          | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
       | Which activity is fast? | run           | walk               | swim               | jump               |
-    And OpenAI evaluates the question as legitimate
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "Which activity is fast?"
     When I choose answer "walk"

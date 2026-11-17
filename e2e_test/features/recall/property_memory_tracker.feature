@@ -32,7 +32,6 @@ Feature: Property memory tracker
     And OpenAI generates this question:
       | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
       | What does the topic property mean? | micronutrients | vitamins           | minerals           | proteins           |
-    And OpenAI evaluates the question as legitimate
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "What does the topic property mean?"
     When I choose answer "micronutrients"
@@ -48,7 +47,6 @@ Feature: Property memory tracker
     And OpenAI generates this question:
       | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
       | What does the topic property mean? | micronutrients | vitamins           | minerals           | proteins           |
-    And OpenAI evaluates the question as legitimate
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "What does the topic property mean?"
     When I choose answer "vitamins"
@@ -87,7 +85,6 @@ Feature: Property memory tracker
     Given OpenAI generates this question:
       | Question Stem                     | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
       | Which verb is this an example of? | run            | walk               | swim               | jump               |
-    And OpenAI evaluates the question as legitimate
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "Which verb is this an example of?"
     When I choose answer "walk"
