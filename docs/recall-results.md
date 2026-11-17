@@ -22,3 +22,11 @@ and do not navigate.
 Spelling results keep their read-only note context below the source header,
 including the note's properties, body, image, references and existing context
 interactions. Source destinations continue to use ordinary note read rights.
+
+A plain wrong spelling answer that names no other note offers to add the typed
+answer to the reviewed note's frontmatter `aliases` in one click, so later
+spelling recalls accept it; the grade of that answer stays. The result then
+shows the answer as an alias, also when it is shown again. There is no offer
+for a correct or blank answer, an answer that names another note (accidental
+match or overlap), a note the learner cannot edit, text that cannot be an
+alias, or a note whose `aliases` is not a list.
