@@ -174,7 +174,7 @@ then change with one stub to update.
 ### 3. A contest is decided by which choices the note supports
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`;
 `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature`;
 the sweep reading above.
@@ -219,6 +219,19 @@ The CLI needs no change: it shows the returned advice.
 - For slice 3: the four-argument `AiQuestionGenerator.regenerateQuestion`
   overload has no callers (unused before this story too); delete it with the
   contest check change.
+- Slice 3: ADR 0001 was 253 lines, over the file-size check; the owner
+  decided on 2026-11-17 to amend the **Contested** entry in place and allow
+  the file to stay over 250 (a split is left for later). The verdict and
+  advice live in `SupportedChoices.contestResult`. It keeps two guards on
+  external data that the old check also had: a stored MCQ with no answer
+  index (nullable column) is accepted with "The question has no stored
+  answer…", and a model position outside the choices is left out of the
+  advice; both have contest controller tests.
+  `AiOpenAiAssistantFactoryWithDBTest` duplicated the controller contest
+  tests and was deleted.
+- Sweep reading at acceptance (2026-11-17, slice 3): `git grep` outside
+  `.planning/` for the eight removed names in the proof map, plus
+  `evaluateQuestion` and "not feasible", returned nothing.
 
 ## Concern evidence
 

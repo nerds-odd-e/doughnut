@@ -62,7 +62,7 @@ const defaultReplacementMcq = {
 }
 
 Given('OpenAI will uphold a contest', () => {
-  start.questionGenerationService().stubRejectedEvaluation()
+  start.questionGenerationService().stubNoteSupportsNoChoice()
   start
     .questionGenerationService()
     .stubRegeneratedQuestion(defaultReplacementMcq)

@@ -43,36 +43,22 @@ const stubQuestionDesignerMcqOutput = async (outputText: string) => {
     })
     .requestDoesNotMessageMatch({
       role: 'user',
-      content: 'Previously generated non-feasible question',
+      content: 'Previously generated question, contested by the learner:',
     })
     .stubOutputText(outputText)
 }
 
-type QuestionEvaluation = {
-  feasibleQuestion: boolean
-  correctChoices: number[]
-  improvementAdvices: string
-}
-
-const rejectedQuestionEvaluation: QuestionEvaluation = {
-  feasibleQuestion: false,
-  correctChoices: [0],
-  improvementAdvices:
-    'This question is not feasible and needs to be regenerated completely.',
-}
-
-const evaluationDeveloperMessage = {
-  role: 'developer' as const,
-  content: 'evaluating a memory recall question',
-}
-
-const stubEvaluationOutput = (record: QuestionEvaluation) => {
+/** The contest check: which choices the note supports. */
+const stubSupportedChoices = (supportedChoices: number[]) => {
   cy.then(async () => {
     await mock_services
       .openAi()
       .responses()
-      .requestMessageMatches(evaluationDeveloperMessage)
-      .stubOutputText(JSON.stringify(record))
+      .requestMessageMatches({
+        role: 'developer',
+        content: 'Your only responsibility is answer support',
+      })
+      .stubOutputText(JSON.stringify({ supportedChoices }))
   })
 }
 
@@ -92,14 +78,14 @@ export const questionGenerationService = () => {
           .responses()
           .requestMessageMatches({
             role: 'user',
-            content: 'Previously generated non-feasible question',
+            content: 'Previously generated question, contested by the learner:',
           })
           .stubOutputText(reply)
       })
     },
 
-    stubRejectedEvaluation: () => {
-      stubEvaluationOutput(rejectedQuestionEvaluation)
+    stubNoteSupportsNoChoice: () => {
+      stubSupportedChoices([])
     },
   }
 }

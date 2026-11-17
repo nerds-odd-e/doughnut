@@ -1,6 +1,5 @@
 package com.odde.donut.services.ai.tools;
 
-import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.controllers.dto.QuestionContestResult;
@@ -78,37 +77,6 @@ public class AiToolFactory {
             verifyGroundingRule);
   }
 
-  public static InstructionAndSchema questionEvaluationAiTool(Mcq question) {
-    String messageBody =
-        """
-        You are an AI assistant evaluating a memory recall question for a user’s personal knowledge management (PKM) system. The user has hidden Markdown context around a focus note (wiki-linked notes and inbound references, possibly beyond one link away) along with a multiple-choice question meant to test recollection of that focus note. The user does not know which note is the focus note when answering.
-
-        Your task is to analyze the provided question and determine whether it effectively tests the user’s memory of the focus note while adhering to the following evaluation criteria:
-            1.	Selecting Correct Answers: Try to select all correct answers from the given choices.
-            2.	Feasibility of the Question: Consider whether the question, without revealing the focus note title, is logically understandable and answerable based on what a user should reasonably remember.
-            3.	Logical Consistency: Ensure that the question logically follows from the focus note and its supporting context without assuming misleading or incorrect relationships.
-            4.	Relevance to the Focus Note: The question should not just be related to indirectly linked notes; it should be closely tied to the focus note itself and not merely any related concepts.
-            5.	Avoiding Simplicity or Obviousness: The question should not be too trivial or easily guessable without requiring meaningful recall of the focus note.
-            6.	Wiki-linked notes: The question must not test wiki-linked notes (they have their own memory trackers); those notes may only support or distract.
-
-        Output Requirements:
-            •	If the question fails any of the above criteria, set the field "feasibleQuestion": false in the response.
-            •	Provide a clear explanation of why the question is not feasible and what could be improved in the field "improvementAdvices". If the question is too far off, please advise to generate completely new question.
-
-        Here is the question to evaluate:
-
-        %s
-
-        """
-            .formatted(
-                new ObjectMapperConfig()
-                    .objectMapper()
-                    .valueToTree(question.withoutSolution())
-                    .toString());
-
-    return new InstructionAndSchema(messageBody, QuestionEvaluation.class);
-  }
-
   public static InstructionAndSchema generateNoteRefinementLayoutAiTool(
       NoteRefinementQuestionContextDTO questionContext) {
     return NoteRefinementAiToolFactory.generateNoteRefinementLayoutAiTool(questionContext);
@@ -142,10 +110,7 @@ public class AiToolFactory {
 
   public static List<Class<?>> getAllAssistantTools() {
     return List.of(
-        completeNoteContent(),
-        suggestNoteTitle(),
-        askSingleAnswerMultipleChoiceQuestion(),
-        evaluateQuestion());
+        completeNoteContent(), suggestNoteTitle(), askSingleAnswerMultipleChoiceQuestion());
   }
 
   public static Class<?> suggestNoteTitle() {
@@ -158,10 +123,6 @@ public class AiToolFactory {
 
   public static Class<?> completeNoteContent() {
     return NoteContentCompletion.class;
-  }
-
-  public static Class<?> evaluateQuestion() {
-    return QuestionEvaluation.class;
   }
 
   public static InstructionAndSchema extractNoteAiTool(

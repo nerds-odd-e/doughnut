@@ -4,7 +4,7 @@ import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.*;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.AiQuestionGenerator;
-import com.odde.donut.services.ai.QuestionEvaluation;
+import com.odde.donut.services.ai.SupportedChoices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,7 @@ public class McqService {
   }
 
   private QuestionContestResult evaluate(Note note, Mcq mcq) {
-    QuestionEvaluation evaluation = aiQuestionGenerator.getQuestionContestResult(note, mcq);
-    return evaluation == null ? null : evaluation.getQuestionContestResult(mcq);
+    SupportedChoices supported = aiQuestionGenerator.supportedChoices(note, mcq);
+    return supported == null ? null : supported.contestResult(mcq);
   }
 }

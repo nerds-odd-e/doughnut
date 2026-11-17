@@ -23,7 +23,7 @@ final class RegenerateQuestionMessage {
       throw new RuntimeException(e);
     }
     return """
-    Previously generated non-feasible question:
+    Previously generated question, contested by the learner:
 
     %s
 
