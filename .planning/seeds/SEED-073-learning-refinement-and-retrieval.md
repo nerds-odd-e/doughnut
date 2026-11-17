@@ -21,6 +21,37 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 [Local recall evidence and validation workflow](learning-refinement-and-retrieval-context.md#local-recall-evidence) apply to each story below.
 
+<a id="accept-spelling-answer-as-alias"></a>
+
+### Accept a wrong spelling answer as an alias
+
+**Identity:** SEED-073#accept-spelling-answer-as-alias
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Beneficiary and outcome.** A learner whose spelling answer was marked
+  wrong, but is another name or written form of the same note, adds that
+  answer as an alias of the reviewed note in one step from the answer
+  result. Later recalls of the note accept it by the existing exact match.
+- **Why.** In the [fixed-skill retest](fixed-skill-spelling-retest-evidence.md)
+  readers could not tell which written forms an author lists (つてを頼る,
+  死に掛け); the author is the one who can decide, at the moment the answer
+  is in front of them.
+- **Owner decisions (2026-11-17).** A wrong answer gets one offer, never
+  both. When it matches no other note, the result offers adding it as an
+  alias. When it matches another note, the result keeps the existing
+  resolve flow with add as overlapped and offers no alias: the name belongs
+  to a different note.
+- **Proposed, not yet decided.** The grade of the answer just given stays
+  as recorded; the alias counts from the next recall. A read-only notebook
+  shows no alias action, as it shows no overlap action.
+- **Out of scope.** Merging two notes that describe the same thing; a
+  several-answer spelling format; a warning when a note fits spelling
+  poorly.
+- **Effort hypothesis.** S, medium confidence; the alias write and the
+  answer-result actions exist.
+
 <a id="replace-correct-but-poor-question"></a>
 
 ### Replace a correct but poor recall question
