@@ -112,6 +112,26 @@ during generation.
 - **Effort hypothesis.** M, medium confidence: the behavior change is small,
   and the removal reaches many tests.
 
+<a id="replace-correct-but-poor-question"></a>
+
+### Replace a correct but poor recall question
+
+**Identity:** SEED-073#replace-correct-but-poor-question
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal / hypothesis.** A learner whose recall question is correct but poor
+  (easy to guess, or testing a linked note rather than the focus note) can
+  get a better one. A contest is judged on correctness alone, so such a
+  contest is refused today and the learner must answer.
+- **Open questions.** How many correct questions a learner would want
+  replaced is unknown: the [comparison's](reliable-recall-question-checks-evidence.md#comparison-2026-11-17)
+  reviewers judged correctness only, and the earlier quality verdict flagged
+  30 of 75 sound questions. Whether to check a question before it is first
+  shown, or to check stored questions that are waiting, is also undecided.
+- **Effort hypothesis.** Unknown until the beneficiary's need is validated.
+
 <a id="validate-spelling-objectives"></a>
 
 ### Validate spelling objectives and cues

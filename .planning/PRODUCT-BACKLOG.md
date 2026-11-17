@@ -20,3 +20,4 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
 - [Validate when question generation should abstain](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-question-generation-purpose) — SEED-073#validate-question-generation-purpose
 - [See surrounding text in references](seeds/SEED-131-reference-details.md#see-surrounding-text-in-references) — SEED-131#see-surrounding-text-in-references
+- [Replace a correct but poor recall question](seeds/SEED-073-learning-refinement-and-retrieval.md#replace-correct-but-poor-question) — SEED-073#replace-correct-but-poor-question
