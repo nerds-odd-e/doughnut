@@ -54,7 +54,8 @@ setup_claude_skills() {
   local dir
   for dir in "${skills_src}"/*/; do
     name="$(basename "${dir}")"
-    [ -e "${skills_dst}/${name}" ] || ln -s "../../.agents/skills/${name}" "${skills_dst}/${name}"
+    # -n: a concurrent shell may have just created the link; never descend into it
+    [ -e "${skills_dst}/${name}" ] || ln -sfn "../../.agents/skills/${name}" "${skills_dst}/${name}"
   done
 }
 
