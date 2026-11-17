@@ -8,10 +8,10 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
+- [Retest spelling objectives with one skill held fixed](seeds/SEED-073-learning-refinement-and-retrieval.md#retest-fixed-skill-spelling-objectives) — SEED-073#retest-fixed-skill-spelling-objectives ([plan](slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md))
 
 ## Backlog list
 
-- [Retest spelling objectives with one skill held fixed](seeds/SEED-073-learning-refinement-and-retrieval.md#retest-fixed-skill-spelling-objectives) — SEED-073#retest-fixed-skill-spelling-objectives
 - [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons
 - [Validate source-backed note edits from recall](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits) — SEED-073#validate-source-backed-note-edits
 - [Renew a waiting question when its note changes](seeds/SEED-073-learning-refinement-and-retrieval.md#renew-waiting-question-when-note-changes) — SEED-073#renew-waiting-question-when-note-changes
