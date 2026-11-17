@@ -173,7 +173,11 @@ as this needs; they are deleted at closeout.
 
 ### 4. The owner takes the lessons
 Type: Behavior
-Status: planned
+Status: done
+Completed: 2026-11-18
+Lesson day: 2026-11-18 (07:22–07:31 SGT, 8.9 minutes, none skipped).
+Check window: 2026-11-23 to 2026-11-27, aimed at 2026-11-25.
+Evidence: [lessons taken](../../seeds/short-recall-lessons-evidence.md#lessons-taken-2026-11-18).
 Proof: the saved lesson answer file with start and end time; this plan
 records the lesson day and the check window (day 5 to 9, aimed at day 7).
 

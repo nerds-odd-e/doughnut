@@ -122,3 +122,13 @@ passed.
 - The check page embeds only each item's id, sentence and hint. None of the
   44 pair words occurs in it; four accepted alternative spellings occur by
   chance inside other items' sentences or hints (for example 少し).
+
+## Lessons taken (2026-11-18)
+
+- The owner took the lesson page on 2026-11-18 from 07:22 to 07:31 SGT,
+  8.9 minutes for 10 pairs (36 to 79 seconds a pair). No pair was skipped.
+  Practice answers: 7 of 10 right on the first answer (wrong: 含める/込める,
+  付く/付ける, 悩む/煩う). Answer file SHA-256
+  `9b991c988161ef79223adfa8f280cebb6f6d4e8da884e6dc1ade89e86fc464e8`.
+- Check window: day 5 to day 9, 2026-11-23 to 2026-11-27, aimed at
+  2026-11-25. Answers after 2026-11-27 are reported as late.
