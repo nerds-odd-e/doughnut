@@ -202,6 +202,15 @@ stubs match it and the new instruction. ADR 0001's **Contested** entry and
 the test-class example in `docs/cloud_agent_backend_testing.md` are amended.
 The CLI needs no change: it shows the returned advice.
 
+## Execution complete
+
+Product advice: no change. The retrospective found no implementation
+defects and needs no correction. The story's deferred promises stay as
+recorded (replacing a correct but poor question; checking before first show
+or while waiting). Splitting ADR 0001, now 253 lines, was left for later by
+the owner on 2026-11-17. Process review is deferred into wrap-up with the
+intent coverage check, because this story removed and rewrote tests.
+
 ## Learnings
 
 - Slice 1: with the loop gone, `McqService.generateAFeasibleQuestion` was a
