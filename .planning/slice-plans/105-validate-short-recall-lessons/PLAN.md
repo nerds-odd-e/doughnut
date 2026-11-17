@@ -208,3 +208,14 @@ and its own proof, below the eight-slice limit; slice 2 is the only
 Structure and directly feeds slice 3. This review identified no remaining
 slice-specific concern. The one unobserved premise, how many groups pass
 the fit check, is bounded by slice 1 as an early probe.
+
+## Execution complete
+
+Product advice: no change to priorities. The lessons were cheap (8.9
+minutes for 10 pairs against about 35 planned); the result waits for
+SEED-073#check-short-recall-lessons. The retrospective found that six
+groups passed the fit check only on a near synonym or a shared kanji, so
+14 groups meet the plan's rule; the queued correction
+SEED-073#correct-short-lessons-fit-check fixes the record and has the check
+report the 14 groups as the comparison and the six apart, before the check
+window opens on 2026-11-23.

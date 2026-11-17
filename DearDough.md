@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 500. Removed numbers are never reused.
+- Highest allocated local number: 504. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -463,6 +463,16 @@ Former local code: DD-445. A repair publication started before an `amended` fres
 
 Former local code: DD-447. A slice was published without its source-review observations. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-478.md).
 
+### Occurrences
+- Execution: SEED-073#validate-short-recall-lessons, plan 105, first commit 47f09f6176
+  - Timestamp: 2026-11-18T00:36:46+08:00 (slice 2 delivery commit)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.104
+  - Evidence: 08df87c943 (slice 2) changes only the evidence file and PLAN.md; 289bff89de (slice 3) carries the `source-review.md` rows; coordinator report: `source-review.md` was left out of slice 2's owned paths.
+  - Observed effect: slice 2's observations were published one slice late; no content was lost.
+  - Inference: the owned-path list for a delivery was written by hand and omitted the plan-adjacent source review.
+
 <a id="dd-479"></a>
 <a id="dd-479--merged-repair-restores-were-misclassified-as-wholly-unapplied"></a>
 <a id="odf-487"></a>
@@ -650,3 +660,58 @@ Story wrap-up deletes a story section "after queuing its deferred promises as on
   - Observed effect: no story was queued; the limits survive as a note under the seed's Ordering and Scope Reduction.
   - Inference: the wrap-up wording does not distinguish promises a story deferred from scope limits it never promised.
 
+## DD-501 — A fit check counted AI-authored near synonyms as the intended word
+
+Plan 105's fit check passed a group only when both blind readers wrote "the intended word, or a script or inflected form of it". The AI sentence author's accepted lists, frozen before any answer, also held different words (越して and 切れた for 過ぎる, さっき for たった今, 怖く for 恐ろしい, 幾分 for いくらか, で for それで), and one kanji shared by both words of a pair (奴 for やつ and やっこ). The scoring script accepted any listed entry, so six of the 20 passing groups passed without the readers separating the pair as the rule required, and the evidence file says all 20 were answered with the intended word. The coordinator noticed the near synonyms only later, when writing plan 106's scoring, and did not connect them to the fit check.
+
+### Occurrences
+- Execution: SEED-073#validate-short-recall-lessons, plan 105, first commit 47f09f6176
+  - Timestamp: 2026-11-18T00:29+08:00 (round-one scoring; `round1-scores.json` time)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.104
+  - Evidence: private `short-lessons/score_round1.py` (`ok=a in s['accepted'] or a==s['target']`), `round1-scores.json`, `check-items.json`; [evidence file fit check](.planning/seeds/short-recall-lessons-evidence.md#fit-check-2026-11-18) counts table; plan 106 slice 1 near-synonym paragraph; correction plan 107.
+  - Observed effect: the qualified set is 14 groups under the stated rule, not 20; three of the six are in the lesson half. Found by this retrospective; a correction plan was written before the check day.
+  - Inference: when an AI author writes the answer key for its own rule, a separate pass that classifies each accepted entry as the target, a script or inflected form, or another word would have caught it at slice 1 for little cost.
+
+## DD-502 — A zsh `set -- $S` did not split a recorded state string
+
+A record-state call built its arguments with `set -- $S`; zsh does not word-split an unquoted parameter by default, so the call received one argument and failed.
+
+### Occurrences
+- Execution: SEED-073#validate-short-recall-lessons, plan 105, first commit 47f09f6176
+  - Timestamp: unknown (2026-11-18, Asia/Singapore)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.104
+  - Evidence: coordinator report to the retrospective; no guidance under `.claude/skills` or `.agents` contains `set -- $`.
+  - Observed effect: one failed call and a retry; nothing written by the failure.
+  - Inference: a coordinator-written shell idiom from bash, not a guidance defect.
+
+## DD-503 — The coordinator wrote a slice's done status by hand before delivery
+
+The coordinator wrote "Status: done (date)" into the plan by hand, then restored "planned" so that guarded delivery could mark the slice itself. Related to ODF-323 (a caller-written status surviving a refusal), but here the coordinator reverted it before any delivery.
+
+### Occurrences
+- Execution: SEED-073#validate-short-recall-lessons, plan 105, first commit 47f09f6176
+  - Timestamp: unknown (2026-11-18, Asia/Singapore)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.104
+  - Evidence: coordinator report to the retrospective; delivered commits show only delivery-written statuses.
+  - Observed effect: one extra edit and its reversal; no wrong status published.
+  - Inference: none beyond the event.
+
+## DD-504 — A blind reader tried the lesson practice items before the owner did
+
+Before the owner's lesson day, a fresh reader answered each lesson's open-blank practice sentence without the words. It chose other near words for 5 of 10, so the practice items were changed to name the two words to choose from (a second fresh reader then chose right 10 of 10), and the check items stayed open blanks.
+
+### Occurrences
+- Execution: SEED-073#validate-short-recall-lessons, plan 105, first commit 47f09f6176
+  - Timestamp: 2026-11-18T00:35+08:00 (`practice-answers.json` time)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.104
+  - Evidence: [split and lessons](.planning/seeds/short-recall-lessons-evidence.md#split-and-lessons-2026-11-18) "Practice check"; plan 105 slice 2 Learning.
+  - Observed effect: ambiguous practice items were fixed before the owner's 9-minute sitting, at the cost of two reader runs.
+  - Inference: a useful practice for owner-facing study material.
