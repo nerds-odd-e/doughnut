@@ -71,3 +71,35 @@ passed.
   both readers separated the two words. The pair is kept by the stated rule.
 - A declared overlap removes a group even when readers separated its words
   (9 groups); the owner had already accepted both words for those notes.
+
+## Split and lessons (2026-11-18)
+
+- Split: the 20 passing groups, sorted by id, were shuffled with Python
+  `random.Random(20261118)`; the first 10 form the lesson half (10 pairs),
+  the rest the comparison half (14 pairs, including the four-pair いかにも
+  group). Groups, not pairs, were split, so both directions of a pair and
+  all pairs of a group share a half. Assignment file SHA-256
+  `1339038df0770ce7d4e34f48760598efe0555bb1fc92bed48ceb56464fe95144`,
+  written 00:32:18 UTC, before the first lesson file (00:34:45).
+- Lessons: one per lesson-half pair, from the word the owner typed to the
+  intended word, with one deciding feature, two contrasting sentences and
+  a practice sentence. Every pair was confused in one direction only. Each
+  feature cites a dictionary or encyclopedia page (デジタル大辞泉 through
+  Weblio for the Japanese pairs; Merriam-Webster and Wikipedia for the
+  English ones). For 付く/付ける and 砕く/砕ける the transitive and
+  intransitive reading comes from the dictionary's definitions and
+  examples, not from a label. Lesson content SHA-256
+  `db5e7ffd6fdfc2b25c2749ff8849f95b253578eefc7b42b2e525338170a272d4`.
+- Several features: ただいま/たった今 differ in tone and in ただいま's
+  greeting use more than in meaning; the lesson teaches greeting or formal
+  word versus casual time word and the pair is reported here.
+- Practice check: with an open blank and a meaning hint, a fresh reader
+  wrote the intended word for 5 of 10 practice sentences, choosing other
+  near words (割れて, 見事な, あぐねて, 今, だから). Each practice item now
+  names the two words to choose from, as a contrast lesson does; a second
+  fresh reader then chose the intended word in the needed form for 10 of 10.
+  The check sentences stay open blanks and do not name the words.
+- No lesson sentence reuses a check sentence: the 30 lesson sentences were
+  compared with the 48 frozen check sentences; the closest text similarity
+  was 0.48, and shared set phrases were avoided (for example 言い煩う in
+  the lesson against 思い煩う in the check).

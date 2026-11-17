@@ -127,7 +127,15 @@ owner; slices 2 to 6 wait.
 
 ### 2. Split the groups and write the lessons
 Type: Structure
-Status: planned
+Status: done
+Completed: 2026-11-18
+Result: seed 20261118; lesson half 10 groups (10 pairs), comparison half 10
+groups (14 pairs). Assignment 00:32:18 UTC precedes lessons 00:34:45.
+Lessons cite sources; ただいま/たった今 reported as several features.
+Evidence: [split and lessons](../../seeds/short-recall-lessons-evidence.md#split-and-lessons-2026-11-18).
+Learning: open-blank practice sentences drew other near words (5 of 10), so
+practice items name the two words to choose from; check items stay open
+blanks. Slice 3's lesson page shows the two choices with the practice.
 Proof: the assignment file (seed, script, halves) is older than every
 lesson file; each lesson names its source; a fresh reader given only the
 lesson's practice sentence supplies the intended word.
