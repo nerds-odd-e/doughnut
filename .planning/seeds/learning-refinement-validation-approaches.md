@@ -12,7 +12,9 @@ The [validation evidence](spelling-objectives-validation-evidence.md) recommends
 narrowing and retesting the paired objective-and-cue proposal while retaining
 manual note and alias review as the smaller baseline. Its five-family comparison
 records the observed answerability, changed skills and remaining uncertainty.
-The product owner approved the [fixed-skill retest](SEED-073-learning-refinement-and-retrieval.md#retest-fixed-skill-spelling-objectives).
+The [fixed-skill retest evidence](fixed-skill-spelling-retest-evidence.md)
+recommends proceeding to design the paired objective, cue and rule, with its
+open points listed there.
 
 <a id="validate-short-recall-lessons"></a>
 

@@ -41,49 +41,6 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
   shown, or to check stored questions that are waiting, is also undecided.
 - **Effort hypothesis.** Unknown until the beneficiary's need is validated.
 
-<a id="retest-fixed-skill-spelling-objectives"></a>
-
-### Retest spelling objectives with one skill held fixed
-
-**Identity:** SEED-073#retest-fixed-skill-spelling-objectives
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"74e4f65c768b73a12e3214375cae0170fdf82c04e02ebbd54dc37aba41fe8584","plan":"e1ac5bbc94895693bad997ecdde0c6fcd778c36f13f6e72758b45fec2de1892e"}}
-```
-
-- **Goal.** Give the product owner evidence to recommend proceeding to design,
-  narrowing and retesting, or stopping objective-and-cue review: can a clearer
-  cue and explicit answer rule make recall fair while preserving the skill?
-  The owner approved this narrowed retest on 2026-11-17 from the
-  [prior recommendation](spelling-objectives-validation-evidence.md#comparison-and-decision).
-
-**Scope**
-
-- Reuse the five archived families and response matrices. Before rewriting,
-  declare one intended skill per item, supplied information and remaining
-  retrieval, script permissions and blank boundaries. Record any departure
-  from the archived task; a changed skill is a result, not a successful repair.
-- Compare paired objective/cue/rule review with manual note/alias review and
-  broader acceptance under the original cue. Use two independent key-hidden
-  readers to answer, identify the remaining retrieval and judge response
-  variants; retain disagreement and genuine errors alongside agreement.
-- Resolve exact 伝手に頼る usage with attributable evidence or retain it as
-  unresolved. Keep meadow as an ambiguity control. Deliver a per-item skill
-  preservation judgment and bounded recommendation. Live recall changes,
-  product design and learner comprehension or retention trials are deferred.
-
-**Key examples**
-
-| Given the held skill | When a cue or rule is reviewed | Required result |
-| --- | --- | --- |
-| Brine word-family retrieval in the archived slots | A rewrite asks only for the material noun | Record the lost process/inflection demand; keep real spelling errors distinct. |
-| Natural whole-expression production for reliance on connections | A rewrite supplies 伝手 and asks for its reading | Record the skill change; judge script variants separately from unresolved usage. |
-| Honorific lexical written-form recall | A response varies script or omits small っ | Apply declared script permissions without crediting a genuine form error. |
-| Retrieval and formation of the near-death construction | A rewrite supplies ～かける or changes the blank ending | Identify supplied retrieval and changed completion demands rather than count agreement as preservation. |
-| Vocabulary retrieval from the meadow description | Readers find grassland or pasture defensible | Preserve the overlap as ambiguity, not an error inferred from a hidden name. |
-
-- **Effort hypothesis.** S, medium confidence; a bounded offline retest.
-- **Evidence and cleanup.** Use the [local evidence](#local-recall-evidence) and [shared contract](#close-out-temporary-recall-evidence); learner benefit remains a hypothesis.
-
 <a id="validate-short-recall-lessons"></a>
 
 ### Validate short lessons after recall misses

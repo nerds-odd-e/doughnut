@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#retest-fixed-skill-spelling-objectives",
+  "title": "Retest spelling objectives with one skill held fixed",
+  "completedAt": "2026-11-17T14:16:06.330Z",
+  "developer": "Terry Yin",
+  "agent": "steven-chan",
+  "host": "claude"
+}

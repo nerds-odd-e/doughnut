@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 497. Removed numbers are never reused.
+- Highest allocated local number: 499. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -607,3 +607,31 @@ The slice 3 refactor pass deleted the null stored-answer and out-of-range model 
   - Evidence: slice 3 refactor return ("Assumption to accept or reverse"); `V100000000__baseline.sql` `correct_answer_index` DEFAULT NULL; `RecallPromptContestControllerTest.Accepted.whenTheQuestionHasNoStoredAnswer` / `whenTheModelNamesAPositionOutsideTheChoices` in 58638c87e6
   - Observed effect: no regression shipped; the coordinator spent one extra check and two tests.
   - Inference: the refactor agent flagged its own assumption, which made the catch cheap; the rule against defensive code can be over-applied to data from storage or a model.
+
+## DD-498 — AI reader returns were retained as coordinator paraphrases, not verbatim
+
+In a validation study run with fresh AI reader contexts, the coordinator saved each reader's answer and judging returns to private files by hand, in a compact paraphrase of the hand-back, before the report writer decoded them. The owner-facing report's per-response marks trace to those paraphrases, not to the readers' own words.
+
+### Occurrences
+- Execution: SEED-073#retest-fixed-skill-spelling-objectives, plan 103, first commit 68ebdc1a9b
+  - Timestamp: 2026-11-17 (between 68ebdc1a9b and 2b90d82410; exact time unknown)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: [plan 103 execution evidence](https://github.com/nerds-odd-e/doughnut/blob/6f02bb77ca188e4f19e1c33d510621c7a424090c/.planning/slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md#execution-evidence); [retest report](.planning/seeds/fixed-skill-spelling-retest-evidence.md) "Provenance and method"; private `returns/C*-answer.md`/`C*-judge.md` (removed at closeout)
+  - Observed effect: a spot check of four decoded marks against the mapping matched, but no verbatim reader record existed for the report writer or acceptance; one reader's misreading (brine slot 6) survived only because the paraphrase kept its reason.
+  - Inference: asking readers to write their own return file, or saving the hand-back text unchanged, would make the "trace each judgment to its packet" proof direct and cost nothing. Copying only one packet into an isolated per-reader directory was a useful practice for keeping contexts key-hidden.
+
+## DD-499 — A plan premise called a scratch directory Git-ignored without checking
+
+Plan 103 placed private packets in "this execution worktree's Git-ignored `.planning/tmp/retest-fixed-skill/`". At execution, `git status --porcelain --ignored` showed `?? .planning/tmp/`: nothing ignored it. The coordinator added a `*` `.gitignore` inside the directory before writing private material.
+
+### Occurrences
+- Execution: SEED-073#retest-fixed-skill-spelling-objectives, plan 103, first commit 68ebdc1a9b
+  - Timestamp: 2026-11-17 (before 68ebdc1a9b; exact time unknown)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: [plan 103 "Inputs and decisive premises"](https://github.com/nerds-odd-e/doughnut/blob/6f02bb77ca188e4f19e1c33d510621c7a424090c/.planning/slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md#inputs-and-decisive-premises); coordinator check before slice 1 delegation
+  - Observed effect: no private material was staged; the gap was caught before any sensitive file existed.
+  - Inference: a privacy premise in a plan deserves the same literal observation as its input premises; the shared cache relies on its own inner `.gitignore` for the same reason.
