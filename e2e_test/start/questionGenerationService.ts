@@ -111,19 +111,5 @@ export const questionGenerationService = () => {
     stubRejectedEvaluation: () => {
       stubEvaluationOutput(rejectedQuestionEvaluation)
     },
-
-    /** First evaluation accepts (generation keeps MCQ); later evaluations uphold contest. */
-    stubAcceptThenUpholdContestEvaluations: () => {
-      cy.then(async () => {
-        await mock_services
-          .openAi()
-          .responses()
-          .requestMessageMatches(evaluationDeveloperMessage)
-          .stubOutputTextSequence(
-            JSON.stringify(acceptedQuestionEvaluation),
-            JSON.stringify(rejectedQuestionEvaluation)
-          )
-      })
-    },
   }
 }

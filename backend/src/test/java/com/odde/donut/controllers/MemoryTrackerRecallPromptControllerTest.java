@@ -13,7 +13,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ai.QuestionEvaluation;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
@@ -140,32 +139,6 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
       assertThat(transactionActiveDuringOpenAiCalls, is(not(empty())));
       assertThat(transactionActiveDuringOpenAiCalls, everyItem(is(false)));
       assertThat(recallPrompt.getMcq(), notNullValue());
-    }
-
-    @Test
-    void shouldGenerateMcqWithoutHoldingATransactionDuringContestAndRegenerateOpenAiCalls()
-        throws UnexpectedNoAccessRightException {
-      List<Boolean> transactionActiveDuringOpenAiCalls = new ArrayList<>();
-      MemoryTracker tracker =
-          trackerTrackingTransactionActivityDuringOpenAiCalls(transactionActiveDuringOpenAiCalls);
-
-      QuestionEvaluation notLegitimateEvaluation = new QuestionEvaluation();
-      notLegitimateEvaluation.feasibleQuestion = false;
-      notLegitimateEvaluation.correctChoices = new int[] {1};
-      notLegitimateEvaluation.improvementAdvices = "the answer is disputable";
-
-      openAiStructuredResponseMock.enqueueStructuredResponse(makeMe.aGeneratedMcq().please());
-      openAiStructuredResponseMock.enqueueStructuredResponse(notLegitimateEvaluation);
-      openAiStructuredResponseMock.enqueueStructuredResponse(
-          makeMe.aGeneratedMcq().stem("regenerated stem").please());
-
-      com.odde.donut.controllers.dto.RecallPrompt recallPrompt =
-          controller.getRecallPrompt(tracker);
-
-      assertThat(transactionActiveDuringOpenAiCalls, is(not(empty())));
-      assertThat(transactionActiveDuringOpenAiCalls, everyItem(is(false)));
-      assertThat(recallPrompt.getMcq(), notNullValue());
-      assertThat(recallPrompt.getMcq().getQuestionStem(), equalTo("regenerated stem"));
     }
   }
 

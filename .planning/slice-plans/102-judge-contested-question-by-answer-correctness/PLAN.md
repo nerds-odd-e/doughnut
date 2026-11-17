@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#judge-contested-question-by-answer-correctness
 **Source:** [selected story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#judge-contested-question-by-answer-correctness)
+**Source review:** [source-review.md](source-review.md)
 
 ## Outcome and boundaries
 
@@ -130,7 +131,7 @@ nothing outside `.planning/`.
 ### 1. A new recall question is shown as generated
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`; then
 `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature`.
 
@@ -200,6 +201,19 @@ rewritten to the examples above through `RecallPromptController.contest`;
 stubs match it and the new instruction. ADR 0001's **Contested** entry and
 the test-class example in `docs/cloud_agent_backend_testing.md` are amended.
 The CLI needs no change: it shows the returned advice.
+
+## Learnings
+
+- Slice 1: with the loop gone, `McqService.generateAFeasibleQuestion` was a
+  pass-through; the refactor moved generation into
+  `RecallPromptService.generateNewRecallPrompt` and deleted `McqTest`, whose
+  remaining cases are proven through
+  `MemoryTrackerQuestionPersistenceControllerTest.persistsTheSelectedQuestionWithItsCurrentTracker`
+  (single generated question, context seed set, exactly one model request).
+  `McqService` now holds only the contest.
+- For slice 3: the four-argument `AiQuestionGenerator.regenerateQuestion`
+  overload has no callers (unused before this story too); delete it with the
+  contest check change.
 
 ## Concern evidence
 

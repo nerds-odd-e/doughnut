@@ -65,15 +65,8 @@ Given('OpenAI evaluates the question as legitimate', () => {
   start.questionGenerationService().stubAcceptedEvaluation()
 })
 
-Given('OpenAI evaluates the question as not legitimate', () => {
+Given('OpenAI will uphold a contest', () => {
   start.questionGenerationService().stubRejectedEvaluation()
-  start
-    .questionGenerationService()
-    .stubRegeneratedQuestion(defaultReplacementMcq)
-})
-
-Given('OpenAI will accept the generated question then uphold a contest', () => {
-  start.questionGenerationService().stubAcceptThenUpholdContestEvaluations()
   start
     .questionGenerationService()
     .stubRegeneratedQuestion(defaultReplacementMcq)

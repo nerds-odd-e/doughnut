@@ -65,9 +65,6 @@ spring:
     token: ${GITHUB_FOR_ISSUES_API_TOKEN}
   openai:
     token: ${OPENAI_API_TOKEN}
-question:
-  regeneration:
-    times: 0
 donut:
   # prod: immutable notebook LFS payloads (GcsNotebookAttachmentContent). Non-prod uses in-memory.
   notebook-attachment:

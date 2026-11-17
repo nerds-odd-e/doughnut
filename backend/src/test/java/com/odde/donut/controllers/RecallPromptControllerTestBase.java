@@ -7,7 +7,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.repositories.RecallLogRepository;
-import com.odde.donut.services.ai.QuestionEvaluation;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +24,6 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.first, 1));
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
-
-    QuestionEvaluation evaluation = new QuestionEvaluation();
-    evaluation.feasibleQuestion = false;
-    evaluation.correctChoices = new int[] {0};
-    evaluation.improvementAdvices = "This question needs improvement";
-    openAiStructuredResponseMock.stubStructuredResponse(evaluation);
   }
 
   Note ownedNote() {

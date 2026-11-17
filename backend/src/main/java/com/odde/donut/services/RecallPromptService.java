@@ -62,7 +62,10 @@ public class RecallPromptService {
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
     Note note = memoryTracker.getNote();
-    Mcq mcq = mcqService.generateAFeasibleQuestion(note, memoryTracker.propertyFocus());
+    Long contextSeed = Long.valueOf(ThreadLocalRandom.current().nextLong());
+    Mcq mcq =
+        aiQuestionGenerator.getAiGeneratedQuestion(
+            note, null, contextSeed, memoryTracker.propertyFocus());
     if (mcq == null) {
       return null;
     }
