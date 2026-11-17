@@ -90,8 +90,7 @@ of the changed files, and
 
 ## Ordered slices
 
-Slices 4 to 6 wait on dates. Record each date in this plan when it is set.
-Between them the story stays in progress; nothing else is done.
+Slice 4 waited on the owner's lesson day.
 
 ### 1. Select the pair groups that can be tested
 Type: Behavior
@@ -187,44 +186,10 @@ the practice answers, the option to skip a pair, where the answer file is
 saved, and the check window dates → the lesson half is taken or marked
 skipped per pair. He does not open the check page before the check day.
 
-### 5. The owner takes the check; report the recommendation
-Type: Behavior
-Status: planned
-Proof: the saved check answer file; the evidence file's dated section
-gives, per half, answers right, the paired word, and other; minutes spent
-on lessons and check; skipped lessons; late or missed items apart; the
-limits from the story; and the recommendation.
-
-Behavior: on the check day ask the owner once: the file path, about 20
-minutes, no notes or tools, type the word for each sentence → score each
-answer against the forms frozen in slice 1 → publish the counts and the
-recommendation for the owner's review. Report on-time and late answers
-apart. A group the owner did not check is reported as missed, not scored.
-
-The frozen accepted forms include some near synonyms besides readings
-and inflections (少し, 幾分 for いくらか; で for それで; しかも for それに;
-さっき for たった今; grass for pasture; trireme for galley; 越して, 超して,
-切れた for 過ぎる; 割れた for 砕ける; 怖く for 恐ろしい; 沈黙 for 黙り;
-着いた for 付く). Score against the frozen forms, and report answers that
-match only such a synonym apart from answers that are the intended word.
-
-The recommendation states what the difference between the halves shows and
-how little it can show with this many groups; it fixes no pass mark.
-
-### 6. Count four weeks of recalls and close out
-Type: Behavior
-Status: planned
-Proof: the fresh export's window and SHA-256; per half, spelling recalls of
-the trial's notes from the lesson day: correct, the paired word typed,
-other; the recommendation confirmed or revised with the date; the closeout
-paragraph.
-
-Behavior: four weeks after the lesson day → run a copy of `fetch.py` in
-`short-lessons/` for the days needed → count per half and add the dated
-section; revise the recommendation only if the count changes its reading.
-Record this story's evidence disposition: delete `short-lessons/` once the
-conclusions are in the evidence file, and release or keep the shared cache
-under the shared contract after checking the other queued validations.
+On 2026-11-18 the owner split the check (slice 5) and the four-week count
+(slice 6) into SEED-073#check-short-recall-lessons, with its own
+[plan](../106-check-short-recall-lessons/PLAN.md); this story closes at
+slice 4.
 
 ## Current decisions
 
