@@ -27,30 +27,72 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 **Identity:** SEED-073#accept-spelling-answer-as-alias
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/104-accept-spelling-answer-as-alias/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"75a408c01218b176dffa1931861a26ca5022a52b36865a19326e642c8bf58b60","plan":"08ca2cb726e6d8c55ae49c29d489454061bb3e9683a9912eb9c6e37195f900bb"}}
 ```
 
-- **Beneficiary and outcome.** A learner whose spelling answer was marked
-  wrong, but is another name or written form of the same note, adds that
-  answer as an alias of the reviewed note in one step from the answer
-  result. Later recalls of the note accept it by the existing exact match.
+- **Goal.** A learner who reviews their own note and whose spelling answer
+  was marked wrong, but is another name or written form of the same note,
+  adds that answer to the note's aliases in one step from the answer
+  result. Later spelling recalls of the note accept it through the existing
+  title-or-alias match, so the learner stops losing recalls to forms the
+  note should accept.
 - **Why.** In the [fixed-skill retest](fixed-skill-spelling-retest-evidence.md)
   readers could not tell which written forms an author lists (つてを頼る,
   死に掛け); the author is the one who can decide, at the moment the answer
-  is in front of them.
-- **Owner decisions (2026-11-17).** A wrong answer gets one offer, never
-  both. When it matches no other note, the result offers adding it as an
-  alias. When it matches another note, the result keeps the existing
-  resolve flow with add as overlapped and offers no alias: the name belongs
-  to a different note.
-- **Proposed, not yet decided.** The grade of the answer just given stays
-  as recorded; the alias counts from the next recall. A read-only notebook
-  shows no alias action, as it shows no overlap action.
-- **Out of scope.** Merging two notes that describe the same thing; a
-  several-answer spelling format; a warning when a note fits spelling
-  poorly.
-- **Effort hypothesis.** S, medium confidence; the alias write and the
-  answer-result actions exist.
+  is in front of them. The [follow-up count](fixed-skill-spelling-retest-evidence.md#follow-up-count-and-decisions-november-17-2026)
+  found about 15 same-word and 5 expression-variant misses among 402 wrong
+  answers in 100 days.
+- **Required behavior.**
+  - A wrong, nonblank spelling answer that names no other note shows an
+    action to add the typed answer as an alias of the reviewed note. One
+    click writes it into the note's `aliases`; no dialog or confirmation.
+  - Afterwards the result shows that the answer is now an alias, and the
+    action cannot add it twice. The same holds when the result is shown
+    again later, for example from the last answered question.
+  - The grade of the answer just given stays as recorded (owner decision
+    2026-11-17); the alias counts from the next recall.
+- **Required restrictions.**
+  - A wrong answer gets one offer, never both (owner decision 2026-11-17).
+    An answer that names another note (an accidental match, or a declared
+    overlap that asks for a retry) keeps its existing flow and offers no
+    alias: the name belongs to a different note.
+  - The action appears only where the learner may edit the reviewed note; a
+    read-only notebook shows none, as it shows no overlap action.
+  - An answer that cannot be a valid alias (it contains `/`, `\`, `:`, `#`,
+    `^`, `[[`, `]]` or a line break) shows no action, because the note
+    would reject that alias.
+- **Out of scope.** Changing or excluding the grade of the answer just
+  given; offering aliases for multiple-choice answers; merging two notes
+  that describe the same thing; a several-answer spelling format; a warning
+  when a note fits spelling poorly; removing an alias from the answer
+  result (ordinary note editing does that).
+- **Key examples.**
+  1. Note 伝手を頼る, no aliases. The learner types つてを頼る, which names
+     no other note → marked wrong; the result offers "add つてを頼る as an
+     alias". Clicking it → the note's `aliases` lists つてを頼る and the
+     result shows it is added. The next spelling recall of the note,
+     answered つてを頼る → correct.
+  2. Note 尚更; the learner types 更に, which is the title of another note →
+     the existing "names another note" result and resolve action; no alias
+     action.
+  3. Note colour declares an overlap with Partner, whose alias is hue; the
+     learner types hue → the existing retry feedback; no alias action.
+  4. A blank answer, or a correct one → no alias action.
+  5. A wrong answer on a note in a notebook the learner can only read → no
+     alias action.
+  6. The learner types draw/a line → marked wrong; no alias action.
+- **UI.** The action sits with the "Your answer `X` is incorrect." message,
+  named with the typed answer, for example "Add `つてを頼る` as an alias".
+  After the write, it reads as done (for example "`つてを頼る` is now an
+  alias") and the note shown under the result lists the new alias.
+- **Considered.** Clearing the miss by excluding the attempt from
+  scheduling, reusing the existing exclusion rebuild ([ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md#recall-history-and-current-state)):
+  declined; the grade stays. Leaving the learner to edit `aliases` by hand
+  from the note under the result already works but takes several steps,
+  which is the cost this story removes.
+- **Effort hypothesis.** S, medium confidence; the frontend already appends
+  an alias to note content (used by the Wikidata flows) and the answer
+  result already edits the reviewed note for overlaps.
 
 <a id="replace-correct-but-poor-question"></a>
 
