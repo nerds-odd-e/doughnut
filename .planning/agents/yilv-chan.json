@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "yilv-chan",
+  "email": "yilv-chan@example.org",
+  "identity": "SEED-131#label-every-property-link-in-references",
+  "mode": "story-branch",
+  "branch": "claude/label-every-property-link-in-references",
+  "host": "claude"
+}
