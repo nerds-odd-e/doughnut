@@ -13,20 +13,23 @@ export function normalizedLookupKey(item: string): string {
   return item.normalize("NFKC").toLowerCase()
 }
 
+function stringListHasItem(
+  existingItems: readonly string[],
+  item: string
+): boolean {
+  const key = normalizedLookupKey(item.trim())
+  return existingItems.some(
+    (existing) => normalizedLookupKey(existing.trim()) === key
+  )
+}
+
 /** Appends `item` when its normalized key is new; otherwise returns null (no change). */
 export function mergeItemIntoStringList(
   existingItems: readonly string[],
   item: string
 ): string[] | null {
   const trimmed = item.trim()
-  if (!trimmed) return null
-
-  const newKey = normalizedLookupKey(trimmed)
-  const alreadyPresent = existingItems.some(
-    (existing) => normalizedLookupKey(existing.trim()) === newKey
-  )
-  if (alreadyPresent) return null
-
+  if (!trimmed || stringListHasItem(existingItems, trimmed)) return null
   return [...existingItems, trimmed]
 }
 
@@ -40,6 +43,20 @@ export function findStringListPropertyKey(
     if (key.trim().toLowerCase() === target) return key
   }
   return
+}
+
+/** True when frontmatter `listKey` is a YAML list already holding `item` (normalized). */
+export function frontmatterStringListHasItem(
+  contentMarkdown: string,
+  listKey: string,
+  item: string
+): boolean {
+  const parsed = parseNoteContentMarkdown(contentMarkdown)
+  if (!parsed.ok) return false
+  const key = findStringListPropertyKey(parsed.properties, listKey)
+  const value = key === undefined ? undefined : parsed.properties[key]
+  if (value === undefined || !isListPropertyValue(value)) return false
+  return stringListHasItem(value.items, item)
 }
 
 /**

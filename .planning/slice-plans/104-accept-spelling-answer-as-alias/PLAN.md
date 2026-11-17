@@ -132,7 +132,7 @@ for slice 2: the done state today means `appendAliasToNoteContent` returned
 
 ### 2. Offer the alias only where it can apply
 Type: Behavior
-Status: planned
+Status: done
 Proof: `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm vitest run tests/components/recall/AnsweredSpellingQuestion`
 (and the alias-validation unit test if touched) in `frontend/` passes with
 the new restriction tests; slice 1's scenario stays green.
@@ -145,6 +145,15 @@ accidental-match resolve action is unchanged.
 Export the existing valid-alias-text rule from
 `authoredAliasesValidation.ts` and use it in the offer rule.
 
+Accepted (2026-11-17): offer rule in `AddSpellingAnswerAsAlias.vue`
+(readonly, valid alias text, nonblank, appendable; done state only when the
+`aliases` list holds the answer); accidental match excluded in
+`AnsweredSpellingQuestion.vue`. Recall components + utils 446 tests,
+RecallPage 73 tests, vue-tsc, and the spelling E2E feature (4/4) passed.
+Learning: the answered-question view renders the reviewed note's
+frontmatter, so "no offer" assertions must look for the button or done text,
+not the word "alias".
+
 ## Refinement and concerns
 
 Refinement was not needed: two slices with separate proof loops, one offer
@@ -156,9 +165,9 @@ concern.
 ### G1. Alias action offered on every wrong result (first reported in slice 1)
 Reported: slice 1 — "the action also shows on accidental-match, read-only, blank and invalid-text answers. Slice 2 owns those cases."
 Story clause: "A wrong answer gets one offer, never both"
-Disposition: receiving slice 2
+Disposition: proved by slice 2: frontend/tests/components/recall/AnsweredSpellingQuestionAddAnswerAsAlias.spec.ts accidental-match, read-only, invalid-text and blank cases assert no alias offer
 
 ### G2. Done state shown when the alias cannot be appended (first reported in slice 1)
 Reported: slice 1 — "the done state means `appendAliasToNoteContent` returned null. That also happens when the note's `aliases` is a single value rather than a list, or the frontmatter cannot be parsed, so those notes wrongly show \"is now an alias\"."
 Story clause: "Afterwards the result shows that the answer is now an alias"
-Disposition: receiving slice 2
+Disposition: proved by slice 2: frontend/tests/components/recall/AnsweredSpellingQuestionAddAnswerAsAlias.spec.ts 'offers nothing when aliases is a scalar the answer cannot be added to'; done state now from noteContentHasAlias

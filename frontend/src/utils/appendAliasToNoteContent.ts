@@ -1,4 +1,7 @@
-import { appendItemToFrontmatterStringList } from "./frontmatterStringList"
+import {
+  appendItemToFrontmatterStringList,
+  frontmatterStringListHasItem,
+} from "./frontmatterStringList"
 
 /**
  * Returns updated note markdown with `alias` in frontmatter `aliases`, or null when
@@ -9,4 +12,12 @@ export function appendAliasToNoteContent(
   alias: string
 ): string | null {
   return appendItemToFrontmatterStringList(contentMarkdown, "aliases", alias)
+}
+
+/** True when the note's frontmatter `aliases` list already holds `alias`. */
+export function noteContentHasAlias(
+  contentMarkdown: string,
+  alias: string
+): boolean {
+  return frontmatterStringListHasItem(contentMarkdown, "aliases", alias)
 }

@@ -16,7 +16,7 @@
     <strong v-else>{{ alertMessage }}</strong>
   </div>
   <AddSpellingAnswerAsAlias
-    v-if="!answeredQuestion.answer.correct"
+    v-if="!answeredQuestion.answer.correct && !isAccidentalMatch"
     :reviewed-note-id="answeredQuestion.recalledNote.noteTopology.id"
     :answer="(spellingAnswer ?? '').trim()"
   />

@@ -16,7 +16,7 @@ export function hasPipeAlias(items: string[]): boolean {
   return items.some((item) => item.includes("|"))
 }
 
-function isValidPlainAliasText(trimmed: string): boolean {
+export function isValidPlainAliasText(trimmed: string): boolean {
   if (trimmed.includes("[[") || trimmed.includes("]]")) return false
   return !INVALID_ALIAS_CHARACTERS.test(trimmed)
 }
