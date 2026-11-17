@@ -184,6 +184,16 @@ references with the same exclusion, seed order and cap. Proof:
 `*AuthoredNoteReferenceInboundFacadeTest`; client regenerated, `vue-tsc`
 passes. `backend:test:worktree` keeps only the last run's result XML.
 
+## Execution complete
+
+Product advice: no change. All three slices delivered the story as written;
+the retrospective found no correction. The next story in this seed,
+"See surrounding text in references", can add its excerpt beneath the
+`via its …` line on the same reference card. Carried to wrap-up: the
+References section E2E locators sit in `e2e_test/step_definitions/wiki_link.ts`
+rather than a page object (pre-existing; used by three features). Process
+review is deferred into wrap-up with the intent coverage check.
+
 ## Concern evidence
 
 Slice-plan refinement was not needed: three slices, each with one outcome and
