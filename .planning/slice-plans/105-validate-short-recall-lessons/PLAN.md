@@ -152,7 +152,13 @@ sentence.
 
 ### 3. Open the lesson and check pages locally
 Type: Behavior
-Status: planned
+Status: done
+Completed: 2026-11-18
+Result: `lesson.html` and `check.html` in `short-lessons/`, rebuilt by
+`build_pages.py`; headless Chromium dry run passed and its files were
+deleted. Answer files download as `lesson-answers-<date>.json` and
+`check-answers-<date>.json` to the Downloads folder.
+Evidence: [pages](../../seeds/short-recall-lessons-evidence.md#lesson-and-check-pages-2026-11-18).
 Proof: a dry run in a browser with made-up answers: the lesson page shows
 one pair at a time and withholds the practice answer until one is typed;
 the check page shows one sentence at a time in shuffled order with no
@@ -190,6 +196,13 @@ minutes, no notes or tools, type the word for each sentence → score each
 answer against the forms frozen in slice 1 → publish the counts and the
 recommendation for the owner's review. Report on-time and late answers
 apart. A group the owner did not check is reported as missed, not scored.
+
+The frozen accepted forms include some near synonyms besides readings
+and inflections (少し, 幾分 for いくらか; で for それで; しかも for それに;
+さっき for たった今; grass for pasture; trireme for galley; 越して, 超して,
+切れた for 過ぎる; 割れた for 砕ける; 怖く for 恐ろしい; 沈黙 for 黙り;
+着いた for 付く). Score against the frozen forms, and report answers that
+match only such a synonym apart from answers that are the intended word.
 
 The recommendation states what the difference between the halves shows and
 how little it can show with this many groups; it fixes no pass mark.

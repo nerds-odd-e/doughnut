@@ -103,3 +103,22 @@ passed.
   compared with the 48 frozen check sentences; the closest text similarity
   was 0.48, and shared set phrases were avoided (for example 言い煩う in
   the lesson against 思い煩う in the check).
+
+## Lesson and check pages (2026-11-18)
+
+- Two self-contained local pages built from the lesson content and the
+  frozen check items (`lesson.html` SHA-256
+  `dbf0c1197c805a8411be7a5114a9c4eea18c625e4bbce60b0698e22cb5f865af`,
+  `check.html` SHA-256
+  `fbc1947144744622f70d0e97ccc046e6df69a42e8acf9bff597eb6be70fa5916`).
+  Each saves its answers through a browser download, with start, end and
+  per-item times and a skipped flag.
+- Dry run in headless Chromium with made-up answers: the lesson page showed
+  one pair at a time (1 of 10 to 10 of 10), hid the practice answer and
+  reason until an answer was given, and recorded a skipped pair. The check
+  page showed one of 48 sentences at a time, in an order shuffled by seed
+  `20261118` with no two sentences of a pair adjacent, gave no feedback and
+  ended with "Saved." The dry-run answer files were deleted.
+- The check page embeds only each item's id, sentence and hint. None of the
+  44 pair words occurs in it; four accepted alternative spellings occur by
+  chance inside other items' sentences or hints (for example 少し).
