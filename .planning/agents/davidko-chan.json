@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "DavidKo-chan",
+  "email": "davidko-chan@example.org",
+  "identity": "SEED-073#validate-spelling-objectives",
+  "mode": "story-branch",
+  "branch": "codex/validate-spelling-objectives-and-cues",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

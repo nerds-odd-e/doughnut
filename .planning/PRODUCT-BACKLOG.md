@@ -10,10 +10,10 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 - [See link property types in references](seeds/SEED-131-reference-details.md#see-link-property-types-in-references) — SEED-131#see-link-property-types-in-references ([plan](slice-plans/100-see-link-property-types-in-references/PLAN.md))
 - [Judge a contested question by whether its answer is correct](seeds/SEED-073-learning-refinement-and-retrieval.md#judge-contested-question-by-answer-correctness) — SEED-073#judge-contested-question-by-answer-correctness ([plan](slice-plans/102-judge-contested-question-by-answer-correctness/PLAN.md))
+- [Validate spelling objectives and cues](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-spelling-objectives) — SEED-073#validate-spelling-objectives ([plan](slice-plans/101-validate-spelling-objectives/PLAN.md))
 
 ## Backlog list
 
-- [Validate spelling objectives and cues](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-spelling-objectives) — SEED-073#validate-spelling-objectives
 - [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons
 - [Validate source-backed note edits from recall](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits) — SEED-073#validate-source-backed-note-edits
 - [Renew a waiting question when its note changes](seeds/SEED-073-learning-refinement-and-retrieval.md#renew-waiting-question-when-note-changes) — SEED-073#renew-waiting-question-when-note-changes
