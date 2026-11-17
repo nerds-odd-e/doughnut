@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Validate short lessons after recall misses](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons) — SEED-073#validate-short-recall-lessons ([plan](slice-plans/105-validate-short-recall-lessons/PLAN.md))
-
 ## Backlog list
 
 - [Correct the short lessons' fit-check record](seeds/SEED-073-learning-refinement-and-retrieval.md#correct-short-lessons-fit-check) — SEED-073#correct-short-lessons-fit-check

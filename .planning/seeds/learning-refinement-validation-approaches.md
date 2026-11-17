@@ -20,7 +20,7 @@ open points listed there.
 
 ## Validate short lessons after recall misses
 
-[Story home](SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons).
+[Story home](SEED-073-learning-refinement-and-retrieval.md#check-short-recall-lessons).
 
 - **For / why.** A learner who makes a meaningful mistake needs a way to
   understand the distinction and use it in another situation.

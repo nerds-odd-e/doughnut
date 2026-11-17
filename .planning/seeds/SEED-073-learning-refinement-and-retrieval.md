@@ -41,97 +41,6 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
   shown, or to check stored questions that are waiting, is also undecided.
 - **Effort hypothesis.** Unknown until the beneficiary's need is validated.
 
-<a id="validate-short-recall-lessons"></a>
-
-### Validate short lessons after recall misses
-
-**Identity:** SEED-073#validate-short-recall-lessons
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/105-validate-short-recall-lessons/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3409590cd01dd54943ccace868fdd875d4571f8c2b89ff59554f85ce036fa502","plan":"4d262221eaa5bc9d283c10dbfa2111d28423613be0d826b97b081e455fea6e13"}}
-```
-
-- **Goal.** The owner, the only learner with recall evidence, takes short
-  contrast lessons for half of the word pairs he keeps confusing in
-  spelling recall, with an unseen check for both halves fixed beforehand,
-  so that [checking the lessons](#check-short-recall-lessons) can compare
-  the halves. It changes no product behavior.
-- **Why.** In 100 days of spelling recall, 227 of 402 wrong answers named
-  another of the learner's notes, and 39 word pairs recurred. After a
-  mix-up the next recall of the note is already correct 157 of 210 times,
-  so a comparison on every new miss would take about 13 weeks; the repeated
-  pairs are where today's feedback has not been enough. Counts and
-  arithmetic are in the [detailed proposal](learning-refinement-validation-approaches.md#validate-short-recall-lessons).
-- **Required behavior.**
-  - **Pairs.** Start from the pairs confused two or more times in the
-    November 13 export. Words that were confused with each other, in
-    either direction or through a shared word (いかにも with さも and
-    甚だしい), form one group. A group enters the trial only when, for each
-    of its pairs, sentences exist in which exactly one of the two words
-    fits, confirmed by two independent readers who do not see the intended
-    word. The other groups are counted with the reason (both words fit the
-    note's cue, or an overlap is already declared) and take no further part.
-  - **Assignment.** Qualifying groups are split at random into a lesson
-    half and a comparison half, by a recorded seed, before any lesson is
-    written.
-  - **Lesson.** For each pair in the lesson half, one read-once local page:
-    the word the owner typed, the intended word, the one feature that
-    decides between them, two short sentences that differ in that feature,
-    and one practice sentence he answers, followed by the answer and its
-    reason. Each stated feature is checked against a dictionary or usage
-    source. The comparison half gets nothing new; both notes stay available
-    to him as they are today.
-  - **Check page.** New sentences for every pair of both halves, not used
-    in any lesson, fixed before the lessons were shown, naming neither
-    word; ready for the owner on the check day.
-  - **Record.** The lesson day, minutes spent on lessons, and any lesson he
-    skipped, in the [evidence](short-recall-lessons-evidence.md).
-- **Required restrictions.**
-  - Production is read only: no note, alias, overlap, grade or tracker is
-    written, so the comparison half's recalls stay ordinary and the
-    owner's notebook and schedule are untouched ([ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)).
-  - Pages, answers and the pair list hold private learning evidence. They
-    stay in the local cache and are not committed; the seed keeps counts
-    and a few short examples.
-- **Out of scope.** Any product screen, model call or stored lesson state;
-  lessons shown at the moment of a miss; mistakes in multiple-choice
-  questions about a concept (giving and receiving, 向き and 向け, RDF
-  literals), which stay a deferred promise; lessons kept as notebook
-  content (a contrast note, or one deciding line in both notes); other
-  learners; statistical proof. The check, its scoring, the recommendation
-  and the four-week count belong to [checking the lessons](#check-short-recall-lessons).
-- **Key examples.**
-  1. 含める answered 込める four times, and 込める is a note. Readers given
-     two new sentences each supply only one of the two words → the pair
-     qualifies. Drawn into the lesson half → the owner reads its page and
-     answers the practice sentence.
-  2. meadow answered pasture three times, but the note's cue says "used
-     for hay production or grazing", and readers accept pasture for the
-     sentences tried → the pair is counted as "both words fit" and gets no
-     lesson and no check.
-  3. 整う and 調う were confused in both directions → one group; both
-     directions fall in the same half.
-  4. A pair drawn into the comparison half → no page.
-  5. The owner skips a lesson page → the pair stays in the lesson half and
-     is recorded as not taken.
-- **UI.** Local pages only. A lesson page shows one pair at a time and
-  asks for the practice answer before showing it. The check page shows one
-  sentence at a time with a meaning hint and a blank, gives no feedback
-  until all are answered, and saves the answers to a local file.
-- **Considered.** A lesson or no lesson on every new mix-up, checked at
-  the next recall: about 100 misses a half, 13 weeks, and the check reuses
-  the same cue. Reading the answer from history: the notebook holds 17
-  hand-written contrast notes, two match a confused pair, and their
-  creation dates are not recoverable, so history cannot answer it. Closing
-  on the counts without a trial: declined by the owner on 2026-11-17. The
-  lesson's single deciding feature borrows the "similar species" entry of
-  a field guide, which separates two look-alikes by one mark; it breaks
-  where two words differ in several ways at once, and such pairs are
-  reported. On 2026-11-18, after the lessons were taken, the owner split
-  the check and the four-week count into [their own story](#check-short-recall-lessons)
-  so this one could close while they wait for their dates.
-- **Effort hypothesis.** S, delivered: about 35 minutes of owner time
-  planned, 9 taken.
-
 <a id="check-short-recall-lessons"></a>
 
 ### Check short lessons and count later recalls
@@ -141,17 +50,16 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 {"schemaVersion":1,"identity":"SEED-073#check-short-recall-lessons","dependencies":[{"supplier":{"identity":"SEED-073#validate-short-recall-lessons","href":"seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons"},"implementation":"The lessons story's closure lands the evidence file (groups, split, lessons, pages, lesson record) on trunk.","rationale":"This story's plan scores and appends to that evidence file and relies on its recorded digests; started from a trunk without it, the check would have no recorded split or lesson day to compare against.","condition":"SEED-073#validate-short-recall-lessons is wrapped up and its evidence file short-recall-lessons-evidence.md is on trunk.","state":"waiting"}]}
 ```
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/106-check-short-recall-lessons/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"810ebe5b31dc4c33904a83ca471ac87de24f87e7f6f96263638df42d26a4c222","plan":"95ed9550fb94f3af728c2429513e632b09b9142279b102a49cbd83098928bb31"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/106-check-short-recall-lessons/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b3dbfc1f6b089536eed31fcf9cdd3c856e27e44a8dc840b6d1d3ccd3af82fde4","plan":"95ed9550fb94f3af728c2429513e632b09b9142279b102a49cbd83098928bb31"}}
 ```
 
 - **Goal.** The owner learns whether the short contrast lessons he took on
   2026-11-18 helped him use the right word later without help, compared
   with the feedback he gets today. The result is a recommendation to
   proceed to design, narrow and retest, or stop; it changes no product
-  behavior. Split on 2026-11-18 from
-  [the lessons](#validate-short-recall-lessons) (SEED-073#validate-short-recall-lessons),
-  whose groups, split, lessons, pages and lesson record are in the
-  [evidence](short-recall-lessons-evidence.md).
+  behavior. The groups, split, lessons, pages and lesson record are in the
+  [evidence](short-recall-lessons-evidence.md); the counts behind the trial
+  are in the [detailed proposal](learning-refinement-validation-approaches.md#validate-short-recall-lessons).
 - **Dates.** Lesson day 2026-11-18. Check window 2026-11-23 to 2026-11-27,
   aimed at 2026-11-25. Four-week count due on 2026-12-16.
 - **Required behavior.**
@@ -173,10 +81,19 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
     review. The four-week recall count is added when it is due and may
     revise the recommendation. Evidence closeout follows the
     [shared contract](#close-out-temporary-recall-evidence).
-- **Required restrictions.** As in [the lessons](#validate-short-recall-lessons):
-  production is read only, and private learning evidence stays in the
-  local cache.
-- **Out of scope.** As in [the lessons](#validate-short-recall-lessons).
+- **Required restrictions.**
+  - Production is read only: no note, alias, overlap, grade or tracker is
+    written, so the comparison half's recalls stay ordinary and the
+    owner's notebook and schedule are untouched ([ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)).
+  - Pages, answers and the pair list hold private learning evidence. They
+    stay in the local cache and are not committed; the seed keeps counts
+    and a few short examples.
+- **Out of scope.** Any product screen, model call or stored lesson state;
+  lessons shown at the moment of a miss; mistakes in multiple-choice
+  questions about a concept (giving and receiving, 向き and 向け, RDF
+  literals), which stay a deferred promise; lessons kept as notebook
+  content (a contrast note, or one deciding line in both notes); other
+  learners; statistical proof.
 - **Key examples.**
   1. The owner opens the check on 2026-11-20 → told it is three days too
      early; the story stays queued.

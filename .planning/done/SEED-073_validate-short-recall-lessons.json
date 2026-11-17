@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#validate-short-recall-lessons",
+  "title": "Validate short lessons after recall misses",
+  "completedAt": "2026-11-17T23:52:54.785Z",
+  "developer": "Terry Yin",
+  "agent": "d.kanai-chan",
+  "host": "claude"
+}

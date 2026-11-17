@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-073_validate-short-recall-lessons.json",
+      "identity": "SEED-073#validate-short-recall-lessons",
+      "completedAt": "2026-11-17T23:52:54.785Z",
+      "blob": "04c1abab68b08dde796fd772c4be83ed002c60d4"
+    },
+    {
       "fileName": "SEED-073_accept-spelling-answer-as-alias.json",
       "identity": "SEED-073#accept-spelling-answer-as-alias",
       "completedAt": "2026-11-17T16:04:36.673Z",

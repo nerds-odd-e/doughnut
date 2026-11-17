@@ -1,6 +1,6 @@
 # Short lessons after recall misses: evidence
 
-Story: [SEED-073#validate-short-recall-lessons](SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons).
+Story: [check short lessons and count later recalls](SEED-073-learning-refinement-and-retrieval.md#check-short-recall-lessons).
 Private files (pair list, check items, readers' answers, scripts) stay in the
 local recall-history cache and are not committed; this file keeps counts,
 digests and short examples.

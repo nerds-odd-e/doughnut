@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "d.kanai-chan",
-  "email": "d.kanai-chan@example.org",
-  "identity": "SEED-073#validate-short-recall-lessons",
-  "mode": "story-branch",
-  "branch": "claude/validate-short-lessons-after-recall-misses",
-  "host": "claude"
-}
