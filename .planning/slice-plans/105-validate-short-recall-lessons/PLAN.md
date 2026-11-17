@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#validate-short-recall-lessons
 **Source:** [selected story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -94,7 +95,15 @@ Between them the story stays in progress; nothing else is done.
 
 ### 1. Select the pair groups that can be tested
 Type: Behavior
-Status: planned
+Status: done
+Completed: 2026-11-18
+Result: 20 of 31 groups pass (24 pairs, 48 check sentences); 9 out for a
+declared overlap, 2 because readers wrote the other word (整う/調う after
+revision, 脇/腋). Frozen check items `check-items.json` SHA-256
+`9db182f94e32085410ca992e7461a43da9a15f5c6d0905aa8edfc4b2d63a8da1`.
+Evidence: [fit check](../../seeds/short-recall-lessons-evidence.md#fit-check-2026-11-18).
+Learning: meadow/pasture passed (the sentences do not use its cue), unlike
+key example 2's expectation; kept by the stated rule.
 Proof: the private list holds every one of the 40 pairs with its group,
 two check sentences, both readers' answers and pass or reason; the frozen
 check-item file's SHA-256 is recorded here; the evidence file is started
