@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 493. Removed numbers are never reused.
+- Highest allocated local number: 494. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -553,3 +553,18 @@ The fresh-generation attempt stopped with completed compatible evidence and an a
   - Evidence: [generation attempt and safe disposition](https://github.com/nerds-odd-e/doughnut/blob/b36962bb1f32635f3fa63d824aac0f9d61f449df/.planning/slice-plans/099-explore-reliable-recall-question-checks/fresh-generation-evidence.md#attempt-limit-and-safe-disposition); `/root/fresh_generation_checks` handback after 2026-11-16 UTC generation work. The exact limit-reaching time was not recorded.
   - Observed effect: the original combined slice remained incomplete and was split into generation and semantic-comparison outcomes. Later comparison/report slices recorded 636.307 and 525.708 active seconds; those measurements cannot recover the earlier duration.
   - Inference: host-clock active/wait intervals need to start with the attempt, counting concurrent authorship and unioning overlapping waits. Existing guidance required timing; this occurrence exposes missing execution evidence, not a need to change the product.
+
+## DD-494 — Guarded fresh delivery refused a records-only execution-complete commit without a slice
+
+After all slices were done, the coordinator published the plan's execution-complete record through guarded fresh delivery with `kind: planned` and no `plan` field, since no slice remained to mark done. The operation refused before preparation (`preparation-refused`, operation `context`: "planned work requires its workspace-relative plan and selected slice"). Supplying the last, already-done slice succeeded and left its status unchanged.
+
+### Occurrences
+
+- Execution: SEED-131#see-link-property-types-in-references / 04bc57930e0f59cc7ce2fa4bc49f89f4545d6c16
+  - Timestamp: 2026-11-17 (Asia/Singapore; exact time not recorded)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.104
+  - Evidence: execution-complete publication accepted as fcd05a8199d1c5894e8b6010198fea84283ea127 on `claude/see-link-property-types-in-references` after the refused first attempt.
+  - Observed effect: one refused invocation and a retry; no commit, push or file change from the refusal.
+  - Inference: the finish-or-stop guidance names increment delivery for this record but does not say which slice a records-only completion commit names; the cost was one tool round-trip.

@@ -137,6 +137,36 @@ at read time breaks the cache constraint.
 - **Safe stopping point.** This story stands alone. Readers can identify named
   relationships on both surfaces, within the existing reference visibility rules.
 
+<a id="label-every-property-link-in-references"></a>
+
+### Label every property link in references
+
+**Identity:** SEED-131#label-every-property-link-in-references
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why.** A note reader or connected assistant can see the authored
+  property behind every reference, including the cases the first
+  property-type labels leave out.
+- **Evaluation.** Source has `see also: "[[Other]] and [[Target]]"` → both
+  Other's and Target's References show Source with `see also`, and so does
+  Target's `inboundReferences` entry.
+- **Boundary.** Deferred from the delivered property-type labels: a property
+  value holding more than one link labels only its first link, because the
+  property index associates one reference with each value; keys the index
+  leaves out (`image`, `image_mask`, `wikidata_id`, `url`, `title_pattern`,
+  `question_generation_instruction`, `note_level`, `type`, `relation`,
+  `source`, `target`, `tags`, `aliases`, `overlaps`, `cssclasses`, and list
+  items longer than 255 characters) give no label; the Markdown focus context,
+  retrieval path steps, outgoing links and attachment page references carry no
+  label; references are not grouped, filtered or sorted by property type.
+  Refinement selects which of these give readers value; a relationship note's
+  title already names its relation.
+- **Effort hypothesis.** S to M, low confidence. Labelling every link in a
+  value likely needs the index to associate each link with its property.
+- **Safe stopping point.** Each deferred case can be delivered on its own.
+
 <a id="see-surrounding-text-in-references"></a>
 
 ### See surrounding text in references
