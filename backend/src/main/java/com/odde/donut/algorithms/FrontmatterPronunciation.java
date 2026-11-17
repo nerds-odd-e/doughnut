@@ -13,17 +13,10 @@ public final class FrontmatterPronunciation {
   public static List<String> fromNoteContent(String content) {
     return NoteContentMarkdown.leadingFrontmatter(content)
         .getPropertyValue(KEY)
-        .map(FrontmatterPronunciation::values)
+        .map(FrontmatterPropertyValue::strings)
         .orElse(List.of())
         .stream()
         .filter(value -> !value.isBlank())
         .toList();
-  }
-
-  private static List<String> values(FrontmatterPropertyValue value) {
-    return switch (value) {
-      case FrontmatterPropertyValue.Scalar scalar -> List.of(scalar.value());
-      case FrontmatterPropertyValue.ListItems list -> list.items();
-    };
   }
 }

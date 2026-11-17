@@ -2,6 +2,7 @@
 
 **Identity:** SEED-131#label-every-property-link-in-references
 **Source:** [selected story](../../seeds/SEED-131-reference-details.md#label-every-property-link-in-references)
+**Source review:** [source-review.md](source-review.md)
 
 ## Outcome and boundaries
 
@@ -110,7 +111,7 @@ for `findPropertyKeysByReferenceRowIds` returns nothing.
 
 ### 1. Label references from the referring note's own properties
 Type: Behavior
-Status: planned
+Status: done
 Proof: `pnpm backend:test:worktree --tests` for `*NoteRealmServiceTest`,
 `*NoteControllerGraphTests`, `*GraphNavigationMcpEndpointTest`,
 `*NoteControllerShowTests`, `*AuthoredNoteReferenceInboundFacadeTest` and
@@ -132,6 +133,18 @@ that resolved to the target for each referring note and calls it. Delete the
 index lookup and the row-id map. Replace the test of the lifted limit with
 example 1, add the other examples, drop label-only index refreshes from test
 setups, and reword the three comments.
+
+Accepted proof (2026-11-17): all six focused patterns passed
+(`NoteRealmServiceTest` `ReferencePropertyTypes` now holds examples 1–7, the
+example-of family and the relationship-note case; graph and MCP tests assert
+example 1 `["see also"]` and example 4 no types); `property_wiki_link.feature`
+12/12. Removal sweep: `git grep findPropertyKeysByReferenceRowIds` outside
+`.planning` reads empty. Refactor pass added
+`FrontmatterPropertyValue.strings()` and
+`RelationshipNoteComposition.isRelationshipNote`, rerunning
+`*algorithms.Frontmatter*`, `*NoteRealmServiceTest` and
+`*RecallPromptAnswerSpellingControllerTest` green. Commitments observed in
+[source-review.md](source-review.md).
 
 ## Refinement and concerns
 

@@ -1,6 +1,8 @@
 package com.odde.donut.entities.repositories;
 
 import com.odde.donut.algorithms.AuthoredNoteReference;
+import com.odde.donut.algorithms.AuthoredNoteReferences;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteReferenceResolution;
 import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
@@ -10,11 +12,13 @@ import com.odde.donut.entities.User;
 import com.odde.donut.services.WikiLinkResolver;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,14 +42,17 @@ public class AuthoredNoteReferenceInboundFacade {
   private final AuthoredNoteReferenceRowRepository authoredNoteReferenceRowRepository;
   private final NoteAliasIndexRepository noteAliasIndexRepository;
   private final WikiLinkResolver wikiLinkResolver;
+  private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public AuthoredNoteReferenceInboundFacade(
       AuthoredNoteReferenceRowRepository authoredNoteReferenceRowRepository,
       NoteAliasIndexRepository noteAliasIndexRepository,
-      WikiLinkResolver wikiLinkResolver) {
+      WikiLinkResolver wikiLinkResolver,
+      CanonicalDonutOrigin canonicalDonutOrigin) {
     this.authoredNoteReferenceRowRepository = authoredNoteReferenceRowRepository;
     this.noteAliasIndexRepository = noteAliasIndexRepository;
     this.wikiLinkResolver = wikiLinkResolver;
+    this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
   /** Whether any referrer has an authored reference that live-resolves to {@code target}. */
@@ -64,7 +71,8 @@ public class AuthoredNoteReferenceInboundFacade {
    * to the queried target. A referrer can carry more than one text when it authors several distinct
    * references (wiki and/or note-ID URL) that all resolve to the same target. {@code propertyTypes}
    * are the distinct {@link PropertyKeyNaming#propertyType property types} (authored order) of the
-   * referrer's indexed properties that hold those references.
+   * referrer's properties whose values hold one of those references, read from its content by
+   * {@link AuthoredNoteReferences#propertyTypesHolding}.
    */
   public record InboundReference(
       Note referrer, List<String> authoredLinkTexts, List<String> propertyTypes) {}
@@ -76,38 +84,33 @@ public class AuthoredNoteReferenceInboundFacade {
   public List<InboundReference> distinctInboundReferencesForViewer(Note target, User viewer) {
     LinkedHashMap<Integer, Note> referrersInOrder = new LinkedHashMap<>();
     Map<Integer, LinkedHashSet<String>> linkTextsByReferrerId = new LinkedHashMap<>();
-    Map<Integer, Integer> referrerIdByRowId = new LinkedHashMap<>();
+    Map<Integer, Set<String>> sourceLocalKeysByReferrerId = new LinkedHashMap<>();
     for (AuthoredNoteReferenceRow candidate : candidateRowsForTarget(target)) {
       Note sourceNote = candidate.getNote();
       Integer sourceNoteId = sourceNote.getId();
       if (!isInboundReference(candidate, sourceNote, target, viewer)) {
         continue;
       }
+      AuthoredNoteReference reference = candidate.toDomainReference();
       referrersInOrder.putIfAbsent(sourceNoteId, sourceNote);
       linkTextsByReferrerId
           .computeIfAbsent(sourceNoteId, _ -> new LinkedHashSet<>())
-          .add(candidate.toDomainReference().authoredLink());
-      referrerIdByRowId.put(candidate.getId(), sourceNoteId);
-    }
-    Map<Integer, LinkedHashSet<String>> propertyTypesByReferrerId = new LinkedHashMap<>();
-    if (!referrerIdByRowId.isEmpty()) {
-      for (Object[] rowIdAndKey :
-          authoredNoteReferenceRowRepository.findPropertyKeysByReferenceRowIds(
-              List.copyOf(referrerIdByRowId.keySet()))) {
-        propertyTypesByReferrerId
-            .computeIfAbsent(
-                referrerIdByRowId.get((Integer) rowIdAndKey[0]), _ -> new LinkedHashSet<>())
-            .add(PropertyKeyNaming.propertyType((String) rowIdAndKey[1]));
-      }
+          .add(reference.authoredLink());
+      sourceLocalKeysByReferrerId
+          .computeIfAbsent(sourceNoteId, _ -> new HashSet<>())
+          .add(reference.sourceLocalKey());
     }
     List<InboundReference> results = new ArrayList<>();
     for (var entry : referrersInOrder.entrySet()) {
+      Note referrer = entry.getValue();
       results.add(
           new InboundReference(
-              entry.getValue(),
+              referrer,
               List.copyOf(linkTextsByReferrerId.get(entry.getKey())),
-              List.copyOf(
-                  propertyTypesByReferrerId.getOrDefault(entry.getKey(), new LinkedHashSet<>()))));
+              AuthoredNoteReferences.propertyTypesHolding(
+                  referrer.getContent(),
+                  sourceLocalKeysByReferrerId.get(entry.getKey()),
+                  canonicalDonutOrigin)));
     }
     return results;
   }

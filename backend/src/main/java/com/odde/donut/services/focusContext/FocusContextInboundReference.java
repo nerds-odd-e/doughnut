@@ -7,7 +7,8 @@ import java.util.List;
 /**
  * One entry of the focus note's {@code inboundReferences}: the wiki link that selects the referring
  * note, plus the property types of the referring note's properties that hold its link to the focus
- * note. {@code referrerPropertyTypes} is null (omitted) when no indexed property holds the link.
+ * note. {@code referrerPropertyTypes} is null (omitted) when no property value holds the link (a
+ * body-only link, or a relationship note's structural keys).
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record FocusContextInboundReference(

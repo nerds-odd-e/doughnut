@@ -3,6 +3,7 @@ package com.odde.donut.algorithms;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -48,6 +49,40 @@ public final class AuthoredNoteReferences {
       }
     }
     return List.copyOf(out);
+  }
+
+  /**
+   * Distinct {@link PropertyKeyNaming#propertyType property types}, in authored key order, of the
+   * frontmatter properties whose scalar value or any list item holds a link whose {@link
+   * AuthoredNoteReference#sourceLocalKey()} is in {@code sourceLocalKeys}. On a relationship note
+   * ({@code type: Relationship}) its structural keys name no type.
+   */
+  public static List<String> propertyTypesHolding(
+      String content, Set<String> sourceLocalKeys, CanonicalDonutOrigin canonicalOrigin) {
+    return NoteContentMarkdown.splitLeadingFrontmatter(content)
+        .map(lf -> {
+          Frontmatter frontmatter = lf.frontmatter();
+          boolean relationshipNote = RelationshipNoteComposition.isRelationshipNote(frontmatter);
+          Set<String> types = new LinkedHashSet<>();
+          for (String key : frontmatter.keys()) {
+            if (relationshipNote
+                && PropertyKeyNaming.isRelationshipNoteStructuralPropertyKey(key)) {
+              continue;
+            }
+            List<String> values =
+                frontmatter
+                    .getPropertyValueExact(key)
+                    .map(FrontmatterPropertyValue::strings)
+                    .orElse(List.of());
+            if (values.stream()
+                .flatMap(value -> fromMarkdownFragment(value, canonicalOrigin).stream())
+                .anyMatch(ref -> sourceLocalKeys.contains(ref.sourceLocalKey()))) {
+              types.add(PropertyKeyNaming.propertyType(key));
+            }
+          }
+          return List.copyOf(types);
+        })
+        .orElse(List.of());
   }
 
   /** Wiki Portable-path authored inners only, in first-occurrence unique order. */
