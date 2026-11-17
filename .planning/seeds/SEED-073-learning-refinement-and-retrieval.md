@@ -120,19 +120,107 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 **Identity:** SEED-073#validate-short-recall-lessons
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/105-validate-short-recall-lessons/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3409590cd01dd54943ccace868fdd875d4571f8c2b89ff59554f85ce036fa502","plan":"4d262221eaa5bc9d283c10dbfa2111d28423613be0d826b97b081e455fea6e13"}}
 ```
 
-- **Goal / hypothesis.** Help learners apply a distinction after a meaningful
-  mistake. Test whether an optional contrastive lesson plus practice improves
-  delayed, unassisted application over ordinary feedback.
-- **Why now.** In 100 days of spelling recall, 227 of 402 wrong answers
-  named another of the learner's notes, and 39 word pairs recurred; see
-  the count in the detailed proposal.
-- **Validation and decision.** See the [detailed proposal](learning-refinement-validation-approaches.md#validate-short-recall-lessons).
-- **Effort hypothesis.** L, low confidence; preparation can be small, but learner
-  participation and an elapsed follow-up are needed.
-- **Evidence and cleanup.** Follow the [shared contract](#close-out-temporary-recall-evidence).
+- **Goal.** The owner, the only learner with recall evidence, learns whether
+  a short contrast lesson for two words he keeps confusing in spelling recall
+  helps him use the right word later without help, compared with the
+  feedback he gets today. The result is a recommendation to proceed to
+  design, narrow and retest, or stop; it changes no product behavior.
+- **Why.** In 100 days of spelling recall, 227 of 402 wrong answers named
+  another of the learner's notes, and 39 word pairs recurred. After a
+  mix-up the next recall of the note is already correct 157 of 210 times,
+  so a comparison on every new miss would take about 13 weeks; the repeated
+  pairs are where today's feedback has not been enough. Counts and
+  arithmetic are in the [detailed proposal](learning-refinement-validation-approaches.md#validate-short-recall-lessons).
+- **Required behavior.**
+  - **Pairs.** Start from the pairs confused two or more times in the
+    November 13 export. Words that were confused with each other, in
+    either direction or through a shared word (いかにも with さも and
+    甚だしい), form one group. A group enters the trial only when, for each
+    of its pairs, sentences exist in which exactly one of the two words
+    fits, confirmed by two independent readers who do not see the intended
+    word. The other groups are counted with the reason (both words fit the
+    note's cue, or an overlap is already declared) and take no further part.
+  - **Assignment.** Qualifying groups are split at random into a lesson
+    half and a comparison half, by a recorded seed, before any lesson is
+    written.
+  - **Lesson.** For each pair in the lesson half, one read-once local page:
+    the word the owner typed, the intended word, the one feature that
+    decides between them, two short sentences that differ in that feature,
+    and one practice sentence he answers, followed by the answer and its
+    reason. Each stated feature is checked against a dictionary or usage
+    source. The comparison half gets nothing new; both notes stay available
+    to him as they are today.
+  - **Check.** Seven days later (five to nine accepted), the owner fills
+    new sentences for every pair of both halves, typing the word without
+    notes or tools. The sentences were not used in any lesson, were fixed
+    before the lessons were shown, and do not name the two words.
+  - **Record.** Per pair: half, check answers (right, the paired word,
+    other), minutes spent on lessons and on the check, any lesson he
+    skipped, and any check item missed or late. His spelling recalls of the
+    trial's notes are counted for four weeks from the lesson day from a
+    fresh read-only export.
+  - **Recommendation.** After the check: the counts for both halves, the
+    effort, and proceed, narrow and retest, or stop, for the owner's
+    review. The four-week recall count is added when it is due and may
+    revise the recommendation. Evidence closeout follows the
+    [shared contract](#close-out-temporary-recall-evidence).
+- **Required restrictions.**
+  - Production is read only: no note, alias, overlap, grade or tracker is
+    written, so the comparison half's recalls stay ordinary and the
+    owner's notebook and schedule are untouched ([ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)).
+  - Pages, answers and the pair list hold private learning evidence. They
+    stay in the local cache and are not committed; the seed keeps counts
+    and a few short examples.
+- **Out of scope.** Any product screen, model call or stored lesson state;
+  lessons shown at the moment of a miss; mistakes in multiple-choice
+  questions about a concept (giving and receiving, 向き and 向け, RDF
+  literals), which stay a deferred promise; lessons kept as notebook
+  content (a contrast note, or one deciding line in both notes); other
+  learners; statistical proof.
+- **Key examples.**
+  1. 含める answered 込める four times, and 込める is a note. Readers given
+     「サービス料を＿＿と一万円になる」 and 「心を＿＿て手紙を書く」 each
+     supply only one of the two words → the pair qualifies. Drawn into the
+     lesson half → the owner reads its page and answers the practice
+     sentence. Seven days later he types answers to two unseen sentences
+     for the pair → each is recorded as right, the paired word, or other.
+  2. meadow answered pasture three times, but the note's cue says "used
+     for hay production or grazing", and readers accept pasture for the
+     sentences tried → the pair is counted as "both words fit" and gets no
+     lesson and no check.
+  3. 整う and 調う were confused in both directions → one group; both
+     directions fall in the same half and are checked together.
+  4. A pair drawn into the comparison half → no page; the same kind of
+     unseen sentences at the check.
+  5. The owner does the check on day 12 → the answers are recorded and
+     marked late, and reported apart from on-time answers.
+  6. The owner skips a lesson page → the pair stays in the lesson half and
+     is reported as not taken.
+- **UI.** Local pages only. A lesson page shows one pair at a time and
+  asks for the practice answer before showing it. The check page shows one
+  sentence at a time with a meaning hint and a blank, gives no feedback
+  until all are answered, and saves the answers to a local file.
+- **Limits to state with the result.** One learner; 31 groups before
+  the fit check, so about 15 a half at most: a direction, not proof. The owner knows
+  which pairs had lessons. Lessons come days or weeks after the misses,
+  not at the miss. A lesson adds one more exposure to the pair, which the
+  comparison half does not get.
+- **Considered.** A lesson or no lesson on every new mix-up, checked at
+  the next recall: about 100 misses a half, 13 weeks, and the check reuses
+  the same cue. Reading the answer from history: the notebook holds 17
+  hand-written contrast notes, two match a confused pair, and their
+  creation dates are not recoverable, so history cannot answer it. Closing
+  on the counts without a trial: declined by the owner on 2026-11-17. The
+  lesson's single deciding feature borrows the "similar species" entry of
+  a field guide, which separates two look-alikes by one mark; it breaks
+  where two words differ in several ways at once, and such pairs are
+  reported.
+- **Effort hypothesis.** M, medium confidence. Owner: about 35 minutes of
+  lessons and 20 minutes of check. Elapsed: seven days to the
+  recommendation, four weeks to the recall count.
 
 <a id="validate-source-backed-note-edits"></a>
 

@@ -26,7 +26,8 @@ open points listed there.
   understand the distinction and use it in another situation.
 - **Proposal hypothesis.** An optional lesson that contrasts the learner's
   answer with the intended idea leads to better delayed, unassisted
-  application than ordinary feedback alone.
+  application than ordinary feedback alone. Goal, scope and key examples
+  of the trial are in the story home.
 - **Spelling mix-up count (2026-11-17).** From the November 13 private
   export (August 5–November 13; 2,602 spelling answers on 784 notes):
   - 402 answers were wrong. In 227 (56%) the typed answer was another of
@@ -49,20 +50,39 @@ open points listed there.
   - Limits: a match with another note shows the words were confused, not
     why; some pairs may be acceptable synonyms for the cue. Counts are
     from one learner. Multiple-choice misses were not counted.
-- **Validate first.** Use independently checked items that isolate a real
-  misunderstanding, such as explicit giver and recipient roles or the
-  position of literals in RDF. Compare ordinary feedback with a short
-  explanation and practice, with the same key facts available to each group.
-  Score a different application after a comparable delay without assistance.
-  Record uptake, effort, and missed follow-ups alongside the answers. The
-  offline replay already checks that sample tasks are answerable.
-- **Decision.** Show whether a learner applies the distinction in a fresh
-  setting, with enough evidence and acceptable effort to justify another
-  trial. If promising, design the entry point, the learner's choice to
-  continue, and the follow-up experience before implementation. Scope a
-  follow-up story if needed.
-- **Effort hypothesis.** L, low confidence. Preparation can be small, but
-  the validation needs learner participation and an elapsed follow-up.
+- **After a mix-up today (2026-11-17, same export).**
+  - The answer result names the other note and offers a wiki link, a
+    relationship or an overlap; it shows no contrast between the two words.
+    The reviewed note is graded as failed and the other note comes due
+    sooner ([ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md#accidental-matches-confusion-and-overlap)).
+  - Of the 227 mix-ups, 210 had a later spelling recall of the same note
+    more than an hour afterwards, at a median of 2.5 days (middle half 1.1
+    to 4.1 days). That recall was correct in 157 (75%), repeated the same
+    wrong word in 18, named a different note in 17, was otherwise wrong in
+    14 and blank in 4. The same wrong word came back at some later recall
+    in 55 of the 210.
+  - Mix-ups arrived at 6 to 29 a week, about 15 on average. Showing a rise
+    from 75% to 90% correct at the next recall, at the usual 5% and 80%
+    levels, needs about 100 mix-ups in each group: about 13 weeks.
+  - Pair counts: 134 pairs once, 28 twice, 8 three times, 2 four times, 1
+    five times. Counting both directions together, 40 pairs were confused
+    two or more times (103 answers; 36 in the Japanese notebook). Joined
+    through shared words they form 31 groups: 25 of one pair, 4 of two, 1
+    of three and 1 of four.
+  - The Japanese notebook (read-only clone, 2026-11-17) holds 17 notes
+    titled as a difference between words. Two match a confused pair
+    (含める と 込める, 脇 と 腋); the first pair was confused again on
+    November 3 and 8. The clone's history starts on 2026-09-17, so when
+    each contrast note was written is not recoverable.
+  - Limits: next-recall figures use the same cue, so they show recall of
+    the word, not use in a new sentence. Cue text was exported for 82 of
+    the 227 mix-ups.
+- **Earlier approach (2026-11-14).** Compare ordinary feedback with a
+  short explanation and practice on checked concept items (giver and
+  recipient roles, the position of literals in RDF), with a different
+  application scored after a comparable delay. The offline replay checked
+  that those sample tasks are answerable. The owner chose spelling word
+  pairs for this validation on 2026-11-17; the concept items are deferred.
 - **Evidence and cleanup.** Use the [local recall evidence](SEED-073-learning-refinement-and-retrieval.md#local-recall-evidence)
   and apply the [shared closeout](SEED-073-learning-refinement-and-retrieval.md#close-out-temporary-recall-evidence).
 
