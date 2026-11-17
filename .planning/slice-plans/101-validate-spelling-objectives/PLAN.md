@@ -158,7 +158,7 @@ execution workflow's sizing rule if missing adjudication overruns that bound.
 ### 2. Deliver the bounded validation recommendation
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: The report satisfies the Slice 2 rows above and remains traceable to
 Slice 1's case verdicts; inspect conclusions, references and cleanup together.
 
@@ -206,6 +206,20 @@ record the inspected expected/actual observations. No application tests or
 expensive checks apply to this report boundary.
 Independent refactor `/root/refactor_cases` completed: plan-only consistency
 edits, unchanged case proof reused, whitespace passed; no follow-ups.
+Published slice 1: `b1fad80d32e06e5b113cc117ceea6e4b1c23237d`, branch target;
+suffix base was the published claim. Same observer attached.
+
+Slice 2: accepted report's common five-criterion comparison, narrow-and-retest
+recommendation, bounded proposed next question and conditional cache closeout.
+All Slice 1 case judgments remain unchanged. Source-review IDs 17–26 record
+expected/actual observations. One-time acceptance reading: three owned scratch
+files gone; all eight original export/replay inputs retained for four queued
+consumers. No approved follow-up needs this story's use; it is released.
+Whitespace and consumer-trace clock runs passed (exit 0); direct report reading
+and trace found only human consumers. Clock paused at 3.8 active minutes.
+Freshness unchanged at `0f7994a0d6`; no incoming sibling change affects proof.
+Independent refactor `/root/refactor_recommendation` completed: already clean;
+no edits or tests, accepted proof reused, no follow-ups.
 
 ## Story obligations
 

@@ -1,8 +1,14 @@
-# Spelling objectives and cues: case validation
+# Spelling objectives and cues: validation
 
 Case review: November 17, 2026, at `0f7994a0d6`.
 This report retains minimal examples from the November 14 offline review;
 the response rules below are informed adjudications, not a new blind review.
+Recommendation and closeout review: November 17, 2026, at `b1fad80d32`.
+
+**Recommendation: narrow and retest the paired objective-and-cue proposal.**
+The selected rewrites clarify tasks, but some narrow or supply the target skill,
+and meadow retains overlap. Keep manual note and alias review as the smaller
+baseline; broader acceptance alone cannot specify what a mixed cue asks.
 
 ## Provenance and interpretation
 
@@ -171,3 +177,59 @@ The later C07 comparison supplies “hay meadow” and “pasture,” describes 
 cutting versus grazing, and asks about shared seasonal use. Its retained
 result matches the primary uses and recognizes overlap. This is guided
 classification with a word-overlap shortcut, not unaided vocabulary retrieval.
+
+## Comparison and decision
+
+The following is an informed comparison of the case verdicts, not a measured
+workflow trial. Manual editing means reviewing the note, title and authored
+aliases. The paired proposal adds one declared objective, an intact cue and
+its answer rule. Broader acceptance changes credit under the original cue.
+
+| Criterion | Manual note and alias review | Objective, intact cue and rule | Broader acceptance under original cue |
+| --- | --- | --- | --- |
+| Clarity | Can repair source wording, but the author must identify each mixed task. | Makes noun, script and blank requirements inspectable; meadow still lacks a unique boundary. | Leaves the mixed brine slots and expression/reading target unspecified. |
+| Legitimate credit | An author can add known alternatives; unlisted valid responses need review. | States when script variants count and keeps unsettled usage open. | Could credit plausible meanings such as grassland, but needs a defensible acceptance boundary. |
+| Retained distinctions | Depends on which aliases the author chooses. | Explicitly retains small っ, connecting form and material/process distinctions. | Meaning alone cannot decide when small っ or the supplied construction matters. |
+| Skill assessed | Preserves or changes the task according to the edit; this must be checked. | Makes changes visible: 伝手 becomes reading, ～かける guided formation, brine noun retrieval. | Broad meaning credit can replace precise written-form recall without making that change explicit. |
+| Author effort | Smallest existing action; requires individual judgment and maintenance. | Requires choosing the objective, supplied information, rule and controls per task. | Requires adjudicating alternatives and boundaries even when wording is unchanged. |
+
+Effort above is a responsibility comparison, not timed author data. The
+retained AI answers support selected-task answerability; the response matrices
+show how proposed rules preserve or lose distinctions. Neither measures grading
+accuracy in production, author usability, comprehension or delayed retention.
+
+Narrowing is warranted before product design: the clearer reading and guided
+formation tasks cannot validate the original retrieval goals, the exact
+伝手に頼る collocation remains unresolved, and meadow does not justify one
+hidden name. Retain the paired review as the next experiment rather than adopt
+a semantic grader from these results. Stopping all objective work is not
+supported either: the honorific and complete-blank cases expose useful,
+inspectable form requirements without crediting genuine form errors.
+
+Proposed next question for the product owner: in these same five families,
+with one intended skill held fixed per item, can key-hidden readers agree on
+what remains to retrieve and credit
+defensible variants while rejecting genuine form errors, without a rewrite
+supplying the answer-bearing form? Resolve the disputed usage or retain it as
+unresolved, and keep meadow as an ambiguity control. This question is a
+proposal; no follow-up is approved, queued or implemented by this report.
+Learner benefit remains a hypothesis requiring separate learner evidence.
+
+## Temporary evidence disposition
+
+On November 17, 2026, this validation releases its use of the private cache.
+No approved follow-up requires it for this story; these de-identified case
+verdicts, provenance and limits are the lasting handoff. This study's private
+matrix, mapping script and consumer trace were removed after retaining their
+useful conclusions, and their removal was checked by a one-time reading.
+No raw learner responses, learner identifiers, note metadata or full packets
+are published.
+
+The shared cache remains for the queued validations of short lessons after
+misses, source-backed note edits, follow-up by learning objective, and when
+question generation should abstain. Their original inputs were preserved.
+Under the [shared closeout contract](SEED-073-learning-refinement-and-retrieval.md#close-out-temporary-recall-evidence),
+the last consumer must check every disposition and approved follow-up, then
+remove shared exports, derived data, reports, packets and scratch scripts once
+their remaining use is finished or minimally handed off; it must verify and
+record that cleanup. This study does not claim that shared closeout occurred.
