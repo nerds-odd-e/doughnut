@@ -118,7 +118,7 @@ workspace after copying it to `note-edits/`.
 
 ### 5. Generate the questions and check them
 Type: Behavior
-Status: planned
+Status: done
 Proof: `responses/` and a sent log with one line per paid call; the
 evidence file gives, per case and state, how many of three questions had
 a key that agrees with the source, and for the after state whether a
@@ -183,6 +183,12 @@ after checking the other queued validations.
 - Slice 4 (2026-11-18): 11 bodies in `note-edits/requests/`; price
   $2.00/$10.00 per 1M tokens; about $0.43 for 33 calls; owner: go.
   tiktoken is unavailable, so token counts are estimates.
+- Slice 5 (2026-11-18): `OPENAI_API_TOKEN` is only in the owner's
+  interactive zsh; the owner allowed `zsh -i -c`. 33 of 33 calls 200,
+  about $0.18. Blind reviewers matched every key. Questions touched the
+  edit in 2 of 5 after cases (prisoner's dilemma, 整う), none from a
+  property. Responses give `questionStem`, `correctAnswer`, `distractors`;
+  the packet shuffles choices itself.
 
 ## Current decisions
 

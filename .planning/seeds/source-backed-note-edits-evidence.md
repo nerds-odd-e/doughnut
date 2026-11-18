@@ -96,3 +96,31 @@ request lacks.
   read 2026-11-18.
 - 33 calls (three per body): about $0.43 in total, at most about $0.014 a
   call. The owner answered go on 2026-11-18.
+
+## Question check (2026-11-18)
+
+33 paid calls to `gpt-6.2-sol` after the owner's go: all returned HTTP 200
+on the first try; 45,846 input and 8,464 output tokens, about $0.18. Two
+reviewers in the agent's session answered all 33 questions from a
+shuffled packet that held only stem and choices.
+
+| Case | State | Reviewers on key (A, B) | Key agrees with source | Questions on the edited claim | Near miss told apart |
+| --- | --- | --- | --- | --- | --- |
+| 存じる | before | 3, 3 | 3 of 3 | 0: all ask which verb 存じる humbles | — |
+| 存じる | after | 3, 3 | 3 of 3 | 0: the new example appears, but no question on 他動詞 | not tested |
+| Solid OIDC | before | 3, 3 | 3 of 3 | 0: all ask its role | — |
+| Solid OIDC | after | 3, 3 | 3 of 3 | 0: all ask its role | not tested |
+| prisoner's dilemma | before | 3, 3 | 3 of 3 | 0: all ask the outcome; the faulty motive is never keyed | — |
+| prisoner's dilemma | after | 3, 3 | 3 of 3 | 2: "better off confessing no matter what the other does" | yes: "better only if the other confesses" is a distractor in both |
+| んじゃない | before | 3, 3 | 3 of 3 | 0: all ask meaning by ん and intonation | — |
+| んじゃない | after | 3, 3 | 3 of 3 | 0: same, gender never asked | not tested |
+| 整う | before | 3, 3 | 3 of 3 | 0: all ask the 準備 sense | — |
+| 整う | after | 3, 3 | 3 of 3 | 2: which sense may be written 調う; how to write 「列がととのった」 | yes: 調う is a wrong choice for the 列 sense, and the 列 sense is a wrong choice for 調う |
+| ことだから (no change) | before | 3, 3 | 3 of 3 | — | — |
+
+Neither reviewer flagged a question. The weakest key is one 整う after
+question that gives both senses' shared meaning as "その場にふさわしい状態になる",
+a loose fit to the 文化庁 split. Reading: no before question asked about a
+faulty claim, so these faults were not reaching questions; after the edit,
+the generator asked about the change only where the edit put it in the
+body's main sentence (two of five cases), never about a property.
