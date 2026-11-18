@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#validate-source-backed-note-edits
 **Source:** [selected story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -57,7 +58,7 @@ Before each commit, `git status --short` shows no scratch file.
 
 ### 1. Freeze the four fault cases with sources and smallest edits
 Type: Behavior
-Status: planned
+Status: done
 Proof: `cases.json` holds, per fault, the attempt (question, answer given,
 mark), the current note content with its read time, the faulty passage, a
 quoted source passage with its link, and the smallest edit as old and new
@@ -159,6 +160,15 @@ delete `note-edits/` once the conclusions are in the evidence file, and
 release or keep the shared cache under the
 [shared contract](../../seeds/SEED-073-learning-refinement-and-retrieval.md#close-out-temporary-recall-evidence)
 after checking the other queued validations.
+
+## Learnings
+
+- Slice 1 (2026-11-18): all four notes read 02:20Z, each claim still
+  present; four cases kept. Sources for 存じる (kotobank 日国 gives 他動詞;
+  Wiktionary labels the 思う sense 自動詞) and んじゃない (only the note's
+  own cited article; it ties men's language to a final か) are weaker than
+  the other two. Row 8502's stored key was itself wrong. In the export the
+  question is under `multipleChoice`, not `note`.
 
 ## Current decisions
 
