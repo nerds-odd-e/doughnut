@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "ruuf-chan",
-  "email": "ruuf-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-073#assistant-quoted-source-in-corrections",
-  "host": "claude",
-  "model": "fable"
-}

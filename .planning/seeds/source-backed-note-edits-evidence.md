@@ -203,6 +203,59 @@ Limits:
 - The local request lacked production's wider context, and token counts
   before sending were estimates.
 
+## Assistant search try (2026-11-18)
+
+After the owner's go on 2026-11-18 (limit $4), 12 paid requests went to
+`gpt-6.2-sol`, the production model for note conversations: two for each
+of the six cases above. Each was a streamed request of the kind the note
+conversation sends, with the web search tool added (at most 5 tool calls)
+and two new optional parts on the content correction tool: a quote and
+the address of its page. The request asked for a search before a
+correction, the note's own `url` first, and a passage copied word for
+word. The note content was as read from production on 2026-11-18; for
+Solid OIDC and the prisoner's dilemma it was the content before
+revisions 5ed4e72e and fa5efa4d. The author's message stated the fault,
+as in the two real tries. The scratch script is deleted.
+
+| Case | Run | Search steps | Input / output tokens | Cost | Source | Quote on the page |
+| --- | --- | --- | --- | --- | --- | --- |
+| 存じる | 1 | search | 8,543 / 304 | $0.030 | kotobank | yes |
+| 存じる | 2 | search, open page | 10,201 / 333 | $0.024 | kotobank | yes |
+| Solid OIDC | 1 | open page, search | 13,033 / 305 | $0.039 | Solid-OIDC specification (the note's `url`) | yes |
+| Solid OIDC | 2 | open page, search | 13,125 / 306 | $0.030 | same | two passages joined with "…"; each is on the page |
+| prisoner's dilemma | 1 | search, find in page | 12,921 / 316 | $0.039 | Cornell book chapter (PDF) | yes |
+| prisoner's dilemma | 2 | search | 8,913 / 293 | $0.021 | Stanford Encyclopedia of Philosophy | yes |
+| んじゃない | 1 | open page, search, find in page, open page twice | 31,761 / 1,404 | $0.088 | Kobe Gakuin paper (PDF) | yes |
+| んじゃない | 2 | open page, search, find in page | 22,531 / 1,211 | $0.057 | Osaka University paper (scanned PDF) | yes to the eye; the PDF's text layer reads ウイーク where the quote has ウィーク |
+| 整う | 1 | search, open page | 11,563 / 746 | $0.041 | 教育出版 | yes |
+| 整う | 2 | search twice, open page | 14,241 / 728 | $0.046 | 国立国語研究所 | yes |
+| ことだから (no change) | 1 | search, find in page, search | 13,292 / 295 | $0.050 | — | no correction proposed |
+| ことだから (no change) | 2 | search, find in page, search | 13,423 / 330 | $0.041 | — | no correction proposed |
+
+- All 12 completed, in 7 to 25 seconds. Search, the correction tools and
+  streaming worked in one request.
+- All 10 corrections carried a quote and an address. No quote was
+  invented: 8 are on their page word for word (6 web pages, 2 PDFs), one
+  joined two true passages, and one differs from a scanned PDF's text
+  layer by one small character.
+- 4 of the 10 sources were PDFs.
+- The two んじゃない quotes are example sentences spoken by women. They
+  support the correction only indirectly. The note's own `url` holds the
+  direct sentence; the assistant opened that page first and quoted
+  another source.
+- The no-change case proposed nothing in both runs, and still searched.
+- Solid OIDC run 2 again changed `an instance of` to `builds on`, which
+  was not asked.
+- Cost: $0.51 in total, counting $0.01 for each search, input at $2.00
+  and output at $10.00 per 1M tokens. If opening a page and finding in a
+  page are also charged as searches, $0.66. A correction cost $0.02 to
+  $0.09.
+
+Limits: the request held the note alone, without the linked notes that
+production adds. Two runs a case; output varies between runs. The author's
+message named the fault. Whether a quote supports the claim was read by
+the agent, not by the owner.
+
 ## Closeout (2026-11-18)
 
 This story's private folder `note-edits/` was deleted after these
