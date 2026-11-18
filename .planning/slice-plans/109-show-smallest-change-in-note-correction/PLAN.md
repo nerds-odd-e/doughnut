@@ -108,6 +108,17 @@ shown once, with only the removed characters in `<del>` and the added
 characters in `<ins>`. A line that was only added or only removed stays
 marked whole.
 
+## Execution complete
+
+Product advice: no backlog change. Before relying on the display, the
+owner should read one real pending content correction in the product: the
+marks were proved in component tests and one E2E scenario, and nobody has
+yet looked at the colours or at a heavily rewritten sentence on a real
+note. If such a sentence reads as too many short marks (obligation G4), a
+small follow-up could tidy marks to word boundaries for text with spaces;
+that is a hypothesis, not a queued story. The sibling story about the
+quoted source can build on `NoteCorrectionChange.vue` as it is.
+
 ## Current decisions
 
 - Split by the owner on 2026-11-18: this plan shows the change only.
