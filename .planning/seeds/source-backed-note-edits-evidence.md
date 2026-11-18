@@ -62,3 +62,19 @@ lessons-trial pair or one of the four fault notes. Six cases now exist.
 Left out: 脇/腋 (G30, outside both trial halves) was not chosen; 整う/調う
 had an opened source showing the one-sense fit, and no source was opened
 for 脇/腋. No candidate pair was found in the lessons trial.
+
+## Two real tries of today's note conversation (2026-11-18)
+
+The owner asked the agent to make both tries and the decisions on his
+behalf. So the tries were made by the agent, which already knew the
+fault and the source, through the production page "Send message and
+invite AI to reply". Minutes are the agent's, not a person's.
+
+| Note | Fault in | What was asked | What was proposed | Rest of the note | Could judge | Minutes | Decision |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Solid OIDC | property | not a specialization of WebID; it builds on OpenID Connect and uses a WebID | `a specialization of: WebID` → `uses: WebID`; also `an instance of: OpenID Connect` → `builds on: OpenID Connect` (not asked); body rewritten to say it builds on OpenID Connect, layered on OAuth 2.0, and uses a WebID | `type`, `url` and `a part of` kept; one property not asked about changed; body sentence replaced | yes: whole content shown, change found by comparing both versions | about 1.5 | Accept (revision 5ed4e72e) |
+| prisoner's dilemma | body | the motive is wrong; confessing is better whatever the other does | the faulty sentence replaced by "confessing gives them a lighter sentence than staying silent, regardless of what the other prisoner does", plus one sentence naming the strictly dominant strategy | properties and the other sentences unchanged | yes | about 1 | Accept (revision fa5efa4d) |
+
+Both proposals came on the first request, each with a short reason, and
+both agree with the sources in the fault cases above. A read of each
+note through the API after acceptance showed the new text.

@@ -84,7 +84,7 @@ each chosen note against the trial halves; a trial pair is left out.
 
 ### 3. The owner tries today's conversation on two faults
 Type: Behavior
-Status: planned
+Status: done
 Proof: the evidence file's dated section records, for Solid OIDC (fault
 in a property) and prisoner's dilemma (fault in the body): what was
 proposed, whether the rest of the note came back unchanged against the
@@ -174,12 +174,20 @@ after checking the other queued validations.
   Its rows have no recoverable prompt (note edited 2026-11-12), so the
   review page shows the export's prompt-unavailable text. No-change case
   〜ことだから/〜ことから (note 22629, row 4032). 脇/腋 left out: no source.
+- Slice 3 (2026-11-18): the owner asked the agent to make both tries and
+  decide on his behalf. Both proposals came on the first request and were
+  accepted (Solid OIDC 5ed4e72e, prisoner's dilemma fa5efa4d). Solid OIDC
+  also changed `an instance of` to `builds on`, unasked. Both notes now
+  differ from the frozen content; slices 4–6 keep using the frozen
+  content, and the page marks these two as already corrected.
 
 ## Current decisions
 
 - The comparison is with today's reviewed correction, not manual editing
   (owner, 2026-11-18).
-- The owner's real tries come before he sees the prepared edits.
+- The owner's real tries come before he sees the prepared edits. On
+  2026-11-18 the owner delegated both tries and their decisions to the
+  agent; the evidence states that limit.
 - Paid calls wait for the owner's go on the computed cost. Estimate for
   orientation only, not a limit: 33 calls of at most about 5,000 input
   and 1,000 output tokens each.
