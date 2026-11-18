@@ -2,6 +2,13 @@
 
 **Identity:** SEED-073#renew-waiting-question-when-note-changes
 **Source:** [Renew a waiting question when its note changes](../../seeds/SEED-073-learning-refinement-and-retrieval.md#renew-waiting-question-when-note-changes)
+**Source review:** [Independent source review](source-review.md)
+
+## Execution context
+
+Story Branch Mode. Dashboard claim `1d5aace35c3890daad54fc736c540d0546c01d66` was accepted on `origin/main` and published to `origin/codex/renew-a-waiting-question-when-its-note-changes`. Publisher `dashboard-territory.local-doughnut`, agent `philip-chan`.
+
+GitHub Actions `ci.yml` (donut CI) is observed from this execution checkout. Coordinator `renew-waiting-question-5429872a`, mailbox `/tmp/dough-ci-501/watch-2XulhF`, stream cell `g102:17`, session `11773`, PID `48144`. Claim CI on trunk was unobserved by this branch observer.
 
 ## Goal and scope
 
@@ -30,11 +37,15 @@ Local observations on 2026-11-18 at `01c8a94235523f02d7ec8fb4a05434af02ad6825` u
 ### 1. Keep the source of an on-demand question with the question
 
 Type: Structure
-Status: planned
+Status: done
 
 Capture the input fingerprint within synchronous request construction and persist it with the resulting MCQ through the existing atomic question/prompt write. Keep it private in API output. Preserve legacy rows with unknown input. This supplies the evidence the next slice compares. Existing selection still returns the newest eligible unanswered prompt at this point.
 
 **Proof.** From the controller, generate a question with the model stub, inspect the submitted focus and reload the selected MCQ. Check that the stored evidence corresponds to the authored title and Markdown used in that request, including frontmatter. Preserve the returned choices, solution omission, atomic write and read of a legacy MCQ. Where new columns are used, deliver compatible additive schema first and follow the repository's schema-before-reader release ordering. [Database migration guidance](../../../.agents/skills/db-migration/SKILL.md#release-safety)
+
+**Accepted proof.** `MemoryTrackerQuestionPersistenceControllerTest.preservesTheGenerationFocusWithThePersistedQuestion` captured the model request for a Unicode title and full Markdown with frontmatter. Reloading the persisted MCQ confirmed the independently framed SHA-256 fingerprint, original choices and answer key. Jackson API serialization omitted the key and fingerprint from the visible question, and the legacy cases still selected questions. The concurrent-insert and atomic-write cases preserved their existing outcomes. The fingerprint lives in the existing private MCQ JSON payload, so it is compatible with the current schema.
+
+The independent refactor unified focus hydration for request construction and returned a 224-line request builder. The focused implementation and refactor runs passed 116 and 113 cases. The final `CURSOR_DEV=true nix develop -c pnpm backend:test_only` run passed 3,209 cases with two skipped. Reports and consumer traces are in this checkout's Git evidence directory under `slice-1-`.
 
 ### 2. Offer a question made from the current focus note
 

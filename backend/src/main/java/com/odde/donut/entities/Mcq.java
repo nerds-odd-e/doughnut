@@ -85,6 +85,18 @@ public class Mcq extends EntityIdentifiedByIdOnly {
     stemAndChoices().setResponseChoices(responseChoices);
   }
 
+  @JsonIgnore
+  @Schema(hidden = true)
+  public String getFocusNoteFingerprint() {
+    return multipleChoicesQuestion == null
+        ? null
+        : multipleChoicesQuestion.getFocusNoteFingerprint();
+  }
+
+  public void setFocusNoteFingerprint(String focusNoteFingerprint) {
+    stemAndChoices().setFocusNoteFingerprint(focusNoteFingerprint);
+  }
+
   public Mcq withoutSolution() {
     Mcq copy = new Mcq();
     copy.id = this.id;

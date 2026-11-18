@@ -15,4 +15,6 @@ public class MultipleChoicesQuestion {
 
   @JsonAlias({"f1__choices", "choices"})
   private List<String> responseChoices;
+
+  private String focusNoteFingerprint;
 }

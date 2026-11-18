@@ -1,11 +1,11 @@
 package com.odde.donut.services.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.services.NoteQuestionGenerationService;
+import com.odde.donut.services.NoteQuestionGenerationService.GeneratedQuestion;
 import com.odde.donut.services.ai.tools.AiToolFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,14 +25,14 @@ public class AiQuestionGenerator {
 
   public Mcq getAiGeneratedQuestion(
       Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
-    try {
-      GeneratedMcq original =
-          noteQuestionGenerationService.generateQuestion(
-              note, additionalMessage, contextSeed, propertyFocus);
-      return generatedQuestionPostProcessor.assembleMcq(original, contextSeed);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+    GeneratedQuestion generated =
+        noteQuestionGenerationService.generateQuestionWithFocus(
+            note, additionalMessage, contextSeed, propertyFocus);
+    Mcq mcq = generatedQuestionPostProcessor.assembleMcq(generated.question(), contextSeed);
+    if (mcq != null) {
+      mcq.setFocusNoteFingerprint(generated.focusNoteFingerprint());
     }
+    return mcq;
   }
 
   public SupportedChoices supportedChoices(Note note, Mcq mcq) {
