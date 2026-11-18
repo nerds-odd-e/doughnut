@@ -124,3 +124,32 @@ a loose fit to the 文化庁 split. Reading: no before question asked about a
 faulty claim, so these faults were not reaching questions; after the edit,
 the generator asked about the change only where the edit put it in the
 body's main sentence (two of five cases), never about a property.
+
+## The owner's verdicts (2026-11-18)
+
+The owner filled in the local review page himself and saved his answers
+at 03:58Z. He said he was not quite sure of them and welcomed advice.
+
+| Case | Verdict | Quoted source | Smallest change | Before-and-after question |
+| --- | --- | --- | --- | --- |
+| 存じる | accept as it is | eased | changed | eased |
+| んじゃない | accept with his wording | changed | changed | eased |
+| 整う | decline: "The focus was in 整う, I assume. But the question is about 調う" | eased | no effect | no effect |
+| ことだから | agree: no change | eased | — | eased |
+| Solid OIDC (already accepted) | — | changed | changed | no effect |
+| prisoner's dilemma (already accepted) | — | changed | changed | no effect |
+
+Per addition, cases where it changed or eased the decision: quoted
+source 6 of 6 (changed 3, eased 3); smallest change 4 of 5 (changed 4);
+before-and-after question 3 of 6 (eased 3, changed none).
+
+Two answers need reading:
+
+- んじゃない: the "wording" he gave is not wording for the note: "the 2nd
+  question used the wrong language (English)". The after question shown
+  (run 1 of 3) was in English for a Japanese note. So the verdict is an
+  accept of the edit, plus a fault found in the generated question.
+- 整う: the decline says the edit taught 調う inside a note about 整う.
+  The case came from spelling misses (調う typed for the 整う cue), and
+  the edit answered them by adding the other spelling's sense to this
+  note, which moved the note's focus.

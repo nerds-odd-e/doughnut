@@ -134,7 +134,7 @@ source as the note stands.
 
 ### 6. The owner records his verdicts on the review page
 Type: Behavior
-Status: planned
+Status: done
 Proof: the saved answers file; the evidence file gives, per case, accept
 as it is, accept with his wording, or decline with his reason; and per
 addition (source, smallest change, before-and-after question) in how many
@@ -189,6 +189,10 @@ after checking the other queued validations.
   edit in 2 of 5 after cases (prisoner's dilemma, 整う), none from a
   property. Responses give `questionStem`, `correctAnswer`, `distractors`;
   the packet shuffles choices itself.
+- Slice 6 (2026-11-18): the owner filled the page himself; answers in
+  `note-edits/note-edit-verdicts-2026-11-18.json`. The page was checked
+  by parsing only; the owner's save worked. He asked for advice on his
+  answers.
 
 ## Current decisions
 
