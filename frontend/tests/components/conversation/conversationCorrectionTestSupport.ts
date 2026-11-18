@@ -22,7 +22,7 @@ export const noteConversation = makeMe.aConversation
 export const recallConversation = makeMe.aConversation
   .forAnsweredQuestion(makeMe.anAnsweredQuestion.withNote(realm.note).please())
   .please()
-const correctionBuilder = () =>
+export const correctionBuilder = () =>
   makeMe.aConversationNoteCorrection
     .forNote(realm.note)
     .fromMessage(exchange.id)

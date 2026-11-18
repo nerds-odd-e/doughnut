@@ -149,6 +149,15 @@ Then(
   }
 )
 
+Then(
+  'the pending content correction should quote {string} from {string}',
+  (quote: string, address: string) => {
+    start
+      .assumeConversationAboutNotePage()
+      .expectCorrectionSource(quote, address)
+  }
+)
+
 When('I accept the reviewed content correction', () => {
   start.assumeConversationAboutNotePage().acceptContentCorrection()
 })

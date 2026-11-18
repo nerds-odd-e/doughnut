@@ -17,12 +17,13 @@ Feature: Reviewing generated note content
   Scenario: Reviewing and accepting a note content correction
     Given OpenAI will reply below for user messages:
       | user message                      | response type   | assistant reply                       |
-      | Please complete the note content. | requires action | {"content": "It is a vigorous city.", "reason": "Completes the city description."} |
+      | Please complete the note content. | requires action | {"content": "It is a vigorous city.", "reason": "Completes the city description.", "sourceQuote": "Taipei is a vigorous city.", "sourceUrl": "https://example.org/taipei"} |
     When I request to complete the content for the note "Taipei"
     Then I should see this run's pending content correction
     And my OpenAI mock still records only my request marker
     And I keep my OpenAI mock configured across the other worktree's mock reset
     Then my OpenAI mock still records only my request marker
+    And the pending content correction should quote "Taipei is a vigorous city." from "https://example.org/taipei"
     When I revise the pending content correction to "Taipei is a lively city."
     Then the pending content correction should contain "Taipei is a lively city."
     When I close the conversation

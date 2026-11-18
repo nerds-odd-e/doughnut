@@ -77,6 +77,7 @@ from searching when it proposes nothing; storing the source in the note.
 | A clicked link ending in `#:~:text=` and the encoded quote opens the page at the quote, also for Japanese | slice 3, example 2 | 2026-11-18, Chrome on the owner's Mac, links built with the rule above and clicked: Solid-OIDC specification scrolled to the sentence (scroll position 2532 of 18013); kotobank 「〘 他動詞 ザ上一 〙」 in view; 教育出版, a 100-character Japanese sentence, in view | settled for Chrome. A navigation started by a script does not scroll, so an automated browser test cannot observe the scroll; the tests observe the link's address |
 | A correction is read by the web review only | slices 1 and 3 | 2026-11-18 at 41d1ee7e1f: search for `ConversationNoteCorrection` and `getConversationCorrections` over `cli/src`, `mcp-server/src`, `frontend`, `packages` → only the generated client, `packages/donut-test-fixtures` and the conversation components and their tests | settled |
 | The production model accepts the two source parts as nullable (`type: [string, null]`) and gives null for both when it finds no source | slice 2, story example 4 | Not observed. The OpenAI library lists every tool part as required, so the optional form is nullable; the paid try's parts were optional in a raw request. 2026-11-18: `ConversationAiRequestBuilderTest` `theContentCorrectionToolTakesAnOptionalQuotedSourceAndItsAddress` observes the schema sent; `ConversationAiReplyControllerTest` observes that null, a blank or a non-web address stores no source | unverified remainder: the real model's answer to this request. Checked by a paid call the owner authorizes, or by the first real correction after release |
+| A link whose quoted words are not on the page, and a link to a PDF, still open the source | slice 3, example 5 | 2026-11-18, Chrome on the owner's Mac, addresses opened by the browser tool: `https://solid.github.io/solid-oidc/#:~:text=` with words not on the page loaded at scroll position 0 of 18013; `https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf#:~:text=Dummy%20PDF%20file` opened the PDF at page 1, and Chrome marked the words | settled for Chrome. The navigation was started by a tool, not a click. Chrome now marks the words in a PDF too, which is more than the story promises |
 
 ## Outside-in proof ownership
 
@@ -140,7 +141,7 @@ passage word for word with its address, or neither.
 
 ### 3. The review shows the quoted source, or says none was found
 Type: Behavior
-Status: planned
+Status: done
 Proof: the component tests and the E2E step above; both typechecks; the
 existing correction specs in `frontend/tests/components/conversation/`
 stay green; `docs/recall-help.md` describes the source.
@@ -195,3 +196,21 @@ remains.
   developer message's position remain in
   `RecallConversationReasoningControllerTest` (first test) and
   `RecallConversationExclusionProposalControllerTest`.
+- Slice 3 proof: `ConversationInner.correctionSource.spec.ts` (9 cases
+  through `ConversationInner`), seen failing before the change; the
+  conversation spec folder (73 tests) and both typechecks pass; the E2E
+  feature passes with the step
+  `the pending content correction should quote … from …`. The link shows
+  the source address as its text.
+- Named sibling: "Show the smallest change in a note correction" landed on
+  trunk (c05c42ccbc) during this execution and is not in this branch.
+  Both edit `ConversationNoteCorrectionReview.vue`,
+  `note_content_completion.feature`, `conversationAboutNotePage.ts`,
+  `conversationCorrectionTestSupport.ts`, `docs/recall-help.md` and the
+  generated `frontend/components.d.ts`, at different lines. Integration
+  merges them; after the merge the conversation specs, both typechecks
+  and the E2E feature are run again, and the page order is reason,
+  source, change, editor.
+- Follow-up named by the refactor pass, not done: `expectCorrectionSource`
+  builds a pattern from the raw address; a plain prefix comparison would
+  be exact for addresses with `?` or `.`.
