@@ -7,8 +7,11 @@ digests and short examples.
 
 ## Fit check (2026-11-18)
 
-**Result: 20 of 31 groups can be tested (24 pairs, 48 check sentences).**
-The plan's stop line of 12 groups is passed.
+**Result: 20 of 31 groups were kept for the check (24 pairs, 48 check
+sentences); 14 of them met the fit-check rule (7 in each half).** Six kept
+groups passed only through another accepted word and are
+[reported apart](#groups-reported-apart). The plan's stop line of 12 groups
+is passed.
 
 ### Provenance and method
 
@@ -27,7 +30,10 @@ The plan's stop line of 12 groups is passed.
   `20261118` so a pair's two sentences are not adjacent.
 - Readers: two fresh AI contexts each saw only the 80 shuffled sentences and
   hints, with no words, no pair, no web access, and wrote one word per
-  blank. A sentence passes when both readers write an accepted form.
+  blank. A sentence passes when both readers write the intended word, or a
+  script or inflected form of it. The scoring script counted any entry of
+  the author's accepted list as a pass, and those lists include some
+  different words.
 - Revision: the four failed sentences of groups not already out for a
   declared overlap were rewritten once, labelled revised, and read by two
   further fresh contexts.
@@ -44,7 +50,8 @@ The plan's stop line of 12 groups is passed.
 
 | Groups | Reason |
 | --- | --- |
-| 20 | Pass: every sentence of every pair answered with the intended word by both readers (2 groups after a revised sentence) |
+| 14 | Pass: every sentence of every pair answered with the intended word by both readers (2 groups after a revised sentence) |
+| 6 | Kept, reported apart: some sentence was answered only with another accepted word, or with a kanji both words share |
 | 9 | Both words fit: an overlap with the other word is already declared (10 pairs) |
 | 2 | Both words fit: the readers wrote the other word (整う/調う after revision, 脇/腋) |
 
@@ -52,6 +59,36 @@ In round one, 73 of 80 sentences passed both readers. Of the seven
 failures, two were in a group already out for a declared overlap and one
 drew the other word; the other four were rewritten and three of those
 passed.
+
+<a id="groups-reported-apart"></a>
+
+### Groups reported apart
+
+The author's accepted lists, frozen before any reader answered, include
+words other than the intended one. These six groups passed only through
+such an entry and stay in the check and the split; the check reports them
+apart from the 14.
+
+| Group | Half | Sentence | Readers wrote | Intended word |
+| --- | --- | --- | --- | --- |
+| G03 経つ/過ぎる/過ごす | comparison | two | 越して (both); 切れた (both) | 過ぎる |
+| G22 ただいま/たった今 | lesson | one | さっき (both) | たった今 |
+| G26 凄い/恐ろしい | lesson | one | 怖く (both) | 恐ろしい |
+| G20 いくらか/いくら | comparison | one | 幾分 (one reader) | いくらか |
+| G21 それで/それに | lesson | one | で (one reader) | それで |
+| G23 やつ/やっこ | comparison | both | 奴 (both, for both words) | やつ, やっこ |
+
+奴 is the kanji of both やつ and やっこ and is accepted for both, so the
+readers did not separate that pair.
+
+The 14 qualified groups (ids as in the private check items):
+
+- Lesson half (7): G10 含める/込める, G17 brine/curing, G18
+  caravel/galley, G24 不正/犯行, G25 付く/付ける, G27 悩む/煩う, G29
+  砕く/砕ける.
+- Comparison half (7): G01 いかにも (four pairs), G07 尚更/更に, G08
+  にこやか/和やか, G11 見かける/見つける, G12 meadow/pasture, G13
+  下がる/下る, G31 黙り/黙る.
 
 ### Examples
 
@@ -74,13 +111,15 @@ passed.
 
 ## Split and lessons (2026-11-18)
 
-- Split: the 20 passing groups, sorted by id, were shuffled with Python
+- Split: the 20 kept groups, sorted by id, were shuffled with Python
   `random.Random(20261118)`; the first 10 form the lesson half (10 pairs),
   the rest the comparison half (14 pairs, including the four-pair いかにも
   group). Groups, not pairs, were split, so both directions of a pair and
   all pairs of a group share a half. Assignment file SHA-256
   `1339038df0770ce7d4e34f48760598efe0555bb1fc92bed48ceb56464fe95144`,
-  written 00:32:18 UTC, before the first lesson file (00:34:45).
+  written 2026-11-18 00:32:18 SGT (2026-11-17 16:32:18 UTC), before the
+  first lesson file (00:34:45 SGT). Of each half, seven groups met the fit
+  check and three are [reported apart](#groups-reported-apart).
 - Lessons: one per lesson-half pair, from the word the owner typed to the
   intended word, with one deciding feature, two contrasting sentences and
   a practice sentence. Every pair was confused in one direction only. Each

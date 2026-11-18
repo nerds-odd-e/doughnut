@@ -50,7 +50,7 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 {"schemaVersion":1,"identity":"SEED-073#check-short-recall-lessons","dependencies":[{"supplier":{"identity":"SEED-073#validate-short-recall-lessons","href":"seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons"},"implementation":"The lessons story's closure lands the evidence file (groups, split, lessons, pages, lesson record) on trunk.","rationale":"This story's plan scores and appends to that evidence file and relies on its recorded digests; started from a trunk without it, the check would have no recorded split or lesson day to compare against.","condition":"SEED-073#validate-short-recall-lessons is wrapped up and its evidence file short-recall-lessons-evidence.md is on trunk.","state":"satisfied","resolution":{"revision":"51a743c6cb63d765188cde77f0d0254e797a43d3","path":".planning/seeds/SEED-073-learning-refinement-and-retrieval.md#validate-short-recall-lessons","summary":"The lessons story closed with slices 1-4 done (plan 105 at the before-cleanup revision) and its closure was fast-forwarded onto main at 8790b5d7e6; .planning/seeds/short-recall-lessons-evidence.md with the fit check, split, lessons, pages and lesson record is on main.\nCondition satisfied: SEED-073#validate-short-recall-lessons is wrapped up and its evidence file short-recall-lessons-evidence.md is on trunk.\nAccepted integration: 8790b5d7e66e76134102b55cc9dcf280593af79c on origin/refs/heads/main."}}]}
 ```
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/106-check-short-recall-lessons/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b3dbfc1f6b089536eed31fcf9cdd3c856e27e44a8dc840b6d1d3ccd3af82fde4","plan":"95ed9550fb94f3af728c2429513e632b09b9142279b102a49cbd83098928bb31"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/106-check-short-recall-lessons/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7e0c860c732e66f5db5c4f81cbfe617bcbb54118298db41b5025a523d29cbc17","plan":"07cf75a9f7c715f1db7a6425f8cb1f6e8c013e4d1a058135d31f1315b143dc99"}}
 ```
 
 - **Goal.** The owner learns whether the short contrast lessons he took on
@@ -104,32 +104,16 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
   4. The owner does the check on 2026-11-30 (day 12) → the answers are
      recorded and marked late, and reported apart from on-time answers.
   5. The lesson for a pair was skipped → reported as not taken.
-- **Limits to state with the result.** One learner; 20 groups passed the
-  fit check, 10 a half: a direction, not proof. The owner knows which pairs
+- **Limits to state with the result.** One learner; 14 groups met the
+  fit check, 7 a half: a direction, not proof. The comparison rests on
+  those 14; the six groups that passed only through another accepted word
+  or a kanji both words share are checked and
+  [reported apart](short-recall-lessons-evidence.md#groups-reported-apart). The owner knows which pairs
   had lessons. Lessons come days or weeks after the misses, not at the
   miss. A lesson adds one more exposure to the pair, which the comparison
   half does not get.
 - **Effort hypothesis.** S. Owner: about 20 minutes of check. Elapsed: to
   2026-11-27 for the recommendation, to 2026-12-16 for the recall count.
-
-<a id="correct-short-lessons-fit-check"></a>
-
-### Correct the short lessons' fit-check record
-
-**Identity:** SEED-073#correct-short-lessons-fit-check
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/107-correct-short-lessons-fit-check/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6e30f6a927011dfc8b509c1bb7b9acd031b312339fd55800173048b744657ecd","plan":"aa9461c257d32e5a46e84a591c667893b5b591fea0cc45a77e2e61ae22540dbf"}}
-```
-
-- **Goal.** Before the owner takes the day-seven check, his recommendation
-  rests on an accurate record of which lesson groups the fit check really
-  qualified: the evidence and [the check's](#check-short-recall-lessons)
-  plan name the groups that passed only through accepted near synonyms or
-  a kanji shared by both words, and report them apart.
-- **Scope.** Records only: the fit-check and split sections of the
-  [evidence](short-recall-lessons-evidence.md) and the check story's limits
-  and plan. The frozen check items, the split and the pages stay as they are.
-  Plan: [107](../slice-plans/107-correct-short-lessons-fit-check/PLAN.md).
 
 <a id="validate-source-backed-note-edits"></a>
 
