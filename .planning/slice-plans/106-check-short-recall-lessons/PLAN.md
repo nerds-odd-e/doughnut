@@ -64,6 +64,13 @@ answer against the frozen forms → publish the counts and the
 recommendation for the owner's review. Report on-time and late answers
 apart. A group the owner did not check is reported as missed, not scored.
 
+The comparison between the halves uses the 14 groups that met the fit
+check, 7 a half. The six groups that passed it only through another
+accepted word or the shared kanji 奴 (G21, G22, G26 in the lesson half;
+G03, G20, G23 in the comparison half; see the
+[evidence](../../seeds/short-recall-lessons-evidence.md#groups-reported-apart))
+are checked and scored the same way, and their counts are reported apart.
+
 The frozen accepted forms include some near synonyms besides readings
 and inflections (少し, 幾分 for いくらか; で for それで; しかも for それに;
 さっき for たった今; grass for pasture; trireme for galley; 越して, 超して,

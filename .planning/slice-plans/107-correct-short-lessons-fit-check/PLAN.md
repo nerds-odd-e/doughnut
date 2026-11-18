@@ -60,7 +60,7 @@ shows the check story's state recorded after its edit.
 
 ### 1. Name the qualified groups in the evidence and the check plan
 Type: Behavior
-Status: planned
+Status: done
 Proof: the evidence file's fit check names the 14 groups that met the rule
 and the six apart with their reason, and the assignment time is in SGT; the
 check story's limits and plan 106 slice 1 report the 14 groups as the
@@ -73,6 +73,17 @@ shared kanji 奴); correct the assignment time; in the check story's
 reports the 14 qualified groups (7 a half) as the comparison and the six
 groups apart, keeping the existing near-synonym reporting. Record the check
 story's preparation state again after its section changes.
+
+Accepted proof (2026-11-18): the cached answers (`round1-scores.json`
+for round one, `answers-C/D.json` for the revised sentences) read again
+with `python3 -I` against `check-items.json` give exactly the six groups
+and 14 qualified groups named above; `assignment.json` and the cache
+files' modification times are local +08 (SGT). `git diff --check` is
+clean; every changed link and anchor resolves. The check story's
+assessment was reviewed and recorded ready again; `read-state` shows
+`changedSinceReview: false`. The evidence file names the 14 groups with
+ids, a table of the six with the words the readers wrote, and the split's
+"20 kept groups".
 
 ## Current decisions
 
