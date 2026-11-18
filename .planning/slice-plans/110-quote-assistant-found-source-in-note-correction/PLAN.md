@@ -153,6 +153,19 @@ content correction without a source shows "No source was found." in the
 same place. A title correction shows neither. `ConversationNoteCorrectionBuilder`
 in `packages/donut-test-fixtures` gains the source for the tests.
 
+## Execution complete
+
+Product advice: no change to the story or the queue. The review found no
+defect in the delivered work. Process review is deferred into wrap-up.
+
+- Before or right after release, check one real note conversation: the
+  request now sent (web search with the two nullable source parts) was
+  not sent to the real model in this execution. A paid call needs the
+  owner's go.
+- Every assistant reply in a note or recall conversation may now search
+  the web, also when it proposes nothing; the story does not promise to
+  prevent this ($0.04 to $0.05 a reply in the try).
+
 ## Current decisions
 
 - Owner, 2026-11-18: the quote and link are their own parts of the
