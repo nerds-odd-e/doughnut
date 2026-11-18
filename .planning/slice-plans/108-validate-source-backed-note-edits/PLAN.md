@@ -72,7 +72,7 @@ edit, is recorded as such and the case is dropped, not replaced.
 
 ### 2. Freeze the one-sense case and the no-change case
 Type: Behavior
-Status: planned
+Status: done
 Proof: `cases.json` holds both cases in the same form; the evidence file
 names them, and names any candidate left out with the reason.
 
@@ -169,6 +169,11 @@ after checking the other queued validations.
   own cited article; it ties men's language to a final か) are weaker than
   the other two. Row 8502's stored key was itself wrong. In the export the
   question is under `multipleChoice`, not `note`.
+- Slice 2 (2026-11-18): one-sense case 整う/調う (note 28353, rows 2012
+  and 2484, spelling misses; source 文化庁「異字同訓」の漢字の使い分け例).
+  Its rows have no recoverable prompt (note edited 2026-11-12), so the
+  review page shows the export's prompt-unavailable text. No-change case
+  〜ことだから/〜ことから (note 22629, row 4032). 脇/腋 left out: no source.
 
 ## Current decisions
 

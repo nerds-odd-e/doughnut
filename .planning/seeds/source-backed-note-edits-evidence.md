@@ -36,3 +36,29 @@ quoted, and the smallest edit. Four cases kept, none dropped.
    summary sentence becomes 「また、最後に「か」がつくと男言葉になります。」
    Limit: no independent grammar reference on gender use was found; the
    missed question was about meaning, not gender.
+
+## One-sense and no-change cases (2026-11-18)
+
+Both notes were read from production on 2026-11-18. Neither is a
+lessons-trial pair or one of the four fault notes. Six cases now exist.
+
+5. **整う** (typed word fits one sense of the cue only; group G16,
+   outside both trial halves). Claim: two spelling misses typed 調う for
+   the 整う cue. The note's 準備が完了する sense (必要不可欠なものが不足なく揃う)
+   is the sense 調う also covers. Source: the 文化庁
+   [「異字同訓」の漢字の使い分け例](https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/ijidokun_140221.pdf)
+   gives 「【整う・整える】乱れがない状態になる。」 and 「【調う・調える】必要なものがそろう。」
+   Edit: the 準備が完了する bullet adds that this sense may also be written
+   調う, and that the 乱れのない状態 sense (「列が整う」) is 整う only.
+   Limit: the report's examples do not name 準備が整う itself.
+6. **〜ことだから confused with 〜ことから** (no change). Claim: one missed
+   question (row 4032) chose ことから／ことだから; the 2026-11-14 replay
+   kept the question as a sound control. Sources: the
+   [edewakaru 〜ことだから article](https://www.edewakaru.com/archives/12106149.html)
+   (judging from a known person's character or habits) and
+   [JLPT Sensei ことから](https://jlptsensei.com/learn-japanese-grammar/%E3%81%93%E3%81%A8%E3%81%8B%E3%82%89-koto-kara-meaning/)
+   ("from the fact that ~") support the note's split. Proposal: no change.
+
+Left out: 脇/腋 (G30, outside both trial halves) was not chosen; 整う/調う
+had an opened source showing the one-sense fit, and no source was opened
+for 脇/腋. No candidate pair was found in the lessons trial.
