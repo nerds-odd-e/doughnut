@@ -101,7 +101,7 @@ recorded result.
 
 ### 4. Render the generation requests and show the cost
 Type: Behavior
-Status: planned
+Status: done
 Proof: `requests/` holds one body per case and state (before, after; the
 no-change case before only), each with model `gpt-6.2-sol`; the owner is
 shown the number of calls, measured input size, the price source and the
@@ -180,6 +180,9 @@ after checking the other queued validations.
   also changed `an instance of` to `builds on`, unasked. Both notes now
   differ from the frozen content; slices 4–6 keep using the frozen
   content, and the page marks these two as already corrected.
+- Slice 4 (2026-11-18): 11 bodies in `note-edits/requests/`; price
+  $2.00/$10.00 per 1M tokens; about $0.43 for 33 calls; owner: go.
+  tiktoken is unavailable, so token counts are estimates.
 
 ## Current decisions
 

@@ -78,3 +78,21 @@ invite AI to reply". Minutes are the agent's, not a person's.
 Both proposals came on the first request, each with a short reason, and
 both agree with the sources in the fault cases above. A read of each
 note through the API after acceptance showed the new text.
+
+## Generation requests and cost (2026-11-18)
+
+A scratch backend test, since removed, wrote the product's question
+generation request for each case from its frozen note content: 11
+bodies (before and after for five cases, before only for the no-change
+case), each with model `gpt-6.2-sol` and an output limit of 1,000 tokens.
+Linked notes were created with their current content; production also
+adds second-level links, folder siblings and back links, which the local
+request lacks.
+
+- Input size: about 1,190 to 2,150 tokens a body (estimated: ASCII at
+  four characters a token, other characters one each).
+- Price: $2.00 per 1M input and $10.00 per 1M output tokens, from
+  [OpenAI's pricing page](https://developers.openai.com/api/docs/pricing),
+  read 2026-11-18.
+- 33 calls (three per body): about $0.43 in total, at most about $0.014 a
+  call. The owner answered go on 2026-11-18.
