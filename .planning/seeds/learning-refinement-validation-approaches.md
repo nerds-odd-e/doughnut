@@ -90,9 +90,8 @@ open points listed there.
 
 ## Validate source-backed note edits from recall
 
-[Story home](SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits).
-
-Goal, scope and key examples are in the story home.
+[Result](source-backed-note-edits-evidence.md#recommendation-2026-11-18); follow-up
+[story home](SEED-073-learning-refinement-and-retrieval.md#source-and-smallest-change-in-corrections).
 
 - **For / why.** A note author needs a concrete correction when the note
   caused a misleading judgment and a way to preserve useful distinctions.

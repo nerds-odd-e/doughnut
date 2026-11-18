@@ -1,7 +1,8 @@
 # Source-backed note edits: evidence
 
-Evidence for the story
-[Validate source-backed note edits from recall](SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits).
+Evidence from validating source-backed note edits after recall misses
+(SEED-073, 2026-11-18). The follow-up is
+[showing a quoted source and the smallest change](SEED-073-learning-refinement-and-retrieval.md#source-and-smallest-change-in-corrections).
 
 ## Fault cases (2026-11-18)
 

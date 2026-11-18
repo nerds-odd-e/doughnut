@@ -12,6 +12,7 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Show a quoted source and the smallest change in a note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#source-and-smallest-change-in-corrections) — SEED-073#source-and-smallest-change-in-corrections
 - [Renew a waiting question when its note changes](seeds/SEED-073-learning-refinement-and-retrieval.md#renew-waiting-question-when-note-changes) — SEED-073#renew-waiting-question-when-note-changes
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
 - [Validate when question generation should abstain](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-question-generation-purpose) — SEED-073#validate-question-generation-purpose

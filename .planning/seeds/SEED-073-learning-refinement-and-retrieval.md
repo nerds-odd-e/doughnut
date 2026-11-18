@@ -206,6 +206,37 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 - **Effort hypothesis.** M, medium confidence. Owner: about 40 minutes of
   review and two conversations.
 
+<a id="source-and-smallest-change-in-corrections"></a>
+
+### Show a quoted source and the smallest change in a note correction
+
+**Identity:** SEED-073#source-and-smallest-change-in-corrections
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Beneficiary and outcome.** A note author deciding on a
+  [reviewed note correction](../../docs/recall-help.md#reviewed-note-corrections)
+  sees a quoted outside source for the claim and the edit shown as the
+  change against the current note, not only the whole new content.
+- **Why.** In the [validation](source-backed-note-edits-evidence.md#recommendation-2026-11-18)
+  the owner's decision was changed or eased by the quoted source in 6 of 6
+  cases and changed by the smallest change in 4 of 5; one correction in
+  production also changed a property nobody asked about, which a
+  whole-content review makes easy to miss. The owner agreed to design both.
+- **Open.** Today's assistant has no web access, so who finds and quotes
+  the source is undecided. A question made from the note before and after
+  the edit needs narrowing before a retest: it reached the edit in 2 of 5
+  cases and never in a property, and one question came in English for a
+  Japanese note.
+- **Deferred promises carried from the validation.** The assistant
+  finding and quoting a source itself; offering a correction without
+  being asked; a note that is only a pointer to a source; help for
+  spelling attempts; other authors, and learners who cannot edit the
+  note. Renewing stored questions after an edit is its
+  [own story](#renew-waiting-question-when-note-changes).
+- **Effort hypothesis.** M, low confidence.
+
 <a id="renew-waiting-question-when-note-changes"></a>
 
 ### Renew a waiting question when its note changes
