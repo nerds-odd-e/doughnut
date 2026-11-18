@@ -161,6 +161,16 @@ release or keep the shared cache under the
 [shared contract](../../seeds/SEED-073-learning-refinement-and-retrieval.md#close-out-temporary-recall-evidence)
 after checking the other queued validations.
 
+## Execution complete
+
+Product advice: the owner agreed to design two additions to today's
+reviewed note correction: a quoted outside source, and the edit shown as
+the smallest change. Narrow and retest the before-and-after question:
+aim it at the changed passage, including a changed property, and keep the
+note's language (one question for a Japanese note came in English). No
+correction of this execution is needed. Wrap-up decides how these become
+stories.
+
 ## Learnings
 
 - Slice 1 (2026-11-18): all four notes read 02:20Z, each claim still

@@ -536,6 +536,14 @@ The coordinator ran three environment probes in one shell command whose outputs 
   - Evidence: plan "Decision before Take" edit in 57115c1329's parent working state; slice 1 return; corrected in 57115c1329 ("Current decisions")
   - Observed effect: the slice 1 agent's first send failed with a missing variable before any request; no charge; one plan correction.
   - Inference: labelling each probe's output, or one probe per call, would have avoided the false premise.
+- Execution: SEED-073#validate-source-backed-note-edits, plan 108, first commit 673a239e00
+  - Timestamp: unknown (2026-11-18, between bcd0205558 and 2d6340d688)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: plan 108 "Decisive premises" row "Stored requests can be sent from the Nix shell"; slice 5 Learnings in 2d6340d688
+  - Observed effect: the slice 5 agent's first send failed with a missing `OPENAI_API_TOKEN` before any request; no charge; one owner turn to allow `zsh -i -c`.
+  - Inference: the planning premise cited plan 098's sent log for the Nix shell without the later correction, so the same false fact came back one story later.
 
 ## DD-488 — Coordinator recheck of a subagent's summary figure before it reached the recommendation
 The slice 6 agent reported that 6 of 32 verifier flags came from its choices differing from the key. Rereading the agent's own per-row JSON before writing the recommendation showed 8 of 32 (24 feasibility-only), and the plan was corrected.
