@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#validate-source-backed-note-edits",
+  "title": "Validate source-backed note edits from recall",
+  "completedAt": "2026-11-18T04:14:30.782Z",
+  "developer": "Terry Yin",
+  "agent": "pyo-chan",
+  "host": "claude"
+}

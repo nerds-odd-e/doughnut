@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Validate source-backed note edits from recall](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits) — SEED-073#validate-source-backed-note-edits ([plan](slice-plans/108-validate-source-backed-note-edits/PLAN.md))
-
 ## Backlog list
 
 - [Show a quoted source and the smallest change in a note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#source-and-smallest-change-in-corrections) — SEED-073#source-and-smallest-change-in-corrections
