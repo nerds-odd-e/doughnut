@@ -117,33 +117,142 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 <a id="source-and-smallest-change-in-corrections"></a>
 
-### Show a quoted source and the smallest change in a note correction
+### Show the smallest change in a note correction
 
 **Identity:** SEED-073#source-and-smallest-change-in-corrections
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/109-show-smallest-change-in-note-correction/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8efecabf7419b912ae71e8fdf1a63dc8effca4e9b323c5000c15a368ea220df1","plan":"c60a032b827630e98c910da396ee5d5cc4ea1d1732a336cd950f49f85834ffe6"}}
+```
+
+- **Goal.** A note author deciding on a
+  [reviewed note correction](../../docs/recall-help.md#reviewed-note-corrections)
+  to a note's content sees what the correction would change in the current
+  note, without comparing two full versions. The author can then accept
+  with confidence and notices a change nobody asked for. This serves the
+  wider aim of turning recall misses into reviewed note corrections.
+- **Why.** In the [validation](source-backed-note-edits-evidence.md#recommendation-2026-11-18)
+  the smallest change altered the owner's decision in 4 of 5 cases. One
+  correction in production also changed a property nobody asked about,
+  which a whole-content review makes easy to miss.
+- **Owner decision (2026-11-18).** The story was split. This story shows
+  the change. The quoted source is
+  [its own story](#assistant-quoted-source-in-corrections).
+- **Required behavior.**
+  - For a pending content correction that the author may accept, the
+    review shows the change between the current note content and the
+    wording in the editor: removed text and added text are marked, and
+    unchanged text is not.
+  - Note properties are part of the content, so a changed, added or
+    removed property is marked like any other change.
+  - Inside a changed line, only the changed characters are marked, not
+    the whole line. This also holds for text without spaces, such as
+    Japanese.
+  - The change follows the editor. When the author edits the wording, the
+    marks update. After **Load current content**, the change is shown
+    against the note as just loaded.
+  - When the wording equals the current content, the review says there is
+    no change.
+  - The full current content, the original proposal and the editor stay
+    available.
+- **Out of scope.**
+  - Title corrections. A title is one line, and the current and proposed
+    titles are already shown together.
+  - Corrections already accepted or declined, and the view of a reader who
+    cannot accept. They keep today's display.
+  - Accepting or declining each change separately. The author removes an
+    unwanted change in the editor.
+  - Making the assistant propose smaller edits. The story makes extra
+    changes visible; it does not prevent them.
+  - A question made from the note before and after the edit. The
+    validation said to narrow and retest it first.
+  - Carried from the validation: offering a correction without being
+    asked; a note that is only a pointer to a source; help for spelling
+    attempts; other authors, and learners who cannot edit the note.
+    Renewing stored questions after an edit is its
+    [own story](#renew-waiting-question-when-note-changes).
+- **Key examples.**
+  1. Solid OIDC, as proposed on 2026-11-18: the property `a specialization
+     of: WebID` becomes `uses: WebID`, `an instance of: OpenID Connect`
+     becomes `builds on: OpenID Connect`, and one body sentence is
+     reworded → the author sees those two property lines and the reworded
+     words marked. `type`, `url` and `a part of` are not marked.
+  2. Prisoner's dilemma: the body is one long paragraph on one line, and
+     the correction replaces one sentence and adds another → only those
+     words are marked. The rest of the paragraph is not.
+  3. In example 1 the author did not ask for the `an instance of` change
+     and types the old line back into the editor → that mark disappears,
+     and Accept publishes the wording without that change.
+  4. A Japanese body sentence gains 「最後に「か」がつくと」 in the middle of a
+     line → the added characters are marked, not the whole line.
+  5. Another edit changes the note while the correction is pending. Accept
+     is refused as stale and the author chooses **Load current content** →
+     the change is shown against the note as it now reads.
+  6. The author edits the wording until it equals the current note → the
+     review says there is no change.
+- **Interaction.** For a pending content correction the change is what the
+  author reads first. The editor, the full current content and the
+  original proposal are still there, but the author no longer has to
+  compare them by eye.
+- **Found during refinement (2026-11-18).**
+  - The product already compares two texts line by line, side by side, in
+    the refine-note preview and the undo confirmation. Reusing that view
+    unchanged is not enough: in the two corrections accepted in production
+    (revisions 5ed4e72e and fa5efa4d, read from the notebooks' Git history)
+    the body change sat inside one paragraph that is a single line, so a
+    line comparison marks the whole paragraph. Property changes sat on
+    their own lines.
+  - The review already loads the current content and holds the proposal,
+    so the change can be worked out in the browser. Nothing new is stored
+    and acceptance stays as it is
+    ([ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)).
+    No Accepted decision is in conflict.
+  - Strongest doubt: in the validation an agent wrote the smallest edit
+    itself. In the product the assistant may rewrite more than asked, as
+    in example 1. Showing the change does not make the edit small; it
+    lets the author see and undo the extra. The purpose, an easier and
+    safer decision, still holds.
+- **Effort hypothesis.** S, medium confidence.
+
+<a id="assistant-quoted-source-in-corrections"></a>
+
+### Quote a source the assistant found in a note correction
+
+**Identity:** SEED-073#assistant-quoted-source-in-corrections
 ```json dough-story-state
 {"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
 ```
 
 - **Beneficiary and outcome.** A note author deciding on a
   [reviewed note correction](../../docs/recall-help.md#reviewed-note-corrections)
-  sees a quoted outside source for the claim and the edit shown as the
-  change against the current note, not only the whole new content.
+  sees a passage quoted from an outside source for the corrected claim,
+  with a link to open it. The assistant searches the web for it when it
+  proposes the correction.
 - **Why.** In the [validation](source-backed-note-edits-evidence.md#recommendation-2026-11-18)
-  the owner's decision was changed or eased by the quoted source in 6 of 6
-  cases and changed by the smallest change in 4 of 5; one correction in
-  production also changed a property nobody asked about, which a
-  whole-content review makes easy to miss. The owner agreed to design both.
-- **Open.** Today's assistant has no web access, so who finds and quotes
-  the source is undecided. A question made from the note before and after
-  the edit needs narrowing before a retest: it reached the edit in 2 of 5
-  cases and never in a property, and one question came in English for a
-  Japanese note.
-- **Deferred promises carried from the validation.** The assistant
-  finding and quoting a source itself; offering a correction without
-  being asked; a note that is only a pointer to a source; help for
-  spelling attempts; other authors, and learners who cannot edit the
-  note. Renewing stored questions after an edit is its
-  [own story](#renew-waiting-question-when-note-changes).
+  the quoted source changed or eased the owner's decision in 6 of 6 cases.
+  There an agent with web access found the sources. A source the author
+  supplies tells the author nothing new, so the owner chose on 2026-11-18
+  to have the assistant find it, as a story after
+  [showing the smallest change](#source-and-smallest-change-in-corrections).
+- **Facts (2026-11-18).**
+  - Today's assistant has no web search. The OpenAI library the backend
+    uses (openai-java 4.106.0) includes a web search tool for the same
+    kind of request the assistant already makes.
+  - Price, from [OpenAI's pricing page](https://developers.openai.com/api/docs/pricing):
+    $10.00 per 1,000 searches, plus the text the search returns, charged
+    at the model's input price.
+- **Open.**
+  - Whether the model in use finds a passage that supports the correction
+    and quotes it word for word is not observed. A paid try on the
+    validation's cases needs the owner's go, with the cost worked out from
+    the real price and measured tokens.
+  - What a correction costs with search is not measured.
+  - What the author sees when no source is found. One idea, borrowed from
+    how Wikipedia marks a claim that lacks a citation: the correction says
+    plainly that no source was found, so the gap is visible. Wikipedia has
+    many later readers to check a citation; here one author decides once,
+    so the link must open and the quote must be checkable.
+  - Whether the note's own `url` property is tried first. It held the
+    source in 2 of the 6 validated cases.
 - **Effort hypothesis.** M, low confidence.
 
 <a id="renew-waiting-question-when-note-changes"></a>
