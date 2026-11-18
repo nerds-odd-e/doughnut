@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "philip-chan",
+  "email": "philip-chan@example.org",
+  "identity": "SEED-073#renew-waiting-question-when-note-changes",
+  "mode": "story-branch",
+  "branch": "codex/renew-a-waiting-question-when-its-note-changes",
+  "host": "codex",
+  "model": "gpt-6.2-sol"
+}
