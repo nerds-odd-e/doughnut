@@ -133,7 +133,7 @@ at 03:58Z. He said he was not quite sure of them and welcomed advice.
 | Case | Verdict | Quoted source | Smallest change | Before-and-after question |
 | --- | --- | --- | --- | --- |
 | 存じる | accept as it is | eased | changed | eased |
-| んじゃない | accept with his wording | changed | changed | eased |
+| んじゃない | accept as it is (corrected, see below) | changed | changed | eased |
 | 整う | decline: "The focus was in 整う, I assume. But the question is about 調う" | eased | no effect | no effect |
 | ことだから | agree: no change | eased | — | eased |
 | Solid OIDC (already accepted) | — | changed | changed | no effect |
@@ -145,11 +145,67 @@ before-and-after question 3 of 6 (eased 3, changed none).
 
 Two answers need reading:
 
-- んじゃない: the "wording" he gave is not wording for the note: "the 2nd
-  question used the wrong language (English)". The after question shown
-  (run 1 of 3) was in English for a Japanese note. So the verdict is an
-  accept of the edit, plus a fault found in the generated question.
+- んじゃない: he saved "accept with my wording", but the wording he gave
+  is not wording for the note: "the 2nd question used the wrong language
+  (English)". The after question shown (run 1 of 3) was in English for a
+  Japanese note. On the agent's advice he agreed on 2026-11-18 to record
+  it as accept as it is, plus a fault found in the generated question.
 - 整う: the decline says the edit taught 調う inside a note about 整う.
   The case came from spelling misses (調う typed for the 整う cue), and
   the edit answered them by adding the other spelling's sense to this
   note, which moved the note's focus.
+
+## Recommendation (2026-11-18)
+
+For the owner's review; he agreed with it on 2026-11-18. No pass mark
+was fixed in advance.
+
+| Addition | Call | Behind it |
+| --- | --- | --- |
+| Quoted outside source | design it | changed or eased the decision in 6 of 6 cases (changed 3) |
+| Edit shown as the smallest change | design it | changed the decision in 4 of 5 cases; the 整う decline came from what the edit said, not from how it was shown |
+| Question from the note before and after the edit | narrow and retest | eased 3 of 6 decisions and changed none; questions reached the edit in 2 of 5 after cases and never in a property; one of the shown questions came in English for a Japanese note |
+
+What to narrow before a retest: aim the question at the changed passage,
+including a changed property, and keep the note's language.
+
+Compared with today's conversation (two tries): both proposals came on
+the first request with a short reason, and both were right. What today's
+review lacks is what the page added: the quote and the change shown
+alone. In the Solid OIDC try one property not asked about also changed,
+which a full-content review makes easy to miss; the owner marked the
+smallest change as changing his decision on both tried cases.
+
+Other findings:
+
+- No question made before an edit asked about the faulty claim (0 of
+  15): these faults were not reaching the questions.
+- The 整う case came from spelling misses. The edit answered them by
+  teaching 調う inside the 整う note, and the owner declined it. Help for
+  spelling attempts stays out of scope.
+- Row 8502's stored answer key for the prisoner's dilemma was itself
+  wrong.
+
+Limits:
+
+- One author, who is also the developer and was told the four faults
+  during refinement on 2026-11-18. He delegated the two conversation
+  tries and their decisions to the agent, which already knew the faults
+  and sources; their minutes are the agent's.
+- Cases were chosen, not sampled: nothing here says how often a recall
+  miss comes from a faulty note.
+- Generator output varies between runs: three questions a state, and the
+  page showed one.
+- Sources were found and quoted by an agent with web access, which
+  today's assistant does not have. Two sources (存じる, んじゃない) are weak.
+- The local request lacked production's wider context, and token counts
+  before sending were estimates.
+
+## Closeout (2026-11-18)
+
+This story's private folder `note-edits/` was deleted after these
+conclusions were written, together with the proposal and answer copies in
+`~/Downloads` (moved to the Trash). No approved follow-up needs that
+evidence. The shared cache `.planning/tmp/recall-history/` stays: other
+SEED-073 validations are still queued, and the lessons trial runs to
+2026-12-16. The two accepted note corrections stay in the product.

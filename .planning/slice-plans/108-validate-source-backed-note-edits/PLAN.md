@@ -149,7 +149,7 @@ of slice 3 are shown too, marked as already tried.
 
 ### 7. Report the recommendation and close out
 Type: Behavior
-Status: planned
+Status: done
 Proof: the evidence file ends with, per addition, design it, narrow and
 retest, or stop, the counts and reasons behind each, the comparison with
 slice 3, the story's limits, and the closeout paragraph.
@@ -193,6 +193,11 @@ after checking the other queued validations.
   `note-edits/note-edit-verdicts-2026-11-18.json`. The page was checked
   by parsing only; the owner's save worked. He asked for advice on his
   answers.
+- Slice 7 (2026-11-18): owner agreed to record んじゃない as accept as it
+  is and agreed with the recommendation (source and smallest change:
+  design it; before-and-after question: narrow and retest). `note-edits/`
+  deleted and the `~/Downloads` copies moved to the Trash; the shared
+  cache stays for the queued validations.
 
 ## Current decisions
 
