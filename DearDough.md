@@ -514,7 +514,7 @@ Former local code: DD-484. In a single execution on Open Dough 0.3.96, a source 
 
 ## DD-485 — GitHub Actions observation ended before a rerun finished
 
-The SEED-124 pronunciation execution on Open Dough 0.3.96 lost story-branch observation after the GitHub Jobs API returned HTTP 502 for run 43053073660, attempt 2. The coordinator read successful attempt 3 directly. The same execution later lost trunk observation to a TLS handshake timeout. The [retained observer evidence](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-121.md#odf-121) identifies both transport failures. See the [original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L590) and [Donut’s package-install facet](DonutRetrospectiveFindings.md#dd-485).
+A GitHub Jobs API 502 ended observation during attempt 2. The same execution later lost trunk observation to TLS. The [local package-install facet](DonutRetrospectiveFindings.md#dd-485) remains with Donut. [Retained evidence](https://github.com/terryyin/open-dough/blob/286c5e0dec58e72e9328b7dec4a1ab52e88710b1/docs/maintainer/findings/ODF-121.md#retained-evidence--doughnut--dd-485-2026-11-13).
 
 <a id="dd-486"></a>
 <a id="dd-486--a-checkpoint-go-ahead-did-not-let-the-session-push-the-release-tag"></a>
@@ -525,25 +525,8 @@ The SEED-124 pronunciation execution on Open Dough 0.3.96 lost story-branch obse
 Former local code: DD-486. The host required separate production-deployment authorization for the release tag after the story checkpoint had been answered. The release took one additional owner turn. [Evidence and response](https://github.com/terryyin/open-dough/blob/96e641815b9b7d957d97e03c612034d1c4093734/docs/maintainer/findings/ODF-492.md#odf-492). [Original source](https://github.com/nerds-odd-e/doughnut/blob/4783aec679dc0119cc6e43fe600324fde2d3e502/DearDough.md#L604).
 
 ## DD-487 — A combined, unlabelled command output was misread as an environment fact
-The coordinator ran three environment probes in one shell command whose outputs carried no labels, then recorded in the plan that the Nix shell supplies `OPENAI_API_TOKEN`. The variable came from the interactive zsh profile instead.
 
-### Occurrences
-- Execution: SEED-073#validate-recall-question-integrity, plan 098, first commit 57115c1329
-  - Timestamp: unknown (before 2026-11-16T07:48:31Z, the first paid send)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: plan "Decision before Take" edit in 57115c1329's parent working state; slice 1 return; corrected in 57115c1329 ("Current decisions")
-  - Observed effect: the slice 1 agent's first send failed with a missing variable before any request; no charge; one plan correction.
-  - Inference: labelling each probe's output, or one probe per call, would have avoided the false premise.
-- Execution: SEED-073#validate-source-backed-note-edits, plan 108, first commit 673a239e00
-  - Timestamp: unknown (2026-11-18, between bcd0205558 and 2d6340d688)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: plan 108 "Decisive premises" row "Stored requests can be sent from the Nix shell"; slice 5 Learnings in 2d6340d688
-  - Observed effect: the slice 5 agent's first send failed with a missing `OPENAI_API_TOKEN` before any request; no charge; one owner turn to allow `zsh -i -c`.
-  - Inference: the planning premise cited plan 098's sent log for the Nix shell without the later correction, so the same false fact came back one story later.
+Two stories reused an unverified Nix environment premise. Both initial sends stopped before a request or charge. Execution releases are unknown. [Retained evidence](https://github.com/terryyin/open-dough/blob/286c5e0dec58e72e9328b7dec4a1ab52e88710b1/docs/maintainer/findings/ODF-074.md#doughnut--dd-487).
 
 ## DD-488 — Coordinator recheck of a subagent's summary figure before it reached the recommendation
 The slice 6 agent reported that 6 of 32 verifier flags came from its choices differing from the key. Rereading the agent's own per-row JSON before writing the recommendation showed 8 of 32 (24 feasibility-only), and the plan was corrected.
@@ -572,46 +555,21 @@ The fresh-generation attempt stopped with completed compatible evidence and an a
   - Observed effect: the original combined slice remained incomplete and was split into generation and semantic-comparison outcomes. Later comparison/report slices recorded 636.307 and 525.708 active seconds; those measurements cannot recover the earlier duration.
   - Inference: host-clock active/wait intervals need to start with the attempt, counting concurrent authorship and unioning overlapping waits. Existing guidance required timing; this occurrence exposes missing execution evidence, not a need to change the product.
 
-## DD-494 — Guarded fresh delivery refused a records-only execution-complete commit without a slice
+## ODF-515 — Guarded fresh delivery refused a records-only execution-complete commit without a slice
 
-After all slices were done, the coordinator published the plan's execution-complete record through guarded fresh delivery with `kind: planned` and no `plan` field, since no slice remained to mark done. The operation refused before preparation (`preparation-refused`, operation `context`: "planned work requires its workspace-relative plan and selected slice"). Supplying the last, already-done slice succeeded and left its status unchanged.
+<a id="dd-494--guarded-fresh-delivery-refused-a-records-only-execution-complete-commit-without-a-slice"></a>
 
-### Occurrences
+Former local code: DD-494. A records-only completion became publishable after naming the last already-done slice. The refusal cost one retry. [Retained evidence](https://github.com/terryyin/open-dough/blob/286c5e0dec58e72e9328b7dec4a1ab52e88710b1/docs/maintainer/findings/ODF-515.md#doughnut--dd-494).
 
-- Execution: SEED-131#see-link-property-types-in-references / 04bc57930e0f59cc7ce2fa4bc49f89f4545d6c16
-  - Timestamp: 2026-11-17 (Asia/Singapore; exact time not recorded)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.104
-  - Evidence: execution-complete publication accepted as fcd05a8199d1c5894e8b6010198fea84283ea127 on `claude/see-link-property-types-in-references` after the refused first attempt.
-  - Observed effect: one refused invocation and a retry; no commit, push or file change from the refusal.
-  - Inference: the finish-or-stop guidance names increment delivery for this record but does not say which slice a records-only completion commit names; the cost was one tool round-trip.
+## ODF-516 — The plan's file-size premise skipped a document the story edits
 
-## DD-495 — The plan's file-size premise skipped a document the story edits
-The plan stated that no expected edit touched a file over the 250-line check, but the story's ADR 0001 amendment edited a 253-line glossary. The coordinator found it only at slice 3 delegation and had to ask the owner mid-execution.
+<a id="dd-495--the-plans-file-size-premise-skipped-a-document-the-story-edits"></a>
 
-### Occurrences
-- Execution: SEED-073#judge-contested-question-by-answer-correctness, plan 102, first commit 2b70e2f6d9
-  - Timestamp: unknown (2026-11-17, Asia/Singapore)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: plan 102 "Architecture and reuse" (file-size paragraph listed only Java files); `wc -l docs/adrs/0001-ubiquitous-language.md` = 253 at slice 3; owner answer recorded in the plan Learnings
-  - Observed effect: the ADR edit was held while the rest of slice 3 ran; one owner question; the owner allowed the file to stay over 250.
-  - Inference: the planning size check was applied to code files only; measuring every file the slices name, documents included, would have raised the question during planning.
+Former local code: DD-495. The 253-line glossary was missing from the plan’s size assessment. The edit waited for one owner decision. [Retained evidence](https://github.com/terryyin/open-dough/blob/286c5e0dec58e72e9328b7dec4a1ab52e88710b1/docs/maintainer/findings/ODF-516.md#doughnut--dd-495).
 
 ## DD-496 — A slice's proof named an `@ignore` feature that no runner admits
-Slice 2's proof command listed `cli_recall.feature`, which is tagged `@ignore` and `@interactiveCLI` and is refused by the isolated Cypress runner, so the five-spec command exited before running any test.
 
-### Occurrences
-- Execution: SEED-073#judge-contested-question-by-answer-correctness, plan 102, first commit 2b70e2f6d9
-  - Timestamp: unknown (2026-11-17, Asia/Singapore)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: plan 102 slice 2 Proof; slice 2 return (first run exit 1, rerun with four specs, 8 passing; `pnpm -s test:gherkin-validation` for the ignored file)
-  - Observed effect: one wasted proof launch; the ignored file's step removal is proven only by Gherkin validation.
-  - Inference: the planning premise run covered one feature; checking each named spec's tags would have caught it.
+The planned five-spec proof named an ignored interactive feature. Four specs ran after narrowing, and the excluded file received Gherkin validation. [Retained evidence](https://github.com/terryyin/open-dough/blob/286c5e0dec58e72e9328b7dec4a1ab52e88710b1/docs/maintainer/findings/ODF-074.md#doughnut--dd-496).
 
 ## DD-497 — The refactor pass removed guards on reachable external data as "defensive programming"
 The slice 3 refactor pass deleted the null stored-answer and out-of-range model position handling from the contest verdict, citing "no defensive programming". The answer-index column is nullable and the model's positions have no upper bound, so a learner's contest could return a server error. The previous check had handled both cases. The coordinator restored both guards with controller tests.
@@ -642,17 +600,7 @@ In a validation study run with fresh AI reader contexts, the coordinator saved e
 
 ## DD-499 — A plan premise called a scratch directory Git-ignored without checking
 
-Plan 103 placed private packets in "this execution worktree's Git-ignored `.planning/tmp/retest-fixed-skill/`". At execution, `git status --porcelain --ignored` showed `?? .planning/tmp/`: nothing ignored it. The coordinator added a `*` `.gitignore` inside the directory before writing private material.
-
-### Occurrences
-- Execution: SEED-073#retest-fixed-skill-spelling-objectives, plan 103, first commit 68ebdc1a9b
-  - Timestamp: 2026-11-17 (before 68ebdc1a9b; exact time unknown)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: [plan 103 "Inputs and decisive premises"](https://github.com/nerds-odd-e/doughnut/blob/6f02bb77ca188e4f19e1c33d510621c7a424090c/.planning/slice-plans/103-retest-fixed-skill-spelling-objectives/PLAN.md#inputs-and-decisive-premises); coordinator check before slice 1 delegation
-  - Observed effect: no private material was staged; the gap was caught before any sensitive file existed.
-  - Inference: a privacy premise in a plan deserves the same literal observation as its input premises; the shared cache relies on its own inner `.gitignore` for the same reason.
+A pre-delegation check found the claimed Git ignore binding missing. The coordinator corrected it before writing private study packets. [Retained evidence](https://github.com/terryyin/open-dough/blob/286c5e0dec58e72e9328b7dec4a1ab52e88710b1/docs/maintainer/findings/ODF-074.md#doughnut--dd-499).
 
 ## DD-500 — Wrap-up treats story scope limits as deferred promises
 
