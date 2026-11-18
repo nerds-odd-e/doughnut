@@ -121,15 +121,90 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 **Identity:** SEED-073#validate-source-backed-note-edits
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/108-validate-source-backed-note-edits/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"57acaaebc6bf25508d76cb592b170a7e1f44580284ac3761408ba76e15bc7836","plan":"6a2a241bbd00cf285fc083cace193020ba050495d935c2009fb92b066f0e276d"}}
 ```
 
-- **Goal / hypothesis.** Give authors an evaluable correction when a note
-  misleads. Test whether source, attempt and smallest proposed edit help them
-  preserve useful distinctions and improve the note and its questions.
-- **Validation and decision.** See the [detailed proposal](learning-refinement-validation-approaches.md#validate-source-backed-note-edits).
-- **Effort hypothesis.** M, medium confidence; a few authored examples and accessible sources.
-- **Evidence and cleanup.** Follow the [shared contract](#close-out-temporary-recall-evidence).
+- **Goal.** The owner, as author of his notes, learns what to add to
+  today's [reviewed note correction](../../docs/recall-help.md#reviewed-note-corrections)
+  so that he can decide on a correction when a recall attempt points at a
+  faulty note. Three additions are tested: a quoted outside source, the
+  edit shown as the smallest change, and a question made from the note
+  before and after the edit. The result is a recommendation to design
+  named additions, narrow and retest, or stop; it changes no product
+  behavior. Findings behind this scope are in the
+  [detailed proposal](learning-refinement-validation-approaches.md#validate-source-backed-note-edits).
+- **Required behavior.**
+  - **Cases.** Six, from the owner's own notes: the four faulty claims
+    confirmed in the current notes on 2026-11-18 (存じる tagged 自動詞;
+    Solid OIDC as a specialization of WebID; the prisoner's dilemma motive;
+    んじゃない as used only by men); one answer that fits only one sense of
+    a word, chosen from recurring mix-ups outside the lessons trial; and
+    one attempt where the note is right, for which the proposal is "no
+    change".
+  - **Review page.** A local page shows each case: the recall attempt
+    (question, answer given, mark), the passage in the current note, the
+    quoted source with its link, the smallest edit as a change against the
+    current text, and the question the product's generator makes from the
+    note before and after the edit.
+  - **Verdict.** Per case the owner records: accept as it is, accept with
+    his own wording, or decline with a reason; and for each of the three
+    additions whether it changed or eased his decision.
+  - **Two real tries.** For two of the faults, one in a note property and
+    one in the body text, the owner asks for the fix through today's note
+    conversation in production. Recorded: what was proposed, whether the
+    rest of the note was kept unchanged, whether he could judge it, the
+    minutes spent, and his decision.
+  - **Question check.** The product's generator runs locally on the note
+    before and after each edit. Reviewers answer with the key hidden.
+    Recorded: whether the key after the edit agrees with the source, and
+    whether a valid near miss is still told apart.
+  - **Recommendation.** Per addition: design it, narrow and retest, or
+    stop, with the counts and the owner's reasons, for his review.
+    Evidence closeout follows the [shared contract](#close-out-temporary-recall-evidence).
+- **Required restrictions.**
+  - Production is read only, except an edit the owner himself accepts in
+    the two real tries; that edit goes through the existing acceptance and
+    Git history ([ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)).
+    No attempt, grade or schedule is changed ([ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)).
+  - Word pairs of the [lessons trial](#check-short-recall-lessons) are
+    neither shown nor edited before 2026-12-16: an extra exposure or a
+    changed note would disturb that trial's four-week count.
+  - Paid generator calls are sent only after the plan's cost, computed
+    from real prices, is shown to the owner.
+  - Attempts, note passages and the review page are private learning
+    evidence. They stay in the local cache and are not committed; the seed
+    keeps counts and a few short examples.
+- **Out of scope.** Any product change. Deferred promises: the assistant
+  finding and quoting a source itself; offering a correction without being
+  asked; a note that is only a pointer to a source; help for spelling
+  attempts; [renewing stored questions](#renew-waiting-question-when-note-changes)
+  after an edit; other authors, and learners who cannot edit the note.
+- **Key examples.**
+  1. 存じる is tagged 自動詞; the dictionary entry classes it as 他動詞.
+     The page shows the attempt, the tag line, the quoted entry, and an
+     edit that changes the tag and adds one example with a noun object →
+     the owner records a verdict and whether the quote mattered.
+  2. The owner asks today's conversation to correct Solid OIDC → the
+     proposal is recorded, including whether the other properties and the
+     body came back unchanged.
+  3. The note is right and the learner's answer was wrong → the page
+     proposes no change and quotes the source that supports the note; the
+     owner agrees or objects.
+  4. An answer fits one sense of a word only → the edit accepts it for
+     that sense; in the question made after the edit, the same answer in
+     the other sense is still marked wrong.
+  5. A question made from the edited prisoner's dilemma note → reviewers
+     solve it with the key hidden, and the key is compared with the source.
+  6. A candidate pair turns out to be in the lessons trial → it is left
+     out and named in the record.
+- **Limits to state with the result.** One author, who is also the
+  developer and was told the four faults during refinement on 2026-11-18.
+  Cases are chosen, not sampled: the result says nothing about how often a
+  recall miss comes from a faulty note. Generator output varies between
+  runs. Sources are found by an agent with web access, which today's
+  assistant does not have.
+- **Effort hypothesis.** M, medium confidence. Owner: about 40 minutes of
+  review and two conversations.
 
 <a id="renew-waiting-question-when-note-changes"></a>
 

@@ -92,24 +92,50 @@ open points listed there.
 
 [Story home](SEED-073-learning-refinement-and-retrieval.md#validate-source-backed-note-edits).
 
+Goal, scope and key examples are in the story home.
+
 - **For / why.** A note author needs a concrete correction when the note
   caused a misleading judgment and a way to preserve useful distinctions.
-- **Proposal hypothesis.** Showing the attempt, relevant source, and
-  smallest proposed edit makes it easier for authors to improve a note and
-  the questions that rely on it.
-- **Validate first.** Verify that the relevant claim or answer rule remains
-  in the current note. Compare a factual correction, a scoped usage edit,
-  and an alternative that only fits one sense with the author's current
-  workflow. Ask the author whether they would accept each edit. Replay a
-  question from the proposed revision and a valid near miss. Use source
-  checks such as the classification of 存じる and the distinct roles of
-  OpenID Connect and WebID.
-- **Decision.** Record whether the author can evaluate the change, whether
-  it fixes the source or question, and whether the intended distinctions
-  survive. If promising, design review, revision context, and author
-  approval before implementation. Scope a follow-up story if needed.
-- **Effort hypothesis.** M, medium confidence. A few authored examples and
-  accessible source material are enough for the first review.
+- **Proposal hypothesis.** Showing the attempt, a quoted source, and the
+  smallest proposed edit makes it easier for an author to decide on a
+  correction than today's reviewed correction does.
+- **What exists today (code and documents read 2026-11-18).**
+  - Since 2026-10-14 a help or note conversation can propose a
+    [reviewed note correction](../../docs/recall-help.md#reviewed-note-corrections):
+    new content or title with a reason, the current and proposed values,
+    editable wording, Accept or Decline, and the accepted Git revision.
+  - The proposal replaces the whole content. The review shows the current
+    and proposed content in full, not the change between them.
+  - The assistant proposes a correction only when asked to update the
+    note, and it has no web search, so it cannot fetch a source.
+  - "Refine note" from an answered question extracts or removes parts of a
+    note; it does not correct a claim.
+  - A changed note does not renew stored questions that are waiting.
+- **Current notes (production, read only, 2026-11-18).** The claims from
+  the [2026-11-14 replay](learning-refinement-and-retrieval-context.md#local-recall-evidence)
+  are still present: 存じる carries the property `tagged by: 自動詞` and
+  has no example with a noun object; Solid OIDC carries `a specialization
+  of: WebID`; the prisoner's dilemma note gives the motive as preventing
+  the other's lighter punishment; the んじゃない comparison note says women
+  should not use the form. Two of the four faults are in note properties.
+- **One-sense cases and the lessons trial (cache read 2026-11-18).** The
+  earlier examples of an answer that fits one sense only (浅はか with
+  軽はずみ, 気まずい, 発覚) already have an overlap declared and were left
+  out of the lessons trial for that reason. Two recurring mix-ups are
+  outside the trial and have no overlap declared: 整う with 調う, and 脇
+  with 腋. This validation takes its one-sense case from those. The 20
+  groups in the trial stay untouched until 2026-12-16.
+- **Still a hypothesis.** Whether the owner accepts each edit; whether a
+  quoted source, the smallest change, or the before-and-after question
+  eases his decision; what today's conversation proposes for these notes;
+  whether the generator makes a sound question from an edited note. The
+  validation settles these.
+- **Borrowed check.** A code change is reviewed with the bug report, the
+  smallest change, and a test that failed before and passes after. Here
+  the attempt is the report, the edit is the change, and the question made
+  before and after the edit is the test. The likeness stops at
+  repeatability: a generated question differs between runs, so one
+  question after the edit is a sample, not proof.
 - **Evidence and cleanup.** Use the [local recall evidence](SEED-073-learning-refinement-and-retrieval.md#local-recall-evidence)
   and apply the [shared closeout](SEED-073-learning-refinement-and-retrieval.md#close-out-temporary-recall-evidence).
 

@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "darren-chan",
-  "email": "darren-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-073#validate-source-backed-note-edits",
-  "host": "claude",
-  "model": "fable"
-}
