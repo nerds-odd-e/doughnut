@@ -92,7 +92,7 @@ open points listed there.
 
 [Result](source-backed-note-edits-evidence.md#recommendation-2026-11-18); follow-up
 stories: [smallest change](SEED-073-learning-refinement-and-retrieval.md#source-and-smallest-change-in-corrections)
-and [quoted source](SEED-073-learning-refinement-and-retrieval.md#assistant-quoted-source-in-corrections).
+and [quoted source](../../docs/recall-help.md#reviewed-note-corrections).
 
 - **For / why.** A note author needs a concrete correction when the note
   caused a misleading judgment and a way to preserve useful distinctions.
