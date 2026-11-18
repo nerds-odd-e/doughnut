@@ -1,49 +1,14 @@
 # Donut Retrospective Findings
 
-Donut owns findings about its product, repository tooling and local conventions.
-[DearDough](DearDough.md) covers shared planning, proof acceptance and delivery,
-even when the product symptom was repaired. Keep the original identity and
-evidence when moving a finding. Retire only with attributable repair and outcome
-evidence or a satisfied observation criterion. Reopen the same lineage when new
-evidence contradicts an adopted repair, and link any bounded follow-up.
+
+Donut owns findings about its product, tooling and conventions. [DearDough](DearDough.md) owns shared guidance findings. Keep original identities and evidence on moves. Retire with attributable outcome proof or a satisfied observation criterion. Resume the same lineage if later evidence contradicts an adopted repair.
 
 ## Ownership and priority assessment
 
-The 2026-10-12 review (Donut `8ac439b16b`, Open Dough `v0.3.60`) verified that
-[shared execution wrap-up](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-execute-plan/references/wrap-up.md)
-and [refactor checks](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-post-change-refactor/references/refactor-checks.md)
-allow a negative assertion when absence is the promise and defer to project
-test style. Donut's principle 7 and `unit-testing` skill supply the stricter
-removal convention. The 2026-11-03 review (Donut `afc47ea75c`, Open Dough
-`0.3.82`) separated the shared acceptance decision (former DD-334) from the
-local OpenAPI collision (DD-335).
-
-DD-317 and DD-318 retired after SEED-081#story-1 and SEED-081#story-2 completed
-2026-10-21. Both were source-backed assessments without live occurrence
-counts. For DD-318, `bae8f72e04` and `8ee3143db6` preserve per-tracker pending,
-failed and loaded state with same-tracker Retry and explicit Self-review
-(`RecallPage.questionRecovery.spec.ts`, [current behavior](docs/recall-question-loading.md)).
-Recover the full DD-317 and DD-318 records at
-`eae596d487:DonutRetrospectiveFindings.md` and
-`1348cea71a:DonutRetrospectiveFindings.md`, respectively.
-
-The 2026-11-08 review at `5f2be9874c` queues zero stories. MinerU setup and
-the single repaired OpenAPI collision rank below current learning/refinement
-work, and the Development failure still has no established cause. In the new
-SEED-108#spread-out-recall-backlog report, `5002ad7856` repaired the test
-builder's due-time override. The remaining unverified-premise observation
-belongs with ODF-074 in [DearDough](DearDough.md#odf-074).
-
-The 2026-11-10 review at `f61aeafdf4` read the DearDough
-additions DD-347, DD-348 and DD-438 to DD-447. DD-439 moved here: the failed
-responsibility is Donut's command wrappers, and the briefs' repeated exports
-show recurring cost, so it queues
-[SEED-116](.planning/seeds/SEED-116-agent-shell-independent-commands.md#run-repository-commands-without-interactive-shell-setup).
-DD-438's leftover check failed through a Nix-shell temporary folder, but no
-false reading occurred and its finding is about deriving a proof location from
-the environment, so it stays shared. The other additions concern shared
-planning, delegation, proof and delivery. DD-161, DD-159 and DD-335 have no
-new occurrences.
+- Donut's principle 7 and unit-testing skill impose the removal-test convention. The 2026-10-12 review at `8ac439b16b` verified that Open Dough v0.3.60 permits an absence assertion when absence is the promise and defers to project test style. [Shared wrap-up](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-execute-plan/references/wrap-up.md), [refactor checks](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-post-change-refactor/references/refactor-checks.md).
+- DD-317 and DD-318 retired when SEED-081 stories 1 and 2 completed on 2026-10-21. Both assessments were source-backed with no live occurrence count. DD-318 proof at `bae8f72e04` and `8ee3143db6` preserves per-tracker pending, failed and loaded state, same-tracker Retry and explicit Self-review. [Current behavior](docs/recall-question-loading.md). Full records at `eae596d487:DonutRetrospectiveFindings.md` and `1348cea71a:DonutRetrospectiveFindings.md`.
+- `5002ad7856` repaired the due-time override in SEED-108#spread-out-recall-backlog. The remaining premise finding is [ODF-074](DearDough.md#odf-074). DD-438 remains shared: the Nix temporary folder changed, but the proposed remedy concerns deriving proof locations from the environment. It caused no false reading.
+- DD-161 and DD-335 rank below current learning work. DD-159 has no established cause. DD-439 moved here on 2026-11-10 and its response shipped through [SEED-116](.planning/done/SEED-116_run-repository-commands-without-interactive-shell-setup.json). Earlier review and attribution notes are recoverable at `05b47c062f8d0d2f23c4d7eb5739c6bdacde3873:DonutRetrospectiveFindings.md`.
 
 <a id="records-only-refactor-reviews"></a>
 
@@ -61,40 +26,20 @@ occurrence and its active cost was unmeasured. No local policy change is queued.
 
 ### DD-439 — Agent shells lacked the environment that repository commands rely on
 
-The coordinator's and agents' non-interactive shells do not load `~/.zshrc`, which exports `NIX_CONFIG` (flakes) and `OPENAI_API_TOKEN`. `./scripts/run.sh` refused to start Nix, and mocked-OpenAI E2E features failed because the backend reads its key only from `OPENAI_API_TOKEN`.
 
-Moved from [DearDough](DearDough.md) on 2026-11-10; the source entry is recoverable at `f61aeafdf4:DearDough.md`. Ownership: Donut's `./scripts/run.sh` and mocked-OpenAI E2E stack depend on interactive-shell exports; no shared Open Dough contract failed.
+Donut's runner and mocked E2E stack relied on interactive exports. In `SEED-113#assimilate-notes-with-a-clear-default-and-result` at `9868d40b3c` (Claude Code Opus 5.5, Open Dough 0.3.92, 2026-11-09 Singapore, time unknown), setup refused disabled flakes; missing mock credentials caused 8 refinement and 10 question-generation errors across two features. Reruns passed with a placeholder and later briefs repeated the exports. Source: `f61aeafdf4:DearDough.md`.
 
-#### Occurrences
-- Execution: SEED-113#assimilate-notes-with-a-clear-default-and-result (first implementation commit 9868d40b3c)
-  - Timestamp: unknown (2026-11-09 Asia/Singapore, execution start and slice 1 E2E)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.92
-  - Evidence: `./scripts/run.sh bash scripts/worktree_setup.sh` → "experimental Nix feature 'flakes' is disabled"; slice 1 E2E `sut.log`: `IllegalStateException: This request requires apiKey` (8 refinement, 10 question-generation errors); reruns with an exported placeholder passed.
-  - Observed effect: one refused setup command and a diagnosis at startup; two E2E features failed and were rerun; every later brief had to carry both exports.
-  - Inference: the wrappers depend on interactive-shell environment; a wrapper-supplied flag and mock token would remove the dependency.
-- Verified response (2026-11-10, SEED-116#run-repository-commands-without-interactive-shell-setup): `scripts/run.sh` supplies its required additive Nix features for population and reuse (`12e1f925a5`). The E2E profile supplies a non-secret credential fallback while preserving supplied-token precedence and the held-stack paid-call choice; delivered in [`be62cc90a4`](https://github.com/nerds-odd-e/doughnut/commit/be62cc90a427fc7663fb481a06e1f15a582fe99b).
-  - Current execution proof: six runner cases, real Nix cold/reuse with host features disabled, and public worktree setup passed. The corrected full backend suite ran 3,093 tests with no failures (two existing skips), including production-YAML E2E unset/supplied and Development-unset configuration cases. All six held-stack cases passed, including both synthetic-token choices. A clean-shell invocation with neither token nor Nix-feature exports passed all seven refinement/question-contest scenarios; its owned services shut down, and its new `sut.log` had no credential-precondition error.
-  - This verifies the repair under the selected reproductions. A later agent execution must supply non-recurrence evidence; none is claimed here. The original dated observations and Open Dough 0.3.92 provenance above remain unchanged.
+**Adopted 2026-11-10.** SEED-116 supplied additive Nix features on population and reuse (`12e1f925a5`) and an E2E mock fallback preserving supplied-token precedence and held-stack paid-call choices ([implementation](https://github.com/nerds-odd-e/doughnut/commit/be62cc90a427fc7663fb481a06e1f15a582fe99b)). Six runner cases, cold/reused worktree setup, 3,093 backend tests with two skips, all six held-stack cases and seven clean-shell E2E scenarios verified the selected reproductions. Services stopped and the new `sut.log` showed no credential error. Later ordinary non-interactive use remains the observation criterion.
 
 <a id="dd-485"></a>
 
 ### DD-485 — CI jobs waited about 50 minutes each on a package mirror that did not resolve
 
-Two story-branch CI runs failed in every job that installs system packages, each after about 50 minutes inside `apt-get`. The failures arrived as separate notifications over about 90 minutes. [The shared observer facet](DearDough.md#dd-485) covers the same execution. This entry owns Donut’s system-package setup bound; the shared CI-observation facet stays in DearDough.
 
-#### Occurrences
-- Execution: SEED-124#save-pronunciations-as-note-properties / e9f109c3c25b0355a897161f8a8180fdfb22a1a5
-  - Timestamp: 2026-11-11T23:32:09+08:00
-  - Tool: Claude Code
-  - Model: claude-fable-5-2
-  - Open Dough release: 0.3.96
-  - Evidence: CI runs 43049319481 and 43053073660 (attempts 1 to 3); failed step durations of about 3,046 seconds; `Temporary failure resolving 'azure.archive.ubuntu.com'`; attempt 2 lost one runner during the same step.
-  - Observed effect: Eleven failed jobs per run with no test executed; five diagnosis rounds for one cause; green evidence for the product commit came about eight hours after its push.
-  - Inference: The mirror outage was external. At `4059ac2353`, Donut’s [Node/Cypress setup](.github/setup_nodejs_with_cache/action.yml) and [MySQL setup](.github/mysql_binaries/action.yml) run package installs without an explicit shorter bound. The backend unit-test job passed in both affected runs without using these package steps. See `aa17aab044:.planning/slice-plans/001-save-pronunciations-as-note-properties/PLAN.md` for the job and attempt distinctions; the full combined source is at `4059ac2353:DearDough.md`.
-- Verified response (2026-11-13, SEED-129#bound-ci-system-package-installation): shared `scripts/ci-system-packages.sh` bounds canvas and MySQL system-library phases to 600s with 10s kill-after and two acquisition retries; both setup actions call it. Disposable Linux probe `43410926122` showed bad-mirror DNS failure in 3s with phase/budget diagnosis and skipped downstream, stalled TERM-ignore cleanup at 25s (`status=137`), transient recovery, and healthy install in 11s. Surviving shell fixtures and push CI on product SHA `281dd13820f8aa2d6c426fdac20ee153171c524c` (run `43418396664`) accepted the wiring. Intent Coverage Caught on phase/budget enrichment (`281dd138`).
-  - This verifies the repair under the selected reproductions. A later agent execution must supply non-recurrence evidence against a real mirror outage; none is claimed here. The original dated observations and Open Dough 0.3.96 provenance above remain unchanged.
+Donut owns the system-package setup bound. [DD-485 in DearDough](DearDough.md#dd-485) owns the observer facet of the same execution.
+
+- `SEED-124#save-pronunciations-as-note-properties` / `e9f109c3c25b0355a897161f8a8180fdfb22a1a5`, 2026-11-11T23:32:09+08:00, Claude Code Fable 5.2, Open Dough 0.3.96. A package mirror DNS outage blocked eleven setup jobs on each of runs 43049319481 and 43053073660 (~3,046 seconds per failed step; attempt 2 also lost a runner). Separate notifications arrived over ~90 minutes, costing five diagnosis rounds and ~8 hours to green. Backend unit tests bypassed package setup and passed. The 2026-11-11 baseline lacked an explicit shorter package-install bound. [Node setup](.github/setup_nodejs_with_cache/action.yml), [MySQL setup](.github/mysql_binaries/action.yml), original `4059ac2353:DearDough.md`, attempt details at `aa17aab044:.planning/slice-plans/001-save-pronunciations-as-note-properties/PLAN.md`.
+- **Adopted 2026-11-13.** [SEED-129#bound-ci-system-package-installation](.planning/done/SEED-129_bound-ci-system-package-installation.json) routes both actions through `scripts/ci-system-packages.sh` with 600 s, 10 s kill-after and two acquisition retries. Probe 43410926122 covered 3 s DNS failure, TERM-ignore cleanup at 25 s (137), transient recovery and healthy 11 s install. Shell fixtures, Intent Coverage and push CI 43418396664 accepted `281dd13820f8aa2d6c426fdac20ee153171c524c`. Observe a later real mirror outage.
 
 ## Queued
 
