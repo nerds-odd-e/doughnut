@@ -68,6 +68,30 @@ occurrence costs about the same. Otherwise add one line under the finding:
 If you cannot tell, write the full row. The rest of the recording rule applies
 unchanged.
 
+### Trial: first-report admission
+
+Use this Open Dough pilot in an ordinary enabled `dough-execution-retrospective`
+process review or at `Complete a deferred process review` in
+`dough-story-wrap-up`. Before opening the findings log, confirm the review is
+within `2026-11-18T23:43:11+08:00` through the exclusive cutoff
+`2026-11-25T23:43:11+08:00`. Count distinct ordinary story completions in that
+window from additions to `.planning/done/*.json` in first-parent history on
+freshly fetched `origin/main`, including additions brought in by merges. Exclude
+pilot setup and cleanup, including `SEED-132#route-first-report-trial`. The
+notice expires at cutoff or after two ordinary completions, whichever comes
+first. For a skipped review, pilot work, or an unverified gate, use the ordinary
+route.
+
+For an unmatched observation, apply the [pinned first-report wording](https://github.com/terryyin/open-dough/blob/211360795b04901fca1eefd95e1b4256d411024c/.planning/slice-plans/709-assess-new-retrospective-findings-pilot/trial-wording.md)
+(blob `e114ab467d71183873dd4217e4ed52565785d781`) before allocating an ID or
+gathering occurrence metadata. Replace only the sentence it identifies for
+this review. Use ordinary recording if the pinned wording cannot be verified
+or the installed rule lacks the sentence it names. Keep
+required reporting and the matched-repeat route in force. If you apply the
+trial wording at a real decision, identify the blob, actual time with timezone,
+and review route in the existing execution transcript. Evidence of trial use
+belongs there.
+
 ## Cursor Cloud specific instructions
 
 On the Cloud VM there is **no Nix** — run commands directly (drop the `CURSOR_DEV=true nix develop -c` prefix). Full details: `.agents/skills/cloud-vm-setup/SKILL.md`.

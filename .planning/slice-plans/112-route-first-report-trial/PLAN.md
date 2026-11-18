@@ -1,6 +1,7 @@
 # Route the first-report pilot into ordinary Doughnut reviews
 
 **Source:** [Route the first-report pilot into ordinary Doughnut reviews (Codex-owned)](../../seeds/SEED-132-route-first-report-trial.md#route-first-report-trial)
+**Source review:** [Source-only review](source-review.md)
 **Identity:** SEED-132#route-first-report-trial
 
 ## Goal and scope
@@ -22,10 +23,10 @@ and heartbeat. This story's execution is excluded from its ordinary sample.
 ### 1. Make the wording available during the observation window
 
 Type: Behavior
-Status: planned
+Status: done
 
 Add one bounded instruction to `AGENTS.md` alongside the existing process
-guidance. Refer to the immutable wording, apply it only when the ordinary
+guidance and link to it from the Claude Code review entry. Refer to the immutable wording, apply it only when the ordinary
 review reaches the unmatched admission step before cutoff and with fewer than
 two ordinary completed stories in the window, and identify actual use and
 review route in the existing transcript. Tell a reviewer to use the existing
@@ -44,7 +45,8 @@ Status: planned
 
 At the earlier of the second ordinary completion and the original cutoff
 (25 November 2026 23:43:11 Singapore time), remove the first-report notice
-as one block. The Open Dough heartbeat owns return and coordination.
+as one block and delete its temporary pointer from `CLAUDE.md`. The Open
+Dough heartbeat owns return and coordination.
 
 **Proof.** Confirm origin/main no longer contains the first-report notice.
 Check the surrounding guidance, retaining any independent changes since
@@ -62,3 +64,28 @@ deployment. Close the story through the normal backlog completion operation.
   the sleep log afterwards. [Machine sleep on macOS](https://github.com/terryyin/open-dough/blob/211360795b04901fca1eefd95e1b4256d411024c/Distribution/tests/local-test-resources.md#machine-sleep-on-macos)
 - Budget 15 active minutes per slice. Ordinary work between slices supplies
   experimental exposure.
+
+## Execution context
+
+- Codex owns the trunk claim `ea5138dcce0f7ae859ce04ea776c455a669a1b87`. It was confirmed on `origin/main`.
+- Owned workspace `/Users/terryyin/git/doughnut/.worktrees/seed-401-first-report-trial`, branch `codex/seed-401-first-report-trial`.
+- GitHub workflow `ci.yml`, target `refs/heads/main`, coordinator `seed401-doughnut`,
+  observer directory `/tmp/dough-ci-501/watch-Knc1eA`. The scheduled assessment resumes this story.
+
+## Representative walk for slice 1
+
+- `AGENTS.md` contains the only notice, and the direct and deferred Claude Code
+  routes discover it through `CLAUDE.md#planning-and-slice-delivery`.
+- At an eligible unmatched decision, the reviewer reads the pinned blob
+  `e114ab467d71183873dd4217e4ed52565785d781` and checks the single replaced sentence against installed
+  baseline `49de76bfeaa121266318d47e07a3008ca06a9d07`. Both an admitted finding and a candidate skip leave actual
+  use, route, time and blob in the existing transcript. Quiet reviews may have
+  no eligible decision. Older sessions can miss the notice.
+- A matched repeat, an explicitly skipped process review, a required report
+  and this pilot story each use their ordinary route. At the second ordinary
+  completion or the cutoff, and with an unverified gate or incompatible pin,
+  ordinary recording applies.
+- The notice and pointer are additive. Removing just their additions recovers
+  both pre-change guidance files byte for byte. The repeat trial survives.
+- `git diff --check` passed after independent review. Live admission decisions
+  and their effort are outcomes owned by the Open Dough assessment.
