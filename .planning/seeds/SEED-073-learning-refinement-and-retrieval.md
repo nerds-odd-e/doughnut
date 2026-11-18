@@ -115,25 +115,6 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 - **Effort hypothesis.** S. Owner: about 20 minutes of check. Elapsed: to
   2026-11-27 for the recommendation, to 2026-12-16 for the recall count.
 
-<a id="correct-short-lessons-fit-check"></a>
-
-### Correct the short lessons' fit-check record
-
-**Identity:** SEED-073#correct-short-lessons-fit-check
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/107-correct-short-lessons-fit-check/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6e30f6a927011dfc8b509c1bb7b9acd031b312339fd55800173048b744657ecd","plan":"aa9461c257d32e5a46e84a591c667893b5b591fea0cc45a77e2e61ae22540dbf"}}
-```
-
-- **Goal.** Before the owner takes the day-seven check, his recommendation
-  rests on an accurate record of which lesson groups the fit check really
-  qualified: the evidence and [the check's](#check-short-recall-lessons)
-  plan name the groups that passed only through accepted near synonyms or
-  a kanji shared by both words, and report them apart.
-- **Scope.** Records only: the fit-check and split sections of the
-  [evidence](short-recall-lessons-evidence.md) and the check story's limits
-  and plan. The frozen check items, the split and the pages stay as they are.
-  Plan: [107](../slice-plans/107-correct-short-lessons-fit-check/PLAN.md).
-
 <a id="validate-source-backed-note-edits"></a>
 
 ### Validate source-backed note edits from recall
