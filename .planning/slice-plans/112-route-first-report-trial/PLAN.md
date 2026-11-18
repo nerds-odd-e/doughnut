@@ -89,3 +89,26 @@ deployment. Close the story through the normal backlog completion operation.
   both pre-change guidance files byte for byte. The repeat trial survives.
 - `git diff --check` passed after independent review. Live admission decisions
   and their effort are outcomes owned by the Open Dough assessment.
+
+## Rollout CI repair
+
+The hosted [rollout attempt](https://github.com/nerds-odd-e/doughnut/actions/runs/44423649370)
+timed out in five `pnpm cli:test` cases, across four files. The same command
+on the rollout SHA passed 447 Vitest tests locally in 44.95 s. A prior run on
+the same hosted runner label passed the CLI step in 47 s. The failed step took
+60 s, with all five failures reaching Vitest's 5 s case deadline.
+
+The shared LFS publish fixture can freeze the accepted bundle from its fresh
+checkout, then bind that checkout for the local edits. It formerly cloned the
+same accepted Git state and reconfigured identity. The paired setup trace
+counted 464 versus 423 Git command events across ten LFS publish cases. The
+final fixture passed 54 tests across the four implicated files with the same
+default deadline. Three timed-out cases use the leaner fixture. The unrelated
+binding case and the LFS pull conflict-pause case passed locally and still need
+hosted evidence. The two-arm sample excludes this pilot administration. Follow
+the [failure policy](../../../.agents/skills/dough-execute-plan/references/failure-policy.md)
+on the repair's accepted hosted run.
+
+The local probe is recoverable from the scope, command and report in the
+Codex execution thread. The transient raw reports are under
+`/tmp/seed401-cli-repair.ow53ID` on the test host.

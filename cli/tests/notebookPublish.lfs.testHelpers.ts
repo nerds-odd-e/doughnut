@@ -6,10 +6,12 @@ import { join } from 'node:path'
 import { vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { runGit } from './notebookClone.testHelpers.js'
-import { configureTestGitIdentity } from './notebookGit.testHelpers.js'
+import {
+  bindNotebookCheckout,
+  configureTestGitIdentity,
+} from './notebookGit.testHelpers.js'
 import {
   bundleMain,
-  cloneAsBoundCheckout,
   type rejectionPost,
   stubFetchForSubmission,
 } from './notebookPublish.testHelpers.js'
@@ -77,8 +79,11 @@ export function commitPointerAttachment(
   return runGit(['rev-parse', 'main'], dir)
 }
 
-export function buildLfsSourceRepo(workDir: string): string {
-  const dir = join(workDir, 'lfs-source')
+export function buildLfsSourceRepo(
+  workDir: string,
+  name = 'lfs-source'
+): string {
+  const dir = join(workDir, name)
   fs.mkdirSync(dir)
   runGit(['init', '--quiet', '-b', 'main'], dir)
   configureTestGitIdentity(dir)
@@ -162,6 +167,8 @@ export function commitAttachmentHistory(
     }
   }
   execFileSync('git', ['fast-import', '--quiet'], { cwd: dir, input: stream })
+  // fast-import advances main without updating the checkout.
+  runGit(['reset', '--hard', '--quiet', 'HEAD'], dir)
 }
 
 const ACCEPTED_HEAD = 'deadbeefcafef00ddeadbeefcafef00ddeadbeef'
@@ -177,17 +184,12 @@ export function prepareLfsPublishCheckout(
   dir: string
   fetchMock: ReturnType<typeof stubFetchForSubmission>
 } {
-  const sourceRepoDir = buildLfsSourceRepo(workDir)
-  buildAcceptedHistory?.(sourceRepoDir)
+  const dir = buildLfsSourceRepo(workDir, checkoutName)
+  buildAcceptedHistory?.(dir)
   const bundleFile = join(workDir, 'accepted.bundle')
-  bundleMain(sourceRepoDir, bundleFile)
+  bundleMain(dir, bundleFile)
   const fetchMock = stubFetchForSubmission(bundleFile, postResponse)
-  const dir = cloneAsBoundCheckout(
-    workDir,
-    sourceRepoDir,
-    getApiConfig().apiBaseUrl,
-    checkoutName
-  )
+  bindNotebookCheckout(dir, getApiConfig().apiBaseUrl)
   return { dir, fetchMock }
 }
 
