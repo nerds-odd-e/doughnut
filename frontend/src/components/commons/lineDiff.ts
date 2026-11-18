@@ -51,7 +51,7 @@ const computeLCS = (current: string[], old: string[]): LCSMatch[] => {
   return result
 }
 
-const computeLineDiff = (
+export const computeLineDiff = (
   currentText: string,
   oldText: string
 ): { currentLines: DiffLine[]; oldLines: DiffLine[] } => {
@@ -195,21 +195,5 @@ export const buildPairedDiffRows = (
     }
   }
 
-  return result
-}
-
-export const buildChangedLines = (from: string, to: string): DiffLine[] => {
-  const { currentLines: added, oldLines: removed } = computeLineDiff(to, from)
-  const result: DiffLine[] = []
-  let ai = 0
-  let ri = 0
-  while (ai < added.length || ri < removed.length) {
-    if (removed[ri]?.type === "removed") {
-      result.push(removed[ri++]!)
-    } else {
-      if (added[ai]!.type === "same") ri++
-      result.push(added[ai++]!)
-    }
-  }
   return result
 }

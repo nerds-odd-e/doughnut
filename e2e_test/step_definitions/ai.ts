@@ -137,12 +137,12 @@ Then("I should see this run's pending content correction", () => {
 })
 
 Then(
-  "the review should mark {string} as removed and this run's proposal as added",
-  (removed: string) => {
+  "the review should mark only what this run's proposal adds to {string}",
+  (current: string) => {
     thisRunsProposal().then((proposal) => {
       start
         .assumeConversationAboutNotePage()
-        .expectPendingContentCorrectionMarks(removed, proposal)
+        .expectPendingContentCorrectionOnlyAdds(proposal.slice(current.length))
     })
   }
 )

@@ -91,10 +91,10 @@ export class ConversationAboutNotePage {
     return this
   }
 
-  expectPendingContentCorrectionMarks(removed: string, added: string) {
+  expectPendingContentCorrectionOnlyAdds(added: string) {
     cy.get('[data-testid="note-correction-change"]').within(() => {
-      cy.contains('del', removed).should('be.visible')
-      cy.contains('ins', added).should('be.visible')
+      cy.get('ins').should('be.visible').and('have.text', added)
+      cy.get('del').should('not.exist')
     })
     return this
   }

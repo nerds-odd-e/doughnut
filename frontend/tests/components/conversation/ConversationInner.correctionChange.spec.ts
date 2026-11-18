@@ -5,7 +5,9 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { beforeEach, expect, it, vi } from "vitest"
 import {
   body,
+  changedLineTexts,
   declinedCorrection,
+  markedTexts,
   mountConversation,
   realm,
   setupCorrections,
@@ -33,6 +35,8 @@ a part of: Solid
 ${sentence}`
 const oldSentence = "Solid OIDC lets an app prove who the user is."
 const newSentence = "Solid OIDC lets a pod verify who the user is."
+const removedWords = "n app prove"
+const addedWords = " pod verify"
 const currentContent = solidOidc(
   "a specialization of",
   "an instance of",
@@ -57,26 +61,20 @@ const mountReview = async () => {
   await flushPromises()
   return wrapper.find('[data-testid="conversation-note-correction"]')
 }
-const marked = (review: DOMWrapper<Element>, tag: "del" | "ins") =>
-  review.findAll(tag).map((mark) => mark.text())
 const click = (review: DOMWrapper<Element>, label: string) =>
   review
     .findAll("button")
     .find((button) => button.text() === label)!
     .trigger("click")
 
-it("marks the removed and added lines of a pending content correction", async () => {
+it("marks the removed and added text of a pending content correction", async () => {
   const review = await mountReview()
-  expect(marked(review, "del")).toEqual([
-    "a specialization of: WebID",
-    "an instance of: OpenID Connect",
-    oldSentence,
+  expect(markedTexts(review, "del")).toEqual([
+    "a specialization of",
+    "an instance of",
+    removedWords,
   ])
-  expect(marked(review, "ins")).toEqual([
-    "uses: WebID",
-    "builds on: OpenID Connect",
-    newSentence,
-  ])
+  expect(markedTexts(review, "ins")).toEqual(["uses", "builds on", addedWords])
   const change = review.find('[data-testid="note-correction-change"]')
   expect(change.text()).toContain("type: Note")
   expect(change.text()).toContain("url: https://solidproject.org/TR/oidc")
@@ -106,11 +104,11 @@ it("removes the mark of a line typed back and accepts the wording without that c
   const review = await mountReview()
   const edited = solidOidc("uses", "an instance of", newSentence)
   await review.find("textarea").setValue(edited)
-  expect(marked(review, "del")).toEqual([
-    "a specialization of: WebID",
-    oldSentence,
+  expect(markedTexts(review, "del")).toEqual([
+    "a specialization of",
+    removedWords,
   ])
-  expect(marked(review, "ins")).toEqual(["uses: WebID", newSentence])
+  expect(markedTexts(review, "ins")).toEqual(["uses", addedWords])
   await click(review, "Accept")
   expect(accept).toHaveBeenCalledWith({
     path: { correctionId: body.id },
@@ -138,11 +136,21 @@ const mountReviewAddingABlankLine = async () => {
 
 it("shows each line with no added characters", async () => {
   const review = await mountReviewAddingABlankLine()
-  const lines = review.find('[data-testid="note-correction-change"] div')
-  expect(
-    Array.from(lines.element.children, (line) => line.textContent)
-  ).toEqual(["first", "second", "changed", "", "third"])
-  expect(lines.element.textContent).toBe("firstsecondchangedthird")
+  const change = review.find('[data-testid="note-correction-change"]')
+  expect(changedLineTexts(change)).toEqual([
+    "first",
+    "second",
+    "changed",
+    "",
+    "third",
+  ])
+  expect(change.find("div").element.textContent).toBe("firstsecondchangedthird")
+})
+
+it("marks whole a removed line and the added lines that share no wording with it", async () => {
+  const review = await mountReviewAddingABlankLine()
+  expect(markedTexts(review, "del")).toEqual(["second"])
+  expect(markedTexts(review, "ins")).toEqual(["changed", ""])
 })
 
 it("visibly marks a blank added line", async () => {
@@ -176,14 +184,8 @@ it("marks the change against the content loaded after a stale acceptance", async
   await flushPromises()
   await click(review, "Load current content")
   await flushPromises()
-  expect(marked(review, "del")).toEqual([
-    "an instance of: OpenID Connect",
-    oldSentence,
-  ])
-  expect(marked(review, "ins")).toEqual([
-    "builds on: OpenID Connect",
-    newSentence,
-  ])
+  expect(markedTexts(review, "del")).toEqual(["an instance of", removedWords])
+  expect(markedTexts(review, "ins")).toEqual(["builds on", addedWords])
 })
 
 it.each([

@@ -98,7 +98,7 @@ is marked whole. Slice 2 replaces this.
 
 ### 2. Only the changed characters inside a changed line are marked
 Type: Behavior
-Status: planned
+Status: done
 Proof: the component tests for examples 2 and 4; slice 1's tests stay
 green, with example 1's body sentence now marked only where it differs;
 both typechecks.
@@ -127,9 +127,24 @@ its own proof. No slice-specific concern remains.
 ### G1. A changed line is marked whole
 Reported: slice 1 — "Interim as planned: a changed line is marked whole (slice 2)."
 Story clause: "Inside a changed line, only the changed characters are marked, not the whole line."
-Disposition: interim until slices 2
+Disposition: proved by slice 2: frontend/tests/components/conversation/ConversationInner.correctionChangeWithinLine.spec.ts, both tests, and the marks test in ConversationInner.correctionChange.spec.ts: a replaced line is shown once with only its differing characters marked
 
 ### G2. Mark colours were not looked at in a browser
 Reported: slice 1 — "The `block` and colour classes were not looked at in a browser."
 Story clause: "removed text and added text are marked, and unchanged text is not"
-Disposition: proved by slice 1: the marks are `<del>` and `<ins>` elements, which do not depend on colour; e2e_test/start/pageObjects/conversationAboutNotePage.ts `expectPendingContentCorrectionMarks` observes both visible in the running product with its stylesheet (evidence s1-fix-e2e.log)
+Disposition: proved by slice 1: the marks are `<del>` and `<ins>` elements, which do not depend on colour; e2e_test/start/pageObjects/conversationAboutNotePage.ts `expectPendingContentCorrectionOnlyAdds` observes the added text visible in the running product with its stylesheet (evidence s2-e2e.log)
+
+### G3. Common text shorter than 3 characters inside a changed stretch is marked too
+Reported: slice 2 — "a common run shorter than 3 characters is not kept. Without it one changed word is cut into many marks."
+Story clause: "Inside a changed line, only the changed characters are marked, not the whole line."
+Disposition: no user cost "sees what the correction would change in the current note, without comparing two full versions": at most two unchanged characters between two changes are shown as removed and added again, so the marks stay a correct and readable account of the change; path inspected: frontend/src/components/commons/changedLines.ts `changedCharacters`, whose only consumer is NoteCorrectionChange.vue, and acceptance sends the editor's wording, not the marks
+
+### G4. A heavily rewritten sentence shows several short marks
+Reported: slice 2 — "Chance 3-character matches split a rewritten sentence."
+Story clause: "Inside a changed line, only the changed characters are marked, not the whole line."
+Disposition: no user cost "sees what the correction would change in the current note, without comparing two full versions": the marks are exact, and the rest of the line stays unmarked; a fully rewritten sentence reads as several removed and added pieces instead of one, which costs some reading ease only inside that sentence (evidence s2-fix-timing.log fixture, slice-2-report.md)
+
+### G5. Two distant edits in one very long line are slow to compare
+Reported: slice 2 — "Two distant edits stay quadratic."
+Story clause: "The change follows the editor. When the author edits the wording, the marks update."
+Disposition: no user cost "sees what the correction would change in the current note, without comparing two full versions": the cost is the square of the text between the first and last edit of one line; measured 5 ms for a 600-character line (the size of the production paragraph the plan cites), 153 ms at 5000 characters and 534 ms at 10000 (evidence s2-fix-timing.log); a single edit costs under 1 ms at any of these sizes; path inspected: NoteCorrectionChange.vue recomputes on each editor change
