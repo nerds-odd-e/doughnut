@@ -9,7 +9,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 ## Taken
 
 - [Show the smallest change in a note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#source-and-smallest-change-in-corrections) — SEED-073#source-and-smallest-change-in-corrections ([plan](slice-plans/109-show-smallest-change-in-note-correction/PLAN.md))
-- [Quote a source the assistant found in a note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#assistant-quoted-source-in-corrections) — SEED-073#assistant-quoted-source-in-corrections ([plan](slice-plans/110-quote-assistant-found-source-in-note-correction/PLAN.md))
 
 ## Backlog list
 
