@@ -65,11 +65,15 @@ The isolated Cypress run passed all 11 scenarios across `recall_quiz_ai_question
 ### 3. Present the current input when an edit races with renewal
 
 Type: Behavior
-Status: planned
+Status: done
 
 An edit can land during the model call. Recheck the candidate against the current projected focus before returning it. A concurrent reusable prompt must satisfy the same selection rule as other candidates. Keep provider calls outside write locks. If a current question cannot be obtained, ordinary load recovery applies.
 
 **Proof.** Use the external model stub's before-response hook to commit an edit from “nine” to “ten” while a question is generated. The load or its retry must present a question derived from “ten”. Use the existing concurrent-insert example to distinguish reuse of a matching concurrent prompt from a stale one. Check persisted question/answer bindings and that the call holds no write transaction. [Atomic generation fixture](../../../backend/src/test/java/com/odde/donut/controllers/MemoryTrackerQuestionPersistenceControllerTest.java)
+
+**Accepted proof.** At baseline a stale competitor appeared and a current competitor was missed. `MemoryTrackerRecallPromptRaceControllerTest` commits the edit through the ordinary text controller inside the provider hook. In the stale case the initial load returns the existing unavailable result, and Retry requests the corrected authored input, presents its choices and grades the returned ID. In the matching case it returns the exact concurrently saved ID. Both observe the provider outside a transaction. The original failed-prompt rollback stays proved.
+
+The 158 focused cases passed. The independent refactor shared provider-input capture between the two recall controller tests and brought the existing 263-line freshness test under the size check. Its 10 focused cases passed. The earlier Cypress proof still applies to the compatible prompt and recovery boundaries. The full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` run passed 3,219 cases with 2 skipped. Evidence is in this checkout's Git evidence directory under `slice-3-`.
 
 ### 4. Reuse a batch question that still matches its generation input
 
@@ -124,7 +128,7 @@ The consumer probes resolved the sequencing concern during planning. The CLI fix
 ### G1. An edit can race synchronous generation
 Reported: slice 2 — "The final freshness check across a concurrent edit during generation belongs to slice 3."
 Story clause: "When the content differs, present a question generated from the current note."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: MemoryTrackerRecallPromptRaceControllerTest.retriesWithTheAcceptedEditWhenTheCompetingQuestionIsStale and reusesTheMatchingPromptInsertedAfterAnEditDuringGeneration
 
 ### G2. Matching batch questions need render-time provenance
 Reported: slice 2 — "Batch requests without provenance follow the unknown-source rule until slice 4."

@@ -5,8 +5,6 @@ import static com.odde.donut.controllers.dto.Randomization.RandomStrategy.last;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.Randomization;
@@ -18,7 +16,6 @@ import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.models.responses.StructuredResponseCreateParams;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.List;
@@ -27,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -107,8 +103,8 @@ class MemoryTrackerRecallPromptFreshnessControllerTest extends MemoryTrackerCont
       String correctChoice)
       throws Exception {
     assertThat(acceptedRevision(), not(equalTo(initialAcceptedRevision)));
-    assertThat(
-        generationInputs(1).getFirst(), containsString(markdown(ORIGINAL_SITE, ORIGINAL_BODY)));
+    String originalInput = openAi.requestInputTexts(1).getFirst();
+    assertThat(originalInput, containsString(markdown(ORIGINAL_SITE, ORIGINAL_BODY)));
     reloadTracker();
     serveQuestion(CURRENT_STEM, correctChoice);
 
@@ -120,9 +116,9 @@ class MemoryTrackerRecallPromptFreshnessControllerTest extends MemoryTrackerCont
         renewed.getMcq().getResponseChoices(),
         equalTo(List.of(correctChoice, "distractor1", "distractor2", "distractor3")));
     assertThat(controller.getRecallPrompt(tracker).getId(), equalTo(renewed.getId()));
-    List<String> inputs = generationInputs(2);
-    assertThat(inputs.getLast(), containsString("<focus_note>\nTitle: " + title + "\n"));
-    assertThat(inputs.getLast(), containsString(content));
+    String input = openAi.requestInputTexts(2).getLast();
+    assertThat(input, containsString("<focus_note>\nTitle: " + title + "\n"));
+    assertThat(input, containsString(content));
   }
 
   @ParameterizedTest
@@ -143,7 +139,7 @@ class MemoryTrackerRecallPromptFreshnessControllerTest extends MemoryTrackerCont
 
     assertThat(renewed.getId(), not(equalTo(legacy.getId())));
     assertThat(renewed.getMcq().getQuestionStem(), equalTo(CURRENT_STEM));
-    assertThat(generationInputs(1).getFirst(), containsString(ORIGINAL_BODY));
+    assertThat(openAi.requestInputTexts(1).getFirst(), containsString(ORIGINAL_BODY));
   }
 
   @Test
@@ -182,7 +178,7 @@ class MemoryTrackerRecallPromptFreshnessControllerTest extends MemoryTrackerCont
     assertThat(earlierHistory.getAnswer().getId(), equalTo(earlierAnswerId));
     assertThat(earlierHistory.getAnswer().getChoiceIndex(), equalTo(0));
     assertThat(earlierHistory.getMcq().getResponseChoices(), equalTo(earlierChoices));
-    assertThat(generationInputs(3).getLast(), containsString(CORRECTED_BODY));
+    assertThat(openAi.requestInputTexts(3).getLast(), containsString(CORRECTED_BODY));
   }
 
   @Test
@@ -249,15 +245,5 @@ class MemoryTrackerRecallPromptFreshnessControllerTest extends MemoryTrackerCont
   private void serveQuestion(String stem, String correctChoice) {
     openAi.stubStructuredResponse(
         makeMe.aGeneratedMcq().stem(stem).correctAnswer(correctChoice).please());
-  }
-
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  private List<String> generationInputs(int expectedCalls) {
-    ArgumentCaptor<StructuredResponseCreateParams<?>> requests =
-        ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-    verify(openAi.responseService(), times(expectedCalls)).create(requests.capture());
-    return requests.getAllValues().stream()
-        .map(request -> request.rawParams().input().flatMap(input -> input.text()).orElseThrow())
-        .toList();
   }
 }
