@@ -15,6 +15,7 @@ import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import jakarta.persistence.EntityManager;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -74,8 +75,33 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
   @Test
   void shouldRecycleMostRecentUnansweredMcqPrompt() throws UnexpectedNoAccessRightException {
     MemoryTracker tracker = ownedTracker();
+    Note focus = tracker.getNote();
+    var old = Timestamp.valueOf("2025-01-01 08:00:00");
+    makeMe
+        .aRecallPrompt()
+        .forMemoryTracker(tracker)
+        .withMcq(makeMe.anMcq().generatedFrom(focus).createdAt(old).inMemoryPlease())
+        .questionGeneratedTime(old)
+        .please();
+    RecallPrompt mostRecent =
+        makeMe
+            .aRecallPrompt()
+            .forMemoryTracker(tracker)
+            .withMcq(makeMe.anMcq().generatedFrom(focus).createdAt(old).inMemoryPlease())
+            .questionGeneratedTime(old)
+            .please();
     makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
-    RecallPrompt mostRecent = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
+    makeMe
+        .aRecallPrompt()
+        .forMemoryTracker(tracker)
+        .withMcq(makeMe.anMcq().generatedFrom(focus).contested().inMemoryPlease())
+        .please();
+    makeMe
+        .aRecallPrompt()
+        .forMemoryTracker(tracker)
+        .withMcq(makeMe.anMcq().generatedFrom(focus).inMemoryPlease())
+        .answerChoiceIndex(0)
+        .please();
     makeMe.entityPersister.flush();
 
     assertThat(controller.getRecallPrompt(tracker).getId(), equalTo(mostRecent.getId()));
@@ -145,7 +171,12 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
   @Test
   void unansweredMcqPromptCarriesSolutionOmittedMcq() throws Exception {
     MemoryTracker tracker = ownedTracker();
-    RecallPrompt existing = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
+    RecallPrompt existing =
+        makeMe
+            .aRecallPrompt()
+            .forMemoryTracker(tracker)
+            .withMcq(makeMe.anMcq().generatedFrom(tracker.getNote()).inMemoryPlease())
+            .please();
     Integer persistedAnswerIndex = existing.getMcq().getCorrectAnswerIndex();
     assertThat(persistedAnswerIndex, notNullValue());
 

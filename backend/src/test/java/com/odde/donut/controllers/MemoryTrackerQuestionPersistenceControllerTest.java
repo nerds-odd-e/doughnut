@@ -147,7 +147,12 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
     AtomicReference<RecallPrompt> concurrentPrompt = new AtomicReference<>();
     openAiMock.onBeforeCreate(() -> {
       openAiMock.onBeforeCreate(null);
-      concurrentPrompt.set(makeMe.aRecallPrompt().forMemoryTracker(tracker).please());
+      concurrentPrompt.set(
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(tracker)
+              .withMcq(makeMe.anMcq().generatedFrom(tracker.getNote()).inMemoryPlease())
+              .please());
     });
     openAiMock.stubStructuredResponse(makeMe.aGeneratedMcq().please());
     long questionsBefore = questionCount();

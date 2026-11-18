@@ -47,17 +47,16 @@ public class RecallPromptService {
       return null;
     }
 
-    // First check if there's an existing unanswered recall prompt for this note and memory tracker
-    RecallPrompt existingPrompt = findExistingUnansweredRecallPrompt(memoryTracker);
+    RecallPrompt existingPrompt =
+        recallPromptRepository
+            .findUnansweredMcqForFocus(
+                memoryTracker.getId(), FocusNoteFingerprint.of(memoryTracker.getNote()))
+            .orElse(null);
     if (existingPrompt != null) {
       return existingPrompt;
     }
 
     return generateNewRecallPrompt(memoryTracker);
-  }
-
-  private RecallPrompt findExistingUnansweredRecallPrompt(MemoryTracker memoryTracker) {
-    return recallPromptRepository.findUnansweredByMemoryTracker(memoryTracker.getId()).orElse(null);
   }
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {

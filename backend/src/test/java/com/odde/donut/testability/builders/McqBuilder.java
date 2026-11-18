@@ -1,6 +1,8 @@
 package com.odde.donut.testability.builders;
 
 import com.odde.donut.entities.Mcq;
+import com.odde.donut.entities.Note;
+import com.odde.donut.services.FocusNoteFingerprint;
 import com.odde.donut.testability.EntityBuilder;
 import com.odde.donut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -63,6 +65,11 @@ public class McqBuilder extends EntityBuilder<Mcq> {
 
   public McqBuilder contextSeed(Long seed) {
     this.entity.setContextSeed(seed);
+    return this;
+  }
+
+  public McqBuilder generatedFrom(Note focus) {
+    entity.setFocusNoteFingerprint(FocusNoteFingerprint.of(focus));
     return this;
   }
 }

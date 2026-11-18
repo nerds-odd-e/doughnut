@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// Re-checks for an unanswered prompt inside the write transaction to avoid a concurrent duplicate.
+// Rechecks for a matching prompt inside the write transaction before saving a new one.
 @Service
 public class RecallPromptPersister {
   private final RecallPromptRepository recallPromptRepository;
@@ -25,7 +25,9 @@ public class RecallPromptPersister {
   @Transactional
   public RecallPrompt persistRecallPromptForMcq(Mcq mcq, MemoryTracker memoryTracker) {
     RecallPrompt existingPrompt =
-        recallPromptRepository.findUnansweredByMemoryTracker(memoryTracker.getId()).orElse(null);
+        recallPromptRepository
+            .findUnansweredMcqForFocus(memoryTracker.getId(), mcq.getFocusNoteFingerprint())
+            .orElse(null);
     if (existingPrompt != null) {
       return existingPrompt;
     }

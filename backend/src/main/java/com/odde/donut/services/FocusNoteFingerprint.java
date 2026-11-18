@@ -8,10 +8,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 /** Identifies the authored focus used to generate a recall question. */
-final class FocusNoteFingerprint {
+public final class FocusNoteFingerprint {
   private FocusNoteFingerprint() {}
 
-  static String of(Note note) {
+  public static String of(Note note) {
     MessageDigest digest = sha256();
     updateInt(digest, note.getId());
     updateText(digest, note.getTitle());

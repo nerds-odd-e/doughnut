@@ -39,11 +39,11 @@ and judging otherwise poor questions are deferred.
 | C15 | When web recall prefetched the observatory card behind another card and the correction to 10 is accepted before the learner reaches it, the learner first sees the current question. | slice 5 | |
 | C16 | The web learner can answer the MCQ presented from the corrected note. | slice 5 | |
 | C17 | The CLI learner can answer the MCQ presented from the corrected note. | slice 7 | |
-| C18 | Renewal keeps the learner’s tracker. | slice 2 | |
-| C19 | Renewal keeps the learner’s earlier answers. | slice 2 | |
-| C20 | Renewal keeps the learner’s schedule. | slice 2 | |
-| C21 | Saving the corrected note requires no learner action for renewal. | slice 2 | |
-| C22 | The learner waits for renewal only when recall needs a current question. | slice 2 | |
+| C18 | Renewal keeps the learner’s tracker. | slice 2 | observed: MemoryTrackerRecallPromptFreshnessControllerTest.failedRenewalAndRetryPreservePriorRecallState checks the reloaded prompt is on the original tracker. gradesTheIssuedPromptAgainstItsOriginalChoicesAfterRenewal checks that tracker on the issued prompt's answer. |
+| C19 | Renewal keeps the learner’s earlier answers. | slice 2 | observed: MemoryTrackerRecallPromptFreshnessControllerTest.failedRenewalAndRetryPreservePriorRecallState reads the earlier answer ID, choice and original choices after renewal. |
+| C20 | Renewal keeps the learner’s schedule. | slice 2 | observed: MemoryTrackerRecallPromptFreshnessControllerTest.failedRenewalAndRetryPreservePriorRecallState checks the exact due timestamp and single prior log ID after a failed load and again after successful retry. |
+| C21 | Saving the corrected note requires no learner action for renewal. | slice 2 | observed: MemoryTrackerRecallPromptFreshnessControllerTest.replacesWaitingQuestionAfterAnAcceptedMarkdownEdit and replacesWaitingQuestionAfterAnAcceptedTitleEdit observe an accepted revision advance while the model call count remains one. |
+| C22 | The learner waits for renewal only when recall needs a current question. | slice 2 | observed: MemoryTrackerRecallPromptFreshnessControllerTest.replacesWaitingQuestionAfterAnAcceptedMarkdownEdit and replacesWaitingQuestionAfterAnAcceptedTitleEdit observe two calls for distinct authored sources and reuse the renewed ID on an exact match. MemoryTrackerRecallPromptControllerTest.shouldRecycleMostRecentUnansweredMcqPrompt proves old matching reuse. |
 | C23 | A focus-note edit while the learner is reading a displayed web question leaves its displayed choices intact. | slice 5 | |
 | C24 | A focus-note edit while the learner is reading a displayed CLI question leaves its displayed choices intact. | slice 7 | |
 | C25 | After a focus-note edit while the web learner is reading, submission is graded against the original key for the prompt they saw. | slice 5 | |

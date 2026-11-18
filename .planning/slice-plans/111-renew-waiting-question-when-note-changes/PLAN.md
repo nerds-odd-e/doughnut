@@ -52,11 +52,15 @@ The independent refactor unified focus hydration for request construction and re
 ### 2. Offer a question made from the current focus note
 
 Type: Behavior
-Status: planned
+Status: done
 
 A learner asks for an MCQ after an accepted title, body or property edit. Reuse an eligible question with current evidence, or generate and return a current one for the same tracker. Treat a missing fingerprint as unknown on demand. Keep older prompts and their keys available by ID. Batch results without input evidence use this same rule until slice 4.
 
 **Proof.** At the normal tracker controller, store a question, publish an edit, then load recall. Capture the new focus sent for generation and assert the new returned prompt and choices. Distinguish a corrected fact, a punctuation-only edit, and a property change. A second load with matching input reuses its prompt. A legacy row is renewed on demand. Answer a previously issued ID after renewal and read back its original question, answer and Grade. Loading and retrying alone leave due time, log and prior answers intact. Stub a failed generation and check the existing unavailable response and successful retry.
+
+**Accepted proof.** The controller cases used real accepted Git revisions for body, punctuation, properties and title changes. They observed the new authored focus in the provider request, a new prompt and its choices, and reuse on the next exact match. They renewed two legacy payload shapes, reused an old known match ahead of newer ineligible candidates, preserved the tracker, due timestamp and prior answers through failure and retry, and graded a previously issued prompt against its original choices. The 72-case focused run passed. The independent refactor separated the title, Markdown, recovery and older-answer witnesses. Its eight controller cases passed and production and Cypress inputs kept the same behavior.
+
+The isolated Cypress run passed all 11 scenarios across `recall_quiz_ai_question`, `property_memory_tracker`, `ambiguous_question_exclusion`, `browse_answer_and_notes_while_recalling`, `export_highlighted_property` and `question_contest`. Shared pre-generation reaches the same ordinary server selection. The linked-worktree runner refused the archived interactive `cli_recall.feature`. Commit `7ede3d4fa4c` keeps that feature ignored and names Vitest as the terminal harness. Slices 6–7 own that maintained proof for CLI presentation and answers. The full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` run passed 3,217 cases with 2 skipped. Evidence is in the checkout's Git evidence directory under `slice-2-`.
 
 ### 3. Present the current input when an edit races with renewal
 
@@ -114,3 +118,25 @@ On opening an MCQ, request the server-selected prompt. The CLI uses that stem, c
 ## Concerns
 
 The consumer probes resolved the sequencing concern during planning. The CLI fixture change directly precedes the behavior it enables. Seven slices use one focus-content comparison. No remaining slice-specific concern requires a further refinement pass.
+
+## Story obligations
+
+### G1. An edit can race synchronous generation
+Reported: slice 2 — "The final freshness check across a concurrent edit during generation belongs to slice 3."
+Story clause: "When the content differs, present a question generated from the current note."
+Disposition: receiving slice 3
+
+### G2. Matching batch questions need render-time provenance
+Reported: slice 2 — "Batch requests without provenance follow the unknown-source rule until slice 4."
+Story clause: "Reuse a question made from matching content."
+Disposition: receiving slice 4
+
+### G3. A warmed web question needs foreground selection
+Reported: slice 2 — "Warmed web MCQs still use the existing display timing."
+Story clause: "The learner first sees the current question."
+Disposition: receiving slice 5
+
+### G4. CLI recall still selects MCQs from prompt history
+Reported: slice 2 — "The legacy MCQ fallback in the CLI still selects from history ahead of a server request."
+Story clause: "At first presentation in web or CLI recall, compare the authored title, body and properties of the focus note with the content used to generate the waiting MCQ."
+Disposition: receiving slice 7
