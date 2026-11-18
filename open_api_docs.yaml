@@ -5397,6 +5397,10 @@ components:
           type: string
         reason:
           type: string
+        sourceQuote:
+          type: string
+        sourceUrl:
+          type: string
         baseRevision:
           type: string
         decision:
@@ -6846,6 +6850,10 @@ components:
         content:
           type: string
         reason:
+          type: string
+        sourceQuote:
+          type: string
+        sourceUrl:
           type: string
       required:
       - content

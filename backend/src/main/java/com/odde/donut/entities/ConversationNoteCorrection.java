@@ -51,6 +51,12 @@ public class ConversationNoteCorrection extends EntityIdentifiedByIdOnly {
   @Column(columnDefinition = "TEXT", nullable = false)
   private String reason;
 
+  @Column(name = "source_quote", columnDefinition = "TEXT")
+  private String sourceQuote;
+
+  @Column(name = "source_url", columnDefinition = "TEXT")
+  private String sourceUrl;
+
   @Column(name = "base_revision")
   private String baseRevision;
 

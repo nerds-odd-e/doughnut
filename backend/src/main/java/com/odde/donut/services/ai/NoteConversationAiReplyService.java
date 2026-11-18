@@ -72,6 +72,14 @@ public class NoteConversationAiReplyService {
           correction.setField(field);
           correction.setProposedValue(arguments.path(valueProperty).asText());
           correction.setReason(arguments.path("reason").asText(reply.content()));
+          String sourceQuote = arguments.path("sourceQuote").asText(null);
+          String sourceUrl = arguments.path("sourceUrl").asText("");
+          if (field == ConversationNoteCorrection.Field.CONTENT
+              && sourceQuote != null
+              && (sourceUrl.startsWith("http://") || sourceUrl.startsWith("https://"))) {
+            correction.setSourceQuote(sourceQuote);
+            correction.setSourceUrl(sourceUrl);
+          }
           correction.setBaseRevision(baseRevision);
           corrections.add(correction);
         } catch (JsonProcessingException e) {

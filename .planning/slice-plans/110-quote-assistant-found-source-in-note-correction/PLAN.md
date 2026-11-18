@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#assistant-quoted-source-in-corrections
 **Source:** [selected story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#assistant-quoted-source-in-corrections)
+**Source review:** [source review](source-review.md)
 
 ## Goal and scope
 
@@ -107,7 +108,7 @@ the source in slice 3.
 
 ### 1. A content correction keeps the quote and address the assistant gives
 Type: Behavior
-Status: planned
+Status: done
 Proof: the three controller tests above; the existing tests in
 `ConversationAiReplyControllerTest` stay green; the migration runs on the
 test database; the generated API client is regenerated
@@ -173,3 +174,13 @@ in `packages/donut-test-fixtures` gains the source for the tests.
 Slice-plan refinement was not needed: three slices, each one outcome with
 its own proof, and each premise is observed. No slice-specific concern
 remains.
+
+## Execution
+
+- Mode: Story Branch; checkout `.worktrees/quote-a-source-the-assistant-found-in-a-note-cor`,
+  branch `claude/quote-a-source-the-assistant-found-in-a-note-cor`; remote
+  `origin`, trunk `main`. Claim 0a8decd4ee accepted on `main`.
+- Slice 1 proof: `ConversationAiReplyControllerTest`
+  `keepsTheQuotedWebSourceOfAContentCorrection` (5 rows), seen failing
+  before the change. The migration is `V300000361`. `docs/database-erd.md`
+  lists key columns only, so it has no change.

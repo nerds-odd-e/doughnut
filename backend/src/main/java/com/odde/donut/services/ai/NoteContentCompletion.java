@@ -25,6 +25,13 @@ public class NoteContentCompletion {
   @JsonPropertyDescription("Why this correction helps the user, grounded in the conversation.")
   public String reason;
 
+  @JsonPropertyDescription(
+      "One passage copied word for word from the source page that supports this correction.")
+  public String sourceQuote;
+
+  @JsonPropertyDescription("The web address of the page the sourceQuote was copied from.")
+  public String sourceUrl;
+
   public NoteContentCompletion(String content) {
     this.content = content;
   }
