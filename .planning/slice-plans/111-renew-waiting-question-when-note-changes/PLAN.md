@@ -12,6 +12,8 @@ GitHub Actions `ci.yml` (donut CI) is observed from this execution checkout. Coo
 
 Slice 1 was accepted and registered on the story branch at `9ea958ddbf5ef712d9663b0e2a97a577cc118813`. During slice 2, its CI attempt hit the same shared canvas setup failure in two jobs. The [diagnosis and proof](diagnosis-canvas-apt-source.md) own the repair. Slice 2 remains planned.
 
+Slices 2 and 3 were accepted and registered at `8fe775e98aa921fc02f18982beb0252a296280ae` and `e669f8a5f3b610f5c77652d9deaf92e2c12b7888`. The latter exposed an existing browser-isolation startup race during slice 4. The [diagnosis and proof](diagnosis-mock-serving-port-collision.md) cover its repair. Slice 4 remains planned.
+
 ## Goal and scope
 
 The learner first sees an MCQ generated from the current authored title, body and properties of its focus note. A punctuation edit counts. Matching source content permits reuse even after a long interval. Once the card appears, its prompt ID, choices and key stay together through answering. Apply this to ordinary web and CLI MCQ recall, including stored, on-demand and batch questions. The focus note can be edited through any accepted publication path. Spelling, linked-note invalidation, semantic question quality and scheduling policy have separate owners.

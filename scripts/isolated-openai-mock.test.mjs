@@ -1,11 +1,36 @@
 import assert from 'node:assert/strict'
+import { createServer } from 'node:net'
 import { test } from 'node:test'
+import { allocatePrivateOpenAiMockPorts } from './isolated-mountebank-mock-ports.mjs'
 import {
   SHARED_MOUNTEBANK_MANAGEMENT_PORT,
   SHARED_OPEN_AI_SERVING_PORT,
   startPrivateOpenAiMock,
 } from './isolated-openai-mock.mjs'
 import { getListenerPids } from './sut-listener-pids.mjs'
+import { closeListeningServer } from './sut-e2e-port-listen.mjs'
+
+test('private OpenAI startup keeps its serving port while management starts', async (t) => {
+  const peer = createServer()
+  t.after(() => closeListeningServer(peer))
+
+  const mock = await startPrivateOpenAiMock({
+    allocatePortsFn: async (allocation) => {
+      const ports = await allocatePrivateOpenAiMockPorts(allocation)
+      await new Promise((resolve, reject) => {
+        peer.once('error', (error) => {
+          if (error.code === 'EADDRINUSE') resolve()
+          else reject(error)
+        })
+        peer.listen(ports.servingPort, '127.0.0.1', resolve)
+      })
+      return ports
+    },
+  })
+  t.after(() => mock.stop())
+
+  await mock.verifyOwnership()
+})
 
 test('startPrivateOpenAiMock owns management and serving listeners then stops cleanly', async (t) => {
   const mock = await startPrivateOpenAiMock({
@@ -61,4 +86,24 @@ test('startPrivateOpenAiMock refuses when the mock child exits before ownership'
       }),
     /exited before management port|Refusing bind\/start failure/
   )
+})
+
+test('private OpenAI startup releases its reservations when spawning throws', async (t) => {
+  const ports = await allocatePrivateOpenAiMockPorts()
+  t.after(() => ports.releasePorts())
+
+  await assert.rejects(
+    () =>
+      startPrivateOpenAiMock({
+        allocatePortsFn: async () => ports,
+        spawnFn: () => {
+          throw new Error('cannot spawn mock child')
+        },
+      }),
+    /cannot spawn mock child/
+  )
+
+  for (const port of [ports.managementPort, ports.servingPort]) {
+    assert.ok(!(await getListenerPids(port)).includes(process.pid))
+  }
 })
