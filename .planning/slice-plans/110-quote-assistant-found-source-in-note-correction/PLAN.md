@@ -76,6 +76,7 @@ from searching when it proposes nothing; storing the source in the note.
 | The request builder accepts the web search tool and the tool-call limit beside the class-based tools, and the existing conversation tests and E2E still pass | slice 2 | 2026-11-18 at 41d1ee7e1f in this worktree, scratch edit adding `WebSearchTool` and `maxToolCalls(5)` to the builder, since reverted: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --tests '*ConversationAiRequestBuilderTest' --tests '*ConversationAiReplyControllerTest' --tests '*OpenAiTransactionalRatchetTest'` → 15 tests, 0 failures; `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_content/note_content_completion.feature` → 2 passing | settled |
 | A clicked link ending in `#:~:text=` and the encoded quote opens the page at the quote, also for Japanese | slice 3, example 2 | 2026-11-18, Chrome on the owner's Mac, links built with the rule above and clicked: Solid-OIDC specification scrolled to the sentence (scroll position 2532 of 18013); kotobank 「〘 他動詞 ザ上一 〙」 in view; 教育出版, a 100-character Japanese sentence, in view | settled for Chrome. A navigation started by a script does not scroll, so an automated browser test cannot observe the scroll; the tests observe the link's address |
 | A correction is read by the web review only | slices 1 and 3 | 2026-11-18 at 41d1ee7e1f: search for `ConversationNoteCorrection` and `getConversationCorrections` over `cli/src`, `mcp-server/src`, `frontend`, `packages` → only the generated client, `packages/donut-test-fixtures` and the conversation components and their tests | settled |
+| The production model accepts the two source parts as nullable (`type: [string, null]`) and gives null for both when it finds no source | slice 2, story example 4 | Not observed. The OpenAI library lists every tool part as required, so the optional form is nullable; the paid try's parts were optional in a raw request. 2026-11-18: `ConversationAiRequestBuilderTest` `theContentCorrectionToolTakesAnOptionalQuotedSourceAndItsAddress` observes the schema sent; `ConversationAiReplyControllerTest` observes that null, a blank or a non-web address stores no source | unverified remainder: the real model's answer to this request. Checked by a paid call the owner authorizes, or by the first real correction after release |
 
 ## Outside-in proof ownership
 
@@ -125,7 +126,7 @@ replaces this.
 
 ### 2. The assistant searches the web before it proposes a content correction
 Type: Behavior
-Status: planned
+Status: done
 Proof: the request builder test above; `ConversationAiRequestBuilderTest`,
 `ConversationAiReplyControllerTest` and `OpenAiTransactionalRatchetTest`
 stay green; the E2E feature
@@ -184,3 +185,13 @@ remains.
   `keepsTheQuotedWebSourceOfAContentCorrection` (5 rows), seen failing
   before the change. The migration is `V300000361`. `docs/database-erd.md`
   lists key columns only, so it has no change.
+- Slice 2 proof: `ConversationAiRequestBuilderTest` (web search tool, limit
+  of 5 tool calls, instruction, nullable source parts), seen failing before
+  the change; 164 backend tests on conversations and `services.ai` pass;
+  the E2E feature `note_content_completion.feature` passed with the search
+  tool and instruction, before the source parts became nullable (its mock
+  does not read tool schemas).
+- Follow-up named by the refactor pass, not done: assertions bound to a
+  developer message's position remain in
+  `RecallConversationReasoningControllerTest` (first test) and
+  `RecallConversationExclusionProposalControllerTest`.

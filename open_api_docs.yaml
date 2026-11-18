@@ -6852,9 +6852,13 @@ components:
         reason:
           type: string
         sourceQuote:
-          type: string
+          type:
+          - string
+          - "null"
         sourceUrl:
-          type: string
+          type:
+          - string
+          - "null"
       required:
       - content
     TitleReplacement:

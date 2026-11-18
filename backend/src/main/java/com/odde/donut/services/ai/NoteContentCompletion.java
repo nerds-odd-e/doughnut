@@ -3,6 +3,7 @@ package com.odde.donut.services.ai;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NoArgsConstructor;
 
 @JsonClassDescription(
@@ -27,9 +28,11 @@ public class NoteContentCompletion {
 
   @JsonPropertyDescription(
       "One passage copied word for word from the source page that supports this correction.")
+  @Schema(nullable = true)
   public String sourceQuote;
 
   @JsonPropertyDescription("The web address of the page the sourceQuote was copied from.")
+  @Schema(nullable = true)
   public String sourceUrl;
 
   public NoteContentCompletion(String content) {

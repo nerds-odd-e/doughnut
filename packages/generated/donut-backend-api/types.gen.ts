@@ -1501,8 +1501,8 @@ export type DummyForGeneratingTypes = {
 export type NoteContentCompletion = {
     content: string;
     reason?: string;
-    sourceQuote?: string;
-    sourceUrl?: string;
+    sourceQuote?: string | null;
+    sourceUrl?: string | null;
 };
 
 export type TitleReplacement = {

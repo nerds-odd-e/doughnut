@@ -10,7 +10,10 @@ import com.odde.donut.entities.User;
 import com.odde.donut.services.focusContext.FocusContextConstants;
 import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.responses.EasyInputMessage;
+import com.openai.models.responses.FunctionTool;
+import com.openai.models.responses.ResponseCreateParams;
 import com.openai.models.responses.ResponseInputItem;
+import com.openai.models.responses.Tool;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,18 +57,19 @@ class ConversationAiRequestBuilderTest extends SpringTestBase {
 
       List<ResponseInputItem> items = inputItems(conversation);
 
-      assertThat(items, hasSize(5));
-      assertThat(easyInput(items, 0).role(), equalTo(EasyInputMessage.Role.DEVELOPER));
-      assertThat(easyInput(items, 1).role(), equalTo(EasyInputMessage.Role.DEVELOPER));
       assertThat(
-          easyInputText(items, 1),
-          containsString("Make tool calls when user asks to update the note."));
-      assertThat(easyInput(items, 2).role(), equalTo(EasyInputMessage.Role.USER));
-      assertThat(easyInputText(items, 2), equalTo("First question"));
-      assertThat(easyInput(items, 3).role(), equalTo(EasyInputMessage.Role.ASSISTANT));
-      assertThat(easyInputText(items, 3), equalTo("AI response"));
-      assertThat(easyInput(items, 4).role(), equalTo(EasyInputMessage.Role.USER));
-      assertThat(easyInputText(items, 4), equalTo("Follow up question"));
+          developerMessageTexts(items),
+          hasItem("Make tool calls when user asks to update the note."));
+      List<EasyInputMessage> exchange = conversationMessages(items);
+      assertThat(
+          exchange.stream().map(EasyInputMessage::role).toList(),
+          contains(
+              EasyInputMessage.Role.USER,
+              EasyInputMessage.Role.ASSISTANT,
+              EasyInputMessage.Role.USER));
+      assertThat(
+          exchange.stream().map(message -> message.content().asTextInput()).toList(),
+          contains("First question", "AI response", "Follow up question"));
     }
 
     @Test
@@ -89,9 +93,61 @@ class ConversationAiRequestBuilderTest extends SpringTestBase {
 
       List<ResponseInputItem> items = inputItems(conversation);
 
-      assertThat(items, hasSize(2));
-      assertThat(easyInput(items, 0).role(), equalTo(EasyInputMessage.Role.DEVELOPER));
-      assertThat(easyInput(items, 1).role(), equalTo(EasyInputMessage.Role.DEVELOPER));
+      assertThat(conversationMessages(items), empty());
+    }
+
+    @Test
+    void aNoteConversationSearchesTheWebBeforeProposingAContentCorrection() {
+      Conversation conversation = makeMe.aConversation().forANote(makeMe.aNote().please()).please();
+
+      assertSearchesTheWebForASource(conversation);
+    }
+
+    @Test
+    void aRecallConversationSearchesTheWebBeforeProposingAContentCorrection() {
+      Conversation conversation =
+          makeMe
+              .aConversation()
+              .forARecallPrompt(
+                  makeMe
+                      .aRecallPrompt()
+                      .forMemoryTracker(makeMe.aMemoryTrackerFor(makeMe.aNote().please()).please())
+                      .please())
+              .please();
+
+      assertSearchesTheWebForASource(conversation);
+    }
+
+    @Test
+    void theContentCorrectionToolTakesAnOptionalQuotedSourceAndItsAddress() {
+      Conversation conversation = makeMe.aConversation().forANote(makeMe.aNote().please()).please();
+
+      FunctionTool contentTool =
+          params(conversation).tools().orElseThrow().stream()
+              .filter(Tool::isFunction)
+              .map(Tool::asFunction)
+              .filter(tool -> tool.name().equals(NoteContentCompletion.class.getSimpleName()))
+              .findFirst()
+              .orElseThrow();
+
+      assertThat(
+          contentTool._parameters().toString(),
+          allOf(
+              containsString("sourceQuote={type=[string, null]"),
+              containsString("sourceUrl={type=[string, null]"),
+              containsString("content={type=string"),
+              containsString("reason={type=string")));
+    }
+
+    private void assertSearchesTheWebForASource(Conversation conversation) {
+      ResponseCreateParams params = params(conversation);
+
+      assertThat(params.tools().orElseThrow().stream().filter(Tool::isWebSearch).count(), is(1L));
+      assertThat(params.maxToolCalls().orElseThrow(), is(5L));
+      assertThat(
+          developerMessageTexts(params.input().flatMap(i -> i.response()).orElseThrow()),
+          hasItem(
+              "Before you propose a correction to the note content, search the web for a source for the corrected claim. If the note has a url property, open that page first. In the tool call give sourceQuote, one passage copied word for word from the source page in the page's own language, and sourceUrl, the address of that page. When you find no source that supports the correction, leave both out."));
     }
 
     private ConversationAiRequestBuilder builder() {
@@ -99,12 +155,29 @@ class ConversationAiRequestBuilderTest extends SpringTestBase {
           focusContextRetrievalService, focusContextMarkdownRenderer);
     }
 
+    private ResponseCreateParams params(Conversation conversation) {
+      return builder().buildResponseCreateParams(conversation, "gpt-4.1-mini");
+    }
+
     private List<ResponseInputItem> inputItems(Conversation conversation) {
-      return builder()
-          .buildResponseCreateParams(conversation, "gpt-4.1-mini")
-          .input()
-          .flatMap(i -> i.response())
-          .orElseThrow();
+      return params(conversation).input().flatMap(i -> i.response()).orElseThrow();
+    }
+
+    private List<EasyInputMessage> conversationMessages(List<ResponseInputItem> items) {
+      return easyInputs(items).stream()
+          .filter(message -> !message.role().equals(EasyInputMessage.Role.DEVELOPER))
+          .toList();
+    }
+
+    private List<String> developerMessageTexts(List<ResponseInputItem> items) {
+      return easyInputs(items).stream()
+          .filter(message -> message.role().equals(EasyInputMessage.Role.DEVELOPER))
+          .map(message -> message.content().asTextInput())
+          .toList();
+    }
+
+    private List<EasyInputMessage> easyInputs(List<ResponseInputItem> items) {
+      return items.stream().map(item -> item.easyInputMessage().orElseThrow()).toList();
     }
 
     private String firstDeveloperMessageBody(Conversation conversation) {

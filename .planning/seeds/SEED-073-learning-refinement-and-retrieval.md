@@ -235,7 +235,7 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
   There an agent with web access found the sources. A source the author
   supplies tells the author nothing new, so the owner chose on 2026-11-18
   to have the assistant find it, as a story after
-  [showing the smallest change](#source-and-smallest-change-in-corrections).
+  [showing the smallest change](../../docs/recall-help.md#reviewed-note-corrections).
 - **Owner decisions (2026-11-18).** The quote and link are their own parts
   of the correction, and the link opens the page at the quoted words. A
   correction without a source is still offered and says that no source

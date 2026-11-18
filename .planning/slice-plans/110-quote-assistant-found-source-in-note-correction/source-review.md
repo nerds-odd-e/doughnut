@@ -17,11 +17,15 @@ note"; the effort hypothesis. Reading notes: promise 1 has no key example;
 qualification, not a rule rejecting more sources; key example 5 spans 3
 and 6a.
 
+Trunk amendment absorbed 2026-11-18 (trunk c05c42ccbc): in Why, the link
+target of "showing the smallest change" changed. The reviewer's input held
+the sentence as plain text, so the reviewed source text is unchanged.
+
 ## Commitments
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| 1 | "When the assistant proposes a content correction it first searches the web for a source for the corrected claim." Content corrections only; the search comes first; the author does not supply the source. (Goal; Required behavior 1; Why) | slice 2 | |
+| 1 | "When the assistant proposes a content correction it first searches the web for a source for the corrected claim." Content corrections only; the search comes first; the author does not supply the source. (Goal; Required behavior 1; Why) | slice 2 | observed: backend/src/test/java/com/odde/donut/services/ai/ConversationAiRequestBuilderTest.java aNoteConversationSearchesTheWebBeforeProposingAContentCorrection and aRecallConversationSearchesTheWebBeforeProposingAContentCorrection: the request holds one web search tool, a limit of 5 tool calls and the search-first instruction; the assistant's search itself was observed in the paid try of 2026-11-18 |
 | 2a | The correction carries one passage copied word for word from the source, as its own part, when a source was found. (Required behavior 1; Owner decisions; Goal) | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/ConversationAiReplyControllerTest.java keepsTheQuotedWebSourceOfAContentCorrection row 1: getSourceQuote equals the passage given in the tool call |
 | 2b | The correction carries the address of the page, as its own part, when a source was found. (Required behavior 1; Owner decisions) | slice 1 | observed: backend/src/test/java/com/odde/donut/controllers/ConversationAiReplyControllerTest.java keepsTheQuotedWebSourceOfAContentCorrection row 1: getSourceUrl equals the https address given in the tool call |
 | 3a | The quote is shown with the correction, apart from the reason, to an author deciding on a content correction with a source. (Goal; Required behavior 2; Key examples 1, 3) | slice 3 | |

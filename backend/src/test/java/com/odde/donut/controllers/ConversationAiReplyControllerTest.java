@@ -116,6 +116,7 @@ class ConversationAiReplyControllerTest extends ConversationMessageControllerTes
       value = {
         "NoteContentCompletion|content|,\"sourceQuote\":\"A passage, word for word\",\"sourceUrl\":\"https://example.com/page\"|A passage, word for word|https://example.com/page",
         "NoteContentCompletion|content|''||",
+        "NoteContentCompletion|content|,\"sourceQuote\":null,\"sourceUrl\":null||",
         "NoteContentCompletion|content|,\"sourceQuote\":\"A passage\",\"sourceUrl\":\"javascript:alert(1)\"||",
         "NoteContentCompletion|content|,\"sourceUrl\":\"https://example.com/page\"||",
         "TitleReplacement|newTitle|,\"sourceQuote\":\"A passage\",\"sourceUrl\":\"https://example.com/page\"||"
