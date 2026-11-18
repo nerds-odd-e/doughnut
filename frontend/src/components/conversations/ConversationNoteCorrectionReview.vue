@@ -10,10 +10,11 @@
         <p v-if="loadFailed" class="text-error">{{ CURRENT_NOTE_LOAD_FAILURE }}</p>
         <button v-if="loadFailed" class="daisy-btn daisy-btn-outline mt-2" @click="reload">Retry loading current content</button>
         <template v-if="observedNoteRealm">
+          <NoteCorrectionChange v-if="correction.field !== 'TITLE' && authorMayAccept(observedNoteRealm)" :current="observedNoteRealm.note.content ?? ''" :proposed="reviewedValue" />
           <h4>Current {{ correction.field === 'TITLE' ? 'title' : 'content' }}</h4>
           <p v-if="correction.field === 'TITLE'">{{ observedNoteRealm.note.noteTopology.title }}</p>
           <div v-else :class="RICH_CONTENT_PROSE" v-html="markdownizer.markdownToHtml(observedNoteRealm.note.content)" />
-          <template v-if="correction.decision === 'PENDING' && user && !observedNoteRealm.notebookRealm.readonly">
+          <template v-if="authorMayAccept(observedNoteRealm)">
             <details>
               <summary>Original proposal</summary>
               <p v-if="correction.field === 'TITLE'">{{ correction.proposedValue }}</p>
@@ -70,6 +71,7 @@ import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NoteRealmLoader from "@/components/notes/NoteRealmLoader.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import NoteCorrectionChange from "./NoteCorrectionChange.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import markdownizer from "@/components/form/markdownizer"
@@ -108,6 +110,11 @@ const referenceHandling = ref<TitleRenameReferenceHandling | "">("")
 const deciding = ref(false)
 const decisionFailure = ref("")
 const noteRefreshFailed = ref(false)
+
+const authorMayAccept = (noteRealm: NoteRealm) =>
+  props.correction.decision === "PENDING" &&
+  props.user &&
+  !noteRealm.notebookRealm.readonly
 
 const requiresReferenceHandling = (noteRealm: NoteRealm) =>
   props.correction.field === "TITLE" &&

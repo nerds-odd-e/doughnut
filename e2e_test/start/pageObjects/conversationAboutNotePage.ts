@@ -91,6 +91,14 @@ export class ConversationAboutNotePage {
     return this
   }
 
+  expectPendingContentCorrectionOnlyAdds(added: string) {
+    cy.get('[data-testid="note-correction-change"]').within(() => {
+      cy.get('ins').should('be.visible').and('have.text', added)
+      cy.get('del').should('not.exist')
+    })
+    return this
+  }
+
   revisePendingContentCorrection(content: string) {
     cy.get('[data-testid="conversation-note-correction"]').within(() => {
       cy.findByLabelText('Proposed Content').clear().type(content, { delay: 0 })

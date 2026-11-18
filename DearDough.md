@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 504. Removed numbers are never reused.
+- Highest allocated local number: 506. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -671,3 +671,31 @@ Before the owner's lesson day, a fresh reader answered each lesson's open-blank 
   - Evidence: [split and lessons](.planning/seeds/short-recall-lessons-evidence.md#split-and-lessons-2026-11-18) "Practice check"; plan 105 slice 2 Learning.
   - Observed effect: ambiguous practice items were fixed before the owner's 9-minute sitting, at the cost of two reader runs.
   - Inference: a useful practice for owner-facing study material.
+
+## DD-505 — A plan named a character comparison without settling its rule or cost
+
+The plan decided "by line, then by character inside changed lines" and verified premises about content shape and test routes, but none about the comparison itself. The implementer's first attempt (the existing line comparison's rule on characters) marked stray letters of an appended sentence as removed and failed; the replacement added a 3-character minimum the plan did not name. The accepted return then cost about 0.5 s per editor keystroke on a 5000-character line, found only because the coordinator measured it.
+
+### Occurrences
+- Execution: SEED-073#source-and-smallest-change-in-corrections, plan 109 (recoverable at 9fff453ac3), first commit e4040e0562
+  - Timestamp: 2026-11-18T15:10+08:00 (approximate; slice 2 return, same day as the run records)
+  - Tool: Claude Code
+  - Model: claude-fable-5-2
+  - Open Dough release: 0.3.106
+  - Evidence: plan 109 "Decisive premises" and "Current decisions"; evidence `s2-green-frontend` (exit 1, abandoned attempt), `s2-fix-timing.log`; plan 109 Story obligations G3–G5; commit 8f7bc71dab `frontend/src/components/commons/changedLines.ts`.
+  - Observed effect: one failed attempt inside the slice, one coordinator return for cost, and three obligations (G3–G5) closed as no user cost after delivery instead of being decided in the plan.
+  - Inference: a scratch run of the candidate rule on the plan's own two production examples, with a timing, would probably have settled the rule before execution. Possibly the same family as ODF-074; not merged because the premise here was absent, not checked by proxy.
+
+## DD-506 — A rendered-text defect passed its tests because they read each mark, not the whole display
+
+Slice 1's component rendered a stray space after every line inside a `whitespace-pre-wrap` container. Its tests read the text of each `<del>` and `<ins>` and passed. The coordinator found the defect by reading the template at acceptance and returned the slice; the correction added an assertion on the container's whole text.
+
+### Occurrences
+- Execution: SEED-073#source-and-smallest-change-in-corrections, plan 109 (recoverable at 9fff453ac3), first commit e4040e0562
+  - Timestamp: 2026-11-18T14:58+08:00 (approximate; slice 1 return)
+  - Tool: Claude Code
+  - Model: claude-fable-5-2
+  - Open Dough release: 0.3.106
+  - Evidence: evidence `s1-fix-red-change-spec.log` ("expected 'first \nsecond \nchanged \n \nthird \n' to be 'firstsecondchangedthird'"); `frontend/tests/components/conversation/ConversationInner.correctionChange.spec.ts` "shows each line with no added characters".
+  - Observed effect: one return within the slice budget (6.1 of 15 active minutes in total); the defect did not reach a commit.
+  - Inference: reading the product diff at acceptance, not only the return's observations, caught it; a useful practice for rendered output.

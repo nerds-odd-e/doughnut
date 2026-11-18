@@ -115,104 +115,6 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 - **Effort hypothesis.** S. Owner: about 20 minutes of check. Elapsed: to
   2026-11-27 for the recommendation, to 2026-12-16 for the recall count.
 
-<a id="source-and-smallest-change-in-corrections"></a>
-
-### Show the smallest change in a note correction
-
-**Identity:** SEED-073#source-and-smallest-change-in-corrections
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/109-show-smallest-change-in-note-correction/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8efecabf7419b912ae71e8fdf1a63dc8effca4e9b323c5000c15a368ea220df1","plan":"c60a032b827630e98c910da396ee5d5cc4ea1d1732a336cd950f49f85834ffe6"}}
-```
-
-- **Goal.** A note author deciding on a
-  [reviewed note correction](../../docs/recall-help.md#reviewed-note-corrections)
-  to a note's content sees what the correction would change in the current
-  note, without comparing two full versions. The author can then accept
-  with confidence and notices a change nobody asked for. This serves the
-  wider aim of turning recall misses into reviewed note corrections.
-- **Why.** In the [validation](source-backed-note-edits-evidence.md#recommendation-2026-11-18)
-  the smallest change altered the owner's decision in 4 of 5 cases. One
-  correction in production also changed a property nobody asked about,
-  which a whole-content review makes easy to miss.
-- **Owner decision (2026-11-18).** The story was split. This story shows
-  the change. The quoted source is
-  [its own story](#assistant-quoted-source-in-corrections).
-- **Required behavior.**
-  - For a pending content correction that the author may accept, the
-    review shows the change between the current note content and the
-    wording in the editor: removed text and added text are marked, and
-    unchanged text is not.
-  - Note properties are part of the content, so a changed, added or
-    removed property is marked like any other change.
-  - Inside a changed line, only the changed characters are marked, not
-    the whole line. This also holds for text without spaces, such as
-    Japanese.
-  - The change follows the editor. When the author edits the wording, the
-    marks update. After **Load current content**, the change is shown
-    against the note as just loaded.
-  - When the wording equals the current content, the review says there is
-    no change.
-  - The full current content, the original proposal and the editor stay
-    available.
-- **Out of scope.**
-  - Title corrections. A title is one line, and the current and proposed
-    titles are already shown together.
-  - Corrections already accepted or declined, and the view of a reader who
-    cannot accept. They keep today's display.
-  - Accepting or declining each change separately. The author removes an
-    unwanted change in the editor.
-  - Making the assistant propose smaller edits. The story makes extra
-    changes visible; it does not prevent them.
-  - A question made from the note before and after the edit. The
-    validation said to narrow and retest it first.
-  - Carried from the validation: offering a correction without being
-    asked; a note that is only a pointer to a source; help for spelling
-    attempts; other authors, and learners who cannot edit the note.
-    Renewing stored questions after an edit is its
-    [own story](#renew-waiting-question-when-note-changes).
-- **Key examples.**
-  1. Solid OIDC, as proposed on 2026-11-18: the property `a specialization
-     of: WebID` becomes `uses: WebID`, `an instance of: OpenID Connect`
-     becomes `builds on: OpenID Connect`, and one body sentence is
-     reworded → the author sees those two property lines and the reworded
-     words marked. `type`, `url` and `a part of` are not marked.
-  2. Prisoner's dilemma: the body is one long paragraph on one line, and
-     the correction replaces one sentence and adds another → only those
-     words are marked. The rest of the paragraph is not.
-  3. In example 1 the author did not ask for the `an instance of` change
-     and types the old line back into the editor → that mark disappears,
-     and Accept publishes the wording without that change.
-  4. A Japanese body sentence gains 「最後に「か」がつくと」 in the middle of a
-     line → the added characters are marked, not the whole line.
-  5. Another edit changes the note while the correction is pending. Accept
-     is refused as stale and the author chooses **Load current content** →
-     the change is shown against the note as it now reads.
-  6. The author edits the wording until it equals the current note → the
-     review says there is no change.
-- **Interaction.** For a pending content correction the change is what the
-  author reads first. The editor, the full current content and the
-  original proposal are still there, but the author no longer has to
-  compare them by eye.
-- **Found during refinement (2026-11-18).**
-  - The product already compares two texts line by line, side by side, in
-    the refine-note preview and the undo confirmation. Reusing that view
-    unchanged is not enough: in the two corrections accepted in production
-    (revisions 5ed4e72e and fa5efa4d, read from the notebooks' Git history)
-    the body change sat inside one paragraph that is a single line, so a
-    line comparison marks the whole paragraph. Property changes sat on
-    their own lines.
-  - The review already loads the current content and holds the proposal,
-    so the change can be worked out in the browser. Nothing new is stored
-    and acceptance stays as it is
-    ([ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)).
-    No Accepted decision is in conflict.
-  - Strongest doubt: in the validation an agent wrote the smallest edit
-    itself. In the product the assistant may rewrite more than asked, as
-    in example 1. Showing the change does not make the edit small; it
-    lets the author see and undo the extra. The purpose, an easier and
-    safer decision, still holds.
-- **Effort hypothesis.** S, medium confidence.
-
 <a id="assistant-quoted-source-in-corrections"></a>
 
 ### Quote a source the assistant found in a note correction
@@ -235,7 +137,7 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
   There an agent with web access found the sources. A source the author
   supplies tells the author nothing new, so the owner chose on 2026-11-18
   to have the assistant find it, as a story after
-  [showing the smallest change](#source-and-smallest-change-in-corrections).
+  [showing the smallest change](../../docs/recall-help.md#reviewed-note-corrections).
 - **Owner decisions (2026-11-18).** The quote and link are their own parts
   of the correction, and the link opens the page at the quoted words. A
   correction without a source is still offered and says that no source

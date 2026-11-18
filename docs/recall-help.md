@@ -110,6 +110,15 @@ changes are discarded when the conversation is reopened. Readers can decline
 a proposal under the conversation's existing access rules, while acceptance
 requires ordinary note edit rights.
 
+For a pending content correction that the author may accept, the review
+first shows the change between the current content and the wording in the
+editor: removed text is struck through, added text is highlighted, and
+unchanged text, including note properties, is plain. When a line is
+replaced by a similar line, only the characters that differ inside it are
+marked; this is the same for every language. The change follows
+the editor and **Load current content**. When the wording equals the
+current content, the review says there is no change.
+
 Acceptance publishes the reviewed content or title and retains its confirmed decision,
 reviewed wording, and Git revision together. Open note shows the subject note.
 Reopening the conversation keeps that original receipt, even after a later

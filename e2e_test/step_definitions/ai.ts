@@ -123,15 +123,29 @@ Given(
   }
 )
 
+const thisRunsProposal = () =>
+  fetchOpenAiMockIsolationProof().then(
+    (proof) => proof?.suggestion ?? 'It is a vigorous city.'
+  )
+
 Then("I should see this run's pending content correction", () => {
-  fetchOpenAiMockIsolationProof().then((proof) => {
+  thisRunsProposal().then((proposal) => {
     start
       .assumeConversationAboutNotePage()
-      .expectPendingContentCorrection(
-        proof?.suggestion ?? 'It is a vigorous city.'
-      )
+      .expectPendingContentCorrection(proposal)
   })
 })
+
+Then(
+  "the review should mark only what this run's proposal adds to {string}",
+  (current: string) => {
+    thisRunsProposal().then((proposal) => {
+      start
+        .assumeConversationAboutNotePage()
+        .expectPendingContentCorrectionOnlyAdds(proposal.slice(current.length))
+    })
+  }
+)
 
 When(
   'I revise the pending content correction to {string}',

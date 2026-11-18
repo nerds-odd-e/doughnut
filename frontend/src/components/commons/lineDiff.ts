@@ -51,7 +51,7 @@ const computeLCS = (current: string[], old: string[]): LCSMatch[] => {
   return result
 }
 
-const computeLineDiff = (
+export const computeLineDiff = (
   currentText: string,
   oldText: string
 ): { currentLines: DiffLine[]; oldLines: DiffLine[] } => {

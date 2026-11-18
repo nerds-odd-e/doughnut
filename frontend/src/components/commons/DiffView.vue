@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
 import DiffPane from "./DiffPane.vue"
-import { buildPairedDiffRows } from "./diffViewPairedRows"
+import { buildPairedDiffRows } from "./lineDiff"
 
 const props = defineProps({
   current: { type: String, required: true },

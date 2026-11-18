@@ -2,6 +2,7 @@ import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
+import type { DOMWrapper } from "@vue/test-utils"
 import { resetInstance } from "@tests/helpers/aiReplyEventSourceTracker"
 import makeMe from "donut-test-fixtures/makeMe"
 import { vi } from "vitest"
@@ -60,3 +61,9 @@ export const mountConversation = (
     .withCurrentUser(user)
     .withProps({ conversation, user })
     .mount()
+
+export const markedTexts = (review: DOMWrapper<Element>, mark: "del" | "ins") =>
+  review.findAll(mark).map((marked) => marked.element.textContent)
+
+export const changedLineTexts = (change: DOMWrapper<Element>) =>
+  Array.from(change.find("div").element.children, (line) => line.textContent)
