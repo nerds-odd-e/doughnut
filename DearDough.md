@@ -677,7 +677,7 @@ Before the owner's lesson day, a fresh reader answered each lesson's open-blank 
 The plan decided "by line, then by character inside changed lines" and verified premises about content shape and test routes, but none about the comparison itself. The implementer's first attempt (the existing line comparison's rule on characters) marked stray letters of an appended sentence as removed and failed; the replacement added a 3-character minimum the plan did not name. The accepted return then cost about 0.5 s per editor keystroke on a 5000-character line, found only because the coordinator measured it.
 
 ### Occurrences
-- Execution: SEED-073#source-and-smallest-change-in-corrections, plan 109, first commit e4040e0562
+- Execution: SEED-073#source-and-smallest-change-in-corrections, plan 109 (recoverable at 9fff453ac3), first commit e4040e0562
   - Timestamp: 2026-11-18T15:10+08:00 (approximate; slice 2 return, same day as the run records)
   - Tool: Claude Code
   - Model: claude-fable-5-2
@@ -691,7 +691,7 @@ The plan decided "by line, then by character inside changed lines" and verified 
 Slice 1's component rendered a stray space after every line inside a `whitespace-pre-wrap` container. Its tests read the text of each `<del>` and `<ins>` and passed. The coordinator found the defect by reading the template at acceptance and returned the slice; the correction added an assertion on the container's whole text.
 
 ### Occurrences
-- Execution: SEED-073#source-and-smallest-change-in-corrections, plan 109, first commit e4040e0562
+- Execution: SEED-073#source-and-smallest-change-in-corrections, plan 109 (recoverable at 9fff453ac3), first commit e4040e0562
   - Timestamp: 2026-11-18T14:58+08:00 (approximate; slice 1 return)
   - Tool: Claude Code
   - Model: claude-fable-5-2

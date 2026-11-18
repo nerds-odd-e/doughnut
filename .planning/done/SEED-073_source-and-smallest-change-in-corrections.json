@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#source-and-smallest-change-in-corrections",
+  "title": "Show the smallest change in a note correction",
+  "completedAt": "2026-11-18T07:49:18.619Z",
+  "developer": "Terry Yin",
+  "agent": "joey-chan",
+  "host": "claude",
+  "model": "fable"
+}
