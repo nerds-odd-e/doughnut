@@ -129,6 +129,13 @@ conversation and do not change the recall attempt or schedule. Title acceptance
 uses ordinary title validation. When renaming a linked note, choose whether to
 update or keep visible wiki reference text before accepting.
 
+A content correction shows, right after its reason, the passage the assistant
+quoted from a source it found on the web and a link to that source. The link
+opens in a new tab at the quoted passage and the browser marks it, where the
+browser and the page allow; otherwise the source opens at its start. The quote
+and link stay with the correction after it is accepted or declined. When the
+assistant found no source, the review says "No source was found."
+
 Accept becomes available after the current note loads. If that read fails,
 retry loading current content; your edited wording stays available. The review
 keeps the content it loaded while you decide what to submit.

@@ -790,6 +790,8 @@ export type ConversationNoteCorrection = {
     field?: 'CONTENT' | 'TITLE';
     proposedValue?: string;
     reason?: string;
+    sourceQuote?: string;
+    sourceUrl?: string;
     baseRevision?: string;
     decision?: 'PENDING' | 'DECLINED' | 'ACCEPTED';
     reviewedValue?: string;
@@ -1499,6 +1501,8 @@ export type DummyForGeneratingTypes = {
 export type NoteContentCompletion = {
     content: string;
     reason?: string;
+    sourceQuote?: string | null;
+    sourceUrl?: string | null;
 };
 
 export type TitleReplacement = {

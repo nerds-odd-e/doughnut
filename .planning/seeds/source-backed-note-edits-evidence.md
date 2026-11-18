@@ -2,8 +2,7 @@
 
 Evidence from validating source-backed note edits after recall misses
 (SEED-073, 2026-11-18). The follow-ups are
-[showing the smallest change](../../docs/recall-help.md#reviewed-note-corrections)
-and [quoting a source the assistant found](SEED-073-learning-refinement-and-retrieval.md#assistant-quoted-source-in-corrections).
+[showing the smallest change and quoting a source the assistant found](../../docs/recall-help.md#reviewed-note-corrections).
 
 ## Fault cases (2026-11-18)
 
@@ -250,6 +249,10 @@ as in the two real tries. The scratch script is deleted.
   and output at $10.00 per 1M tokens. If opening a page and finding in a
   page are also charged as searches, $0.66. A correction cost $0.02 to
   $0.09.
+
+The product now quotes the source without a server check that the quote
+is on the page; a strict check would have wrongly failed 2 of these 10. A
+check becomes worth a story if invented quotes are seen in use.
 
 Limits: the request held the note alone, without the linked notes that
 production adds. Two runs a case; output varies between runs. The author's

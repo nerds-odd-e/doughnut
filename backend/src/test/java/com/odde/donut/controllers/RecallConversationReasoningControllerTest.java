@@ -118,17 +118,19 @@ class RecallConversationReasoningControllerTest extends ConversationMessageContr
 
     controller.getAiReply(reopened);
 
-    List<ResponseInputItem> history = sentInput().subList(4, 7);
+    List<EasyInputMessage> history =
+        sentInput().stream()
+            .map(item -> item.easyInputMessage().orElseThrow())
+            .filter(message -> !message.role().equals(EasyInputMessage.Role.DEVELOPER))
+            .toList();
     assertThat(
-        history.stream().map(item -> item.easyInputMessage().orElseThrow().role()).toList(),
+        history.stream().map(EasyInputMessage::role).toList(),
         contains(
             EasyInputMessage.Role.USER,
             EasyInputMessage.Role.ASSISTANT,
             EasyInputMessage.Role.USER));
     assertThat(
-        history.stream()
-            .map(item -> item.easyInputMessage().orElseThrow().content().asTextInput())
-            .toList(),
+        history.stream().map(message -> message.content().asTextInput()).toList(),
         contains(
             "I thought co-movement showed a cause",
             "Tentative explanation",

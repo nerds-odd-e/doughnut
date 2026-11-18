@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Quote a source the assistant found in a note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#assistant-quoted-source-in-corrections) — SEED-073#assistant-quoted-source-in-corrections ([plan](slice-plans/110-quote-assistant-found-source-in-note-correction/PLAN.md))
-
 ## Backlog list
 
 - [Renew a waiting question when its note changes](seeds/SEED-073-learning-refinement-and-retrieval.md#renew-waiting-question-when-note-changes) — SEED-073#renew-waiting-question-when-note-changes

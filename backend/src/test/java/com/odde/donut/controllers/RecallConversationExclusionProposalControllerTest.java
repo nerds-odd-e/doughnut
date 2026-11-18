@@ -15,6 +15,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.testability.OpenAiResponseStreamMocker;
 import com.openai.models.responses.ResponseCreateParams;
+import com.openai.models.responses.Tool;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,7 +95,10 @@ class RecallConversationExclusionProposalControllerTest
   }
 
   private List<String> toolNames(ResponseCreateParams sent) {
-    return sent.tools().orElseThrow().stream().map(tool -> tool.asFunction().name()).toList();
+    return sent.tools().orElseThrow().stream()
+        .filter(Tool::isFunction)
+        .map(tool -> tool.asFunction().name())
+        .toList();
   }
 
   private String developerMessage(ResponseCreateParams sent, int index) {

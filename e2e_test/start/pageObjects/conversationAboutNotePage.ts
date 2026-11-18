@@ -74,6 +74,16 @@ export class ConversationAboutNotePage {
     return this
   }
 
+  expectCorrectionSource(quote: string, address: string) {
+    cy.get('[data-testid="correction-source"]').within(() => {
+      cy.findByText(quote).should('be.visible')
+      cy.findByRole('link', { name: address })
+        .should('have.attr', 'href')
+        .and('match', new RegExp(`^${address}#:~:text=`))
+    })
+    return this
+  }
+
   closeConversation() {
     cy.findByRole('button', { name: 'Close dialog' }).click()
     waitUntilAppIsNotBusy()

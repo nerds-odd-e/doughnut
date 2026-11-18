@@ -699,3 +699,30 @@ Slice 1's component rendered a stray space after every line inside a `whitespace
   - Evidence: evidence `s1-fix-red-change-spec.log` ("expected 'first \nsecond \nchanged \n \nthird \n' to be 'firstsecondchangedthird'"); `frontend/tests/components/conversation/ConversationInner.correctionChange.spec.ts` "shows each line with no added characters".
   - Observed effect: one return within the slice budget (6.1 of 15 active minutes in total); the defect did not reach a commit.
   - Inference: reading the product diff at acceptance, not only the return's observations, caught it; a useful practice for rendered output.
+## DD-507 — A premise settled by a raw request missed the schema the library builds
+
+The plan settled "the model accepts web search with the correction tools" with raw HTTP requests whose two new tool parts were optional, and covered the Java library only by mocked tests. The library lists every tool part as required, so the delivered request first forced the assistant to give a quote and address. The implementer reported it; the slice was returned and the parts became nullable, the library's optional form. The real model has not been sent that request.
+
+### Occurrences
+- Execution: SEED-073#assistant-quoted-source-in-corrections, plan 110, first commit 0439d21faf
+  - Timestamp: unknown (2026-11-18, Asia/Singapore)
+  - Tool: Claude Code
+  - Model: claude-fable-5-2
+  - Open Dough release: 0.3.106
+  - Evidence: plan 110 Decisive premises rows 1, 2 and 5 (before-cleanup commit); commit 3f3f3aaaff `NoteContentCompletion` `@Schema(nullable = true)`; `ConversationAiRequestBuilderTest` `theContentCorrectionToolTakesAnOptionalQuotedSourceAndItsAddress`.
+  - Observed effect: one returned slice (about 2 more active minutes, 8 minutes elapsed) and one unverified remainder carried to the owner, because a paid call needs the owner's go.
+  - Inference: when a premise is observed through a proxy, the row should name which request fields the proxy and the product build differently, not only that both build "the same request fields".
+
+## DD-508 — A named sibling landed on trunk between two slices of a story branch
+
+The plan named a sibling story that edits the same review component. It landed on trunk after slice 2. The freshness check reported the story text amendment, and the named-sibling rule asks for reconciliation before done, but the guidance names no step that brings trunk into a story branch before integration. The coordinator briefed the slice 3 implementer with the sibling's exact edit positions, kept the edits apart, and left the merge to integration.
+
+### Occurrences
+- Execution: SEED-073#assistant-quoted-source-in-corrections, plan 110, first commit 0439d21faf
+  - Timestamp: unknown (2026-11-18, Asia/Singapore)
+  - Tool: Claude Code
+  - Model: claude-fable-5-2
+  - Open Dough release: 0.3.106
+  - Evidence: trunk c05c42ccbc; `deliver-the-change.md` "Check named siblings"; plan 110 Execution notes (before-cleanup commit); slice 3 commit 71339b3122.
+  - Observed effect: slice 3 was proved without the sibling's code; its specs, typechecks and E2E feature had to run again after the merge.
+  - Inference: uncertain whether a merge of trunk into the story branch before the dependent slice is intended; the publication guidance describes merges only for integration.

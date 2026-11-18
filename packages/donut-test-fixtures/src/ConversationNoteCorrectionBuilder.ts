@@ -53,6 +53,12 @@ class ConversationNoteCorrectionBuilder extends Builder<ConversationNoteCorrecti
     return this
   }
 
+  source(quote: string, url: string) {
+    this.data.sourceQuote = quote
+    this.data.sourceUrl = url
+    return this
+  }
+
   declinedBy(user: User, decidedAt: string) {
     this.data.decision = 'DECLINED'
     this.data.decidedBy = user

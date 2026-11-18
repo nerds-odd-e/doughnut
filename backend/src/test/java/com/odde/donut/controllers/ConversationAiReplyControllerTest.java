@@ -110,6 +110,36 @@ class ConversationAiReplyControllerTest extends ConversationMessageControllerTes
         noteRepository.findById(note.getId()).orElseThrow().getContent(), equalTo("original"));
   }
 
+  @ParameterizedTest
+  @CsvSource(
+      delimiter = '|',
+      value = {
+        "NoteContentCompletion|content|,\"sourceQuote\":\"A passage, word for word\",\"sourceUrl\":\"https://example.com/page\"|A passage, word for word|https://example.com/page",
+        "NoteContentCompletion|content|''||",
+        "NoteContentCompletion|content|,\"sourceQuote\":null,\"sourceUrl\":null||",
+        "NoteContentCompletion|content|,\"sourceQuote\":\"A passage\",\"sourceUrl\":\"javascript:alert(1)\"||",
+        "NoteContentCompletion|content|,\"sourceUrl\":\"https://example.com/page\"||",
+        "TitleReplacement|newTitle|,\"sourceQuote\":\"A passage\",\"sourceUrl\":\"https://example.com/page\"||"
+      })
+  void keepsTheQuotedWebSourceOfAContentCorrection(
+      String tool, String property, String sourceArguments, String quote, String url)
+      throws Exception {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    Conversation conversation = controller.startConversationAboutNote(note, "Clarify");
+    new OpenAiResponseStreamMocker(officialClient)
+        .withToolCall(
+            tool, "{\"" + property + "\":\"One\",\"reason\":\"Reason\"" + sourceArguments + "}")
+        .mockStreamResponse();
+
+    controller.getAiReply(conversation);
+    entityManager.flush();
+    entityManager.clear();
+    Conversation fresh = conversationRepository.findById(conversation.getId()).orElseThrow();
+    ConversationNoteCorrection correction = controller.getConversationCorrections(fresh).getFirst();
+    assertThat(correction.getSourceQuote(), equalTo(quote));
+    assertThat(correction.getSourceUrl(), equalTo(url));
+  }
+
   @Test
   void repeatedMockCallIdentityRetainsSeparateResponses() throws Exception {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();

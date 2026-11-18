@@ -4,6 +4,7 @@
     <p>{{ correction.note?.noteTopology.title }}</p>
     <p class="daisy-badge">{{ correction.decision === 'PENDING' ? 'Pending review' : correction.decision === 'DECLINED' ? 'Declined' : 'Accepted' }}</p>
     <div :class="RICH_CONTENT_PROSE" v-html="markdownizer.markdownToHtml(correction.reason)" />
+    <NoteCorrectionSource v-if="correction.field === 'CONTENT'" :correction="correction" />
     <NoteRealmLoader v-if="correction.note" :note-id="correction.note.id" recover-load-failure @loaded="observedNoteRealm = $event">
       <template #default="{ fresh, loading, loadFailed, reload }">
         <ContentLoader v-if="loading" />
@@ -67,6 +68,7 @@ import {
   TITLE_RENAME_REFERENCE_PROMPT,
   TITLE_RENAME_REFERENCE_SAVE_OPTIONS,
 } from "@/components/notes/core/titleRenameReferenceChoices"
+import NoteCorrectionSource from "@/components/conversations/NoteCorrectionSource.vue"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NoteRealmLoader from "@/components/notes/NoteRealmLoader.vue"
