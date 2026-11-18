@@ -1,28 +1,22 @@
-## Test Data And Service Mocking
+## E2E test data and service mocks
 
-- Use Given steps to set up test data.
-- Mock external services, such as OpenAI, for reliable tests.
-- Use tags to indicate when mocks are required.
-- Keep mock responses consistent with real service behavior.
-- Store mock data separately from test code.
-- Clean up test data after each test.
-- Use data tables for complex test data.
+Donut's notebook Given accepts a Cucumber data table and injects the notebook
+in one batch. For example:
 
 ```gherkin
 Given I have a notebook "Geometry set" with notes:
-  | Title  |
-  | Shape  |
-  | Square |
+  | Title  | Folder |
+  | Square | Shapes |
 ```
 
-Square is placed under Shape when the notebook is created in one inject batch. Do not add a `Folder` column; see testability inject ordering.
+The optional `Folder` column supplies a notebook-local path. Separate nested
+folder segments with `/`. Testability creates the folder path and places the
+note there.
 
-```typescript
-Given("OpenAI assistant will reply below for user messages in a stream run:", (data: DataTable) => {
-  mock_services
-    .openAi()
-    .stubCreateThread("thread-123")
-    .createThreadAndStubMessages("thread-123", data.hashes())
-})
-```
-
+For scenarios that need an OpenAI substitute, use `@usingMockedOpenAiService`
+and the Responses helpers. Conversation replies can use the
+`OpenAI will reply below for user messages:` Given in
+[ai.ts](../../../../e2e_test/step_definitions/ai.ts), which passes the
+scenario's reply table to `stubConversationAiReplyStream`. The
+[Cucumber hooks](../../../../e2e_test/step_definitions/hook.ts) set up and
+restore the tagged mock.

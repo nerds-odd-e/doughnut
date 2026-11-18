@@ -24,7 +24,9 @@
       },
       {
         "path": "backend/src/test/java",
-        "sources": [{ "include": ["**/*Test.java"], "syntax": "java" }],
+        "sources": [
+          { "include": ["**/*Test.java", "**/*Tests.java"], "syntax": "java" }
+        ],
         "makeMe": true
       },
       {

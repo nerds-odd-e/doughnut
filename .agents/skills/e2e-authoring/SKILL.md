@@ -9,12 +9,11 @@ paths:
 
 Use this skill when writing or modifying E2E tests, Cypress/Cucumber feature files, step definitions, page objects, or E2E assertions. For OCR-specific canvas assertions, use the `e2e-ocr` skill.
 
-## Select browser test guidance
+## Select test guidance
 
-For browser authoring, extension and implicated refactoring, follow
-[Dough Page Objects](../dough-page-objects/SKILL.md) with the owning feature
-source path. Its shared entry selector decides whether to load the convention;
-MakeMe is an independent selection. Other entries retain their practice.
+Follow [Open Dough test guidance](../dough-execute-plan/references/test-entry-rules.md)
+for boundaries and observable cases. Select [Dough Page Objects](../dough-page-objects/SKILL.md)
+using the owning browser feature.
 
 When only a Cucumber step, page object or other support source changes, trace
 its changed operation through callers and step wording to the owning browser
@@ -22,9 +21,8 @@ feature(s), and select those feature paths. Do this even when `--changed`
 lists only support sources: they do not themselves match the feature entry.
 Carry each edited support path, owning feature path and caller/step evidence
 into the implementation or refactor brief. For new support, identify the
-intended owning feature before applying the convention. Follow the shared
-unresolved-rule handling if ownership, selection or selected guidance is
-unresolved; leave only convention-dependent work unperformed.
+intended owning feature before applying the convention. Report any unresolved
+feature owner in the brief and follow the shared unresolved-rule handling.
 
 For example, `conversation.ts`'s “I start a conversation about the note …
 inviting AI …” step belongs to
@@ -35,10 +33,7 @@ at `conversationAboutNotePage.ts`, trace
 feature. Run the shared selector for the feature; keep the original support
 path and this owner evidence in the brief. No feature edit is required.
 
-Apply browser conventions only to browser work. A terminal-only CLI feature
-may select `pageObjects` through its entry but keeps the
-[CLI helpers](#cli-terminal-helpers). A frontend unit test's Chromium runtime
-alone does not select page objects.
+Terminal-only CLI features use the [CLI helpers](#cli-terminal-helpers).
 
 ## Running and debugging
 
@@ -57,35 +52,15 @@ checkout origins, focused commands, profiling and debugging.
 - `e2e_test/start/pageObjects/cli/` contains CLI page objects with the `cli.xxx` prefix.
 - `e2e_test/support/` contains support files.
 
-## Focus on Behavior
-
-**Behavior** (external behavior) has 3 parts: **pre-condition**, **trigger**, and **post-condition**. Each part is:
-
-  * externally observable
-  * of user value
-  * typically involves state change.
-
-Avoid e2e test that is only about the presentation of a state and having no state change after setup / given.
-
 ## Gherkin
 
-- Write features in Gherkin syntax focused on behaviors that has business value.
 - Group related features in domain-specific folders.
-- Name feature files and titles by domain/capability, such as `note_creation.feature` or `spaced_repetition.feature`. Never name them by planning sequence number or delivery order.
-- Use tags, such as `@usingMockedOpenAiService` or `@mockBrowserTime`, to control test execution.
-- Keep scenarios focused and concise.
-- Prefer `Scenario Outline` with an `Examples` table when the path and assertion focus are the same and only data varies. Keep separate scenarios when observable behavior differs, with the condition in the step wording (for example slash command, plain line, Enter alone or ESC).
+- Use `Scenario Outline` and an `Examples` table to parameterize a scenario.
+- Use `@mockBrowserTime` when the scenario needs to control browser time.
 
 ## Step Definitions
 
-- Use TypeScript and reuse steps where practical.
-- Use parameter types for complex objects.
-
-```typescript
-When("I start a conversation about the note {string}", (noteTopology: string) => {
-  start.jumpToNotePage(noteTopology).startAConversationAboutNote()
-})
-```
+Use TypeScript and Cucumber parameter types for complex objects.
 
 ## Page Objects
 
@@ -129,68 +104,29 @@ Then("I should see {string} in the non-interactive output", (expected: string) =
 
 Product loading UI that means unfinished work marks itself with `data-app-busy` (`LoadingThinBar` from `apiCallWithLoading`, `ContentLoader` for pending page data, `LoadingModal` for `blockUi`). See [frontend loading UI](../frontend/SKILL.md#api).
 
-E2E waits with `waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts` (also `start.waitUntilAppIsNotBusy()`):
-
-```typescript
-import { waitUntilAppIsNotBusy } from '../pageBase'
-
-cy.findByRole('button', { name: 'Submit' }).click()
-waitUntilAppIsNotBusy()
-```
-
-Rules of thumb:
-
-- Call `waitUntilAppIsNotBusy()` in the page object **on the action that starts loading**, before the next step that needs that work’s result.
-- Prefer asserting a **user-visible** success outcome when the product provides one; use the waiter for “busy cleared,” not as a substitute for success.
-- Do not use hardcoded waits (`cy.wait(ms)`) for this.
-- Do not skip the wait and rely on a later navigation’s loading check alone — that races when the next step does not go through busy UI.
-- Network `cy.intercept` / `cy.wait('@…')` is optional; it is not the documented default stand-in for this product/E2E pair.
+When the busy marker is the relevant completion signal, call
+`waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts` in the page object
+before the next step that needs the completed work. When the scenario observes
+pending work, return control after the trigger so it can make that observation
+and release any held response before the page object checks for completion. Follow
+the [shared synchronization guidance](../dough-page-objects/references/convention.md)
+for scenarios whose proof includes network behavior.
 
 ## Test Data And Service Mocking
 
 Follow [test data and service mocking](references/test-data-and-service-mocking.md) when writing Given setup or external-service fixtures.
 
-## Assertions
+## Learning-session scheduling
 
-Error messages must be immediately actionable:
-
-1. Assert with clear domain meaning, not just technical selectors.
-2. Show expected and actual values when they differ.
-3. Include relevant context, such as page content or API response, when helpful.
-4. Given, When, and Then steps should be assertive and fail early.
-5. For commissioned learning-session report scheduling, use the UI report
-   response's `recordedAt` (`POST /api/learning-sessions/record`) as the time
-   authority and assert each graded tracker’s next recall is after that time.
-   Do not pin an exact hour spread in E2E; backend tests own scheduling
-   arithmetic. Browser `Date.now()` is not that authority when
-   `@mockBrowserTime` and day/hour steps move backend time separately.
-
-```typescript
-expectQuizScore(expectedScore?: string) {
-  if (expectedScore) {
-    cy.get("[data-test='quiz-score']").should(($score) => {
-      const actualScore = $score.text().trim()
-      expect(
-        actualScore,
-        `Expected quiz score to be ${expectedScore}, but found ${actualScore}`
-      ).to.equal(expectedScore)
-    })
-  }
-  return this
-}
-```
+For commissioned learning-session reports, use `recordedAt` from the
+`POST /api/learning-sessions/record` response as the time authority. Check that
+each graded tracker's next recall is after that time. Backend tests cover the
+exact scheduling arithmetic. The browser clock and the backend day/hour
+steps can move separately.
 
 ## Before hook order
 
 `@badeball/cypress-cucumber-preprocessor` defaults Before hooks to order `10000`. The shared DB reset Before uses **`order: 0`** so it runs before tagged setup. Hooks that start long-lived side effects (e.g. `@interactiveCLI` PTY at order `2`) must stay **after** that reset; otherwise truncate can block on MySQL locks held by the PTY’s HTTP traffic.
 
-## Pitfalls
-
-- Do not put complex logic in step definitions.
-- Do not create long scenarios with many steps.
-- Avoid using UI language like "click a button" in Gerhkin. Use intention and domain language. 
-- Do not rely on test order.
-- Do not use hardcoded waits.
-- Do not fire a user action that starts app-busy loading and then assert domain state without `waitUntilAppIsNotBusy()` (or a clearer user-visible success signal) first.
-- Failure handling in steps and page objects: ADR 0006.
-- Do not mix different levels of abstraction in scenarios.
+For failure handling in steps and page objects, follow
+[ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md#usage).

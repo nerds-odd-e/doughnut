@@ -7,7 +7,8 @@ paths:
 ---
 # Frontend Testing Rules
 
-**Style ("small test" practice — stable boundary, data over mocks, focused assertions):** the `unit-testing` skill — follow that first.
+Follow the [unit-testing skill](../unit-testing/SKILL.md) for shared guidance
+and Donut proof conventions.
 
 These commands cover behavioral testing only. Before accepting frontend proof,
 also pass the typecheck required by the `frontend` skill's "Frontend proof" rule.
@@ -20,8 +21,8 @@ From the repo root:
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
-All frontend unit-test commands use headless Chromium and never automatically open
-a browser window. Do not enable a visible browser unless the user explicitly asks.
+All frontend unit-test commands use headless Chromium. Enable a visible browser
+only at the user's request.
 
 The legacy UI command also runs headlessly:
 
@@ -56,8 +57,6 @@ CURSOR_DEV=true nix develop -c pnpm -C frontend test -t "test name pattern"
 
 The test file path is relative to `frontend/`. Do not use `pnpm ... test -- tests/...`; the `--` is forwarded to Vitest and file filtering is skipped.
 
-In most situations, run all unit tests instead of a selected file only. Use a single test file when actively debugging or iterating on a specific component.
-
 For `dough-test-optimization`, `frontend:test` remains the ordinary local
 feedback measurement because it runs Chromium browser mode. When per-test JSON
 durations are needed for investigation, use
@@ -65,13 +64,6 @@ durations are needed for investigation, use
 That plain Vitest run is profiling evidence only; verify retained changes with
 the normal browser-mode command and do not compare its wall time directly with
 `frontend:test`.
-
-## Component Behavior
-
-- Drive the mounted component / page ("small test" style per `unit-testing` skill); cover lower layers with realistic scenario props/state, not by testing internal helpers in isolation.
-- Test through user interactions; assert observable DOM outcomes.
-- Use `data-testid` for test selectors.
-- Use Vitest browser mode and prefer real browser rendering over mocking sibling components or internal modules; stop using jsdom.
 
 ## Allowed Mocks
 
@@ -110,14 +102,12 @@ and `useRoute` stubs with `path: "/"` are not a second screen dialect
 
 ## Mock SDK Services
 
-The backend HTTP API is an **external** dependency from the frontend’s perspective (`unit-testing` skill mocking exception).
-
 - Use `mockSdkService` from `@tests/helpers` for type-safe mocking: pass the generated **controller class** and the **method name** (same static methods as `@generated/donut-backend-api/sdk.gen`).
 - It automatically wraps responses in the standard format `{ data, error, request, response }`.
 - It returns a spy that can be reconfigured in tests.
 - Use `wrapSdkResponse` when updating mock return values.
 - Use `mockSdkServiceWithImplementation` only for custom async logic based on options.
-- Arrange response payloads through [test-data guidance](#test-data-guidance); do not mock in-process collaborators to “reach” coverage.
+- Arrange response payloads through [test-data guidance](#test-data-guidance).
 
 ```typescript
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
@@ -150,7 +140,6 @@ mockSdkServiceWithImplementation(TextContentController, "updateNoteContent", asy
 
 - Use `helper.component(ComponentName).withStorageProps` if the component requires a `storageAccessor` prop.
 - Use `withProps` instead of `withStorageProps` if the component does not require `storageAccessor`.
-- Test prop changes and their effects.
 
 ```typescript
 const wrapper = helper
@@ -163,11 +152,8 @@ await wrapper.setProps({ value: newValue })
 
 ## Test-data guidance
 
-For authoring, extension and implicated refactoring, follow
-[Dough MakeMe](../dough-makeme/SKILL.md) with the actual test source path before
-arranging fixtures. Use the selected shared convention, with its unresolved
-selection handling; other entries keep their practice. Running Vitest in
-Chromium does not select browser page objects.
+Use [Dough MakeMe](../dough-makeme/SKILL.md) to select shared fixture guidance
+for the test source.
 
 The frontend's API-shaped fixtures live in `packages/donut-test-fixtures`.
 Import `donut-test-fixtures/makeMe` only, rather than the bare package or a
@@ -184,53 +170,14 @@ const answered = makeMe.anAnsweredQuestion
 
 ## Browser Mode Mounting
 
-- Use `render()` from `@testing-library/vue` for most tests.
-- `render()` encourages user-perspective tests and returns fast queries such as `getByText`, `getByLabelText`, and `data-testid`.
-- Use `mount()` from `@vue/test-utils` only when you need direct access to Vue internals, emitted events, slots, or provide/inject edge cases.
-- Query the DOM, not Vue components.
-
-Prefer:
-
-```typescript
-page.getByText(/submit/i)
-screen.getByText("Loading...")
-```
-
-Avoid:
-
-```typescript
-wrapper.findComponent(MyButton)
-wrapper.find("[data-testid='my-component']")
-```
+- Use Vitest browser mode with Chromium.
+- Use `render()` from `@testing-library/vue` for most tests. Query the DOM.
+  Use `data-testid` for test-specific selectors.
+- Use `mount()` from `@vue/test-utils` when the contract under proof requires
+  an observation such as an emitted event, a slot, or a provided value.
 
 ## Layout and Pointer Tests
 
 - Prove that text is visible with geometry: `scrollWidth <= clientWidth`, and range or element rectangles inside their row. Checking `textContent` alone misses clipped text.
 - Browser specs use production CSS. Set the container width, or call `page.viewport` for breakpoint (`sm:`) behavior; the default viewport is 414px wide.
 - Name a spec `*.touch.spec.ts` when it needs a real coarse pointer. The `chromium-touch` browser instance in `vitest.config.ts` runs those files with touch emulation, so `(pointer: coarse)` matches. Do not substitute a `matchMedia` stub.
-
-## Deterministic Tests
-
-- Tests must always execute the same way.
-- Use assertions instead of if-conditions so failures are clear.
-- Use sequential async operations instead of loops where possible.
-
-Avoid:
-
-```typescript
-if (vm.searchResults) {
-  const selected = vm.searchResults.find((result) => result.id === wikidataId)
-  if (selected) {
-    // do something
-  }
-}
-```
-
-Prefer:
-
-```typescript
-expect(vm.searchResults).toBeDefined()
-expect(vm.searchResults.length).toBeGreaterThan(0)
-const selected = vm.searchResults.find((result) => result.id === wikidataId)
-expect(selected).toBeDefined()
-```

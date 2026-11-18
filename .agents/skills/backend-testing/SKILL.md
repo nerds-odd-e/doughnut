@@ -6,23 +6,32 @@ paths:
 ---
 # Backend Testing Rules
 
-**Style ("small test" practice — stable boundary, data over mocks, focused assertions):** the `unit-testing` skill — follow that first.
+Follow the [unit-testing skill](../unit-testing/SKILL.md) for shared guidance
+and Donut proof conventions.
 
 ## Commands
 
-Run backend verification from the repo root:
+Run backend verification from the repo root. For focused feedback, use a
+Gradle test filter:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
+CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests '<pattern>'
 ```
 
-When no database migration is involved, this is faster:
+When broader verification is needed, run the whole suite:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm backend:test_only
 ```
 
-Always run all backend unit tests instead of a selected file or test case.
+For database migration verification, use:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm backend:verify
+```
+
+See [worktree backend tests](../../../docs/worktree-backend-tests.md) for the
+checkout's test database and runner options.
 
 For `dough-test-optimization`, use `backend:test_only` as both the ordinary
 feedback measurement and profiling run. Per-test timings are the `time`
@@ -33,48 +42,15 @@ profile outside committed files. To count Spring context boots, temporarily add
 logger is overridden by the test profile's `logging.level.root=OFF`); each rise
 in the logged `missCount` is one boot. Revert it afterwards.
 
-## Core Principles
+## Controller and Spring setup
 
-Backend application of the "small test" style (`unit-testing` skill):
-
-1. Prefer **controller** (or other HTTP-stable-boundary) tests for behavior users see through HTTP. These tests often do not reference the internal class you edited; cover services/repos via realistic `makeMe` preconditions and the real DB.
-2. Test services and algorithms directly only when they are an independent, intentional domain-stable contract (pure logic or algorithms).
-3. Keep tests small and focused: one behavior per test and descriptive names that explain the behavior.
-
-Controller-style example:
-
-```java
-@Test
-void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException {
-  Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-  final NoteRealm noteRealm = controller.show(note);
-  assertThat(noteRealm.getId(), equalTo(note.getId()));
-}
-```
-
-Prefer injecting the controller on `ControllerTestBase` (as above). Every Spring test of the `test` profile extends `SpringTestBase` (`testability` package), directly or through `ControllerTestBase`, so the suite shares one application context. Do not add `@AutoConfigureMockMvc` or extra `@MockitoBean` / `@TestBean` on a subclass unless that **exact** annotation mix already exists — each unique mix caches another ApplicationContext and Hikari pool; CI MySQL then fails with `Too many connections` while a local run still passes. To observe a package-private persistence table, query through `EntityManager` rather than opening a new MockMvc context.
+Prefer injecting the controller on `ControllerTestBase`. Every Spring test of the `test` profile extends `SpringTestBase` (`testability` package), directly or through `ControllerTestBase`, so the suite shares one application context. Do not add `@AutoConfigureMockMvc` or extra `@MockitoBean` / `@TestBean` on a subclass unless that **exact** annotation mix already exists — each unique mix caches another ApplicationContext and Hikari pool; CI MySQL then fails with `Too many connections` while a local run still passes. To observe a package-private persistence table, query through `EntityManager` rather than opening a new MockMvc context.
 
 Calling a controller method directly skips request binding. When a multipart or form DTO field name matters (for example a boolean the frontend sends by name), prove it with a request through an `@Autowired MockMvc` (`multipart(...)` with the real field name); `SpringTestBase` already configures MockMvc, so this adds no context.
-
-Independent algorithm example:
-
-```java
-@ParameterizedTest
-@CsvSource({
-  "moon,     partner of earth,          partner of earth",
-  "Sedition, word sedition means this,  word [...] means this"
-})
-void clozeDescription(String title, String markdown, String expectedClozeDescription) {
-  assertThat(
-      new ClozedString(clozeReplacement, markdown).hide(new NoteTitle(title)).maskedContentAsMarkdown(),
-      containsString(expectedClozeDescription));
-}
-```
 
 ## Database Tests
 
 - Tests use actual database interactions inside the transaction that `SpringTestBase` rolls back after each test.
-- This gives confidence in database operations and repository behavior.
 - A `@Formula` field (for example `Note.trashedInDatabase`) is hydrated only when Hibernate loads the row from the database. An entity persisted or moved earlier in the same persistence context still carries the Java default, so a test that reads such a field through a loaded collection must `makeMe.refresh(entity)` first. Query-level predicates (`Note.JPA_AVAILABLE`) evaluate in SQL and need no refresh.
 - A test that signs in through the security filters creates a `SPRING_SESSION` row in Spring Session's own transaction, outside that rollback. Such a test class is non-transactional and deletes its session rows after each test (see `DevelopmentAuthenticationConfigurationTest`). Session cookie attributes apply only on the embedded server, so a test asserting them uses `webEnvironment = RANDOM_PORT`.
 
@@ -93,10 +69,8 @@ class TextContentValidatorTest extends SpringTestBase {
 
 ## Test-data guidance and Java construction
 
-For authoring, extension and implicated refactoring, follow
-[Dough MakeMe](../dough-makeme/SKILL.md) with the actual test source path before
-arranging fixtures. Use the selected shared convention and its unresolved
-selection handling; other entries keep their practice.
+Use [Dough MakeMe](../dough-makeme/SKILL.md) to select shared fixture guidance
+for the test source.
 
 Backend `MakeMe` is supplied by `SpringTestBase`. Java factory access calls a
 method such as `makeMe.aNote()`. Entity builders complete with `please()` to
@@ -116,10 +90,12 @@ Note note = makeMe.aNote()
 ## Test Organization
 
 - Group related tests with `@Nested`.
-- Use `@BeforeEach` for common setup, keeping setup minimal and relevant to the group.
-- Mocking policy: `unit-testing` skill. Backend exception: external services only — mock `OpenAIClient` structured Responses output with `OpenAiStructuredResponseMock` in controller tests.
+- Use `@BeforeEach` for common setup.
+- When a controller test needs an OpenAI substitute, use
+  `OpenAiStructuredResponseMock` for the structured Responses output from
+  `OpenAIClient`.
 
 ## Assertions
 
-- Use `assertThat` with descriptive matchers; `assertThrows` for exceptions; `@ParameterizedTest` when inputs vary but the assertion focus stays the same.
-- Assertion **scope** and avoiding cross-test redundancy: `unit-testing` skill.
+Use `assertThat` with descriptive matchers, `assertThrows` for exceptions, and
+`@ParameterizedTest` to parameterize cases.

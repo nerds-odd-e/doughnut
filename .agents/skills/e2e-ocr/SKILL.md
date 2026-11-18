@@ -27,5 +27,5 @@ Use this skill when asserting text that is not in the DOM, such as PDF content d
 - Export with `toDataURL("image/png")`.
 - Strip the data URL prefix.
 - Use `cy.task(..., { timeout: ... })` for slow OCR.
-- Assert the returned string contains the expected substring with a clear message.
-- Reference: `e2e_test/start/pageObjects/bookReadingPage.ts`, from `expectPdfBeginningVisible` through `expectCurrentPage(1).expectVisibleOCRContains`.
+- Compare the recognized text with the expected substring supplied by the
+  scenario.

@@ -10,19 +10,6 @@ Vue 3 + TypeScript in `frontend/src/`. Tests in `frontend/tests/`. Import the ba
 
 Matching `frontend-component`, `frontend-testing`, `frontend-api`, and `frontend-storybook` skills attach via `paths` when those files are in context — do not fetch them up front. Lint: `linting_formating` skill.
 
-## Commands
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test
-```
-
-Spec paths are relative to `frontend/`. Do not pass `--` before the path (Vitest skips file filtering). Prefer the full frontend unit suite; a single file only while iterating on that file.
-
-Always run frontend unit tests headlessly. The shared Vitest config keeps Chromium
-headless and disables automatic browser opening for regular, direct, UI, and watch
-runs. Agents must not override this with `--browser.headless=false` or `--open`
-unless the user explicitly requests a visible browser.
-
 ## Frontend proof
 
 `frontend:test` runs Vitest only; `frontend/vitest.config.ts` disables
@@ -61,8 +48,9 @@ User actions: `apiCallWithLoading(() => Controller.method(...))` from `@/managed
 
 `{ blockUi: true }` for a whole-UI blocker. `{ blockUi: true, cancelable: true }` only for allowlisted read-only sites gated by `frontend/tests/managedApi/cancelableAllowlist.spec.ts`. Do not opt mutations into cancelable. Do not add component-local `LoadingModal` refs.
 
-Loading UI that means unfinished work marks `data-app-busy` (`LoadingThinBar`, `ContentLoader`, `LoadingModal`). E2E: `waitUntilAppIsNotBusy()`. Validation 400: `toOpenApiError(error)`.
+Loading UI that means unfinished work marks `data-app-busy` (`LoadingThinBar`, `ContentLoader`, `LoadingModal`). See [E2E loading checks](../e2e-authoring/SKILL.md#waiting-until-the-app-is-not-busy). Validation 400: `toOpenApiError(error)`.
 
 ## Tests
 
-Drive the mounted component. Mock only the backend HTTP API with `mockSdkService(Controller, "method", payload)` from `@tests/helpers`. Payloads: `donut-test-fixtures/makeMe`. No `getByRole` (slow). Prefer `render()` from Testing Library. Vitest browser mode; do not use jsdom.
+See [frontend testing](../frontend-testing/SKILL.md) for Vitest commands,
+browser-mode mounting, mock options, and fixture selection.

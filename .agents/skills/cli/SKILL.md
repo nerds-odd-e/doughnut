@@ -63,20 +63,30 @@ Apply architectural changes when a feature needs them; challenge the fit first.
 
 ## Vitest: observable behavior
 
-**Style ("small test" practice — stable boundary, data over mocks, focused assertions):** the `unit-testing` skill — follow that first.
+Follow the [unit-testing skill](../unit-testing/SKILL.md) for shared guidance
+and Donut proof conventions.
 
-For **interactive** behavior, prefer **`runInteractive`** (from `interactive.js`, implemented in `interactiveInkSession.ts`) with a **mock TTY** stdin and assert **stdout** / visible output — the test may **not import** the module you changed; coverage through the CLI surface is enough. For **argv routing** (`version`, `help`, interactive fallback), use **`run`** from `run.js` (see `cli/tests/index.test.ts`). E2E vs unit-test layering for slices: `dough-slice-planning` skill; write unit tests in the "small test" style (`unit-testing` skill).
+For interactive behavior, call `runInteractive` from `interactive.js` with a
+mock TTY stdin and observe stdout. For argv routing (`version`, `help`,
+interactive fallback), use `run` from `run.js`. See `cli/tests/index.test.ts`.
 
-**Mocking Donut HTTP from unit tests** — The Donut backend is an **external** dependency (`unit-testing` skill exception). Use **`vi.spyOn`** on **`donut-api`** controller static methods (e.g. `RecallsController.recalling`, `MemoryTrackerController.showMemoryTracker`) and **`mockResolvedValue`** with the SDK success shape (`{ data: … }`, cast as **`Awaited<ReturnType<typeof Controller.method>>`** when needed). For fixture selection during authoring, extension and implicated refactoring, follow [Dough MakeMe](../dough-makeme/SKILL.md) with the actual test source path and its unresolved-selection handling. Other entries keep their practice. For selected CLI sources, import `makeMe` from `donut-test-fixtures/makeMe`; its API-shaped values (e.g. `makeMe.aMemoryTracker`, `makeMe.aNoteRealm`, `makeMe.aDueMemoryTrackersList`) supply the SDK response's `data`. Do **not** use **`http.createServer`** to fake `/api/…` for ordinary command behavior. Reserve a real local HTTP server for tests whose subject is transport or error classification (e.g. status codes), not for happy-path recall or token flows.
+To substitute Donut HTTP for command behavior, use `vi.spyOn` on `donut-api`
+controller methods such as `RecallsController.recalling`. Pass
+`mockResolvedValue` the SDK success shape `{ data: … }`, cast as
+`Awaited<ReturnType<typeof Controller.method>>` if needed. Reserve a local HTTP
+server for tests of transport behavior or status-code classification.
 
-**No fixed-time waits in unit tests** — Do not use `sleep`, `setTimeout(…, N)` with a duration, or similar wall-clock delays to “let Ink/React catch up.” Prefer driving the real async surface: `setImmediate` / microtask turns in a loop until an **observable** condition holds (e.g. `frames` or stdout contains the expected text), with a **turn-count** cap and a clear failure message if the condition never becomes true. E2E may still use bounded retries where appropriate; Vitest unit tests under `cli/tests/` should stay deterministic without arbitrary milliseconds.
+Use [Dough MakeMe](../dough-makeme/SKILL.md) to select shared fixture guidance
+for the test source. For selected CLI sources, import `makeMe` from
+`donut-test-fixtures/makeMe`. Its API-shaped values supply the SDK response's
+`data`.
 
 ## Ink + React + Node (avoid flaky interactive tests)
 
 - **Defer `useApp().exit()` / unmount after UI updates:** Do not call **`exit()`** from the same synchronous turn as a slash command that still has to append transcript state (e.g. “Bye.”). **`/exit`** is special-cased in **`InteractiveCliApp`**: after the assistant line is committed, a **`useEffect`** runs **`exit()`**. In Node, **`setTimeout(…, 0)`** can still run **before** **`setImmediate`** work used by React/Ink — avoid **`setTimeout(…, 0)`** for this ordering.
 - **Stable `useInput` handler:** Pass **`useCallback`** (with correct deps) to **`useInput`**, not a new inline function every render. Ink’s `useInput` effect depends on the handler reference; a new function each render tears down and re-attaches the internal listener and can drop keystrokes under load.
 - **`ink-testing-library` + stdin:** **`useInput` registers via `useEffect`** — **`stdin.write` immediately after `render()` can race** empty listeners. Before real input, **wait on an observable** (e.g. write a harmless probe key, **`waitForFrames` until `lastFrame()` shows it**, then undo if needed), or use **`renderInkWhenCommandLineReady`** from `cli/tests/inkTestHelpers.ts` (probe key + wait; see `InteractiveCliApp` ink tests).
-- **Ink test async helpers:** Import **`waitForFrames`**, **`waitForLastFrame`**, and **`stripAnsi`** from **`cli/tests/inkTestHelpers.ts`** instead of duplicating the `setImmediate` poll loop (or ANSI stripping) in each test file. After **`renderInkWhenCommandLineReady`**, prefer **`lastStrippedFrame()`** (current frame, ANSI-stripped), **`waitForLastFrameToInclude(pattern)`**, and **`waitForFramesToInclude(pattern)`** where **`pattern`** is a substring or **`RegExp`** (combined scrollback is ANSI-stripped for matching). Use **`waitForFrames`** / raw **`frames.join('\n')`** when the assertion must see **SGR sequences** (e.g. `\x1b[100m`) that stripping would remove.
+- **Ink test async helpers:** Import **`waitForFrames`**, **`waitForLastFrame`**, and **`stripAnsi`** from **`cli/tests/inkTestHelpers.ts`** for bounded `setImmediate` polling and ANSI stripping. After **`renderInkWhenCommandLineReady`**, prefer **`lastStrippedFrame()`** (current frame, ANSI-stripped), **`waitForLastFrameToInclude(pattern)`**, and **`waitForFramesToInclude(pattern)`** where **`pattern`** is a substring or **`RegExp`** (combined scrollback is ANSI-stripped for matching). Use **`waitForFrames`** / raw **`frames.join('\n')`** when the assertion must see **SGR sequences** (e.g. `\x1b[100m`) that stripping would remove.
 - **`<Static>` scrollback:** Session history is rendered inside Ink `<Static>`; captured **`frames`** can **repeat** the same scrollback text every frame. For “appears once on screen” or row budgets, prefer **`lastFrame()`** / **`lastStrippedFrame()`**, not counting substrings across **`frames.join('\n')`**.
 - **Typing simulations:** Do not use **`setImmediate` per character** as “Ink is ready.” **Wait until the frame shows the expected buffer** (or combined `frames` text) before the next `stdin.write`.
 

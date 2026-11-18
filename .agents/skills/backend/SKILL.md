@@ -10,20 +10,6 @@ Java/Spring in `backend/src/main/java/com/odde/donut/`. Tests under `backend/src
 
 Matching `backend-code` (production Java) and `backend-testing` (tests) skills attach via `paths` when those files are in context — do not fetch them up front.
 
-## Commands
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
-```
-
-When a database migration is involved:
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
-```
-
-Always run all backend unit tests, not a selected file or test case.
-
 ## Production
 
 - Controllers: return entities (or existing API body types). Narrow with `@JsonIgnore` / `@JsonView`. Introduce a response DTO only when the wire shape differs.
@@ -33,6 +19,5 @@ Always run all backend unit tests, not a selected file or test case.
 
 ## Tests
 
-Small-test style (`unit-testing` skill): prefer **controller** (HTTP-stable-boundary) tests; cover services/repos via realistic `makeMe` preconditions and the real DB (`@Transactional`). Test a service/algorithm directly only when it is an intentional domain-stable contract.
-
-Mock only external services — `OpenAIClient` via `OpenAiStructuredResponseMock`. Ownership: `notebookOwnedBy(user)` so trackers inherit the owner. Group with `@Nested`.
+See [backend testing](../backend-testing/SKILL.md) for verification commands,
+controller and database setup, and Java fixtures.

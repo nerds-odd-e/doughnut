@@ -21,7 +21,7 @@ Use `packages/generated/donut-backend-api/api-summary.md` as the default endpoin
 - `packages/generated/donut-backend-api/sdk.gen.ts`
 - `open_api_docs.yaml`
 
-For frontend calls, import services from `@generated/donut-backend-api/sdk.gen`. For API-shaped fixtures, import `makeMe` from `donut-test-fixtures/makeMe`. Open `sdk.gen.ts` or `types.gen.ts` only when checking an exact generated signature. After backend controller signature or DTO changes, run:
+For frontend calls, import services from `@generated/donut-backend-api/sdk.gen`. For API-shaped test fixtures, see [frontend fixture guidance](skills/frontend-testing/SKILL.md#test-data-guidance). Open `sdk.gen.ts` or `types.gen.ts` only when checking an exact generated signature. After backend controller signature or DTO changes, run:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm generateTypeScript
@@ -65,13 +65,13 @@ CURSOR_DEV=true nix develop -c <command>
 
 Useful focused checks:
 
-- Backend: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- Backend: see [backend verification commands](skills/backend-testing/SKILL.md#commands).
 - Isolated worktree backend tests: [`docs/worktree-backend-tests.md`](../docs/worktree-backend-tests.md). Linked worktrees isolate ordinary `pnpm backend:test` / `backend:test_only` and wrapper `test` / `migrateTestDB` automatically. Opt-in remains: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree`
 - Frontend single file: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts`.
   If the shell sets `NODE_ENV=production`, prefix `env -u NODE_ENV`; otherwise Vue hides `<script setup>` bindings from `wrapper.vm` and mounted specs fail.
   This runs Vitest only; frontend proof also requires the typecheck in the
   `frontend` skill's "Frontend proof" rule before acceptance.
-- E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/path/to.feature`
+- E2E: see [focused E2E commands](skills/e2e-authoring/references/running-e2e.md#run-e2e-tests).
 - Log inspection: `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`, `dev`)
 - Diff whitespace: `scripts/check_diff_whitespace.sh` or `scripts/check_diff_whitespace.sh --cached`
 - Coordinator format of changed working-tree components:

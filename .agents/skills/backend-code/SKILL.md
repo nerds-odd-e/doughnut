@@ -10,17 +10,7 @@ Migrations: `db-migration` skill.
 
 ## Commands
 
-Run backend verification from the repo root:
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
-```
-
-When no database migration is involved, this is faster:
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
-```
+See [backend verification commands](../backend-testing/SKILL.md#commands).
 
 ## Relational Schema
 

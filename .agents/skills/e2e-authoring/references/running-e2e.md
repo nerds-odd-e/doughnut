@@ -6,8 +6,6 @@ For browser authoring, use [E2E authoring](../SKILL.md).
 
 The `pnpm cy:run` wrapper owns its stack and compiles current backend source once per batch, without a continuous backend compiler. Local batches retain frontend HMR; backend edits need a new invocation. Use `pnpm cy:open` for an interactive session with backend reload and frontend HMR. Required mocks are owned by the selected invocation.
 
-If services are not running, suggest running `pnpm cy:run --spec <feature>` in a separate terminal.
-
 ## Cypress Origin
 
 Primary unconfigured checkouts and CI use `http://localhost:5173` as the Cypress
@@ -35,11 +33,16 @@ CI vs `pnpm cy:run`, `wait-on`, `NO_PROXY`, and env vars are documented in
 
 ## Run E2E Tests
 
-Agents should default to `pnpm cypress run --spec` with one or more `.feature` paths tied to the changed capability. Add adjacent specs only when regression risk warrants it. Do not run bare `pnpm cypress run`, `pnpm verify`, or the whole suite unless the user explicitly asks for a full E2E run or the instructions require reproducing CI.
+Use `pnpm cy:run --spec` for a local run with one or more `.feature` paths tied
+to the changed capability. Add adjacent specs when regression risk warrants
+it. Reserve full E2E runs for an explicit request or CI reproduction.
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
+
+Use raw `pnpm cypress run --spec` when targeting a prepared E2E stack, such as
+CI or a local run that needs a Cypress option the wrapper does not forward.
 
 Important notes:
 
