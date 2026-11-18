@@ -20,6 +20,7 @@ Feature: Reviewing generated note content
       | Please complete the note content. | requires action | {"content": "It is a vigorous city.", "reason": "Completes the city description."} |
     When I request to complete the content for the note "Taipei"
     Then I should see this run's pending content correction
+    And the review should mark "It is a" as removed and this run's proposal as added
     And my OpenAI mock still records only my request marker
     And I keep my OpenAI mock configured across the other worktree's mock reset
     Then my OpenAI mock still records only my request marker

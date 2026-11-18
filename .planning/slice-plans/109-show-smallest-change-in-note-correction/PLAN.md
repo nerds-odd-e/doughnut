@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#source-and-smallest-change-in-corrections
 **Source:** [selected story](../../seeds/SEED-073-learning-refinement-and-retrieval.md#source-and-smallest-change-in-corrections)
+**Source review:** [source review](source-review.md)
 
 ## Goal and scope
 
@@ -24,7 +25,7 @@ making the assistant propose smaller edits; the quoted source, which is
   untouched, so [ADR 0002](../../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
   holds as today.
 - The product compares two texts line by line in
-  `frontend/src/components/commons/diffViewPairedRows.ts` (199 lines),
+  `frontend/src/components/commons/lineDiff.ts` (199 lines),
   shown side by side by `DiffView.vue` and `DiffPane.vue` in the refine-note
   preview and the undo confirmation. Reuse that line comparison. Do not
   reuse the side-by-side view for corrections: its cells do not wrap
@@ -78,7 +79,7 @@ the change display in slice 1.
 
 ### 1. A pending content correction marks its changed lines
 Type: Behavior
-Status: planned
+Status: done
 Proof: the component tests for examples 1, 3, 5 and 6 and the E2E step
 above; both typechecks; the existing correction specs in
 `frontend/tests/components/conversation/` stay green.
@@ -120,3 +121,15 @@ marked whole.
 
 Slice-plan refinement was not needed: two slices, each one outcome with
 its own proof. No slice-specific concern remains.
+
+## Story obligations
+
+### G1. A changed line is marked whole
+Reported: slice 1 — "Interim as planned: a changed line is marked whole (slice 2)."
+Story clause: "Inside a changed line, only the changed characters are marked, not the whole line."
+Disposition: interim until slices 2
+
+### G2. Mark colours were not looked at in a browser
+Reported: slice 1 — "The `block` and colour classes were not looked at in a browser."
+Story clause: "removed text and added text are marked, and unchanged text is not"
+Disposition: proved by slice 1: the marks are `<del>` and `<ins>` elements, which do not depend on colour; e2e_test/start/pageObjects/conversationAboutNotePage.ts `expectPendingContentCorrectionMarks` observes both visible in the running product with its stylesheet (evidence s1-fix-e2e.log)

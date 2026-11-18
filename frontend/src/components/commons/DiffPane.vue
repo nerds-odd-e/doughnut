@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type { DiffLine } from "./diffViewPairedRows"
+import type { DiffLine } from "./lineDiff"
 
 const props = defineProps<{
   label: string
