@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "yusuke-chan",
+  "email": "yusuke-chan@example.org",
+  "identity": "SEED-132#route-first-report-trial",
+  "mode": "trunk",
+  "branch": "origin/main",
+  "host": "codex"
+}

@@ -9,6 +9,7 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 ## Taken
 
 - [Renew a waiting question when its note changes](seeds/SEED-073-learning-refinement-and-retrieval.md#renew-waiting-question-when-note-changes) — SEED-073#renew-waiting-question-when-note-changes ([plan](slice-plans/111-renew-waiting-question-when-note-changes/PLAN.md))
+- [Route the first-report pilot into ordinary Doughnut reviews (Codex-owned)](seeds/SEED-132-route-first-report-trial.md#route-first-report-trial) — SEED-132#route-first-report-trial ([plan](slice-plans/112-route-first-report-trial/PLAN.md))
 
 ## Backlog list
 
@@ -17,4 +18,3 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 - [See surrounding text in references](seeds/SEED-131-reference-details.md#see-surrounding-text-in-references) — SEED-131#see-surrounding-text-in-references
 - [Replace a correct but poor recall question](seeds/SEED-073-learning-refinement-and-retrieval.md#replace-correct-but-poor-question) — SEED-073#replace-correct-but-poor-question
 - [Check short lessons and count later recalls](seeds/SEED-073-learning-refinement-and-retrieval.md#check-short-recall-lessons) — SEED-073#check-short-recall-lessons
-- [Route the first-report pilot into ordinary Doughnut reviews (Codex-owned)](seeds/SEED-132-route-first-report-trial.md#route-first-report-trial) — SEED-132#route-first-report-trial
