@@ -96,3 +96,9 @@ ids, a table of the six with the words the readers wrote, and the split's
 
 Refinement not needed: one slice, one outcome. This review identified no
 remaining slice-specific concern.
+
+## Execution complete
+
+Product advice: no change to priorities. The day-seven check (window from
+2026-11-23) now compares 7 groups a half, which strengthens the "a
+direction, not proof" limit the check story already states.
