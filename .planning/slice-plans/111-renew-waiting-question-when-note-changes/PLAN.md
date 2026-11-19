@@ -162,3 +162,9 @@ Disposition: proved by slice 5: RecallPromptCard.activation.spec.ts observes a f
 Reported: slice 2 — "The legacy MCQ fallback in the CLI still selects from history ahead of a server request."
 Story clause: "At first presentation in web or CLI recall, compare the authored title, body and properties of the focus note with the content used to generate the waiting MCQ."
 Disposition: proved by slice 7: recallMcqInteractive.current.test.tsx first shows the current stem and submits its prompt and choice after another edit.
+
+## Execution complete
+
+Product advice: no change to backlog order. Authored-content matching and selection on first presentation address the stale-question examples. The existing objective-validation and question-quality stories still have distinct learning questions. No measurement here establishes a change in pedagogical quality.
+
+The seven implementation commits and three separately evidenced repairs on the published branch are attributable to this execution. The source, artifact and proof map above covers all 34 commitments. Controller, Chromium and Ink cases drove the changes. Cypress exercised real recall, scheduling, contest and spelling interactions. It supplied regression coverage after implementation. The model was stubbed at the provider boundary. The private generation fingerprint and existing accepted-note projection preserve ADR 0002. Pinning the issued prompt and retaining explicit grading preserve ADR 0003. Failure and retry keep their existing ADR 0006 boundary. The selected process review carries into wrap-up with the automatic Intent Coverage check.
