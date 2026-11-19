@@ -264,8 +264,8 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(hono@4.13.18)
       '@mbtest/mountebank':
-        specifier: 2.9.5
-        version: 2.9.5(supports-color@8.1.1)
+        specifier: 2.10.0
+        version: 2.10.0(supports-color@8.1.1)
       '@modelcontextprotocol/sdk':
         specifier: 1.32.2
         version: 1.32.2(supports-color@8.1.1)(zod@4.6.7)
@@ -1318,9 +1318,9 @@ packages:
     resolution: {integrity: sha512-wN5yd3WBtmyrZIapIwYH4rAxQVYF8Qoro7UU4SeCbA8M/TtTBMfVQg+2cZkat79IeJujrjS4NOAZLya9rEf/mw==}
     engines: {node: '>=10'}
 
-  '@mbtest/mountebank@2.9.5':
-    resolution: {integrity: sha512-MB04OH0cDt0dBGp49Jjv4pqLBluqRRwv39NPh1HYyho6pm55UPb5Y4ps58SjCsmXxDxzlJkculRpHCG5NvhVfg==}
-    engines: {node: '>=20'}
+  '@mbtest/mountebank@2.10.0':
+    resolution: {integrity: sha512-21t30IvtL0C8KngRrO2usx3cRKUYw1UqHjbwn4ZuLMyFnOGYJU/O9Vw7keLjYRuSspP8KdrHctyBkSjramn2NQ==}
+    engines: {node: '>=20.19'}
     hasBin: true
 
   '@mdx-js/react@3.1.1':
@@ -2420,6 +2420,10 @@ packages:
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
+
+  agent-base@9.0.0:
+    resolution: {integrity: sha512-TQf59BsZnytt8GdJKLPfUZ54g/iaUL2OWDSFCCvMOhsHduDQxO8xC4PNeyIkVcA5KwL2phPSv0douC0fgWzmnA==}
+    engines: {node: '>= 20'}
 
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
@@ -3575,13 +3579,13 @@ packages:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
     engines: {node: '>= 0.8'}
 
-  http-proxy-agent@7.0.0:
-    resolution: {integrity: sha512-+ZT+iBxVUQ1asugqnD6oWoRiS25AkjNfG085dKJGtGxkdwLQrMKU5wJr2bOOFAXzKcTuqq+7fZlTMgG3SRfIYQ==}
-    engines: {node: '>= 14'}
-
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
     engines: {node: '>= 14'}
+
+  http-proxy-agent@9.1.0:
+    resolution: {integrity: sha512-2NxoveTT58mjYT4n3RPTEfCZGLMbidoO8XEieXfpSYxu+PQJ1qpx4ypwH6N+uF9twBPIvRRgvkvW5HUTYWENig==}
+    engines: {node: '>= 20'}
 
   http-signature@1.4.0:
     resolution: {integrity: sha512-G5akfn7eKbpDN+8nPS/cb57YeA1jLTVxjpCj7tmm3QKPdyDy7T+qSC40e9ptydSWvkwjSXw1VbkpyEm39ukeAg==}
@@ -4646,6 +4650,15 @@ packages:
     resolution: {integrity: sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==}
     engines: {node: '>= 0.10'}
 
+  proxy-agent-negotiate@1.1.0:
+    resolution: {integrity: sha512-N8IBcM3UgCVzz2L2Lqv8DVntDnnC8/hiV4nEDUPkqq72TPUgYWjQc+bdZlBPZK9LzPAvOY//gAt0S0DApoOXWQ==}
+    engines: {node: '>= 20'}
+    peerDependencies:
+      kerberos: ^2.0.0
+    peerDependenciesMeta:
+      kerberos:
+        optional: true
+
   proxy-from-env@1.0.0:
     resolution: {integrity: sha512-F2JHgJQ1iqwnHDcQjVBsq3n/uoaFL+iPW/eAeL7kVxy/2RrWaN4WroKjjvbsoRtv0ftelNyC01bjRhn/bhcf4A==}
 
@@ -5027,8 +5040,8 @@ packages:
     resolution: {integrity: sha512-vZ7rfeehZui7wQs438JXBckYLkIIdfHOXsaVEUMyS5fHo1483l1bMdo0EDSWYclY0yZKFOipDy4KHuKs6ssvdg==}
     engines: {node: '>=8.0.0'}
 
-  smtp-server@3.19.13:
-    resolution: {integrity: sha512-W1CjNcrPqW4+1gUOYRyjPvTOxu7GgKR9+7l50yQBF0GM8v8jpYwheHFCHX7s+p7pYI8iXKQQZiF2Rv2Na/3i2g==}
+  smtp-server@3.21.3:
+    resolution: {integrity: sha512-RJRuhJWt+Zs8/c9Pa1Qrzz7RO49iRxrdj+7CXjz+zwRZLVliYyM/vrqF4VxsFH67eLCNW9kM3o5K9tHvlPuiIw==}
     engines: {node: '>=20.0.0'}
 
   source-map-js@1.2.2:
@@ -6845,7 +6858,7 @@ snapshots:
       fs-extra: 9.0.1
     optional: true
 
-  '@mbtest/mountebank@2.9.5(supports-color@8.1.1)':
+  '@mbtest/mountebank@2.10.0(supports-color@8.1.1)':
     dependencies:
       '@xmldom/xmldom': 0.9.12
       cors: 2.8.6
@@ -6855,7 +6868,7 @@ snapshots:
       escape-html: 1.0.3
       express: 5.2.1(supports-color@8.1.1)
       fs-extra: 11.2.0
-      http-proxy-agent: 7.0.0(supports-color@8.1.1)
+      http-proxy-agent: 9.1.0(supports-color@8.1.1)
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
       jsonpath-plus: 10.4.0
       mailparser: 3.9.12
@@ -6863,13 +6876,14 @@ snapshots:
       proper-lockfile: 4.1.2
       safe-regex: 2.1.1
       safe-stable-stringify: 2.5.0
-      smtp-server: 3.19.13
+      smtp-server: 3.21.3
       winston: 3.19.0
       xpath: 0.0.34
       yargs: 17.7.2
     optionalDependencies:
       '@mbtest/mountebank-formatters': 0.0.2
     transitivePeerDependencies:
+      - kerberos
       - supports-color
 
   '@mdx-js/react@3.1.1(@types/react@19.3.0)(react@19.3.1)':
@@ -7965,6 +7979,8 @@ snapshots:
       - supports-color
 
   agent-base@7.1.4: {}
+
+  agent-base@9.0.0: {}
 
   ajv-formats@3.0.1:
     dependencies:
@@ -9189,13 +9205,6 @@ snapshots:
       statuses: 2.0.2
       toidentifier: 1.0.1
 
-  http-proxy-agent@7.0.0(supports-color@8.1.1):
-    dependencies:
-      agent-base: 7.1.4
-      debug: 4.4.3(supports-color@8.1.1)
-    transitivePeerDependencies:
-      - supports-color
-
   http-proxy-agent@7.0.2(supports-color@11.0.0):
     dependencies:
       agent-base: 7.1.4
@@ -9209,6 +9218,15 @@ snapshots:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
+      - supports-color
+
+  http-proxy-agent@9.1.0(supports-color@8.1.1):
+    dependencies:
+      agent-base: 9.0.0
+      debug: 4.4.3(supports-color@8.1.1)
+      proxy-agent-negotiate: 1.1.0
+    transitivePeerDependencies:
+      - kerberos
       - supports-color
 
   http-signature@1.4.0:
@@ -10289,6 +10307,8 @@ snapshots:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
 
+  proxy-agent-negotiate@1.1.0: {}
+
   proxy-from-env@1.0.0: {}
 
   proxy-from-env@2.1.0: {}
@@ -10753,7 +10773,7 @@ snapshots:
 
   slugify@1.6.9: {}
 
-  smtp-server@3.19.13:
+  smtp-server@3.21.3:
     dependencies:
       ipv6-normalize: 1.0.1
       nodemailer: 10.3.1
