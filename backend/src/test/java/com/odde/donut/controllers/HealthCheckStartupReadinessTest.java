@@ -87,6 +87,7 @@ class HealthCheckStartupReadinessTest {
           CompletableFuture.runAsync(() -> {
             application.run(
                 "--spring.profiles.active=e2e",
+                "--server.address=127.0.0.1",
                 "--server.port=0",
                 "--" + UnitTestDatasource.URL_PROPERTY);
             events.add("startup completed");
