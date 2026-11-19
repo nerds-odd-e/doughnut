@@ -55,7 +55,7 @@
     "es-toolkit": "1.53.2",
     "esbuild": "0.28.2",
     "gsap": "3.15.1",
-    "marked": "18.2.0",
+    "marked": "18.2.1",
     "optionator": "^0.9.4",
     "pdfjs-dist": "6.5.438",
     "playwright": "1.65.1",
