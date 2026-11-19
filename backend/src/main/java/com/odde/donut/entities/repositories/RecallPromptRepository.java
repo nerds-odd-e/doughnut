@@ -33,6 +33,20 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   Optional<RecallPrompt> findUnansweredByMemoryTracker(
       @Param("memoryTrackerId") Integer memoryTrackerId);
 
+  @Query(
+      value =
+          "SELECT rp.*"
+              + unansweredByMemoryTrackerFrom
+              + " AND rp.question_type = 'MCQ'"
+              + " AND JSON_UNQUOTE(JSON_EXTRACT("
+              + "IF(JSON_VALID(mcq.raw_json_question), mcq.raw_json_question, NULL),"
+              + " '$.focusNoteFingerprint')) = :focusNoteFingerprint"
+              + " ORDER BY rp.id DESC LIMIT 1",
+      nativeQuery = true)
+  Optional<RecallPrompt> findUnansweredMcqForFocus(
+      @Param("memoryTrackerId") Integer memoryTrackerId,
+      @Param("focusNoteFingerprint") String focusNoteFingerprint);
+
   @Query(value = "SELECT rp.*" + unansweredByMemoryTrackerFrom, nativeQuery = true)
   List<RecallPrompt> findAllUnansweredByMemoryTrackerId(
       @Param("memoryTrackerId") Integer memoryTrackerId);

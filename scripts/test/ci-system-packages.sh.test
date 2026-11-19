@@ -12,7 +12,7 @@ SCRIPT="$REPO_ROOT/scripts/ci-system-packages.sh"
 source "$REPO_ROOT/scripts/test/ci-system-packages-test-lib.sh"
 
 clear_fixture_env() {
-	unset APT_GET_HANG APT_GET_DELAY_SECONDS APT_GET_FAIL_ONCE APT_GET_FAIL_INSTALL \
+	unset APT_GET_HANG APT_GET_DELAY_SECONDS APT_GET_FAIL_ONCE APT_GET_FAIL_INSTALL APT_GET_FAIL_UPDATE \
 		CI_SYSTEM_PACKAGES_BUDGET_SECONDS CI_SYSTEM_PACKAGES_KILL_AFTER_SECONDS || true
 }
 
@@ -164,10 +164,50 @@ test_transient_recovery() {
 	rm -rf "$work"
 }
 
+test_installs_canvas_packages_during_vendor_outage() {
+	local work status out
+	work=$(mktemp -d)
+	setup_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	status=0
+	APT_GET_FAIL_UPDATE=vendor run_canvas_under_fakes "$work" || status=$?
+	out=$(cat "$work/out")
+
+	((status == 0)) || fail "expected canvas setup during a vendor outage; status=$status out=$out"
+	assert_canvas_packages_in_install "$APT_GET_LOG"
+	grep -Fq 'apt-get: install from Ubuntu archive' "$APT_GET_LOG" ||
+		fail 'expected canvas packages to install from the same Ubuntu sources'
+	[[ $out == *"phase=canvas completed"* ]] || fail "expected completed diagnostic; out=$out"
+
+	trap - RETURN
+	rm -rf "$work"
+}
+
+test_reports_required_archive_failure() {
+	local work status out
+	work=$(mktemp -d)
+	setup_work "$work"
+	trap 'rm -rf "'"$work"'"' RETURN
+
+	status=0
+	APT_GET_FAIL_UPDATE=archive run_canvas_under_fakes "$work" || status=$?
+	out=$(cat "$work/out")
+
+	((status == 100)) || fail "expected APT exit 100; status=$status out=$out"
+	[[ $out == *"Required index unavailable"* && $out == *"phase=canvas"* ]] ||
+		fail "expected the required archive and phase diagnostics; out=$out"
+
+	trap - RETURN
+	rm -rf "$work"
+}
+
 main() {
 	[[ -x $SCRIPT ]] || fail "script missing or not executable: $SCRIPT"
 	require_timeout
 
+	test_installs_canvas_packages_during_vendor_outage
+	test_reports_required_archive_failure
 	test_deadline_exhaustion
 	test_deadline_exhaustion_fails_with_guard_bypassed
 	test_slow_success_within_deadline

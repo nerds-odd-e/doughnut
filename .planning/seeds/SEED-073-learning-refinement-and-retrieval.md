@@ -115,73 +115,17 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 - **Effort hypothesis.** S. Owner: about 20 minutes of check. Elapsed: to
   2026-11-27 for the recommendation, to 2026-12-16 for the recall count.
 
-<a id="renew-waiting-question-when-note-changes"></a>
+<a id="revisit-waiting-questions-after-linked-note-edits"></a>
 
-### Renew a waiting question when its note changes
+### Revisit a waiting question after a linked note changes
 
-**Identity:** SEED-073#renew-waiting-question-when-note-changes
+**Identity:** SEED-073#revisit-waiting-questions-after-linked-note-edits
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/111-renew-waiting-question-when-note-changes/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"bd5ec173530540e80c66b2e065c11badc062a2751a9a4fe8c0f1f33308645061","plan":"6c9b298fbc454c320c7240367b11c282e64ac5ef0b05ac27330c7d218e93678b"}}
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
 ```
 
-- **Goal.** A learner who corrects a note can return to recall and answer
-  a multiple-choice question made from the corrected note, even when a
-  question was prepared before the edit. Renewal keeps the learner's
-  tracker, earlier answers, and schedule.
-- **Evidence.** The November 16 census counted 8,254 unanswered, uncontested
-  stored questions across 2,650 trackers with one next in line. It measured
-  answer status. Whether a learner had seen a question was unrecorded.
-  [Stored-question census](learning-refinement-integrity-initial-recommendation.md#recall-question-integrity-recommendation)
-- **What an edit predicts.** On November 18, a local cross-tab of the
-  November 16 pilot's scored rows (`noteChangedAfterGeneration` by
-  `outcome` in the historical and held-out labels) found that reviewers
-  judged 9 of 13 and 16 of 22 questions with a later focus-note edit sound
-  against the current note. The samples were selected, and the reviewers
-  lacked the original note text. The comparison establishes neither which
-  edits caused a defect nor how often renewal helps learners.
-  [Cohorts and source limitations](reliable-recall-question-checks-evidence.md#route-age-and-context)
-- **Scope.** At first presentation in web or CLI recall, compare the authored
-  title, body and properties of the focus note with the content used to
-  generate the waiting MCQ. Reuse a question made from matching content.
-  When the content differs, present a question generated from the current
-  note. A legacy question with unknown source content needs renewal when it
-  comes up. The learner takes no action on save and pays the wait only when
-  a current question is needed. While answering, the learner keeps the
-  displayed choices and submits against that prompt's original key.
-- **Key examples.**
-  1. A stored question asks about an observatory that opens at 9. The author
-     corrects the note to 10. Opening recall on web or CLI asks a question
-     made from the note that says 10, including when a batch requested
-     before the edit finishes importing afterward.
-  2. The opening time stays at 9 and the author fixes punctuation. The next
-     presentation still renews the question. If the focus text is identical
-     to the generation input, even an old question with known provenance
-     can be reused.
-  3. Web recall has prefetched the observatory card behind another card.
-     The edit to 10 is accepted before the learner reaches it. The learner
-     first sees the current question. If another edit happens while they
-     are reading it, their answer is graded against the choices they saw.
-  4. Renewal fails. The web learner can retry or choose Self-review, and
-     the CLI offers just review. Loading or choosing recovery leaves the
-     tracker due until the learner actually grades or answers it.
-     [Recall question loading](../../docs/recall-question-loading.md)
-- **Decision.** The owner selected exact focus-content comparison at first
-  presentation. As in a build system, recording the inputs used to make an
-  output allows it to be rebuilt on demand. An edit can renew a sound MCQ.
-  This buys freshness without asking a model to judge the effect of a typo
-  or requiring the learner to discover an obsolete question and clear it.
-  Linked-note edits and judging otherwise poor questions are deferred.
-- **Architecture.** Use the focus content that went into the generation
-  request. A batch may import after another edit. Both clients need one
-  server decision about the question they can present. Web prefetch can
-  finish before that decision, and CLI history is a record of prompts.
-  Accepted Git content provides the source. Provenance, questions, answers
-  and grades belong to the learner's tracker.
-  [Web prefetch](../../frontend/src/components/recall/useRecallPromptFetching.ts)
-  · [CLI question selection](../../cli/src/commands/recall/recallMcqCardLoad.ts)
-  · [Batch generation and import](../../docs/question-generation-batch-operations.md)
-  · [ADR 0002, Git-native Portable notebook tree synchronization](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
-  · [ADR 0003, Spaced-repetition scheduling policy](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)
+- **Goal / hypothesis.** A learner’s waiting question may depend on information from a linked note. If an edit changes the answer, the learner needs a question and choices that reflect the correction when recall opens.
+- **Open question.** Which linked-note edits matter enough to renew a question when the authored focus note still matches? Correct questions that are poor practice have their own [replacement story](#replace-correct-but-poor-question).
 
 <a id="validate-within-note-objectives"></a>
 

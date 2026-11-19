@@ -197,7 +197,9 @@ public class OpenAiApiHandler {
     }
   }
 
-  public <T> Optional<T> parseStructuredOutputFromBatchSuccessLine(
+  public record BatchStructuredOutput<T>(T output, JsonNode metadata) {}
+
+  public <T> Optional<BatchStructuredOutput<T>> parseStructuredOutputFromBatchSuccessLine(
       String rawSuccessLine, Class<T> responseType) {
     if (rawSuccessLine == null || rawSuccessLine.isBlank()) {
       return Optional.empty();
@@ -219,7 +221,8 @@ public class OpenAiApiHandler {
           if (text == null || text.isBlank()) {
             continue;
           }
-          return Optional.of(objectMapper.readValue(text, responseType));
+          return Optional.ofNullable(objectMapper.readValue(text, responseType))
+              .map(output -> new BatchStructuredOutput<>(output, bodyNode.path("metadata")));
         }
       }
       return Optional.empty();

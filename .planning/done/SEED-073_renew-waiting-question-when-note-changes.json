@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#renew-waiting-question-when-note-changes",
+  "title": "Renew a waiting question when its note changes",
+  "completedAt": "2026-11-19T00:49:47.608Z",
+  "developer": "Terry Yin",
+  "agent": "philip-chan",
+  "host": "codex",
+  "model": "gpt-6.2-sol",
+  "intentCoverage": {
+    "report": "**Caught.** For `SEED-073#renew-waiting-question-when-note-changes` at `6f50812667ec9284bc6b55a54362dc21e24d27b9`, the maintained CLI test caught an answer submitted to the wrong prompt after a later edit.\n\nThe test displayed prompt 42 about ten o’clock and kept its North choice after the fixture offered prompt 43 about eleven. In a detached scratch checkout, I changed the MCQ mapper in `cli/src/commands/recall/nextRecallCardLoad.ts` to carry the tracker ID as the prompt ID. A separate trace at the answer submission boundary recorded prompt 1 and choice index 1. The displayed-text and choice assertions passed. The final `answerSpy` assertion in `cli/tests/recallMcqInteractive.current.test.tsx` failed on the actual SDK call, which specified prompt 1 where it expected 42.\n\nThe same command ran each time, `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/recallMcqInteractive.current.test.tsx`. The baseline passed one test, the fault failed that test, and restoration passed it again. Git confirmed the original clean checkout at the checked revision before removal. Scratch setup encountered a Cypress package postinstall error. The independently installed CLI dependencies ran all three Vitest checks in the scratch checkout.\n\n**Next proof action.** Retain the existing prompt-ID and choice assertion. This probe covers the CLI answer path.\n\n- **Test runtime.** 5.63 seconds measured by Vitest across the baseline, fault and restored runs (3.45, 1.15 and 1.03 seconds).\n- **Human effort.** Unavailable. The check required no human intervention, and no separate human-effort measure was recorded.\n- **Agent effort.** Unavailable. The host supplied a session start and command timings without a separate active-effort measurement.\n\n\n- **Invocation-to-report elapsed.** 147642 ms (measured), from 1795049138055 to 1795049285697 in Unix epoch ms. The end clock was sampled after writing the prepared report body.\n\nWrap-up disposition for 6f50812667ec9284bc6b55a54362dc21e24d27b9: Caught. Retain the maintained CLI assertion. No follow-up is needed for this probe.\n"
+  }
+}

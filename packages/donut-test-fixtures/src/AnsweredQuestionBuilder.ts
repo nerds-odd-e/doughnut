@@ -4,7 +4,7 @@ import type {
   Note,
   NoteTopology,
   Mcq,
-  RecallPromptHistoryItem,
+  RecallPrompt,
 } from '@generated/donut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
@@ -118,8 +118,8 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
-  fromMcqHistoryItem(
-    pending: RecallPromptHistoryItem,
+  fromMcqPrompt(
+    pending: RecallPrompt,
     note: Note,
     memoryTrackerId: number
   ): this {

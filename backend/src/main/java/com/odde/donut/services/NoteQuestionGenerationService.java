@@ -5,6 +5,7 @@ import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
+import com.odde.donut.services.QuestionGenerationRequestBuilder.PreparedQuestionGeneration;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.ai.SupportedChoices;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
@@ -39,15 +40,24 @@ public class NoteQuestionGenerationService {
   public GeneratedMcq generateQuestion(
       Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus)
       throws JsonProcessingException {
-    return generateQuestionWithResponses(note, additionalMessage, contextSeed, propertyFocus);
+    return generateQuestionFromRequest(
+        requestBuilder.buildQuestionGenerationResponseRequest(
+            note, additionalMessage, contextSeed, propertyFocus));
   }
 
-  private GeneratedMcq generateQuestionWithResponses(
+  public GeneratedQuestion generateQuestionWithFocus(
       Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
-    StructuredResponseCreateParams<GeneratedMcq> responseRequest =
-        requestBuilder.buildQuestionGenerationResponseRequest(
+    PreparedQuestionGeneration prepared =
+        requestBuilder.prepareQuestionGeneration(
             note, additionalMessage, contextSeed, propertyFocus);
+    return new GeneratedQuestion(
+        generateQuestionFromRequest(prepared.request()), prepared.focusNoteFingerprint());
+  }
 
+  public record GeneratedQuestion(GeneratedMcq question, String focusNoteFingerprint) {}
+
+  private GeneratedMcq generateQuestionFromRequest(
+      StructuredResponseCreateParams<GeneratedMcq> responseRequest) {
     return openAiApiHandler
         .requestAndGetStructuredResponseResult(responseRequest)
         .flatMap(this::validQuestion)

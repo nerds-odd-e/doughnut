@@ -54,15 +54,19 @@ public class FocusContextRetrievalService {
   }
 
   public FocusContextResult retrieve(Note focusNote, User viewer, RetrievalConfig config) {
-    Note hydrated =
-        Optional.ofNullable(focusNote.getId())
-            .flatMap(id ->
-                noteRepository
-                    .hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(id))
-                    .stream()
-                    .findFirst())
-            .orElse(focusNote);
+    return retrieveFromHydratedFocus(hydrateFocus(focusNote), viewer, config);
+  }
 
+  public Note hydrateFocus(Note focusNote) {
+    return Optional.ofNullable(focusNote.getId())
+        .flatMap(id ->
+            noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(id)).stream()
+                .findFirst())
+        .orElse(focusNote);
+  }
+
+  public FocusContextResult retrieveFromHydratedFocus(
+      Note hydrated, User viewer, RetrievalConfig config) {
     int combinedContentBudget = config.getFocusContextContentTokenBudget();
     int focusDetailTruncationCap =
         Math.min(

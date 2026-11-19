@@ -13,10 +13,8 @@ import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.odde.donut.testability.SpringTestBase;
-import com.openai.models.responses.StructuredResponseCreateParams;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,14 +64,13 @@ class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
   private Map<String, Object> expectedBodyForRequest(
       QuestionGenerationBatch batch, QuestionGenerationBatchRequest request) {
     MemoryTracker tracker = request.getMemoryTracker();
-    StructuredResponseCreateParams<GeneratedMcq> params =
-        requestBuilder.buildQuestionGenerationResponseRequestForBatch(
-            tracker.getNote(),
-            null,
-            request.getContextSeed(),
-            tracker.propertyFocus(),
-            batch.getUser());
-    return paramsSerializer.toBodyMap(params);
+    var prepared =
+        requestBuilder.prepareBatchQuestionGeneration(
+            tracker.getNote(), request.getContextSeed(), tracker.propertyFocus(), batch.getUser());
+    Map<String, Object> body = paramsSerializer.toBodyMap(prepared.request());
+    body.put(
+        "metadata", Map.of("focus_note_fingerprint", FocusNoteFingerprint.of(tracker.getNote())));
+    return body;
   }
 
   @Nested
@@ -163,15 +160,11 @@ class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
 
       QuestionGenerationBatch batch = savePlannedBatch();
       saveBatchRequest(batch, tracker);
-      List<QuestionGenerationBatchRequest> requests =
-          batchRequestRepository.findByBatch_Id(batch.getId());
       String jsonl = jsonlRenderer.renderInputJsonl(batch);
       List<Map<String, Object>> lines = parseJsonl(jsonl);
 
-      assertThat(lines, hasSize(1));
       @SuppressWarnings("unchecked")
-      Map<String, Object> body = (Map<String, Object>) lines.get(0).get("body");
-      assertThat(body, is(expectedBodyForRequest(batch, requests.get(0))));
+      Map<String, Object> body = (Map<String, Object>) lines.getFirst().get("body");
       @SuppressWarnings("unchecked")
       Map<String, Object> reasoning = (Map<String, Object>) body.get("reasoning");
       assertThat(reasoning.get("effort"), is("high"));

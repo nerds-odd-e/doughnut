@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// Re-checks for an unanswered prompt inside the write transaction to avoid a concurrent duplicate.
+// Rechecks for a matching prompt inside the write transaction before saving a new one.
 @Service
 public class RecallPromptPersister {
   private final RecallPromptRepository recallPromptRepository;
@@ -24,10 +25,20 @@ public class RecallPromptPersister {
 
   @Transactional
   public RecallPrompt persistRecallPromptForMcq(Mcq mcq, MemoryTracker memoryTracker) {
+    Note currentFocus = entityPersister.find(Note.class, memoryTracker.getNote().getId());
+    if (currentFocus == null) {
+      return null;
+    }
+    String currentFingerprint = FocusNoteFingerprint.of(currentFocus);
     RecallPrompt existingPrompt =
-        recallPromptRepository.findUnansweredByMemoryTracker(memoryTracker.getId()).orElse(null);
+        recallPromptRepository
+            .findUnansweredMcqForFocus(memoryTracker.getId(), currentFingerprint)
+            .orElse(null);
     if (existingPrompt != null) {
       return existingPrompt;
+    }
+    if (!currentFingerprint.equals(mcq.getFocusNoteFingerprint())) {
+      return null;
     }
     return persistNewRecallPromptForMcq(mcq, memoryTracker);
   }

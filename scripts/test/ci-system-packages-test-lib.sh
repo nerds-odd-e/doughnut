@@ -36,8 +36,8 @@ EOS
 	chmod +x "$fake_bin/sudo"
 }
 
-# Stand-in apt-get: honors Acquire::Retries for one simulated transient install
-# failure, optional delay, optional hang, and hard install failure.
+# Stand-in apt-get: model repository availability, acquisition retries and the
+# deadline of the real canvas and MySQL scripts.
 write_fake_apt_get() {
 	local fake_bin=$1
 	{
@@ -52,6 +52,9 @@ delay_seconds="${APT_GET_DELAY_SECONDS:-0}"
 hang="${APT_GET_HANG:-0}"
 fail_once="${APT_GET_FAIL_ONCE:-0}"
 fail_install="${APT_GET_FAIL_INSTALL:-0}"
+fail_update="${APT_GET_FAIL_UPDATE:-}"
+source_list=
+source_parts=
 
 args=("$@")
 echo "apt-get $*" >>"$APT_GET_LOG"
@@ -62,11 +65,22 @@ for arg in "${args[@]}"; do
 	Acquire::Retries=*)
 		retries=${arg#Acquire::Retries=}
 		;;
+	Dir::Etc::SourceList=*)
+		source_list=${arg#Dir::Etc::SourceList=}
+		;;
+	Dir::Etc::SourceParts=*)
+		source_parts=${arg#Dir::Etc::SourceParts=}
+		;;
 	update | install | upgrade | dist-upgrade)
 		subcommand=$arg
 		;;
 	esac
 done
+
+sources='runner repositories'
+if [[ $source_list == /etc/apt/sources.list.d/ubuntu.sources && $source_parts == /dev/null ]]; then
+	sources='Ubuntu archive'
+fi
 
 if [[ $hang == 1 ]]; then
 	# Sleep past the fixture budget; responds to TERM so the real timeout
@@ -82,10 +96,19 @@ fi
 
 case $subcommand in
 update)
+	if [[ $fail_update == archive ]]; then
+		echo 'Ubuntu archive: Required index unavailable' >&2
+		exit 100
+	fi
+	if [[ $fail_update == vendor && $sources == 'runner repositories' ]]; then
+		echo 'Microsoft package repository: 429 Too Many Requests' >&2
+		exit 100
+	fi
 	echo "apt-get: update ok" >>"$APT_GET_LOG"
 	exit 0
 	;;
 install)
+	echo "apt-get: install from $sources" >>"$APT_GET_LOG"
 	attempt_file="$APT_STATE_DIR/install_attempts"
 	attempt=$(($(cat "$attempt_file" 2>/dev/null || echo 0) + 1))
 	echo "$attempt" >"$attempt_file"

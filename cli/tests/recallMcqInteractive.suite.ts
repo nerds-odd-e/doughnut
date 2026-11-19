@@ -4,12 +4,7 @@ import {
   RecallPromptController,
   RecallsController,
 } from 'donut-api'
-import type {
-  AnsweredQuestion,
-  NoteRealm,
-  RecallPromptHistoryItem,
-  RecallPrompt,
-} from 'donut-api'
+import type { AnsweredQuestion, NoteRealm, RecallPrompt } from 'donut-api'
 import makeMe from 'donut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
@@ -37,9 +32,7 @@ export type RecallMcqInteractiveApi = {
   expect: typeof expect
   vi: typeof vi
   makeMe: typeof makeMe
-  MemoryTrackerController: typeof MemoryTrackerController
   RecallPromptController: typeof RecallPromptController
-  RecallsController: typeof RecallsController
   InteractiveCliApp: typeof InteractiveCliApp
   RECALL_PROMPT_ID: typeof RECALL_PROMPT_ID
   EXPECT_GUIDANCE_MORE_BELOW: typeof EXPECT_GUIDANCE_MORE_BELOW
@@ -55,20 +48,22 @@ export type RecallMcqInteractiveApi = {
   waitMcqIncorrectOnLastFrame: typeof waitMcqIncorrectOnLastFrame
   waitReturnsToMcq: typeof waitReturnsToMcq
   recallingSpy: ReturnType<typeof vi.spyOn>
-  getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
+  setMcqQuestion: (
+    trackerId: number,
+    prompt: RecallPrompt | Promise<RecallPrompt>
+  ) => void
   answerSpy: ReturnType<typeof vi.spyOn>
-  pendingMcqPrompt: () => RecallPromptHistoryItem
   pendingMcqQuestion: (
     id?: number,
     stem?: string,
     choices?: string[]
   ) => RecallPrompt
   mcqAnsweredPrompt: (
-    pending: RecallPromptHistoryItem,
+    pending: RecallPrompt,
     answer: { id: number; correct: boolean; choiceIndex: number },
     memoryTrackerId?: number
   ) => AnsweredQuestion
-  mockSingleMcqDue: () => void
+  setDueMcqTrackers: (...trackerIds: number[]) => void
   setContestSpy: (spy: ReturnType<typeof vi.spyOn>) => void
   setRegenerateSpy: (spy: ReturnType<typeof vi.spyOn>) => void
 }
@@ -81,19 +76,18 @@ export function describeRecallMcqInteractive(
     let savedConfigDir: string | undefined
     let recallingSpy: ReturnType<typeof vi.spyOn>
     let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
-    let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptSpy: ReturnType<typeof vi.spyOn>
     let answerSpy: ReturnType<typeof vi.spyOn>
     let contestSpy: ReturnType<typeof vi.spyOn> | undefined
     let regenerateSpy: ReturnType<typeof vi.spyOn> | undefined
     let mcqFixtureNoteRealm: NoteRealm
 
-    function pendingMcqPrompt(): RecallPromptHistoryItem {
-      return makeMe.aRecallPromptHistoryItem
-        .withId(RECALL_PROMPT_ID)
-        .withQuestionStem('Choose **Alpha**?')
-        .withChoices(['First', '**Beta**', 'Third'])
-        .please()
+    const questions = new Map<number, RecallPrompt | Promise<RecallPrompt>>()
+
+    async function questionFor(trackerId: number) {
+      const question = questions.get(trackerId)
+      if (!question) throw new Error(`unexpected memoryTracker ${trackerId}`)
+      return question
     }
 
     function pendingMcqQuestion(
@@ -109,21 +103,26 @@ export function describeRecallMcqInteractive(
     }
 
     function mcqAnsweredPrompt(
-      pending: RecallPromptHistoryItem,
+      pending: RecallPrompt,
       answer: { id: number; correct: boolean; choiceIndex: number },
       memoryTrackerId = 1
     ): AnsweredQuestion {
       return makeMe.anAnsweredQuestion
-        .fromMcqHistoryItem(pending, mcqFixtureNoteRealm.note, memoryTrackerId)
+        .fromMcqPrompt(pending, mcqFixtureNoteRealm.note, memoryTrackerId)
         .withAnswer(answer)
         .please()
     }
 
-    function mockSingleMcqDue() {
+    function setDueMcqTrackers(...trackerIds: number[]) {
       recallingSpy.mockResolvedValue({
         data: makeMe.aDueMemoryTrackersList
           .totalAssimilatedCount(0)
-          .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+          .toRepeat(
+            trackerIds.map((memoryTrackerId) => ({
+              memoryTrackerId,
+              spelling: false,
+            }))
+          )
           .please(),
       } as Awaited<ReturnType<typeof RecallsController.recalling>>)
     }
@@ -138,14 +137,10 @@ export function describeRecallMcqInteractive(
         .content('body')
         .please()
 
-      recallingSpy = vi
-        .spyOn(RecallsController, 'recalling')
-        .mockResolvedValue({
-          data: makeMe.aDueMemoryTrackersList
-            .totalAssimilatedCount(0)
-            .toRepeat([{ memoryTrackerId: 1, spelling: false }])
-            .please(),
-        } as Awaited<ReturnType<typeof RecallsController.recalling>>)
+      recallingSpy = vi.spyOn(RecallsController, 'recalling')
+      setDueMcqTrackers(1)
+      questions.clear()
+      questions.set(1, pendingMcqQuestion())
 
       showMemoryTrackerSpy = vi
         .spyOn(MemoryTrackerController, 'showMemoryTracker')
@@ -153,17 +148,16 @@ export function describeRecallMcqInteractive(
           new Error('unexpected showMemoryTracker in MCQ path')
         )
 
-      getRecallPromptsSpy = vi
-        .spyOn(MemoryTrackerController, 'getRecallPrompts')
-        .mockResolvedValue({
-          data: [pendingMcqPrompt()],
-        } as Awaited<
-          ReturnType<typeof MemoryTrackerController.getRecallPrompts>
-        >)
-
       getRecallPromptSpy = vi
         .spyOn(MemoryTrackerController, 'getRecallPrompt')
-        .mockRejectedValue(new Error('stub: MCQ from getRecallPrompts'))
+        .mockImplementation(
+          async (options) =>
+            ({
+              data: await questionFor(options.path.memoryTracker),
+            }) as Awaited<
+              ReturnType<typeof MemoryTrackerController.getRecallPrompt>
+            >
+        )
 
       answerSpy = vi.spyOn(RecallPromptController, 'answer')
     })
@@ -175,7 +169,6 @@ export function describeRecallMcqInteractive(
       regenerateSpy = undefined
       recallingSpy.mockRestore()
       showMemoryTrackerSpy.mockRestore()
-      getRecallPromptsSpy.mockRestore()
       getRecallPromptSpy.mockRestore()
       answerSpy.mockRestore()
       if (savedConfigDir === undefined) {
@@ -191,9 +184,7 @@ export function describeRecallMcqInteractive(
       expect,
       vi,
       makeMe,
-      MemoryTrackerController,
       RecallPromptController,
-      RecallsController,
       InteractiveCliApp,
       RECALL_PROMPT_ID,
       EXPECT_GUIDANCE_MORE_BELOW,
@@ -211,16 +202,15 @@ export function describeRecallMcqInteractive(
       get recallingSpy() {
         return recallingSpy
       },
-      get getRecallPromptsSpy() {
-        return getRecallPromptsSpy
+      setMcqQuestion: (trackerId, question) => {
+        questions.set(trackerId, question)
       },
       get answerSpy() {
         return answerSpy
       },
-      pendingMcqPrompt,
       pendingMcqQuestion,
       mcqAnsweredPrompt,
-      mockSingleMcqDue,
+      setDueMcqTrackers,
       setContestSpy: (spy) => {
         contestSpy = spy
       },

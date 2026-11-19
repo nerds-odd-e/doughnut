@@ -4,8 +4,7 @@ describeRecallMcqInteractive((api) => {
   const {
     test,
     expect,
-    makeMe,
-    MemoryTrackerController,
+    pendingMcqQuestion,
     InteractiveCliApp,
     RECALL_PROMPT_ID,
     EXPECT_GUIDANCE_MORE_BELOW,
@@ -15,17 +14,14 @@ describeRecallMcqInteractive((api) => {
 
   test('many MCQ choices use a fixed-height list with more-below', async () => {
     const manyChoicesCount = 15
-    api.getRecallPromptsSpy.mockResolvedValue({
-      data: [
-        makeMe.aRecallPromptHistoryItem
-          .withId(RECALL_PROMPT_ID)
-          .withQuestionStem('Pick one')
-          .withChoices(
-            Array.from({ length: manyChoicesCount }, (_, i) => `c${i}`)
-          )
-          .please(),
-      ],
-    } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
+    api.setMcqQuestion(
+      1,
+      pendingMcqQuestion(
+        RECALL_PROMPT_ID,
+        'Pick one',
+        Array.from({ length: manyChoicesCount }, (_, i) => `c${i}`)
+      )
+    )
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 

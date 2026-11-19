@@ -31,47 +31,50 @@ function excludedApplicationPorts(allocation) {
   return used
 }
 
-async function closeHeld(held) {
-  for (const item of held) {
-    await closeListeningServer(item.server)
-  }
-}
-
 /**
- * Reserve one management port and one serving port, then release the holds so
- * the mock child can bind. Excludes the canonical Mountebank management port,
+ * Reserve one management port and one serving port until the mock binds.
+ * Excludes the canonical Mountebank management port,
  * the caller's canonical serving ports, and the checkout's application ports.
  * Delegates to the multi-service allocator with `servingPortCount: 1` and
  * adapts the return shape to the single-service contract.
- * @returns {Promise<{ managementPort: number, servingPort: number }>}
  */
 export async function allocateMountebankMockPorts(
   allocation,
   { excludeServingPorts = [] } = {}
 ) {
-  const { managementPort, servingPorts } =
+  const { servingPorts, ...reservation } =
     await allocateMountebankMockPortsMulti(allocation, {
       excludeServingPorts,
       servingPortCount: 1,
     })
-  return { managementPort, servingPort: servingPorts[0] }
+  return { ...reservation, servingPort: servingPorts[0] }
 }
 
 /**
  * Multi-service allocation: reserve one management port and `servingPortCount`
- * serving ports (one per mocked service), then release the holds so the mock
- * child can bind. Excludes the canonical Mountebank management port, the
+ * serving ports (one per mocked service). The starter releases each port
+ * just before binding and releases any unused reservations when startup ends.
+ * Excludes the canonical Mountebank management port, the
  * caller's canonical serving ports (one per mocked service), and the
  * checkout's application ports. Used when one invocation requires more than
  * one mocked service under a single owned management process; the
  * single-service allocator wraps this with `servingPortCount: 1`.
- * @returns {Promise<{ managementPort: number, servingPorts: number[] }>}
  */
 export async function allocateMountebankMockPortsMulti(
   allocation,
   { excludeServingPorts = [], servingPortCount = 2 } = {}
 ) {
-  const held = []
+  const held = new Map()
+  async function releasePort(port) {
+    const server = held.get(port)
+    if (server) {
+      held.delete(port)
+      await closeListeningServer(server)
+    }
+  }
+  async function releasePorts() {
+    await Promise.all([...held.keys()].map(releasePort))
+  }
   const used = new Set([SHARED_MOUNTEBANK_MANAGEMENT_PORT])
   for (const port of excludeServingPorts) {
     if (Number.isInteger(port)) used.add(port)
@@ -82,7 +85,7 @@ export async function allocateMountebankMockPortsMulti(
   const target = 1 + servingPortCount
   try {
     let attempts = 0
-    while (held.length < target) {
+    while (held.size < target) {
       attempts += 1
       if (attempts > ALLOCATE_ATTEMPTS) {
         throw new Error(
@@ -95,14 +98,12 @@ export async function allocateMountebankMockPortsMulti(
         continue
       }
       used.add(reserved.port)
-      held.push(reserved)
+      held.set(reserved.port, reserved.server)
     }
-    const managementPort = held[0].port
-    const servingPorts = held.slice(1).map((h) => h.port)
-    await closeHeld(held)
-    return { managementPort, servingPorts }
+    const [managementPort, ...servingPorts] = held.keys()
+    return { managementPort, servingPorts, releasePort, releasePorts }
   } catch (error) {
-    await closeHeld(held)
+    await releasePorts()
     throw error
   }
 }
@@ -110,7 +111,6 @@ export async function allocateMountebankMockPortsMulti(
 /**
  * OpenAI-specific allocation: exclude the OpenAI canonical serving port (5001)
  * in addition to the canonical management port and the checkout's app ports.
- * @returns {Promise<{ managementPort: number, servingPort: number }>}
  */
 export async function allocatePrivateOpenAiMockPorts(allocation) {
   return allocateMountebankMockPorts(allocation, {
@@ -123,7 +123,6 @@ export async function allocatePrivateOpenAiMockPorts(allocation) {
  * (5002) in addition to the canonical management port and the checkout's app
  * ports. Wikidata's adapter consumes this owned endpoint instead of the
  * hardcoded 5002/default 2525.
- * @returns {Promise<{ managementPort: number, servingPort: number }>}
  */
 export async function allocatePrivateWikidataMockPorts(allocation) {
   return allocateMountebankMockPorts(allocation, {

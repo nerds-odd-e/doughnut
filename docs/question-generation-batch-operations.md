@@ -1,6 +1,6 @@
 # Question Generation Batch Operations
 
-Production-only hourly job that pre-generates recall questions via the OpenAI Batch API. Synchronous on-demand generation is unchanged and still serves as fallback when no pre-generated prompt exists.
+The production hourly job pre-generates recall questions via the OpenAI Batch API. Recall reuses a pre-generated question when it matches the current authored focus and generates one on demand when renewal is needed.
 
 ## Scheduler
 
@@ -121,13 +121,14 @@ WHERE latest.submitted_at > NOW() - INTERVAL 23 HOUR;
 
 ## OpenAI Batch Request Compatibility
 
-Batch JSONL uses a separate request shape from synchronous question generation (`buildQuestionGenerationResponseRequestForBatch`):
+`prepareBatchQuestionGeneration` supplies the parameters and authored focus fingerprint for each JSONL request.
 
 - **`reasoning.effort`** — included at **HIGH** when the configured question-generation model supports reasoning (`OpenAiModelCapabilities.supportsReasoningEffort`: `o1`, `o3`, `o4`, `gpt-5` prefixes); omitted for non-reasoning models such as `gpt-4.1-mini`.
 - **Sync generation** uses the same model detection with **MEDIUM** effort when supported; no `reasoning` key otherwise.
 - **`text.verbosity: medium`** — batch requests always use medium verbosity (non-reasoning batch models reject `low`); sync generation uses `low`.
+- **`metadata.focus_note_fingerprint`** carries the authored focus fingerprint in the Responses request. Output collection retains the matching response metadata in `raw_success_payload`. The importer copies it to the MCQ, including when import resumes after a restart. Batch output with unknown provenance follows on-demand renewal at recall.
 
-Captured success JSONL from manual verification is at `backend/src/test/resources/openai-batch-fixtures/live_batch_success_line.json`, covered by `QuestionGenerationBatchOutputFixtureTest`.
+`QuestionGenerationBatchOutputFixtureTest` exercises the semantic MCQ success fixture in `backend/src/test/resources/openai-batch-fixtures/semantic_mcq_batch_success_line.json`. The success line captured during manual verification is retained in Git history. [Manual verification capture](https://github.com/nerds-odd-e/doughnut/blob/ea9826fd71b37e0222cdf10cd75c2ff924c778b8/backend/src/test/resources/openai-batch-fixtures/live_batch_success_line.json)
 
 ### Timezone
 

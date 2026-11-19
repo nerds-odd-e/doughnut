@@ -33,14 +33,18 @@ apt_option_string() {
 		-o "Acquire::Retries=${ACQUIRE_RETRIES}" \
 		-o "Acquire::http::Timeout=30" \
 		-o "Acquire::https::Timeout=30" \
-		-o "APT::Update::Error-Mode=any"
+		-o "APT::Update::Error-Mode=any" "$@"
 }
 
-apt_update_install_body() {
+canvas_apt_body() {
 	local packages=$1
 	local opts
-	opts=$(apt_option_string)
-	printf 'apt-get %supdate && apt-get %sinstall --yes --no-install-recommends %s' \
+	# Canvas dependencies come from Ubuntu's archive. Preserve the runner's
+	# other repository definitions and cached indexes during this refresh.
+	opts=$(apt_option_string \
+		-o Dir::Etc::SourceList=/etc/apt/sources.list.d/ubuntu.sources \
+		-o Dir::Etc::SourceParts=/dev/null)
+	printf 'apt-get %supdate --no-list-cleanup && apt-get %sinstall --yes --no-install-recommends %s' \
 		"$opts" "$opts" "$packages"
 }
 
@@ -95,7 +99,7 @@ sudo_apt_script() {
 purpose_canvas() {
 	local packages
 	packages=$(printf '%s ' "${CANVAS_PACKAGES[@]}")
-	run_bounded_phase canvas "$(sudo_apt_script "$(apt_update_install_body "$packages")")"
+	run_bounded_phase canvas "$(sudo_apt_script "$(canvas_apt_body "$packages")")"
 }
 
 # Compatibility downloads and APT install share one phase deadline/retry policy.

@@ -17,6 +17,18 @@ unanswered prompts preserves a question that an answered prompt still uses.
 Removing a tracker removes its prompts and their questions through the shared
 application-owned lifecycle.
 
+When a learner opens a multiple-choice card, the server looks for an unanswered,
+uncontested question on that tracker whose generation input matches the current
+focus note. It compares a private fingerprint of the note's identity, authored
+title and full Markdown, including properties and punctuation. The newest
+matching prompt can be reused regardless of age. If no prompt has a known
+match, the server generates a question from the current note. Batch questions
+carry the fingerprint captured when their requests were rendered.
+
+An edit after presentation leaves the open attempt bound to the choices and
+answer key of its issued prompt. Answering or grading that attempt updates
+the learner's schedule.
+
 ## Shared due list order
 
 Eligible due work for web and CLI comes from the shared due list. Order is
@@ -43,10 +55,21 @@ The existing backend operation reuses an unanswered prompt. Access checks and
 foreground error reporting remain applicable. Background prefetch failures stay
 with their tracker until the learner reaches it and deliberately retries.
 
-The web card's shared `useRecallPromptFetching` owner keeps pending, failed, and
-loaded state by tracker. It prevents duplicate pending requests and associates
-each completion with its initiating request. Navigation remains available while
-a request is pending; a late response preserves the visible card and its input.
+An upcoming multiple-choice question can be prepared in the background. When
+the learner reaches that tracker, the web card requests the current prompt and
+shows a loading indicator until the foreground request completes. The displayed
+choices and any subsequent answer use that selected prompt ID.
+
+The CLI requests the current prompt when it opens a multiple-choice card.
+It shows that prompt's stem and choices and submits the selected choice against
+the same prompt ID, including after another note edit. If the request fails or
+returns no usable choices, the CLI opens the note for just review. The learner
+can grade it there.
+
+The web card's shared `useRecallPromptFetching` owner keeps question load state
+by tracker and associates each completion with its initiating request.
+Navigation remains available while a request is pending. A late response
+preserves the visible card and its input.
 Spelling entry receives the loaded prompt from this owner and is presented only
 when that prompt is available.
 

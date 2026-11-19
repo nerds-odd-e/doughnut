@@ -26,7 +26,8 @@ class QuestionGenerationBatchOutputFixtureTest extends SpringTestBase {
     GeneratedMcq mcq =
         openAiApiHandler
             .parseStructuredOutputFromBatchSuccessLine(line, GeneratedMcq.class)
-            .orElseThrow();
+            .orElseThrow()
+            .output();
 
     assertThat(mcq.isValid(), is(true));
     assertThat(mcq.getQuestionStem(), containsStringIgnoringCase("sunlight"));

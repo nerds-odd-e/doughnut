@@ -72,32 +72,46 @@ describe("RecallPage question recovery", () => {
     expect(grade).not.toHaveBeenCalled()
   })
 
-  it.each([true, false])(
-    "keeps navigation and a different question intact after late retry success=%s",
-    async (success) => {
-      const pending = deferredRecallPromptResponse()
-      mockSdkService(MemoryTrackerController, "getRecallPrompt", prompt(2))
-        .mockResolvedValueOnce(wrapSdkError("unavailable"))
-        .mockImplementationOnce(() => pending.promise)
-      const wrapper = await ctx.mountPage()
-      await retry(wrapper).trigger("click")
-      await flushPromises()
-      await moveCurrentRecallToEnd(wrapper)
-      expect(wrapper.text()).toContain("Question 2")
-      pending.resolve(
-        success ? wrapSdkResponse(prompt(1)) : wrapSdkError("retry failed")
-      )
-      await flushPromises()
-      expect(wrapper.text()).toContain("Question 2")
-      expect(progress(wrapper)).toContain("0/2")
-      await moveCurrentRecallToEnd(wrapper)
-      expect(
-        success
-          ? wrapper.text().includes("Question 1")
-          : retry(wrapper).exists()
-      ).toBe(true)
-    }
-  )
+  async function returnAfterOffscreenRetry(
+    response: Awaited<
+      ReturnType<typeof deferredRecallPromptResponse>["promise"]
+    >
+  ) {
+    const pending = deferredRecallPromptResponse()
+    const getPrompt = mockSdkService(
+      MemoryTrackerController,
+      "getRecallPrompt",
+      prompt(2)
+    )
+      .mockResolvedValueOnce(wrapSdkError("unavailable"))
+      .mockImplementationOnce(() => pending.promise)
+    const wrapper = await ctx.mountPage()
+    await retry(wrapper).trigger("click")
+    await flushPromises()
+    await moveCurrentRecallToEnd(wrapper)
+    expect(wrapper.text()).toContain("Question 2")
+
+    pending.resolve(response)
+    await flushPromises()
+    expect(wrapper.text()).toContain("Question 2")
+    expect(progress(wrapper)).toContain("0/2")
+
+    getPrompt.mockResolvedValue(wrapSdkResponse(prompt(3)))
+    await moveCurrentRecallToEnd(wrapper)
+    return wrapper
+  }
+
+  it("selects the current question when returning after an offscreen retry succeeded", async () => {
+    const wrapper = await returnAfterOffscreenRetry(wrapSdkResponse(prompt(1)))
+    expect(wrapper.text()).toContain("Question 3")
+  })
+
+  it("offers deliberate retry when returning after an offscreen retry failed", async () => {
+    const wrapper = await returnAfterOffscreenRetry(
+      wrapSdkError("retry failed")
+    )
+    expect(retry(wrapper).text()).toBe("Retry")
+  })
 
   it("keeps a failed future prefetch local and offers recovery when reached", async () => {
     const pending = deferredRecallPromptResponse()

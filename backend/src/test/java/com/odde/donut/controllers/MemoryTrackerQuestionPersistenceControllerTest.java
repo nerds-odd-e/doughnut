@@ -17,7 +17,11 @@ import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import jakarta.persistence.EntityManager;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,9 +35,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerControllerTestBase {
   @Autowired EntityManager entityManager;
+  @Autowired JsonMapper webJsonMapper;
 
   OpenAiStructuredResponseMock openAiMock;
 
@@ -72,19 +79,66 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
     assertThat(question.getContextSeed(), notNullValue());
     assertThat(questionCount(), equalTo(questionsBefore + 1));
 
+    assertThat(
+        generationInput(), containsString("<focus_note>\nTitle: " + current.getTitle() + "\n"));
+  }
+
+  @Test
+  void preservesTheGenerationFocusWithThePersistedQuestion() throws Exception {
+    String title = "Observatory at Ångström Peak";
+    String markdown = "---\nsite: North ridge\n---\nThe observatory opens at nine.";
+    Note focus =
+        makeMe.aNote(title).notebookOwnedBy(currentUser.getUser()).content(markdown).please();
+    MemoryTracker tracker = ownedTracker(focus);
+    openAiMock.stubStructuredResponse(
+        makeMe
+            .aGeneratedMcq()
+            .stem("When does the observatory open?")
+            .correctAnswer("Nine")
+            .please());
+
+    var result = controller.getRecallPrompt(tracker);
+    makeMe.entityPersister.flushAndClear();
+
+    String input = generationInput();
+    assertThat(input, containsString("<focus_note>\nTitle: " + title + "\n"));
+    assertThat(input, containsString(markdown));
+    Mcq persisted = entityManager.find(RecallPrompt.class, result.getId()).getMcq();
+    assertThat(
+        persisted.getFocusNoteFingerprint(),
+        equalTo(expectedFingerprint(focus.getId(), title, markdown)));
+    assertThat(persisted.getCorrectAnswerIndex(), equalTo(0));
+    JsonNode mcqJson = webJsonMapper.valueToTree(result.getMcq());
+    assertThat(mcqJson.get("questionStem").asText(), equalTo("When does the observatory open?"));
+    assertThat(
+        result.getMcq().getResponseChoices(),
+        equalTo(List.of("Nine", "distractor1", "distractor2", "distractor3")));
+    assertThat(mcqJson.hasNonNull("correctAnswerIndex"), is(false));
+    assertThat(mcqJson.has("focusNoteFingerprint"), is(false));
+    assertThat(webJsonMapper.valueToTree(persisted).has("focusNoteFingerprint"), is(false));
+  }
+
+  private String generationInput() {
     @SuppressWarnings({"unchecked", "rawtypes"})
     ArgumentCaptor<StructuredResponseCreateParams<GeneratedMcq>> requests =
         ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
     verify(openAiMock.responseService(), times(1)).create(requests.capture());
-    String firstInput =
-        requests
-            .getAllValues()
-            .getFirst()
-            .rawParams()
-            .input()
-            .flatMap(input -> input.text())
-            .orElse("");
-    assertThat(firstInput, containsString("<focus_note>\nTitle: " + current.getTitle() + "\n"));
+    return requests.getValue().rawParams().input().flatMap(input -> input.text()).orElseThrow();
+  }
+
+  private static String expectedFingerprint(int noteId, String title, String markdown)
+      throws Exception {
+    byte[] titleBytes = title.getBytes(StandardCharsets.UTF_8);
+    byte[] markdownBytes = markdown.getBytes(StandardCharsets.UTF_8);
+    byte[] framedFocus =
+        ByteBuffer.allocate(3 * Integer.BYTES + titleBytes.length + markdownBytes.length)
+            .putInt(noteId)
+            .putInt(titleBytes.length)
+            .put(titleBytes)
+            .putInt(markdownBytes.length)
+            .put(markdownBytes)
+            .array();
+    return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(framedFocus));
   }
 
   @Test
@@ -93,7 +147,12 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
     AtomicReference<RecallPrompt> concurrentPrompt = new AtomicReference<>();
     openAiMock.onBeforeCreate(() -> {
       openAiMock.onBeforeCreate(null);
-      concurrentPrompt.set(makeMe.aRecallPrompt().forMemoryTracker(tracker).please());
+      concurrentPrompt.set(
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(tracker)
+              .withMcq(makeMe.anMcq().generatedFrom(tracker.getNote()).inMemoryPlease())
+              .please());
     });
     openAiMock.stubStructuredResponse(makeMe.aGeneratedMcq().please());
     long questionsBefore = questionCount();

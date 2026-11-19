@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -57,6 +58,16 @@ public class OpenAiStructuredResponseMock {
 
   public ResponseService responseService() {
     return responseService;
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public List<String> requestInputTexts(int expectedCalls) {
+    ArgumentCaptor<StructuredResponseCreateParams<?>> requests =
+        ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+    Mockito.verify(responseService, Mockito.times(expectedCalls)).create(requests.capture());
+    return requests.getAllValues().stream()
+        .map(request -> request.rawParams().input().flatMap(input -> input.text()).orElseThrow())
+        .toList();
   }
 
   /** Invoked synchronously right before each stubbed {@code responses().create(...)} call. */

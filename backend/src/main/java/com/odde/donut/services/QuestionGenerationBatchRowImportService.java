@@ -1,5 +1,7 @@
 package com.odde.donut.services;
 
+import static com.odde.donut.services.QuestionGenerationBatchJsonlRenderer.FOCUS_NOTE_FINGERPRINT_METADATA_KEY;
+
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
@@ -8,6 +10,7 @@ import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestReposi
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.ai.GeneratedQuestionPostProcessor;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
+import com.odde.donut.services.openAiApis.OpenAiApiHandler.BatchStructuredOutput;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,13 +44,13 @@ public class QuestionGenerationBatchRowImportService {
       return false;
     }
 
-    GeneratedMcq generatedMcq =
+    BatchStructuredOutput<GeneratedMcq> result =
         openAiApiHandler
             .parseStructuredOutputFromBatchSuccessLine(
                 request.getRawSuccessPayload(), GeneratedMcq.class)
-            .filter(GeneratedMcq::isValid)
+            .filter(response -> response.output().isValid())
             .orElse(null);
-    if (generatedMcq == null) {
+    if (result == null) {
       request.setStatus(QuestionGenerationBatchRequestStatus.FAILED);
       request.setErrorDetail("invalid batch success payload");
       batchRequestRepository.save(request);
@@ -56,7 +59,9 @@ public class QuestionGenerationBatchRowImportService {
     }
 
     MemoryTracker memoryTracker = request.getMemoryTracker();
-    Mcq mcq = generatedQuestionPostProcessor.assembleMcq(generatedMcq, request.getContextSeed());
+    Mcq mcq = generatedQuestionPostProcessor.assembleMcq(result.output(), request.getContextSeed());
+    mcq.setFocusNoteFingerprint(
+        result.metadata().path(FOCUS_NOTE_FINGERPRINT_METADATA_KEY).textValue());
     recallPromptPersister.persistNewRecallPromptForMcq(mcq, memoryTracker);
 
     request.setStatus(QuestionGenerationBatchRequestStatus.IMPORTED);
