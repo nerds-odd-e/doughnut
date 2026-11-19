@@ -183,6 +183,18 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
   · [ADR 0002, Git-native Portable notebook tree synchronization](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
   · [ADR 0003, Spaced-repetition scheduling policy](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)
 
+<a id="revisit-waiting-questions-after-linked-note-edits"></a>
+
+### Revisit a waiting question after a linked note changes
+
+**Identity:** SEED-073#revisit-waiting-questions-after-linked-note-edits
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal / hypothesis.** A learner’s waiting question may depend on information from a linked note. If an edit changes the answer, the learner needs a question and choices that reflect the correction when recall opens.
+- **Open question.** Which linked-note edits matter enough to renew a question when the authored focus note still matches? Correct questions that are poor practice have their own [replacement story](#replace-correct-but-poor-question).
+
 <a id="validate-within-note-objectives"></a>
 
 ### Validate follow-up by learning objective

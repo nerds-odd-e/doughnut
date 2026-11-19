@@ -17,6 +17,18 @@ unanswered prompts preserves a question that an answered prompt still uses.
 Removing a tracker removes its prompts and their questions through the shared
 application-owned lifecycle.
 
+When a learner opens a multiple-choice card, the server looks for an unanswered,
+uncontested question on that tracker whose generation input matches the current
+focus note. It compares a private fingerprint of the note's identity, authored
+title and full Markdown, including properties and punctuation. The newest
+matching prompt can be reused regardless of age. If no prompt has a known
+match, the server generates a question from the current note. Batch questions
+carry the fingerprint captured when their requests were rendered.
+
+An edit after presentation leaves the open attempt bound to the choices and
+answer key of its issued prompt. Answering or grading that attempt updates
+the learner's schedule.
+
 ## Shared due list order
 
 Eligible due work for web and CLI comes from the shared due list. Order is
