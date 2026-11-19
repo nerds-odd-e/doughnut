@@ -87,7 +87,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springframework.security:spring-security-oauth2-authorization-server'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.2.0'
-  implementation 'com.openai:openai-java:4.106.0'
+  implementation 'com.openai:openai-java:4.109.0'
   implementation 'org.yaml:snakeyaml:2.7'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
