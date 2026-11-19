@@ -81,7 +81,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-flyway'
   implementation 'org.flywaydb:flyway-mysql:12.11.0'
   implementation 'org.springframework.boot:spring-boot-starter-session-jdbc'
-  implementation 'io.micrometer:micrometer-core:1.17.2'
+  implementation 'io.micrometer:micrometer-core:1.17.3'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
