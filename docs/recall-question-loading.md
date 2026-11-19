@@ -43,10 +43,15 @@ The existing backend operation reuses an unanswered prompt. Access checks and
 foreground error reporting remain applicable. Background prefetch failures stay
 with their tracker until the learner reaches it and deliberately retries.
 
-The web card's shared `useRecallPromptFetching` owner keeps pending, failed, and
-loaded state by tracker. It prevents duplicate pending requests and associates
-each completion with its initiating request. Navigation remains available while
-a request is pending; a late response preserves the visible card and its input.
+An upcoming multiple-choice question can be prepared in the background. When
+the learner reaches that tracker, the web card requests the current prompt and
+shows a loading indicator until the foreground request completes. The displayed
+choices and any subsequent answer use that selected prompt ID.
+
+The web card's shared `useRecallPromptFetching` owner keeps question load state
+by tracker and associates each completion with its initiating request.
+Navigation remains available while a request is pending. A late response
+preserves the visible card and its input.
 Spelling entry receives the loaded prompt from this owner and is presented only
 when that prompt is available.
 

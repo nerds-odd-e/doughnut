@@ -5,7 +5,7 @@
       class="daisy-alert daisy-alert-warning mb-2 shrink-0"
       data-testid="spelling-overlap-feedback"
     >{{ spellingOverlapFeedback }}</div>
-    <ContentLoader v-if="!currentRecallPromptLoad || currentRecallPromptLoad.status === 'loading'" />
+    <ContentLoader v-if="!currentRecallPromptLoad || currentRecallPromptLoad.status === 'loading' || currentRecallPromptLoad.status === 'prepared'" />
     <div v-else class="pt-5 flex-1 min-h-0">
       <JustReview
         v-if="selfReviewTrackerIds.has(currentMemoryTrackerId!)"
@@ -17,7 +17,7 @@
         <button
           class="daisy-btn daisy-btn-primary mt-4"
           data-testid="retry-question"
-          @click="retryRecallPrompt(currentMemoryTrackerId!)"
+          @click="retryRecallPrompt()"
         >Retry</button>
         <button
           v-if="!currentMemoryTracker?.spelling"
@@ -82,6 +82,7 @@ const emit = defineEmits<{
 }>()
 
 const {
+  currentMemoryTracker,
   recallPromptLoads,
   fetchRecallPrompts,
   retryRecallPrompt,
@@ -90,7 +91,6 @@ const {
 const selfReviewTrackerIds = ref(new Set<number>())
 
 // Computed properties with better naming
-const currentMemoryTracker = computed(() => memoryTrackerAt(props.currentIndex))
 const currentMemoryTrackerId = computed(
   () => currentMemoryTracker.value?.memoryTrackerId
 )
@@ -106,9 +106,6 @@ const currentRecallPrompt = computed(() => {
 })
 
 // Methods
-const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined =>
-  props.memoryTrackers?.[index]
-
 const onAnswered = (answerResult: AnsweredQuestion) => {
   emit("answered", answerResult)
 }
@@ -120,7 +117,7 @@ watch(
   () => props.spellingRetryNonce,
   () => {
     if (currentMemoryTracker.value?.spelling) {
-      startRecallAttempt(currentMemoryTrackerId.value!)
+      startRecallAttempt(currentMemoryTracker.value)
     }
   }
 )

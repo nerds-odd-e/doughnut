@@ -99,11 +99,13 @@ After restoring the batch work on the fixture repair, the ordinary complete back
 ### 5. Check a prefetched web card when the learner reaches it
 
 Type: Behavior
-Status: planned
+Status: done
 
 On the first foreground activation of an MCQ, display the current server selection. Prefetched or late background results cannot appear as the selected question while the foreground check is pending. Keep navigation, input on an active card, spelling and deliberate retry working. A failed MCQ load offers Retry and Self-review.
 
 **Proof.** Mount the real recall card with two trackers. After background preparation, change the response for the second tracker and advance. Observe the loading state and first visible stem, answer that card, and check the submitted prompt ID. Exercise navigation while background or foreground work is pending and retry after failure. Update the existing prefetch assertion to observe the visible card and continued lookahead after the foreground request settles. Retain the spelling and self-review checks. [Web load states](../../../docs/recall-question-loading.md#question-load-states)
+
+**Accepted proof.** The two browser cases failed on the prior implementation. With foreground selection they displayed the ten card after preparation of the nine card, kept the displayed choices through another edit, and submitted index 1 on prompt 43. The 284 Chromium cases, both frontend TypeScript checks and 14 scenarios across six Cypress features passed. The source-review commitments combine real backend input and grading observations with the SDK-to-browser observations. The independent refactor shared current-tracker selection and separated offscreen retry outcomes. All 82 affected Chromium cases and both typechecks passed afterward. Evidence is in the checkout's Git evidence directory under `slice-5-*`.
 
 ### 6. Make CLI recall fixtures support the question offered for display
 
@@ -150,7 +152,7 @@ Disposition: proved by slice 4: MemoryTrackerBatchRecallPromptControllerTest.reu
 ### G3. A warmed web question needs foreground selection
 Reported: slice 2 — "Warmed web MCQs still use the existing display timing."
 Story clause: "The learner first sees the current question."
-Disposition: receiving slice 5
+Disposition: proved by slice 5: RecallPromptCard.activation.spec.ts observes a foreground request, loading, the current stem, continued lookahead and the submitted prompt ID in both prefetch completion orders.
 
 ### G4. CLI recall still selects MCQs from prompt history
 Reported: slice 2 — "The legacy MCQ fallback in the CLI still selects from history ahead of a server request."

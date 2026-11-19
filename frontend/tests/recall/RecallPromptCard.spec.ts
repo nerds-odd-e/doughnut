@@ -80,20 +80,6 @@ describe("repeat page", () => {
       )
       expect(contestableQuestionVisible(recallPromptCardWrapper)).toBe(true)
     })
-
-    it("does not fetch question 2 again after prefetched", async () => {
-      const recallPromptCardWrapper = await mountRecallPromptCardReady(
-        [1, 2, 3, 4],
-        2
-      )
-      expect(getRecallPromptSpy).toBeCalledTimes(2)
-      await recallPromptCardWrapper.setProps({ currentIndex: 1 })
-      expect(getRecallPromptSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: { memoryTracker: 3 },
-        })
-      )
-    })
   })
 
   describe("spelling questions", () => {
