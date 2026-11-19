@@ -95,8 +95,8 @@
         inputSearchKey,
         notebookId,
       }"
-      v-model:all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
-      v-model:all-my-circles="allMyCircles"
+      :all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
+      :all-my-circles="allMyCircles"
       @keydown="onSearchDialogKeydown"
       @navigate="emit('navigate')"
     >

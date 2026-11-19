@@ -26,10 +26,16 @@ beforeEach(() => {
   window.history.replaceState(window.history.state, "", "/")
 })
 
-// Fail tests on Vue warnings and console.log usage
-// Allow console.warn and console.error from libraries to pass through
+// Fail tests on Vue warnings, console.log and console.error usage
+// Allow non-Vue console.warn from libraries to pass through
 const originalConsoleLog = console.log
 const originalConsoleWarn = console.warn
+const originalConsoleError = console.error
+
+console.error = (...args: unknown[]) => {
+  originalConsoleError(...args)
+  throw new Error(`Failing due to console.error while running test!`)
+}
 
 // Fail on any console.log usage
 console.log = (...args: unknown[]) => {

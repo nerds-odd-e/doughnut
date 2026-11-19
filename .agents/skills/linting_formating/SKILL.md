@@ -148,7 +148,7 @@ Running `biome migrate --write` from inside `frontend/` writes `"root": false` i
 
 ### CRITICAL: Project-domain (MFA) rules and Vue SFCs
 
-Biome 2.x introduces "project" / multi-file-analysis (MFA) rules that build a cross-file import graph. As of Biome 2.6.4 (measured on 2.6.3 and 2.6.4, identical results), **the MFA resolver does not understand Vue SFC `<script setup>` implicit default exports**. Once MFA activates, `import X from "./X.vue"` fails with `The path ./X.vue has no default export` for every SFC that lacks an explicit `export default` (most of `frontend/src`). SFCs with an explicit `export default` resolve.
+Biome 2.x introduces "project" / multi-file-analysis (MFA) rules that build a cross-file import graph. As of Biome 2.6.8 (measured on 2.6.3, 2.6.4 and 2.6.8), **the MFA resolver does not understand Vue SFC `<script setup>` implicit default exports**. Once MFA activates, `import X from "./X.vue"` fails with `The path ./X.vue has no default export` for every SFC that lacks an explicit `export default` (most of `frontend/src`). SFCs with an explicit `export default` resolve.
 
 The changelog and rule docs do not cover this behaviour, so measure it after each Biome bump, from `frontend/`:
 
@@ -156,10 +156,11 @@ The changelog and rule docs do not cover this behaviour, so measure it after eac
 pnpm biome lint --only=correctness/noUnresolvedImports --max-diagnostics=none --reporter=github . | grep -c '\.vue has no default export'
 ```
 
-`--only` activates MFA without a config edit. 2.6.4 baseline: 704 errors, 696 of them this false positive. A count near zero means the limitation is gone: lift the rule below and update this section.
+`--only` activates MFA without a config edit. 2.6.8 baseline: 715 errors, 704 of them this false positive (2.6.4: 704 / 696). A count near zero means the limitation is gone: lift the rule below and update this section.
 
 Project-domain rules include (non-exhaustive):
 - `correctness/noUnresolvedImports`
+- `nursery/noUnresolvedDefaultImport` (2.6.7+; same SFC false positive expected)
 - `suspicious/noDeprecatedImports`
 - `suspicious/noImportCycles`
 - `correctness/noFloatingPromises`

@@ -97,13 +97,15 @@ const props = defineProps({
   isDropdown: { type: Boolean, default: false },
   notebookId: { type: Number, default: undefined },
   listModeToggle: { type: Boolean, default: true },
+  allMyNotebooksAndSubscriptions: { type: Boolean, default: true },
+  allMyCircles: { type: Boolean, default: false },
 })
 
-const allMyNotebooksAndSubscriptions = defineModel<boolean>(
-  "allMyNotebooksAndSubscriptions",
-  { default: true }
+const allMyNotebooksAndSubscriptions = toRef(
+  props,
+  "allMyNotebooksAndSubscriptions"
 )
-const allMyCircles = defineModel<boolean>("allMyCircles", { default: false })
+const allMyCircles = toRef(props, "allMyCircles")
 
 const emit = defineEmits<{
   navigate: []
