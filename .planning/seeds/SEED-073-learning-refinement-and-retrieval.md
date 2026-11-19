@@ -178,7 +178,7 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
   Accepted Git content provides the source. Provenance, questions, answers
   and grades belong to the learner's tracker.
   [Web prefetch](../../frontend/src/components/recall/useRecallPromptFetching.ts)
-  · [CLI question selection](../../cli/src/commands/recall/recallMcqCardLoad.ts)
+  · [CLI question selection](../../cli/src/commands/recall/nextRecallCardLoad.ts)
   · [Batch generation and import](../../docs/question-generation-batch-operations.md)
   · [ADR 0002, Git-native Portable notebook tree synchronization](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
   · [ADR 0003, Spaced-repetition scheduling policy](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md)

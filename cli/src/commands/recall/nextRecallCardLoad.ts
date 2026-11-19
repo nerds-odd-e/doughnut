@@ -4,7 +4,6 @@ import {
   type DueMemoryTrackers,
   type MemoryTracker,
   type MemoryTrackerLite,
-  type RecallPromptHistoryItem,
   type RecallPrompt,
 } from 'donut-api'
 import {
@@ -13,15 +12,6 @@ import {
 } from '../../backendApi/donutBackendClient.js'
 import { dueRecallQuery } from './dueRecallQuery.js'
 import { noteBreadcrumbTrailTitles } from './recallNoteContext.js'
-import {
-  tryLoadMcqPayload,
-  type RecallMcqCardPayload,
-} from './recallMcqCardLoad.js'
-
-export {
-  recallMcqPayloadFromRecallPrompt,
-  type RecallMcqCardPayload,
-} from './recallMcqCardLoad.js'
 
 export async function fetchDueMemoryTrackerIds(
   dueInDays: number,
@@ -34,6 +24,29 @@ export async function fetchDueMemoryTrackerIds(
     })
   )
   return due.toRepeat ?? []
+}
+
+export type RecallMcqCardPayload = {
+  readonly memoryTrackerId: number
+  readonly recallPromptId: number
+  readonly stem: string
+  readonly choices: readonly string[]
+  readonly notebookName: string
+}
+
+export function recallMcqPayloadFromRecallPrompt(
+  memoryTrackerId: number,
+  prompt: RecallPrompt
+): RecallMcqCardPayload | null {
+  const choices = prompt.mcq?.responseChoices
+  if (!choices?.length) return null
+  return {
+    memoryTrackerId,
+    recallPromptId: prompt.id,
+    stem: prompt.mcq?.questionStem?.trim() ?? '',
+    choices,
+    notebookName: prompt.notebook.name.trim(),
+  }
 }
 
 /** Just-review recall card (fallback when MCQ is not available). */
@@ -74,6 +87,22 @@ export type SpellingRecallSessionPayload = {
   readonly stemMarkdown?: string
 }
 
+function spellingRecallSessionPayload(
+  memoryTrackerId: number,
+  prompt: RecallPrompt | undefined
+): SpellingRecallSessionPayload {
+  const payload = { memoryTrackerId, contentMarkdown: '' }
+  if (!prompt?.spellingQuestion) return payload
+  const { spellingQuestion } = prompt
+  const notebookName = spellingQuestion.notebook?.name ?? prompt.notebook?.name
+  return {
+    ...payload,
+    notebookName: notebookName?.trim() || undefined,
+    recallPromptId: prompt.id,
+    stemMarkdown: spellingQuestion.stem ?? '',
+  }
+}
+
 export type RecallCard =
   | {
       readonly variant: 'just-review'
@@ -91,60 +120,23 @@ export async function loadRecallCardForMemoryTrackerId(
   spelling: boolean,
   signal?: AbortSignal
 ): Promise<RecallCard> {
-  if (spelling) {
-    try {
-      const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
-        MemoryTrackerController.getRecallPrompt({
-          path: { memoryTracker: memoryTrackerId },
-          ...donutSdkOptions(signal),
-        })
-      )
-      if (prompt.spellingQuestion != null) {
-        const fromPrompt =
-          prompt.spellingQuestion.notebook?.name ?? prompt.notebook?.name
-        const notebookName = fromPrompt?.trim()
-        return {
-          variant: 'spelling-session',
-          payload: {
-            memoryTrackerId,
-            notebookName:
-              notebookName !== undefined && notebookName.length > 0
-                ? notebookName
-                : undefined,
-            contentMarkdown: '',
-            recallPromptId: prompt.id,
-            stemMarkdown: prompt.spellingQuestion.stem ?? '',
-          },
-        }
-      }
-    } catch {
-      // Same as web when getRecallPrompt fails: stage will retry.
-    }
-    return {
-      variant: 'spelling-session',
-      payload: {
-        memoryTrackerId,
-        contentMarkdown: '',
-      },
-    }
-  }
-
-  const prompts = await runDefaultBackendJson<RecallPromptHistoryItem[]>(() =>
-    MemoryTrackerController.getRecallPrompts({
+  const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
+    MemoryTrackerController.getRecallPrompt({
       path: { memoryTracker: memoryTrackerId },
       ...donutSdkOptions(signal),
     })
-  )
+  ).catch(() => undefined)
 
-  const mcqPayload = await tryLoadMcqPayload(
-    memoryTrackerId,
-    prompts,
-    '',
-    signal
-  )
-  if (mcqPayload !== null) {
-    return { variant: 'mcq', payload: mcqPayload }
+  if (spelling) {
+    return {
+      variant: 'spelling-session',
+      payload: spellingRecallSessionPayload(memoryTrackerId, prompt),
+    }
   }
+
+  const mcq =
+    prompt && recallMcqPayloadFromRecallPrompt(memoryTrackerId, prompt)
+  if (mcq) return { variant: 'mcq', payload: mcq }
 
   const mt = await runDefaultBackendJson<MemoryTracker>(() =>
     MemoryTrackerController.showMemoryTracker({

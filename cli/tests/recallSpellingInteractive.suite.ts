@@ -71,7 +71,6 @@ export function describeRecallSpellingInteractive(
     let savedConfigDir: string | undefined
     let recallingSpy: ReturnType<typeof vi.spyOn>
     let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
-    let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptSpy: ReturnType<typeof vi.spyOn>
     let answerSpellingSpy: ReturnType<typeof vi.spyOn>
     let spellingFixtureNoteRealm: NoteRealm
@@ -146,12 +145,6 @@ export function describeRecallSpellingInteractive(
           new Error('unexpected showMemoryTracker in spelling path')
         )
 
-      getRecallPromptsSpy = vi
-        .spyOn(MemoryTrackerController, 'getRecallPrompts')
-        .mockRejectedValue(
-          new Error('unexpected getRecallPrompts in spelling path')
-        )
-
       getRecallPromptSpy = vi.spyOn(MemoryTrackerController, 'getRecallPrompt')
       getRecallPromptSpy.mockResolvedValue({
         data: pendingSpellingPrompt(),
@@ -163,7 +156,6 @@ export function describeRecallSpellingInteractive(
     afterEach(() => {
       recallingSpy.mockRestore()
       showMemoryTrackerSpy.mockRestore()
-      getRecallPromptsSpy.mockRestore()
       getRecallPromptSpy.mockRestore()
       answerSpellingSpy.mockRestore()
       if (savedConfigDir === undefined) {

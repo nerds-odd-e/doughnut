@@ -107,7 +107,6 @@ export function describeRecallJustReviewInteractive(
     let savedConfigDir: string | undefined
     let recallingSpy: ReturnType<typeof vi.spyOn>
     let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
-    let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptSpy: ReturnType<typeof vi.spyOn>
     let markAsRecalledSpy: ReturnType<typeof vi.spyOn>
 
@@ -142,14 +141,6 @@ export function describeRecallJustReviewInteractive(
         'showMemoryTracker'
       )
 
-      getRecallPromptsSpy = vi
-        .spyOn(MemoryTrackerController, 'getRecallPrompts')
-        .mockResolvedValue({
-          data: [],
-        } as Awaited<
-          ReturnType<typeof MemoryTrackerController.getRecallPrompts>
-        >)
-
       getRecallPromptSpy = vi
         .spyOn(MemoryTrackerController, 'getRecallPrompt')
         .mockRejectedValue(new Error('stub: no quiz in just-review tests'))
@@ -164,7 +155,6 @@ export function describeRecallJustReviewInteractive(
     afterEach(() => {
       recallingSpy.mockRestore()
       showMemoryTrackerSpy.mockRestore()
-      getRecallPromptsSpy.mockRestore()
       getRecallPromptSpy.mockRestore()
       markAsRecalledSpy.mockRestore()
       if (savedConfigDir === undefined) {

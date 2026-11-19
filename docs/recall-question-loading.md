@@ -48,6 +48,12 @@ the learner reaches that tracker, the web card requests the current prompt and
 shows a loading indicator until the foreground request completes. The displayed
 choices and any subsequent answer use that selected prompt ID.
 
+The CLI requests the current prompt when it opens a multiple-choice card.
+It shows that prompt's stem and choices and submits the selected choice against
+the same prompt ID, including after another note edit. If the request fails or
+returns no usable choices, the CLI opens the note for just review. The learner
+can grade it there.
+
 The web card's shared `useRecallPromptFetching` owner keeps question load state
 by tracker and associates each completion with its initiating request.
 Navigation remains available while a request is pending. A late response

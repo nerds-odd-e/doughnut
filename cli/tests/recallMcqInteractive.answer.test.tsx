@@ -103,6 +103,7 @@ describeRecallMcqInteractive((api) => {
     ink.stdin.write('2\r')
 
     await waitLoadingNextQuestion(ink)
+    expect(api.answerSpy).toHaveBeenCalledTimes(1)
 
     secondQuestion.resolve(secondPrompt)
 

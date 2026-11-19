@@ -76,7 +76,6 @@ export function describeRecallMcqInteractive(
     let savedConfigDir: string | undefined
     let recallingSpy: ReturnType<typeof vi.spyOn>
     let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
-    let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptSpy: ReturnType<typeof vi.spyOn>
     let answerSpy: ReturnType<typeof vi.spyOn>
     let contestSpy: ReturnType<typeof vi.spyOn> | undefined
@@ -149,22 +148,6 @@ export function describeRecallMcqInteractive(
           new Error('unexpected showMemoryTracker in MCQ path')
         )
 
-      getRecallPromptsSpy = vi
-        .spyOn(MemoryTrackerController, 'getRecallPrompts')
-        .mockImplementation(async (options) => {
-          const prompt = await questionFor(options.path.memoryTracker)
-          return {
-            data: [
-              makeMe.aRecallPromptHistoryItem
-                .withId(prompt.id)
-                .withMcq(prompt.mcq!)
-                .please(),
-            ],
-          } as Awaited<
-            ReturnType<typeof MemoryTrackerController.getRecallPrompts>
-          >
-        })
-
       getRecallPromptSpy = vi
         .spyOn(MemoryTrackerController, 'getRecallPrompt')
         .mockImplementation(
@@ -186,7 +169,6 @@ export function describeRecallMcqInteractive(
       regenerateSpy = undefined
       recallingSpy.mockRestore()
       showMemoryTrackerSpy.mockRestore()
-      getRecallPromptsSpy.mockRestore()
       getRecallPromptSpy.mockRestore()
       answerSpy.mockRestore()
       if (savedConfigDir === undefined) {

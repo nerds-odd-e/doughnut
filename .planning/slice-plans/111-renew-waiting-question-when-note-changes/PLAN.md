@@ -121,11 +121,13 @@ The four MCQ terminal suites share a fixture that serves history and rejects ord
 ### 7. Use the current question in CLI recall
 
 Type: Behavior
-Status: planned
+Status: done
 
 On opening an MCQ, request the server-selected prompt. The CLI uses that stem, choices and ID through answering. When no MCQ can be loaded it follows its existing just-review route. Prompt history continues to describe earlier attempts.
 
 **Proof.** Start recall with different history and current responses. Assert the terminal first shows the current stem, submit its numbered choice, and inspect the exact prompt ID and choice index. Exercise just-review fallback. Retain the interactive outcomes from slice 6. Remove obsolete pending-question selection helpers and sweep for their names once at acceptance.
+
+**Accepted proof.** The distinguishing Ink case displayed the historical nine question on its baseline. It now displays ten and submits prompt 42/index 1 after the available question changes to eleven. All 38 maintained recall cases and the full CLI suite passed. The CLI Cypress spec is deliberately excluded from the isolated runner (commit `7ede3d4fa4c` assigns TTY coverage to Vitest). Its invocation selected no scenarios. The independent refactor placed the shared MCQ mapper with the card loader and retargeted the seed link. All 38 affected terminal tests passed afterward. The one-time product sweep and proof records are under `slice-7-*` in the Git evidence directory.
 
 ## Proof ownership and delivery
 
@@ -159,4 +161,4 @@ Disposition: proved by slice 5: RecallPromptCard.activation.spec.ts observes a f
 ### G4. CLI recall still selects MCQs from prompt history
 Reported: slice 2 — "The legacy MCQ fallback in the CLI still selects from history ahead of a server request."
 Story clause: "At first presentation in web or CLI recall, compare the authored title, body and properties of the focus note with the content used to generate the waiting MCQ."
-Disposition: receiving slice 7
+Disposition: proved by slice 7: recallMcqInteractive.current.test.tsx first shows the current stem and submits its prompt and choice after another edit.
