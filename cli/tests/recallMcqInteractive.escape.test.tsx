@@ -12,9 +12,8 @@ describeRecallMcqInteractive((api) => {
     waitMcqVisible,
     waitMcqIncorrectOnLastFrame,
     waitReturnsToMcq,
-    pendingMcqPrompt,
+    pendingMcqQuestion,
     mcqAnsweredPrompt,
-    mockSingleMcqDue,
     RECALL_PROMPT_ID,
     RecallPromptController,
   } = api
@@ -51,8 +50,7 @@ describeRecallMcqInteractive((api) => {
   })
 
   test('after Esc then n, MCQ list highlight preserved (Enter submits second choice)', async () => {
-    mockSingleMcqDue()
-    const pending = pendingMcqPrompt()
+    const pending = pendingMcqQuestion()
     api.answerSpy.mockResolvedValue({
       data: mcqAnsweredPrompt(pending, {
         id: 100,

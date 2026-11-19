@@ -110,11 +110,13 @@ On the first foreground activation of an MCQ, display the current server selecti
 ### 6. Make CLI recall fixtures support the question offered for display
 
 Type: Structure
-Status: planned
+Status: done
 
 The four MCQ terminal suites share a fixture that serves history and rejects ordinary presentation. Give the answer, contest, escape and guidance scenarios equivalent pending MCQs through both fixture operations. Keep the distinguishing case for slice 7 separate. This enables its change of source while preserving each scenario's own assertions.
 
 **Proof.** With existing product selection, run all four MCQ terminal files plus just-review and spelling. Preserve the displayed stem, available choices, submitted ID/index, contest result, keyboard behavior and pending-second-card feedback. Keep the asynchronous gates attached to the operation delivering the relevant card.
+
+**Accepted proof.** The shared fixtures supply equivalent questions and a second-tracker loading gate through history and ordinary selection. All 37 MCQ, just-review and spelling terminal cases passed. All 12 MCQ cases also passed with history temporarily empty, exercising the singular fixture. The independent refactor consolidated due-tracker setup and verified all 12 affected terminal cases. Evidence is under `slice-6-*` in the Git evidence directory.
 
 ### 7. Use the current question in CLI recall
 
