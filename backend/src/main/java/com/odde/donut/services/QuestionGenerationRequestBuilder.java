@@ -63,7 +63,8 @@ public class QuestionGenerationRequestBuilder {
       Long contextSeed,
       PropertyFocus propertyFocus,
       User viewer) {
-    return prepareQuestionGeneration(note, additionalMessage, contextSeed, propertyFocus, viewer)
+    return prepareQuestionGeneration(
+            note, additionalMessage, contextSeed, propertyFocus, viewer, false)
         .request();
   }
 
@@ -71,7 +72,12 @@ public class QuestionGenerationRequestBuilder {
   public PreparedQuestionGeneration prepareQuestionGeneration(
       Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
     return prepareQuestionGeneration(
-        note, additionalMessage, contextSeed, propertyFocus, authorizationService.getCurrentUser());
+        note,
+        additionalMessage,
+        contextSeed,
+        propertyFocus,
+        authorizationService.getCurrentUser(),
+        false);
   }
 
   private PreparedQuestionGeneration prepareQuestionGeneration(
@@ -79,30 +85,20 @@ public class QuestionGenerationRequestBuilder {
       String additionalMessage,
       Long contextSeed,
       PropertyFocus propertyFocus,
-      User viewer) {
+      User viewer,
+      boolean batch) {
     Note focus = focusContextRetrievalService.hydrateFocus(note);
     return new PreparedQuestionGeneration(
-        buildMcqRequest(focus, additionalMessage, contextSeed, propertyFocus, viewer, false),
+        buildMcqRequest(focus, additionalMessage, contextSeed, propertyFocus, viewer, batch),
         FocusNoteFingerprint.of(focus));
   }
 
   public record PreparedQuestionGeneration(
       StructuredResponseCreateParams<GeneratedMcq> request, String focusNoteFingerprint) {}
 
-  public StructuredResponseCreateParams<GeneratedMcq>
-      buildQuestionGenerationResponseRequestForBatch(
-          Note note,
-          String additionalMessage,
-          Long contextSeed,
-          PropertyFocus propertyFocus,
-          User viewer) {
-    return buildMcqRequest(
-        focusContextRetrievalService.hydrateFocus(note),
-        additionalMessage,
-        contextSeed,
-        propertyFocus,
-        viewer,
-        true);
+  PreparedQuestionGeneration prepareBatchQuestionGeneration(
+      Note note, Long contextSeed, PropertyFocus propertyFocus, User viewer) {
+    return prepareQuestionGeneration(note, null, contextSeed, propertyFocus, viewer, true);
   }
 
   private StructuredResponseCreateParams<GeneratedMcq> buildMcqRequest(

@@ -14,6 +14,10 @@ Slice 1 was accepted and registered on the story branch at `9ea958ddbf5ef712d966
 
 Slices 2 and 3 were accepted and registered at `8fe775e98aa921fc02f18982beb0252a296280ae` and `e669f8a5f3b610f5c77652d9deaf92e2c12b7888`. The latter exposed an existing browser-isolation startup race during slice 4. The [diagnosis and proof](diagnosis-mock-serving-port-collision.md) cover its repair. Slice 4 remains planned.
 
+The startup readiness fixture could connect to a different loopback listener on macOS. A controlled reproduction returned 404 during the held migration. Binding the test server to its client’s address prevented the overlapping bind. The ordinary focused test passed. The story branch accepted the independently reviewed fixture repair at `8f75c7099aede2492cab96e9b592e59414787ce1`. The original response did not identify its listener. [Diagnosis and controls](diagnosis-startup-readiness-http.md)
+
+The previous CI observer stopped on the diagnostic handoff. The resumed coordinator owns `/tmp/dough-ci-501/watch-eaXjff`, stream cell `g158:25`, session `51569`, PID `7285`.
+
 ## Goal and scope
 
 The learner first sees an MCQ generated from the current authored title, body and properties of its focus note. A punctuation edit counts. Matching source content permits reuse even after a long interval. Once the card appears, its prompt ID, choices and key stay together through answering. Apply this to ordinary web and CLI MCQ recall, including stored, on-demand and batch questions. The focus note can be edited through any accepted publication path. Spelling, linked-note invalidation, semantic question quality and scheduling policy have separate owners.
@@ -80,11 +84,17 @@ The 158 focused cases passed. The independent refactor shared provider-input cap
 ### 4. Reuse a batch question that still matches its generation input
 
 Type: Behavior
-Status: planned
+Status: done
 
 An hourly batch can finish after a note edit. Persist the focus fingerprint when its request body is rendered and carry it to the imported MCQ, including on resume. The normal presentation operation can now reuse valid batch output and renew stale output. Older in-flight requests follow the unknown-source rule.
 
 **Proof.** Use the real request renderer, importer and recall selection with a stubbed provider row. A matching focus serves the imported question without synchronous generation. Editing after rendering and before import serves a current replacement. Repeat the import and inspect the selected ID and persisted row count. Apply the same additive schema rollout rule as slice 1 if the batch request needs a column. [Batch operations](../../../docs/question-generation-batch-operations.md)
+
+**Accepted proof.** `MemoryTrackerBatchRecallPromptControllerTest` renders the actual batch request and uses its fingerprint in the stubbed provider response. The real collector stores that response, and a reload gives the importer the same metadata. With matching note content, normal recall serves the imported ID with zero synchronous generation calls. An accepted correction between render and import yields a new prompt made from the corrected focus. The earlier wire shape yields renewal on demand. The reloaded imported row is idempotent and leaves one batch-created prompt before recall selection.
+
+The matching observation failed at baseline and passed with the implementation. The 204 focused cases also passed atomic import, repeat import, stored output parsing and existing synchronous paths. The batch operations guide records the request, stored response and resumed import. A product sweep for the superseded request-builder name returned no matches. Provider proof uses a stub that follows the documented Responses and Batch APIs. Evidence is in this checkout's Git evidence directory under `slice-4-`.
+
+After restoring the batch work on the fixture repair, the ordinary complete backend suite ran 3,225 cases with 3,223 passed, two skipped and zero failures. The uninstrumented startup readiness test passed in that run. Evidence is in `slice-4-backend-repaired*` and `slice-4-repaired-TEST-*`.
 
 ### 5. Check a prefetched web card when the learner reaches it
 
@@ -135,7 +145,7 @@ Disposition: proved by slice 3: MemoryTrackerRecallPromptRaceControllerTest.retr
 ### G2. Matching batch questions need render-time provenance
 Reported: slice 2 — "Batch requests without provenance follow the unknown-source rule until slice 4."
 Story clause: "Reuse a question made from matching content."
-Disposition: receiving slice 4
+Disposition: proved by slice 4: MemoryTrackerBatchRecallPromptControllerTest.reusesTheImportedQuestionWhenItsRenderedFocusStillMatches, replacesTheImportedQuestionWhenAnEditLandsAfterRendering and renewsAQuestionFromAnOlderBatchResultWithoutRequestMetadata
 
 ### G3. A warmed web question needs foreground selection
 Reported: slice 2 — "Warmed web MCQs still use the existing display timing."

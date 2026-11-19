@@ -3,12 +3,12 @@ package com.odde.donut.services;
 import com.odde.donut.testability.OpenAiBatchApiMock;
 import com.openai.models.batches.Batch;
 
-final class QuestionGenerationBatchOutputCollectionTestSupport {
+public final class QuestionGenerationBatchOutputCollectionTestSupport {
 
   private QuestionGenerationBatchOutputCollectionTestSupport() {}
 
   /** Stubs OpenAI reporting batch-openai-1 completed with the given output and error files. */
-  static void stubCompletedOpenAiBatch(
+  public static void stubCompletedOpenAiBatch(
       OpenAiBatchApiMock openAiBatches, String outputLines, String errorLines) {
     openAiBatches.stubRetrieve(
         Batch.builder()

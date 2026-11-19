@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.services.ai.GeneratedMcq;
 
-final class QuestionGenerationBatchImportPayloadSupport {
+public final class QuestionGenerationBatchImportPayloadSupport {
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapperConfig().objectMapper();
 
   private QuestionGenerationBatchImportPayloadSupport() {}
 
-  static String batchSuccessLine(String customId, GeneratedMcq generatedMcq)
+  public static String batchSuccessLine(String customId, GeneratedMcq generatedMcq)
       throws JsonProcessingException {
     String structuredOutput = OBJECT_MAPPER.writeValueAsString(generatedMcq);
     String responseBody =
