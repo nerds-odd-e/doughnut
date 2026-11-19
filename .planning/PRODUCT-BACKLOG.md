@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Renew a waiting question when its note changes](seeds/SEED-073-learning-refinement-and-retrieval.md#renew-waiting-question-when-note-changes) — SEED-073#renew-waiting-question-when-note-changes ([plan](slice-plans/111-renew-waiting-question-when-note-changes/PLAN.md))
-
 ## Backlog list
 
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
