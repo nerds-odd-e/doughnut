@@ -18,3 +18,4 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 - [Replace a correct but poor recall question](seeds/SEED-073-learning-refinement-and-retrieval.md#replace-correct-but-poor-question) — SEED-073#replace-correct-but-poor-question
 - [Check short lessons and count later recalls](seeds/SEED-073-learning-refinement-and-retrieval.md#check-short-recall-lessons) — SEED-073#check-short-recall-lessons
 - [Revisit a waiting question after a linked note changes](seeds/SEED-073-learning-refinement-and-retrieval.md#revisit-waiting-questions-after-linked-note-edits) — SEED-073#revisit-waiting-questions-after-linked-note-edits
+- [Recall a whole list property](seeds/SEED-133-recall-a-whole-list-property.md#recall-a-whole-list-property) — SEED-133#recall-a-whole-list-property
