@@ -130,7 +130,7 @@ check_redis_ready() {
     if redis-cli -p ${REDIS_TCP_PORT} ping >/dev/null 2>&1; then
       local response=$(redis-cli -p ${REDIS_TCP_PORT} ping 2>/dev/null)
       if [ "$response" = "PONG" ]; then
-        log "Redis is ready! \ud83d\ude80"
+        log "Redis is ready! 🚀"
         return 0
       fi
     fi
