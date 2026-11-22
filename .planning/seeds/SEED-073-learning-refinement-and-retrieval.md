@@ -21,46 +21,6 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 [Local recall evidence and validation workflow](learning-refinement-and-retrieval-context.md#local-recall-evidence) apply to each story below.
 
-<a id="generate-useful-refinement-layouts"></a>
-
-### Generate useful refinement layouts for notes
-
-**Identity:** SEED-073#generate-useful-refinement-layouts
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/113-useful-refinement-layouts/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b8ab798eba0413313d0585f3636315c4ebb848a9784e3f3b3acf61d6784c572e","plan":"dffee9398925f64ad75f374f8882d43be577fb2618cd2845fd3b47edbc9403cb"}}
-```
-
-- **Goal.** A learner opening **Refine note** can select the parts of a
-  structured note they want to work on. If generation fails, they can see
-  what happened and retry from the same view.
-- **Scope.** Generate concise, selectable descriptions that follow meaningful
-  source sections in order. For a dictionary note, keep numbered senses as
-  top-level items, use the note's languages, and add children for distinct
-  usages. Supporting examples and grammatical labels stay with the source
-  sense. Use the existing question-aware selection when refinement starts
-  from recall. Give generation enough output budget to complete and carry a
-  useful failure reason to the view when it cannot. Extraction and removal
-  edit content only after the learner chooses the corresponding action.
-- **Key examples.**
-  - A Japanese–Chinese dictionary note has five numbered senses, bilingual
-    examples, and decorative markers. Opening refinement shows five concise
-    sense labels in source order. Distinct usages within a sense can be
-    selected individually.
-  - A learner opens refinement from a recall question. The layout identifies
-    and preselects the relevant content.
-  - OpenAI runs out of output tokens. The view shows that generation could
-    not finish within its limit, with the existing retry action. A successful
-    retry replaces the failure message with the selectable layout. Cancelling
-    an in-flight request still leaves the view available for a fresh attempt.
-- **Evidence, 2026-11-22.** Production build `e5c95cb37c` returned HTTP
-  200 with an empty layout for a five-sense dictionary note. A replay of
-  the exported `gpt-6.2-sol` request used 2,169 input tokens and exhausted
-  the 1,000-token output cap with reason `max_output_tokens`. The same
-  request completed with a 3,000-token cap at 1,104 output tokens. A
-  prompt that asked for concise bilingual sense labels and children for
-  distinct usages produced all five senses in order at 675 output tokens
-  under the original cap. Each figure is from one replay.
-
 <a id="replace-correct-but-poor-question"></a>
 
 ### Replace a correct but poor recall question
