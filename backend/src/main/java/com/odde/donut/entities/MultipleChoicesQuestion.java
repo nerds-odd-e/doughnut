@@ -1,6 +1,7 @@
 package com.odde.donut.entities;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import java.sql.Timestamp;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,4 +18,8 @@ public class MultipleChoicesQuestion {
   private List<String> responseChoices;
 
   private String focusNoteFingerprint;
+
+  private Integer focusNoteId;
+
+  private Timestamp focusNoteReadAt;
 }

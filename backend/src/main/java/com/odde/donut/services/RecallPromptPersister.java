@@ -15,12 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecallPromptPersister {
   private final RecallPromptRepository recallPromptRepository;
   private final EntityPersister entityPersister;
+  private final MemoryTrackerLifecycle memoryTrackerLifecycle;
 
   @Autowired
   public RecallPromptPersister(
-      RecallPromptRepository recallPromptRepository, EntityPersister entityPersister) {
+      RecallPromptRepository recallPromptRepository,
+      EntityPersister entityPersister,
+      MemoryTrackerLifecycle memoryTrackerLifecycle) {
     this.recallPromptRepository = recallPromptRepository;
     this.entityPersister = entityPersister;
+    this.memoryTrackerLifecycle = memoryTrackerLifecycle;
   }
 
   @Transactional
@@ -47,5 +51,19 @@ public class RecallPromptPersister {
   public RecallPrompt persistNewRecallPromptForMcq(Mcq mcq, MemoryTracker memoryTracker) {
     entityPersister.save(mcq);
     return entityPersister.save(RecallPrompt.forMcq(mcq, memoryTracker));
+  }
+
+  @Transactional
+  public void persistImportedRecallPromptForMcq(Mcq mcq, MemoryTracker memoryTracker) {
+    RecallPrompt imported = persistNewRecallPromptForMcq(mcq, memoryTracker);
+    if (FocusNoteFingerprint.of(memoryTracker.getNote()).equals(mcq.getFocusNoteFingerprint())) {
+      replaceStalePromptsWith(imported);
+    }
+  }
+
+  @Transactional
+  public void replaceStalePromptsWith(RecallPrompt currentPrompt) {
+    memoryTrackerLifecycle.deleteStaleUnansweredRecallPrompts(
+        currentPrompt.requireMemoryTracker(), currentPrompt.getMcq().getFocusNoteFingerprint());
   }
 }

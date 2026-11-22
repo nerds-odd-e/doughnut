@@ -41,7 +41,7 @@ class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    currentTime = makeMe.aTimestamp().please();
+    currentTime = testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     globalSettingsService
         .globalSettingQuestionGeneration()
         .setKeyValue(currentTime, "gpt-batch-question-generation");
@@ -69,7 +69,11 @@ class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
             tracker.getNote(), request.getContextSeed(), tracker.propertyFocus(), batch.getUser());
     Map<String, Object> body = paramsSerializer.toBodyMap(prepared.request());
     body.put(
-        "metadata", Map.of("focus_note_fingerprint", FocusNoteFingerprint.of(tracker.getNote())));
+        "metadata",
+        Map.of(
+            "focus_note_fingerprint", FocusNoteFingerprint.of(tracker.getNote()),
+            "focus_note_id", String.valueOf(tracker.getNote().getId()),
+            "focus_note_read_at", String.valueOf(currentTime.getTime())));
     return body;
   }
 

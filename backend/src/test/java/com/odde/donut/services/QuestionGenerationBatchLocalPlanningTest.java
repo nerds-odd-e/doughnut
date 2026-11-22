@@ -71,8 +71,16 @@ class QuestionGenerationBatchLocalPlanningTest extends SpringTestBase {
 
   @Test
   void createsNoBatchWhenUserHasNoCandidateTrackers() {
-    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).please();
-    makeMe.aRecallPrompt().forMemoryTracker(secondDueTracker).please();
+    makeMe
+        .aRecallPrompt()
+        .forMemoryTracker(dueTracker)
+        .generatedFrom(dueTracker.getNote())
+        .please();
+    makeMe
+        .aRecallPrompt()
+        .forMemoryTracker(secondDueTracker)
+        .generatedFrom(secondDueTracker.getNote())
+        .please();
 
     Optional<QuestionGenerationBatch> plannedBatch =
         planningService.planLocalBatchForUser(user, currentTime);

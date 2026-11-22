@@ -93,8 +93,22 @@ public class Mcq extends EntityIdentifiedByIdOnly {
         : multipleChoicesQuestion.getFocusNoteFingerprint();
   }
 
-  public void setFocusNoteFingerprint(String focusNoteFingerprint) {
-    stemAndChoices().setFocusNoteFingerprint(focusNoteFingerprint);
+  @JsonIgnore
+  @Schema(hidden = true)
+  public FocusNoteInput getFocusNoteInput() {
+    return multipleChoicesQuestion == null
+        ? null
+        : new FocusNoteInput(
+            multipleChoicesQuestion.getFocusNoteId(),
+            multipleChoicesQuestion.getFocusNoteReadAt(),
+            multipleChoicesQuestion.getFocusNoteFingerprint());
+  }
+
+  public void setFocusNoteInput(FocusNoteInput focusNoteInput) {
+    MultipleChoicesQuestion question = stemAndChoices();
+    question.setFocusNoteId(focusNoteInput.noteId());
+    question.setFocusNoteReadAt(focusNoteInput.readAt());
+    question.setFocusNoteFingerprint(focusNoteInput.fingerprint());
   }
 
   public Mcq withoutSolution() {

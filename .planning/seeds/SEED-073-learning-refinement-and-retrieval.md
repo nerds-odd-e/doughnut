@@ -21,43 +21,6 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 [Local recall evidence and validation workflow](learning-refinement-and-retrieval-context.md#local-recall-evidence) apply to each story below.
 
-<a id="replace-stale-waiting-questions"></a>
-
-### Replace stale waiting recall questions
-
-**Identity:** SEED-073#replace-stale-waiting-questions
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/114-replace-stale-waiting-questions/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"16f9af39d7946a9bd1fe010def76d89bc60f79aaf792a8015aa525e37c7f949d","plan":"5dd73454bd4da17ae382890a546fe9fd546d7ecabdd67cf171c5d9d663291db1"}}
-```
-
-- **Goal.** A learner who edits the focus note of a due multiple-choice
-  tracker can get its replacement question from the ordinary batch before
-  opening recall. Once recall has a current question, stale unanswered
-  prompts stop accumulating on the tracker.
-- **Scope.** Use update time to screen likely stale waiting questions for
-  the existing batch due window. Confirm reuse by comparing the authored
-  focus fingerprint before queuing a replacement. Both ordinary batch
-  import and on-demand recall delete confirmed stale, unanswered prompts
-  for that tracker once a current prompt is available. Preserve answered
-  attempts, existing contests, and the tracker’s schedule. A question
-  record survives while any prompt still references it.
-- **Key examples.**
-  - A learner changes “opens at nine” to “opens at ten” before batch
-    preparation. The due tracker has only a waiting question for “nine.”
-    The batch queues a replacement from the edited note and removes the
-    stale prompt after the replacement is available.
-  - A due tracker already has a matching waiting question, perhaps
-    alongside an older one. The batch reuses the available preparation
-    by leaving the tracker out of the new batch.
-  - A learner opens recall before the batch prepares a replacement. The
-    server offers a question from the edited note and removes stale
-    unanswered prompts. Earlier answers, their choices and grades, and
-    the due time are still available.
-- **Outside delivery scope.** An edit during an in-flight batch, overlap
-  between a batch and on-demand generation, and submission from a card
-  whose prompt has just been removed. Linked-note edits have their own
-  [story](#revisit-waiting-questions-after-linked-note-edits).
-
 <a id="replace-correct-but-poor-question"></a>
 
 ### Replace a correct but poor recall question

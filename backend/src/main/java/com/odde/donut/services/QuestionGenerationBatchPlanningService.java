@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import com.odde.donut.algorithms.RecallSilentPeriodTargetSelector;
 import com.odde.donut.algorithms.RecallSilentWindowDueInstant;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
@@ -76,7 +77,23 @@ public class QuestionGenerationBatchPlanningService {
   public List<MemoryTracker> findCandidateMemoryTrackersForBatchGeneration(
       User user, Timestamp currentTime) {
     Timestamp dueBy = new Timestamp(currentTime.getTime() + CANDIDATE_TRACKER_WINDOW_MILLIS);
-    return memoryTrackerRepository.findBatchQuestionGenerationCandidatesByUser(user.getId(), dueBy);
+    return memoryTrackerRepository
+        .findBatchQuestionGenerationCandidatesByUser(user.getId(), dueBy)
+        .stream()
+        .filter(tracker -> !hasCurrentWaitingQuestion(tracker))
+        .toList();
+  }
+
+  private boolean hasCurrentWaitingQuestion(MemoryTracker tracker) {
+    Note focus = tracker.getNote();
+    List<RecallPrompt> waiting =
+        recallPromptRepository.findAllUnansweredByMemoryTrackerId(tracker.getId());
+    return waiting.stream()
+            .anyMatch(prompt -> prompt.getMcq().getFocusNoteInput().wasReadAfterLastUpdateOf(focus))
+        || (!waiting.isEmpty()
+            && recallPromptRepository
+                .findUnansweredMcqForFocus(tracker.getId(), FocusNoteFingerprint.of(focus))
+                .isPresent());
   }
 
   public Optional<QuestionGenerationBatch> planLocalBatchForUser(User user, Timestamp currentTime) {

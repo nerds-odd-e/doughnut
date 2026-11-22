@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
@@ -9,6 +10,7 @@ import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,19 +55,36 @@ public class MemoryTrackerLifecycle {
 
   @Transactional
   public void deleteUnansweredRecallPrompts(MemoryTracker memoryTracker) {
-    List<Integer> questionIds =
-        recallPromptRepository.findUnansweredQuestionIdsByMemoryTrackerId(memoryTracker.getId());
-    List<RecallPrompt> unansweredPrompts =
-        recallPromptRepository.findAllUnansweredByMemoryTrackerId(memoryTracker.getId());
-    if (!unansweredPrompts.isEmpty()) {
-      conversationRepository
-          .findBySubjectRecallPromptIn(unansweredPrompts)
-          .forEach(conversation -> {
-            conversation.getSubject().setRecallPrompt(null);
-            conversationRepository.save(conversation);
-          });
+    deleteRecallPrompts(
+        recallPromptRepository.findAllUnansweredByMemoryTrackerId(memoryTracker.getId()));
+  }
+
+  // Keeps prompts whose recorded focus input is unknown: only a conflicting fingerprint is stale.
+  @Transactional
+  public void deleteStaleUnansweredRecallPrompts(
+      MemoryTracker memoryTracker, String currentFocusFingerprint) {
+    deleteRecallPrompts(
+        recallPromptRepository.findAllUnansweredMcqsForOtherFocus(
+            memoryTracker.getId(), currentFocusFingerprint));
+  }
+
+  private void deleteRecallPrompts(List<RecallPrompt> prompts) {
+    if (prompts.isEmpty()) {
+      return;
     }
-    unansweredPrompts.forEach(entityPersister::remove);
+    List<Integer> questionIds =
+        prompts.stream()
+            .map(RecallPrompt::getMcq)
+            .filter(Objects::nonNull)
+            .map(Mcq::getId)
+            .toList();
+    conversationRepository
+        .findBySubjectRecallPromptIn(prompts)
+        .forEach(conversation -> {
+          conversation.getSubject().setRecallPrompt(null);
+          conversationRepository.save(conversation);
+        });
+    prompts.forEach(entityPersister::remove);
     mcqRepository.deleteUnreferencedByIds(questionIds);
   }
 }

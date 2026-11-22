@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.controllers.dto.Randomization.RandomStrategy.first;
-import static com.odde.donut.controllers.dto.Randomization.RandomStrategy.last;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -179,35 +178,6 @@ class MemoryTrackerRecallPromptFreshnessControllerTest extends MemoryTrackerCont
     assertThat(earlierHistory.getAnswer().getChoiceIndex(), equalTo(0));
     assertThat(earlierHistory.getMcq().getResponseChoices(), equalTo(earlierChoices));
     assertThat(openAi.requestInputTexts(3).getLast(), containsString(CORRECTED_BODY));
-  }
-
-  @Test
-  void gradesTheIssuedPromptAgainstItsOriginalChoicesAfterRenewal() throws Exception {
-    var waiting = loadWaitingQuestion();
-    editContent(ORIGINAL_SITE, CORRECTED_BODY);
-    reloadTracker();
-    testabilitySettings.setRandomization(new Randomization(last, 0));
-    serveQuestion(CURRENT_STEM, "Ten");
-    var renewed = controller.getRecallPrompt(tracker);
-    assertThat(renewed.getMcq().getResponseChoices().getLast(), equalTo("Ten"));
-
-    var answer =
-        recallPromptController.answer(
-            entityManager.find(RecallPrompt.class, waiting.getId()), choiceAnswer(0));
-
-    assertThat(answer.getId(), equalTo(waiting.getId()));
-    assertThat(answer.getMemoryTrackerId(), equalTo(tracker.getId()));
-    assertThat(answer.getAnswer().getCorrect(), is(true));
-    reloadTracker();
-    var original = historyFor(waiting.getId());
-    assertThat(original.getRecallPrompt().getMcq().getQuestionStem(), equalTo(WAITING_STEM));
-    assertThat(
-        original.getRecallPrompt().getMcq().getResponseChoices(),
-        equalTo(waiting.getMcq().getResponseChoices()));
-    assertThat(original.getRecallPrompt().getMcq().getCorrectAnswerIndex(), equalTo(0));
-    assertThat(original.getRecallPrompt().getAnswer().getChoiceIndex(), equalTo(0));
-    assertThat(original.getRecallLog().getGrade(), equalTo(Grade.GOOD));
-    assertThat(historyFor(renewed.getId()).getRecallPrompt().getAnswer(), nullValue());
   }
 
   private RecallHistoryItem historyFor(int promptId) throws Exception {
