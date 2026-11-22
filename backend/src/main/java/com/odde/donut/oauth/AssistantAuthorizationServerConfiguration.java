@@ -60,7 +60,6 @@ public class AssistantAuthorizationServerConfiguration {
           @Override
           @SuppressWarnings("unchecked")
           public <O extends AuthenticationProvider> O postProcess(O provider) {
-            // Keep the original list entries visible to SAS's shared request validator.
             if (provider instanceof OAuth2AuthorizationCodeRequestAuthenticationProvider
                 || provider instanceof OAuth2AuthorizationConsentAuthenticationProvider) {
               return (O) new AssistantGrantAuthenticationProvider(provider, grants);
@@ -96,15 +95,7 @@ public class AssistantAuthorizationServerConfiguration {
                     .authorizationEndpoint(endpoint ->
                         endpoint
                             .consentPage("/assistant-consent")
-                            .authenticationProviders(providers ->
-                                providers.forEach(provider -> {
-                                  if (provider
-                                      instanceof
-                                      OAuth2AuthorizationCodeRequestAuthenticationProvider
-                                          codeRequest) {
-                                    codeRequest.setAuthenticationValidator(validator);
-                                  }
-                                })))
+                            .authorizationCodeRequestAuthenticationValidator(validator))
                     .tokenEndpoint(endpoint ->
                         endpoint.authenticationProviders(providers ->
                             AssistantGrantAuthenticationProvider.serialize(providers, grants)))

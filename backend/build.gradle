@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '4.1.2'
+  id 'org.springframework.boot' version '4.2.0'
   // Spotless for the code style
   id "com.diffplug.spotless" version "8.12.0"
   id "io.github.ben-manes.versions" version "0.67.0"
@@ -79,16 +79,16 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
   implementation 'org.springframework.boot:spring-boot-starter-flyway'
-  implementation 'org.flywaydb:flyway-mysql:12.11.0'
+  implementation 'org.flywaydb:flyway-mysql'
   implementation 'org.springframework.boot:spring-boot-starter-session-jdbc'
-  implementation 'io.micrometer:micrometer-core:1.18.0'
+  implementation 'io.micrometer:micrometer-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springframework.security:spring-security-oauth2-authorization-server'
-  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.2.0'
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.2.1'
   implementation 'com.openai:openai-java:4.111.0'
-  implementation 'org.yaml:snakeyaml:2.7'
+  implementation 'org.yaml:snakeyaml'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
   implementation 'net.javacrumbs.shedlock:shedlock-spring:7.11.0'
@@ -96,10 +96,10 @@ dependencies {
   implementation 'org.eclipse.jgit:org.eclipse.jgit:7.8.1.202611041320-r'
   implementation 'org.apache.pdfbox:pdfbox:3.0.8'
   implementation 'io.modelcontextprotocol.sdk:mcp:2.2.0'
-  compileOnly 'org.projectlombok:lombok:1.18.48'
-  annotationProcessor 'org.projectlombok:lombok:1.18.48'
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
-  runtimeOnly 'com.mysql:mysql-connector-j:26.10.0'
+  runtimeOnly 'com.mysql:mysql-connector-j'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'

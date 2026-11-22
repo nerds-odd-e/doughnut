@@ -5326,9 +5326,6 @@ components:
     ConversationMessage:
       type: object
       properties:
-        id:
-          type: integer
-          format: int32
         message:
           type: string
         sender:
@@ -5338,6 +5335,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        id:
+          type: integer
+          format: int32
       required:
       - id
       - message
@@ -5812,14 +5812,14 @@ components:
     UserToken:
       type: object
       properties:
-        id:
-          type: integer
-          format: int32
         userId:
           type: integer
           format: int32
         label:
           type: string
+        id:
+          type: integer
+          format: int32
       required:
       - id
       - label
@@ -6753,6 +6753,12 @@ components:
     GithubIssue:
       type: object
       properties:
+        errorName:
+          type: string
+          writeOnly: true
+        errorDetail:
+          type: string
+          writeOnly: true
         title:
           type: string
         body:

@@ -757,11 +757,11 @@ export type DailyProbe = {
 };
 
 export type ConversationMessage = {
-    id: number;
     message: string;
     sender?: User;
     readByReceiver?: boolean;
     createdAt?: string;
+    id: number;
 };
 
 export type SseEmitter = {
@@ -1035,9 +1035,9 @@ export type WikidataEntityData = {
 };
 
 export type UserToken = {
-    id: number;
     userId?: number;
     label: string;
+    id: number;
 };
 
 export type AccuracyStats = {
@@ -1539,6 +1539,28 @@ export type SubscriptionWritable = {
     user?: User;
     notebook?: Notebook;
     fromDTO?: SubscriptionDto;
+};
+
+export type FailureReportWritable = {
+    id?: number;
+    errorName: string;
+    errorDetail: string;
+    issueNumber?: number;
+    createDatetime: string;
+    occurrenceCount: number;
+    githubIssue?: GithubIssueWritable;
+};
+
+export type FailureReportForViewWritable = {
+    failureReport?: FailureReportWritable;
+    githubIssueUrl?: string;
+};
+
+export type GithubIssueWritable = {
+    errorName?: string;
+    errorDetail?: string;
+    title?: string;
+    body?: string;
 };
 
 export type McpStreamableHttpData = {
