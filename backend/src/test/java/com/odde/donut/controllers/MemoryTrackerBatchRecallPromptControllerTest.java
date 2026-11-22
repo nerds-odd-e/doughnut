@@ -26,6 +26,7 @@ import com.odde.donut.services.FocusNoteFingerprint;
 import com.odde.donut.services.QuestionGenerationBatchImportService;
 import com.odde.donut.services.QuestionGenerationBatchJsonlRenderer;
 import com.odde.donut.services.QuestionGenerationBatchOutputCollectionService;
+import com.odde.donut.services.QuestionGenerationBatchPlanningService;
 import com.odde.donut.services.QuestionGenerationBatchRowImportService;
 import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import com.odde.donut.testability.OpenAiBatchApiMock;
@@ -47,6 +48,7 @@ class MemoryTrackerBatchRecallPromptControllerTest extends MemoryTrackerControll
   @Autowired QuestionGenerationBatchOutputCollectionService outputCollector;
   @Autowired QuestionGenerationBatchImportService importer;
   @Autowired QuestionGenerationBatchRowImportService rowImporter;
+  @Autowired QuestionGenerationBatchPlanningService planner;
   @Autowired QuestionGenerationBatchRequestRepository requests;
   @Autowired RecallPromptRepository recallPrompts;
   @Autowired NotebookGitHistoryService notebookGitHistory;
@@ -128,6 +130,24 @@ class MemoryTrackerBatchRecallPromptControllerTest extends MemoryTrackerControll
     assertThat(offered.getMcq().getResponseChoices().getFirst(), is("Ten"));
     assertThat(synchronousApi.requestInputTexts(1).getFirst(), containsString(CORRECTED));
     assertThat(savedPrompts(), hasSize(2));
+  }
+
+  @Test
+  void plansABatchReplacementFromTheEditedFocusBeforeRecall() throws Exception {
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(2, 3).please());
+    importProviderQuestion(renderRequestMetadata());
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(3, 3).please());
+    var update = new NoteUpdateContentDTO();
+    update.setContent(CORRECTED);
+    textContentController.updateNoteContent(tracker.getNote(), update);
+    makeMe.entityPersister.flushAndClear();
+
+    QuestionGenerationBatch replacement =
+        planner
+            .planLocalBatchForUser(currentUser.getUser(), reloadTracker().getNextRecallAt())
+            .orElseThrow();
+
+    assertThat(renderer.renderInputJsonl(replacement), containsString("opens at ten"));
   }
 
   @Test

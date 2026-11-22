@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
+import com.odde.donut.entities.FocusNoteInput;
+import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
@@ -114,10 +116,70 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest extends SpringTestBase 
   }
 
   @Test
-  void excludesTrackerWithUnansweredNonContestedPrompt() {
-    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).please();
+  void excludesTrackerWaitingWithAQuestionReadAfterTheLastUpdate() {
+    waitingQuestionFromCurrentFocus();
 
     assertThat(candidates(), empty());
+  }
+
+  @Test
+  void includesTrackerWhoseOnlyWaitingQuestionIsFromAnOlderFocus() {
+    waitingQuestionFromCurrentFocus();
+    editFocus("edited content");
+
+    assertThat(candidateIds(), contains(dueTracker.getId()));
+  }
+
+  @Test
+  void excludesTrackerWhenTheFocusWasRestoredAfterTheQuestionWasRead() {
+    waitingQuestionFromCurrentFocus();
+    editFocus(note.getContent());
+
+    assertThat(candidates(), empty());
+  }
+
+  @Test
+  void excludesTrackerWhenAMatchingQuestionWaitsBesideAStaleOne() {
+    waitingQuestionFromCurrentFocus();
+    editFocus("edited content");
+    waitingQuestionFromCurrentFocus();
+
+    assertThat(candidates(), empty());
+  }
+
+  @Test
+  void excludesTrackerWhoseLegacyQuestionWithoutReadTimeMatchesTheFocus() {
+    Mcq legacy = makeMe.anMcq().please(false);
+    legacy.setFocusNoteInput(new FocusNoteInput(null, null, FocusNoteFingerprint.of(note)));
+    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).withMcq(legacy).please();
+
+    assertThat(candidates(), empty());
+  }
+
+  @Test
+  void includesTrackerWhoseWaitingQuestionHasNoRecordedFocus() {
+    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).please();
+
+    assertThat(candidateIds(), contains(dueTracker.getId()));
+  }
+
+  @Test
+  void excludesTrackerWithWaitingNonMcqPrompt() {
+    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).spelling().please();
+
+    assertThat(candidates(), empty());
+  }
+
+  private void waitingQuestionFromCurrentFocus() {
+    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).generatedFrom(note).please();
+  }
+
+  private void editFocus(String content) {
+    testabilitySettings.timeTravelTo(hoursFrom(testabilitySettings.getCurrentUTCTimestamp(), 1));
+    note.setContent(content);
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    makeMe.entityPersister.merge(note);
+    makeMe.entityPersister.flush();
   }
 
   @Test

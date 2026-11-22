@@ -65,7 +65,7 @@ class QuestionGenerationBatchSubmitDueUsersTest extends SpringTestBase {
           .answerChoiceIndex(0)
           .answerTimestamp(recallTime)
           .please();
-      makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
+      makeMe.aRecallPrompt().forMemoryTracker(tracker).generatedFrom(note).please();
     });
 
     QuestionGenerationBatchSubmissionSummaryDTO[] summary =

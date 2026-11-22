@@ -104,7 +104,7 @@ builder's consumers passed after refactoring. API generation produced no change.
 ### 2. Prepare a batch replacement for an edited focus note
 
 Type: Behavior
-Status: planned
+Status: done
 
 A due tracker has only a waiting question for the older focus. During batch
 planning, retain the cheap timestamp shortcut for likely current prompts.
@@ -113,6 +113,20 @@ check all eligible waiting prompts before creating a batch request.
 **Proof.** Reproduce the baseline through the planner and render the edited
 focus. Check that a matching question, including a match after restoring the
 content or alongside a stale prompt, keeps the tracker out of the batch.
+
+**Accepted proof (2026-11-22).** The candidate SQL now excludes only a
+waiting prompt without an MCQ; `QuestionGenerationBatchPlanningService`
+drops trackers with a current waiting MCQ, first through
+`FocusNoteInput.wasReadAfterLastUpdateOf(note)` and otherwise through the
+recall fingerprint match `findUnansweredMcqForFocus`. Both queries keep the
+contested-question exclusion. A waiting MCQ with no recorded fingerprint now
+gets a batch replacement, as recall already replaces it on demand.
+Observations: `MemoryTrackerBatchRecallPromptControllerTest#plansABatchReplacementFromTheEditedFocusBeforeRecall`
+(failed before the change) and the `QuestionGenerationBatchCandidateMemoryTrackersTest`
+cases for an older focus, a match beside a stale prompt, a read after the
+last update, restored content, a legacy fingerprint-only match and a missing
+fingerprint. The `QuestionGenerationBatch*` and `MemoryTracker*ControllerTest`
+suites passed (228 tests), and the affected suites passed again after refactoring.
 
 ### 3. Remove stale waiting prompts after batch replacement
 

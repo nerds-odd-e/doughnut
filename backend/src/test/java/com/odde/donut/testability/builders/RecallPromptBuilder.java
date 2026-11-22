@@ -6,6 +6,7 @@ import com.odde.donut.entities.AnswerOutcome;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionType;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.testability.EntityBuilder;
@@ -119,6 +120,11 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     }
     entity.setQuestionType(QuestionType.SPELLING);
     entity.setMcq(null);
+    return this;
+  }
+
+  public RecallPromptBuilder generatedFrom(Note focus) {
+    this.mcqBuilder.generatedFrom(focus);
     return this;
   }
 
