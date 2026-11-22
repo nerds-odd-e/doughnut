@@ -66,7 +66,8 @@ class MemoryTrackerBatchRecallPromptControllerTest
     assertThat(offered.getId(), not(equalTo(imported.getId())));
     assertThat(offered.getMcq().getResponseChoices().getFirst(), is("Ten"));
     assertThat(synchronousApi.requestInputTexts(1).getFirst(), containsString(CORRECTED));
-    assertThat(savedPrompts(), hasSize(2));
+    assertThat(
+        savedPrompts().stream().map(RecallPrompt::getId).toList(), contains(offered.getId()));
   }
 
   @Test

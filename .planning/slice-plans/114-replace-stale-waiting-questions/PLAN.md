@@ -157,7 +157,7 @@ after refactoring.
 ### 4. Remove stale waiting prompts when recall supplies a current question
 
 Type: Behavior
-Status: planned
+Status: done
 
 Opening recall after a focus edit selects or generates a current question
 through the ordinary recall endpoint. Apply the same lifecycle cleanup once
@@ -165,8 +165,32 @@ that prompt is available. **Proof.** Check the current question and the
 remaining waiting queue after recall opens. Compare earlier answers, grades
 and due time, and confirm that history still holds any question it references.
 
+**Accepted proof (2026-11-22).** `RecallPromptService.generateAQuestion`
+passes the selected or newly generated current prompt to
+`RecallPromptPersister.replaceStalePromptsWith`, the same lifecycle cleanup
+the batch import uses; with no current prompt it deletes nothing.
+Observations: `MemoryTrackerRecallStalePromptRetirementControllerTest`
+(edited-focus question offered, cleanup after generation and after selecting a
+waiting current prompt, no cleanup when generation is unavailable, earlier
+answer with its choices and grade, due time). The two cleanup cases failed
+before the change. The recall answer-after-renewal test was deleted
+(obligation G1), and the edit-after-rendering batch case now expects only
+the offered prompt. The `MemoryTracker*`, `RecallPrompt*`,
+`QuestionGenerationBatch*`, `Recall*Controller*` and conversation suites
+passed (618 tests), and 426 affected tests passed after refactoring.
+Refactor follow-up for wrap-up: `MemoryTrackerRecallStalePromptRetirementControllerTest`
+inherits the batch-specific `MemoryTrackerBatchImportControllerTestBase`,
+whose batch setup it never uses.
+
 ## Plan review
 
 Slice plan refinement was unnecessary. A short storage change supplies the
 batch selector, and both replacement paths use one cleanup rule with separate
 provider-boundary proof. No remaining slice-specific concern was identified.
+
+## Story obligations
+
+### G1. Answering a waiting card after recall removed its stale prompt
+Reported: slice 4 — "Deleted MemoryTrackerRecallPromptFreshnessControllerTest#gradesTheIssuedPromptAgainstItsOriginalChoicesAfterRenewal: it answers the old waiting prompt after recall renewed the question, and that prompt is now deleted."
+Story clause: "submission from a card whose prompt has just been removed"
+Disposition: excluded "An edit during an in-flight batch, overlap between a batch and on-demand generation, and submission from a card whose prompt has just been removed"

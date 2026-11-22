@@ -52,11 +52,12 @@ public class RecallPromptService {
             .findUnansweredMcqForFocus(
                 memoryTracker.getId(), FocusNoteFingerprint.of(memoryTracker.getNote()))
             .orElse(null);
-    if (existingPrompt != null) {
-      return existingPrompt;
+    RecallPrompt currentPrompt =
+        existingPrompt != null ? existingPrompt : generateNewRecallPrompt(memoryTracker);
+    if (currentPrompt != null) {
+      recallPromptPersister.replaceStalePromptsWith(currentPrompt);
     }
-
-    return generateNewRecallPrompt(memoryTracker);
+    return currentPrompt;
   }
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {

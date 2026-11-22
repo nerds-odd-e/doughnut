@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.Randomization;
+import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.QuestionGenerationBatch;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
@@ -21,6 +22,7 @@ import com.odde.donut.services.QuestionGenerationBatchOutputCollectionService;
 import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import com.odde.donut.testability.OpenAiBatchApiMock;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
+import com.odde.donut.testability.builders.RecallPromptBuilder;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -92,6 +94,38 @@ abstract class MemoryTrackerBatchImportControllerTestBase extends MemoryTrackerC
     importer.importCompletedBatches(now);
     makeMe.entityPersister.flushAndClear();
     return savedPrompts().getFirst();
+  }
+
+  record StaleWaitingQueue(
+      RecallPrompt answered,
+      RecallPrompt contested,
+      RecallPrompt stale,
+      RecallPrompt unknownInput,
+      Grade grade,
+      Timestamp nextRecallAt) {}
+
+  StaleWaitingQueue prepareAStaleWaitingQueueAfterAnAcceptedEdit()
+      throws UnexpectedNoAccessRightException {
+    var answered = promptFromFocus().answerChoiceIndex(0).recorded().please();
+    var contested = promptFromFocus().contested().please();
+    makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcq(answered.getMcq()).please();
+    var stale = promptFromFocus().please();
+    var unknownInput = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
+    makeMe.entityPersister.flushAndClear();
+    var queue =
+        new StaleWaitingQueue(
+            answered,
+            contested,
+            stale,
+            unknownInput,
+            Grade.fromCorrect(answered.getAnswer().getCorrect()),
+            reloadTracker().getNextRecallAt());
+    publishCorrectedFocus();
+    return queue;
+  }
+
+  private RecallPromptBuilder promptFromFocus() {
+    return makeMe.aRecallPrompt().forMemoryTracker(tracker).generatedFrom(tracker.getNote());
   }
 
   void publishCorrectedFocus() throws UnexpectedNoAccessRightException {

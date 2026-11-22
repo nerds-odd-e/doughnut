@@ -53,13 +53,17 @@ public class RecallPromptPersister {
     return entityPersister.save(RecallPrompt.forMcq(mcq, memoryTracker));
   }
 
-  // A current imported question replaces the tracker's stale waiting prompts.
   @Transactional
   public void persistImportedRecallPromptForMcq(Mcq mcq, MemoryTracker memoryTracker) {
-    persistNewRecallPromptForMcq(mcq, memoryTracker);
-    String currentFingerprint = FocusNoteFingerprint.of(memoryTracker.getNote());
-    if (currentFingerprint.equals(mcq.getFocusNoteFingerprint())) {
-      memoryTrackerLifecycle.deleteStaleUnansweredRecallPrompts(memoryTracker, currentFingerprint);
+    RecallPrompt imported = persistNewRecallPromptForMcq(mcq, memoryTracker);
+    if (FocusNoteFingerprint.of(memoryTracker.getNote()).equals(mcq.getFocusNoteFingerprint())) {
+      replaceStalePromptsWith(imported);
     }
+  }
+
+  @Transactional
+  public void replaceStalePromptsWith(RecallPrompt currentPrompt) {
+    memoryTrackerLifecycle.deleteStaleUnansweredRecallPrompts(
+        currentPrompt.requireMemoryTracker(), currentPrompt.getMcq().getFocusNoteFingerprint());
   }
 }
