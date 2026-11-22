@@ -182,6 +182,15 @@ Refactor follow-up for wrap-up: `MemoryTrackerRecallStalePromptRetirementControl
 inherits the batch-specific `MemoryTrackerBatchImportControllerTestBase`,
 whose batch setup it never uses.
 
+## Execution complete
+
+Product advice: no change to priorities. Expect the first batch after
+release to replace waiting questions that predate the recorded fingerprint
+(2026-11-18) for trackers due in the window, one request each; on-demand
+recall already replaced these, so this moves cost to the cheaper batch path.
+Legacy prompts without a fingerprint are kept rather than deleted, so each
+affected tracker may retain one such prompt beside its current question.
+
 ## Plan review
 
 Slice plan refinement was unnecessary. A short storage change supplies the
