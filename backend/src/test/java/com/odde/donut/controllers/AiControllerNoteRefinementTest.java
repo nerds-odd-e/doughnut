@@ -14,13 +14,14 @@ import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ai.NoteRefinementLayout;
+import com.odde.donut.services.ai.NoteRefinementLayoutItem;
 import com.odde.donut.services.ai.NoteRefinementLayoutItems;
 import com.odde.donut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
+import com.openai.models.responses.Response;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -100,15 +101,49 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
           .doesNotContain("Set ledToQuestion=true");
       assertThat(params.rawParams().text().flatMap(ResponseTextConfig::format)).isPresent();
       assertThat(params.rawParams().input().flatMap(input -> input.text()).orElse("")).isNotBlank();
-      assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(1000L));
+    }
+
+    @Test
+    void returnsCompleteHierarchyWhenLayoutBudgetIsThreeThousandTokens()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      NoteRefinementLayout complete =
+          new NoteRefinementLayout(
+              List.of(
+                  NoteRefinementLayoutItems.parent(
+                      "sense-1",
+                      "Cut with a blade",
+                      List.of(
+                          NoteRefinementLayoutItems.leaf("usage-rope", "Cut a rope"),
+                          NoteRefinementLayoutItems.leaf("usage-power", "Switch power off"))),
+                  NoteRefinementLayoutItems.leaf("sense-2", "End a relationship")));
+      long[] outputTokenBudget = {0L};
+      openAiStructuredResponseMock.stubStructuredResponseFromRequest(request -> {
+        outputTokenBudget[0] = request.rawParams().maxOutputTokens().orElse(0L);
+        return outputTokenBudget[0] == 3000L
+            ? complete
+            : openAiStructuredResponseMock.incompleteStructuredResponse(
+                Response.IncompleteDetails.Reason.of("max_output_tokens"));
+      });
+      testNote.setContent("A note with two senses.");
+
+      NoteRefinementLayout result = controller.generateRefinementSuggestions(testNote, null);
+
+      assertThat(outputTokenBudget[0]).isEqualTo(3000L);
+      assertThat(result.getItems())
+          .extracting(NoteRefinementLayoutItem::getId)
+          .containsExactly("sense-1", "sense-2");
+      assertThat(result.getItems().getFirst().getChildren())
+          .extracting(NoteRefinementLayoutItem::getId)
+          .containsExactly("usage-rope", "usage-power");
     }
 
     @Test
     void shouldAppendQuestionLedGuidanceWhenQuestionContextProvided()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
+      NoteRefinementLayoutItem marked =
+          NoteRefinementLayoutItems.leaf("p1", "Capital of France", false, true);
       openAiStructuredResponseMock.stubStructuredResponse(
-          new NoteRefinementLayout(
-              List.of(NoteRefinementLayoutItems.leaf("p1", "Capital of France", false, true))));
+          new NoteRefinementLayout(List.of(marked)));
       testNote.setContent("Paris is the capital of France.");
 
       NoteRefinementQuestionContextDTO questionContext = new NoteRefinementQuestionContextDTO();
@@ -119,7 +154,8 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       questionContext.setClarification("I confused the French capital with the UK capital.");
       questionContext.setTestedFocus("capital city");
 
-      controller.generateRefinementSuggestions(testNote, questionContext);
+      assertThat(controller.generateRefinementSuggestions(testNote, questionContext).getItems())
+          .containsExactly(marked);
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<NoteRefinementLayout>> paramsCaptor =

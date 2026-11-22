@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.function.Function;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -28,6 +29,7 @@ public class OpenAiStructuredResponseMock {
   private final Map<Class<?>, Queue<Object>> structuredResults = new HashMap<>();
   private final Queue<Object> fallbackStructuredResults = new LinkedList<>();
   private Runnable beforeCreate;
+  private Function<StructuredResponseCreateParams<?>, Object> structuredResultFromRequest;
 
   private record MalformedStructuredContent(String content) {}
 
@@ -40,7 +42,10 @@ public class OpenAiStructuredResponseMock {
             beforeCreate.run();
           }
           StructuredResponseCreateParams<?> params = invocation.getArgument(0);
-          Object result = pollStructuredResult(params.responseType());
+          Object result =
+              structuredResultFromRequest != null
+                  ? structuredResultFromRequest.apply(params)
+                  : pollStructuredResult(params.responseType());
           if (result == null) {
             return null;
           }
@@ -100,6 +105,17 @@ public class OpenAiStructuredResponseMock {
 
   public void stubStructuredResponseMalformed(String malformedJson) {
     fallbackStructuredResults.add(new MalformedStructuredContent(malformedJson));
+  }
+
+  public void stubStructuredResponseFromRequest(
+      Function<StructuredResponseCreateParams<?>, Object> structuredResultFromRequest) {
+    this.structuredResultFromRequest = structuredResultFromRequest;
+  }
+
+  public Response incompleteStructuredResponse(Response.IncompleteDetails.Reason reason) {
+    return buildStructuredResponse("{}", ResponseStatus.INCOMPLETE).toBuilder()
+        .incompleteDetails(Response.IncompleteDetails.builder().reason(reason).build())
+        .build();
   }
 
   public void stubStructuredResponseIncomplete(
