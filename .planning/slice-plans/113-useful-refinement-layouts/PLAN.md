@@ -252,3 +252,10 @@ separate slices. They still exercise one layout rule: concise source-ordered
 sections, with dictionary senses as parents and distinct usages as children.
 Failure and retry remain the last slice. No Structure slice was added. The
 plan holds four slices.
+
+## Execution complete
+
+Product advice: no change. The published slices deliver the story's selection
+and failure examples. The mounted reload-failure spec observes the explanation
+the existing Cypress feature does not, and that feature still covers the
+successful path. No product correction follows.
