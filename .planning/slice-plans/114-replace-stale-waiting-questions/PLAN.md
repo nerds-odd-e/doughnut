@@ -131,13 +131,28 @@ suites passed (228 tests), and the affected suites passed again after refactorin
 ### 3. Remove stale waiting prompts after batch replacement
 
 Type: Behavior
-Status: planned
+Status: done
 
 After ordinary import supplies a current question, remove the tracker's
 confirmed stale unanswered prompts through the lifecycle. Keep the imported
 prompt and any answered history. **Proof.** Import a current replacement
 for a tracker with a stale waiting prompt. Verify the remaining queue and
 recall history after reloading the tracker.
+
+**Accepted proof (2026-11-22).** `MemoryTrackerLifecycle.deleteStaleUnansweredRecallPrompts(tracker, fingerprint)`
+removes uncontested unanswered MCQ prompts whose known fingerprint differs
+(`RecallPromptRepository.findAllUnansweredMcqsForOtherFocus`; an unknown
+fingerprint is kept) and shares conversation detachment and unreferenced
+question removal with `deleteUnansweredRecallPrompts`.
+`RecallPromptPersister.persistImportedRecallPromptForMcq` runs it only when
+the imported question matches the current focus; slice 4 reuses the
+lifecycle method. Observations: `MemoryTrackerBatchStalePromptRetirementControllerTest`
+(remaining queue, imported prompt offered at recall, earlier answer and
+grade, due time; the shared question survives) and the unchanged
+"edit after rendering" case for "not before". The new case failed before the
+change; the `QuestionGenerationBatch*`, `MemoryTracker*`, `RecallPrompt*` and
+conversation suites passed (501 tests); the split batch test classes passed
+after refactoring.
 
 ### 4. Remove stale waiting prompts when recall supplies a current question
 

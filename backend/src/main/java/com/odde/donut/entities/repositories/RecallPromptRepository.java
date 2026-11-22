@@ -27,6 +27,12 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
           + "AND rp.answer_id IS NULL "
           + "AND (mcq.id IS NULL OR mcq.is_contested = false)";
 
+  String unansweredMcqFingerprint =
+      " AND rp.question_type = 'MCQ'"
+          + " AND JSON_UNQUOTE(JSON_EXTRACT("
+          + "IF(JSON_VALID(mcq.raw_json_question), mcq.raw_json_question, NULL),"
+          + " '$.focusNoteFingerprint'))";
+
   @Query(
       value = "SELECT rp.*" + unansweredByMemoryTrackerFrom + " ORDER BY rp.id DESC LIMIT 1",
       nativeQuery = true)
@@ -37,10 +43,8 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       value =
           "SELECT rp.*"
               + unansweredByMemoryTrackerFrom
-              + " AND rp.question_type = 'MCQ'"
-              + " AND JSON_UNQUOTE(JSON_EXTRACT("
-              + "IF(JSON_VALID(mcq.raw_json_question), mcq.raw_json_question, NULL),"
-              + " '$.focusNoteFingerprint')) = :focusNoteFingerprint"
+              + unansweredMcqFingerprint
+              + " = :focusNoteFingerprint"
               + " ORDER BY rp.id DESC LIMIT 1",
       nativeQuery = true)
   Optional<RecallPrompt> findUnansweredMcqForFocus(
@@ -59,12 +63,14 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
 
   @Query(
       value =
-          "SELECT DISTINCT rp.mcq_id"
+          "SELECT rp.*"
               + unansweredByMemoryTrackerFrom
-              + " AND rp.mcq_id IS NOT NULL",
+              + unansweredMcqFingerprint
+              + " <> :focusNoteFingerprint",
       nativeQuery = true)
-  List<Integer> findUnansweredQuestionIdsByMemoryTrackerId(
-      @Param("memoryTrackerId") Integer memoryTrackerId);
+  List<RecallPrompt> findAllUnansweredMcqsForOtherFocus(
+      @Param("memoryTrackerId") Integer memoryTrackerId,
+      @Param("focusNoteFingerprint") String focusNoteFingerprint);
 
   List<RecallPrompt> findAllByMemoryTracker_IdOrderByIdDesc(Integer memoryTrackerId);
 

@@ -60,7 +60,7 @@ public class QuestionGenerationBatchRowImportService {
     Mcq mcq = generatedQuestionPostProcessor.assembleMcq(result.output(), request.getContextSeed());
     mcq.setFocusNoteInput(
         QuestionGenerationBatchJsonlRenderer.focusNoteInputFrom(result.metadata()));
-    recallPromptPersister.persistNewRecallPromptForMcq(mcq, memoryTracker);
+    recallPromptPersister.persistImportedRecallPromptForMcq(mcq, memoryTracker);
 
     request.setStatus(QuestionGenerationBatchRequestStatus.IMPORTED);
     batchRequestRepository.save(request);
