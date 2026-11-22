@@ -41,7 +41,7 @@ origin/main and record when it first became available.
 ### 2. Withdraw the notice at the end of the pilot
 
 Type: Behavior
-Status: planned
+Status: done
 
 On 22 November Terry closed enrollment after the first ordinary completion
 and directed immediate removal. Doughnut main at `8959ee4429` has one
@@ -52,6 +52,12 @@ Dough heartbeat owns return and coordination.
 **Proof.** Confirm origin/main no longer contains the first-report notice.
 Check the surrounding guidance, retaining any independent changes since
 deployment. Close the story through the normal backlog completion operation.
+
+**Accepted proof.** On 22 November origin/main `c449d1d2202c67ad956fcbd1b32797c15845078f`
+removed the 24-line notice and one-line Claude pointer. Both guidance files
+are byte-identical to the pre-rollout files. The process-review setting is
+byte-identical to pre-withdrawal main. An enabled ordinary review follows
+the existing recording route. The separate repeat guidance is present.
 
 ## Current decisions and gates
 
@@ -113,3 +119,14 @@ on the repair's accepted hosted run.
 The local probe is recoverable from the scope, command and report in the
 Codex execution thread. The transient raw reports are under
 `/tmp/seed401-cli-repair.ow53ID` on the test host.
+
+## Execution complete
+
+- The frozen wording was available on origin/main at `1ed33fda63`.
+- Terry ended observation after one ordinary completion. Main `c449d1d220`
+  exactly reverses the temporary notice and pointer. Independent inspection
+  and the fetched-main comparison verified the surrounding guidance and
+  the separate repeat instruction.
+- Product review matched the planned removal. The current project default
+  skips process retrospective.
+- Product advice: no change.
