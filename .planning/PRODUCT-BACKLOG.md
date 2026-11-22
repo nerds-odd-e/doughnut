@@ -8,8 +8,6 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
-- [Route the first-report pilot into ordinary Doughnut reviews (Codex-owned)](seeds/SEED-132-route-first-report-trial.md#route-first-report-trial) — SEED-132#route-first-report-trial ([plan](slice-plans/112-route-first-report-trial/PLAN.md))
-
 ## Backlog list
 
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives

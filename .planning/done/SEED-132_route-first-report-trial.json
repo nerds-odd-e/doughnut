@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-132#route-first-report-trial",
+  "title": "Route the first-report pilot into ordinary Doughnut reviews (Codex-owned)",
+  "completedAt": "2026-11-22T00:23:23.505Z",
+  "developer": "Terry Yin",
+  "agent": "yusuke-chan",
+  "host": "codex"
+}
