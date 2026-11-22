@@ -91,7 +91,7 @@ in the parent. Only `電源を切る。 / 关掉电源。` has `ledToQuestion` t
 
 ### 3. Select a child usage and recall targets
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted selection checks in the proof table.
 
 Behavior: A learner viewing a nested layout selects one child usage on its
@@ -102,6 +102,18 @@ refinement from a recall question preselects the tagged items.
   `NoteRefinement.layoutSelection.spec.ts` is the child proof. Re-run the
   existing question-context preselection case in that file. Run both
   frontend typechecks because that test source changed.
+
+Accepted on 2026-11-22 at revision `de130d723643` with the uncommitted
+selection spec, exit 0. Command: `pnpm frontend:test tests/components/recall/NoteRefinement.layoutSelection.spec.ts`
+(8 tests). `shows checkboxes and toggles remove/extract button disabled state with selection`
+observes three checkboxes and that selecting the first item enables remove and
+extract. `cascades parent selection and marks already extracted items without disabling`
+observes that selecting `p1` checks `p1`, `p1-1`, and `p1-2`.
+`selects a child item on its own` observes `p1-1` checked while `p1-2` and
+`p1` stay unchecked. `preselects ledToQuestion items only when question context is provided`
+observes `p1` checked and `p2` unchecked with question context, and the flagged
+item unchecked without it. `vue-tsc --noEmit` and `tsc --noEmit` both exited 0.
+Refactor made no edits, so this proof stayed in place.
 
 ### 4. Explain a failed layout and recover inline
 Type: Behavior
