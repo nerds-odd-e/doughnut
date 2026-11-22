@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.odde.donut.controllers.dto.Randomization;
+import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -21,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Timestamp;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
@@ -90,6 +92,7 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
     Note focus =
         makeMe.aNote(title).notebookOwnedBy(currentUser.getUser()).content(markdown).please();
     MemoryTracker tracker = ownedTracker(focus);
+    Timestamp readAt = testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(2, 3).please());
     openAiMock.stubStructuredResponse(
         makeMe
             .aGeneratedMcq()
@@ -105,8 +108,10 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
     assertThat(input, containsString(markdown));
     Mcq persisted = entityManager.find(RecallPrompt.class, result.getId()).getMcq();
     assertThat(
-        persisted.getFocusNoteFingerprint(),
-        equalTo(expectedFingerprint(focus.getId(), title, markdown)));
+        persisted.getFocusNoteInput(),
+        equalTo(
+            new FocusNoteInput(
+                focus.getId(), readAt, expectedFingerprint(focus.getId(), title, markdown))));
     assertThat(persisted.getCorrectAnswerIndex(), equalTo(0));
     JsonNode mcqJson = webJsonMapper.valueToTree(result.getMcq());
     assertThat(mcqJson.get("questionStem").asText(), equalTo("When does the observatory open?"));
@@ -114,8 +119,11 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
         result.getMcq().getResponseChoices(),
         equalTo(List.of("Nine", "distractor1", "distractor2", "distractor3")));
     assertThat(mcqJson.hasNonNull("correctAnswerIndex"), is(false));
-    assertThat(mcqJson.has("focusNoteFingerprint"), is(false));
-    assertThat(webJsonMapper.valueToTree(persisted).has("focusNoteFingerprint"), is(false));
+    for (String privateField :
+        List.of("focusNoteFingerprint", "focusNoteInput", "focusNoteId", "focusNoteReadAt")) {
+      assertThat(mcqJson.has(privateField), is(false));
+      assertThat(webJsonMapper.valueToTree(persisted).has(privateField), is(false));
+    }
   }
 
   private String generationInput() {

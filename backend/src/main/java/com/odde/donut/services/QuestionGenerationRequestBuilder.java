@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.algorithms.RelationshipNoteComposition;
+import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
@@ -16,6 +17,7 @@ import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.donut.services.focusContext.FocusContextResult;
 import com.odde.donut.services.focusContext.FocusContextRetrievalService;
 import com.odde.donut.services.focusContext.RetrievalConfig;
+import com.odde.donut.testability.TestabilitySettings;
 import com.openai.models.ReasoningEffort;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
@@ -33,6 +35,7 @@ public class QuestionGenerationRequestBuilder {
   private final NoteRealmService noteRealmService;
   private final NoteReferenceService noteReferenceService;
   private final AuthorizationService authorizationService;
+  private final TestabilitySettings testabilitySettings;
 
   @Autowired
   public QuestionGenerationRequestBuilder(
@@ -41,13 +44,15 @@ public class QuestionGenerationRequestBuilder {
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       NoteRealmService noteRealmService,
       NoteReferenceService noteReferenceService,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      TestabilitySettings testabilitySettings) {
     this.globalSettingsService = globalSettingsService;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.noteRealmService = noteRealmService;
     this.noteReferenceService = noteReferenceService;
     this.authorizationService = authorizationService;
+    this.testabilitySettings = testabilitySettings;
   }
 
   @Transactional(readOnly = true)
@@ -88,13 +93,18 @@ public class QuestionGenerationRequestBuilder {
       User viewer,
       boolean batch) {
     Note focus = focusContextRetrievalService.hydrateFocus(note);
+    FocusNoteInput focusNoteInput =
+        new FocusNoteInput(
+            focus.getId(),
+            testabilitySettings.getCurrentUTCTimestamp(),
+            FocusNoteFingerprint.of(focus));
     return new PreparedQuestionGeneration(
         buildMcqRequest(focus, additionalMessage, contextSeed, propertyFocus, viewer, batch),
-        FocusNoteFingerprint.of(focus));
+        focusNoteInput);
   }
 
   public record PreparedQuestionGeneration(
-      StructuredResponseCreateParams<GeneratedMcq> request, String focusNoteFingerprint) {}
+      StructuredResponseCreateParams<GeneratedMcq> request, FocusNoteInput focusNoteInput) {}
 
   PreparedQuestionGeneration prepareBatchQuestionGeneration(
       Note note, Long contextSeed, PropertyFocus propertyFocus, User viewer) {

@@ -1,6 +1,8 @@
 package com.odde.donut.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.QuestionGenerationBatch;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
@@ -8,6 +10,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.QuestionGenerationRequestBuilder.PreparedQuestionGeneration;
 import com.odde.donut.services.openAiApis.StructuredResponseCreateParamsSerializer;
+import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +22,9 @@ import org.springframework.stereotype.Service;
 public class QuestionGenerationBatchJsonlRenderer {
   public static final String BATCH_RESPONSES_ENDPOINT = "/v1/responses";
   public static final String BATCH_REQUEST_METHOD = "POST";
-  static final String FOCUS_NOTE_FINGERPRINT_METADATA_KEY = "focus_note_fingerprint";
+  private static final String FOCUS_NOTE_FINGERPRINT_METADATA_KEY = "focus_note_fingerprint";
+  private static final String FOCUS_NOTE_ID_METADATA_KEY = "focus_note_id";
+  private static final String FOCUS_NOTE_READ_AT_METADATA_KEY = "focus_note_read_at";
 
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final QuestionGenerationRequestBuilder requestBuilder;
@@ -61,8 +66,7 @@ public class QuestionGenerationBatchJsonlRenderer {
         requestBuilder.prepareBatchQuestionGeneration(
             tracker.getNote(), request.getContextSeed(), tracker.propertyFocus(), viewer);
     Map<String, Object> body = paramsSerializer.toBodyMap(prepared.request());
-    body.put(
-        "metadata", Map.of(FOCUS_NOTE_FINGERPRINT_METADATA_KEY, prepared.focusNoteFingerprint()));
+    body.put("metadata", focusNoteInputMetadata(prepared.focusNoteInput()));
 
     Map<String, Object> line = new LinkedHashMap<>();
     line.put("custom_id", request.getCustomId());
@@ -75,5 +79,22 @@ public class QuestionGenerationBatchJsonlRenderer {
     } catch (Exception e) {
       throw new RuntimeException("Failed to render batch JSONL line", e);
     }
+  }
+
+  private static Map<String, String> focusNoteInputMetadata(FocusNoteInput input) {
+    return Map.of(
+        FOCUS_NOTE_FINGERPRINT_METADATA_KEY, input.fingerprint(),
+        FOCUS_NOTE_ID_METADATA_KEY, String.valueOf(input.noteId()),
+        FOCUS_NOTE_READ_AT_METADATA_KEY, String.valueOf(input.readAt().getTime()));
+  }
+
+  /** Batch rows submitted before the id and read time were recorded carry only the fingerprint. */
+  static FocusNoteInput focusNoteInputFrom(JsonNode metadata) {
+    JsonNode noteId = metadata.path(FOCUS_NOTE_ID_METADATA_KEY);
+    JsonNode readAt = metadata.path(FOCUS_NOTE_READ_AT_METADATA_KEY);
+    return new FocusNoteInput(
+        noteId.isMissingNode() ? null : Integer.valueOf(noteId.textValue()),
+        readAt.isMissingNode() ? null : new Timestamp(Long.parseLong(readAt.textValue())),
+        metadata.path(FOCUS_NOTE_FINGERPRINT_METADATA_KEY).textValue());
   }
 }

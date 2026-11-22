@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.configs.ObjectMapperConfig;
+import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
@@ -51,10 +52,10 @@ public class NoteQuestionGenerationService {
         requestBuilder.prepareQuestionGeneration(
             note, additionalMessage, contextSeed, propertyFocus);
     return new GeneratedQuestion(
-        generateQuestionFromRequest(prepared.request()), prepared.focusNoteFingerprint());
+        generateQuestionFromRequest(prepared.request()), prepared.focusNoteInput());
   }
 
-  public record GeneratedQuestion(GeneratedMcq question, String focusNoteFingerprint) {}
+  public record GeneratedQuestion(GeneratedMcq question, FocusNoteInput focusNoteInput) {}
 
   private GeneratedMcq generateQuestionFromRequest(
       StructuredResponseCreateParams<GeneratedMcq> responseRequest) {

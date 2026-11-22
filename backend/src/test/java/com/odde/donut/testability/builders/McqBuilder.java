@@ -1,5 +1,6 @@
 package com.odde.donut.testability.builders;
 
+import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.FocusNoteFingerprint;
@@ -69,7 +70,11 @@ public class McqBuilder extends EntityBuilder<Mcq> {
   }
 
   public McqBuilder generatedFrom(Note focus) {
-    entity.setFocusNoteFingerprint(FocusNoteFingerprint.of(focus));
+    entity.setFocusNoteInput(
+        new FocusNoteInput(
+            focus.getId(),
+            makeMe.testabilitySettings.getCurrentUTCTimestamp(),
+            FocusNoteFingerprint.of(focus)));
     return this;
   }
 }

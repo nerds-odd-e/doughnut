@@ -12,7 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.Randomization;
+import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
@@ -20,6 +22,7 @@ import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
+import com.odde.donut.services.FocusNoteFingerprint;
 import com.odde.donut.services.QuestionGenerationBatchImportService;
 import com.odde.donut.services.QuestionGenerationBatchJsonlRenderer;
 import com.odde.donut.services.QuestionGenerationBatchOutputCollectionService;
@@ -92,6 +95,20 @@ class MemoryTrackerBatchRecallPromptControllerTest extends MemoryTrackerControll
     assertThat(offered.getMcq().getQuestionStem(), is(BATCH_STEM));
     assertThat(offered.getMcq().getResponseChoices().getFirst(), is("Nine"));
     verifyNoInteractions(synchronousApi.responseService());
+  }
+
+  @Test
+  void recordsTheRenderedFocusInputWithTheImportedQuestion() throws Exception {
+    Timestamp readAt = testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(2, 3).please());
+    JsonNode requestMetadata = renderRequestMetadata();
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(3, 3).please());
+
+    importProviderQuestion(requestMetadata);
+    Note focus = reloadTracker().getNote();
+
+    assertThat(
+        savedPrompts().getFirst().getMcq().getFocusNoteInput(),
+        equalTo(new FocusNoteInput(focus.getId(), readAt, FocusNoteFingerprint.of(focus))));
   }
 
   @Test

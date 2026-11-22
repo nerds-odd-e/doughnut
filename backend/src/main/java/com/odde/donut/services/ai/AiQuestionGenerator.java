@@ -30,7 +30,7 @@ public class AiQuestionGenerator {
             note, additionalMessage, contextSeed, propertyFocus);
     Mcq mcq = generatedQuestionPostProcessor.assembleMcq(generated.question(), contextSeed);
     if (mcq != null) {
-      mcq.setFocusNoteFingerprint(generated.focusNoteFingerprint());
+      mcq.setFocusNoteInput(generated.focusNoteInput());
     }
     return mcq;
   }

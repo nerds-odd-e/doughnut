@@ -1,7 +1,5 @@
 package com.odde.donut.services;
 
-import static com.odde.donut.services.QuestionGenerationBatchJsonlRenderer.FOCUS_NOTE_FINGERPRINT_METADATA_KEY;
-
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
@@ -60,8 +58,8 @@ public class QuestionGenerationBatchRowImportService {
 
     MemoryTracker memoryTracker = request.getMemoryTracker();
     Mcq mcq = generatedQuestionPostProcessor.assembleMcq(result.output(), request.getContextSeed());
-    mcq.setFocusNoteFingerprint(
-        result.metadata().path(FOCUS_NOTE_FINGERPRINT_METADATA_KEY).textValue());
+    mcq.setFocusNoteInput(
+        QuestionGenerationBatchJsonlRenderer.focusNoteInputFrom(result.metadata()));
     recallPromptPersister.persistNewRecallPromptForMcq(mcq, memoryTracker);
 
     request.setStatus(QuestionGenerationBatchRequestStatus.IMPORTED);

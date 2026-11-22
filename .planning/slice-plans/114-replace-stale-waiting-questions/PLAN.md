@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#replace-stale-waiting-questions
 **Source:** [Replace stale waiting recall questions](../../seeds/SEED-073-learning-refinement-and-retrieval.md#replace-stale-waiting-questions)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -76,13 +77,29 @@ by web and CLI.
 ### 1. Record when question generation read the focus note
 
 Type: Structure
-Status: planned
+Status: done
 
 Record the focus note identity and input-read time with the fingerprint
 when preparing the provider request. Carry them through both generation paths
 to persisted question metadata. This supplies the timestamp shortcut in
 slice 2. **Proof.** Observe the prepared and persisted input identity and
 time, private API output, and the same reuse behavior for a matching prompt.
+
+**Accepted proof (2026-11-22).** `FocusNoteInput(noteId, readAt, fingerprint)`
+is built in `QuestionGenerationRequestBuilder` (read time from
+`TestabilitySettings`) and stored in the MCQ JSON (no migration). Batch rows
+carry `focus_note_id` and `focus_note_read_at` (epoch millis) beside the
+fingerprint; `QuestionGenerationBatchJsonlRenderer.focusNoteInputFrom` decodes
+them on import, and a row without them imports fingerprint-only (kept for
+batches spanning a deploy; slice 2 sends missing metadata to fingerprint
+confirmation). `McqBuilder.generatedFrom` now records a full input, so a
+legacy fingerprint-only question needs explicit setup in slice 2.
+Observations: `QuestionGenerationBatchJsonlRendererTest` expected body;
+`MemoryTrackerBatchRecallPromptControllerTest#recordsTheRenderedFocusInputWithTheImportedQuestion`;
+`MemoryTrackerQuestionPersistenceControllerTest#preservesTheGenerationFocusWithThePersistedQuestion`
+(including private-field absence); existing reuse and legacy cases. The
+focused suite plus consumer-traced suites passed (89 tests), and the
+builder's consumers passed after refactoring. API generation produced no change.
 
 ### 2. Prepare a batch replacement for an edited focus note
 
