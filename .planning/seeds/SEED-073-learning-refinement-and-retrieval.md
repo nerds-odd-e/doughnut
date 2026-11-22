@@ -21,6 +21,22 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 [Local recall evidence and validation workflow](learning-refinement-and-retrieval-context.md#local-recall-evidence) apply to each story below.
 
+<a id="replace-stale-waiting-questions"></a>
+
+### Replace stale waiting recall questions
+
+**Identity:** SEED-073#replace-stale-waiting-questions
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal.** Learners with an edited focus note can get a current multiple-choice
+  question from the batch before recall. When the batch or on-demand recall
+  supplies a current replacement, discard stale unanswered prompts.
+- **Scope.** Use the focus note's update time to screen due batch candidates and
+  its fingerprint to confirm whether a waiting question is current. Preserve
+  answered recall history and reserve contests for challenges to a question.
+
 <a id="replace-correct-but-poor-question"></a>
 
 ### Replace a correct but poor recall question
