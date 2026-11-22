@@ -117,7 +117,7 @@ Refactor made no edits, so this proof stayed in place.
 
 ### 4. Explain a failed layout and recover inline
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller HTTP problem response and mounted failure/retry journey.
 
 Behavior: The provider returns an incomplete or unusable layout → **Refine
@@ -125,21 +125,27 @@ note** displays an actionable explanation beside **Ask AI to retry**. If the
 learner retries and generation completes, the layout replaces the message.
 Cancelling leaves the same view available for a fresh request.
 
-- Reuse the structured Responses SDK boundary where the incomplete reason is
-  available. Carry a specific, safe message for token exhaustion through the
-  existing HTTP problem response. Give other unusable provider results a
-  generic refinement-specific message. A genuinely empty note is a valid
-  empty layout. Keep the shared handler's existing semantics for callers
-  such as recall question generation and extraction.
-- Use the existing cancelable loading and retry in `useNoteRefinementLayout`.
-  Render the failure in `NoteRefinement`. Use extraction preview's error
-  handling as the nearby precedent. Clear the message on a successful fresh
-  layout and preserve quiet cancellation.
-- Prove the wire response through existing Spring MockMvc setup with an owned
-  note. The existing recall prompt recovery test demonstrates how to provide an
-  incomplete response from the typed SDK mock. Mount the component with a
-  problem response from the generated SDK followed by a successful result.
-  Follow the same path for automatic reload after a removal.
+Accepted on 2026-11-22 at revision `61059dd0a55a` with the uncommitted
+explanation, exit 0. Token exhaustion is HTTP 503 `Generation could not
+finish within its limit.` Other unusable results are HTTP 503 `AI could not
+generate a refinement layout.` A blank note and a completed empty layout stay
+empty successes. The shared reader still returns only the parsed value to
+recall and extraction. The view shows the message beside **Ask AI to retry**,
+clears it when a retry succeeds, and leaves it in place on a quiet cancel.
+
+`outputTokenLimitIsASafeProblemDetail` observes that 503 message and that the
+partial text `刀で切` is absent. The mounted spec shows that sentence beside
+**Ask AI to retry**, then checkbox `p1` with `Cut a rope` and no error.
+`NoteRefinement.cancel.spec.ts` leaves retry available and no error on a
+fresh cancel. Cancelling a retry ignores the late layout. Extraction calls
+`createExtractedNote` only after the learner uses the create control. Removal
+emits updated content only after confirm. The frontend command passed 39
+tests. Extraction preview (6), removal (3), export (4), and the cancelable
+allowlist (2) passed. `vue-tsc` and `tsc` exited 0. Refactor changed
+acceptance to `acceptedLayout` and reran the problem, generation, service, and
+export tests with 0 failures. The mounted commands stayed in place.
+`note_refinement.feature` was not run; the mounted reload-failure spec
+observes the explanation after a confirmed removal.
 
 ## Current decisions
 
@@ -225,6 +231,18 @@ request, not an automated suite.
   edit that finds a file already over 250 stops before that edit.
 - A second overrun of this story requires reassessment of the story boundary
   before another slice-only refinement.
+- On 2026-11-22 slice 4 reached the limit. The pause settled at 17.8 active
+  minutes and `storyOverruns` 2. The failure point was the clock, after the
+  focused failure proof and before the consumer dispositions were finished.
+  The sizing assumption that failed: writing the failure explanation and
+  also finishing the consumer dispositions of the shared response reader
+  fits in 15 active minutes.
+- Story-boundary reassessment: slices 1–3 are published and deliver the
+  compact request, the dictionary replay, and mounted selection. The goal,
+  scope, and examples stay as written. The remaining scope is still the
+  failure example. Continuing is the same story because that example is the
+  rest of this outcome, not a new problem. The attempt stays parked in the
+  worktree. The restarted slice only finishes the consumer proof.
 
 ## Plan review
 

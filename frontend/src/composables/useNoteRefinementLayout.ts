@@ -12,6 +12,7 @@ import {
 import { useRefinementLayoutSelection } from "@/composables/useRefinementLayoutSelection"
 import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import { onMounted, ref, type Ref } from "vue"
 
 export function useNoteRefinementLayout(
@@ -21,6 +22,7 @@ export function useNoteRefinementLayout(
   questionContext?: Ref<NoteRefinementQuestionContextDto | undefined>
 ) {
   const refinementLayoutItems = ref<NoteRefinementLayoutItem[]>([])
+  const layoutError = ref("")
   const layoutLoadSettled = ref(false)
   const showExportExtractDialog = ref(false)
   const showExportBreakdownDialog = ref(false)
@@ -52,6 +54,7 @@ export function useNoteRefinementLayout(
   } = {}) => {
     const settleLayout = (items: NoteRefinementLayoutItem[]) => {
       refinementLayoutItems.value = items
+      layoutError.value = ""
       if (questionContext?.value) {
         selectWhere((item) => item.ledToQuestion)
       } else {
@@ -61,13 +64,30 @@ export function useNoteRefinementLayout(
       layoutLoadSettled.value = true
     }
 
+    const settleFailure = (error: unknown) => {
+      refinementLayoutItems.value = []
+      clearSelection()
+      onLayoutReset()
+      const message = toOpenApiError(error).message
+      layoutError.value = message
+        ? message
+        : "AI could not generate a refinement layout."
+      layoutLoadSettled.value = true
+    }
+
     const settleFromResult = ({
       data,
       error,
     }: {
       data?: NoteRefinementLayout | null
       error?: unknown
-    }) => settleLayout(!error && data ? data.items : [])
+    }) => {
+      if (error || !data) {
+        settleFailure(error)
+        return
+      }
+      settleLayout(data.items)
+    }
 
     const requestLayout = (signal?: AbortSignal) =>
       AiController.generateRefinementSuggestions({
@@ -88,7 +108,7 @@ export function useNoteRefinementLayout(
     })
 
     if (outcome.status === "cancelled") {
-      settleLayout([])
+      layoutLoadSettled.value = true
       return
     }
 
@@ -159,6 +179,7 @@ export function useNoteRefinementLayout(
 
   return {
     refinementLayoutItems,
+    layoutError,
     layoutLoadSettled,
     showExportExtractDialog,
     showExportBreakdownDialog,

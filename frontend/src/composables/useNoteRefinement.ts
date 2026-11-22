@@ -25,6 +25,7 @@ export function useNoteRefinement(
 
   return {
     refinementLayoutItems: layout.refinementLayoutItems,
+    layoutError: layout.layoutError,
     layoutLoadSettled: layout.layoutLoadSettled,
     showExportExtractDialog: layout.showExportExtractDialog,
     showExportBreakdownDialog: layout.showExportBreakdownDialog,

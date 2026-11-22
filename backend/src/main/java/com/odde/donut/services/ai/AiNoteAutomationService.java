@@ -14,7 +14,9 @@ import com.odde.donut.services.focusContext.FocusContextResult;
 import com.odde.donut.services.focusContext.FocusContextRetrievalService;
 import com.odde.donut.services.focusContext.RetrievalConfig;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
+import com.odde.donut.services.openAiApis.StructuredResponseReading;
 import com.odde.donut.validators.DisplayNamePathSeparators;
+import com.openai.models.responses.Response;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import java.util.function.Function;
@@ -54,10 +56,22 @@ public class AiNoteAutomationService {
 
   public NoteRefinementLayout generateRefinementSuggestions(
       NoteRefinementQuestionContextDTO questionContext) throws JsonProcessingException {
-    return executeWithParams(
-        buildRefinementLayoutRequest(questionContext),
-        NoteRefinementLayoutValidator::validOrEmpty,
-        NoteRefinementLayout.empty());
+    StructuredResponseReading<NoteRefinementLayout> reading =
+        openAiApiHandler.readStructuredResponse(buildRefinementLayoutRequest(questionContext));
+    if (isOutputTokenLimit(reading)) {
+      throw RefinementLayoutUnavailable.outputLimit();
+    }
+    return reading
+        .value()
+        .flatMap(NoteRefinementLayoutValidator::acceptedLayout)
+        .orElseThrow(RefinementLayoutUnavailable::unusable);
+  }
+
+  private static boolean isOutputTokenLimit(StructuredResponseReading<?> reading) {
+    return reading
+        .incompleteReason()
+        .filter(Response.IncompleteDetails.Reason.MAX_OUTPUT_TOKENS.asString()::equals)
+        .isPresent();
   }
 
   public StructuredResponseCreateParams<NoteExtractionResult> buildExtractNoteRequest(

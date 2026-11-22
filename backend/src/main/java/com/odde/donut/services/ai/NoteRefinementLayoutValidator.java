@@ -13,13 +13,13 @@ import org.slf4j.LoggerFactory;
 public class NoteRefinementLayoutValidator {
   private static final Logger logger = LoggerFactory.getLogger(NoteRefinementLayoutValidator.class);
 
-  public static NoteRefinementLayout validOrEmpty(NoteRefinementLayout layout) {
+  static Optional<NoteRefinementLayout> acceptedLayout(NoteRefinementLayout layout) {
     Optional<String> reason = firstInvalidReason(layout);
     if (reason.isPresent()) {
       logger.warn("Rejecting invalid refinement layout: {}", reason.get());
-      return NoteRefinementLayout.empty();
+      return Optional.empty();
     }
-    return layout;
+    return Optional.of(layout);
   }
 
   public static boolean isValid(NoteRefinementLayout layout) {

@@ -27,7 +27,7 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 **Identity:** SEED-073#generate-useful-refinement-layouts
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/113-useful-refinement-layouts/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b8ab798eba0413313d0585f3636315c4ebb848a9784e3f3b3acf61d6784c572e","plan":"3be06227668ae0944f83fa2736b99333202bb88b1479917850311c08da6c4f59"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/113-useful-refinement-layouts/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b8ab798eba0413313d0585f3636315c4ebb848a9784e3f3b3acf61d6784c572e","plan":"dffee9398925f64ad75f374f8882d43be577fb2618cd2845fd3b47edbc9403cb"}}
 ```
 
 - **Goal.** A learner opening **Refine note** can select the parts of a

@@ -96,13 +96,22 @@
     data-test-id="refinement-layout-empty"
   >
     <div class="font-semibold mb-3 text-accent-content">Refinement layout:</div>
-    <button
-      data-test-id="retry-refinement-layout"
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-      @click="() => loadRefinementLayout()"
-    >
-      Ask AI to retry
-    </button>
+    <div class="flex flex-wrap items-center gap-3">
+      <p
+        v-if="layoutError"
+        class="text-error text-sm"
+        data-test-id="refinement-layout-error"
+      >
+        {{ layoutError }}
+      </p>
+      <button
+        data-test-id="retry-refinement-layout"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        @click="() => loadRefinementLayout()"
+      >
+        Ask AI to retry
+      </button>
+    </div>
   </div>
 
   <AiRequestExportDialog
@@ -144,6 +153,7 @@ const emit = defineEmits<{
 
 const {
   refinementLayoutItems,
+  layoutError,
   layoutLoadSettled,
   showExtractionPreview,
   extractionPreview,

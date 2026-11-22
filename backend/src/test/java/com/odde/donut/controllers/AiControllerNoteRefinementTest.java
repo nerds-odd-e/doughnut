@@ -177,16 +177,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldReturnEmptyLayoutWhenAiReturnsNoResponse()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAiStructuredResponseMock.stubStructuredResponse(null);
-      testNote.setContent("Some note content");
-
-      assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmptyLayoutWhenAiReturnsInvalidLayout()
+    void shouldExplainWhenAiReturnsInvalidLayout()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
       Logger validatorLogger = loggerContext.getLogger(NoteRefinementLayoutValidator.class);
@@ -204,7 +195,11 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
                     NoteRefinementLayoutItems.leaf("same", "Point 2"))));
         testNote.setContent("Some note content");
 
-        assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
+        ResponseStatusException failure =
+            assertThrows(
+                ResponseStatusException.class,
+                () -> controller.generateRefinementSuggestions(testNote, null));
+        assertThat(failure.getReason()).isEqualTo("AI could not generate a refinement layout.");
         assertThat(logAppender.list)
             .anyMatch(event ->
                 event.getLevel() == Level.WARN
