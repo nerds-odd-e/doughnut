@@ -123,6 +123,18 @@ describe("NoteRefinement layout selection", () => {
     )
     expect(layoutCheckbox(withoutContext, "p1").checked).toBe(false)
   })
+
+  it("selects a child item on its own", async () => {
+    const wrapper = await mountNoteRefinementWithLayoutReady(
+      sampleNestedLayout()
+    )
+
+    await selectRefinementLayoutItem(wrapper, "p1-1")
+
+    expect(layoutCheckbox(wrapper, "p1-1").checked).toBe(true)
+    expect(layoutCheckbox(wrapper, "p1-2").checked).toBe(false)
+    expect(layoutCheckbox(wrapper, "p1").checked).toBe(false)
+  })
 })
 
 describe("NoteRefinement remove refinement layout items", () => {

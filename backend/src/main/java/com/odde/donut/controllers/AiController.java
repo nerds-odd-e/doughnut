@@ -11,6 +11,7 @@ import com.odde.donut.services.ai.NoteExtractionResult;
 import com.odde.donut.services.ai.NoteRefinementLayout;
 import com.odde.donut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.donut.services.ai.OtherAiServices;
+import com.odde.donut.services.ai.RefinementLayoutUnavailable;
 import com.odde.donut.services.notebookGit.WebNoteCreationService;
 import com.odde.donut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.openai.models.responses.StructuredResponseCreateParams;
@@ -77,6 +78,8 @@ public class AiController {
           .generateRefinementSuggestions(questionContext);
     } catch (OpenAiNotAvailableException e) {
       return NoteRefinementLayout.empty();
+    } catch (RefinementLayoutUnavailable unavailable) {
+      throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, unavailable.getMessage());
     }
   }
 

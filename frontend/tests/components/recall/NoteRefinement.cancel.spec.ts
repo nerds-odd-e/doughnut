@@ -37,6 +37,7 @@ const exists = (wrapper: VueWrapper, testId: string) =>
 function expectEmptyLayoutWithRetry(wrapper: VueWrapper) {
   expect(exists(wrapper, "refinement-layout-empty")).toBe(true)
   expect(exists(wrapper, "retry-refinement-layout")).toBe(true)
+  expect(exists(wrapper, "refinement-layout-error")).toBe(false)
   expect(exists(wrapper, "refinement-layout")).toBe(false)
   expect(exists(wrapper, "extract-refinement-layout")).toBe(false)
 }

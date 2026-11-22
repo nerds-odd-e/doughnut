@@ -2,6 +2,7 @@ package com.odde.donut.services.ai;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.Note;
@@ -65,10 +66,14 @@ class AiNoteAutomationServiceTest extends SpringTestBase {
     }
 
     @Test
-    void shouldReturnEmptyLayoutWhenNoResponse() throws JsonProcessingException {
+    void shouldExplainWhenNoResponse() {
       openAiStructuredResponseMock.stubStructuredResponse(null);
 
-      assertThat(service.generateRefinementSuggestions(null).getItems(), empty());
+      RefinementLayoutUnavailable failure =
+          assertThrows(
+              RefinementLayoutUnavailable.class, () -> service.generateRefinementSuggestions(null));
+
+      assertThat(failure.getMessage(), equalTo("AI could not generate a refinement layout."));
     }
   }
 }

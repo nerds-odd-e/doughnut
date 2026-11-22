@@ -18,8 +18,6 @@ import com.openai.models.files.FileCreateParams;
 import com.openai.models.files.FileObject;
 import com.openai.models.files.FilePurpose;
 import com.openai.models.responses.ResponseCreateParams;
-import com.openai.models.responses.ResponseStatus;
-import com.openai.models.responses.StructuredResponse;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -138,22 +136,15 @@ public class OpenAiApiHandler {
         .orElseThrow(() -> new IOException("Empty transcription response from OpenAI"));
   }
 
-  public <T> Optional<T> requestAndGetStructuredResponseResult(
+  public <T> StructuredResponseReading<T> readStructuredResponse(
       StructuredResponseCreateParams<T> responseRequest) {
     assertOpenAiAvailable();
-    StructuredResponse<T> response = officialClient.responses().create(responseRequest);
-    if (response == null
-        || response.status().filter(ResponseStatus.INCOMPLETE::equals).isPresent()
-        || response.output() == null
-        || response.output().isEmpty()) {
-      return Optional.empty();
-    }
+    return StructuredResponseReading.read(officialClient.responses().create(responseRequest));
+  }
 
-    return response.output().stream()
-        .flatMap(output -> output.message().stream())
-        .flatMap(message -> message.content().stream())
-        .flatMap(content -> content.outputText().stream())
-        .findFirst();
+  public <T> Optional<T> requestAndGetStructuredResponseResult(
+      StructuredResponseCreateParams<T> responseRequest) {
+    return readStructuredResponse(responseRequest).value();
   }
 
   public String uploadBatchInputFile(byte[] jsonlBytes) {

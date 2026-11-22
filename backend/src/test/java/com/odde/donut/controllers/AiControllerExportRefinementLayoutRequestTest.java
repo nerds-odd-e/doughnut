@@ -4,9 +4,12 @@ import static com.odde.donut.controllers.AiControllerExtractNoteTestSupport.newR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.ai.NoteRefinementLayout;
+import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +34,6 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
       Map<String, Object> body = controller.exportRefinementLayoutRequest(testNote, null);
 
       assertThat(body).containsKeys("model", "instructions", "input", "text");
-      assertThat(body.get("max_output_tokens")).isEqualTo(1000);
       @SuppressWarnings("unchecked")
       Map<String, Object> format =
           (Map<String, Object>) ((Map<String, Object>) body.get("text")).get("format");
@@ -59,6 +61,43 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
           .contains("What is the capital of France?")
           .contains("Set ledToQuestion=true")
           .doesNotContain("Set ledToQuestion to false for every item");
+      verifyNoInteractions(officialClient);
+    }
+
+    @Test
+    void exportedOutputTokenBudgetMatchesGeneration()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+      long[] generationBudget = {0L};
+      new OpenAiStructuredResponseMock(officialClient)
+          .stubStructuredResponseFromRequest(request -> {
+            generationBudget[0] = request.rawParams().maxOutputTokens().orElse(0L);
+            return new NoteRefinementLayout(List.of());
+          });
+
+      controller.generateRefinementSuggestions(testNote, null);
+      Object exportedBudget =
+          controller.exportRefinementLayoutRequest(testNote, null).get("max_output_tokens");
+
+      assertThat(((Number) exportedBudget).longValue()).isEqualTo(generationBudget[0]);
+    }
+
+    @Test
+    void asksForConciseItemsThatFollowSourceSections() throws UnexpectedNoAccessRightException {
+      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+
+      String instructions =
+          controller.exportRefinementLayoutRequest(testNote, null).get("instructions").toString();
+
+      assertThat(instructions)
+          .contains("Prefer meaningful existing sections")
+          .contains("concise items in source order")
+          .contains("numbered senses are top-level items")
+          .contains("distinct usages are children")
+          .contains("the note's languages")
+          .contains("Grammatical labels are context and stay with their sense")
+          .contains("Illustrative or supporting sentences stay with their sense")
+          .contains("Decorative markers are not sections");
       verifyNoInteractions(officialClient);
     }
   }

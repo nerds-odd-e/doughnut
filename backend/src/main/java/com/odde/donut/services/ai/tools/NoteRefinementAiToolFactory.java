@@ -30,8 +30,13 @@ final class NoteRefinementAiToolFactory {
         - Build the refinement layout from the Focus Note content only. The Focus Note is the only source for refinement layout items.
         - Retrieved Notes are secondary context only: use them to clarify scope or ambiguous Focus Note content, but do not add refinement layout items for content that appears only in Retrieved Notes. If a Retrieved Note clarifies a Focus Note section, reflect that in the Focus Note item text.
 
+        Prefer meaningful existing sections. Write concise items in source order.
         The refinement layout must have at most two levels: top-level items and optional child items. Do not create grandchildren.
-        Each item text should describe the Focus Note content represented by that refinement layout item.
+        For a dictionary note, numbered senses are top-level items; distinct usages are children; use the note's languages. Do not translate item text into another language.
+        When a numbered sense has more than one distinct usage, each usage is its own child and keeps that usage's wording.
+        Grammatical labels are context and stay with their sense.
+        Illustrative or supporting sentences stay with their sense and are not top-level items.
+        Decorative markers are not sections and are not refinement layout items.
         Give every item a stable id that is unique within the refinement layout.
         Set alreadyExtracted to true only for simple standalone wiki-link-only lines that point to content already extracted into another note, for example [[Target note]] or [[Target note|Label]]. These items should be marked Already extracted in the UI but remain selectable.
         %s
