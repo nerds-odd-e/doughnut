@@ -65,7 +65,7 @@ spec remains uncommitted for slice 3.
 
 ### 2. Replay a useful dictionary layout
 Type: Behavior
-Status: planned
+Status: done
 Proof: One live replay in the proof table.
 
 Behavior: The exported request for a synthetic Japanese–Chinese dictionary
@@ -80,6 +80,14 @@ grammatical labels kept with their sense, and the question's usage identified.
   items with the numbered senses, read the children, and check that the
   layout identifies that usage. If that shape is missing, record the response
   and stop. Do not send another model call.
+
+Accepted on 2026-11-22 from one Responses API call of the exported body.
+Model `gpt-6.2-sol`, cap 3000, status `completed`, usage 1081 input and 463
+output tokens. Revision `e447306215`. The returned items are, in order,
+`1. （他動詞）刀物で分ける。` with children `縄を切る。 / 割断绳子。` and
+`電源を切る。 / 关掉电源。`, then senses 2–5 with their example lines kept
+in the parent. Only `電源を切る。 / 关掉电源。` has `ledToQuestion` true.
+`※ 見出し` is not an item. No product file changed.
 
 ### 3. Select a child usage and recall targets
 Type: Behavior
