@@ -8,9 +8,10 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
+- [Generate useful refinement layouts for notes](seeds/SEED-073-learning-refinement-and-retrieval.md#generate-useful-refinement-layouts) — SEED-073#generate-useful-refinement-layouts ([plan](slice-plans/113-useful-refinement-layouts/PLAN.md))
+
 ## Backlog list
 
-- [Generate useful refinement layouts for notes](seeds/SEED-073-learning-refinement-and-retrieval.md#generate-useful-refinement-layouts) — SEED-073#generate-useful-refinement-layouts
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
 - [Validate when question generation should abstain](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-question-generation-purpose) — SEED-073#validate-question-generation-purpose
 - [See surrounding text in references](seeds/SEED-131-reference-details.md#see-surrounding-text-in-references) — SEED-131#see-surrounding-text-in-references
