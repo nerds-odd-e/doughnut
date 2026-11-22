@@ -54,20 +54,6 @@ Portable digest (details live in the cited skills — keep `AGENTS.md` and `CLAU
 - **CI repair:** When Dough Execute Plan pauses work for a CI repair, use the [Doughnut CI repair restoration guide](docs/ci-repair-restoration.md) for the stash commands.
 - **Test optimization:** `dough-test-optimization` — use the public Open Dough workflow; plans live under `.planning/slice-plans/` and run via dough-execute-plan. Donut-specific commands and profile exclusions live in `.agents/agent-map.md` and the applicable stack testing skills.
 
-### Trial: record what a repeat teaches
-
-Open Dough pilot SEED-401; remove when the pilot closes. When a retrospective
-matches a finding from a new execution, ask what this occurrence teaches that
-could change the next action. Write the full occurrence row when it shows a
-material new effect, a cost that changes priority, a newly affected workflow, a
-corrected attribution, or, where the entry names an adopted response, that
-response working or failing in this execution. Write a full row when a
-previously isolated high cost recurs in another execution, even if each
-occurrence costs about the same. Otherwise add one line under the finding:
-`- Execution: <identity> · <timestamp> · <tool> · release <version>`.
-If you cannot tell, write the full row. The rest of the recording rule applies
-unchanged.
-
 ## Cursor Cloud specific instructions
 
 On the Cloud VM there is **no Nix** — run commands directly (drop the `CURSOR_DEV=true nix develop -c` prefix). Full details: `.agents/skills/cloud-vm-setup/SKILL.md`.
