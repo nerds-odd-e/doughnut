@@ -4,6 +4,11 @@ Fresh isolated reviewer `/root/doughnut_source_review` received only the selecte
 
 The Open Dough assessment owns cohort selection and the verdict. The existing transcript carries use evidence.
 
+A fresh source-only review by `/root/doughnut_early_close_source_review` used
+the selected source and Terry’s 22 November amendment. It confirmed that the
+owner closes the route after the first ordinary completion, removes the notice
+immediately, restores the ordinary route and verifies removal on origin/main.
+
 ## Commitments
 
 | Id | Source commitment | Slice | Observation or obligation |
@@ -23,5 +28,5 @@ The Open Dough assessment owns cohort selection and the verdict. The existing tr
 | P13 | A matched repeat follows its usual route. | slice 1 | observed: Representative walk for slice 1: matched repeat path in the representative walk |
 | P14 | A skipped review follows its usual route. | slice 1 | observed: Representative walk for slice 1: skipped-review path in the representative walk |
 | P15 | A review of this pilot follows its usual route. | slice 1 | observed: Representative walk for slice 1: client pilot execution path in the representative walk |
-| P16 | The owner returns at cutoff to remove the temporary notice, and the removal is present on origin/main. | slice 2 | |
+| P16 | The owner removes the temporary notice when the window closes after the first ordinary completion per the 22 November amendment, and verifies removal on origin/main. | slice 2 | |
 | P17 | The surrounding guidance remains intact after removal. | slice 2 | |

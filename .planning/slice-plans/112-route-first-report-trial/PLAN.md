@@ -43,8 +43,9 @@ origin/main and record when it first became available.
 Type: Behavior
 Status: planned
 
-At the earlier of the second ordinary completion and the original cutoff
-(25 November 2026 23:43:11 Singapore time), remove the first-report notice
+On 22 November Terry closed enrollment after the first ordinary completion
+and directed immediate removal. Doughnut main at `8959ee4429` has one
+ordinary completion, added in `d3db25bda0`. Remove the first-report notice
 as one block and delete its temporary pointer from `CLAUDE.md`. The Open
 Dough heartbeat owns return and coordination.
 
