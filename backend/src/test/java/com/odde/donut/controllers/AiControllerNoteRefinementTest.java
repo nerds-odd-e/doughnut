@@ -17,6 +17,7 @@ import com.odde.donut.services.ai.NoteRefinementLayout;
 import com.odde.donut.services.ai.NoteRefinementLayoutItem;
 import com.odde.donut.services.ai.NoteRefinementLayoutItems;
 import com.odde.donut.services.ai.NoteRefinementLayoutValidator;
+import com.odde.donut.services.ai.RefinementLayoutUnavailable;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.openai.models.responses.Response;
 import com.openai.models.responses.ResponseTextConfig;
@@ -199,7 +200,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
             assertThrows(
                 ResponseStatusException.class,
                 () -> controller.generateRefinementSuggestions(testNote, null));
-        assertThat(failure.getReason()).isEqualTo("AI could not generate a refinement layout.");
+        assertThat(failure.getReason()).isEqualTo(RefinementLayoutUnavailable.UNUSABLE);
         assertThat(logAppender.list)
             .anyMatch(event ->
                 event.getLevel() == Level.WARN

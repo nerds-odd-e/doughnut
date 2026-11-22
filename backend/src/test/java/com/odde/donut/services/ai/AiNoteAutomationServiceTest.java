@@ -12,6 +12,7 @@ import com.odde.donut.services.focusContext.FocusContextRetrievalService;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.odde.donut.testability.SpringTestBase;
+import com.openai.models.responses.Response;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -73,7 +74,31 @@ class AiNoteAutomationServiceTest extends SpringTestBase {
           assertThrows(
               RefinementLayoutUnavailable.class, () -> service.generateRefinementSuggestions(null));
 
-      assertThat(failure.getMessage(), equalTo("AI could not generate a refinement layout."));
+      assertThat(failure.getMessage(), equalTo(RefinementLayoutUnavailable.UNUSABLE));
+    }
+
+    @Test
+    void outputTokenLimitExplainsSafeLimit() {
+      openAiStructuredResponseMock.stubStructuredResponseIncomplete(
+          "{\"items\":[]}", Response.IncompleteDetails.Reason.of("max_output_tokens"));
+
+      RefinementLayoutUnavailable failure =
+          assertThrows(
+              RefinementLayoutUnavailable.class, () -> service.generateRefinementSuggestions(null));
+
+      assertThat(failure.getMessage(), equalTo(RefinementLayoutUnavailable.OUTPUT_LIMIT));
+    }
+
+    @Test
+    void otherIncompleteReasonsAreUnusable() {
+      openAiStructuredResponseMock.stubStructuredResponseIncomplete(
+          "{\"items\":[]}", Response.IncompleteDetails.Reason.of("content_filter"));
+
+      RefinementLayoutUnavailable failure =
+          assertThrows(
+              RefinementLayoutUnavailable.class, () -> service.generateRefinementSuggestions(null));
+
+      assertThat(failure.getMessage(), equalTo(RefinementLayoutUnavailable.UNUSABLE));
     }
   }
 }

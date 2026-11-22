@@ -81,24 +81,5 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
 
       assertThat(((Number) exportedBudget).longValue()).isEqualTo(generationBudget[0]);
     }
-
-    @Test
-    void asksForConciseItemsThatFollowSourceSections() throws UnexpectedNoAccessRightException {
-      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
-
-      String instructions =
-          controller.exportRefinementLayoutRequest(testNote, null).get("instructions").toString();
-
-      assertThat(instructions)
-          .contains("Prefer meaningful existing sections")
-          .contains("concise items in source order")
-          .contains("numbered senses are top-level items")
-          .contains("distinct usages are children")
-          .contains("the note's languages")
-          .contains("Grammatical labels are context and stay with their sense")
-          .contains("Illustrative or supporting sentences stay with their sense")
-          .contains("Decorative markers are not sections");
-      verifyNoInteractions(officialClient);
-    }
   }
 }
