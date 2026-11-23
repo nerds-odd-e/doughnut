@@ -602,19 +602,16 @@ In a validation study run with fresh AI reader contexts, the coordinator saved e
 
 A pre-delegation check found the claimed Git ignore binding missing. The coordinator corrected it before writing private study packets. [Retained evidence](https://github.com/terryyin/open-dough/blob/286c5e0dec58e72e9328b7dec4a1ab52e88710b1/docs/maintainer/findings/ODF-074.md#doughnut--dd-499).
 
-## DD-500 — Wrap-up treats story scope limits as deferred promises
+## ODF-548 — Wrap-up treats story scope limits as deferred promises
 
-Story wrap-up deletes a story section "after queuing its deferred promises as one new story unless the developer drops them". A story's scope limits phrased "each deliverable on its own later" name unrelated possible extensions with no beneficiary or evaluable outcome, so a bundled story would fail the backlog's admission rule; the coordinator had to judge that they were context, not promises, and kept a one-line note in the seed instead.
+<a id="dd-500"></a>
+<a id="dd-500--wrap-up-treats-story-scope-limits-as-deferred-promises"></a>
+Former local code: DD-500.
 
-### Occurrences
-- Execution: SEED-131#label-every-property-link-in-references
-  - Timestamp: 2026-11-17 (time unknown)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: seed SEED-131 section Scope "Scope limits, each deliverable on its own later" (before-cleanup commit); dough-story-wrap-up "Delete spent history"; dough-product-backlog "Add a feature story only with a named beneficiary and evaluable outcome"; the source-only reviewer also left those limits unnumbered.
-  - Observed effect: no story was queued; the limits survive as a note under the seed's Ordering and Scope Reduction.
-  - Inference: the wrap-up wording does not distinguish promises a story deferred from scope limits it never promised.
+- SEED-131#label-every-property-link-in-references
+
+[Account and evidence at ODF-548](https://github.com/terryyin/open-dough/blob/9f08e8ffa820d367ac43816d10f7954bb33976b8/docs/maintainer/findings/ODF-548.md#evidence-2026-11-23-doughnut-dd-500).
+Source recovery: `5d595ee21e0ee1d8f49108f42d99c04dc5a81bad:DearDough.md`.
 
 ## DD-501 — A fit check counted AI-authored near synonyms as the intended word
 
@@ -713,19 +710,16 @@ The plan settled "the model accepts web search with the correction tools" with r
   - Observed effect: one returned slice (about 2 more active minutes, 8 minutes elapsed) and one unverified remainder carried to the owner, because a paid call needs the owner's go.
   - Inference: when a premise is observed through a proxy, the row should name which request fields the proxy and the product build differently, not only that both build "the same request fields".
 
-## DD-508 — A named sibling landed on trunk between two slices of a story branch
+## ODF-429 — A named sibling landed on trunk between two slices of a story branch
 
-The plan named a sibling story that edits the same review component. It landed on trunk after slice 2. The freshness check reported the story text amendment, and the named-sibling rule asks for reconciliation before done, but the guidance names no step that brings trunk into a story branch before integration. The coordinator briefed the slice 3 implementer with the sibling's exact edit positions, kept the edits apart, and left the merge to integration.
+<a id="dd-508"></a>
+<a id="dd-508--a-named-sibling-landed-on-trunk-between-two-slices-of-a-story-branch"></a>
+Former local code: DD-508.
 
-### Occurrences
-- Execution: SEED-073#assistant-quoted-source-in-corrections, plan 110, first commit 0439d21faf
-  - Timestamp: unknown (2026-11-18, Asia/Singapore)
-  - Tool: Claude Code
-  - Model: claude-fable-5-2
-  - Open Dough release: 0.3.106
-  - Evidence: trunk c05c42ccbc; `deliver-the-change.md` "Check named siblings"; plan 110 Execution notes (before-cleanup commit); slice 3 commit 71339b3122.
-  - Observed effect: slice 3 was proved without the sibling's code; its specs, typechecks and E2E feature had to run again after the merge.
-  - Inference: uncertain whether a merge of trunk into the story branch before the dependent slice is intended; the publication guidance describes merges only for integration.
+- SEED-073#assistant-quoted-source-in-corrections, plan 110, first commit 0439d21faf
+
+[Account and evidence at ODF-429](https://github.com/terryyin/open-dough/blob/9f08e8ffa820d367ac43816d10f7954bb33976b8/docs/maintainer/findings/ODF-429.md#evidence-2026-11-23-doughnut-dd-508).
+Source recovery: `5d595ee21e0ee1d8f49108f42d99c04dc5a81bad:DearDough.md`.
 
 ## DD-517 — A competing listener hypothesis was exercised only on a quiet port
 
