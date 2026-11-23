@@ -2,6 +2,7 @@
 
 **Identity:** SEED-073#show-prefetched-recall-questions-immediately
 **Source:** [Show prefetched recall questions immediately](../../seeds/SEED-073-learning-refinement-and-retrieval.md#show-prefetched-recall-questions-immediately)
+**Source review:** [source-review.md](source-review.md)
 
 ## Goal and scope
 
@@ -80,7 +81,7 @@ current prompt when the card is reached.
 ### 1. Show the prefetched prompt when the learner reaches its card
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the rewritten activation spec and the adjusted question-recovery case
 fail before the change and pass after; the rest of the local proof command
 stays green. Documentation reading as above.
@@ -95,6 +96,22 @@ adjust the question-recovery returning case, then apply the composable and
 card change from Current decisions. In the same slice, delete
 `docs/recall-question-loading.md`, add the three destination sections and
 retarget the retrospective link.
+
+Accepted proof (slice 1, uncommitted candidate on `92aa3d067f`): the focused
+command passed, 18 files and 93 tests, with `vue-tsc --noEmit` passing, after
+the refactor pass; the rewritten activation cases and the adjusted
+question-recovery case failed against the base production files first.
+Acceptance sweep found no `prepared` load status, `needsSelection` or
+`recall-question-loading` outside planning records. Source review
+observations are in [source-review.md](source-review.md).
+
+Learnings: `startRecallAttempt` stays because the spelling restart watcher
+uses it. makeMe's auto-numbered IDs can collide with fixed prompt IDs in a
+spec file, which makes Vue reuse a keyed `ContestableQuestion`; give fixed
+prompts distinct IDs. The refactor pass shared one `recallPromptRequestsFor`
+reader in `frontend/tests/helpers/recallDataTestSupport.ts`. Optional
+follow-up from that pass: the "keeps a failed future prefetch local…" case
+asserts a fixed call position and could use that reader.
 
 ## Plan review
 

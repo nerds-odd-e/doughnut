@@ -3,12 +3,10 @@ import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { describe, expect, it } from "vitest"
+import { recallPromptRequestsFor } from "@tests/helpers/recallDataTestSupport"
 import {
   contentLoaderVisible,
-  contestableQuestionVisible,
   createDeferredGate,
-  createMemoryTrackerLite,
-  getRecallPrompt,
   getRecallPromptSpy,
   mountRecallPromptCardReady,
   setupRecallPromptCardTests,
@@ -26,74 +24,62 @@ describe("a prefetched multiple-choice card", () => {
       .please()
 
   async function startPrefetch() {
-    const warm = createDeferredGate()
-    const select = createDeferredGate()
+    const prefetch = createDeferredGate()
     const server = { available: openingTimePrompt(42, "nine") }
     getRecallPromptSpy
       .mockImplementation(async () => wrapSdkResponse(server.available))
-      .mockResolvedValueOnce(wrapSdkResponse(getRecallPrompt()))
+      .mockResolvedValueOnce(wrapSdkResponse(openingTimePrompt(41, "eight")))
       .mockImplementationOnce(async () => {
-        const prepared = server.available
-        await warm.gate
-        return wrapSdkResponse(prepared)
+        const prefetched = server.available
+        await prefetch.gate
+        return wrapSdkResponse(prefetched)
       })
-      .mockImplementationOnce(async () => {
-        await select.gate
-        return wrapSdkResponse(server.available)
-      })
-
     const card = await mountRecallPromptCardReady([1, 2, 3], 2)
-    expect(getRecallPromptSpy).toHaveBeenCalledWith({
-      path: { memoryTracker: 2 },
-    })
-
-    async function reachCorrectedCard() {
-      server.available = openingTimePrompt(43, "ten")
-      await card.setProps({ currentIndex: 1 })
-      expect(contentLoaderVisible(card)).toBe(true)
-      expect(contestableQuestionVisible(card)).toBe(false)
-      expect(getRecallPromptSpy).toHaveBeenLastCalledWith({
-        path: { memoryTracker: 2 },
-      })
-      select.resolve()
-      await flushPromises()
-      expect(card.text()).toContain("Which door opens at ten?")
-    }
-
-    return { card, server, warm, reachCorrectedCard }
+    expect(recallPromptRequestsFor(getRecallPromptSpy, 2)).toHaveLength(1)
+    return { card, server, prefetch }
   }
 
-  it("selects the current question after prefetch completes and continues lookahead", async () => {
-    const { warm, reachCorrectedCard } = await startPrefetch()
-    warm.resolve()
+  it("shows a completed prefetch immediately and continues lookahead", async () => {
+    const { card, prefetch } = await startPrefetch()
+    prefetch.resolve()
     await flushPromises()
-    await reachCorrectedCard()
-    expect(getRecallPromptSpy).toHaveBeenCalledWith({
-      path: { memoryTracker: 3 },
-    })
+    await card.setProps({ currentIndex: 1 })
+    expect(contentLoaderVisible(card)).toBe(false)
+    expect(card.text()).toContain("Which door opens at nine?")
+    expect(recallPromptRequestsFor(getRecallPromptSpy, 2)).toHaveLength(1)
+    await flushPromises()
+    expect(recallPromptRequestsFor(getRecallPromptSpy, 3)).toHaveLength(1)
   })
 
-  it("answers the displayed prompt after a later edit and a late background response", async () => {
+  it("shows the loader for an in-flight prefetch, then that request's result", async () => {
+    const { card, prefetch } = await startPrefetch()
+    await card.setProps({ currentIndex: 1 })
+    expect(contentLoaderVisible(card)).toBe(true)
+    prefetch.resolve()
+    await flushPromises()
+    expect(card.text()).toContain("Which door opens at nine?")
+    expect(recallPromptRequestsFor(getRecallPromptSpy, 2)).toHaveLength(1)
+  })
+
+  it("answers the prefetched prompt after the server prompt changes", async () => {
     const answer = mockSdkService(
       RecallPromptController,
       "answer",
       makeMe.anAnsweredQuestion.please()
     )
-    const { card, server, warm, reachCorrectedCard } = await startPrefetch()
-    await reachCorrectedCard()
-    server.available = openingTimePrompt(44, "eleven")
-    await card.setProps({
-      memoryTrackers: [1, 2, 3].map((id) => createMemoryTrackerLite(id)),
-    })
-    warm.resolve()
+    const { card, server, prefetch } = await startPrefetch()
+    prefetch.resolve()
+    await flushPromises()
+    server.available = openingTimePrompt(43, "ten")
+    await card.setProps({ currentIndex: 1 })
     await flushPromises()
 
     const choices = card.findAll("li.choice button")
-    expect(choices[1]!.text()).toContain("Entrance marked ten")
+    expect(choices[1]!.text()).toContain("Entrance marked nine")
     await choices[1]!.trigger("click")
     await flushPromises()
     expect(answer).toHaveBeenCalledWith({
-      path: { recallPrompt: 43 },
+      path: { recallPrompt: 42 },
       body: expect.objectContaining({ choiceIndex: 1 }),
     })
   })
