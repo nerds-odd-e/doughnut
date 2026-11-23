@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate7.Hibernate7Module;
 import org.junit.jupiter.api.Test;
 
 class ObjectMapperConfigTest {
@@ -19,6 +20,16 @@ class ObjectMapperConfigTest {
     assertThat(jsonNode.get("field1").asText(), is("value1"));
     assertThat(jsonNode.has("field2"), is(false));
     assertThat(jsonNode.get("field3").asText(), is("value3"));
+  }
+
+  @Test
+  void hibernateModuleMatchesJacksonCoreVersion() {
+    var module = new Hibernate7Module().version();
+    var core = objectMapper.version();
+
+    assertThat(
+        module.getMajorVersion() + "." + module.getMinorVersion(),
+        is(core.getMajorVersion() + "." + core.getMinorVersion()));
   }
 
   private record TestObject(String field1, String field2, String field3) {}
