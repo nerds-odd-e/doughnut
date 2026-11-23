@@ -157,13 +157,6 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest extends SpringTestBase 
   }
 
   @Test
-  void includesTrackerWhoseWaitingQuestionHasNoRecordedFocus() {
-    makeMe.aRecallPrompt().forMemoryTracker(dueTracker).please();
-
-    assertThat(candidateIds(), contains(dueTracker.getId()));
-  }
-
-  @Test
   void excludesTrackerWithWaitingNonMcqPrompt() {
     makeMe.aRecallPrompt().forMemoryTracker(dueTracker).spelling().please();
 

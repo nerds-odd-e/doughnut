@@ -89,9 +89,7 @@ public class QuestionGenerationBatchPlanningService {
     List<RecallPrompt> waiting =
         recallPromptRepository.findAllUnansweredByMemoryTrackerId(tracker.getId());
     return waiting.stream()
-            .map(prompt -> prompt.getMcq().getFocusNoteInput())
-            .filter(Objects::nonNull)
-            .anyMatch(input -> input.wasReadAfterLastUpdateOf(focus))
+            .anyMatch(prompt -> prompt.getMcq().getFocusNoteInput().wasReadAfterLastUpdateOf(focus))
         || (!waiting.isEmpty()
             && recallPromptRepository
                 .findUnansweredMcqForFocus(tracker.getId(), FocusNoteFingerprint.of(focus))

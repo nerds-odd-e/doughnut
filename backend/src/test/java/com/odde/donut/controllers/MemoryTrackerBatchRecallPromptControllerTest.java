@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
@@ -34,13 +35,14 @@ class MemoryTrackerBatchRecallPromptControllerTest
 
   @Test
   void reusesTheImportedQuestionWhenItsRenderedFocusStillMatches() throws Exception {
-    RecallPrompt imported = importProviderQuestion(renderRequestMetadata());
-    var offered = controller.getRecallPrompt(reloadTracker());
+    assertRecallReusesQuestionImportedWith(renderRequestMetadata());
+  }
 
-    assertThat(offered.getId(), is(imported.getId()));
-    assertThat(offered.getMcq().getQuestionStem(), is(BATCH_STEM));
-    assertThat(offered.getMcq().getResponseChoices().getFirst(), is("Nine"));
-    verifyNoInteractions(synchronousApi.responseService());
+  @Test
+  void reusesTheImportedQuestionWithoutReadTimeWhenItsFingerprintMatches() throws Exception {
+    ObjectNode requestMetadata = (ObjectNode) renderRequestMetadata();
+    requestMetadata.remove("focus_note_read_at");
+    assertRecallReusesQuestionImportedWith(requestMetadata);
   }
 
   @Test
@@ -123,6 +125,16 @@ class MemoryTrackerBatchRecallPromptControllerTest
 
     assertThat(savedPrompts(), hasSize(1));
     assertThat(controller.getRecallPrompt(reloadTracker()).getId(), is(imported.getId()));
+  }
+
+  private void assertRecallReusesQuestionImportedWith(JsonNode requestMetadata) throws Exception {
+    RecallPrompt imported = importProviderQuestion(requestMetadata);
+    var offered = controller.getRecallPrompt(reloadTracker());
+
+    assertThat(offered.getId(), is(imported.getId()));
+    assertThat(offered.getMcq().getQuestionStem(), is(BATCH_STEM));
+    assertThat(offered.getMcq().getResponseChoices().getFirst(), is("Nine"));
+    verifyNoInteractions(synchronousApi.responseService());
   }
 
   private void stubCurrentQuestion(String answer) {

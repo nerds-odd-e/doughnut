@@ -98,7 +98,6 @@ abstract class MemoryTrackerBatchImportControllerTestBase extends MemoryTrackerC
       RecallPrompt answered,
       RecallPrompt contested,
       RecallPrompt stale,
-      RecallPrompt unknownInput,
       Grade grade,
       Timestamp nextRecallAt) {}
 
@@ -108,14 +107,12 @@ abstract class MemoryTrackerBatchImportControllerTestBase extends MemoryTrackerC
     var contested = promptFromFocus().contested().please();
     makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcq(answered.getMcq()).please();
     var stale = promptFromFocus().please();
-    var unknownInput = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
     makeMe.entityPersister.flushAndClear();
     var queue =
         new StaleWaitingQueue(
             answered,
             contested,
             stale,
-            unknownInput,
             Grade.fromCorrect(answered.getAnswer().getCorrect()),
             reloadTracker().getNextRecallAt());
     publishCorrectedFocus();

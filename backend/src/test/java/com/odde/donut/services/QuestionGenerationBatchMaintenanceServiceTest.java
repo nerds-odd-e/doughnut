@@ -31,12 +31,16 @@ class QuestionGenerationBatchMaintenanceServiceTest extends SpringTestBase {
 
   OpenAiBatchApiMock openAiBatches;
 
+  @Autowired QuestionGenerationBatchPlanningService planningService;
+  @Autowired QuestionGenerationBatchSubmissionService submissionService;
   @Autowired QuestionGenerationBatchMaintenanceService maintenanceService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired RecallPromptRepository recallPromptRepository;
+  @Autowired GlobalSettingsService globalSettingsService;
 
   Timestamp currentTime;
+  MemoryTracker dueTracker;
   QuestionGenerationBatch submittedBatch;
   QuestionGenerationBatchRequest request;
 
@@ -45,35 +49,27 @@ class QuestionGenerationBatchMaintenanceServiceTest extends SpringTestBase {
     openAiBatches = new OpenAiBatchApiMock(officialClient);
     User user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
+    globalSettingsService
+        .globalSettingQuestionGeneration()
+        .setKeyValue(currentTime, "gpt-batch-question-generation");
 
     Note note = makeMe.aNote().notebookOwnedBy(user).please();
-    MemoryTracker memoryTracker =
+    dueTracker =
         makeMe
             .aMemoryTrackerFor(note)
-            .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
+            .nextRecallAt(new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1)))
             .please();
 
-    submittedBatch =
-        makeMe
-            .aQuestionGenerationBatch()
-            .forUser(user)
-            .submittedInFlight(currentTime)
-            .submittedAt(currentTime)
-            .openaiBatchId("batch-openai-1")
-            .please();
-    makeMe.entityPersister.flush();
-
-    request =
-        makeMe
-            .aQuestionGenerationBatchRequest()
-            .batch(submittedBatch)
-            .memoryTracker(memoryTracker)
-            .please();
-    makeMe.entityPersister.flush();
+    submittedBatch = planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
+    openAiBatches.stubUpload("file-abc");
+    openAiBatches.stubBatchCreation("file-abc", "batch-openai-1");
+    submissionService.submitPlannedBatch(submittedBatch, currentTime);
+    request = batchRequestRepository.findByBatch_Id(submittedBatch.getId()).getFirst();
 
     GeneratedMcq generatedMcq = makeMe.aGeneratedMcq().please();
 
     stubCompletedOpenAiBatch(openAiBatches, batchSuccessLine(request, generatedMcq), "");
+    makeMe.entityPersister.flushAndClear();
   }
 
   @Test
@@ -91,8 +87,7 @@ class QuestionGenerationBatchMaintenanceServiceTest extends SpringTestBase {
     assertThat(reloadedRequest.getStatus(), is(QuestionGenerationBatchRequestStatus.IMPORTED));
 
     List<RecallPrompt> recallPrompts =
-        recallPromptRepository.findAllByMemoryTracker_IdOrderByIdDesc(
-            request.getMemoryTracker().getId());
+        recallPromptRepository.findAllByMemoryTracker_IdOrderByIdDesc(dueTracker.getId());
     assertThat(recallPrompts.size(), is(1));
   }
 }

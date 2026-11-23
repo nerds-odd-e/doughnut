@@ -75,47 +75,6 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
   points. Check once during acceptance for references to the deleted behavior
   and the deleted document in the product, tests, and documentation.
 
-<a id="require-fingerprints-for-new-recall-questions"></a>
-
-### Require fingerprints for new recall questions
-
-**Identity:** SEED-073#require-fingerprints-for-new-recall-questions
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/115-require-fingerprints-for-new-recall-questions/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f304ce49f524eb669484fe3067e2b4c1c26dc480609559df623f2e41ec23fc88","plan":"ad2569874af95239c78385be13f21450eecb0ccb90b827f0db6a44e3a503eb1f"}}
-```
-
-- **Goal.** Learners get reusable waiting multiple-choice questions with a
-  known focus note input and can still review their original answered attempts.
-  Removing the old waiting records lets the recall queue rely on a recorded
-  fingerprint.
-- **Generation and history.** Make the fingerprint non-optional in
-  `FocusNoteInput`. On-demand generation and batch import supply the real
-  fingerprint from the generation input before saving a new question. A batch
-  result without one follows the existing invalid-result outcome, including
-  results from older submissions. The stored `MultipleChoicesQuestion` JSON
-  keeps its optional field so historical questions can be read as recorded.
-  Matching fingerprints remain usable when the newer read timestamp is absent.
-- **Production cutover.** Once the write rule is live, use a temporary
-  operations script outside the startup migration chain to count and purge
-  fingerprint-free waiting, unanswered, uncontested MCQ prompts. Delete a
-  question row only after its final prompt is removed. Preserve existing
-  contests, answered attempts, their wording, choices, answer keys, grades,
-  and the tracker due time. Due trackers get replacements through normal batch
-  or on-demand recall. After verifying the eligible production set is empty,
-  remove the migration code, migration-only tests, and waiting-queue support
-  that existed only for legacy fingerprint-free prompts.
-- **Key examples.**
-  - A new batch result with its recorded fingerprint imports and is available
-    for recall. A result missing the fingerprint records an invalid import and
-    creates no question.
-  - Production contains an unanswered, uncontested MCQ with no fingerprint
-    and an answered prompt that shares it. The purge removes only the waiting
-    prompt. The answered prompt still shows its original choices, answer and
-    grade.
-  - After the purge, a due tracker whose only waiting prompt was removed gets
-    a fresh question through normal recall. A due tracker with a matching
-    fingerprint and no recorded read timestamp reuses its waiting question.
-
 <a id="replace-correct-but-poor-question"></a>
 
 ### Replace a correct but poor recall question
