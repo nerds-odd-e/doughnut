@@ -7,7 +7,7 @@ import org.flywaydb.core.Flyway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 public record DonutTaskRunner(ConfigurableApplicationContext context) {
   private int getPort() {
@@ -32,8 +32,7 @@ public record DonutTaskRunner(ConfigurableApplicationContext context) {
   public void generateOpenAPIDocs() {
     runTask(() -> {
       String docsUrl = "http://localhost:" + getPort() + "/api-docs.yaml";
-      RestTemplate restTemplate = new RestTemplate();
-      String openApiDocs = restTemplate.getForObject(docsUrl, String.class);
+      String openApiDocs = RestClient.create().get().uri(docsUrl).retrieve().body(String.class);
       // Save the OpenAPI docs to a file
       try {
         Files.writeString(Paths.get("../open_api_docs.yaml"), openApiDocs);
