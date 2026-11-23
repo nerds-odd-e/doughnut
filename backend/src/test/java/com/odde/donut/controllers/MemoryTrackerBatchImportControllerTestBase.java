@@ -6,7 +6,6 @@ import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTes
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.Randomization;
 import com.odde.donut.entities.Grade;
@@ -82,12 +81,7 @@ abstract class MemoryTrackerBatchImportControllerTestBase extends MemoryTrackerC
 
   RecallPrompt importProviderQuestion(JsonNode requestMetadata) throws Exception {
     var generated = makeMe.aGeneratedMcq().stem(BATCH_STEM).correctAnswer("Nine").please();
-    String outputLine = batchSuccessLine(request.getCustomId(), generated);
-    if (requestMetadata != null && requestMetadata.isObject()) {
-      JsonNode output = objectMapper.readTree(outputLine);
-      ((ObjectNode) output.at("/response/body")).set("metadata", requestMetadata);
-      outputLine = objectMapper.writeValueAsString(output);
-    }
+    String outputLine = batchSuccessLine(request, generated, requestMetadata);
     stubCompletedOpenAiBatch(batchApi, outputLine, "");
     outputCollector.collectOutputForCompletedBatches(now);
     makeMe.entityPersister.flushAndClear();

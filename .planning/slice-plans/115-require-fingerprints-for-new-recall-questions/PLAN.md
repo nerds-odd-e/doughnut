@@ -2,6 +2,23 @@
 
 **Identity:** SEED-073#require-fingerprints-for-new-recall-questions
 **Source:** [Require fingerprints for new recall questions](../../seeds/SEED-073-learning-refinement-and-retrieval.md#require-fingerprints-for-new-recall-questions)
+**Source review:** [Source review](source-review.md)
+
+## Execution context
+
+- Story Branch Mode in the established worktree on
+  `codex/require-fingerprints-for-new-recall-questions`. The integration checkout
+  is `/Users/terryyin/git/doughnut`. The authorized integration target is
+  `origin/main`.
+- Publisher `dashboard-territory.local-doughnut` and agent `ziqing-chan`.
+  Starting revision `361a576fd1c868e2bb4f85e778847560ad27c92e`.
+  Claim published to `origin/main` and initial story branch accepted at
+  `fe2fbc79c6b909d39726e3afd1b62cca93638274`. The branch observer covers
+  subsequent story-branch pushes.
+- Codex coordinator `codex-70d44cf2-3262-4d53-b493-6416c327978c`, cell
+  `g289:7`, session `66175`, PID `36512`, and observer directory
+  `/tmp/dough-ci-501/watch-9X5ndC`. The selected GitHub Actions workflow
+  is `ci.yml` for `nerds-odd-e/doughnut`.
 
 ## Goal and scope
 
@@ -80,7 +97,7 @@ when the target or candidate set differs from the reviewed scope.
 ### 1. Carry request fingerprints in successful batch fixtures
 
 Type: Structure
-Status: planned
+Status: done
 
 Extend the existing batch payload fixture owner so tests exercising successful
 import carry the fingerprint from the rendered request or the fixture's authored
@@ -88,6 +105,25 @@ focus. Keep malformed-provider inputs deliberate. This prepares the importer
 validation in slice 2. **Proof.** Run the batch test family, including
 maintenance, import and atomic reimport, since they share the fixture contract.
 Production import behavior stays as in the baseline.
+
+**Accepted proof.** At `fe2fbc79c6` with the slice changes, 132 selected tests
+passed against isolated MySQL.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm backend:test_only \
+  --tests '*QuestionGenerationBatch*' \
+  --tests '*MemoryTrackerBatch*' \
+  --tests '*MemoryTrackerRecallStalePromptRetirementControllerTest'
+```
+
+`MemoryTrackerBatchRecallPromptControllerTest` observed the rendered note ID,
+read time and real fingerprint on the imported question, reuse by prompt ID,
+and continued handling of the deliberate metadata-free result.
+`QuestionGenerationBatchMaintenanceServiceTest` observed the completed
+provider batch reach a saved prompt. The row and atomic import suites observed
+import, rollback and reimport. The independent review left the accepted proof
+unchanged. The worktree's Git evidence directory retains `slice1-return.md`,
+`slice1-consumer-trace.txt` and `slice1-batch-fixtures.log.run.json`.
 
 ### 2. Require a real fingerprint on new questions
 

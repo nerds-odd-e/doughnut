@@ -1,8 +1,11 @@
 package com.odde.donut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.donut.configs.ObjectMapperConfig;
+import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.services.ai.GeneratedMcq;
 
 public final class QuestionGenerationBatchImportPayloadSupport {
@@ -11,7 +14,17 @@ public final class QuestionGenerationBatchImportPayloadSupport {
 
   private QuestionGenerationBatchImportPayloadSupport() {}
 
-  public static String batchSuccessLine(String customId, GeneratedMcq generatedMcq)
+  public static String batchSuccessLine(
+      QuestionGenerationBatchRequest request, GeneratedMcq generatedMcq)
+      throws JsonProcessingException {
+    String fingerprint = FocusNoteFingerprint.of(request.getMemoryTracker().getNote());
+    ObjectNode metadata =
+        OBJECT_MAPPER.createObjectNode().put("focus_note_fingerprint", fingerprint);
+    return batchSuccessLine(request, generatedMcq, metadata);
+  }
+
+  public static String batchSuccessLine(
+      QuestionGenerationBatchRequest request, GeneratedMcq generatedMcq, JsonNode metadata)
       throws JsonProcessingException {
     String structuredOutput = OBJECT_MAPPER.writeValueAsString(generatedMcq);
     String responseBody =
@@ -35,10 +48,14 @@ public final class QuestionGenerationBatchImportPayloadSupport {
         }
         """
             .formatted(OBJECT_MAPPER.writeValueAsString(structuredOutput));
+    ObjectNode body = OBJECT_MAPPER.readValue(responseBody, ObjectNode.class);
+    if (metadata != null) {
+      body.set("metadata", metadata);
+    }
 
     return """
     {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":%s},"error":null}\
     """
-        .formatted(customId, OBJECT_MAPPER.readTree(responseBody));
+        .formatted(request.getCustomId(), body);
   }
 }

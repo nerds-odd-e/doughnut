@@ -78,8 +78,7 @@ class QuestionGenerationBatchRowImportServiceTest extends SpringTestBase {
             .memoryTracker(memoryTracker)
             .status(QuestionGenerationBatchRequestStatus.OUTPUT_READY)
             .please();
-    outputReadyRequest.setRawSuccessPayload(
-        batchSuccessLine(outputReadyRequest.getCustomId(), generatedMcq));
+    outputReadyRequest.setRawSuccessPayload(batchSuccessLine(outputReadyRequest, generatedMcq));
     batchRequestRepository.saveAndFlush(outputReadyRequest);
   }
 
