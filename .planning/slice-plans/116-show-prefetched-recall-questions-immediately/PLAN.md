@@ -113,6 +113,13 @@ reader in `frontend/tests/helpers/recallDataTestSupport.ts`. Optional
 follow-up from that pass: the "keeps a failed future prefetch local…" case
 asserts a fixed call position and could use that reader.
 
+## Execution complete
+
+Product advice: no change. The web card now shows the prefetched prompt with
+no display-time request, matching the story; no queued story's priority or
+assumption is affected. Process review is deferred into wrap-up with the
+intent coverage check, because this execution rewrote existing recall tests.
+
 ## Plan review
 
 Refinement not needed: one cohesive change with a single proof loop, and the
