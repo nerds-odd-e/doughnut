@@ -91,7 +91,7 @@ open points listed there.
 ## Validate source-backed note edits from recall
 
 [Result](source-backed-note-edits-evidence.md#recommendation-2026-11-18); follow-up
-stories: [smallest change and quoted source](../../docs/recall-help.md#reviewed-note-corrections).
+stories: smallest change and quoted source.
 
 - **For / why.** A note author needs a concrete correction when the note
   caused a misleading judgment and a way to preserve useful distinctions.
@@ -100,7 +100,7 @@ stories: [smallest change and quoted source](../../docs/recall-help.md#reviewed-
   correction than today's reviewed correction does.
 - **What exists today (code and documents read 2026-11-18).**
   - Since 2026-10-14 a help or note conversation can propose a
-    [reviewed note correction](../../docs/recall-help.md#reviewed-note-corrections):
+    reviewed note correction:
     new content or title with a reason, the current and proposed values,
     editable wording, Accept or Decline, and the accepted Git revision.
   - The proposal replaces the whole content. The review shows the current

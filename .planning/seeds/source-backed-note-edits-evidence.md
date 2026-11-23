@@ -2,7 +2,7 @@
 
 Evidence from validating source-backed note edits after recall misses
 (SEED-073, 2026-11-18). The follow-ups are
-[showing the smallest change and quoting a source the assistant found](../../docs/recall-help.md#reviewed-note-corrections).
+showing the smallest change and quoting a source the assistant found.
 
 ## Fault cases (2026-11-18)
 

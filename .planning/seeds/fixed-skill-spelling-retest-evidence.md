@@ -181,7 +181,7 @@ checked how often the two failing shapes cost the learner an answer.
 - **Decisions.** The owner accepted the recommendation to drop a
   several-answer spelling format and a warning for notes that fit spelling
   poorly. Variants are handled by adding a wrong spelling answer as an alias from the
-  answer result ([recall results](../../docs/recall-results.md)).
+  answer result.
   The paired objective, cue and rule design is not queued.
 - **Largest group.** 227 of the 402 wrong answers named another of the
   learner's notes; the detail is with [short lessons after recall misses](learning-refinement-validation-approaches.md#validate-short-recall-lessons).
