@@ -11,6 +11,7 @@ import com.odde.donut.entities.QuestionGenerationBatch;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.donut.entities.RecallPrompt;
+import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.FocusNoteFingerprint;
@@ -18,6 +19,9 @@ import com.odde.donut.services.QuestionGenerationBatchPlanningService;
 import com.odde.donut.services.QuestionGenerationBatchRowImportService;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class MemoryTrackerBatchRecallPromptControllerTest
@@ -25,6 +29,7 @@ class MemoryTrackerBatchRecallPromptControllerTest
   @Autowired QuestionGenerationBatchRowImportService rowImporter;
   @Autowired QuestionGenerationBatchPlanningService planner;
   @Autowired QuestionGenerationBatchRequestRepository requests;
+  @Autowired McqRepository mcqs;
   @Autowired NotebookGitBindingRepository notebookGitBindings;
 
   @Test
@@ -86,16 +91,25 @@ class MemoryTrackerBatchRecallPromptControllerTest
     assertThat(renderer.renderInputJsonl(replacement), containsString("opens at ten"));
   }
 
-  @Test
-  void renewsAQuestionFromAnOlderBatchResultWithoutRequestMetadata() throws Exception {
-    RecallPrompt imported = importProviderQuestion(null);
-    stubCurrentQuestion("Nine");
+  @ParameterizedTest
+  @NullSource
+  @ValueSource(
+      strings = {
+        "{}",
+        "{\"focus_note_fingerprint\":null}",
+        "{\"focus_note_fingerprint\":123}",
+        "{\"focus_note_fingerprint\":\"not-a-sha256\"}"
+      })
+  void rejectsProviderResultsWithoutAValidFingerprint(String metadata) throws Exception {
+    long questionCount = mcqs.count();
 
-    var offered = controller.getRecallPrompt(reloadTracker());
+    collectAndImportProviderResult(metadata == null ? null : objectMapper.readTree(metadata));
 
-    assertThat(offered.getId(), not(equalTo(imported.getId())));
-    assertThat(offered.getMcq().getResponseChoices().getFirst(), is("Nine"));
-    assertThat(synchronousApi.requestInputTexts(1).getFirst(), containsString(ORIGINAL));
+    QuestionGenerationBatchRequest failedRow = requests.findById(request.getId()).orElseThrow();
+    assertThat(failedRow.getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
+    assertThat(failedRow.getErrorDetail(), is("invalid batch success payload"));
+    assertThat(savedPrompts(), empty());
+    assertThat(mcqs.count(), is(questionCount));
   }
 
   @Test

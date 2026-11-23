@@ -16,14 +16,14 @@ on a recorded fingerprint while preserving review of original answered attempts.
 
 | Id | Source commitment | Slice | Observation or obligation |
 | --- | --- | --- | --- |
-| P01 | `FocusNoteInput` requires a fingerprint. Generation and history. | slice 2 | |
-| P02 | A newly saved on-demand question carries the actual fingerprint from its generation input. Generation and history. Applies at the new-question write. | slice 2 | |
-| P03 | A batch result with its recorded fingerprint imports as a new question carrying that generation-input fingerprint. Generation and history and the first key example. | slice 2 | |
-| P04 | The question imported from the valid batch result is available for recall. First key example. Applies after the successful import in P03. | slice 2 | |
-| P05 | A batch result with a missing fingerprint records the existing invalid-import outcome. Generation and history and the second key example. Includes older submissions. | slice 2 | |
-| P06 | A batch result with a missing fingerprint creates zero questions. Second key example. The missing-fingerprint rule includes older submissions. | slice 2 | |
-| P07 | Stored `MultipleChoicesQuestion` JSON continues to allow an absent fingerprint. Generation and history. | slice 2 | |
-| P08 | Historical questions can be read as recorded, including questions with an absent fingerprint. Generation and history. | slice 2 | |
+| P01 | `FocusNoteInput` requires a fingerprint. Generation and history. | slice 2 | observed: FocusNoteInput compact constructor and MemoryTrackerBatchRecallPromptControllerTest.rejectsProviderResultsWithoutAValidFingerprint |
+| P02 | A newly saved on-demand question carries the actual fingerprint from its generation input. Generation and history. Applies at the new-question write. | slice 2 | observed: MemoryTrackerQuestionPersistenceControllerTest.preservesTheGenerationFocusWithThePersistedQuestion |
+| P03 | A batch result with its recorded fingerprint imports as a new question carrying that generation-input fingerprint. Generation and history and the first key example. | slice 2 | observed: MemoryTrackerBatchRecallPromptControllerTest.recordsTheRenderedFocusInputWithTheImportedQuestion and QuestionGenerationBatchRowImportServiceTest.createsPostProcessedMcqAndRecallPromptFromBatchOutput |
+| P04 | The question imported from the valid batch result is available for recall. First key example. Applies after the successful import in P03. | slice 2 | observed: MemoryTrackerBatchRecallPromptControllerTest.reusesTheImportedQuestionWhenItsRenderedFocusStillMatches |
+| P05 | A batch result with a missing fingerprint records the existing invalid-import outcome. Generation and history and the second key example. Includes older submissions. | slice 2 | observed: MemoryTrackerBatchRecallPromptControllerTest.rejectsProviderResultsWithoutAValidFingerprint checks the FAILED status and existing detail after collection and import |
+| P06 | A batch result with a missing fingerprint creates zero questions. Second key example. The missing-fingerprint rule includes older submissions. | slice 2 | observed: MemoryTrackerBatchRecallPromptControllerTest.rejectsProviderResultsWithoutAValidFingerprint checks the unchanged MCQ count and empty prompt queue after import |
+| P07 | Stored `MultipleChoicesQuestion` JSON continues to allow an absent fingerprint. Generation and history. | slice 2 | observed: MemoryTrackerRecallHistoryControllerTest.readsTheOriginalAnsweredQuestionWithoutAStoredFingerprint reads the persisted JSON with the field omitted |
+| P08 | Historical questions can be read as recorded, including questions with an absent fingerprint. Generation and history. | slice 2 | observed: MemoryTrackerRecallHistoryControllerTest.readsTheOriginalAnsweredQuestionWithoutAStoredFingerprint reads the original wording, choices, key, answer and grade through the history controller |
 | P09 | A due tracker reuses its waiting question when the fingerprint matches and the newer read timestamp is absent. Generation and history and the final key example. | slice 5 | |
 | P10 | The production cutover reports the count of fingerprint-free waiting, unanswered, uncontested MCQ prompts. Production cutover. The count uses all five eligibility conditions. | slice 4 | |
 | P11 | The production purge removes every prompt that meets those eligibility conditions. Production cutover and the shared-question example. The eligible waiting prompt is removed even when an answered prompt shares its question. | slice 4 | |

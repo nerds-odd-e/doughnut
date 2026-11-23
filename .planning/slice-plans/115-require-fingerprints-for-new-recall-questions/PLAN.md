@@ -125,10 +125,17 @@ import, rollback and reimport. The independent review left the accepted proof
 unchanged. The worktree's Git evidence directory retains `slice1-return.md`,
 `slice1-consumer-trace.txt` and `slice1-batch-fixtures.log.run.json`.
 
+Published to the story branch at `50a78657a9c2b53195e85b6ba7b5ddef193f1295`.
+CI run [45100262451](https://github.com/nerds-odd-e/doughnut/actions/runs/45100262451)
+completed with one failed job. Its MySQL prerequisite downloaded the first
+compatibility package, then hit three connection timeouts on the second before
+linting or type generation started. Both pinned Ubuntu package URLs returned
+HTTP 200 in the local check. The next increment receives its own CI run.
+
 ### 2. Require a real fingerprint on new questions
 
 Type: Behavior
-Status: planned
+Status: done
 
 Make the typed `FocusNoteInput` invariant explicit and validate provenance at
 the batch result boundary before persisting. Use the existing failed-row path.
@@ -139,6 +146,27 @@ slice 5. **Proof.** Replace the metadata-free import success example with the
 active rejection at the same boundary. Check valid import and on-demand
 persistence, and read an existing fingerprint-free answered attempt through
 recall history.
+
+**Accepted proof.** At `50a78657a9` with the slice changes, 196 selected tests
+passed against isolated MySQL 8.4.11.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm backend:test_only \
+  --tests '*QuestionGenerationBatch*' --tests '*MemoryTrackerBatch*' \
+  --tests '*MemoryTrackerRecall*' \
+  --tests '*MemoryTrackerQuestionPersistenceControllerTest' \
+  --tests '*MemoryTrackerQuestionDeletionControllerTest'
+```
+
+The batch recall controller cases observed the original rendered fingerprint
+on successful import and reuse by prompt ID. Five responses with missing or
+invalid fingerprints each persisted the existing failure and left the MCQ
+count and prompt queue unchanged. The on-demand persistence case observed
+the actual generation input, and the history case read the saved wording,
+choices, key, answer and grade from a fingerprint-free question.
+The batch planning and stale-prompt cases passed with the interim waiting
+behavior. The worktree's Git evidence directory retains `slice2-return.md`,
+`slice2-consumer-trace.md` and `slice2-recall-fingerprints.log.run.json`.
 
 ### 3. Rehearse the one-time purge on MySQL
 

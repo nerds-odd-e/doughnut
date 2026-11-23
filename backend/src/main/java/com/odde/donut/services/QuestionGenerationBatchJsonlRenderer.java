@@ -90,11 +90,15 @@ public class QuestionGenerationBatchJsonlRenderer {
 
   /** Batch rows submitted before the id and read time were recorded carry only the fingerprint. */
   static FocusNoteInput focusNoteInputFrom(JsonNode metadata) {
+    String fingerprint = metadata.path(FOCUS_NOTE_FINGERPRINT_METADATA_KEY).textValue();
+    if (!FocusNoteInput.isValidFingerprint(fingerprint)) {
+      return null;
+    }
     JsonNode noteId = metadata.path(FOCUS_NOTE_ID_METADATA_KEY);
     JsonNode readAt = metadata.path(FOCUS_NOTE_READ_AT_METADATA_KEY);
     return new FocusNoteInput(
         noteId.isMissingNode() ? null : Integer.valueOf(noteId.textValue()),
         readAt.isMissingNode() ? null : new Timestamp(Long.parseLong(readAt.textValue())),
-        metadata.path(FOCUS_NOTE_FINGERPRINT_METADATA_KEY).textValue());
+        fingerprint);
   }
 }

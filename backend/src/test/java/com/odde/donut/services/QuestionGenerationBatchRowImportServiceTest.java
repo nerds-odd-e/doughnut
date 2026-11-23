@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.Randomization;
+import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -109,6 +110,9 @@ class QuestionGenerationBatchRowImportServiceTest extends SpringTestBase {
 
       Mcq mcq = recallPrompt.getMcq();
       assertThat(mcq.getContextSeed(), is(outputReadyRequest.getContextSeed()));
+      assertThat(
+          mcq.getFocusNoteInput(),
+          is(new FocusNoteInput(null, null, FocusNoteFingerprint.of(memoryTracker.getNote()))));
       assertThat(mcq.isContested(), is(false));
 
       assertThat(mcq.getQuestionStem(), is(generatedMcq.getQuestionStem()));

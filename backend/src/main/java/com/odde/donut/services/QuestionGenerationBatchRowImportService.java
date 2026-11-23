@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
@@ -49,21 +50,29 @@ public class QuestionGenerationBatchRowImportService {
             .filter(response -> response.output().isValid())
             .orElse(null);
     if (result == null) {
-      request.setStatus(QuestionGenerationBatchRequestStatus.FAILED);
-      request.setErrorDetail("invalid batch success payload");
-      batchRequestRepository.save(request);
-      batchMetrics.recordFailedRow();
-      return false;
+      return rejectInvalidResult(request);
+    }
+    FocusNoteInput focusNoteInput =
+        QuestionGenerationBatchJsonlRenderer.focusNoteInputFrom(result.metadata());
+    if (focusNoteInput == null) {
+      return rejectInvalidResult(request);
     }
 
     MemoryTracker memoryTracker = request.getMemoryTracker();
     Mcq mcq = generatedQuestionPostProcessor.assembleMcq(result.output(), request.getContextSeed());
-    mcq.setFocusNoteInput(
-        QuestionGenerationBatchJsonlRenderer.focusNoteInputFrom(result.metadata()));
+    mcq.setFocusNoteInput(focusNoteInput);
     recallPromptPersister.persistImportedRecallPromptForMcq(mcq, memoryTracker);
 
     request.setStatus(QuestionGenerationBatchRequestStatus.IMPORTED);
     batchRequestRepository.save(request);
     return true;
+  }
+
+  private boolean rejectInvalidResult(QuestionGenerationBatchRequest request) {
+    request.setStatus(QuestionGenerationBatchRequestStatus.FAILED);
+    request.setErrorDetail("invalid batch success payload");
+    batchRequestRepository.save(request);
+    batchMetrics.recordFailedRow();
+    return false;
   }
 }

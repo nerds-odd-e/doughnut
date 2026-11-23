@@ -5,17 +5,58 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.RecallHistoryItem;
+import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerRecallHistoryControllerTest extends MemoryTrackerControllerTestBase {
+  @Autowired EntityManager entityManager;
+
+  @Test
+  void readsTheOriginalAnsweredQuestionWithoutAStoredFingerprint() throws Exception {
+    MemoryTracker tracker = ownedTracker();
+    String stem = "When did the observatory open?";
+    List<String> choices = List.of("Eight", "Nine", "Ten");
+    var question = makeMe.anMcq().stem(stem).choices(choices).correctAnswerIndex(1).please();
+    var answered =
+        makeMe
+            .aRecallPrompt()
+            .forMemoryTracker(tracker)
+            .withMcq(question)
+            .answerChoiceIndex(0)
+            .recorded()
+            .please();
+    makeMe.entityPersister.flushAndClear();
+    String storedJson =
+        (String)
+            entityManager
+                .createNativeQuery("SELECT raw_json_question FROM mcq WHERE id = :id")
+                .setParameter("id", question.getId())
+                .getSingleResult();
+    assertThat(storedJson, not(containsString("\"focusNoteFingerprint\"")));
+
+    var history =
+        controller.getRecallHistory(entityManager.find(MemoryTracker.class, tracker.getId()));
+
+    assertThat(history, hasSize(1));
+    var entry = history.getFirst();
+    var prompt = entry.getRecallPrompt();
+    assertThat(prompt.getId(), is(answered.getId()));
+    assertThat(prompt.getMcq().getQuestionStem(), is(stem));
+    assertThat(prompt.getMcq().getResponseChoices(), is(choices));
+    assertThat(prompt.getMcq().getCorrectAnswerIndex(), is(1));
+    assertThat(prompt.getAnswer().getChoiceIndex(), is(0));
+    assertThat(entry.getRecallLog().getGrade(), is(Grade.AGAIN));
+  }
 
   @Test
   void readsAnsweredHistoryAlongsideTheTrackersCurrentNote()

@@ -80,6 +80,11 @@ abstract class MemoryTrackerBatchImportControllerTestBase extends MemoryTrackerC
   }
 
   RecallPrompt importProviderQuestion(JsonNode requestMetadata) throws Exception {
+    collectAndImportProviderResult(requestMetadata);
+    return savedPrompts().getFirst();
+  }
+
+  void collectAndImportProviderResult(JsonNode requestMetadata) throws Exception {
     var generated = makeMe.aGeneratedMcq().stem(BATCH_STEM).correctAnswer("Nine").please();
     String outputLine = batchSuccessLine(request, generated, requestMetadata);
     stubCompletedOpenAiBatch(batchApi, outputLine, "");
@@ -87,7 +92,6 @@ abstract class MemoryTrackerBatchImportControllerTestBase extends MemoryTrackerC
     makeMe.entityPersister.flushAndClear();
     importer.importCompletedBatches(now);
     makeMe.entityPersister.flushAndClear();
-    return savedPrompts().getFirst();
   }
 
   record StaleWaitingQueue(
