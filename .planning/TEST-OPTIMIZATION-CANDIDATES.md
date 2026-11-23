@@ -42,9 +42,9 @@
 - **Alternatives tried:** none.
 - **Decision or evidence needed:** repeated full-suite runs to measure failure rate; for SidebarRowReveal, whether its geometry assertions wait for layout/scroll to settle (vs reading once); for connect timeouts, Vitest browser worker count and connect timeout under full-suite load.
 
-## Spring Boot 4.2 idiom follow-ups (copy of plan 116 Tasks 6–9)
+## Spring Boot 4.2 idiom follow-ups (copy of plan 117 Tasks 6–9)
 
-Source of truth and status: [plan 116](slice-plans/116-spring-boot-4-2-idioms/PLAN.md). Update both when a task changes.
+Source of truth and status: [plan 117](slice-plans/117-spring-boot-4-2-idioms/PLAN.md). Update both when a task changes.
 ### Task 6 — Remaining compiler deprecations (medium)
 
 **Status:** Not started. Find with the `-Xlint:deprecation,removal` init script (Task 5).
