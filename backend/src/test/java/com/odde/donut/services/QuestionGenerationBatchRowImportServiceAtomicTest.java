@@ -140,7 +140,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
                     .contextSeed(contextSeed)
                     .status(QuestionGenerationBatchRequestStatus.OUTPUT_READY)
                     .please();
-            request.setRawSuccessPayload(batchSuccessLine(request.getCustomId(), committedMcq));
+            request.setRawSuccessPayload(batchSuccessLine(request, committedMcq));
             batchRequestRepository.saveAndFlush(request);
 
             return new CommittedImportFixture(

@@ -2,6 +2,23 @@
 
 **Identity:** SEED-073#require-fingerprints-for-new-recall-questions
 **Source:** [Require fingerprints for new recall questions](../../seeds/SEED-073-learning-refinement-and-retrieval.md#require-fingerprints-for-new-recall-questions)
+**Source review:** [Source review](source-review.md)
+
+## Execution context
+
+- Story Branch Mode in the established worktree on
+  `codex/require-fingerprints-for-new-recall-questions`. The integration checkout
+  is `/Users/terryyin/git/doughnut`. The authorized integration target is
+  `origin/main`.
+- Publisher `dashboard-territory.local-doughnut` and agent `ziqing-chan`.
+  Starting revision `361a576fd1c868e2bb4f85e778847560ad27c92e`.
+  Claim published to `origin/main` and initial story branch accepted at
+  `fe2fbc79c6b909d39726e3afd1b62cca93638274`. The branch observer covers
+  subsequent story-branch pushes.
+- Codex coordinator `codex-70d44cf2-3262-4d53-b493-6416c327978c`, cell
+  `g289:7`, session `66175`, PID `36512`, and observer directory
+  `/tmp/dough-ci-501/watch-9X5ndC`. The selected GitHub Actions workflow
+  is `ci.yml` for `nerds-odd-e/doughnut`.
 
 ## Goal and scope
 
@@ -80,7 +97,7 @@ when the target or candidate set differs from the reviewed scope.
 ### 1. Carry request fingerprints in successful batch fixtures
 
 Type: Structure
-Status: planned
+Status: done
 
 Extend the existing batch payload fixture owner so tests exercising successful
 import carry the fingerprint from the rendered request or the fixture's authored
@@ -89,10 +106,36 @@ validation in slice 2. **Proof.** Run the batch test family, including
 maintenance, import and atomic reimport, since they share the fixture contract.
 Production import behavior stays as in the baseline.
 
+**Accepted proof.** At `fe2fbc79c6` with the slice changes, 132 selected tests
+passed against isolated MySQL.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm backend:test_only \
+  --tests '*QuestionGenerationBatch*' \
+  --tests '*MemoryTrackerBatch*' \
+  --tests '*MemoryTrackerRecallStalePromptRetirementControllerTest'
+```
+
+`MemoryTrackerBatchRecallPromptControllerTest` observed the rendered note ID,
+read time and real fingerprint on the imported question, reuse by prompt ID,
+and continued handling of the deliberate metadata-free result.
+`QuestionGenerationBatchMaintenanceServiceTest` observed the completed
+provider batch reach a saved prompt. The row and atomic import suites observed
+import, rollback and reimport. The independent review left the accepted proof
+unchanged. The worktree's Git evidence directory retains `slice1-return.md`,
+`slice1-consumer-trace.txt` and `slice1-batch-fixtures.log.run.json`.
+
+Published to the story branch at `50a78657a9c2b53195e85b6ba7b5ddef193f1295`.
+CI run [45100262451](https://github.com/nerds-odd-e/doughnut/actions/runs/45100262451)
+completed with one failed job. Its MySQL prerequisite downloaded the first
+compatibility package, then hit three connection timeouts on the second before
+linting or type generation started. Both pinned Ubuntu package URLs returned
+HTTP 200 in the local check. The next increment receives its own CI run.
+
 ### 2. Require a real fingerprint on new questions
 
 Type: Behavior
-Status: planned
+Status: done
 
 Make the typed `FocusNoteInput` invariant explicit and validate provenance at
 the batch result boundary before persisting. Use the existing failed-row path.
@@ -104,10 +147,32 @@ active rejection at the same boundary. Check valid import and on-demand
 persistence, and read an existing fingerprint-free answered attempt through
 recall history.
 
+**Accepted proof.** At `50a78657a9` with the slice changes, 196 selected tests
+passed against isolated MySQL 8.4.11.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm backend:test_only \
+  --tests '*QuestionGenerationBatch*' --tests '*MemoryTrackerBatch*' \
+  --tests '*MemoryTrackerRecall*' \
+  --tests '*MemoryTrackerQuestionPersistenceControllerTest' \
+  --tests '*MemoryTrackerQuestionDeletionControllerTest'
+```
+
+The batch recall controller cases observed the original rendered fingerprint
+on successful import and reuse by prompt ID. Five responses with missing or
+invalid fingerprints each persisted the existing failure and left the MCQ
+count and prompt queue unchanged. The on-demand persistence case observed
+the actual generation input, and the history case read the saved wording,
+choices, key, answer and grade from a fingerprint-free question.
+The batch planning and stale-prompt cases passed with the interim waiting
+behavior. The worktree's Git evidence directory retains `slice2-return.md`,
+`slice2-consumer-trace.md` and `slice2-recall-fingerprints.log.run.json`.
+Published to the story branch at `7fc809f31378c7b2b35ae7ec6304d1e46fa62d20`.
+
 ### 3. Rehearse the one-time purge on MySQL
 
 Type: Behavior
-Status: planned
+Status: done
 
 Supply a temporary operator command with read-only preview and explicit
 apply. Apply the same eligibility filter used by preview and recheck the
@@ -118,6 +183,27 @@ operator command on the isolated schema with both a shared and an unshared
 fingerprint-free waiting question, a current waiting question, a contested
 prompt, and an earlier answer with choices and grade. Compare preview to
 the resulting queue, history and tracker due time. Record counts on repeat.
+
+**Accepted proof.** At `7fc809f313` with the slice changes, both rehearsal
+scenarios passed on a disposable MySQL 8.4.11 instance loaded with the
+schema-only dump of the migrated worktree test database.
+
+```sh
+CURSOR_DEV=true nix develop -c node --test \
+  scripts/ops/purge-fingerprint-free-waiting-questions.test.mjs
+```
+
+The [operator](../../../scripts/ops/purge-fingerprint-free-waiting-questions.mjs)
+previewed four eligible prompts. Apply required a confirmation bound to the
+server, schema and exact prompt/MCQ pairs. It refused a different schema and
+refused a changed set after a learner answered one prompt, even though the
+count stayed at four. A refreshed preview and apply removed four prompts and
+three newly unreferenced questions. The repeat preview returned zero.
+The persisted checks kept the shared answered question and its original grade,
+the contest, current fingerprinted and non-MCQ prompts, the tracker due time,
+and the detached conversation's message and note correction.
+The worktree's Git evidence directory retains `slice3-return.md`,
+`slice3-consumer-trace.md` and the final `slice3-refactor-rehearsal.log.run.json`.
 
 ### 4. Apply the production cutover
 

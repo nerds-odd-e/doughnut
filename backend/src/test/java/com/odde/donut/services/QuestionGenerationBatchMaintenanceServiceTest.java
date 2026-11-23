@@ -73,8 +73,7 @@ class QuestionGenerationBatchMaintenanceServiceTest extends SpringTestBase {
 
     GeneratedMcq generatedMcq = makeMe.aGeneratedMcq().please();
 
-    stubCompletedOpenAiBatch(
-        openAiBatches, batchSuccessLine(request.getCustomId(), generatedMcq), "");
+    stubCompletedOpenAiBatch(openAiBatches, batchSuccessLine(request, generatedMcq), "");
   }
 
   @Test

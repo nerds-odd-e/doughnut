@@ -61,8 +61,7 @@ class QuestionGenerationBatchImportServiceTest extends SpringTestBase {
 
     importableRequest =
         createRequest("importable", QuestionGenerationBatchRequestStatus.OUTPUT_READY);
-    importableRequest.setRawSuccessPayload(
-        batchSuccessLine(importableRequest.getCustomId(), generatedMcq));
+    importableRequest.setRawSuccessPayload(batchSuccessLine(importableRequest, generatedMcq));
 
     failedRequest = createRequest("failed", QuestionGenerationBatchRequestStatus.FAILED);
     failedRequest.setErrorDetail("model unavailable");
@@ -159,8 +158,7 @@ class QuestionGenerationBatchImportServiceTest extends SpringTestBase {
               .correctAnswer("correct answer")
               .distractors("first", "second", " correct answer ")
               .please();
-      invalidRequest.setRawSuccessPayload(
-          batchSuccessLine(invalidRequest.getCustomId(), invalidMcq));
+      invalidRequest.setRawSuccessPayload(batchSuccessLine(invalidRequest, invalidMcq));
       batchRequestRepository.save(invalidRequest);
 
       batchImportService.importCompletedBatches(currentTime);
