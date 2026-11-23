@@ -27,28 +27,53 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 **Identity:** SEED-073#show-prefetched-recall-questions-immediately
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/116-show-prefetched-recall-questions-immediately/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6cee6d21b6ec142f0cbda6b71eeaedc2c5b1268b5f9487ce843d3aed2e250701","plan":"fc2b91afd9256a64a05d18238b242d2b306227220b35d2370a2d31e6f3c1aa31"}}
 ```
 
-- **Goal.** When a learner advances to a prefetched multiple-choice card in
-  web recall, show the loaded question immediately. If its prefetch is still
-  running, display the result when that request finishes. An edit made after
-  prefetch can take effect on the next ordinary question fetch.
-- **Scope.** Delete the extra display-time fetch, the state and branches that
-  serve it, and the tests specific to that behavior. Keep initial and
-  background loading, explicit Retry and Self-review, and answer submission
-  against the displayed prompt. Keep the shared recall-prompt endpoint for
-  those loads and CLI recall. Backend freshness selection on ordinary fetches
-  and the existing answer grading path are outside this change.
+- **Goal.** A learner moving through web recall sees each multiple-choice
+  card's question as soon as its background prefetch has it, without a second
+  wait for a display-time request. Fewer loading pauses keep recall flowing.
+  Displaying the prefetched prompt is acceptable: a note edit made after
+  prefetch takes effect on the next ordinary question fetch.
+- **Scope.**
+  - When the learner advances to a multiple-choice card, the web card shows
+    the prompt its prefetch loaded. If that prefetch is still running, the
+    card shows its loading indicator and then the result of that same
+    request. No other request is made for that card.
+  - Delete the extra display-time fetch, the state and branches that serve it
+    (the `prepared` load status and the foreground re-selection in
+    `useRecallPromptFetching`), and the tests specific to that behavior.
+  - Keep initial and background loading, explicit Retry and Self-review,
+    spelling loading and OVERLAP recovery, and answer submission against the
+    displayed prompt ID. Keep the shared recall-prompt endpoint for those loads
+    and for CLI recall.
+  - **Scope limits.** Backend freshness selection on ordinary fetches, the
+    answer grading path, and CLI recall are unchanged.
 - **Documentation.** Delete `docs/recall-question-loading.md`. Move its
   still-applicable guidance on question ownership, due ordering, loading
-  recovery and spelling to existing recall documentation and retarget live
-  links. Remove the explanation of the extra display-time fetch.
-- **Acceptance.** A completed prefetch supplies the next card's choices and
-  prompt ID when the learner advances. Exercise the initial load, Retry,
-  and answer submission through their normal entry points. Check once during
-  acceptance for references to the deleted behavior in the product, tests,
-  and documentation.
+  recovery and spelling into existing recall or question-generation
+  documentation, choosing each destination during planning. Retarget live
+  links, including the one in `DonutRetrospectiveFindings.md`. The moved text
+  describes the prefetched prompt being shown as loaded and omits the
+  display-time request.
+- **Key examples.**
+  - The learner is on card A and card B's prefetch has completed. The learner
+    advances to B. B's choices appear immediately and no recall-prompt
+    request is made for B. Answering submits against B's prefetched prompt ID.
+  - B's prefetch is still running when the learner advances. The card shows
+    the loading indicator, then B's choices when that request returns. No
+    second request is made for B.
+  - B's note is edited after B was prefetched. Advancing to B shows the
+    prefetched choices, and the answer is graded against that prompt's own
+    answer key.
+  - B's prefetch failed. Reaching B shows Retry and Self-review as today;
+    Retry makes one foreground request on B.
+  - The first card of a recall session loads in the foreground with the
+    loading indicator, as today.
+- **Acceptance.** Exercise initial load, advancing to a completed and an
+  in-flight prefetch, Retry, and answer submission through their normal entry
+  points. Check once during acceptance for references to the deleted behavior
+  and the deleted document in the product, tests, and documentation.
 
 <a id="require-fingerprints-for-new-recall-questions"></a>
 
