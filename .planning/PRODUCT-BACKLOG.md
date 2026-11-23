@@ -8,9 +8,10 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Taken
 
+- [Show prefetched recall questions immediately](seeds/SEED-073-learning-refinement-and-retrieval.md#show-prefetched-recall-questions-immediately) — SEED-073#show-prefetched-recall-questions-immediately ([plan](slice-plans/116-show-prefetched-recall-questions-immediately/PLAN.md))
+
 ## Backlog list
 
-- [Show prefetched recall questions immediately](seeds/SEED-073-learning-refinement-and-retrieval.md#show-prefetched-recall-questions-immediately) — SEED-073#show-prefetched-recall-questions-immediately
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
 - [Validate when question generation should abstain](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-question-generation-purpose) — SEED-073#validate-question-generation-purpose
 - [See surrounding text in references](seeds/SEED-131-reference-details.md#see-surrounding-text-in-references) — SEED-131#see-surrounding-text-in-references

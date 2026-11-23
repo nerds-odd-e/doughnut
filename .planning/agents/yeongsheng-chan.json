@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "YeongSheng-chan",
+  "email": "yeongsheng-chan@example.org",
+  "identity": "SEED-073#show-prefetched-recall-questions-immediately",
+  "mode": "story-branch",
+  "branch": "claude/show-prefetched-recall-questions-immediately",
+  "host": "claude"
+}
