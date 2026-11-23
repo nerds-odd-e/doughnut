@@ -89,8 +89,6 @@ dependencies {
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.2.1'
   implementation 'com.openai:openai-java:4.111.0'
   implementation 'org.yaml:snakeyaml'
-  // RxJava2 for Flowable streaming support
-  implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
   implementation 'net.javacrumbs.shedlock:shedlock-spring:7.11.0'
   implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.11.0'
   implementation 'org.eclipse.jgit:org.eclipse.jgit:7.8.1.202611041320-r'

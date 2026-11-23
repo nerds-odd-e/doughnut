@@ -31,6 +31,7 @@ public class OpenAiResponseStreamMocker {
   private String toolName;
   private List<String> toolArguments = List.of();
   private Runnable beforeEvents;
+  private Throwable failure;
 
   public OpenAiResponseStreamMocker withToolCall(String name, String... fragments) {
     toolName = name;
@@ -40,6 +41,11 @@ public class OpenAiResponseStreamMocker {
 
   public OpenAiResponseStreamMocker beforeEvents(Runnable callback) {
     beforeEvents = callback;
+    return this;
+  }
+
+  public OpenAiResponseStreamMocker failingWith(Throwable error) {
+    failure = error;
     return this;
   }
 
@@ -117,7 +123,10 @@ public class OpenAiResponseStreamMocker {
     @SuppressWarnings("unchecked")
     AsyncStreamResponse<ResponseStreamEvent> asyncStreamResponse = mock(AsyncStreamResponse.class);
 
-    CompletableFuture<Void> completionFuture = CompletableFuture.completedFuture(null);
+    CompletableFuture<Void> completionFuture =
+        failure == null
+            ? CompletableFuture.completedFuture(null)
+            : CompletableFuture.failedFuture(failure);
     when(asyncStreamResponse.onCompleteFuture()).thenReturn(completionFuture);
 
     Answer<AsyncStreamResponse<ResponseStreamEvent>> subscribeAnswer =

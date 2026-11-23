@@ -14,7 +14,6 @@ import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.donut.services.focusContext.FocusContextRetrievalService;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.responses.ResponseCreateParams;
-import io.reactivex.Flowable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,46 +46,47 @@ public class NoteConversationAiReplyService {
     String baseRevision = bindingRepository.findAcceptedRevision(subject.getNotebook().getId());
     String responseId = UUID.randomUUID().toString();
     ResponseCreateParams request = buildResponseCreateParams(conversation);
-    Flowable<String> stream = openAiApiHandler.streamResponseAsLegacyChatChunks(request);
-    ConversationAiReplySseStream replySseStream = new ConversationAiReplySseStream(stream);
-    return replySseStream.getSseEmitter(reply -> {
-      List<ConversationNoteCorrection> corrections = new ArrayList<>();
-      for (ConversationAiReplySseStream.ToolCall tool : reply.toolCalls()) {
-        ConversationNoteCorrection.Field field;
-        String valueProperty;
-        if ("NoteContentCompletion".equals(tool.name())) {
-          field = ConversationNoteCorrection.Field.CONTENT;
-          valueProperty = "content";
-        } else if ("TitleReplacement".equals(tool.name())) {
-          field = ConversationNoteCorrection.Field.TITLE;
-          valueProperty = "newTitle";
-        } else {
-          continue;
-        }
-        try {
-          JsonNode arguments = objectMapper.readTree(tool.arguments());
-          ConversationNoteCorrection correction = new ConversationNoteCorrection();
-          correction.setNote(subject);
-          correction.setResponseId(responseId);
-          correction.setToolCallId(tool.id());
-          correction.setField(field);
-          correction.setProposedValue(arguments.path(valueProperty).asText());
-          correction.setReason(arguments.path("reason").asText(reply.content()));
-          String sourceQuote = arguments.path("sourceQuote").asText(null);
-          String sourceUrl = arguments.path("sourceUrl").asText("");
-          if (field == ConversationNoteCorrection.Field.CONTENT
-              && sourceQuote != null
-              && (sourceUrl.startsWith("http://") || sourceUrl.startsWith("https://"))) {
-            correction.setSourceQuote(sourceQuote);
-            correction.setSourceUrl(sourceUrl);
+    ConversationAiReplySseStream replySseStream =
+        new ConversationAiReplySseStream(reply -> {
+          List<ConversationNoteCorrection> corrections = new ArrayList<>();
+          for (ConversationAiReplySseStream.ToolCall tool : reply.toolCalls()) {
+            ConversationNoteCorrection.Field field;
+            String valueProperty;
+            if ("NoteContentCompletion".equals(tool.name())) {
+              field = ConversationNoteCorrection.Field.CONTENT;
+              valueProperty = "content";
+            } else if ("TitleReplacement".equals(tool.name())) {
+              field = ConversationNoteCorrection.Field.TITLE;
+              valueProperty = "newTitle";
+            } else {
+              continue;
+            }
+            try {
+              JsonNode arguments = objectMapper.readTree(tool.arguments());
+              ConversationNoteCorrection correction = new ConversationNoteCorrection();
+              correction.setNote(subject);
+              correction.setResponseId(responseId);
+              correction.setToolCallId(tool.id());
+              correction.setField(field);
+              correction.setProposedValue(arguments.path(valueProperty).asText());
+              correction.setReason(arguments.path("reason").asText(reply.content()));
+              String sourceQuote = arguments.path("sourceQuote").asText(null);
+              String sourceUrl = arguments.path("sourceUrl").asText("");
+              if (field == ConversationNoteCorrection.Field.CONTENT
+                  && sourceQuote != null
+                  && (sourceUrl.startsWith("http://") || sourceUrl.startsWith("https://"))) {
+                correction.setSourceQuote(sourceQuote);
+                correction.setSourceUrl(sourceUrl);
+              }
+              correction.setBaseRevision(baseRevision);
+              corrections.add(correction);
+            } catch (JsonProcessingException e) {
+              throw new IllegalArgumentException("Invalid note correction arguments", e);
+            }
           }
-          correction.setBaseRevision(baseRevision);
-          corrections.add(correction);
-        } catch (JsonProcessingException e) {
-          throw new IllegalArgumentException("Invalid note correction arguments", e);
-        }
-      }
-      conversationService.retainAiReply(conversation, reply.content(), corrections);
-    });
+          conversationService.retainAiReply(conversation, reply.content(), corrections);
+        });
+    openAiApiHandler.streamResponseAsLegacyChatChunks(request, replySseStream);
+    return replySseStream.getSseEmitter();
   }
 }

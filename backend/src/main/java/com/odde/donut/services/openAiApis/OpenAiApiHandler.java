@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
+import com.odde.donut.exceptions.OpenAiUnauthorizedException;
 import com.odde.donut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
 import com.openai.core.MultipartField;
@@ -19,8 +20,6 @@ import com.openai.models.files.FileObject;
 import com.openai.models.files.FilePurpose;
 import com.openai.models.responses.ResponseCreateParams;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,45 +57,47 @@ public class OpenAiApiHandler {
     }
   }
 
-  public Flowable<String> streamResponseAsLegacyChatChunks(ResponseCreateParams params) {
+  public interface ChunkListener {
+    void onChunk(String json);
+
+    void onError(Throwable error);
+
+    void onComplete();
+  }
+
+  public void streamResponseAsLegacyChatChunks(
+      ResponseCreateParams params, ChunkListener listener) {
     assertOpenAiAvailable();
     ResponseStreamToLegacyChatChunkMapper mapper =
         new ResponseStreamToLegacyChatChunkMapper(objectMapper);
-    return Flowable.create(
-        emitter -> {
-          officialClient
-              .async()
-              .responses()
-              .createStreaming(params)
-              .subscribe(event -> {
-                try {
-                  for (String json : mapper.map(event)) {
-                    emitter.onNext(json);
-                  }
-                } catch (JsonProcessingException e) {
-                  emitter.onError(new RuntimeException("Failed to serialize legacy chat chunk", e));
-                } catch (RuntimeException e) {
-                  emitter.onError(e);
-                }
-              })
-              .onCompleteFuture()
-              .whenComplete((unused, error) -> {
-                if (error != null) {
-                  if (error.getMessage() != null
-                      && (error.getMessage().contains("401")
-                          || error.getMessage().contains("Unauthorized"))) {
-                    emitter.onError(
-                        new com.odde.donut.exceptions.OpenAiUnauthorizedException(
-                            "Unauthorized: " + error.getMessage()));
-                  } else {
-                    emitter.onError(error);
-                  }
-                } else {
-                  emitter.onComplete();
-                }
-              });
-        },
-        BackpressureStrategy.BUFFER);
+    officialClient
+        .async()
+        .responses()
+        .createStreaming(params)
+        .subscribe(event -> {
+          try {
+            for (String json : mapper.map(event)) {
+              listener.onChunk(json);
+            }
+          } catch (JsonProcessingException e) {
+            listener.onError(new RuntimeException("Failed to serialize legacy chat chunk", e));
+          } catch (RuntimeException e) {
+            listener.onError(e);
+          }
+        })
+        .onCompleteFuture()
+        .whenComplete((unused, error) -> {
+          if (error == null) {
+            listener.onComplete();
+          } else if (error.getMessage() != null
+              && (error.getMessage().contains("401")
+                  || error.getMessage().contains("Unauthorized"))) {
+            listener.onError(
+                new OpenAiUnauthorizedException("Unauthorized: " + error.getMessage()));
+          } else {
+            listener.onError(error);
+          }
+        });
   }
 
   public List<com.openai.models.models.Model> getModels() {
