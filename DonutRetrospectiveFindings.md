@@ -1,6 +1,5 @@
 # Donut Retrospective Findings
 
-
 Donut owns findings about its product, tooling and conventions. [DearDough](DearDough.md) owns shared guidance findings. Keep original identities and evidence on moves. Retire with attributable outcome proof or a satisfied observation criterion. Resume the same lineage if later evidence contradicts an adopted repair.
 
 ## Ownership and priority assessment
@@ -26,7 +25,6 @@ occurrence and its active cost was unmeasured. No local policy change is queued.
 
 ### DD-439 — Agent shells lacked the environment that repository commands rely on
 
-
 Donut's runner and mocked E2E stack relied on interactive exports. In `SEED-113#assimilate-notes-with-a-clear-default-and-result` at `9868d40b3c` (Claude Code Opus 5.5, Open Dough 0.3.92, 2026-11-09 Singapore, time unknown), setup refused disabled flakes; missing mock credentials caused 8 refinement and 10 question-generation errors across two features. Reruns passed with a placeholder and later briefs repeated the exports. Source: `f61aeafdf4:DearDough.md`.
 
 **Adopted 2026-11-10.** SEED-116 supplied additive Nix features on population and reuse (`12e1f925a5`) and an E2E mock fallback preserving supplied-token precedence and held-stack paid-call choices ([implementation](https://github.com/nerds-odd-e/doughnut/commit/be62cc90a427fc7663fb481a06e1f15a582fe99b)). Six runner cases, cold/reused worktree setup, 3,093 backend tests with two skips, all six held-stack cases and seven clean-shell E2E scenarios verified the selected reproductions. Services stopped and the new `sut.log` showed no credential error. Later ordinary non-interactive use remains the observation criterion.
@@ -35,13 +33,10 @@ Donut's runner and mocked E2E stack relied on interactive exports. In `SEED-113#
 
 ### DD-485 — CI jobs waited about 50 minutes each on a package mirror that did not resolve
 
-
 Donut owns the system-package setup bound. [DD-485 in DearDough](DearDough.md#dd-485) owns the observer facet of the same execution.
 
 - `SEED-124#save-pronunciations-as-note-properties` / `e9f109c3c25b0355a897161f8a8180fdfb22a1a5`, 2026-11-11T23:32:09+08:00, Claude Code Fable 5.2, Open Dough 0.3.96. A package mirror DNS outage blocked eleven setup jobs on each of runs 43049319481 and 43053073660 (~3,046 seconds per failed step; attempt 2 also lost a runner). Separate notifications arrived over ~90 minutes, costing five diagnosis rounds and ~8 hours to green. Backend unit tests bypassed package setup and passed. The 2026-11-11 baseline lacked an explicit shorter package-install bound. [Node setup](.github/setup_nodejs_with_cache/action.yml), [MySQL setup](.github/mysql_binaries/action.yml), original `4059ac2353:DearDough.md`, attempt details at `aa17aab044:.planning/slice-plans/001-save-pronunciations-as-note-properties/PLAN.md`.
 - **Adopted 2026-11-13.** [SEED-129#bound-ci-system-package-installation](.planning/done/SEED-129_bound-ci-system-package-installation.json) routes both actions through `scripts/ci-system-packages.sh` with 600 s, 10 s kill-after and two acquisition retries. Probe 43410926122 covered 3 s DNS failure, TERM-ignore cleanup at 25 s (137), transient recovery and healthy 11 s install. Shell fixtures, Intent Coverage and push CI 43418396664 accepted `281dd13820f8aa2d6c426fdac20ee153171c524c`. Observe a later real mirror outage.
-
-## Queued
 
 ## Open, not queued
 
@@ -96,17 +91,3 @@ The project backend rule requires the entire suite even for a targeted scratch b
   - Inference: Whole-suite repetition is required by the current backend instructions, rather than a worker decision to broaden proof. Shared-host contention and cold scratch caches also contributed; the17.9-minute elapsed cannot all be attributed to the suite policy. Native blocking waits and bounded overdue checks retained one worker without restart or duplicate probing.
 
 Ownership: Donut’s [backend skill](.agents/skills/backend/SKILL.md) still requires all backend tests. A scoped exception needs evidence that a focused check preserves the selected promise and a project decision about the full-suite rule. Keep the measured case open.
-
-## Useful project practice
-
-### DD-230 — An environment-only Flyway callback with a MySQL named lock held a real startup migration open for full-stack proof
-
-SEED-067#start-e2e-after-migrations / `f297a916c5`, 2026-10-11T09:18:00+09:00,
-Claude Code/claude-opus-5-5, Open Dough 0.3.58. An external `beforeMigrate.sql`
-on `SPRING_FLYWAY_LOCATIONS` waited for a lock held by a separate session, which
-released it. Both `pnpm e2e:hold` and `pnpm cy:run` returned 503 while held and
-reset test data only after the first 200. Each slice took about five minutes
-including startup. See plan 066 Learnings for slices 3–4 at `af62c7cd0a` and
-`sut.log` lines 148–234, including 41 applied migrations. `ps eww` confirmed
-environment forwarding. The observation required no product/test changes or
-delay option.
