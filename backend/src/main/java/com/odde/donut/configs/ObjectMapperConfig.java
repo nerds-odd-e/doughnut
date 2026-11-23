@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.datatype.hibernate7.Hibernate7Module.Feature;
 
 @Configuration
@@ -41,6 +42,21 @@ public class ObjectMapperConfig implements WebMvcConfigurer {
         .serializationInclusion(JsonInclude.Include.NON_NULL)
         .addModule(new JavaTimeModule())
         .addModule(new Hibernate7Module())
+        .build();
+  }
+
+  /**
+   * Jackson 3 counterpart of {@link #objectMapper()} with identical output, for hand-written
+   * serialization (stored JSON, MCP and AI payloads). Not a bean: a {@code JsonMapper} bean would
+   * replace Boot's web mapper.
+   */
+  public static tools.jackson.databind.json.JsonMapper handWrittenJsonMapper() {
+    return tools.jackson.databind.json.JsonMapper.builderWithJackson2Defaults()
+        .enable(tools.jackson.databind.MapperFeature.DEFAULT_VIEW_INCLUSION)
+        .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .changeDefaultPropertyInclusion(
+            inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_NULL))
+        .addModule(new tools.jackson.datatype.hibernate7.Hibernate7Module())
         .build();
   }
 
