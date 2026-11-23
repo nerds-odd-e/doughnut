@@ -28,8 +28,7 @@ still-applicable guidance moves into existing documentation.
 - Documentation destinations for the deleted page's surviving guidance:
   - "Question ownership and lifetime" (ownership, fingerprint reuse, edits
     after presentation) → a new "Question ownership and reuse" section in
-    `docs/question-generation-batch-operations.md`, whose introduction
-    already states the reuse rule.
+    `docs/recall-results.md`, beside the question loading section.
   - "Shared due list order" → a new "Due list order" section in
     `docs/recall-backlog-spreading.md`, beside the ADR 0003 scheduling
     policy it already cites.
