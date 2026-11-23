@@ -1,8 +1,6 @@
 package com.odde.donut.services.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.ConversationNoteCorrection;
 import com.odde.donut.entities.Note;
@@ -20,13 +18,17 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @RequiredArgsConstructor
 @Service
 public class NoteConversationAiReplyService {
+  private static final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
+
   private final OpenAiApiHandler openAiApiHandler;
   private final NotebookGitBindingRepository bindingRepository;
-  private final ObjectMapper objectMapper;
   private final GlobalSettingsService globalSettingsService;
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
@@ -68,10 +70,10 @@ public class NoteConversationAiReplyService {
               correction.setResponseId(responseId);
               correction.setToolCallId(tool.id());
               correction.setField(field);
-              correction.setProposedValue(arguments.path(valueProperty).asText());
-              correction.setReason(arguments.path("reason").asText(reply.content()));
-              String sourceQuote = arguments.path("sourceQuote").asText(null);
-              String sourceUrl = arguments.path("sourceUrl").asText("");
+              correction.setProposedValue(arguments.path(valueProperty).asString());
+              correction.setReason(arguments.path("reason").asString(reply.content()));
+              String sourceQuote = arguments.path("sourceQuote").asString(null);
+              String sourceUrl = arguments.path("sourceUrl").asString("");
               if (field == ConversationNoteCorrection.Field.CONTENT
                   && sourceQuote != null
                   && (sourceUrl.startsWith("http://") || sourceUrl.startsWith("https://"))) {
@@ -80,7 +82,7 @@ public class NoteConversationAiReplyService {
               }
               correction.setBaseRevision(baseRevision);
               corrections.add(correction);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
               throw new IllegalArgumentException("Invalid note correction arguments", e);
             }
           }

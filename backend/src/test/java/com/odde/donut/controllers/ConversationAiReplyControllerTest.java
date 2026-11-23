@@ -178,6 +178,23 @@ class ConversationAiReplyControllerTest extends ConversationMessageControllerTes
   }
 
   @Test
+  void correctionWithoutAReasonTakesTheReplyAsItsReason() throws Exception {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    Conversation conversation =
+        makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
+    new OpenAiResponseStreamMocker(officialClient)
+        .withMessage("The note misses the date")
+        .withToolCall("NoteContentCompletion", "{\"content\":\"Clarified\"}")
+        .mockStreamResponse();
+
+    controller.getAiReply(conversation);
+
+    assertThat(
+        controller.getConversationCorrections(conversation).getFirst().getReason(),
+        equalTo("The note misses the date"));
+  }
+
+  @Test
   void retainsTheExplanationAccompanyingAnExclusionTool() throws Exception {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     RecallPrompt prompt =

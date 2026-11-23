@@ -68,8 +68,7 @@ public class OpenAiApiHandler {
   public void streamResponseAsLegacyChatChunks(
       ResponseCreateParams params, ChunkListener listener) {
     assertOpenAiAvailable();
-    ResponseStreamToLegacyChatChunkMapper mapper =
-        new ResponseStreamToLegacyChatChunkMapper(objectMapper);
+    ResponseStreamToLegacyChatChunkMapper mapper = new ResponseStreamToLegacyChatChunkMapper();
     officialClient
         .async()
         .responses()
@@ -79,8 +78,6 @@ public class OpenAiApiHandler {
             for (String json : mapper.map(event)) {
               listener.onChunk(json);
             }
-          } catch (JsonProcessingException e) {
-            listener.onError(new RuntimeException("Failed to serialize legacy chat chunk", e));
           } catch (RuntimeException e) {
             listener.onError(e);
           }

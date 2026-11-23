@@ -1,32 +1,28 @@
 package com.odde.donut.services.openAiApis;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.openai.models.responses.ResponseFunctionToolCall;
 import com.openai.models.responses.ResponseOutputItem;
 import com.openai.models.responses.ResponseStreamEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /** Maps OpenAI Responses stream events to SSE chunk JSON strings consumed by the frontend. */
 public final class ResponseStreamToLegacyChatChunkMapper {
   private static final String FINISH_STOP = "stop";
   private static final String FINISH_TOOL_CALLS = "tool_calls";
 
-  private final ObjectMapper objectMapper;
+  private static final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   private String activeToolName;
   private String activeToolCallId;
   private boolean toolCallOpened;
   private long activeToolIndex;
 
-  public ResponseStreamToLegacyChatChunkMapper(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
-
-  public List<String> map(ResponseStreamEvent event) throws JsonProcessingException {
+  public List<String> map(ResponseStreamEvent event) {
     List<String> out = new ArrayList<>();
     if (event.isError()) {
       throw new RuntimeException(event.asError().message());
@@ -80,19 +76,18 @@ public final class ResponseStreamToLegacyChatChunkMapper {
     return out;
   }
 
-  private String textDeltaChunk(String content) throws JsonProcessingException {
+  private String textDeltaChunk(String content) {
     ObjectNode delta = objectMapper.createObjectNode();
     delta.put("content", content);
     return chunkJson(delta, Optional.empty());
   }
 
-  private String finishTextChunk() throws JsonProcessingException {
+  private String finishTextChunk() {
     return chunkJson(objectMapper.createObjectNode(), Optional.of(FINISH_STOP));
   }
 
   private String toolArgumentsChunk(
-      Optional<String> name, String argumentsFragment, boolean includeMeta)
-      throws JsonProcessingException {
+      Optional<String> name, String argumentsFragment, boolean includeMeta) {
     ObjectNode function = objectMapper.createObjectNode();
     name.ifPresent(n -> function.put("name", n));
     function.put("arguments", argumentsFragment);
@@ -113,12 +108,11 @@ public final class ResponseStreamToLegacyChatChunkMapper {
     return chunkJson(delta, Optional.empty());
   }
 
-  private String finishToolCallsChunk() throws JsonProcessingException {
+  private String finishToolCallsChunk() {
     return chunkJson(objectMapper.createObjectNode(), Optional.of(FINISH_TOOL_CALLS));
   }
 
-  private String chunkJson(ObjectNode delta, Optional<String> finishReason)
-      throws JsonProcessingException {
+  private String chunkJson(ObjectNode delta, Optional<String> finishReason) {
     ObjectNode choice = objectMapper.createObjectNode();
     choice.set("delta", delta);
     finishReason.ifPresentOrElse(

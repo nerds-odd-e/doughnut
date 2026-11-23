@@ -1,7 +1,5 @@
 package com.odde.donut.services.ai;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.exceptions.OpenAiUnauthorizedException;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
@@ -10,10 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 public class ConversationAiReplySseStream implements OpenAiApiHandler.ChunkListener {
   private final SseEmitter emitter = new SseEmitter();
-  private final ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
+  private static final JsonMapper mapper = ObjectMapperConfig.handWrittenJsonMapper();
   private final StringBuilder content = new StringBuilder();
   private final Map<Integer, AccumulatedToolCall> tools = new LinkedHashMap<>();
   private final Consumer<Reply> replyConsumer;
@@ -43,16 +43,16 @@ public class ConversationAiReplySseStream implements OpenAiApiHandler.ChunkListe
     try {
       emitter.send(SseEmitter.event().name("chat.completion.chunk").data(rawJson));
       JsonNode delta = mapper.readTree(rawJson).path("choices").path(0).path("delta");
-      if (delta.path("content").isTextual()) {
-        content.append(delta.path("content").asText());
+      if (delta.path("content").isString()) {
+        content.append(delta.path("content").asString());
       }
       for (JsonNode tool : delta.path("tool_calls")) {
         AccumulatedToolCall accumulated =
             tools.computeIfAbsent(tool.path("index").asInt(), ignored -> new AccumulatedToolCall());
-        if (tool.has("id")) accumulated.id = tool.path("id").asText();
+        if (tool.has("id")) accumulated.id = tool.path("id").asString();
         JsonNode function = tool.path("function");
-        if (function.has("name")) accumulated.name = function.path("name").asText();
-        accumulated.arguments.append(function.path("arguments").asText(""));
+        if (function.has("name")) accumulated.name = function.path("name").asString();
+        accumulated.arguments.append(function.path("arguments").asString(""));
       }
     } catch (Exception e) {
       emitter.completeWithError(e);

@@ -28,13 +28,42 @@ class ConversationAiReplyStreamTest extends SpringTestBase {
   }
 
   @Test
-  void streamsChunksThenDone() throws Exception {
+  void streamsTextChunksThenDone() throws Exception {
     new OpenAiResponseStreamMocker(officialClient).withMessage("Hi").mockStreamResponse();
 
     requestAiReply()
-        .andExpect(content().string(containsString("event:chat.completion.chunk\ndata: ")))
-        .andExpect(content().string(containsString("\"content\":\"Hi\"")))
-        .andExpect(content().string(containsString("event:done\ndata: [DONE]")));
+        .andExpect(
+            content()
+                .string(
+                    chunk("{\"choices\":[{\"delta\":{\"content\":\"Hi\"},\"finish_reason\":null}]}")
+                        + chunk("{\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}")
+                        + "event:done\ndata: [DONE]\n\n"));
+  }
+
+  @Test
+  void streamsToolCallChunksThenDone() throws Exception {
+    new OpenAiResponseStreamMocker(officialClient)
+        .withToolCall("NoteContentCompletion", "{\"content\":", "\"X\"}")
+        .mockStreamResponse();
+
+    requestAiReply()
+        .andExpect(
+            content()
+                .string(
+                    chunk("{\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}")
+                        + chunk(
+                            "{\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":1,\"type\":\"function\","
+                                + "\"function\":{\"name\":\"NoteContentCompletion\",\"arguments\":\"{\\\"content\\\":\"},"
+                                + "\"id\":\"call-mock\"}]},\"finish_reason\":null}]}")
+                        + chunk(
+                            "{\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":1,\"type\":\"function\","
+                                + "\"function\":{\"arguments\":\"\\\"X\\\"}\"}}]},\"finish_reason\":null}]}")
+                        + chunk("{\"choices\":[{\"delta\":{},\"finish_reason\":\"tool_calls\"}]}")
+                        + "event:done\ndata: [DONE]\n\n"));
+  }
+
+  private static String chunk(String json) {
+    return "event:chat.completion.chunk\ndata: " + json + "\n\n";
   }
 
   @Test
