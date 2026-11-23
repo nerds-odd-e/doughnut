@@ -10,6 +10,7 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Add values to an existing note property](seeds/SEED-134-add-values-to-note-properties.md#add-values-to-an-existing-note-property) — SEED-134#add-values-to-an-existing-note-property
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
 - [Validate when question generation should abstain](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-question-generation-purpose) — SEED-073#validate-question-generation-purpose
 - [See surrounding text in references](seeds/SEED-131-reference-details.md#see-surrounding-text-in-references) — SEED-131#see-surrounding-text-in-references
