@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "sessionId": "6e242800-d257-4120-a038-0296e576fd8a",
+  "workflow": "dough-execute-plan",
+  "closedAt": "2026-11-23T06:22:41.819Z",
+  "story": "SEED-073#show-prefetched-recall-questions-immediately",
+  "ranges": [
+    {
+      "base": "92aa3d067ff6fe247bac1e12ed9985d75ee856bb",
+      "candidate": "970aa2f3706e48997cb5a8be1efd0f3447722099"
+    },
+    {
+      "base": "970aa2f3706e48997cb5a8be1efd0f3447722099",
+      "candidate": "52d431b0088b78754f0259c76c08ba584da44e0f"
+    },
+    {
+      "base": "52d431b0088b78754f0259c76c08ba584da44e0f",
+      "candidate": "4650f8aa20625a27472338b1a3a4a1db08af7e21"
+    },
+    {
+      "base": "4650f8aa20625a27472338b1a3a4a1db08af7e21",
+      "candidate": "bf10390f9f707edde642a96de0cbac6f80f567a9"
+    }
+  ]
+}
