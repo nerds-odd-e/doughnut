@@ -1,8 +1,9 @@
 package com.odde.donut.services.book;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.BookContentBlock;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Direct-content predicate for reading-record heuristics: MinerU (PDF) exclusions plus EPUB aside
@@ -10,7 +11,7 @@ import com.odde.donut.entities.BookContentBlock;
  */
 public final class BookBlockDirectContentPredicate {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final JsonMapper MAPPER = ObjectMapperConfig.handWrittenJsonMapper();
 
   private BookBlockDirectContentPredicate() {}
 
@@ -82,15 +83,15 @@ public final class BookBlockDirectContentPredicate {
     }
     JsonNode href = n.get("href");
     JsonNode fragment = n.get("fragment");
-    return href != null && href.isTextual() && fragment != null && fragment.isTextual();
+    return href != null && href.isString() && fragment != null && fragment.isString();
   }
 
   private static boolean isEpubAsideSemantic(JsonNode n) {
     JsonNode sem = n.get("epub_semantic");
-    if (sem == null || !sem.isTextual()) {
+    if (sem == null || !sem.isString()) {
       return false;
     }
-    String v = sem.asText();
+    String v = sem.asString();
     return "note".equals(v) || "sidebar".equals(v);
   }
 }

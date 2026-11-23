@@ -1,17 +1,17 @@
 package com.odde.donut.services.book;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.donut.entities.BookBlockTitleLimits;
 import com.odde.donut.entities.BookContentBlock;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 final class BookContentBlockPayloads {
 
   private BookContentBlockPayloads() {}
 
-  static String stripTextLevel(ObjectMapper objectMapper, String rawData) {
+  static String stripTextLevel(JsonMapper objectMapper, String rawData) {
     if (rawData == null) {
       return rawData;
     }
@@ -25,7 +25,7 @@ final class BookContentBlockPayloads {
   }
 
   static String structuralTitleFromFirstMoved(
-      ObjectMapper objectMapper, BookContentBlock firstMoved) {
+      JsonMapper objectMapper, BookContentBlock firstMoved) {
     String raw = firstMoved.getRawData();
     if (raw == null || raw.isBlank()) {
       return "Untitled";
@@ -33,13 +33,14 @@ final class BookContentBlockPayloads {
     try {
       JsonNode n = objectMapper.readTree(raw);
       JsonNode text = n.get("text");
-      if (text != null && text.isTextual()) {
-        String t = BookService.trimmedMax(text.asText(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS);
+      if (text != null && text.isString()) {
+        String t =
+            BookService.trimmedMax(text.asString(), BookBlockTitleLimits.STRUCTURAL_MAX_CHARS);
         if (!t.isEmpty()) {
           return t;
         }
       }
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       return "Untitled";
     }
     return "Untitled";

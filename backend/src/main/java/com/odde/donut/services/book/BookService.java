@@ -1,6 +1,6 @@
 package com.odde.donut.services.book;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.donut.controllers.dto.BookLastReadPositionRequest;
@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class BookService {
@@ -52,11 +53,11 @@ public class BookService {
       BookBlockReadingRecordRepository bookBlockReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper,
       OpenAiApiHandler openAiApiHandler,
       GlobalSettingsService globalSettingsService,
       BookSourceFile bookSourceFile,
       AttachBookService attachBookService) {
+    JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
     this.bookSourceFile = bookSourceFile;
     this.attachBookService = attachBookService;
     this.bookRepository = bookRepository;

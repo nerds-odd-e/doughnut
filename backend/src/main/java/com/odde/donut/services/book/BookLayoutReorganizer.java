@@ -2,8 +2,6 @@ package com.odde.donut.services.book;
 
 import static com.odde.donut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.donut.controllers.dto.BookLayoutReorganizationSuggestion.BlockDepthSuggestion;
@@ -28,19 +26,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 final class BookLayoutReorganizer {
 
   private static final long BASE_ANSWER_TOKENS = 700L;
   private static final long ANSWER_TOKENS_PER_BLOCK = 12L;
 
-  private final ObjectMapper objectMapper;
+  private final JsonMapper objectMapper;
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
   private final EntityPersister entityPersister;
 
   BookLayoutReorganizer(
-      ObjectMapper objectMapper,
+      JsonMapper objectMapper,
       OpenAiApiHandler openAiApiHandler,
       GlobalSettingsService globalSettingsService,
       EntityPersister entityPersister) {
@@ -60,7 +60,7 @@ final class BookLayoutReorganizer {
     String userJson;
     try {
       userJson = objectMapper.writeValueAsString(layoutBlocksPayload(ordered));
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new ApiException(
           "failed to serialize book blocks",
           ApiError.ErrorType.BINDING_ERROR,

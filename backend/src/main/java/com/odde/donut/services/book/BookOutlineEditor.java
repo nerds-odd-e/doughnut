@@ -2,8 +2,6 @@ package com.odde.donut.services.book;
 
 import static com.odde.donut.services.book.BookReadingWireConstants.MAX_LAYOUT_DEPTH;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.entities.Book;
 import com.odde.donut.entities.BookBlock;
 import com.odde.donut.entities.BookBlockTitleLimits;
@@ -15,19 +13,21 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 final class BookOutlineEditor {
 
   private final BookContentBlockRepository bookContentBlockRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final ObjectMapper objectMapper;
+  private final JsonMapper objectMapper;
 
   BookOutlineEditor(
       BookContentBlockRepository bookContentBlockRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper) {
+      JsonMapper objectMapper) {
     this.bookContentBlockRepository = bookContentBlockRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -96,7 +96,7 @@ final class BookOutlineEditor {
         titleCb.setRawData(
             objectMapper.writeValueAsString(
                 Map.of("type", "text", "text", bookBlock.getStructuralTitle())));
-      } catch (JsonProcessingException e) {
+      } catch (JacksonException e) {
         throw new ResponseStatusException(
             HttpStatus.INTERNAL_SERVER_ERROR, "Failed to serialize title content block");
       }

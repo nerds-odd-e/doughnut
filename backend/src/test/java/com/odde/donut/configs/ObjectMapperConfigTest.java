@@ -11,6 +11,8 @@ import com.fasterxml.jackson.datatype.hibernate7.Hibernate7Module;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -97,6 +99,17 @@ class ObjectMapperConfigTest {
         is(
             "{\"zeta\":\"z\",\"alpha\":\"a\",\"at\":\"2026-11-23T05:06:07Z\","
                 + "\"stamp\":\"2026-11-23T05:06:07.000+00:00\",\"day\":\"2026-11-23\"}"));
+  }
+
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("handWrittenMappers")
+  void writesMapsWithoutNullEntries(String name, HandWrittenJson json) throws Exception {
+    Map<String, Object> raw = new LinkedHashMap<>();
+    raw.put("type", "text");
+    raw.put("level", null);
+    raw.put("page_idx", 3);
+
+    assertThat(json.write(raw), is("{\"type\":\"text\",\"page_idx\":3}"));
   }
 
   @ParameterizedTest(name = "{0}")

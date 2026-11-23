@@ -1,15 +1,16 @@
 package com.odde.donut.services.book;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.BookBlockTitleLimits;
 import com.odde.donut.entities.BookContentBlock;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 public final class BookBlockPdfContentLocators {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final JsonMapper MAPPER = ObjectMapperConfig.handWrittenJsonMapper();
 
   private BookBlockPdfContentLocators() {}
 
@@ -80,10 +81,10 @@ public final class BookBlockPdfContentLocators {
 
   private static String derivedTitleFromRaw(JsonNode n) {
     JsonNode text = n.get("text");
-    if (text == null || !text.isTextual()) {
+    if (text == null || !text.isString()) {
       return null;
     }
-    String t = text.asText().strip();
+    String t = text.asString().strip();
     if (t.isEmpty()) {
       return null;
     }

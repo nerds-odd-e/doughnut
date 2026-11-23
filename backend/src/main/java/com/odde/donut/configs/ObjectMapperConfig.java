@@ -54,8 +54,10 @@ public class ObjectMapperConfig implements WebMvcConfigurer {
     return tools.jackson.databind.json.JsonMapper.builderWithJackson2Defaults()
         .enable(tools.jackson.databind.MapperFeature.DEFAULT_VIEW_INCLUSION)
         .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .changeDefaultPropertyInclusion(
-            inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_NULL))
+        .changeDefaultPropertyInclusion(inclusion ->
+            inclusion
+                .withValueInclusion(JsonInclude.Include.NON_NULL)
+                .withContentInclusion(JsonInclude.Include.NON_NULL))
         .addModule(new tools.jackson.datatype.hibernate7.Hibernate7Module())
         .build();
   }

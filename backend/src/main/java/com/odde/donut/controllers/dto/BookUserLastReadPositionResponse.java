@@ -1,10 +1,10 @@
 package com.odde.donut.controllers.dto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.entities.BookUserLastReadPosition;
 import com.odde.donut.services.book.ContentLocator;
 import com.odde.donut.services.book.ReadingPositionLocatorResolver;
 import io.swagger.v3.oas.annotations.media.Schema;
+import tools.jackson.databind.json.JsonMapper;
 
 @Schema(name = "BookUserLastReadPosition")
 public record BookUserLastReadPositionResponse(
@@ -13,7 +13,7 @@ public record BookUserLastReadPositionResponse(
     @Schema(nullable = true) Integer selectedBookBlockId) {
 
   public static BookUserLastReadPositionResponse from(
-      BookUserLastReadPosition row, ObjectMapper objectMapper) {
+      BookUserLastReadPosition row, JsonMapper objectMapper) {
     ContentLocator locator = ReadingPositionLocatorResolver.resolve(row, objectMapper);
     return new BookUserLastReadPositionResponse(row.getId(), locator, row.getSelectedBookBlockId());
   }

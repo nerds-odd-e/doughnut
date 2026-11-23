@@ -2,8 +2,6 @@ package com.odde.donut.services.book;
 
 import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_EPUB;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.entities.Book;
@@ -17,6 +15,8 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 public enum BookFormat {
   PDF {
@@ -47,7 +47,7 @@ public enum BookFormat {
 
     @Override
     public void writeReadingPositionLocator(
-        BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper) {
+        BookUserLastReadPosition row, ContentLocator locator, JsonMapper objectMapper) {
       if (!(locator instanceof PdfLocator pdf)) {
         throw new ApiException(
             "PdfLocator_Full required for PDF reading-position locator",
@@ -93,7 +93,7 @@ public enum BookFormat {
 
     @Override
     public void writeReadingPositionLocator(
-        BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper) {
+        BookUserLastReadPosition row, ContentLocator locator, JsonMapper objectMapper) {
       if (!(locator instanceof EpubLocator epub)) {
         throw new ApiException(
             "EpubLocator_Full required for EPUB reading-position locator",
@@ -132,7 +132,7 @@ public enum BookFormat {
   public abstract String bookFileExtension();
 
   public abstract void writeReadingPositionLocator(
-      BookUserLastReadPosition row, ContentLocator locator, ObjectMapper objectMapper);
+      BookUserLastReadPosition row, ContentLocator locator, JsonMapper objectMapper);
 
   public static BookFormat forLocator(ContentLocator locator) {
     return switch (locator) {
@@ -169,10 +169,10 @@ public enum BookFormat {
   }
 
   private static void persistReadingPositionLocatorJson(
-      BookUserLastReadPosition row, ObjectMapper objectMapper, ContentLocator locator) {
+      BookUserLastReadPosition row, JsonMapper objectMapper, ContentLocator locator) {
     try {
       row.setReadingPositionLocatorJson(objectMapper.writeValueAsString(locator));
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new ApiException(
           "failed to serialize reading position locator",
           ApiError.ErrorType.BINDING_ERROR,

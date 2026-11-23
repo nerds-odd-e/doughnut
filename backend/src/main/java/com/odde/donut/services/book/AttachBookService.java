@@ -3,7 +3,7 @@ package com.odde.donut.services.book;
 import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_EPUB;
 import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.entities.Book;
@@ -18,6 +18,7 @@ import com.odde.donut.testability.TestabilitySettings;
 import java.io.IOException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Attaching a Book to a notebook: the request is validated, the file is stored first, then the Book
@@ -30,11 +31,11 @@ public class AttachBookService {
       AttachBookRequest request,
       byte[] fileBytes,
       EntityPersister entityPersister,
-      ObjectMapper objectMapper) {}
+      JsonMapper objectMapper) {}
 
   private final BookRepository bookRepository;
   private final EntityPersister entityPersister;
-  private final ObjectMapper objectMapper;
+  private static final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   private final TestabilitySettings testabilitySettings;
   private final NotebookAttachmentContent attachmentContent;
   private final AcceptedWebChangeService acceptedWebChangeService;
@@ -43,14 +44,12 @@ public class AttachBookService {
   public AttachBookService(
       BookRepository bookRepository,
       EntityPersister entityPersister,
-      ObjectMapper objectMapper,
       TestabilitySettings testabilitySettings,
       NotebookAttachmentContent attachmentContent,
       AcceptedWebChangeService acceptedWebChangeService,
       BookSourceFilePlacement bookSourceFilePlacement) {
     this.bookRepository = bookRepository;
     this.entityPersister = entityPersister;
-    this.objectMapper = objectMapper;
     this.testabilitySettings = testabilitySettings;
     this.attachmentContent = attachmentContent;
     this.acceptedWebChangeService = acceptedWebChangeService;

@@ -1,6 +1,5 @@
 package com.odde.donut.services.book;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.donut.controllers.dto.BookLastReadPositionRequest;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.json.JsonMapper;
 
 final class BookReadingProgress {
 
@@ -29,7 +29,7 @@ final class BookReadingProgress {
   private final BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
-  private final ObjectMapper objectMapper;
+  private final JsonMapper objectMapper;
 
   BookReadingProgress(
       BookUserLastReadPositionRepository bookUserLastReadPositionRepository,
@@ -37,7 +37,7 @@ final class BookReadingProgress {
       BookBlockReadingRecordRepository bookBlockReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper) {
+      JsonMapper objectMapper) {
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
     this.bookBlockRepository = bookBlockRepository;
     this.bookBlockReadingRecordRepository = bookBlockReadingRecordRepository;

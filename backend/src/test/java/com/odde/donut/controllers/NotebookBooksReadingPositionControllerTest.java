@@ -35,6 +35,10 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(
           fromJson, equalTo(new PdfLocator(2, List.of(0.0, 750.0, 100.0, 600.0), null, null)));
+      assertThat(
+          stored.getReadingPositionLocatorJson(),
+          equalTo(
+              "{\"type\":\"PdfLocator_Full\",\"pageIndex\":2,\"bbox\":[0.0,750.0,100.0,600.0]}"));
     }
 
     @Test
@@ -141,6 +145,27 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
       assertThat(
           fromJson, equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two", null)));
+      assertThat(
+          stored.getReadingPositionLocatorJson(),
+          equalTo(
+              "{\"type\":\"EpubLocator_Full\",\"href\":\"OEBPS/chapter2.xhtml\",\"fragment\":\"section-beta-two\"}"));
+    }
+
+    @Test
+    void readsALocatorStoredInEarlierFormat() throws Exception {
+      Notebook nb = notebookWithBook();
+      readingController.patchReadingPosition(nb, lastReadBody(0, 100));
+      var stored =
+          bookUserLastReadPositionRepository
+              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookOf(nb).getId())
+              .orElseThrow();
+      stored.setReadingPositionLocatorJson(
+          "{\"type\":\"EpubLocator_Full\",\"href\":\"OEBPS/c.xhtml\",\"fragment\":\"f\",\"cfi\":\"epubcfi(/6/4)\"}");
+      bookUserLastReadPositionRepository.save(stored);
+
+      assertThat(
+          readingController.getReadingPosition(nb).getBody().locator(),
+          equalTo(new EpubLocator("OEBPS/c.xhtml", "f", "epubcfi(/6/4)")));
     }
 
     @Test

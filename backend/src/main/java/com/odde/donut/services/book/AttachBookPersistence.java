@@ -1,7 +1,5 @@
 package com.odde.donut.services.book;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.donut.entities.Book;
@@ -15,6 +13,8 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 final class AttachBookPersistence {
 
@@ -22,7 +22,7 @@ final class AttachBookPersistence {
 
   static void persistNewEpubBook(AttachBookService.PersistContext ctx, Book book) {
     EntityPersister entityPersister = ctx.entityPersister();
-    ObjectMapper objectMapper = ctx.objectMapper();
+    JsonMapper objectMapper = ctx.objectMapper();
     byte[] epubBytes = ctx.fileBytes();
 
     List<EpubStructureExtractor.EpubLayoutBlock> layout =
@@ -110,7 +110,7 @@ final class AttachBookPersistence {
   private static void persistContentBlocks(
       AttachBookService.PersistContext ctx, BookBlock block, List<Map<String, Object>> cbs) {
     EntityPersister entityPersister = ctx.entityPersister();
-    ObjectMapper objectMapper = ctx.objectMapper();
+    JsonMapper objectMapper = ctx.objectMapper();
     for (int i = 0; i < cbs.size(); i++) {
       entityPersister.save(newContentBlock(block, i, cbs.get(i), objectMapper, true));
     }
@@ -120,7 +120,7 @@ final class AttachBookPersistence {
       BookBlock block,
       int siblingOrder,
       Map<String, Object> raw,
-      ObjectMapper objectMapper,
+      JsonMapper objectMapper,
       boolean includePageIdx) {
     BookContentBlock cb = new BookContentBlock();
     cb.setBookBlock(block);
@@ -134,7 +134,7 @@ final class AttachBookPersistence {
     }
     try {
       cb.setRawData(objectMapper.writeValueAsString(raw));
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new ApiException(
           "failed to serialize content block",
           ApiError.ErrorType.BINDING_ERROR,

@@ -1,14 +1,15 @@
 package com.odde.donut.services.book;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.BookContentBlock;
 import java.util.ArrayList;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 public final class BookBlockEpubContentLocators {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final JsonMapper MAPPER = ObjectMapperConfig.handWrittenJsonMapper();
 
   private BookBlockEpubContentLocators() {}
 
@@ -41,16 +42,16 @@ public final class BookBlockEpubContentLocators {
     }
     try {
       JsonNode n = MAPPER.readTree(rawData);
-      if (n == null || !n.has("href") || !n.get("href").isTextual()) {
+      if (n == null || !n.has("href") || !n.get("href").isString()) {
         return null;
       }
-      String href = n.get("href").asText();
+      String href = n.get("href").asString();
       if (href.isBlank()) {
         return null;
       }
       String fragment = null;
-      if (n.has("fragment") && n.get("fragment").isTextual()) {
-        String f = n.get("fragment").asText();
+      if (n.has("fragment") && n.get("fragment").isString()) {
+        String f = n.get("fragment").asString();
         if (!f.isBlank()) {
           String bare = bareEpubFragmentId(f);
           if (!bare.isEmpty()) {
