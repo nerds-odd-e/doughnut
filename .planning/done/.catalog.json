@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-073_require-fingerprints-for-new-recall-questions.json",
+      "identity": "SEED-073#require-fingerprints-for-new-recall-questions",
+      "completedAt": "2026-11-23T04:22:38.915Z",
+      "blob": "43a4a0a73bdc0a4f767e0060f63707d06c8f1f76"
+    },
+    {
       "fileName": "SEED-073_replace-stale-waiting-questions.json",
       "identity": "SEED-073#replace-stale-waiting-questions",
       "completedAt": "2026-11-22T08:00:35.616Z",
