@@ -21,6 +21,40 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 [Local recall evidence and validation workflow](learning-refinement-and-retrieval-context.md#local-recall-evidence) apply to each story below.
 
+<a id="require-fingerprints-for-new-recall-questions"></a>
+
+### Require fingerprints for new recall questions
+
+**Identity:** SEED-073#require-fingerprints-for-new-recall-questions
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal.** Learners get reusable waiting multiple-choice questions with a
+  known focus note input and can still review their original answered attempts.
+  After cutover, recall can use one freshness rule for waiting questions.
+- **Required generation input.** Make the fingerprint non-optional in
+  `FocusNoteInput`. On-demand generation and batch import must supply the real
+  fingerprint before saving a new question. A batch result without one must
+  fail import through the existing invalid-result handling, including a late
+  result submitted by an older build. Keep the fingerprint optional in the
+  stored `MultipleChoicesQuestion` JSON so older answered questions remain
+  readable. Construct `FocusNoteInput` only from a recorded fingerprint.
+- **One-time production data migration.** After the write rule is live, count
+  and purge waiting, unanswered, uncontested MCQ prompts without a fingerprint.
+  Use a temporary operations script outside the application startup migration
+  chain. Follow the prompt lifecycle so a question row is deleted only when no
+  prompt references it. Preserve the wording, choices, keys, answers and grades
+  of answered questions, along with existing contests and tracker due times.
+  Leave historical fingerprints as recorded. Due trackers get replacements
+  through normal batch or on-demand recall.
+- **Completion.** Verify in production that the purge left zero eligible rows
+  before removing the temporary migration code and its migration-only tests.
+  Remove the waiting-question compatibility logic and tests that only support
+  missing fingerprints. Retain proof of answered history, rejection of invalid
+  new batch results, and reuse of a matching fingerprint when the newer read
+  timestamp is absent.
+
 <a id="replace-correct-but-poor-question"></a>
 
 ### Replace a correct but poor recall question

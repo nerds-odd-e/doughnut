@@ -10,6 +10,7 @@ Make daily recall an opportunity to reinforce learning and improve deliberately 
 
 ## Backlog list
 
+- [Require fingerprints for new recall questions](seeds/SEED-073-learning-refinement-and-retrieval.md#require-fingerprints-for-new-recall-questions) — SEED-073#require-fingerprints-for-new-recall-questions
 - [Validate follow-up by learning objective](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-within-note-objectives) — SEED-073#validate-within-note-objectives
 - [Validate when question generation should abstain](seeds/SEED-073-learning-refinement-and-retrieval.md#validate-question-generation-purpose) — SEED-073#validate-question-generation-purpose
 - [See surrounding text in references](seeds/SEED-131-reference-details.md#see-surrounding-text-in-references) — SEED-131#see-surrounding-text-in-references
