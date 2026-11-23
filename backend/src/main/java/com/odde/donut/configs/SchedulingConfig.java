@@ -3,7 +3,7 @@ package com.odde.donut.configs;
 import com.odde.donut.entities.repositories.FailureReportRepository;
 import com.odde.donut.services.GithubService;
 import com.odde.donut.testability.TestabilitySettings;
-import org.springframework.boot.task.ThreadPoolTaskSchedulerCustomizer;
+import org.springframework.boot.task.SimpleAsyncTaskSchedulerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class SchedulingConfig {
 
   @Bean
-  public ThreadPoolTaskSchedulerCustomizer threadPoolTaskSchedulerCustomizer(
+  public SimpleAsyncTaskSchedulerCustomizer simpleAsyncTaskSchedulerCustomizer(
       GithubService githubService,
       FailureReportRepository failureReportRepository,
       TestabilitySettings testabilitySettings) {

@@ -2,7 +2,6 @@ package com.odde.donut.configs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -16,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler;
 
 @ExtendWith(MockitoExtension.class)
 class SchedulingConfigTest {
@@ -25,14 +24,14 @@ class SchedulingConfigTest {
   @Mock FailureReportRepository failureReportRepository;
 
   @Test
-  void keepsPoolSizeThreeAndRecordsUncaughtFailureWithScheduledJobSource() {
-    ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-    scheduler.setPoolSize(3);
+  void recordsUncaughtFailureOfAVirtualThreadScheduledJobWithScheduledJobSource() {
+    SimpleAsyncTaskScheduler scheduler = new SimpleAsyncTaskScheduler();
+    scheduler.setVirtualThreads(true);
     new SchedulingConfig()
-        .threadPoolTaskSchedulerCustomizer(
+        .simpleAsyncTaskSchedulerCustomizer(
             githubService, failureReportRepository, new TestabilitySettings())
         .customize(scheduler);
-    scheduler.initialize();
+    scheduler.start();
     try {
       scheduler.schedule(
           () -> {
@@ -40,12 +39,11 @@ class SchedulingConfigTest {
           },
           Instant.now());
 
-      assertThat(scheduler.getScheduledThreadPoolExecutor().getCorePoolSize(), is(3));
       ArgumentCaptor<FailureReport> reportCaptor = ArgumentCaptor.forClass(FailureReport.class);
       verify(failureReportRepository, timeout(5000).atLeastOnce()).save(reportCaptor.capture());
       assertThat(reportCaptor.getValue().getErrorDetail(), containsString("scheduled-job"));
     } finally {
-      scheduler.shutdown();
+      scheduler.close();
     }
   }
 }

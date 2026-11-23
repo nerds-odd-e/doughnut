@@ -4,6 +4,9 @@ spring:
     active: "test"
   config:
     import: db-test.properties
+  threads:
+    virtual:
+      enabled: true
   logging:
     level:
       root: OFF

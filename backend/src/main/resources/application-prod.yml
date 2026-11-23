@@ -1,9 +1,5 @@
 ---
 spring:
-  task:
-    scheduling:
-      pool:
-        size: 3
   logging:
     level:
       root: INFO
