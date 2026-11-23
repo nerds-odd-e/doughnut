@@ -1,29 +1,26 @@
 package com.odde.donut.entities.converters;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.DailyProbeTrialDTO;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.util.List;
-import lombok.SneakyThrows;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 @Converter
 public class DailyProbeTrialsConverter
     implements AttributeConverter<List<DailyProbeTrialDTO>, String> {
 
-  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+  private final JsonMapper jsonMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   @Override
-  @SneakyThrows
   public String convertToDatabaseColumn(List<DailyProbeTrialDTO> trials) {
-    return objectMapper.writeValueAsString(trials);
+    return jsonMapper.writeValueAsString(trials);
   }
 
   @Override
-  @SneakyThrows
   public List<DailyProbeTrialDTO> convertToEntityAttribute(String json) {
-    return objectMapper.readValue(json, new TypeReference<>() {});
+    return jsonMapper.readValue(json, new TypeReference<>() {});
   }
 }
