@@ -33,3 +33,67 @@
 - **Unique protection:** real clone, pull, rebase and publish subprocess protocol behavior between the installed CLI, Git and the backend.
 - **Alternatives tried:** earlier passes halved CLI E2E time and retired duplicate single-commit and single-file-rebase journeys. This pass found no fixed waits in these scenarios.
 - **Decision or evidence needed:** per-step timings (CI keeps only per-feature Cucumber fragments) to separate the per-scenario CLI install, seeding, Git binding snapshot, and each CLI subprocess before choosing an experiment.
+
+### frontend-full-suite-browser-flakes
+
+- **Affected test or fixture:** `frontend/tests/notes/sidebar/SidebarRowReveal.spec.ts` (`shows the whole opened note row with nothing drawn over it`, `scrolls a row cut off at the bottom just enough to show all of it`: `expected false to be true`); Vitest browser worker connection for `frontend/tests/store/noteStore.spec.ts`, `frontend/tests/notes/NoteNewButton.spec.ts` and `frontend/tests/components/recall/ViewMemoryTrackerLink.spec.ts` (`Failed to run the test … Cannot connect to the server in 60 seconds`).
+- **Observed cost and conditions:** `pnpm frontend:test` (chromium headless), macOS local. 2026-11-22 at `d133deca2a` + Boot 4.2 working changes, concurrent with the backend Gradle suite: NoteNewButton connect timeout, 2576/2576 tests passed, run exit 1. 2026-11-23 at `e4a2531229`, `pnpm frontend:verify` alone: SidebarRowReveal 2 failures + noteStore connect timeout (2568/2570, ~306s); both files then passed in isolation (15/15) and an immediate full rerun passed 2580/2580. 2026-11-23 at `92aa3d067f` + virtual-threads working changes, run right after the backend suite and an E2E feature: ViewMemoryTrackerLink connect timeout, 2578/2578 tests passed, run exit 1; the file passed alone. The changes under test were backend-only (no frontend, generated client or OpenAPI diff), so these are suite-load flakes. A failed run also skips the chained `frontend:build`.
+- **Unique protection:** SidebarRowReveal: real-browser geometry of the opened sidebar row (unobscured, minimally scrolled into view). The connect-timeout files: their own spec content; the failure is runner infrastructure.
+- **Alternatives tried:** none.
+- **Decision or evidence needed:** repeated full-suite runs to measure failure rate; for SidebarRowReveal, whether its geometry assertions wait for layout/scroll to settle (vs reading once); for connect timeouts, Vitest browser worker count and connect timeout under full-suite load.
+
+## Spring Boot 4.2 idiom follow-ups (copy of plan 116 Tasks 6–9)
+
+Source of truth and status: [plan 116](slice-plans/116-spring-boot-4-2-idioms/PLAN.md). Update both when a task changes.
+### Task 6 — Remaining compiler deprecations (medium)
+
+**Status:** Not started. Find with the `-Xlint:deprecation,removal` init script (Task 5).
+
+- MCP SDK (`backend/src/main/java/com/odde/donut/mcp/`): `Tool.builder()` in 6 tools
+  (`GetNoteGraphTool`, `ListNoteCandidatesTool`, `ListRecallAnswersTool`, `ReadNoteTool`,
+  `RecordLearningSessionTool`, `RequestLearningSessionTool`) and `new TextContent(String)` in 5
+  places (`GetNoteGraphTool`, `ListNoteCandidatesTool`, `McpJsonToolResult`, `McpNoteLookup`,
+  `RequestLearningSessionTool`) → SDK's newer builder/factory methods (check SDK 2.2.0 javadoc).
+- Hibernate `Interceptor.onSave`/`onDelete` in `services/notebookGit/ProjectionChangeCapture.java`
+  → `onPersist`/`onRemove`.
+- JGit `RefDatabase.getRefs(String)` in `services/notebookGit/objectstore/JdbcNotebookRefDatabase.java`
+  → `getRefsByPrefix`.
+- Tests: `HttpStatus.PAYLOAD_TOO_LARGE` → `CONTENT_TOO_LARGE` (`ControllerSetupMultipartExceptionTest`);
+  `JsonNode.asText()` → `asString()` (Jackson 3) or `textValue()` (`MemoryTrackerQuestionPersistenceControllerTest`);
+  log `Level.ALL` (`AiControllerNoteRefinementTest`); `FileObject.Status` (`testability/OpenAiBatchApiMock`).
+
+TDD: existing tests cover each call site (MCP endpoint tests, notebook Git tests); per group:
+confirm the covering test, swap the API, run it, then the full suite. Proof of done: lint build shows no
+deprecation warnings for these files.
+
+### Task 7 — HTTP service clients instead of raw `java.net.http.HttpClient` (medium)
+
+**Status:** Not started.
+
+`services/RealGithubService.java` and `services/httpQuery/HttpClientAdapter.java` build requests by
+hand. Boot 4 auto-configures `@HttpExchange` interfaces (base URL, timeouts via properties) that are
+easier to stub. Tests mock `HttpClientAdapter` and `GithubService` (`SpringTestBase` `@MockitoBean`),
+so keep those seams; Red = a test at the adapter boundary for the request each makes today.
+
+### Task 8 — build.gradle cleanup (low)
+
+**Status:** Not started.
+
+- Delete the dead `buildscript { repositories }` block (plugins resolve via `plugins {}`).
+- Drop `gradlePluginPortal()` from project `repositories`.
+- Optional: `apply plugin: 'io.spring.dependency-management'` →
+  `implementation platform(SpringBootPlugin.BOM_COORDINATES)` (Gradle native; both supported).
+  Check resolved versions unchanged (`dependencyInsight` for BOM-managed artifacts) before/after.
+
+Proof: build + full suite green; no resolved-version change.
+
+### Task 9 — Smaller code idioms (low)
+
+**Status:** Not started. Each bullet is its own commit.
+
+- 6 `@Value` uses → `@ConfigurationProperties` records.
+- `JdbcTemplate` (3 main files) → `JdbcClient`.
+- `System.out`/`printStackTrace` in `configs/DonutTaskRunner.java` → a logger.
+- `hibernate.enable_lazy_load_no_trans: true` (in `application.yml`, 3 profiles) is a Hibernate
+  anti-pattern (new connection per lazy load, hides N+1). Not 4.2-specific; needs its own plan —
+  turning it off surfaces `LazyInitializationException` wherever lazy loads happen outside a transaction.
