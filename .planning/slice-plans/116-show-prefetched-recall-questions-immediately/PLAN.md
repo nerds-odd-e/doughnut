@@ -29,8 +29,7 @@ still-applicable guidance moves into existing documentation.
 - Documentation destinations for the deleted page's surviving guidance:
   - "Question ownership and lifetime" (ownership, fingerprint reuse, edits
     after presentation) → a new "Question ownership and reuse" section in
-    `docs/question-generation-batch-operations.md`, whose introduction
-    already states the reuse rule.
+    `docs/recall-results.md`, beside the question loading section.
   - "Shared due list order" → a new "Due list order" section in
     `docs/recall-backlog-spreading.md`, beside the ADR 0003 scheduling
     policy it already cites.
@@ -119,6 +118,9 @@ Product advice: no change. The web card now shows the prefetched prompt with
 no display-time request, matching the story; no queued story's priority or
 assumption is affected. Process review is deferred into wrap-up with the
 intent coverage check, because this execution rewrote existing recall tests.
+The trunk amendment at `0e54051423` moved "Question ownership and reuse" to
+`docs/recall-results.md` and removed
+`docs/question-generation-batch-operations.md`; the branch carries both.
 
 ## Plan review
 
