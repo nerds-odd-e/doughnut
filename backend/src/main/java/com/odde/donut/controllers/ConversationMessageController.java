@@ -1,7 +1,7 @@
 package com.odde.donut.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.controllers.dto.ConversationCorrectionAcceptance;
 import com.odde.donut.controllers.dto.ConversationCorrectionReview;
 import com.odde.donut.controllers.dto.ConversationListItem;
@@ -18,6 +18,7 @@ import com.odde.donut.services.ConversationCorrectionAcceptanceService;
 import com.odde.donut.services.ConversationCorrectionReviewService;
 import com.odde.donut.services.ConversationService;
 import com.odde.donut.services.ai.NoteConversationAiReplyService;
+import com.openai.core.ObjectMappers;
 import com.openai.models.responses.ResponseCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -34,7 +35,9 @@ public class ConversationMessageController {
   private final ConversationService conversationService;
   private final NoteConversationAiReplyService noteConversationAiReplyService;
   private final AuthorizationService authorizationService;
-  private final ObjectMapper objectMapper;
+  // SDK request bodies carry the SDK's Jackson 2 serializers; only its own mapper writes them
+  // faithfully.
+  private static final JsonMapper sdkJson = ObjectMappers.jsonMapper();
   private final ConversationCorrectionAcceptanceService correctionAcceptanceService;
   private final ConversationCorrectionReviewService correctionReviewService;
 
@@ -42,13 +45,11 @@ public class ConversationMessageController {
       ConversationService conversationService,
       NoteConversationAiReplyService noteConversationAiReplyService,
       AuthorizationService authorizationService,
-      ObjectMapper objectMapper,
       ConversationCorrectionAcceptanceService correctionAcceptanceService,
       ConversationCorrectionReviewService correctionReviewService) {
     this.conversationService = conversationService;
     this.noteConversationAiReplyService = noteConversationAiReplyService;
     this.authorizationService = authorizationService;
-    this.objectMapper = objectMapper;
     this.correctionAcceptanceService = correctionAcceptanceService;
     this.correctionReviewService = correctionReviewService;
   }
@@ -167,32 +168,12 @@ public class ConversationMessageController {
   private Map<String, Object> serializeResponseCreateParams(ResponseCreateParams params) {
     try {
       ResponseCreateParams.Body body = params._body();
-      String jsonString = objectMapper.writeValueAsString(body);
+      String jsonString = sdkJson.writeValueAsString(body);
       Map<String, Object> result =
-          objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
-      removeValidFields(result);
+          sdkJson.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
       return result;
     } catch (Exception e) {
       throw new RuntimeException("Failed to serialize ResponseCreateParams", e);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private void removeValidFields(Object obj) {
-    if (obj == null) {
-      return;
-    }
-    if (obj instanceof Map) {
-      Map<String, Object> map = (Map<String, Object>) obj;
-      map.remove("valid");
-      for (Object value : map.values()) {
-        removeValidFields(value);
-      }
-    } else if (obj instanceof List) {
-      List<?> list = (List<?>) obj;
-      for (Object item : list) {
-        removeValidFields(item);
-      }
     }
   }
 

@@ -1,8 +1,6 @@
 package com.odde.donut.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.SpellingQuestion;
 import jakarta.persistence.*;
@@ -13,6 +11,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 @Entity
 @Table(name = "recall_prompt")
@@ -62,7 +62,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     if (getMcq() == null) {
       return "{}";
     }
-    ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
+    JsonMapper mapper = ObjectMapperConfig.handWrittenJsonMapper();
     ObjectNode questionDetails = mapper.createObjectNode();
     questionDetails.set(
         "originalQuestionDefinition", mapper.convertValue(getMcq(), ObjectNode.class));

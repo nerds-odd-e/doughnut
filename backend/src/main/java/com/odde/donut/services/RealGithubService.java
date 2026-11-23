@@ -1,6 +1,5 @@
 package com.odde.donut.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.FailureReport;
 import java.io.IOException;
@@ -16,6 +15,7 @@ import java.util.function.Function;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.type.TypeReference;
 
 @Service
 public class RealGithubService implements GithubService {
@@ -37,7 +37,7 @@ public class RealGithubService implements GithubService {
   public Integer createGithubIssue(FailureReport failureReport)
       throws IOException, InterruptedException {
     FailureReport.GithubIssue githubIssue = failureReport.getGithubIssue();
-    final String body = new ObjectMapperConfig().objectMapper().writeValueAsString(githubIssue);
+    final String body = ObjectMapperConfig.handWrittenJsonMapper().writeValueAsString(githubIssue);
     Map<String, Object> map =
         apiRequestWithMapAsResult("issues", builder -> builder.POST(BodyPublishers.ofString(body)));
 
@@ -47,7 +47,8 @@ public class RealGithubService implements GithubService {
   @Override
   public void commentOnGithubIssue(Integer issueNumber, String body)
       throws IOException, InterruptedException {
-    String json = new ObjectMapperConfig().objectMapper().writeValueAsString(Map.of("body", body));
+    String json =
+        ObjectMapperConfig.handWrittenJsonMapper().writeValueAsString(Map.of("body", body));
     apiRequest(
         "issues/" + issueNumber + "/comments",
         builder -> builder.POST(BodyPublishers.ofString(json)));
@@ -87,8 +88,7 @@ public class RealGithubService implements GithubService {
       String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback)
       throws IOException, InterruptedException {
     HttpResponse<String> response = apiRequest(action, callback);
-    return new ObjectMapperConfig()
-        .objectMapper()
+    return ObjectMapperConfig.handWrittenJsonMapper()
         .readValue(response.body(), new TypeReference<>() {});
   }
 
@@ -96,8 +96,7 @@ public class RealGithubService implements GithubService {
       String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback)
       throws IOException, InterruptedException {
     HttpResponse<String> response = apiRequest(action, callback);
-    return new ObjectMapperConfig()
-        .objectMapper()
+    return ObjectMapperConfig.handWrittenJsonMapper()
         .readValue(response.body(), new TypeReference<>() {});
   }
 

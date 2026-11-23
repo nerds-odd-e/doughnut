@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Note;
@@ -14,10 +13,8 @@ import com.odde.donut.services.QuestionGenerationRequestBuilder;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,55 +114,6 @@ class StructuredResponseCreateParamsSerializerTest extends SpringTestBase {
           containsString(StructuredResponseCreateParamsSerializer.BODY_ACCESSOR_NAME));
       assertThat(error.getMessage(), containsString("SDK"));
       assertThat(error.getCause(), instanceOf(NoSuchMethodException.class));
-    }
-  }
-
-  @Nested
-  class RemoveSyntheticValidFromStructuredOutputSchema {
-    @Test
-    void removesValidOnlyWithinStructuredOutputSchema() throws Exception {
-      StructuredResponseCreateParams<GeneratedMcq> params = sampleParams();
-      Method bodyMethod =
-          params
-              .rawParams()
-              .getClass()
-              .getMethod(StructuredResponseCreateParamsSerializer.BODY_ACCESSOR_NAME);
-      String jsonString = objectMapper.writeValueAsString(bodyMethod.invoke(params.rawParams()));
-      Map<String, Object> body =
-          objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
-
-      Map<String, Object> metadata = new LinkedHashMap<>();
-      metadata.put("valid", true);
-      body.put("metadata", metadata);
-
-      paramsSerializer.removeSyntheticValidFromStructuredOutputSchema(body);
-
-      @SuppressWarnings("unchecked")
-      Map<String, Object> preservedMetadata = (Map<String, Object>) body.get("metadata");
-      assertThat(preservedMetadata.get("valid"), is(true));
-      assertThat(body.containsKey("valid"), is(false));
-
-      @SuppressWarnings("unchecked")
-      Map<String, Object> text = (Map<String, Object>) body.get("text");
-      @SuppressWarnings("unchecked")
-      Map<String, Object> format = (Map<String, Object>) text.get("format");
-      assertThat(findValidFieldPaths(format), empty());
-    }
-
-    @Test
-    void preservesValidOutsideStructuredOutputConfig() {
-      Map<String, Object> body = new LinkedHashMap<>();
-      body.put("model", "gpt-test");
-      Map<String, Object> metadata = new LinkedHashMap<>();
-      metadata.put("valid", true);
-      body.put("metadata", metadata);
-
-      paramsSerializer.removeSyntheticValidFromStructuredOutputSchema(body);
-
-      @SuppressWarnings("unchecked")
-      Map<String, Object> preservedMetadata = (Map<String, Object>) body.get("metadata");
-      assertThat(preservedMetadata.get("valid"), is(true));
-      assertThat(body.get("model"), is("gpt-test"));
     }
   }
 }

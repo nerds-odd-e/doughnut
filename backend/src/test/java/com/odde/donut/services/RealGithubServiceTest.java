@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.odde.donut.entities.FailureReport;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -67,6 +68,26 @@ class RealGithubServiceTest {
           }
         });
     return bodySubscriber.getBody().toCompletableFuture().join();
+  }
+
+  @Test
+  void createGithubIssuePostsTitleAndBodyAndReturnsTheIssueNumber()
+      throws IOException, InterruptedException {
+    HttpResponse<String> response = mockResponse(201, "{\"number\":7,\"title\":\"Boom\"}");
+    when(httpClient.<String>send(any(), any())).thenReturn(response);
+    FailureReport report = new FailureReport();
+    report.setErrorName("Boom");
+
+    Integer number = service.createGithubIssue(report);
+
+    ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+    verify(httpClient).send(requestCaptor.capture(), any());
+    assertThat(number, equalTo(7));
+    assertThat(
+        bodyAsString(requestCaptor.getValue()),
+        equalTo(
+            "{\"title\":\"Boom\",\"body\":\"Find the detail at:"
+                + " https://doughnut.odd-e.com/failure-report-list/show/null\"}"));
   }
 
   @Test

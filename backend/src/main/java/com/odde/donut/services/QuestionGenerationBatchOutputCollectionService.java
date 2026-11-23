@@ -1,8 +1,5 @@
 package com.odde.donut.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.QuestionGenerationBatch;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
@@ -20,6 +17,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class QuestionGenerationBatchOutputCollectionService {
@@ -30,7 +29,7 @@ public class QuestionGenerationBatchOutputCollectionService {
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final OpenAiApiHandler openAiApiHandler;
   private final QuestionGenerationBatchMetrics batchMetrics;
-  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+  private static final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   public QuestionGenerationBatchOutputCollectionService(
       QuestionGenerationBatchRepository batchRepository,
@@ -168,11 +167,11 @@ public class QuestionGenerationBatchOutputCollectionService {
     try {
       JsonNode root = objectMapper.readTree(line);
       JsonNode customIdNode = root.get("custom_id");
-      if (customIdNode == null || customIdNode.isNull() || customIdNode.asText().isBlank()) {
+      if (customIdNode == null || customIdNode.isNull() || customIdNode.asString().isBlank()) {
         logger.warn("Ignoring OpenAI batch output line with missing custom_id");
         return Optional.empty();
       }
-      String customId = customIdNode.asText();
+      String customId = customIdNode.asString();
       JsonNode errorNode = root.get("error");
       if (errorNode != null && !errorNode.isNull()) {
         return Optional.of(new OutputLine(customId, false, line, summarizeErrorNode(errorNode)));
@@ -189,7 +188,7 @@ public class QuestionGenerationBatchOutputCollectionService {
                 customId, false, line, "batch output response status_code " + statusCode));
       }
       return Optional.of(new OutputLine(customId, true, line, null));
-    } catch (JsonProcessingException | RuntimeException e) {
+    } catch (RuntimeException e) {
       logger.warn("Ignoring malformed OpenAI batch output line", e);
       return Optional.empty();
     }
@@ -199,14 +198,14 @@ public class QuestionGenerationBatchOutputCollectionService {
     try {
       JsonNode root = objectMapper.readTree(line);
       JsonNode customIdNode = root.get("custom_id");
-      if (customIdNode == null || customIdNode.isNull() || customIdNode.asText().isBlank()) {
+      if (customIdNode == null || customIdNode.isNull() || customIdNode.asString().isBlank()) {
         logger.warn("Ignoring OpenAI batch error line with missing custom_id");
         return Optional.empty();
       }
-      String customId = customIdNode.asText();
+      String customId = customIdNode.asString();
       JsonNode errorNode = root.get("error");
       return Optional.of(new ErrorLine(customId, line, summarizeErrorNode(errorNode)));
-    } catch (JsonProcessingException | RuntimeException e) {
+    } catch (RuntimeException e) {
       logger.warn("Ignoring malformed OpenAI batch error line", e);
       return Optional.empty();
     }
@@ -217,8 +216,8 @@ public class QuestionGenerationBatchOutputCollectionService {
       return "batch error line without error object";
     }
     JsonNode messageNode = errorNode.get("message");
-    if (messageNode != null && !messageNode.isNull() && !messageNode.asText().isBlank()) {
-      return messageNode.asText();
+    if (messageNode != null && !messageNode.isNull() && !messageNode.asString().isBlank()) {
+      return messageNode.asString();
     }
     return errorNode.toString();
   }
