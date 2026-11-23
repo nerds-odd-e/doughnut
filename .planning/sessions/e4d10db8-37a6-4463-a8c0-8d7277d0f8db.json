@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "sessionId": "e4d10db8-37a6-4463-a8c0-8d7277d0f8db",
+  "workflow": "dough-story-refinement",
+  "closedAt": "2026-11-23T03:35:57.922Z",
+  "story": "SEED-073#show-prefetched-recall-questions-immediately",
+  "ranges": [
+    {
+      "base": "23dc504c9c621e86ed8977faba2c99228f0d2f3f",
+      "candidate": "81fa543f60b4b2081811e0a9434461416bec7352"
+    }
+  ]
+}
