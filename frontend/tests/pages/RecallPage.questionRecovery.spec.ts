@@ -6,6 +6,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
+import { recallPromptRequestsFor } from "@tests/helpers/recallDataTestSupport"
 import {
   createMemoryTrackerLite,
   deferredRecallPromptResponse,
@@ -98,16 +99,19 @@ describe("RecallPage question recovery", () => {
 
     getPrompt.mockResolvedValue(wrapSdkResponse(prompt(3)))
     await moveCurrentRecallToEnd(wrapper)
-    return wrapper
+    return { wrapper, getPrompt }
   }
 
-  it("selects the current question when returning after an offscreen retry succeeded", async () => {
-    const wrapper = await returnAfterOffscreenRetry(wrapSdkResponse(prompt(1)))
-    expect(wrapper.text()).toContain("Question 3")
+  it("shows the retried question when returning after an offscreen retry succeeded", async () => {
+    const { wrapper, getPrompt } = await returnAfterOffscreenRetry(
+      wrapSdkResponse(prompt(1))
+    )
+    expect(wrapper.text()).toContain("Question 1")
+    expect(recallPromptRequestsFor(getPrompt, 1)).toHaveLength(2)
   })
 
   it("offers deliberate retry when returning after an offscreen retry failed", async () => {
-    const wrapper = await returnAfterOffscreenRetry(
+    const { wrapper } = await returnAfterOffscreenRetry(
       wrapSdkError("retry failed")
     )
     expect(retry(wrapper).text()).toBe("Retry")

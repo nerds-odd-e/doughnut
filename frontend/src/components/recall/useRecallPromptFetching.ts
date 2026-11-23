@@ -8,7 +8,6 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 type RecallPromptLoad =
   | { status: "loading"; requestId: number }
-  | { status: "prepared" }
   | { status: "failed" }
   | { status: "loaded"; recallPrompt: RecallPrompt }
 
@@ -40,20 +39,9 @@ export function useRecallPromptFetching(props: {
       : request())
     const current = recallPromptLoads.value[memoryTrackerId]
     if (current?.status !== "loading" || current.requestId !== requestId) return
-    if (error) {
-      recallPromptLoads.value[memoryTrackerId] = { status: "failed" }
-    } else if (
-      tracker.spelling ||
-      (foreground &&
-        currentMemoryTracker.value?.memoryTrackerId === memoryTrackerId)
-    ) {
-      recallPromptLoads.value[memoryTrackerId] = {
-        status: "loaded",
-        recallPrompt: recallPrompt!,
-      }
-    } else {
-      recallPromptLoads.value[memoryTrackerId] = { status: "prepared" }
-    }
+    recallPromptLoads.value[memoryTrackerId] = error
+      ? { status: "failed" }
+      : { status: "loaded", recallPrompt: recallPrompt! }
   }
 
   const fetchRecallPrompts = async () => {
@@ -62,14 +50,8 @@ export function useRecallPromptFetching(props: {
       props.currentIndex + props.eagerFetchCount
     )
     for (const [offset, tracker] of trackers.entries()) {
-      const foreground = offset === 0
-      const previous = recallPromptLoads.value[tracker.memoryTrackerId]
-      const needsSelection =
-        foreground &&
-        !tracker.spelling &&
-        (previous?.status === "loading" || previous?.status === "prepared")
-      if (!previous || needsSelection)
-        await loadRecallPrompt(tracker, foreground)
+      if (!recallPromptLoads.value[tracker.memoryTrackerId])
+        await loadRecallPrompt(tracker, offset === 0)
     }
   }
 

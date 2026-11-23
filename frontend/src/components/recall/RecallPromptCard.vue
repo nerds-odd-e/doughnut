@@ -5,7 +5,7 @@
       class="daisy-alert daisy-alert-warning mb-2 shrink-0"
       data-testid="spelling-overlap-feedback"
     >{{ spellingOverlapFeedback }}</div>
-    <ContentLoader v-if="!currentRecallPromptLoad || currentRecallPromptLoad.status === 'loading' || currentRecallPromptLoad.status === 'prepared'" />
+    <ContentLoader v-if="!currentRecallPromptLoad || currentRecallPromptLoad.status === 'loading'" />
     <div v-else class="pt-5 flex-1 min-h-0">
       <JustReview
         v-if="selfReviewTrackerIds.has(currentMemoryTrackerId!)"
