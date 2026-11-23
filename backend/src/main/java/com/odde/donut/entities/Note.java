@@ -13,6 +13,7 @@ import com.odde.donut.algorithms.NoteTitle;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.NoteTopology;
 import com.odde.donut.entities.converters.DisplayNameConverter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +23,7 @@ import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -195,6 +196,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     return FrontmatterAliases.matchesFromNoteContent(getContent(), spellingAnswer);
   }
 
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull
   public NoteTopology getNoteTopology() {
     NoteTopology noteTopology = new NoteTopology();

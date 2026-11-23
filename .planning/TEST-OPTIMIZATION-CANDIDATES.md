@@ -42,12 +42,12 @@
 - **Alternatives tried:** none.
 - **Decision or evidence needed:** repeated full-suite runs to measure failure rate; for SidebarRowReveal, whether its geometry assertions wait for layout/scroll to settle (vs reading once); for connect timeouts, Vitest browser worker count and connect timeout under full-suite load.
 
-## Spring Boot 4.2 idiom follow-ups (copy of plan 117 Tasks 6–9)
+## Spring Boot 4.2 idiom follow-ups
 
-Source of truth and status: [plan 117](slice-plans/117-spring-boot-4-2-idioms/PLAN.md). Update both when a task changes.
 ### Task 6 — Remaining compiler deprecations (medium)
 
-**Status:** Not started. Find with the `-Xlint:deprecation,removal` init script (Task 5).
+**Status:** Not started. Find with a Gradle init script adding
+`tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xlint:deprecation,removal'] }`.
 
 - MCP SDK (`backend/src/main/java/com/odde/donut/mcp/`): `Tool.builder()` in 6 tools
   (`GetNoteGraphTool`, `ListNoteCandidatesTool`, `ListRecallAnswersTool`, `ReadNoteTool`,

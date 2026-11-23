@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 @Entity
 @Table(name = "notebook")
@@ -44,7 +44,11 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private final List<Note> notes = new ArrayList<>();
 
-  @Embedded @Getter @NonNull private NotebookSettings notebookSettings = new NotebookSettings();
+  @Embedded
+  @Getter
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NonNull
+  private NotebookSettings notebookSettings = new NotebookSettings();
 
   @Column(name = "deleted_at")
   @Setter
@@ -58,12 +62,14 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Column(name = "updated_at")
   @Getter
   @Setter
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull
   private Timestamp updatedAt;
 
   @Column(name = "created_at", nullable = false)
   @Getter
   @Setter
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull
   private Timestamp createdAt;
 

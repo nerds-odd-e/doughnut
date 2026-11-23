@@ -1,15 +1,18 @@
 package com.odde.donut.controllers.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 @NoArgsConstructor
 @Data
 public class NoteTopology {
-  @NonNull private Integer id;
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NonNull
+  private Integer id;
 
   @NotBlank private String title;
 
