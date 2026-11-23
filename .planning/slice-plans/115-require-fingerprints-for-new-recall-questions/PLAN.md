@@ -18,7 +18,9 @@
 - Codex coordinator `codex-70d44cf2-3262-4d53-b493-6416c327978c`, cell
   `g289:7`, session `66175`, PID `36512`, and observer directory
   `/tmp/dough-ci-501/watch-9X5ndC`. The selected GitHub Actions workflow
-  is `ci.yml` for `nerds-odd-e/doughnut`.
+  is `ci.yml` for `nerds-odd-e/doughnut`. The first observer stopped at the
+  approval checkpoint. The resumed story-branch observer is cell `g323:26`,
+  session `70579`, PID `56737`, directory `/tmp/dough-ci-501/watch-sKqSUJ`.
 
 ## Goal and scope
 
@@ -208,7 +210,7 @@ The worktree's Git evidence directory retains `slice3-return.md`,
 ### 4. Apply the production cutover
 
 Type: Behavior
-Status: planned
+Status: done
 
 **Human checkpoint.** Before any production change, obtain authorization for
 the release identity and destructive operation. In Story Branch Mode that
@@ -220,6 +222,42 @@ on production to verify the target and capture the eligible prompt count.
 Use the reviewed operator command for the authorized set. **Proof.** Record
 the release and build SHAs, aggregate affected counts, the final zero-row
 preview and preserved sampled history. Retain the receipt for slice 5.
+
+**Deployment receipt.** On 2026-11-23, following approval, Dough Land
+integrated story tip `f2ade45609c6798360a0d60eb6178f6f5079d508` at
+`a999b7975f4dc3eaff34456bd18f041fbcec1fd1` on `origin/main` and retained
+the worktree. The dashboard recorded the accepted integration. Main CI run
+[45103906894](https://github.com/nerds-odd-e/doughnut/actions/runs/45103906894),
+attempt 1, passed and supplied both release artifacts.
+
+The immutable tag `v1.3.82` selected that same release and backend build
+SHA. Application Release run
+[45104685033](https://github.com/nerds-odd-e/doughnut/actions/runs/45104685033),
+attempt 1, passed admission and the
+[GCP publication job](https://github.com/nerds-odd-e/doughnut/actions/runs/45104685033/job/137463296123).
+The production health endpoint returned `prod` with the full build SHA.
+The live SPA entry script matched the CI artifact, and the CLI download
+returned HTTP 200. The unauthenticated sign-in entry returned HTTP 303 to
+the GitHub OAuth authorization endpoint.
+
+**Production data receipt.** On 2026-11-23, health again identified
+`a999b7975f4dc3eaff34456bd18f041fbcec1fd1` as the serving production build
+before the purge. The reviewed operator previewed 8,335 eligible prompts
+on Cloud SQL instance `doughnut-db`, database `doughnut`. A separate
+read-only query matched the exact preview confirmation and counted 8,334
+questions that would have no prompt afterward and one that had an answered
+prompt sharing it. Apply confirmed the same set and deleted 8,335 prompts
+and 8,334 questions. The repeat read-only preview returned zero eligible
+prompts on the same server and database.
+
+After apply, persisted data matched the pre-apply sample for the one shared
+answered prompt and 12 legacy answered prompts, including wording, choices,
+answer key, learner answer and recorded grades. The audit also preserved
+12 contested prompts and contests, 12 fingerprinted waiting prompts,
+12 waiting non-MCQ prompts and 20 affected trackers' due times. The
+worktree's Git evidence directory retains the operator receipts
+`slice4-production-{preview,apply,final}.json` and read-only snapshots
+`slice4-production-audit-{before,after}.json`.
 
 ### 5. Retire temporary migration and legacy waiting support
 
