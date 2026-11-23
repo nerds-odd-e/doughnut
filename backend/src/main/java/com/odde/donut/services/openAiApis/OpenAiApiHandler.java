@@ -1,8 +1,5 @@
 package com.odde.donut.services.openAiApis;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.OpenAiUnauthorizedException;
@@ -29,11 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class OpenAiApiHandler {
   private final OpenAIClient officialClient;
-  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+  private static final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   private final TestabilitySettings testabilitySettings;
   private final String defaultOpenAiToken;
 
@@ -199,14 +199,14 @@ public class OpenAiApiHandler {
         return Optional.empty();
       }
       for (JsonNode outputItem : bodyNode.path("output")) {
-        if (!"message".equals(outputItem.path("type").asText())) {
+        if (!"message".equals(outputItem.path("type").asString())) {
           continue;
         }
         for (JsonNode content : outputItem.path("content")) {
-          if (!"output_text".equals(content.path("type").asText())) {
+          if (!"output_text".equals(content.path("type").asString())) {
             continue;
           }
-          String text = content.path("text").asText(null);
+          String text = content.path("text").asString(null);
           if (text == null || text.isBlank()) {
             continue;
           }
@@ -215,7 +215,7 @@ public class OpenAiApiHandler {
         }
       }
       return Optional.empty();
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       return Optional.empty();
     }
   }

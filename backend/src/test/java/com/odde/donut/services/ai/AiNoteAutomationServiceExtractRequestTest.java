@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.GlobalSettingsService;
@@ -70,8 +69,7 @@ class AiNoteAutomationServiceExtractRequestTest {
             focusContextRetrievalService,
             focusContextMarkdownRenderer,
             note);
-    paramsSerializer =
-        new StructuredResponseCreateParamsSerializer(new ObjectMapperConfig().objectMapper());
+    paramsSerializer = new StructuredResponseCreateParamsSerializer();
   }
 
   @Test

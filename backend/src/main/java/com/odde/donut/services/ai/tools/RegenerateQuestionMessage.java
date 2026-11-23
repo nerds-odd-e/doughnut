@@ -1,6 +1,5 @@
 package com.odde.donut.services.ai.tools;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.Mcq;
@@ -12,16 +11,10 @@ final class RegenerateQuestionMessage {
   private RegenerateQuestionMessage() {}
 
   static String build(QuestionContestResult contestResult, Mcq mcq) {
-    String mcqJson;
-    try {
-      mcqJson =
-          new ObjectMapperConfig()
-              .objectMapper()
-              .writerWithDefaultPrettyPrinter()
-              .writeValueAsString(generatedMcqView(mcq));
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+    String mcqJson =
+        ObjectMapperConfig.handWrittenJsonMapper()
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(generatedMcqView(mcq));
     return """
     Previously generated question, contested by the learner:
 

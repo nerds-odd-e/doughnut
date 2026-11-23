@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.*;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
@@ -66,7 +65,7 @@ public class AiController {
   public NoteRefinementLayout generateRefinementSuggestions(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody(required = false) NoteRefinementQuestionContextDTO questionContext)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
+      throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     String content = note.getContent();
     if (content == null || content.trim().isEmpty()) {
@@ -92,7 +91,7 @@ public class AiController {
   public RefinedContentResponseDTO removeRefinementSuggestion(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
+      throws UnexpectedNoAccessRightException {
 
     authorizationService.assertAuthorization(note);
 
@@ -117,7 +116,7 @@ public class AiController {
   public NoteExtractionResult extractNotePreview(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
+      throws UnexpectedNoAccessRightException {
     return extractNoteFromLayoutSelection(note, request);
   }
 
@@ -176,7 +175,7 @@ public class AiController {
 
   private NoteExtractionResult extractNoteFromLayoutSelection(
       Note note, NoteRefinementLayoutSelectionRequestDTO request)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
+      throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     assertNoteContentNotEmpty(note);
     NoteRefinementLayout layout =

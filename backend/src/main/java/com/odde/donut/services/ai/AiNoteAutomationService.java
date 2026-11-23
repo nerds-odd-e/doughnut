@@ -1,6 +1,5 @@
 package com.odde.donut.services.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.algorithms.NoteContentTitleHeading;
 import com.odde.donut.algorithms.WikiLinkMarkdownDocumentRewrite;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
@@ -55,7 +54,7 @@ public class AiNoteAutomationService {
   }
 
   public NoteRefinementLayout generateRefinementSuggestions(
-      NoteRefinementQuestionContextDTO questionContext) throws JsonProcessingException {
+      NoteRefinementQuestionContextDTO questionContext) {
     StructuredResponseReading<NoteRefinementLayout> reading =
         openAiApiHandler.readStructuredResponse(buildRefinementLayoutRequest(questionContext));
     if (isOutputTokenLimit(reading)) {
@@ -81,8 +80,8 @@ public class AiNoteAutomationService {
         NoteExtractionResult.class, tool, EXTRACT_NOTE_MAX_OUTPUT_TOKENS);
   }
 
-  public NoteExtractionResult extractNote(NoteRefinementLayout layout, List<String> selectedItemIds)
-      throws JsonProcessingException {
+  public NoteExtractionResult extractNote(
+      NoteRefinementLayout layout, List<String> selectedItemIds) {
     NoteExtractionResult result =
         executeWithParams(buildExtractNoteRequest(layout, selectedItemIds), r -> r, null);
     return sanitizeExtractionResult(result);
@@ -130,7 +129,7 @@ public class AiNoteAutomationService {
   }
 
   public String removeSelectedLayoutPointsAndRegenerateContent(
-      NoteRefinementLayout layout, List<String> selectedItemIds) throws JsonProcessingException {
+      NoteRefinementLayout layout, List<String> selectedItemIds) {
     if (selectedItemIds == null || selectedItemIds.isEmpty()) {
       return note.getContent();
     }

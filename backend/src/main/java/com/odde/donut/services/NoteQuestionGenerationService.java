@@ -1,6 +1,5 @@
 package com.odde.donut.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Mcq;
@@ -28,19 +27,16 @@ public class NoteQuestionGenerationService {
     this.requestBuilder = requestBuilder;
   }
 
-  public GeneratedMcq generateQuestion(Note note, String additionalMessage)
-      throws JsonProcessingException {
+  public GeneratedMcq generateQuestion(Note note, String additionalMessage) {
     return generateQuestion(note, additionalMessage, null, null);
   }
 
-  public GeneratedMcq generateQuestion(Note note, String additionalMessage, Long contextSeed)
-      throws JsonProcessingException {
+  public GeneratedMcq generateQuestion(Note note, String additionalMessage, Long contextSeed) {
     return generateQuestion(note, additionalMessage, contextSeed, null);
   }
 
   public GeneratedMcq generateQuestion(
-      Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus)
-      throws JsonProcessingException {
+      Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
     return generateQuestionFromRequest(
         requestBuilder.buildQuestionGenerationResponseRequest(
             note, additionalMessage, contextSeed, propertyFocus));

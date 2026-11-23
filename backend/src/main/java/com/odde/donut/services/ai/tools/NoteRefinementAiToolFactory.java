@@ -1,6 +1,5 @@
 package com.odde.donut.services.ai.tools;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.services.ai.NoteExtractionResult;
@@ -170,14 +169,9 @@ final class NoteRefinementAiToolFactory {
   }
 
   private static String formatLayoutForPrompt(NoteRefinementLayout layout) {
-    try {
-      return new ObjectMapperConfig()
-          .objectMapper()
-          .writerWithDefaultPrettyPrinter()
-          .writeValueAsString(layout);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+    return ObjectMapperConfig.handWrittenJsonMapper()
+        .writerWithDefaultPrettyPrinter()
+        .writeValueAsString(layout);
   }
 
   private static String formatSelectedItemsForPrompt(

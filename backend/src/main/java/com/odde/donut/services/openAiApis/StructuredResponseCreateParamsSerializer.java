@@ -2,6 +2,7 @@ package com.odde.donut.services.openAiApis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openai.core.ObjectMappers;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -12,11 +13,9 @@ import org.springframework.stereotype.Component;
 public class StructuredResponseCreateParamsSerializer {
   static final String BODY_ACCESSOR_NAME = "_body";
 
-  private final ObjectMapper objectMapper;
-
-  public StructuredResponseCreateParamsSerializer(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
+  // SDK request bodies carry the SDK's Jackson 2 serializers, so only its own mapper writes them
+  // faithfully.
+  private static final ObjectMapper objectMapper = ObjectMappers.jsonMapper();
 
   public Map<String, Object> toBodyMap(StructuredResponseCreateParams<?> params) {
     try {

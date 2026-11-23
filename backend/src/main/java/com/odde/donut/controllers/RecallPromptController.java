@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.AmbiguousExclusionDTO;
 import com.odde.donut.controllers.dto.AnswerDTO;
 import com.odde.donut.controllers.dto.AnswerSpellingDTO;
@@ -45,7 +44,7 @@ class RecallPromptController {
   public com.odde.donut.controllers.dto.RecallPrompt regenerate(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @RequestBody QuestionContestResult contestResult)
-      throws JsonProcessingException, UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     assertCanMutateRecallPrompt(recallPrompt);
     RecallPrompt regenerated =
         recallPromptService.regenerateAQuestion(

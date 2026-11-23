@@ -1,7 +1,6 @@
 package com.odde.donut.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.QuestionGenerationBatch;
@@ -17,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class QuestionGenerationBatchJsonlRenderer {
@@ -28,18 +29,16 @@ public class QuestionGenerationBatchJsonlRenderer {
 
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final QuestionGenerationRequestBuilder requestBuilder;
-  private final ObjectMapper objectMapper;
+  private static final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   private final StructuredResponseCreateParamsSerializer paramsSerializer;
 
   @Autowired
   public QuestionGenerationBatchJsonlRenderer(
       QuestionGenerationBatchRequestRepository batchRequestRepository,
       QuestionGenerationRequestBuilder requestBuilder,
-      ObjectMapper objectMapper,
       StructuredResponseCreateParamsSerializer paramsSerializer) {
     this.batchRequestRepository = batchRequestRepository;
     this.requestBuilder = requestBuilder;
-    this.objectMapper = objectMapper;
     this.paramsSerializer = paramsSerializer;
   }
 
@@ -90,15 +89,15 @@ public class QuestionGenerationBatchJsonlRenderer {
 
   /** Batch rows submitted before the id and read time were recorded carry only the fingerprint. */
   static FocusNoteInput focusNoteInputFrom(JsonNode metadata) {
-    String fingerprint = metadata.path(FOCUS_NOTE_FINGERPRINT_METADATA_KEY).textValue();
+    String fingerprint = metadata.path(FOCUS_NOTE_FINGERPRINT_METADATA_KEY).stringValue(null);
     if (!FocusNoteInput.isValidFingerprint(fingerprint)) {
       return null;
     }
     JsonNode noteId = metadata.path(FOCUS_NOTE_ID_METADATA_KEY);
     JsonNode readAt = metadata.path(FOCUS_NOTE_READ_AT_METADATA_KEY);
     return new FocusNoteInput(
-        noteId.isMissingNode() ? null : Integer.valueOf(noteId.textValue()),
-        readAt.isMissingNode() ? null : new Timestamp(Long.parseLong(readAt.textValue())),
+        noteId.isMissingNode() ? null : Integer.valueOf(noteId.stringValue(null)),
+        readAt.isMissingNode() ? null : new Timestamp(Long.parseLong(readAt.stringValue(null))),
         fingerprint);
   }
 }
