@@ -96,13 +96,10 @@ public class Mcq extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   @Schema(hidden = true)
   public FocusNoteInput getFocusNoteInput() {
-    String fingerprint = getFocusNoteFingerprint();
-    return FocusNoteInput.isValidFingerprint(fingerprint)
-        ? new FocusNoteInput(
-            multipleChoicesQuestion.getFocusNoteId(),
-            multipleChoicesQuestion.getFocusNoteReadAt(),
-            fingerprint)
-        : null;
+    return new FocusNoteInput(
+        multipleChoicesQuestion.getFocusNoteId(),
+        multipleChoicesQuestion.getFocusNoteReadAt(),
+        multipleChoicesQuestion.getFocusNoteFingerprint());
   }
 
   public void setFocusNoteInput(FocusNoteInput focusNoteInput) {

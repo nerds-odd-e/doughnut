@@ -59,7 +59,6 @@ public class MemoryTrackerLifecycle {
         recallPromptRepository.findAllUnansweredByMemoryTrackerId(memoryTracker.getId()));
   }
 
-  // Keeps prompts whose recorded focus input is unknown: only a conflicting fingerprint is stale.
   @Transactional
   public void deleteStaleUnansweredRecallPrompts(
       MemoryTracker memoryTracker, String currentFocusFingerprint) {

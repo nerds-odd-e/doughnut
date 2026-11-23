@@ -22,11 +22,7 @@ class MemoryTrackerBatchStalePromptRetirementControllerTest
   void retiresOnlyTheUnansweredUncontestedPromptsFromAnotherFocus() {
     assertThat(
         savedPrompts().stream().map(RecallPrompt::getId).toList(),
-        contains(
-            imported.getId(),
-            queue.unknownInput().getId(),
-            queue.contested().getId(),
-            queue.answered().getId()));
+        contains(imported.getId(), queue.contested().getId(), queue.answered().getId()));
   }
 
   @Test

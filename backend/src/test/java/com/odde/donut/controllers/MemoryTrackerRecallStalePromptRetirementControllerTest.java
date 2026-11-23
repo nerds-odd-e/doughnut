@@ -44,11 +44,7 @@ class MemoryTrackerRecallStalePromptRetirementControllerTest
     void retiresOnlyTheUnansweredUncontestedPromptsFromAnotherFocus() {
       assertThat(
           savedPrompts().stream().map(RecallPrompt::getId).toList(),
-          contains(
-              current,
-              queue.unknownInput().getId(),
-              queue.contested().getId(),
-              queue.answered().getId()));
+          contains(current, queue.contested().getId(), queue.answered().getId()));
     }
 
     @Test
@@ -89,11 +85,7 @@ class MemoryTrackerRecallStalePromptRetirementControllerTest
     makeMe.entityPersister.flushAndClear();
     assertThat(
         savedPrompts().stream().map(RecallPrompt::getId).toList(),
-        contains(
-            current.getId(),
-            queue.unknownInput().getId(),
-            queue.contested().getId(),
-            queue.answered().getId()));
+        contains(current.getId(), queue.contested().getId(), queue.answered().getId()));
   }
 
   @Test

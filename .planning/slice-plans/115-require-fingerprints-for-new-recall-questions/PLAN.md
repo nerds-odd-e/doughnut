@@ -258,11 +258,13 @@ answer key, learner answer and recorded grades. The audit also preserved
 worktree's Git evidence directory retains the operator receipts
 `slice4-production-{preview,apply,final}.json` and read-only snapshots
 `slice4-production-audit-{before,after}.json`.
+The receipt was published to the story branch at
+`7d2ac14727e25d2e06e6b739b148a3bb0820e035`.
 
 ### 5. Retire temporary migration and legacy waiting support
 
 Type: Structure
-Status: planned
+Status: done
 
 After slice 4's production receipt, remove the operator code, its
 migration-only proof, and compatibility code and tests specific to the old
@@ -271,6 +273,42 @@ present fingerprint, and readable answered history. **Proof.** Run the
 retained generation, reuse and history cases unchanged in intent. Read the
 product and tests for retired migration and waiting-only compatibility
 references as a one-time acceptance sweep.
+
+**Accepted proof.** A separate read-only aggregate on the verified production
+database found canonical fingerprints on all 190 remaining unanswered,
+uncontested MCQ prompts. The on-demand, regeneration and batch write paths
+all supply a validated `FocusNoteInput` before persisting a recall prompt.
+The planning query excludes answered and contested prompts and trackers with
+unanswered spelling prompts. The typed waiting reader uses that invariant.
+
+At `7d2ac14727` with the slice changes, 196 selected tests passed on isolated
+MySQL 8.4.11.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm backend:test_only \
+  --tests '*QuestionGenerationBatch*' --tests '*MemoryTrackerBatch*' \
+  --tests '*MemoryTrackerRecall*' \
+  --tests '*MemoryTrackerQuestionPersistenceControllerTest' \
+  --tests '*MemoryTrackerQuestionDeletionControllerTest'
+```
+
+The batch maintenance case planned, submitted and imported a question for
+an overdue tracker with an empty queue. The on-demand controller saved a
+question with the real generation fingerprint for an empty queue. The batch
+recall controller reused the original prompt with and without read time.
+The importer refusal, stale waiting replacement and older answered-history
+cases retained their existing observations.
+The independent refactor split reuse into two named controller cases. Both
+passed in the targeted rerun recorded in
+`slice5-refactor-retained-reuse.log.run.json`.
+
+**Removal reading.** The temporary operator and its rehearsal were deleted.
+A source reading traced the nullable typed input and waiting-only fixture to
+their removal, then searched product, test, documentation and guidance paths
+for their retired names and found no remaining references. The worktree's
+Git evidence directory retains `slice5-production-fingerprint-coverage.json`,
+`slice5-return.md`, `slice5-consumer-trace.txt`, `slice5-removal-sweep.txt`
+and `slice5-recall-fingerprint-retirement.log.run.json`.
 
 ## Plan review
 
