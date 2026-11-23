@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "sessionId": "70d44cf2-3262-4d53-b493-6416c327978c",
+  "workflow": "dough-execute-plan",
+  "closedAt": "2026-11-23T04:34:40.756Z",
+  "story": "SEED-073#require-fingerprints-for-new-recall-questions",
+  "ranges": [
+    {
+      "base": "fe2fbc79c6b909d39726e3afd1b62cca93638274",
+      "candidate": "50a78657a9c2b53195e85b6ba7b5ddef193f1295"
+    },
+    {
+      "base": "50a78657a9c2b53195e85b6ba7b5ddef193f1295",
+      "candidate": "7fc809f31378c7b2b35ae7ec6304d1e46fa62d20"
+    },
+    {
+      "base": "7fc809f31378c7b2b35ae7ec6304d1e46fa62d20",
+      "candidate": "f2ade45609c6798360a0d60eb6178f6f5079d508"
+    },
+    {
+      "base": "f2ade45609c6798360a0d60eb6178f6f5079d508",
+      "candidate": "7d2ac14727e25d2e06e6b739b148a3bb0820e035"
+    },
+    {
+      "base": "7d2ac14727e25d2e06e6b739b148a3bb0820e035",
+      "candidate": "ac92c470126cd55648270bce40fe8ab3134c3a67"
+    },
+    {
+      "base": "ac92c470126cd55648270bce40fe8ab3134c3a67",
+      "candidate": "0e619ccbf856489488b740dd30a1cb7896dfde8d"
+    },
+    {
+      "base": "0e619ccbf856489488b740dd30a1cb7896dfde8d",
+      "candidate": "d9cc3ee253daf5b4dcb1fc0bfa4dc1c694c7f712"
+    }
+  ]
+}
