@@ -21,6 +21,35 @@ Read the [outcome, rationale, alternatives, constraints and validation context](
 
 [Local recall evidence and validation workflow](learning-refinement-and-retrieval-context.md#local-recall-evidence) apply to each story below.
 
+<a id="show-prefetched-recall-questions-immediately"></a>
+
+### Show prefetched recall questions immediately
+
+**Identity:** SEED-073#show-prefetched-recall-questions-immediately
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal.** When a learner advances to a prefetched multiple-choice card in
+  web recall, show the loaded question immediately. If its prefetch is still
+  running, display the result when that request finishes. An edit made after
+  prefetch can take effect on the next ordinary question fetch.
+- **Scope.** Delete the extra display-time fetch, the state and branches that
+  serve it, and the tests specific to that behavior. Keep initial and
+  background loading, explicit Retry and Self-review, and answer submission
+  against the displayed prompt. Keep the shared recall-prompt endpoint for
+  those loads and CLI recall. Backend freshness selection on ordinary fetches
+  and the existing answer grading path are outside this change.
+- **Documentation.** Delete `docs/recall-question-loading.md`. Move its
+  still-applicable guidance on question ownership, due ordering, loading
+  recovery and spelling to existing recall documentation and retarget live
+  links. Remove the explanation of the extra display-time fetch.
+- **Acceptance.** A completed prefetch supplies the next card's choices and
+  prompt ID when the learner advances. Exercise the initial load, Retry,
+  and answer submission through their normal entry points. Check once during
+  acceptance for references to the deleted behavior in the product, tests,
+  and documentation.
+
 <a id="require-fingerprints-for-new-recall-questions"></a>
 
 ### Require fingerprints for new recall questions
