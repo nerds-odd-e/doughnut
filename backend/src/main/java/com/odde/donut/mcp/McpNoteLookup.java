@@ -1,13 +1,10 @@
 package com.odde.donut.mcp;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.WikiLinkResolver;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -17,15 +14,10 @@ import org.springframework.stereotype.Component;
 class McpNoteLookup {
   private final WikiLinkResolver wikiLinkResolver;
   private final McpNoteCandidates mcpNoteCandidates;
-  private final JsonMapper objectMapper;
 
-  McpNoteLookup(
-      WikiLinkResolver wikiLinkResolver,
-      McpNoteCandidates mcpNoteCandidates,
-      JsonMapper objectMapper) {
+  McpNoteLookup(WikiLinkResolver wikiLinkResolver, McpNoteCandidates mcpNoteCandidates) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.mcpNoteCandidates = mcpNoteCandidates;
-    this.objectMapper = objectMapper;
   }
 
   McpSchema.CallToolResult resolve(
@@ -64,14 +56,11 @@ class McpNoteLookup {
             message,
             "candidates",
             notes.stream().map(note -> mcpNoteCandidates.describe(note, viewer)).toList());
-    try {
-      return McpSchema.CallToolResult.builder()
-          .isError(true)
-          .addContent(
-              new McpSchema.TextContent(message + "\n" + objectMapper.writeValueAsString(result)))
-          .build();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    return McpSchema.CallToolResult.builder()
+        .isError(true)
+        .addContent(
+            new McpSchema.TextContent(
+                message + "\n" + McpJsonToolResult.JSON.writeValueAsString(result)))
+        .build();
   }
 }

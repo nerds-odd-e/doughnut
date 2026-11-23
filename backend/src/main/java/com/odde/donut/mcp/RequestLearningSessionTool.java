@@ -1,6 +1,5 @@
 package com.odde.donut.mcp;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
@@ -10,8 +9,6 @@ import com.odde.donut.utils.TimezoneUtils;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -22,8 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 public record RequestLearningSessionTool(
     LearningSessionService learningSessions,
     AuthorizationService authorization,
-    TestabilitySettings testabilitySettings,
-    JsonMapper objectMapper) {
+    TestabilitySettings testabilitySettings) {
   public static final String NAME = "request_learning_session";
   public static final String NO_SESSION_SIGNAL = "No Potential learning session is available.";
 
@@ -86,13 +82,11 @@ public record RequestLearningSessionTool(
               "requestMarkdown",
                   learningSessions.request(user, notebook.get(), now, zoneId).getRequestMarkdown());
       return McpSchema.CallToolResult.builder()
-          .addContent(new McpSchema.TextContent(objectMapper.writeValueAsString(result)))
+          .addContent(new McpSchema.TextContent(McpJsonToolResult.JSON.writeValueAsString(result)))
           .structuredContent(result)
           .build();
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolFailures.rethrow(e);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
     }
   }
 }

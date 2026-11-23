@@ -1,6 +1,5 @@
 package com.odde.donut.mcp;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.RecallAnswerCursor;
 import com.odde.donut.services.RecallAnswerHistoryService;
@@ -15,9 +14,7 @@ import org.springframework.stereotype.Component;
 /** MCP {@code list_recall_answers}: the learner's recent recall attempts, newest first. */
 @Component
 public record ListRecallAnswersTool(
-    RecallAnswerHistoryService recallAnswerHistory,
-    TestabilitySettings testabilitySettings,
-    JsonMapper objectMapper) {
+    RecallAnswerHistoryService recallAnswerHistory, TestabilitySettings testabilitySettings) {
   public static final String NAME = "list_recall_answers";
   private static final int DEFAULT_DAYS = 7;
 
@@ -106,7 +103,6 @@ public record ListRecallAnswersTool(
           "A positive number of days is required, such as 14. Omit days for the last 7 days.");
     }
     return McpJsonToolResult.of(
-        objectMapper,
         recallAnswerHistory.recentAttempts(
             user,
             testabilitySettings.getCurrentUTCTimestamp().toInstant(),
@@ -122,6 +118,6 @@ public record ListRecallAnswersTool(
           "The cursor cannot be read. Start again without a cursor, then pass each response's"
               + " nextCursor unchanged.");
     }
-    return McpJsonToolResult.of(objectMapper, recallAnswerHistory.continueFrom(user, cursor));
+    return McpJsonToolResult.of(recallAnswerHistory.continueFrom(user, cursor));
   }
 }

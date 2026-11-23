@@ -1,6 +1,5 @@
 package com.odde.donut.mcp;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -25,7 +24,6 @@ public record RecordLearningSessionTool(
     NotebookRepository notebooks,
     AuthorizationService authorization,
     TestabilitySettings testabilitySettings,
-    JsonMapper objectMapper,
     AssistantOAuthEndpoints oauthEndpoints) {
   public static final String NAME = "record_learning_session";
 
@@ -100,7 +98,7 @@ public record RecordLearningSessionTool(
       var result =
           learningSessions.record(
               user, notebook, reportMarkdown, testabilitySettings.getCurrentUTCTimestamp());
-      return McpJsonToolResult.of(objectMapper, result);
+      return McpJsonToolResult.of(result);
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolFailures.rethrow(e);
     }

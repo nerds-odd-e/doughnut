@@ -1,6 +1,5 @@
 package com.odde.donut.mcp;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.controllers.dto.AttributedNoteContent;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
@@ -41,17 +40,14 @@ public class ReadNoteTool {
       """;
 
   private final AttributedNoteContentService attributedNoteContentService;
-  private final JsonMapper objectMapper;
   private final McpNoteLookup mcpNoteLookup;
   private final PortablePathAuthoring portablePathAuthoring;
 
   public ReadNoteTool(
       AttributedNoteContentService attributedNoteContentService,
-      JsonMapper objectMapper,
       McpNoteLookup mcpNoteLookup,
       PortablePathAuthoring portablePathAuthoring) {
     this.attributedNoteContentService = attributedNoteContentService;
-    this.objectMapper = objectMapper;
     this.mcpNoteLookup = mcpNoteLookup;
     this.portablePathAuthoring = portablePathAuthoring;
   }
@@ -115,8 +111,7 @@ public class ReadNoteTool {
     try {
       AttributedNoteContent content = attributedNoteContentService.read(user, destination.getId());
       String portablePath = portablePathAuthoring.qualifiedPortablePath(destination, user);
-      return McpJsonToolResult.of(
-          objectMapper, McpAttributedNoteContent.from(content, portablePath));
+      return McpJsonToolResult.of(McpAttributedNoteContent.from(content, portablePath));
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolFailures.rethrow(e);
     }

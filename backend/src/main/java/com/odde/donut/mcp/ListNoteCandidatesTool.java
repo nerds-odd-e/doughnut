@@ -1,6 +1,5 @@
 package com.odde.donut.mcp;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.controllers.dto.NoteSearchResult;
 import com.odde.donut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.donut.controllers.dto.SearchTerm;
@@ -11,8 +10,6 @@ import com.odde.donut.services.search.NoteSearchService;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,17 +44,14 @@ public class ListNoteCandidatesTool {
           .formatted(EMPTY_SEARCH_SIGNAL);
 
   private final NoteSearchService noteSearchService;
-  private final JsonMapper objectMapper;
   private final NoteRepository noteRepository;
   private final McpNoteCandidates mcpNoteCandidates;
 
   public ListNoteCandidatesTool(
       NoteSearchService noteSearchService,
-      JsonMapper objectMapper,
       NoteRepository noteRepository,
       McpNoteCandidates mcpNoteCandidates) {
     this.noteSearchService = noteSearchService;
-    this.objectMapper = objectMapper;
     this.noteRepository = noteRepository;
     this.mcpNoteCandidates = mcpNoteCandidates;
   }
@@ -107,11 +101,7 @@ public class ListNoteCandidatesTool {
     if (candidates.isEmpty()) {
       return textResult(EMPTY_SEARCH_SIGNAL);
     }
-    try {
-      return textResult(objectMapper.writeValueAsString(candidates));
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    return textResult(McpJsonToolResult.JSON.writeValueAsString(candidates));
   }
 
   private static McpSchema.CallToolResult textResult(String text) {

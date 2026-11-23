@@ -1,6 +1,5 @@
 package com.odde.donut.mcp;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -9,8 +8,6 @@ import com.odde.donut.services.focusContext.FocusContextResult;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -52,13 +49,10 @@ public class GetNoteGraphTool {
       """;
 
   private final NoteGraphService noteGraphService;
-  private final JsonMapper objectMapper;
   private final McpNoteLookup mcpNoteLookup;
 
-  public GetNoteGraphTool(
-      NoteGraphService noteGraphService, JsonMapper objectMapper, McpNoteLookup mcpNoteLookup) {
+  public GetNoteGraphTool(NoteGraphService noteGraphService, McpNoteLookup mcpNoteLookup) {
     this.noteGraphService = noteGraphService;
-    this.objectMapper = objectMapper;
     this.mcpNoteLookup = mcpNoteLookup;
   }
 
@@ -113,12 +107,10 @@ public class GetNoteGraphTool {
     try {
       FocusContextResult graph = noteGraphService.getGraph(user, destination.getId(), tokenLimit);
       return McpSchema.CallToolResult.builder()
-          .addContent(new McpSchema.TextContent(objectMapper.writeValueAsString(graph)))
+          .addContent(new McpSchema.TextContent(McpJsonToolResult.JSON.writeValueAsString(graph)))
           .build();
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolFailures.rethrow(e);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
     }
   }
 
