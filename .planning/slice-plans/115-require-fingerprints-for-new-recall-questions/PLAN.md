@@ -167,11 +167,12 @@ choices, key, answer and grade from a fingerprint-free question.
 The batch planning and stale-prompt cases passed with the interim waiting
 behavior. The worktree's Git evidence directory retains `slice2-return.md`,
 `slice2-consumer-trace.md` and `slice2-recall-fingerprints.log.run.json`.
+Published to the story branch at `7fc809f31378c7b2b35ae7ec6304d1e46fa62d20`.
 
 ### 3. Rehearse the one-time purge on MySQL
 
 Type: Behavior
-Status: planned
+Status: done
 
 Supply a temporary operator command with read-only preview and explicit
 apply. Apply the same eligibility filter used by preview and recheck the
@@ -182,6 +183,27 @@ operator command on the isolated schema with both a shared and an unshared
 fingerprint-free waiting question, a current waiting question, a contested
 prompt, and an earlier answer with choices and grade. Compare preview to
 the resulting queue, history and tracker due time. Record counts on repeat.
+
+**Accepted proof.** At `7fc809f313` with the slice changes, both rehearsal
+scenarios passed on a disposable MySQL 8.4.11 instance loaded with the
+schema-only dump of the migrated worktree test database.
+
+```sh
+CURSOR_DEV=true nix develop -c node --test \
+  scripts/ops/purge-fingerprint-free-waiting-questions.test.mjs
+```
+
+The [operator](../../../scripts/ops/purge-fingerprint-free-waiting-questions.mjs)
+previewed four eligible prompts. Apply required a confirmation bound to the
+server, schema and exact prompt/MCQ pairs. It refused a different schema and
+refused a changed set after a learner answered one prompt, even though the
+count stayed at four. A refreshed preview and apply removed four prompts and
+three newly unreferenced questions. The repeat preview returned zero.
+The persisted checks kept the shared answered question and its original grade,
+the contest, current fingerprinted and non-MCQ prompts, the tracker due time,
+and the detached conversation's message and note correction.
+The worktree's Git evidence directory retains `slice3-return.md`,
+`slice3-consumer-trace.md` and the final `slice3-refactor-rehearsal.log.run.json`.
 
 ### 4. Apply the production cutover
 
