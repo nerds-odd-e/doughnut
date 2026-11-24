@@ -40,7 +40,7 @@ CURSOR_DEV=true nix develop -c pnpm export:database-erd
 Avoid:
 
 ```java
-ObjectMapper mapper = new com.odde.donut.configs.ObjectMapperConfig().objectMapper();
+JsonMapper mapper = com.odde.donut.configs.ObjectMapperConfig.handWrittenJsonMapper();
 List<com.theokanning.openai.completion.chat.ChatMessage> messages = ...;
 ```
 
@@ -50,6 +50,6 @@ Prefer:
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.theokanning.openai.completion.chat.ChatMessage;
 
-ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
+JsonMapper mapper = ObjectMapperConfig.handWrittenJsonMapper();
 List<ChatMessage> messages = ...;
 ```

@@ -215,7 +215,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     shape.put("title", getTitle());
     shape.put("content", getContent());
     String prettyString =
-        new ObjectMapperConfig().objectMapper().valueToTree(shape).toPrettyString();
+        ObjectMapperConfig.handWrittenJsonMapper().valueToTree(shape).toPrettyString();
     return """
     The %s (in JSON format):
     %s

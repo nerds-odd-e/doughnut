@@ -75,8 +75,7 @@ public class NoteQuestionGenerationService {
             .addInstruction(SupportedChoices.INSTRUCTIONS)
             .addUserMessage(
                 "Multiple-choice question:\n\n"
-                    + new ObjectMapperConfig()
-                        .objectMapper()
+                    + ObjectMapperConfig.handWrittenJsonMapper()
                         .valueToTree(question.withoutSolution())
                         .toString())
             .reasoningEffort(ReasoningEffort.LOW)

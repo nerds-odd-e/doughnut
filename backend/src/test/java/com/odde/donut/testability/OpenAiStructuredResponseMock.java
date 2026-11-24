@@ -25,7 +25,6 @@ import org.mockito.Mockito;
 
 public class OpenAiStructuredResponseMock {
   private final ResponseService responseService;
-  private final ObjectMapperConfig objectMapperConfig = new ObjectMapperConfig();
   private final Map<Class<?>, Queue<Object>> structuredResults = new HashMap<>();
   private final Queue<Object> fallbackStructuredResults = new LinkedList<>();
   private Runnable beforeCreate;
@@ -55,7 +54,7 @@ public class OpenAiStructuredResponseMock {
           String content =
               result instanceof MalformedStructuredContent malformed
                   ? malformed.content()
-                  : objectMapperConfig.objectMapper().valueToTree(result).toString();
+                  : ObjectMapperConfig.handWrittenJsonMapper().valueToTree(result).toString();
           return new StructuredResponse(
               params.responseType(), buildStructuredResponse(content, ResponseStatus.COMPLETED));
         });
