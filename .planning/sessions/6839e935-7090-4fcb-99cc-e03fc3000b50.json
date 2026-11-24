@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "sessionId": "6839e935-7090-4fcb-99cc-e03fc3000b50",
+  "workflow": "dough-execute-plan",
+  "closedAt": "2026-11-24T01:44:58.079Z",
+  "story": "SEED-134#add-values-to-an-existing-note-property",
+  "ranges": [
+    {
+      "base": "2a6b4821ad988c10ec36b57ac89a3d1fa62a8dda",
+      "candidate": "a16d83eebd95ab4a56fc78d83cdef2b0eacf7af0"
+    },
+    {
+      "base": "a16d83eebd95ab4a56fc78d83cdef2b0eacf7af0",
+      "candidate": "ce09115bcf82bb818d1bc8594f4f67636870998f"
+    },
+    {
+      "base": "ce09115bcf82bb818d1bc8594f4f67636870998f",
+      "candidate": "7092c7fda6cc7a152f593813636683c267e8326c"
+    }
+  ]
+}
