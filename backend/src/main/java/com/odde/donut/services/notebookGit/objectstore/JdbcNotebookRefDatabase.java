@@ -80,7 +80,10 @@ final class JdbcNotebookRefDatabase extends RefDatabase {
     return null;
   }
 
+  // JGit deprecates getRefs(String) yet still declares it abstract, so every RefDatabase must
+  // implement it.
   @Override
+  @SuppressWarnings("deprecation")
   public Map<String, Ref> getRefs(String prefix) throws IOException {
     Map<String, Ref> refs = new HashMap<>();
     putIfMatching(refs, prefix, exactRef(Constants.HEAD));
