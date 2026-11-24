@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -30,13 +30,13 @@ public class AssistantGrantService {
   private final UserRepository users;
   private final OAuth2AuthorizationService authorizations;
   private final RegisteredClientRepository clients;
-  private final JdbcTemplate jdbc;
+  private final JdbcClient jdbc;
 
   public AssistantGrantService(
       UserRepository users,
       OAuth2AuthorizationService authorizations,
       RegisteredClientRepository clients,
-      JdbcTemplate jdbc) {
+      JdbcClient jdbc) {
     this.users = users;
     this.authorizations = authorizations;
     this.clients = clients;
@@ -80,21 +80,20 @@ public class AssistantGrantService {
 
   public List<ConnectedAssistant> connectedAssistants(String principal) {
     Map<String, Set<String>> scopesByClient = new HashMap<>();
-    jdbc.query(
-        "SELECT registered_client_id, authorities AS scopes FROM oauth2_authorization_consent"
-            + " WHERE principal_name = ?"
-            + " UNION SELECT registered_client_id, authorized_scopes AS scopes"
-            + " FROM oauth2_authorization WHERE principal_name = ? AND authorized_scopes <> ''",
-        row -> {
+    jdbc.sql(
+            "SELECT registered_client_id, authorities AS scopes FROM oauth2_authorization_consent"
+                + " WHERE principal_name = ?"
+                + " UNION SELECT registered_client_id, authorized_scopes AS scopes"
+                + " FROM oauth2_authorization WHERE principal_name = ? AND authorized_scopes <> ''")
+        .params(principal, principal)
+        .query(row -> {
           Set<String> scopes =
               scopesByClient.computeIfAbsent(
                   row.getString("registered_client_id"), ignored -> new HashSet<>());
           Arrays.stream(row.getString("scopes").split(","))
               .map(scope -> scope.startsWith("SCOPE_") ? scope.substring(6) : scope)
               .forEach(scopes::add);
-        },
-        principal,
-        principal);
+        });
     return scopesByClient.entrySet().stream()
         .map(entry -> {
           var client = clients.findById(entry.getKey());
@@ -110,16 +109,16 @@ public class AssistantGrantService {
     var client = clients.findByClientId(clientId);
     if (client == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     int grants =
-        jdbc.update(
-            "DELETE FROM oauth2_authorization WHERE principal_name = ? AND registered_client_id = ?",
-            principal,
-            client.getId());
+        jdbc.sql(
+                "DELETE FROM oauth2_authorization WHERE principal_name = ? AND registered_client_id = ?")
+            .params(principal, client.getId())
+            .update();
     int consent =
-        jdbc.update(
-            "DELETE FROM oauth2_authorization_consent"
-                + " WHERE principal_name = ? AND registered_client_id = ?",
-            principal,
-            client.getId());
+        jdbc.sql(
+                "DELETE FROM oauth2_authorization_consent"
+                    + " WHERE principal_name = ? AND registered_client_id = ?")
+            .params(principal, client.getId())
+            .update();
     if (grants + consent == 0) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
   }
 
