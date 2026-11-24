@@ -1,9 +1,14 @@
-import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  MemoryTrackerController,
+  NoteController,
+  TextContentController,
+} from "@generated/donut-backend-api/sdk.gen"
 import { cleanup, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import {
+  mockSdkService,
   mockSdkServiceWithImplementation,
   productionRouterAt,
 } from "@tests/helpers"
@@ -25,9 +30,9 @@ afterEach(() => {
   restoreNoteToolbarWidthMocks()
 })
 
-async function showNote() {
+async function showNote(content = "Body.") {
   const realm = setupNoteShowPageMocks(
-    makeMe.aNoteRealm.content("Body.").please()
+    makeMe.aNoteRealm.content(content).please()
   )
   const save = mockSdkServiceWithImplementation(
     TextContentController,
@@ -43,6 +48,24 @@ async function showNote() {
     realm.id
   )
   return save
+}
+
+function propertyRow(key: string) {
+  return screen
+    .getAllByTestId("rich-note-property-row")
+    .find((row) => row.dataset.propertyKey === key)!
+}
+
+async function nameProperty(oldKey: string, newKey: string) {
+  const input = propertyRow(oldKey).querySelector<HTMLInputElement>(
+    '[data-testid="rich-note-property-row-key-input"]'
+  )!
+  input.focus()
+  input.value = newKey
+  input.dispatchEvent(new Event("input", { bubbles: true }))
+  await flushPromises()
+  input.blur()
+  await flushPromises()
 }
 
 it("keeps an unfinished draft with its validation, then saves the corrected property", async () => {
@@ -117,3 +140,85 @@ it.each([false, true])(
     expect(row.textContent).toContain("Target")
   }
 )
+
+it("names a picked link using a preset that creates its first value", async () => {
+  const save = await showNote()
+  useContentCursorInserter().insertWikiLinkAsProperty("[[Swim]]")
+  await flushPromises()
+  screen.getByLabelText("Existing note property key (row 1)").focus()
+  await flushPromises()
+  screen.getByText("example of", { selector: "button" }).click()
+  await flushPromises()
+
+  expect(save.mock.calls.map(([options]) => options.body?.content)).toEqual([
+    '---\n"": "[[Swim]]"\n---\nBody.',
+    '---\nexample of: "[[Swim]]"\n---\nBody.',
+  ])
+})
+
+it("names a picked link using the exact authored key and appends to its scalar", async () => {
+  mockSdkService(NoteController, "getNoteInfo", makeMe.aNoteRecallInfo.please())
+  mockSdkService(MemoryTrackerController, "followPropertyValue", undefined)
+  const save = await showNote(
+    '---\nrelated topics: "[[Strength]]"\nRelated topics: "[[Fitness]]"\n---\nBody.'
+  )
+  useContentCursorInserter().insertWikiLinkAsProperty("[[Mobility]]")
+  await flushPromises()
+  await nameProperty("", " related topics ")
+
+  expect(save).toHaveBeenCalledTimes(2)
+  expect(save).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      body: {
+        content:
+          '---\nrelated topics:\n  - "[[Strength]]"\n  - "[[Mobility]]"\nRelated topics: "[[Fitness]]"\n---\nBody.',
+      },
+    })
+  )
+})
+
+it("keeps a picked link available for a corrected name after a scalar-only collision", async () => {
+  const save = await showNote("---\nimage: /cover.png\n---\nBody.")
+  useContentCursorInserter().insertWikiLinkAsProperty("[[Swim]]")
+  await flushPromises()
+  await nameProperty("", "image")
+
+  expect(
+    screen
+      .getByText("Duplicate property keys are not allowed.")
+      .checkVisibility()
+  ).toBe(true)
+  expect(propertyRow("").textContent).toContain("Swim")
+  expect(
+    propertyRow("image").querySelector<HTMLInputElement>(
+      '[data-testid="rich-note-property-row-value-input"]'
+    )?.value
+  ).toBe("/cover.png")
+  expect(save).toHaveBeenCalledOnce()
+
+  await nameProperty("", "example of")
+  expect(save).toHaveBeenCalledTimes(2)
+  expect(save).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      body: {
+        content: '---\nimage: /cover.png\nexample of: "[[Swim]]"\n---\nBody.',
+      },
+    })
+  )
+})
+
+it("preserves both named properties when a rename would collide with a list-capable key", async () => {
+  const save = await showNote(
+    "---\nrelated topics: Strength\ntopic: Mobility\n---\nBody."
+  )
+  await nameProperty("topic", "related topics")
+
+  expect(
+    screen
+      .getByText("Duplicate property keys are not allowed.")
+      .checkVisibility()
+  ).toBe(true)
+  expect(propertyRow("related topics").textContent).toContain("Strength")
+  expect(propertyRow("topic").textContent).toContain("Mobility")
+  expect(save).not.toHaveBeenCalled()
+})

@@ -142,6 +142,10 @@ export const assumeNoteTargetSearchDialog = () => {
       clickUseThisNoteOnTargetNote(toNoteTopic)
       confirmChosenNoteAction('Insert as a wiki link')
     },
+    insertWikiLinkAsProperty(toNoteTopic: string) {
+      clickUseThisNoteOnTargetNote(toNoteTopic)
+      confirmChosenNoteAction('Add wiki link as a new property')
+    },
     insertWikiLinkToTargetInFolder(toNoteTopic: string, folderName: string) {
       clickUseThisNoteOnTargetNoteInFolder(toNoteTopic, folderName)
       confirmChosenNoteAction('Insert as a wiki link')

@@ -9,6 +9,14 @@ export const noteContentRegion = {
 export const richNotePropertyRow = (key: string) =>
   `[data-testid="rich-note-property-row"]:not([data-property-draft="true"])[data-property-key="${key}"]`
 
+export const richNotePropertyPreset = (key: string) =>
+  `[data-testid="rich-note-property-key-preset-option"][data-preset-key="${key}"]`
+
+export const richNotePropertyKeyInput = (key: string) =>
+  findNoteContentRegion()
+    .find(richNotePropertyRow(key))
+    .findByTestId('rich-note-property-row-key-input')
+
 export const richNotePropertyPanelTestId = 'rich-note-property-panel'
 export const richNotePropertyPanelToggleTestId =
   'rich-note-property-panel-toggle'

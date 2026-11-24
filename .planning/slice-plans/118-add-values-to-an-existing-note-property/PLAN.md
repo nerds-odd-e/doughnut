@@ -69,7 +69,7 @@ typechecks with `pnpm -C frontend exec vue-tsc --noEmit` and
 
 ### 1. File a picked wiki link under the chosen property
 Type: Behavior
-Status: planned
+Status: done
 Proof: Note Edit search, two reloads, and ordered values under the selected
 preset. Chromium save checks cover a missing preset and a typed scalar,
 and confirm tracker continuity, manual append, and recovery after a key
@@ -81,6 +81,22 @@ An existing list-capable property's previous values remain in order and
 the link is last. An occupied scalar-only property keeps its value and the
 author can correct the naming attempt.
 
+## Execution context
+
+- Story Branch Mode in the owned worktree
+  `/Users/terryyin/git/doughnut/.worktrees/add-values-to-an-existing-note-property`,
+  branch `codex/add-values-to-an-existing-note-property`, with `origin/main` as
+  the integration target and its main worktree as the integration checkout.
+- Publisher `dashboard-territory.local-doughnut`, agent `chaifeng-chan`.
+  Start `9e98ebd518983459009fb7a14eeba74b6b2b50ed`.
+  The claim `2a6b4821ad988c10ec36b57ac89a3d1fa62a8dda` was confirmed on
+  `origin/main` and the execution branch. This is the first increment's base.
+- Codex coordinator `codex-6839e935` observes GitHub Actions `ci.yml` on
+  `nerds-odd-e/doughnut` for the execution branch. Stream cell `g4:7`,
+  command session `50276`, PID `49231`, mailbox `/tmp/dough-ci-501/watch-3mSTno`.
+  After a server restart, the previous stream at `/tmp/dough-ci-501/watch-3YaWp3`
+  stopped with no unread evidence. Both remote branches still held the claim.
+
 ## Learnings and premise evidence
 
 Observations used this owned checkout at `76f0c9119f` on 2026-11-24.
@@ -90,6 +106,24 @@ Observations used this owned checkout at `76f0c9119f` on 2026-11-24.
 | Manual Add property already covers the `ingredients` examples. | The five pre-change Chromium probes recorded in the [seed](../../seeds/SEED-134-add-values-to-note-properties.md#current-behavior) used `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.notePropertyRefinementProbe.spec.ts`. The actual add control emitted one ordered property for each input. The same probes observed the wiki naming defect, an omitted occupied preset and a duplicate-key message on the typed key. The scratch spec was removed. |
 | The editor can use the current save, key validation, and tracker follow paths. | The focused Chromium runs passed 29 tests across property presets, property entry, note property editing, and tracker following, and 13 across `InsertWikiLink.spec.ts`, property validation, rename guard, and occupied preset slots. The search action handed off the backend-authored Portable path. The note editor sent the unnamed link to the save API and manual append sent the tracker follow request for the original scalar. |
 | The same note save and load route supports the planned starting data and outcome shape. | The isolated Note Edit command above passed 14 scenarios, including manual preset append followed by reload and a Markdown source check. A focused scratch scenario in the same feature ran that command again. It searched for `swim`, chose the property action, waited for the content save, reloaded, and observed `"": "[[swim]]"` in the Markdown with the original two `example of` items still in order. The scenario passed and its scratch edits were reverted. |
+
+## Slice 1 proof
+
+Observed against the working changes based on `2a6b4821ad` on 2026-11-24.
+The command arguments, results, and implementation report are in the checkout's
+`open-dough/evidence` Git directory.
+
+| Observation | Evidence |
+| --- | --- |
+| Real search saves `[[swim]]` under an unnamed key. After reload and preset selection, a second reload shows one `example of` entry in order, and the Markdown retains the other property and body. | `refactor-e2e` passed all 27 scenarios in Note Edit and Note Property Layout. The new scenario uses the shared browser clock for search and asserts the authored `[[swim]]` token in the first reloaded editor. |
+| The absent preset creates its first value. The exact trimmed key appends to a scalar, leaving the differently cased key intact. Each successful name sends one final update after the unnamed save. | `refactor-browser` passed all 64 tests. `NoteTextContent.propertyEditing` asserts the complete generated content SDK payloads. |
+| The tracker follows the former scalar value to the first item. Manual Add property appends to scalar and list `ingredients`. Both the scalar-only assignment refusal and the named-row rename refusal preserve the original values. | The same Chromium run includes `NoteEditableContent.trackerFollowsValue`, `RichMarkdownEditor.propertyEntry`, and the note save and rename guard specs. The scalar-only collision test also verifies recovery by naming the same link with a valid key. |
+| Existing property and preset readers retain their contracts. | `property-consumers` passed 70 tests and `property-ui-readers` passed 41. See `consumer-trace-disposition.md` for the affected entry points and observations. Both frontend typechecks passed. |
+
+The independent pass kept the focus-time naming decision and used the current
+row index to filter rename presets. It renewed the affected browser specs,
+both Cypress features, and both frontend typechecks. Its reasoning and
+consumer trace are recorded in `slice-1-refactor.md`. No generation applies.
 
 ## Plan review
 

@@ -3,7 +3,9 @@ import {
   confirmPropertyMemoryTrackerChange,
   focusNoteBody,
   findNoteContentRegion,
+  richNotePropertyKeyInput,
   richNotePropertyPanelToggleTestId,
+  richNotePropertyPreset,
   richNotePropertyRow,
 } from './notePageContentRegion'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
@@ -28,9 +30,7 @@ export const noteRichPropertyMethods = () => ({
   addRichNotePropertyFromPreset(key: string, value: string) {
     findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
-      cy.get(
-        `[data-testid="rich-note-property-key-preset-option"][data-preset-key="${key}"]`
-      ).click()
+      cy.get(richNotePropertyPreset(key)).click()
       cy.get('[data-property-draft="true"]')
         .findByTestId('rich-note-property-row-value-input')
         .clear()
@@ -40,9 +40,15 @@ export const noteRichPropertyMethods = () => ({
     focusNoteBody()
     return this.flushPendingContentSave()
   },
+  nameRichNotePropertyFromPreset(key: string) {
+    richNotePropertyKeyInput('').focus()
+    cy.get(richNotePropertyPreset(key)).click()
+    return this.flushPendingContentSave()
+  },
   expectRichNotePropertyList(key: string, values: string[]) {
     findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key))
+        .should('have.length', 1)
         .find('[data-testid="rich-note-property-row-list-value"]')
         .should('have.attr', 'title', values.join('\n'))
     })
@@ -59,12 +65,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   typeInRichNotePropertyKey(key: string, text: string) {
-    findNoteContentRegion().within(() => {
-      cy.get(richNotePropertyRow(key))
-        .find('[data-testid="rich-note-property-row-key-input"]')
-        .clear()
-        .type(text)
-    })
+    richNotePropertyKeyInput(key).clear().type(text)
     return this
   },
   uploadRichNoteImagePropertyFromFixture(fixtureRelativePath: string) {

@@ -7,20 +7,18 @@ import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
-  findPropertyRowIndexByExactKey,
-  isListCapablePropertyKey,
   isRelationPropertyKey,
   isReservedReadmeOnlyPropertyKey,
   normalizePropertyRowForCommit,
   notePropertiesFromPropertyRows,
-  propertyRowForInsertedKey,
   propertyRowWithScalar,
-  propertyRowsAfterAppendingValueToExactKey,
+  removePropertyRowAt,
   scalarStringFromPropertyRow,
   propertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import { propertyRowsAfterAddingValue } from "@/utils/noteContentPropertyRows"
 import { scalarPropertyValue } from "@/utils/noteProperties"
 
 export function useRichFrontmatterPropertyEditing(options: {
@@ -94,21 +92,11 @@ export function useRichFrontmatterPropertyEditing(options: {
       return
     }
 
-    let nextRows: PropertyRow[]
-    if (findPropertyRowIndexByExactKey(options.propertyRows.value, key) >= 0) {
-      if (!isListCapablePropertyKey(key)) {
-        options.setValidationMessage("Duplicate property keys are not allowed.")
-        return
-      }
-      nextRows = propertyRowsAfterAppendingValueToExactKey(
-        options.propertyRows.value,
-        key,
-        value
-      )!
-    } else {
-      nextRows = rowsAfterAdding(propertyRowForInsertedKey(key, value))
-    }
-
+    const nextRows = propertyRowsAfterAddingValue(
+      options.propertyRows.value,
+      key,
+      value
+    )
     const result = validatePropertyRowsForRichEdit(nextRows)
     if (!result.ok) {
       options.setValidationMessage(result.message)
@@ -130,22 +118,28 @@ export function useRichFrontmatterPropertyEditing(options: {
     const rows = options.propertyRows.value.map((r, i) =>
       i === idx ? normalizePropertyRowForCommit(r) : r
     )
-    options.propertyRows.value = rows
-
-    const result = validatePropertyRowsForRichEdit(options.propertyRows.value)
+    const row = rows[idx]
+    const oldKey = snapshot?.key.trim()
+    const newKey = row?.key ?? ""
+    const nextRows =
+      oldKey === "" && row?.key && row.value.kind === "scalar"
+        ? propertyRowsAfterAddingValue(
+            removePropertyRowAt(rows, idx),
+            row.key,
+            row.value.value
+          )
+        : rows
+    const result = validatePropertyRowsForRichEdit(nextRows)
     if (!result.ok) {
       options.setValidationMessage(result.message, idx)
-      if (snapshot) {
-        options.propertyRows.value = options.propertyRows.value.map((r, i) =>
-          i === idx ? { ...snapshot } : r
-        )
-      }
+      options.propertyRows.value = snapshot
+        ? rows.map((r, i) => (i === idx ? { ...snapshot } : r))
+        : rows
       return
     }
 
-    const newKey = rows[idx]?.key ?? ""
-    const oldKey = snapshot?.key.trim() ?? ""
-    const isRename = oldKey !== "" && oldKey !== newKey
+    options.propertyRows.value = nextRows
+    const isRename = oldKey && oldKey !== newKey
     const commit = async () => {
       if (isRename) {
         if (!(await confirmAndApplyRename(oldKey, newKey))) {

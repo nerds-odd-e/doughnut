@@ -11,6 +11,13 @@ When('I insert a wiki link to {string}', (targetNoteTitle: string) => {
 })
 
 When(
+  'I add a wiki link to {string} as a property',
+  (targetNoteTitle: string) => {
+    start.assumeNotePage().insertWikiLinkAsProperty(targetNoteTitle)
+  }
+)
+
+When(
   'I insert a wiki link to {string} in folder {string}',
   (targetNoteTitle: string, folderName: string) => {
     start

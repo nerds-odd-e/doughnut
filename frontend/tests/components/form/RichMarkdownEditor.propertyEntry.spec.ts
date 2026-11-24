@@ -204,5 +204,18 @@ example of 2: "[[B]]"
         propertyRowWithScalar("example of 2", "[[B]]").value
       )
     })
+
+    it.each([
+      ["ingredients: flour", ["flour", "salt"]],
+      ["ingredients:\n  - flour\n  - water", ["flour", "water", "salt"]],
+    ])("appends salt to %s", async (frontmatter, values) => {
+      await h.mountEditor(`---\n${frontmatter}\n---\n\n# Body`)
+      await h.commitInsertProperty("ingredients", "salt")
+
+      expect(parseNoteContentMarkdown(h.lastEmittedMarkdown())).toMatchObject({
+        ok: true,
+        properties: { ingredients: listPropertyValue(values) },
+      })
+    })
   })
 })

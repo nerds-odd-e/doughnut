@@ -9,6 +9,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import { pendingPopups } from "@tests/helpers/popupStackTestSupport"
+import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import {
   mountNoteEditableContent,
   setTextareaValue,
@@ -107,6 +108,23 @@ describe("NoteEditableContent: a tracked single value that becomes a list", () =
         appendInRichRow(wrapper, "example of", "[[past tense]]")
       )
 
+      expect(followSpy).toHaveBeenCalledWith(followedTo("[[run]]"))
+    })
+
+    it("moves the tracker onto the former value when a picked link joins its property", async () => {
+      await saveRich(async (wrapper) => {
+        useContentCursorInserter().insertWikiLinkAsProperty("[[swim]]")
+        await flushPromises()
+        const field = wrapper.find(
+          '[data-property-key=""] [data-testid="rich-note-property-row-key-input"]'
+        )
+        await field.trigger("focus")
+        await field.setValue("example of")
+        await field.trigger("blur")
+        await flushPromises()
+      })
+
+      expect(followSpy).toHaveBeenCalledOnce()
       expect(followSpy).toHaveBeenCalledWith(followedTo("[[run]]"))
     })
 

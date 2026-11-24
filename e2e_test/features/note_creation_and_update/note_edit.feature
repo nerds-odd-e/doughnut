@@ -170,3 +170,38 @@ Feature: Note Edit
     And the note content markdown source should contain "[[run]]"
     And the note content markdown source should contain "[[past tense]]"
     And the note content markdown source should not contain "example of 2:"
+
+  @mockBrowserTime
+  Scenario: A saved unnamed wiki link joins an existing property
+    Given I have a notebook "LeSS training" with notes:
+      | Title |
+      | swim  |
+    And note "LeSS in Action" has content:
+      """
+      ---
+      diligence: high
+      example of:
+        - "[[run]]"
+        - "[[walk]]"
+      ---
+
+      # Workshop Body
+      Main content here.
+      """
+    And I visit note "LeSS in Action"
+    When I add a wiki link to "swim" as a property
+    And I reload the current page for note "LeSS in Action"
+    Then I should see rich note property "" with value "[[swim]]"
+    When I name the unnamed rich note property using preset "example of"
+    And I reload the current page for note "LeSS in Action"
+    Then rich note property "example of" should have these values in order:
+      | [[run]]  |
+      | [[walk]] |
+      | [[swim]] |
+    And I should not see rich note property ""
+    When I open the note content markdown editor
+    Then the note content markdown source should contain "example of:"
+    And the note content markdown source should contain "[[swim]]"
+    And the note content markdown source should contain "diligence: high"
+    And the note content markdown source should contain "# Workshop Body"
+    And the note content markdown source should contain "Main content here."

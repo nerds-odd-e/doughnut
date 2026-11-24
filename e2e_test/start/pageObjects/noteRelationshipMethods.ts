@@ -69,6 +69,12 @@ export const noteRelationshipMethods = () => ({
       .insertWikiLinkToTarget(toNoteTopic)
     return this
   },
+  insertWikiLinkAsProperty(toNoteTopic: string) {
+    this.openWikiLinkOrRelationship()
+      .findTarget(toNoteTopic)
+      .insertWikiLinkAsProperty(toNoteTopic)
+    return this.flushPendingContentSave()
+  },
   insertWikiLinkToNoteInFolder(toNoteTopic: string, folderName: string) {
     this.openWikiLinkOrRelationship()
       .findTarget(toNoteTopic)

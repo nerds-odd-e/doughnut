@@ -3,7 +3,10 @@ import {
   composeNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
-import { findPropertyRowIndexByExactKey } from "@/utils/noteContentPropertyKeys"
+import {
+  findPropertyRowIndexByExactKey,
+  isListCapablePropertyKey,
+} from "@/utils/noteContentPropertyKeys"
 import {
   authoredListPropertyValidationErrorForPropertyRow,
   isAuthoredListPropertyKey,
@@ -182,6 +185,17 @@ export function propertyRowsAfterAppendingValueToExactKey(
   return rows.map((r, i) =>
     i === idx ? appendValueToPropertyRow(r, value) : r
   )
+}
+
+export function propertyRowsAfterAddingValue(
+  rows: readonly PropertyRow[],
+  key: string,
+  value: string
+): PropertyRow[] {
+  const appended = isListCapablePropertyKey(key)
+    ? propertyRowsAfterAppendingValueToExactKey(rows, key, value)
+    : null
+  return appended ?? [...rows, propertyRowForInsertedKey(key, value)]
 }
 
 /** Appends an empty-key wiki-link property row; undefined when content cannot be updated. */

@@ -19,7 +19,7 @@
       v-if="presetPanelOpen"
       :list-id="listId"
       :property-rows="propertyRows"
-      :exclude-row-index="excludeRowIndex"
+      :exclude-row-index="keyWasNamed ? excludeRowIndex : undefined"
       :name-filter="typedText"
       @select="onPresetSelected"
     />
@@ -31,7 +31,7 @@ import { ref } from "vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
 import type { PropertyRow } from "@/utils/noteContentFrontmatter"
 
-defineProps<{
+const props = defineProps<{
   modelValue: string
   inputId: string
   listId: string
@@ -50,6 +50,7 @@ const emit = defineEmits<{
 }>()
 
 const presetPanelOpen = ref(false)
+const keyWasNamed = ref(false)
 const typedText = ref("")
 
 function onInput(event: Event) {
@@ -59,6 +60,7 @@ function onInput(event: Event) {
 
 function onFocus() {
   typedText.value = ""
+  keyWasNamed.value = props.modelValue.trim() !== ""
   presetPanelOpen.value = true
   emit("focus")
 }

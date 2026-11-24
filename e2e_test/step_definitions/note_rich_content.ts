@@ -59,6 +59,13 @@ When(
   }
 )
 
+When(
+  'I name the unnamed rich note property using preset {string}',
+  (key: string) => {
+    start.assumeNotePage().nameRichNotePropertyFromPreset(key)
+  }
+)
+
 Then(
   'rich note property {string} should have these values in order:',
   (key: string, data: DataTable) => {
