@@ -5,9 +5,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookGit.WebNoteEditService;
@@ -17,9 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class GraphNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   @Autowired WebNoteEditService webNoteEditService;
   @Autowired CanonicalDonutOrigin canonicalDonutOrigin;
 
@@ -32,8 +33,8 @@ class GraphNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode graph = graph("Engineering:Practices/Code Review", "Other");
 
-    assertThat(graph.at("/focusNote/content").asText(), equalTo("Review guidance"));
-    assertThat(graph.at("/focusNote/folderPath").asText(), equalTo("Practices"));
+    assertThat(graph.at("/focusNote/content").asString(), equalTo("Review guidance"));
+    assertThat(graph.at("/focusNote/folderPath").asString(), equalTo("Practices"));
   }
 
   @Test
@@ -44,12 +45,12 @@ class GraphNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
     var target = makeMe.aNote("Colour Theory").folder(design).aliases("color").please();
     makeMe.aNote("Colour Theory").notebook(notebook).please();
     JsonNode candidates = text(call("list_note_candidates", Map.of("query", "color")));
-    String discoveredPath = candidates.get(0).get("portablePath").asText();
+    String discoveredPath = candidates.get(0).get("portablePath").asString();
 
     JsonNode graph = graph(discoveredPath, "");
 
-    assertThat(graph.at("/focusNote/content").asText(), equalTo(target.getContent()));
-    assertThat(graph.at("/focusNote/folderPath").asText(), equalTo("Practices / Design"));
+    assertThat(graph.at("/focusNote/content").asString(), equalTo(target.getContent()));
+    assertThat(graph.at("/focusNote/folderPath").asString(), equalTo("Practices / Design"));
   }
 
   @ParameterizedTest
@@ -69,8 +70,8 @@ class GraphNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode graph = graph(path, "Engineering");
 
-    assertThat(graph.at("/focusNote/title").asText(), equalTo("Code Review"));
-    assertThat(graph.at("/focusNote/content").asText(), equalTo(saved.getContent()));
+    assertThat(graph.at("/focusNote/title").asString(), equalTo("Code Review"));
+    assertThat(graph.at("/focusNote/content").asString(), equalTo(saved.getContent()));
   }
 
   @ParameterizedTest
@@ -86,15 +87,15 @@ class GraphNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
             "get_note_graph",
             Map.of("portablePath", path, "notebookName", "Engineering", "tokenLimit", 1000));
     assertThat(result.get("isError").asBoolean(), equalTo(true));
-    String message = result.at("/content/0/text").asText();
+    String message = result.at("/content/0/text").asString();
     JsonNode choices =
         objectMapper.readTree(message.substring(message.indexOf('\n') + 1)).get("candidates");
     assertThat(choices.size(), equalTo(2));
     for (JsonNode choice : choices) {
-      JsonNode graph = graph(choice.get("portablePath").asText(), "");
+      JsonNode graph = graph(choice.get("portablePath").asString(), "");
       String expected =
-          choice.get("folderPath").asText().isEmpty() ? "Root guidance" : "Folder guidance";
-      assertThat(graph.at("/focusNote/content").asText(), equalTo(expected));
+          choice.get("folderPath").asString().isEmpty() ? "Root guidance" : "Folder guidance";
+      assertThat(graph.at("/focusNote/content").asString(), equalTo(expected));
     }
   }
 
@@ -106,7 +107,7 @@ class GraphNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
         call("get_note_graph", Map.of("portablePath", "Code Review", "tokenLimit", 1000));
 
     assertThat(result.get("isError").asBoolean(), equalTo(true));
-    assertThat(result.at("/content/0/text").asText(), containsString("Supply notebookName"));
+    assertThat(result.at("/content/0/text").asString(), containsString("Supply notebookName"));
   }
 
   private Notebook engineering() {
@@ -121,7 +122,7 @@ class GraphNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
   }
 
   private JsonNode text(JsonNode result) throws Exception {
-    return objectMapper.readTree(result.at("/content/0/text").asText());
+    return objectMapper.readTree(result.at("/content/0/text").asString());
   }
 
   private JsonNode call(String name, Map<String, Object> arguments) throws Exception {

@@ -5,12 +5,12 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.BooleanNode;
 
 class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestBase {
   @Test
@@ -36,16 +36,16 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
 
     JsonNode attempt = listRecallAnswers().get("attempts").get(0);
 
-    assertThat(attempt.get("answeredAt").asText(), equalTo(yesterday.toInstant().toString()));
+    assertThat(attempt.get("answeredAt").asString(), equalTo(yesterday.toInstant().toString()));
     assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
-    assertThat(attempt.at("/note/title").asText(), equalTo("Code Review"));
-    assertThat(attempt.at("/note/portablePath").asText(), equalTo("Engineering:Code Review"));
+    assertThat(attempt.at("/note/title").asString(), equalTo("Code Review"));
+    assertThat(attempt.at("/note/portablePath").asString(), equalTo("Engineering:Code Review"));
     JsonNode question = attempt.get("multipleChoice");
-    assertThat(question.get("stem").asText(), equalTo("Who reviews code?"));
+    assertThat(question.get("stem").asString(), equalTo("Who reviews code?"));
     assertThat(texts(question.get("choices")), contains("Peers", "Nobody", "The compiler"));
-    assertThat(question.get("selectedChoice").asText(), equalTo("Nobody"));
-    assertThat(question.get("expectedAnswer").asText(), equalTo("Peers"));
-    assertThat(question.get("validationRationale").asText(), equalTo("Peers review code."));
+    assertThat(question.get("selectedChoice").asString(), equalTo("Nobody"));
+    assertThat(question.get("expectedAnswer").asString(), equalTo("Peers"));
+    assertThat(question.get("validationRationale").asString(), equalTo("Peers review code."));
     assertThat(attempt.has("excludedAsAmbiguous"), equalTo(false));
   }
 
@@ -64,9 +64,9 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
     JsonNode attempt = listRecallAnswers().get("attempts").get(0);
 
     assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
-    assertThat(attempt.at("/excludedAsAmbiguous/reason").asText(), equalTo("both choices fit"));
+    assertThat(attempt.at("/excludedAsAmbiguous/reason").asString(), equalTo("both choices fit"));
     assertThat(
-        attempt.at("/note/graph/focusNote/portablePath").asText(),
+        attempt.at("/note/graph/focusNote/portablePath").asString(),
         equalTo("Engineering:Code Review"));
   }
 
@@ -79,9 +79,9 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
 
     assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
     JsonNode spelling = attempt.get("spelling");
-    assertThat(spelling.get("typedAnswer").asText(), equalTo("Code Reveiw"));
+    assertThat(spelling.get("typedAnswer").asString(), equalTo("Code Reveiw"));
     assertThat(
-        spelling.get("prompt").asText(),
+        spelling.get("prompt").asString(),
         equalTo(
             "A <mark title='Hidden text that is matching the answer'>[...]</mark>"
                 + " catches bugs early."));
@@ -99,9 +99,9 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
 
     assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
     JsonNode spelling = attempt.get("spelling");
-    assertThat(spelling.get("typedAnswer").asText(), equalTo("Code Reveiw"));
+    assertThat(spelling.get("typedAnswer").asString(), equalTo("Code Reveiw"));
     assertThat(spelling.has("prompt"), equalTo(false));
-    assertThat(spelling.get("promptUnavailable").asText(), containsString("edited after"));
+    assertThat(spelling.get("promptUnavailable").asString(), containsString("edited after"));
   }
 
   @Test
@@ -118,8 +118,8 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
     JsonNode attempt = listRecallAnswers().get("attempts").get(0);
 
     assertThat(attempt.get("correct"), equalTo(BooleanNode.TRUE));
-    assertThat(attempt.get("outcome").asText(), equalTo("OVERLAP"));
-    assertThat(attempt.at("/spelling/typedAnswer").asText(), equalTo("Review"));
+    assertThat(attempt.get("outcome").asString(), equalTo("OVERLAP"));
+    assertThat(attempt.at("/spelling/typedAnswer").asString(), equalTo("Review"));
     assertTitleAndPathOnly(attempt.get("note"));
   }
 
@@ -149,9 +149,9 @@ class ListRecallAnswersMcpEndpointTest extends ListRecallAnswersMcpEndpointTestB
     assertThat(attempts.size(), equalTo(1));
     JsonNode attempt = attempts.get(0);
     assertThat(attempt.get("correct"), equalTo(BooleanNode.FALSE));
-    assertThat(attempt.get("outcome").asText(), equalTo("ACCIDENTAL_MATCH"));
-    assertThat(attempt.at("/note/title").asText(), equalTo("Code Review"));
-    assertThat(attempt.at("/spelling/typedAnswer").asText(), equalTo("Pair Programming"));
+    assertThat(attempt.get("outcome").asString(), equalTo("ACCIDENTAL_MATCH"));
+    assertThat(attempt.at("/note/title").asString(), equalTo("Code Review"));
+    assertThat(attempt.at("/spelling/typedAnswer").asString(), equalTo("Pair Programming"));
   }
 
   private void noteLastUpdatedAt(Timestamp updatedAt) {

@@ -8,8 +8,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -18,12 +17,13 @@ import com.odde.donut.entities.UserToken;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   @Test
   void returnsAliasMatchAsCandidate() throws Exception {
@@ -38,9 +38,9 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode candidate = findCandidate(candidates, "Engineering:Practices/Design/Colour Theory");
     assertThat(
-        candidate.get("portablePath").asText(),
+        candidate.get("portablePath").asString(),
         equalTo("Engineering:Practices/Design/Colour Theory"));
-    assertThat(candidate.get("folderPath").asText(), equalTo("Practices/Design"));
+    assertThat(candidate.get("folderPath").asString(), equalTo("Practices/Design"));
   }
 
   @Test
@@ -70,11 +70,11 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
     assertThat(candidates.size(), equalTo(2));
     JsonNode first = findCandidate(candidates, "CS concepts:Functional");
     JsonNode second = findCandidate(candidates, "Maths:Functional");
-    assertThat(first.get("notebookName").asText(), equalTo("CS concepts"));
-    assertThat(first.get("folderName").asText(), equalTo("Programming Concepts"));
-    assertThat(second.get("notebookName").asText(), equalTo("Maths"));
-    assertThat(second.get("portablePath").asText(), equalTo("Maths:Functional"));
-    assertThat(second.get("folderPath").asText(), equalTo(""));
+    assertThat(first.get("notebookName").asString(), equalTo("CS concepts"));
+    assertThat(first.get("folderName").asString(), equalTo("Programming Concepts"));
+    assertThat(second.get("notebookName").asString(), equalTo("Maths"));
+    assertThat(second.get("portablePath").asString(), equalTo("Maths:Functional"));
+    assertThat(second.get("folderPath").asString(), equalTo(""));
     assertThat(second.has("folderName"), equalTo(false));
   }
 
@@ -89,7 +89,7 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
     JsonNode candidates = callListNoteCandidates(personalToken, "Code Review");
 
     assertThat(
-        findCandidate(candidates, "Engineering:/Code Review").get("portablePath").asText(),
+        findCandidate(candidates, "Engineering:/Code Review").get("portablePath").asString(),
         equalTo("Engineering:/Code Review"));
   }
 
@@ -101,7 +101,7 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode candidates = callListNoteCandidates(personalToken, "escaped destination");
 
-    assertThat(candidates.get(0).get("portablePath").asText(), equalTo("Engineering:A\\|B\\\\C"));
+    assertThat(candidates.get(0).get("portablePath").asString(), equalTo("Engineering:A\\|B\\\\C"));
   }
 
   @Test
@@ -149,7 +149,7 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
             .andExpect(status().isOk())
             .andReturn();
     JsonNode root = objectMapper.readTree(result.getResponse().getContentAsString());
-    String text = root.at("/result/content/0/text").asText();
+    String text = root.at("/result/content/0/text").asString();
     if (ListNoteCandidatesTool.EMPTY_SEARCH_SIGNAL.equals(text)) {
       return objectMapper.createArrayNode();
     }
@@ -171,14 +171,14 @@ class ListNoteCandidatesMcpEndpointTest extends McpEndpointTestBase {
   private static List<String> candidatePaths(JsonNode candidates) {
     List<String> paths = new ArrayList<>();
     for (JsonNode candidate : candidates) {
-      paths.add(candidate.get("portablePath").asText());
+      paths.add(candidate.get("portablePath").asString());
     }
     return paths;
   }
 
   private static JsonNode findCandidate(JsonNode candidates, String portablePath) {
     for (JsonNode candidate : candidates) {
-      if (candidate.get("portablePath").asText().equals(portablePath)) {
+      if (candidate.get("portablePath").asString().equals(portablePath)) {
         return candidate;
       }
     }

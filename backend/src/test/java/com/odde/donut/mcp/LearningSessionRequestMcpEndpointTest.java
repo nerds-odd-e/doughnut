@@ -5,17 +5,17 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Notebook;
 import java.sql.Timestamp;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class LearningSessionRequestMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   @BeforeEach
   void setSessionTime() {
@@ -36,8 +36,8 @@ class LearningSessionRequestMcpEndpointTest extends McpEndpointTestBase {
     JsonNode session = requestSession().at("/result/structuredContent");
 
     assertThat(session.get("notebookId").asInt(), equalTo(notebook.getId()));
-    assertThat(session.get("notebookName").asText(), equalTo("Japanese"));
-    String markdown = session.get("requestMarkdown").asText();
+    assertThat(session.get("notebookName").asString(), equalTo("Japanese"));
+    String markdown = session.get("requestMarkdown").asString();
     assertThat(markdown, containsString("# Learning Session Request"));
     assertThat(markdown, containsString("Practice polite greetings."));
     assertThat(markdown, containsString("### こんにちは"));
@@ -67,7 +67,7 @@ class LearningSessionRequestMcpEndpointTest extends McpEndpointTestBase {
     makeMe.aMemoryTrackerFor(foreign).commissioned().please();
 
     assertThat(
-        requestSession().at("/result/content/0/text").asText(),
+        requestSession().at("/result/content/0/text").asString(),
         equalTo(RequestLearningSessionTool.NO_SESSION_SIGNAL));
   }
 
@@ -77,7 +77,7 @@ class LearningSessionRequestMcpEndpointTest extends McpEndpointTestBase {
     makeMe.aMemoryTrackerFor(foreign).by(personalUser).commissioned().please();
 
     assertThat(
-        requestSession().at("/error/message").asText(),
+        requestSession().at("/error/message").asString(),
         equalTo("It seems you cannot access this page."));
   }
 

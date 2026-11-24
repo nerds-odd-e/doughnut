@@ -5,9 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -17,10 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   private static final String TITLE = "Topic | Tips\\Examples";
   private static final String ESCAPED_TITLE = "Topic \\| Tips\\\\Examples";
@@ -63,7 +63,7 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
         };
     String entry = "/focusNote/" + collection + "/0";
     String wiki =
-        graph.at(collection.equals("inboundReferences") ? entry + "/link" : entry).asText();
+        graph.at(collection.equals("inboundReferences") ? entry + "/link" : entry).asString();
 
     assertThat(wiki, equalTo("[[" + expectedPath + "]]"));
     assertRoundTrip(wiki, content);
@@ -86,9 +86,9 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
     assertThat(inbound.size(), equalTo(3));
     assertThat(inbound.get(0).has("referrerPropertyTypes"), is(false));
     assertThat(inbound.get(1).get("referrerPropertyTypes").toString(), equalTo("[\"see also\"]"));
-    assertRoundTrip(inbound.get(1).get("link").asText(), sourceContent);
+    assertRoundTrip(inbound.get(1).get("link").asString(), sourceContent);
     assertThat(inbound.get(2).has("referrerPropertyTypes"), is(false));
-    assertRoundTrip(inbound.get(2).get("link").asText(), relationContent);
+    assertRoundTrip(inbound.get(2).get("link").asString(), relationContent);
   }
 
   @ParameterizedTest
@@ -102,7 +102,7 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
     JsonNode graph = graph(FOCUS_PATH);
     JsonNode related = null;
     for (JsonNode note : graph.get("relatedNotes")) {
-      if (note.get("content").asText().equals(content)) {
+      if (note.get("content").asString().equals(content)) {
         related = note;
         break;
       }
@@ -115,7 +115,7 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
         };
     assertThat(related.get("retrievalPath").size(), equalTo(expected.size()));
     for (int i = 0; i < expected.size(); i++) {
-      String wiki = related.get("retrievalPath").get(i).asText();
+      String wiki = related.get("retrievalPath").get(i).asString();
       assertThat(wiki, equalTo("[[" + expected.get(i) + "]]"));
       assertRoundTrip(wiki, i == 0 ? focusContent : content);
     }
@@ -127,9 +127,9 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
                 WikiLinkMarkdown.authoredTokensInOccurrenceOrder(wiki).getFirst())
             .rawTarget();
     assertThat(
-        call("read_note", Map.of("portablePath", destination)).get("content").asText(),
+        call("read_note", Map.of("portablePath", destination)).get("content").asString(),
         equalTo(content));
-    assertThat(graph(destination).at("/focusNote/content").asText(), equalTo(content));
+    assertThat(graph(destination).at("/focusNote/content").asString(), equalTo(content));
   }
 
   private JsonNode graph(String destination) throws Exception {
@@ -155,6 +155,9 @@ class GraphNavigationMcpEndpointTest extends McpEndpointTestBase {
             .andReturn()
             .getResponse();
     return objectMapper.readTree(
-        objectMapper.readTree(response.getContentAsString()).at("/result/content/0/text").asText());
+        objectMapper
+            .readTree(response.getContentAsString())
+            .at("/result/content/0/text")
+            .asString());
   }
 }

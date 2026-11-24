@@ -7,9 +7,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookGit.WebNoteEditService;
@@ -20,9 +19,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   @Autowired WebNoteEditService webNoteEditService;
   @Autowired CanonicalDonutOrigin canonicalDonutOrigin;
 
@@ -43,7 +44,7 @@ class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
     makeMe.aNote("Code Review").notebook(notebook).aliases("Review").please();
     makeMe.aNote("Peer Review").notebook(notebook).aliases("Review").please();
 
-    assertThat(read("Review").get("content").asText(), equalTo("Display name target"));
+    assertThat(read("Review").get("content").asString(), equalTo("Display name target"));
   }
 
   @ParameterizedTest
@@ -52,7 +53,7 @@ class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
     Notebook notebook = engineering();
     var target = makeMe.aNote("Code Review").notebook(notebook).aliases("Review", "A|B").please();
 
-    assertThat(read(path).get("content").asText(), equalTo(target.getContent()));
+    assertThat(read(path).get("content").asString(), equalTo(target.getContent()));
   }
 
   @ParameterizedTest
@@ -72,7 +73,7 @@ class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
     makeMe.aNote("Code Review").folder(otherDesign).content("Other target").please();
     makeMe.aNote("Code Review").notebook(notebook).content("Root target").please();
 
-    assertThat(read(path).get("content").asText(), equalTo(expected));
+    assertThat(read(path).get("content").asString(), equalTo(expected));
   }
 
   @ParameterizedTest
@@ -85,20 +86,20 @@ class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
     assertThat(
         call(Map.of("portablePath", "Engineering:/Review"))
             .at("/structuredContent/portablePath")
-            .asText(),
+            .asString(),
         equalTo("Engineering:/Review"));
 
     JsonNode result = call(Map.of("portablePath", path));
 
     assertThat(result.get("isError").asBoolean(), equalTo(true));
-    assertThat(result.at("/content/0/text").asText(), containsString("Supply notebookName"));
+    assertThat(result.at("/content/0/text").asString(), containsString("Supply notebookName"));
   }
 
   @Test
   void blankScopeReceivesActionableFeedback() throws Exception {
     JsonNode result = call(Map.of("portablePath", "Review", "notebookName", " "));
 
-    assertThat(result.at("/content/0/text").asText(), containsString("Supply notebookName"));
+    assertThat(result.at("/content/0/text").asString(), containsString("Supply notebookName"));
   }
 
   @Test
@@ -109,7 +110,7 @@ class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode result = call(Map.of("portablePath", "Engineering:Review", "notebookName", "Other"));
 
-    assertThat(result.at("/structuredContent/content").asText(), equalTo("Engineering target"));
+    assertThat(result.at("/structuredContent/content").asString(), equalTo("Engineering target"));
   }
 
   @Test
@@ -117,7 +118,7 @@ class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
     String content = "---\ntopic name: authored value\n---\nFull body [[Review]] with spacing.\n";
     makeMe.aNote("Review").notebook(engineering()).content(content).please();
 
-    assertThat(read("Review#prop:topic%20name").get("content").asText(), equalTo(content));
+    assertThat(read("Review#prop:topic%20name").get("content").asString(), equalTo(content));
   }
 
   @ParameterizedTest
@@ -162,7 +163,7 @@ class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
 
     assertThat(result.get("isError").asBoolean(), equalTo(true));
     assertThat(
-        result.at("/content/0/text").asText(), containsString("Several readable notes match"));
+        result.at("/content/0/text").asString(), containsString("Several readable notes match"));
   }
 
   @Test
@@ -171,12 +172,12 @@ class ReadNoteScopedPathMcpEndpointTest extends McpEndpointTestBase {
     makeMe.aNote("Review").notebook(notebook).trashed().please();
     var target = makeMe.aNote("Code Review").notebook(notebook).aliases("Review").please();
 
-    assertThat(read("Review").get("content").asText(), equalTo(target.getContent()));
+    assertThat(read("Review").get("content").asString(), equalTo(target.getContent()));
   }
 
   private void assertUnresolved(JsonNode result) {
     assertThat(result.get("isError").asBoolean(), equalTo(true));
-    assertThat(result.at("/content/0/text").asText(), containsString("No readable note matches"));
+    assertThat(result.at("/content/0/text").asString(), containsString("No readable note matches"));
   }
 
   private Notebook engineering() {

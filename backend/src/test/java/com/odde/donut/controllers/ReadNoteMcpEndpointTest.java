@@ -10,8 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -27,6 +26,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * MCP {@code read_note} at the HTTP boundary, reusing Git-backed notebook fixtures for attribution.
@@ -35,7 +36,7 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
   private static final String MCP_ACCEPT = "application/json, text/event-stream";
 
   @Autowired MockMvc mockMvc;
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   @Test
   void readsTheNoteWithItsSourceAttribution() throws Exception {
@@ -69,17 +70,17 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
     UserToken token = tokenForOwner();
 
     JsonNode result = callReadNoteResult(token, "Physics:Mechanics/Energy/Kinetic");
-    JsonNode text = objectMapper.readTree(result.at("/content/0/text").asText());
+    JsonNode text = objectMapper.readTree(result.at("/content/0/text").asString());
     JsonNode read = result.get("structuredContent");
 
     assertThat(read, equalTo(text));
-    assertThat(read.get("portablePath").asText(), equalTo("Physics:Mechanics/Energy/Kinetic"));
-    assertThat(read.get("title").asText(), equalTo("Kinetic"));
-    assertThat(read.get("notebookName").asText(), equalTo("Physics"));
-    assertThat(read.get("folderPath").asText(), equalTo("Mechanics / Energy"));
-    assertThat(read.get("content").asText(), equalTo(authoredContent));
-    assertThat(read.get("updatedAt").asText(), equalTo("2026-09-06T04:05:06.000+00:00"));
-    assertThat(read.get("acceptedRevision").asText(), equalTo(head));
+    assertThat(read.get("portablePath").asString(), equalTo("Physics:Mechanics/Energy/Kinetic"));
+    assertThat(read.get("title").asString(), equalTo("Kinetic"));
+    assertThat(read.get("notebookName").asString(), equalTo("Physics"));
+    assertThat(read.get("folderPath").asString(), equalTo("Mechanics / Energy"));
+    assertThat(read.get("content").asString(), equalTo(authoredContent));
+    assertThat(read.get("updatedAt").asString(), equalTo("2026-09-06T04:05:06.000+00:00"));
+    assertThat(read.get("acceptedRevision").asString(), equalTo(head));
     assertThat(head, matchesPattern("[0-9a-f]{40}"));
 
     mockMvc
@@ -111,14 +112,14 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
     String earlier =
         callReadNote(token, note.getNotebook().getName() + ":" + note.getTitle())
             .get("acceptedRevision")
-            .asText();
+            .asString();
 
     textContentController.updateNoteContent(edited, contentDto(EDITED_CONTENT));
 
     assertThat(
         callReadNote(token, note.getNotebook().getName() + ":" + note.getTitle())
             .get("acceptedRevision")
-            .asText(),
+            .asString(),
         not(equalTo(earlier)));
     assertThat(earlier, matchesPattern("[0-9a-f]{40}"));
   }
@@ -155,7 +156,7 @@ class ReadNoteMcpEndpointTest extends NotebookGitWebContentControllerTestBase {
 
   private JsonNode callReadNote(UserToken token, String portablePath) throws Exception {
     return objectMapper.readTree(
-        callReadNoteResult(token, portablePath).at("/content/0/text").asText());
+        callReadNoteResult(token, portablePath).at("/content/0/text").asString());
   }
 
   private JsonNode callReadNoteResult(UserToken token, String portablePath) throws Exception {

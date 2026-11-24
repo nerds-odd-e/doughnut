@@ -4,8 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Notebook;
@@ -15,9 +14,11 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class LearningSessionRecordMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   @Autowired RecallLogRepository recallLogs;
   Notebook notebook;
 
@@ -37,7 +38,7 @@ class LearningSessionRecordMcpEndpointTest extends McpEndpointTestBase {
     var requested =
         call(RequestLearningSessionTool.NAME, Map.of("timezone", "Asia/Tokyo"))
             .at("/result/structuredContent/requestMarkdown")
-            .asText();
+            .asString();
     for (String title : new String[] {"A", "B", "C"}) {
       assertThat(requested, containsString("### " + title));
     }
@@ -108,7 +109,7 @@ class LearningSessionRecordMcpEndpointTest extends McpEndpointTestBase {
     makeMe.aMemoryTrackerFor(foreign).by(personalUser).commissioned().please();
 
     assertThat(
-        record(foreign.getNotebook(), "Private: 3").at("/error/message").asText(),
+        record(foreign.getNotebook(), "Private: 3").at("/error/message").asString(),
         equalTo("It seems you cannot access this page."));
     assertThat(recallLogs.count(), equalTo(0L));
   }

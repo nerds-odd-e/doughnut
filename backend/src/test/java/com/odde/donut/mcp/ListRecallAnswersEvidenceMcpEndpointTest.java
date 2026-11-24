@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.entities.Subscription;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.ApproximateUtf8TokenBudget;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 /** Which source note evidence an attempt carries, chosen by recorded correctness and type. */
 class ListRecallAnswersEvidenceMcpEndpointTest extends ListRecallAnswersMcpEndpointTestBase {
@@ -25,7 +25,7 @@ class ListRecallAnswersEvidenceMcpEndpointTest extends ListRecallAnswersMcpEndpo
 
     JsonNode attempt = listRecallAnswers().get("attempts").get(0);
 
-    assertThat(attempt.at("/multipleChoice/stem").asText(), equalTo("Who reviews code?"));
+    assertThat(attempt.at("/multipleChoice/stem").asString(), equalTo("Who reviews code?"));
     assertTitleAndPathOnly(attempt.get("note"));
   }
 
@@ -59,9 +59,9 @@ class ListRecallAnswersEvidenceMcpEndpointTest extends ListRecallAnswersMcpEndpo
 
     JsonNode sourceNote = listRecallAnswers().at("/attempts/0/note");
 
-    assertThat(sourceNote.get("title").asText(), equalTo("Code Review"));
-    assertThat(sourceNote.get("portablePath").asText(), equalTo("Engineering:Code Review"));
-    assertThat(sourceNote.get("content").asText(), equalTo("A code review catches bugs early."));
+    assertThat(sourceNote.get("title").asString(), equalTo("Code Review"));
+    assertThat(sourceNote.get("portablePath").asString(), equalTo("Engineering:Code Review"));
+    assertThat(sourceNote.get("content").asString(), equalTo("A code review catches bugs early."));
     assertThat(sourceNote.has("graph"), equalTo(false));
   }
 
@@ -74,11 +74,11 @@ class ListRecallAnswersEvidenceMcpEndpointTest extends ListRecallAnswersMcpEndpo
 
     JsonNode sourceNote = listRecallAnswers(Map.of("days", 14)).at("/attempts/0/note");
 
-    assertThat(sourceNote.get("title").asText(), equalTo("Code Review"));
-    assertThat(sourceNote.get("portablePath").asText(), equalTo("Engineering:Code Review"));
+    assertThat(sourceNote.get("title").asString(), equalTo("Code Review"));
+    assertThat(sourceNote.get("portablePath").asString(), equalTo("Engineering:Code Review"));
     assertThat(sourceNote.has("content"), equalTo(false));
     JsonNode graph = sourceNote.get("graph");
-    assertThat(graph.at("/focusNote/portablePath").asText(), equalTo("Engineering:Code Review"));
+    assertThat(graph.at("/focusNote/portablePath").asString(), equalTo("Engineering:Code Review"));
     assertThat(graph.get("focusNote").has("id"), equalTo(false));
     assertThat(
         texts(graph.get("relatedNotes"), "/portablePath"), hasItem("Engineering:Pair Programming"));
@@ -96,11 +96,11 @@ class ListRecallAnswersEvidenceMcpEndpointTest extends ListRecallAnswersMcpEndpo
 
     assertThat(graph.get("relatedNotes").size(), greaterThan(0));
     int tokens =
-        ApproximateUtf8TokenBudget.estimateApproxTokens(graph.at("/focusNote/content").asText())
+        ApproximateUtf8TokenBudget.estimateApproxTokens(graph.at("/focusNote/content").asString())
             + StreamSupport.stream(graph.get("relatedNotes").spliterator(), false)
                 .mapToInt(related ->
                     ApproximateUtf8TokenBudget.estimateApproxTokens(
-                        related.get("content").asText()))
+                        related.get("content").asString()))
                 .sum();
     assertThat(tokens, lessThanOrEqualTo(1000));
   }
@@ -146,21 +146,21 @@ class ListRecallAnswersEvidenceMcpEndpointTest extends ListRecallAnswersMcpEndpo
 
     JsonNode attempt = listRecallAnswers().at("/attempts/0");
 
-    assertThat(attempt.at("/spelling/typedAnswer").asText(), equalTo("Code Reveiw"));
+    assertThat(attempt.at("/spelling/typedAnswer").asString(), equalTo("Code Reveiw"));
     assertThat(attempt.get("spelling").has("prompt"), equalTo(false));
     assertThat(
-        attempt.at("/spelling/promptUnavailable").asText(), equalTo("The note is in the trash."));
+        attempt.at("/spelling/promptUnavailable").asString(), equalTo("The note is in the trash."));
     assertThat(fieldNames(attempt.get("note")), contains("unavailable"));
   }
 
   private void assertKeptWithUnavailableNote(JsonNode attempt, String reason) {
-    assertThat(attempt.get("answeredAt").asText(), equalTo(hoursAgo(24).toInstant().toString()));
+    assertThat(attempt.get("answeredAt").asString(), equalTo(hoursAgo(24).toInstant().toString()));
     assertThat(attempt.get("correct").asBoolean(), equalTo(false));
-    assertThat(attempt.at("/multipleChoice/stem").asText(), equalTo("Who reviews code?"));
+    assertThat(attempt.at("/multipleChoice/stem").asString(), equalTo("Who reviews code?"));
     assertThat(texts(attempt.at("/multipleChoice/choices")), contains("Peers", "Nobody"));
-    assertThat(attempt.at("/multipleChoice/selectedChoice").asText(), equalTo("Nobody"));
+    assertThat(attempt.at("/multipleChoice/selectedChoice").asString(), equalTo("Nobody"));
     assertThat(fieldNames(attempt.get("note")), contains("unavailable"));
-    assertThat(attempt.at("/note/unavailable").asText(), equalTo(reason));
+    assertThat(attempt.at("/note/unavailable").asString(), equalTo(reason));
   }
 
   private void answeredMultipleChoice(int choiceIndex, Timestamp answeredAt) {

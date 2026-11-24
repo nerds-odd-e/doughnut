@@ -6,16 +6,16 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class ReadNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   @Test
   void readsAKnownQualifiedDestinationWithoutDiscovery() throws Exception {
@@ -27,8 +27,8 @@ class ReadNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode read = call("read_note", Map.of("portablePath", "Engineering:Practices/Code Review"));
 
-    assertThat(read.get("content").asText(), equalTo(content));
-    assertThat(read.get("portablePath").asText(), equalTo("Engineering:Practices/Code Review"));
+    assertThat(read.get("content").asString(), equalTo(content));
+    assertThat(read.get("portablePath").asString(), equalTo("Engineering:Practices/Code Review"));
   }
 
   @Test
@@ -39,12 +39,12 @@ class ReadNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
     var aliasMatch = makeMe.aNote("Colour Theory").folder(design).aliases("color").please();
     makeMe.aNote("Colour Theory").notebook(notebook).please();
     JsonNode candidates = call("list_note_candidates", Map.of("query", "color"));
-    String discoveredPath = candidates.get(0).get("portablePath").asText();
+    String discoveredPath = candidates.get(0).get("portablePath").asString();
 
     JsonNode read = call("read_note", Map.of("portablePath", discoveredPath));
 
-    assertThat(read.get("content").asText(), equalTo(aliasMatch.getContent()));
-    assertThat(read.get("portablePath").asText(), equalTo(discoveredPath));
+    assertThat(read.get("content").asString(), equalTo(aliasMatch.getContent()));
+    assertThat(read.get("portablePath").asString(), equalTo(discoveredPath));
   }
 
   @Test
@@ -56,7 +56,7 @@ class ReadNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode read = call("read_note", Map.of("portablePath", "Engineering:/Code Review"));
 
-    assertThat(read.get("content").asText(), equalTo("Root target"));
+    assertThat(read.get("content").asString(), equalTo("Root target"));
   }
 
   @Test
@@ -82,7 +82,10 @@ class ReadNotePortablePathMcpEndpointTest extends McpEndpointTestBase {
             .andReturn()
             .getResponse();
     return objectMapper.readTree(
-        objectMapper.readTree(response.getContentAsString()).at("/result/content/0/text").asText());
+        objectMapper
+            .readTree(response.getContentAsString())
+            .at("/result/content/0/text")
+            .asString());
   }
 
   private String body(String name, Map<String, Object> arguments) throws Exception {

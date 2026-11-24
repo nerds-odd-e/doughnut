@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.ai.SupportedChoices;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
@@ -16,6 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
+import tools.jackson.databind.JsonNode;
 
 class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAnswerTestBase {
   @Test
@@ -35,7 +35,7 @@ class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAns
     JsonNode log = asked.history().at("/0/recallLog");
     assertThat(prompt.path("id").asInt(), equalTo(asked.promptId()));
     assertThat(prompt.at("/mcq/id").asInt(), equalTo(asked.questionId()));
-    assertThat(prompt.at("/mcq/questionStem").asText(), equalTo("Which approach?"));
+    assertThat(prompt.at("/mcq/questionStem").asString(), equalTo("Which approach?"));
     assertThat(
         texts(prompt.at("/mcq/responseChoices")), contains("key", "second", "selected-third"));
     assertThat(prompt.at("/mcq/correctAnswerIndex").asInt(), equalTo(0));
@@ -43,13 +43,13 @@ class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAns
     assertThat(answer.path("choiceIndex").asInt(), equalTo(2));
     assertThat(answer.path("correct").asBoolean(), equalTo(false));
     assertThat(answer.path("outcome").isNull(), equalTo(true));
-    assertThat(answer.path("exclusionReason").asText(), equalTo("two interpretations"));
+    assertThat(answer.path("exclusionReason").asString(), equalTo("two interpretations"));
     assertThat(
-        Instant.parse(answer.path("excludedAt").asText()), equalTo(hoursAgo(12).toInstant()));
+        Instant.parse(answer.path("excludedAt").asString()), equalTo(hoursAgo(12).toInstant()));
     assertThat(
-        Instant.parse(prompt.path("answerTime").asText()), equalTo(hoursAgo(24).toInstant()));
+        Instant.parse(prompt.path("answerTime").asString()), equalTo(hoursAgo(24).toInstant()));
     assertThat(
-        Instant.parse(prompt.path("questionGeneratedTime").asText()),
+        Instant.parse(prompt.path("questionGeneratedTime").asString()),
         equalTo(hoursAgo(25).toInstant()));
     assertThat(answer.path("thinkingTimeMs").asInt(), equalTo(1200));
     assertThat(answer.path("awayMs").asInt(), equalTo(200));
@@ -60,7 +60,7 @@ class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAns
     assertThat(log.path("id").asInt(), greaterThan(0));
     assertThat(log.path("answerId"), equalTo(answer.path("id")));
     assertThat(log.path("memoryTrackerId").asInt(), equalTo(asked.trackerId()));
-    assertThat(log.path("productOutcome").asText(), equalTo("AGAIN"));
+    assertThat(log.path("productOutcome").asString(), equalTo("AGAIN"));
     assertThat(log.path("recordedAt"), equalTo(prompt.path("answerTime")));
     assertThat(log.path("elapsedHours").asInt(), equalTo(24));
     assertThat(log.path("stabilityBefore").asDouble(), equalTo(200d));
@@ -73,15 +73,16 @@ class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAns
     JsonNode attempt = answers().at("/attempts/0");
     currentEvidence(attempt, "Code Review");
     assertThat(attempt.path("correct").asBoolean(), equalTo(false));
-    assertThat(attempt.path("answeredAt").asText(), equalTo(hoursAgo(24).toInstant().toString()));
+    assertThat(attempt.path("answeredAt").asString(), equalTo(hoursAgo(24).toInstant().toString()));
     assertThat(
-        attempt.at("/multipleChoice/validationRationale").asText(), equalTo("The key fits."));
-    assertThat(attempt.at("/multipleChoice/stem").asText(), equalTo("Which approach?"));
+        attempt.at("/multipleChoice/validationRationale").asString(), equalTo("The key fits."));
+    assertThat(attempt.at("/multipleChoice/stem").asString(), equalTo("Which approach?"));
     assertThat(
         texts(attempt.at("/multipleChoice/choices")), contains("key", "second", "selected-third"));
-    assertThat(attempt.at("/multipleChoice/selectedChoice").asText(), equalTo("selected-third"));
-    assertThat(attempt.at("/multipleChoice/expectedAnswer").asText(), equalTo("key"));
-    assertThat(attempt.at("/excludedAsAmbiguous/reason").asText(), equalTo("two interpretations"));
+    assertThat(attempt.at("/multipleChoice/selectedChoice").asString(), equalTo("selected-third"));
+    assertThat(attempt.at("/multipleChoice/expectedAnswer").asString(), equalTo("key"));
+    assertThat(
+        attempt.at("/excludedAsAmbiguous/reason").asString(), equalTo("two interpretations"));
     String markdown = export(sourceId, "related");
     assertThat(markdown, containsString("1. Which approach?\n"));
     for (String choice : List.of("key", "second", "selected-third")) {
@@ -119,12 +120,12 @@ class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAns
         conversation.at("/subject/recallPrompt/recalledNote/noteTopology/id").asInt(),
         equalTo(sourceId));
     assertThat(
-        conversation.at("/subject/recallPrompt/recalledNote/propertyKey").asText(),
+        conversation.at("/subject/recallPrompt/recalledNote/propertyKey").asString(),
         equalTo("related"));
     assertThat(
         json(get("/api/conversation/{id}/export", conversation.path("id").asInt()))
             .at("/input/0/content")
-            .asText(),
+            .asString(),
         containsString(focus));
   }
 
@@ -136,7 +137,7 @@ class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAns
     noteReferenceService.refreshDerivedIndexesForNote(note);
     Asked asked = answerAndExclude(note, "related");
     assertThat(
-        asked.history().at("/0/recallPrompt/mcq/questionStem").asText(),
+        asked.history().at("/0/recallPrompt/mcq/questionStem").asString(),
         equalTo("Which approach?"));
     assertThat(asked.history().at("/0/recallPrompt/mcq/id").asInt(), equalTo(asked.questionId()));
     int destinationId =
@@ -154,7 +155,7 @@ class ListRecallAnswersMovedTrackerMcpEndpointTest extends MovedTrackerRecallAns
     retained(asked, destinationId, "");
     JsonNode attempt = answers().at("/attempts/0");
     currentEvidence(attempt, "Code Review related Target");
-    assertThat(attempt.at("/multipleChoice/stem").asText(), equalTo("Which approach?"));
+    assertThat(attempt.at("/multipleChoice/stem").asString(), equalTo("Which approach?"));
     assertThat(export(destinationId, ""), containsString("Which approach?"));
   }
 }

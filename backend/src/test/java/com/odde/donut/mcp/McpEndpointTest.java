@@ -8,8 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.json.McpJsonDefaults;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
@@ -20,6 +18,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class McpEndpointTest extends McpEndpointTestBase {
 
@@ -130,7 +130,7 @@ class McpEndpointTest extends McpEndpointTestBase {
             var decodedTools =
                 mapper.convertValue(response.result(), McpSchema.ListToolsResult.class);
             assertThat(decodedTools.tools(), hasSize(6));
-            JsonNode tools = new ObjectMapper().readTree(json).path("result").path("tools");
+            JsonNode tools = new JsonMapper().readTree(json).path("result").path("tools");
             for (JsonNode tool : tools) {
               assertThat(
                   tool.path("securitySchemes"),

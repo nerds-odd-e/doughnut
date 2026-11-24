@@ -4,18 +4,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class GraphNodePortablePathMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   private static final String TITLE = "Topic | Tips\\Examples";
   private static final String ESCAPED_TITLE = "Topic \\| Tips\\\\Examples";
@@ -58,7 +58,7 @@ class GraphNodePortablePathMcpEndpointTest extends McpEndpointTestBase {
     JsonNode returned = graph.get("focusNote");
     if (node.endsWith("Related")) {
       for (JsonNode related : graph.get("relatedNotes")) {
-        if (related.get("content").asText().equals(content)) {
+        if (related.get("content").asString().equals(content)) {
           returned = related;
           break;
         }
@@ -71,11 +71,11 @@ class GraphNodePortablePathMcpEndpointTest extends McpEndpointTestBase {
           case "folderRelated" -> FOLDER_RELATED;
           default -> ROOT_FOCUS;
         };
-    String portablePath = returned.get("portablePath").asText();
+    String portablePath = returned.get("portablePath").asString();
 
     assertThat(portablePath, equalTo(expectedPath));
     assertThat(
-        call("read_note", Map.of("portablePath", portablePath)).get("content").asText(),
+        call("read_note", Map.of("portablePath", portablePath)).get("content").asString(),
         equalTo(content));
   }
 
@@ -98,6 +98,9 @@ class GraphNodePortablePathMcpEndpointTest extends McpEndpointTestBase {
             .andReturn()
             .getResponse();
     return objectMapper.readTree(
-        objectMapper.readTree(response.getContentAsString()).at("/result/content/0/text").asText());
+        objectMapper
+            .readTree(response.getContentAsString())
+            .at("/result/content/0/text")
+            .asString());
   }
 }

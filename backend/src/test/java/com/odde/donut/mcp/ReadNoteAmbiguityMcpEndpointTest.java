@@ -6,8 +6,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import java.util.Map;
@@ -15,10 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class ReadNoteAmbiguityMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   @ParameterizedTest
   @ValueSource(strings = {"Code Review", "Code Review#prop:topic"})
@@ -32,7 +32,7 @@ class ReadNoteAmbiguityMcpEndpointTest extends McpEndpointTestBase {
 
     assertThat(result.get("isError").asBoolean(), equalTo(true));
     assertThat(
-        result.at("/content/0/text").asText(), containsString("Several readable notes match"));
+        result.at("/content/0/text").asString(), containsString("Several readable notes match"));
     assertThat(
         choices,
         containsInAnyOrder(
@@ -49,14 +49,14 @@ class ReadNoteAmbiguityMcpEndpointTest extends McpEndpointTestBase {
     JsonNode choices = ambiguity(read("Code Review", "Engineering")).get("candidates");
     String selected = null;
     for (JsonNode choice : choices) {
-      if (choice.get("folderPath").asText().equals(folderPath)) {
-        selected = choice.get("portablePath").asText();
+      if (choice.get("folderPath").asString().equals(folderPath)) {
+        selected = choice.get("portablePath").asString();
       }
     }
 
     JsonNode result = read(selected, "");
 
-    assertThat(result.at("/structuredContent/content").asText(), equalTo(content));
+    assertThat(result.at("/structuredContent/content").asString(), equalTo(content));
   }
 
   @Test
@@ -70,7 +70,7 @@ class ReadNoteAmbiguityMcpEndpointTest extends McpEndpointTestBase {
     JsonNode result = read("Code Review", "Private");
 
     assertThat(result.get("isError").asBoolean(), equalTo(true));
-    assertThat(result.at("/content/0/text").asText(), containsString("No readable note matches"));
+    assertThat(result.at("/content/0/text").asString(), containsString("No readable note matches"));
     assertThat(result.has("structuredContent"), equalTo(false));
   }
 
@@ -88,7 +88,7 @@ class ReadNoteAmbiguityMcpEndpointTest extends McpEndpointTestBase {
   }
 
   private JsonNode ambiguity(JsonNode result) throws Exception {
-    String text = result.at("/content/0/text").asText();
+    String text = result.at("/content/0/text").asString();
     return objectMapper.readTree(text.substring(text.indexOf('\n') + 1));
   }
 

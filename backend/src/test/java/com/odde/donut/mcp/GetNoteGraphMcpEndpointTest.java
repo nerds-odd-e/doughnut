@@ -8,8 +8,7 @@ import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -20,11 +19,12 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   @Test
   void largeBudgetReturnsFocusAndFolderPeerRelatedContext() throws Exception {
@@ -34,8 +34,8 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode graph = callGetNoteGraph(focus, 1000);
 
-    assertThat(graph.at("/focusNote/title").asText(), equalTo("Functional"));
-    assertThat(graph.at("/focusNote/notebook").asText(), equalTo(folder.getNotebook().getName()));
+    assertThat(graph.at("/focusNote/title").asString(), equalTo("Functional"));
+    assertThat(graph.at("/focusNote/notebook").asString(), equalTo(folder.getNotebook().getName()));
     assertThat(relatedTitles(graph), hasItem("Object Oriented"));
   }
 
@@ -47,7 +47,7 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
 
     JsonNode graph = callGetNoteGraph(focus, 10);
 
-    assertThat(graph.at("/focusNote/title").asText(), equalTo("Functional"));
+    assertThat(graph.at("/focusNote/title").asString(), equalTo("Functional"));
     assertThat(graph.at("/focusNote/sampleSiblings").size(), equalTo(0));
     assertThat(relatedTitles(graph), not(hasItem("Object Oriented")));
   }
@@ -104,7 +104,7 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
             .andExpect(jsonPath("$.result.content[0].text").exists())
             .andReturn();
     JsonNode root = objectMapper.readTree(result.getResponse().getContentAsString());
-    return objectMapper.readTree(root.at("/result/content/0/text").asText());
+    return objectMapper.readTree(root.at("/result/content/0/text").asString());
   }
 
   private String toolsCallBody(Note note, int tokenLimit) throws Exception {
@@ -131,7 +131,7 @@ class GetNoteGraphMcpEndpointTest extends McpEndpointTestBase {
   private static List<String> relatedTitles(JsonNode graph) {
     List<String> titles = new ArrayList<>();
     for (JsonNode related : graph.get("relatedNotes")) {
-      titles.add(related.get("title").asText());
+      titles.add(related.get("title").asString());
     }
     return titles;
   }

@@ -5,8 +5,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
@@ -16,11 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /** Calls the recall answers tool for a learner with a note "Code Review" in "Engineering". */
 abstract class ListRecallAnswersMcpEndpointTestBase extends McpEndpointTestBase {
-  @Autowired JsonMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   Timestamp now;
   Note note;
@@ -47,18 +47,17 @@ abstract class ListRecallAnswersMcpEndpointTestBase extends McpEndpointTestBase 
 
   static List<String> texts(JsonNode array, String pointer) {
     return StreamSupport.stream(array.spliterator(), false)
-        .map(node -> node.at(pointer).asText())
+        .map(node -> node.at(pointer).asString())
         .toList();
   }
 
   static void assertTitleAndPathOnly(JsonNode sourceNote) {
     assertThat(fieldNames(sourceNote), containsInAnyOrder("title", "portablePath"));
-    assertThat(sourceNote.get("portablePath").asText(), equalTo("Engineering:Code Review"));
+    assertThat(sourceNote.get("portablePath").asString(), equalTo("Engineering:Code Review"));
   }
 
   static List<String> fieldNames(JsonNode node) {
-    return StreamSupport.stream(((Iterable<String>) () -> node.fieldNames()).spliterator(), false)
-        .toList();
+    return List.copyOf(node.propertyNames());
   }
 
   JsonNode listRecallAnswers() throws Exception {
@@ -86,6 +85,9 @@ abstract class ListRecallAnswersMcpEndpointTestBase extends McpEndpointTestBase 
             .andReturn()
             .getResponse();
     return objectMapper.readTree(
-        objectMapper.readTree(response.getContentAsString()).at("/result/content/0/text").asText());
+        objectMapper
+            .readTree(response.getContentAsString())
+            .at("/result/content/0/text")
+            .asString());
   }
 }

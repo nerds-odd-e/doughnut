@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -19,6 +18,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import tools.jackson.databind.JsonNode;
 
 class ListRecallAnswersWindowMcpEndpointTest extends ListRecallAnswersMcpEndpointTestBase {
   /** The plan's fixed response size. */
@@ -38,8 +38,8 @@ class ListRecallAnswersWindowMcpEndpointTest extends ListRecallAnswersMcpEndpoin
     assertThat(
         texts(result.get("attempts"), "/multipleChoice/stem"),
         contains("Yesterday", "Two days ago"));
-    assertThat(result.get("from").asText(), equalTo(hoursAgo(7 * 24).toInstant().toString()));
-    assertThat(result.get("to").asText(), equalTo(now.toInstant().toString()));
+    assertThat(result.get("from").asString(), equalTo(hoursAgo(7 * 24).toInstant().toString()));
+    assertThat(result.get("to").asString(), equalTo(now.toInstant().toString()));
   }
 
   @Test
@@ -70,8 +70,8 @@ class ListRecallAnswersWindowMcpEndpointTest extends ListRecallAnswersMcpEndpoin
         answeredInPairsPerMinute(trackerOf(personalUser), 2 * ATTEMPTS_PER_RESPONSE + 1);
 
     JsonNode first = listRecallAnswers();
-    JsonNode second = listRecallAnswers(Map.of("cursor", first.get("nextCursor").asText()));
-    JsonNode last = listRecallAnswers(Map.of("cursor", second.get("nextCursor").asText()));
+    JsonNode second = listRecallAnswers(Map.of("cursor", first.get("nextCursor").asString()));
+    JsonNode last = listRecallAnswers(Map.of("cursor", second.get("nextCursor").asString()));
 
     assertThat(first.get("attempts").size(), equalTo(ATTEMPTS_PER_RESPONSE));
     assertThat(stemsOf(first, second, last), equalTo(newestFirst));
@@ -89,7 +89,7 @@ class ListRecallAnswersWindowMcpEndpointTest extends ListRecallAnswersMcpEndpoin
     testabilitySettings.timeTravelTo(later);
     answeredAt(tracker, "While paging", later);
 
-    JsonNode last = listRecallAnswers(Map.of("cursor", first.get("nextCursor").asText()));
+    JsonNode last = listRecallAnswers(Map.of("cursor", first.get("nextCursor").asString()));
 
     assertThat(stemsOf(first, last), equalTo(newestFirst));
     assertThat(last.get("nextCursor"), nullValue());

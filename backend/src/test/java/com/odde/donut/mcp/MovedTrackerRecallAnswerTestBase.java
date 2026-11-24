@@ -6,13 +6,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.NoteReferenceService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import tools.jackson.databind.JsonNode;
 
 abstract class MovedTrackerRecallAnswerTestBase extends ListRecallAnswersMcpEndpointTestBase {
   @Autowired NoteReferenceService noteReferenceService;
@@ -63,7 +63,7 @@ abstract class MovedTrackerRecallAnswerTestBase extends ListRecallAnswersMcpEndp
     assertThat(before.size(), equalTo(1));
     JsonNode schedule = json(get("/api/memory-trackers/{id}", trackerId));
     assertThat(schedule.at("/note/id").asInt(), equalTo(originalId));
-    assertThat(schedule.path("propertyKey").asText(), equalTo(propertyKey));
+    assertThat(schedule.path("propertyKey").asString(), equalTo(propertyKey));
     return new Asked(originalId, trackerId, promptId, questionId, before, schedule);
   }
 
@@ -72,8 +72,8 @@ abstract class MovedTrackerRecallAnswerTestBase extends ListRecallAnswersMcpEndp
     JsonNode tracker = json(get("/api/memory-trackers/{id}", asked.trackerId()));
     assertThat(tracker.path("id").asInt(), equalTo(asked.trackerId()));
     assertThat(tracker.at("/note/id").asInt(), equalTo(noteId));
-    assertThat(tracker.path("propertyKey").asText(), equalTo(propertyKey));
-    assertThat(tracker.path("propertyValue").asText(), equalTo(""));
+    assertThat(tracker.path("propertyKey").asString(), equalTo(propertyKey));
+    assertThat(tracker.path("propertyValue").asString(), equalTo(""));
     for (String field :
         List.of(
             "stability",
@@ -88,10 +88,11 @@ abstract class MovedTrackerRecallAnswerTestBase extends ListRecallAnswersMcpEndp
   }
 
   void currentEvidence(JsonNode attempt, String title) {
-    assertThat(attempt.at("/note/title").asText(), equalTo(title));
-    assertThat(attempt.at("/note/portablePath").asText(), equalTo("Engineering:" + title));
+    assertThat(attempt.at("/note/title").asString(), equalTo(title));
+    assertThat(attempt.at("/note/portablePath").asString(), equalTo("Engineering:" + title));
     assertThat(
-        attempt.at("/note/graph/focusNote/portablePath").asText(), equalTo("Engineering:" + title));
+        attempt.at("/note/graph/focusNote/portablePath").asString(),
+        equalTo("Engineering:" + title));
   }
 
   JsonNode history(int trackerId) throws Exception {
@@ -111,7 +112,7 @@ abstract class MovedTrackerRecallAnswerTestBase extends ListRecallAnswersMcpEndp
     if (!propertyKey.isEmpty()) {
       request.param("propertyKey", propertyKey);
     }
-    return json(request).path("markdown").asText();
+    return json(request).path("markdown").asString();
   }
 
   JsonNode json(MockHttpServletRequestBuilder request) throws Exception {
