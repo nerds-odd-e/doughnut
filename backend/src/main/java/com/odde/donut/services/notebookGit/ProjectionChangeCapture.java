@@ -87,14 +87,14 @@ class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomi
   }
 
   @Override
-  public boolean onSave(Object entity, Object id, Object[] state, String[] names, Type[] types) {
+  public boolean onPersist(Object entity, Object id, Object[] state, String[] names, Type[] types) {
     NotebookProjectionChange change = changeFor(entity, state, names);
     if (change != null) change.inserted.add(entity);
     return false;
   }
 
   @Override
-  public void onDelete(Object entity, Object id, Object[] state, String[] names, Type[] types) {
+  public void onRemove(Object entity, Object id, Object[] state, String[] names, Type[] types) {
     NotebookProjectionChange change = changeFor(entity, state, names);
     if (change != null) change.deleted.put(row(entity, id), rowPath(entity, state, names));
   }
