@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "sessionId": "93185c62-7092-45db-8dc2-2e550bfaa300",
+  "workflow": "dough-story-refinement",
+  "closedAt": "2026-11-24T00:26:15.701Z",
+  "story": "SEED-134#add-values-to-an-existing-note-property",
+  "ranges": [
+    {
+      "base": "76f0c9119f1ff24699b366a9f7cb251eace403a4",
+      "candidate": "72bc8bb8b3be3a3c60fc03f55819295686971936"
+    }
+  ]
+}
