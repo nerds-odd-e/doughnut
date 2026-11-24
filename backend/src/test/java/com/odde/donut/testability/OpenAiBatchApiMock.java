@@ -34,6 +34,8 @@ public class OpenAiBatchApiMock {
     return batches;
   }
 
+  // The OpenAI SDK deprecates FileObject.status yet FileObject.builder() still requires it.
+  @SuppressWarnings("deprecation")
   public void stubUpload(String fileId) {
     when(files.create(any(FileCreateParams.class)))
         .thenReturn(
