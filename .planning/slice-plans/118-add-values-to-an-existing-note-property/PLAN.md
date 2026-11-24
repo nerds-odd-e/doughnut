@@ -81,6 +81,19 @@ An existing list-capable property's previous values remain in order and
 the link is last. An occupied scalar-only property keeps its value and the
 author can correct the naming attempt.
 
+## Execution complete
+
+Product advice: no change. The link-first flow now files a saved link using
+the same exact-key addition as manual Add property. The whole-list recall
+story still addresses an independent learning outcome.
+
+The [implementation commit](https://github.com/nerds-odd-e/doughnut/commit/a16d83eebd95ab4a56fc78d83cdef2b0eacf7af0)
+is published on the execution branch. Review found no correction to plan.
+The Cypress journey verifies the real search and persisted state. Chromium
+verifies the save payloads, scalar promotion, and refusal cases at the SDK
+boundary. The existing codec, publication route, and tracker-follow operation
+serve the updated workflow in line with ADRs 0002, 0004 and 0005.
+
 ## Execution context
 
 - Story Branch Mode in the owned worktree

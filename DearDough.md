@@ -4,7 +4,7 @@ Shared findings reviewed 2026-11-13 (Asia/Singapore). The linked catalog records
 own the occurrence evidence and current responses. See the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md)
 and [Donut’s project findings](DonutRetrospectiveFindings.md) for their separate records.
 
-- Highest allocated local number: 517. Removed numbers are never reused.
+- Highest allocated local number: 518. Removed numbers are never reused.
 - Shared-feedback compaction (2026-11-15): [exact post-local source](https://github.com/nerds-odd-e/doughnut/blob/5170deb585edd20cfdecf2e609dea9ae3a5a6e55/DearDough.md) and [retained catalog evidence](https://github.com/terryyin/open-dough/tree/5da5acc11ab3aa58fba24425a5d41213d23ad7b1/docs/maintainer/findings).
 - [Full pre-compaction source and earlier recovery locators](https://github.com/nerds-odd-e/doughnut/blob/0436d21c6e59f75157ab29394e273f8af02fe3f9/DearDough.md).
 - [Open Dough catalog at evidence retention](https://github.com/terryyin/open-dough/tree/784bf7f574cda84eefe505142262e58d42be6cf4/docs/maintainer/findings).
@@ -733,3 +733,15 @@ Source recovery: `5d595ee21e0ee1d8f49108f42d99c04dc5a81bad:DearDough.md`.
   - Evidence: [diagnostic record at the published revision](https://github.com/nerds-odd-e/doughnut/blob/527322acc7e80a464d00dbfee8b80c7435609e6c/.planning/slice-plans/111-renew-waiting-question-when-note-changes/diagnosis-startup-readiness-http.md), fixture repair `8f75c7099a`.
   - Observed effect: The original readiness test reported 404 during migration. Two full diagnostic runs and 18 instrumented startups all passed. They traced requests that reached the expected handler. The developer asked for another attempt after the third round. A controlled second listener then reproduced the 404, and binding the fixture to its client address restored the expected 503 and 200 under the same conditions.
   - Inference: When listener identity is in doubt, exercising address ownership can distinguish the hypothesis earlier. The original failure recorded no listener identity.
+
+## DD-518 — Codex restart disconnects a live CI stream and slice return
+
+### Occurrences
+
+- Execution: SEED-134#add-values-to-an-existing-note-property, first implementation `a16d83eebd`
+  - Timestamp: unknown (2026-11-24, Asia/Singapore)
+  - Tool: Codex
+  - Open Dough release: 0.3.112 (execution checkout)
+  - Evidence: Codex daemon recovery and stale generation result for cell `g538:7`, old mailbox `watch-3YaWp3` stop receipt, and `note-edit-final`, `recovery-browser`, and `recovery-e2e` run records referenced from plan 118.
+  - Observed effect: The stream process stayed alive after its tool handle became unusable. Git state and completed test evidence survived. The coordinator stopped that exact mailbox with zero unread events, confirmed local process exit, rearmed the stream, and reran the two focused suites before accepting the affected slice.
+  - Inference: Keeping the mailbox identity and terminal proof outside the tool session made recovery possible. The persisted test records identified successful runs, although the interrupted delegation rule still required new proof from the checkout.
