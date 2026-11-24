@@ -82,7 +82,7 @@ class NotebookBooksAttachPdfBookmarksControllerTest extends NotebookBooksControl
     private List<String> contentTexts(BookBlock block) throws Exception {
       List<String> texts = new ArrayList<>();
       for (BookContentBlock cb : block.getContentBlocks()) {
-        texts.add(objectMapper.readTree(cb.getRawData()).path("text").asText());
+        texts.add(objectMapper.readTree(cb.getRawData()).path("text").asString());
       }
       return texts;
     }

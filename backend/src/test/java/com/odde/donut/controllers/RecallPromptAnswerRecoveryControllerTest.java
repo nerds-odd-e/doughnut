@@ -37,7 +37,7 @@ class RecallPromptAnswerRecoveryControllerTest extends RecallPromptAnswerRecover
     assertThat(original.answer().get("correct").booleanValue(), is(choice == 0));
     assertThat(original.tracker().logs().size(), equalTo(1));
     assertThat(
-        original.tracker().logs().get(0).get("productOutcome").textValue(),
+        original.tracker().logs().get(0).get("productOutcome").stringValue(null),
         equalTo((choice == 0 ? Grade.GOOD : Grade.AGAIN).name()));
     assertThat(original.tracker().logs().get(0).get("answerId").intValue(), equalTo(answerId));
     assertThat(original.tracker().recallCount(), equalTo(1));

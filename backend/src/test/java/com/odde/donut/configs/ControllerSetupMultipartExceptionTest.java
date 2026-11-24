@@ -23,7 +23,7 @@ class ControllerSetupMultipartExceptionTest {
     return Stream.of(
         Arguments.of(
             new MaxUploadSizeExceededException(1L),
-            HttpStatus.PAYLOAD_TOO_LARGE,
+            HttpStatus.CONTENT_TOO_LARGE,
             ApiError.ErrorType.MULTIPART_SIZE_EXCEEDED,
             "100 MB"),
         Arguments.of(

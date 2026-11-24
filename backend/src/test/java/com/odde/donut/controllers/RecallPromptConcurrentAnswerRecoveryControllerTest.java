@@ -109,7 +109,7 @@ class RecallPromptConcurrentAnswerRecoveryControllerTest
       assertThat(persisted.answer().get("id").intValue(), equalTo(recoveredId));
       if (spelling) {
         assertThat(
-            persisted.answer().get("spellingAnswer").textValue(),
+            persisted.answer().get("spellingAnswer").stringValue(null),
             equalTo(rollback ? "Wrong" : "Correct"));
       } else {
         assertThat(persisted.answer().get("choiceIndex").intValue(), equalTo(rollback ? 1 : 0));
@@ -118,7 +118,7 @@ class RecallPromptConcurrentAnswerRecoveryControllerTest
       assertThat(
           persisted.tracker().logs().get(0).get("answerId").intValue(), equalTo(recoveredId));
       assertThat(
-          persisted.tracker().logs().get(0).get("productOutcome").textValue(),
+          persisted.tracker().logs().get(0).get("productOutcome").stringValue(null),
           equalTo((rollback ? Grade.AGAIN : Grade.GOOD).name()));
       assertThat(persisted.tracker().recallCount(), equalTo(1));
       if (!rollback) {

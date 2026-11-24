@@ -53,7 +53,7 @@ public class ControllerSetup {
   @ExceptionHandler(MultipartException.class)
   public ResponseEntity<ApiError> handleMultipartException(MultipartException ex) {
     if (ex instanceof MaxUploadSizeExceededException) {
-      return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+      return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE)
           .body(
               new ApiError(
                   "The uploaded file exceeds the maximum upload size (100 MB).",
@@ -82,7 +82,7 @@ public class ControllerSetup {
       case OPENAI_SERVICE_ERROR, WIKIDATA_SERVICE_ERROR -> HttpStatus.BAD_GATEWAY;
       case OPENAI_UNAUTHORIZED, QUESTION_ANSWER_ERROR, BINDING_ERROR, MULTIPART_ERROR ->
           HttpStatus.BAD_REQUEST;
-      case MULTIPART_SIZE_EXCEEDED -> HttpStatus.PAYLOAD_TOO_LARGE;
+      case MULTIPART_SIZE_EXCEEDED -> HttpStatus.CONTENT_TOO_LARGE;
       case RESOURCE_CONFLICT, FOLDER_NAME_CONFLICT -> HttpStatus.CONFLICT;
       case OPENAI_NOT_AVAILABLE -> HttpStatus.SERVICE_UNAVAILABLE;
     };

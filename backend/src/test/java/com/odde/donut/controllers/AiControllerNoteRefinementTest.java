@@ -181,7 +181,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
       Logger validatorLogger = loggerContext.getLogger(NoteRefinementLayoutValidator.class);
       Level originalLevel = validatorLogger.getLevel();
-      validatorLogger.setLevel(Level.ALL);
+      validatorLogger.setLevel(Level.TRACE);
       ListAppender<ILoggingEvent> logAppender = new ListAppender<>();
       logAppender.setContext(loggerContext);
       logAppender.start();

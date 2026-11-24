@@ -64,7 +64,7 @@ class RecallPromptSpellingAnswerRecoveryControllerTest extends RecallPromptAnswe
         () -> acceptSpelling(repository.findById(prompt.getId()).orElseThrow(), spelling, true));
     Evidence original = evidence(prompt.getId());
     List<TrackerState> matchedAfter = matchedTrackers.stream().map(this::trackerState).toList();
-    assertThat(original.answer().get("spellingAnswer").textValue(), equalTo(spelling));
+    assertThat(original.answer().get("spellingAnswer").stringValue(null), equalTo(spelling));
     assertThat(
         original.answer().get("correct").booleanValue(),
         is(outcome == Outcome.CORRECT || outcome == Outcome.OVERLAP));
@@ -76,23 +76,24 @@ class RecallPromptSpellingAnswerRecoveryControllerTest extends RecallPromptAnswe
     assertThat(original.answer().get("idleMs").intValue(), equalTo(500));
     if (outcome == Outcome.OVERLAP) {
       assertThat(
-          original.answer().get("outcome").textValue(), equalTo(AnswerOutcome.OVERLAP.name()));
+          original.answer().get("outcome").stringValue(null),
+          equalTo(AnswerOutcome.OVERLAP.name()));
       assertThat(trackerState(prompt.requireMemoryTracker().getId()), equalTo(before));
       assertThat(matchedAfter, equalTo(matchedBefore));
     } else {
       assertThat(original.tracker().logs().size(), equalTo(1));
       assertThat(
-          original.tracker().logs().get(0).get("productOutcome").textValue(),
+          original.tracker().logs().get(0).get("productOutcome").stringValue(null),
           equalTo(outcome == Outcome.CORRECT ? "GOOD" : "AGAIN"));
       assertThat(original.tracker().recallCount(), equalTo(before.recallCount() + 1));
       if (outcome == Outcome.UNIQUE_MATCH || outcome == Outcome.MULTIPLE_MATCH) {
         assertThat(
-            original.answer().get("outcome").textValue(),
+            original.answer().get("outcome").stringValue(null),
             equalTo(AnswerOutcome.ACCIDENTAL_MATCH.name()));
         if (outcome == Outcome.UNIQUE_MATCH) {
           assertThat(matchedAfter.getFirst().logs().size(), equalTo(1));
           assertThat(
-              matchedAfter.getFirst().logs().get(0).get("productOutcome").textValue(),
+              matchedAfter.getFirst().logs().get(0).get("productOutcome").stringValue(null),
               equalTo("CONFUSION"));
           assertThat(
               matchedAfter.getFirst().logs().get(0).get("answerId"),

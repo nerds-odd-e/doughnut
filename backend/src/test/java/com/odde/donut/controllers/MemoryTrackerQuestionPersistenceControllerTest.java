@@ -114,7 +114,7 @@ class MemoryTrackerQuestionPersistenceControllerTest extends MemoryTrackerContro
                 focus.getId(), readAt, expectedFingerprint(focus.getId(), title, markdown))));
     assertThat(persisted.getCorrectAnswerIndex(), equalTo(0));
     JsonNode mcqJson = webJsonMapper.valueToTree(result.getMcq());
-    assertThat(mcqJson.get("questionStem").asText(), equalTo("When does the observatory open?"));
+    assertThat(mcqJson.get("questionStem").asString(), equalTo("When does the observatory open?"));
     assertThat(
         result.getMcq().getResponseChoices(),
         equalTo(List.of("Nine", "distractor1", "distractor2", "distractor3")));

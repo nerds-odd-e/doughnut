@@ -62,7 +62,7 @@ class NotebookLfsTransferController {
       return denial;
     }
     if (body.objects() == null || body.operation() == null) {
-      return lfsError(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid batch request");
+      return lfsError(HttpStatus.UNPROCESSABLE_CONTENT, "Invalid batch request");
     }
     String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     List<BatchObjectResponse> objects = new ArrayList<>();
@@ -86,7 +86,7 @@ class NotebookLfsTransferController {
     }
     String normalizedOid = normalizeOid(oid);
     if (normalizedOid == null) {
-      return lfsError(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid object id");
+      return lfsError(HttpStatus.UNPROCESSABLE_CONTENT, "Invalid object id");
     }
     long size = request.getContentLengthLong();
     if (size < 0) {
@@ -112,7 +112,7 @@ class NotebookLfsTransferController {
     }
     String normalizedOid = normalizeOid(oid);
     if (normalizedOid == null) {
-      return lfsError(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid object id");
+      return lfsError(HttpStatus.UNPROCESSABLE_CONTENT, "Invalid object id");
     }
     Optional<byte[]> bytes = notebookAttachmentContent.get(notebook.getId(), normalizedOid);
     if (bytes.isEmpty()) {
