@@ -26,8 +26,19 @@ public record RequestLearningSessionTool(
   public SyncToolSpecification specification() {
     return SyncToolSpecification.builder()
         .tool(
-            McpSchema.Tool.builder()
-                .name(NAME)
+            McpSchema.Tool.builder(
+                    NAME,
+                    Map.of(
+                        "type", "object",
+                        "properties",
+                            Map.of(
+                                "timezone",
+                                Map.of(
+                                    "type",
+                                    "string",
+                                    "description",
+                                    "The learner's IANA timezone, for example Asia/Tokyo.")),
+                        "required", List.of("timezone")))
                 .meta(McpToolAuthorization.readOnlyMetadata())
                 .description(
                     """
@@ -41,18 +52,6 @@ public record RequestLearningSessionTool(
                     session. If no session is available, tell the learner that there is none.
                     """)
                 .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
-                .inputSchema(
-                    Map.of(
-                        "type", "object",
-                        "properties",
-                            Map.of(
-                                "timezone",
-                                Map.of(
-                                    "type",
-                                    "string",
-                                    "description",
-                                    "The learner's IANA timezone, for example Asia/Tokyo.")),
-                        "required", List.of("timezone")))
                 .build())
         .callHandler(this::call)
         .build();
@@ -70,7 +69,7 @@ public record RequestLearningSessionTool(
     var notebook = learningSessions.firstPotentialNotebook(user, now, zoneId);
     if (notebook.isEmpty()) {
       return McpSchema.CallToolResult.builder()
-          .addContent(new McpSchema.TextContent(NO_SESSION_SIGNAL))
+          .addContent(McpSchema.TextContent.builder(NO_SESSION_SIGNAL).build())
           .build();
     }
     try {
@@ -82,7 +81,9 @@ public record RequestLearningSessionTool(
               "requestMarkdown",
                   learningSessions.request(user, notebook.get(), now, zoneId).getRequestMarkdown());
       return McpSchema.CallToolResult.builder()
-          .addContent(new McpSchema.TextContent(McpJsonToolResult.JSON.writeValueAsString(result)))
+          .addContent(
+              McpSchema.TextContent.builder(McpJsonToolResult.JSON.writeValueAsString(result))
+                  .build())
           .structuredContent(result)
           .build();
     } catch (UnexpectedNoAccessRightException e) {

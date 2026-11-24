@@ -59,12 +59,8 @@ public class ListNoteCandidatesTool {
   public SyncToolSpecification specification() {
     return SyncToolSpecification.builder()
         .tool(
-            McpSchema.Tool.builder()
-                .name(NAME)
-                .meta(McpToolAuthorization.readOnlyMetadata())
-                .description(DESCRIPTION)
-                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
-                .inputSchema(
+            McpSchema.Tool.builder(
+                    NAME,
                     Map.of(
                         "type",
                         "object",
@@ -78,6 +74,9 @@ public class ListNoteCandidatesTool {
                                 "Search text matched against note titles and aliases, e.g. a note title or a keyword it contains.")),
                         "required",
                         List.of("query")))
+                .meta(McpToolAuthorization.readOnlyMetadata())
+                .description(DESCRIPTION)
+                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
                 .build())
         .callHandler(this::call)
         .build();
@@ -105,7 +104,9 @@ public class ListNoteCandidatesTool {
   }
 
   private static McpSchema.CallToolResult textResult(String text) {
-    return McpSchema.CallToolResult.builder().addContent(new McpSchema.TextContent(text)).build();
+    return McpSchema.CallToolResult.builder()
+        .addContent(McpSchema.TextContent.builder(text).build())
+        .build();
   }
 
   private static String queryArgument(McpSchema.CallToolRequest request) {

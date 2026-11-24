@@ -59,8 +59,9 @@ class McpNoteLookup {
     return McpSchema.CallToolResult.builder()
         .isError(true)
         .addContent(
-            new McpSchema.TextContent(
-                message + "\n" + McpJsonToolResult.JSON.writeValueAsString(result)))
+            McpSchema.TextContent.builder(
+                    message + "\n" + McpJsonToolResult.JSON.writeValueAsString(result))
+                .build())
         .build();
   }
 }

@@ -30,8 +30,25 @@ public record RecordLearningSessionTool(
   public SyncToolSpecification specification() {
     return SyncToolSpecification.builder()
         .tool(
-            McpSchema.Tool.builder()
-                .name(NAME)
+            McpSchema.Tool.builder(
+                    NAME,
+                    Map.of(
+                        "type", "object",
+                        "properties",
+                            Map.of(
+                                "notebookId",
+                                    Map.of(
+                                        "type",
+                                        "integer",
+                                        "description",
+                                        "Notebook ID returned by request_learning_session."),
+                                "reportMarkdown",
+                                    Map.of(
+                                        "type",
+                                        "string",
+                                        "description",
+                                        "Existing Learning Session Report markdown for completed items only.")),
+                        "required", List.of("notebookId", "reportMarkdown")))
                 .meta(McpToolAuthorization.recordingMetadata())
                 .description(
                     """
@@ -50,24 +67,6 @@ public record RecordLearningSessionTool(
                         .idempotentHint(false)
                         .openWorldHint(false)
                         .build())
-                .inputSchema(
-                    Map.of(
-                        "type", "object",
-                        "properties",
-                            Map.of(
-                                "notebookId",
-                                    Map.of(
-                                        "type",
-                                        "integer",
-                                        "description",
-                                        "Notebook ID returned by request_learning_session."),
-                                "reportMarkdown",
-                                    Map.of(
-                                        "type",
-                                        "string",
-                                        "description",
-                                        "Existing Learning Session Report markdown for completed items only.")),
-                        "required", List.of("notebookId", "reportMarkdown")))
                 .build())
         .callHandler(this::call)
         .build();

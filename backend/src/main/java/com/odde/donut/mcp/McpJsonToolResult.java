@@ -13,7 +13,7 @@ final class McpJsonToolResult {
   static McpSchema.CallToolResult of(Object value) {
     String serialized = JSON.writeValueAsString(value);
     return McpSchema.CallToolResult.builder()
-        .addContent(new McpSchema.TextContent(serialized))
+        .addContent(McpSchema.TextContent.builder(serialized).build())
         .structuredContent(JSON.readValue(serialized, Object.class))
         .build();
   }

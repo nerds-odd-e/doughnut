@@ -55,12 +55,8 @@ public class ReadNoteTool {
   public SyncToolSpecification specification() {
     return SyncToolSpecification.builder()
         .tool(
-            McpSchema.Tool.builder()
-                .name(NAME)
-                .meta(McpToolAuthorization.readOnlyMetadata())
-                .description(DESCRIPTION)
-                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
-                .inputSchema(
+            McpSchema.Tool.builder(
+                    NAME,
                     Map.of(
                         "type",
                         "object",
@@ -80,6 +76,9 @@ public class ReadNoteTool {
                                 "Explicit notebook scope for an unqualified portablePath; a qualified path supplies its own scope.")),
                         "required",
                         List.of("portablePath")))
+                .meta(McpToolAuthorization.readOnlyMetadata())
+                .description(DESCRIPTION)
+                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
                 .outputSchema(
                     Map.of(
                         "type",

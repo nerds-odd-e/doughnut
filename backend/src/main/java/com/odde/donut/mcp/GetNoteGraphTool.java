@@ -59,12 +59,8 @@ public class GetNoteGraphTool {
   public SyncToolSpecification specification() {
     return SyncToolSpecification.builder()
         .tool(
-            McpSchema.Tool.builder()
-                .name(NAME)
-                .meta(McpToolAuthorization.readOnlyMetadata())
-                .description(DESCRIPTION)
-                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
-                .inputSchema(
+            McpSchema.Tool.builder(
+                    NAME,
                     Map.of(
                         "type",
                         "object",
@@ -90,6 +86,9 @@ public class GetNoteGraphTool {
                                 "Approximate token budget for the focus note body plus all related note bodies combined. Pick a value that fits your remaining context window.")),
                         "required",
                         List.of("portablePath", "tokenLimit")))
+                .meta(McpToolAuthorization.readOnlyMetadata())
+                .description(DESCRIPTION)
+                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
                 .build())
         .callHandler(this::call)
         .build();
@@ -107,7 +106,9 @@ public class GetNoteGraphTool {
     try {
       FocusContextResult graph = noteGraphService.getGraph(user, destination.getId(), tokenLimit);
       return McpSchema.CallToolResult.builder()
-          .addContent(new McpSchema.TextContent(McpJsonToolResult.JSON.writeValueAsString(graph)))
+          .addContent(
+              McpSchema.TextContent.builder(McpJsonToolResult.JSON.writeValueAsString(graph))
+                  .build())
           .build();
     } catch (UnexpectedNoAccessRightException e) {
       throw McpToolFailures.rethrow(e);

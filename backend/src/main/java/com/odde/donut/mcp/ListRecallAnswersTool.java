@@ -62,12 +62,8 @@ public record ListRecallAnswersTool(
   public SyncToolSpecification specification() {
     return SyncToolSpecification.builder()
         .tool(
-            McpSchema.Tool.builder()
-                .name(NAME)
-                .meta(McpToolAuthorization.readOnlyMetadata())
-                .description(DESCRIPTION)
-                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
-                .inputSchema(
+            McpSchema.Tool.builder(
+                    NAME,
                     Map.of(
                         "type",
                         "object",
@@ -85,6 +81,9 @@ public record ListRecallAnswersTool(
                                 "string",
                                 "description",
                                 "nextCursor from the previous response, to continue its window."))))
+                .meta(McpToolAuthorization.readOnlyMetadata())
+                .description(DESCRIPTION)
+                .annotations(McpServerConfiguration.READ_ONLY_TOOL_ANNOTATIONS)
                 .build())
         .callHandler(this::call)
         .build();
