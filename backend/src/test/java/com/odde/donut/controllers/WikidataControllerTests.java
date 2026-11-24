@@ -38,6 +38,14 @@ class WikidataControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void unreadableResponseIsTreatedAsServiceNotAvailable()
+        throws IOException, InterruptedException {
+      Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn("<html>busy</html>");
+      assertThrows(
+          WikidataServiceErrorException.class, () -> controller.fetchWikidataEntityDataByID("Q1"));
+    }
+
+    @Test
     void fetchesEntityDataViaWikidataApi() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
@@ -120,6 +128,13 @@ class WikidataControllerTests extends ControllerTestBase {
     @Test
     void serviceNotAvailable() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
+      assertThrows(WikidataServiceErrorException.class, () -> controller.searchWikidata("berlin"));
+    }
+
+    @Test
+    void unreadableResponseIsTreatedAsServiceNotAvailable()
+        throws IOException, InterruptedException {
+      Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn("<html>busy</html>");
       assertThrows(WikidataServiceErrorException.class, () -> controller.searchWikidata("berlin"));
     }
 

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.core.JacksonException;
 
 @RestController
 @RequestMapping("/api/wikidata")
@@ -29,7 +30,7 @@ public class WikidataController {
       @PathVariable("wikidataId") String wikidataId) {
     try {
       return wikidataService.wrapWikidataIdWithApi(wikidataId).fetchWikidataEntityData();
-    } catch (IOException e) {
+    } catch (IOException | JacksonException e) {
       throw new WikidataServiceErrorException(
           "The wikidata service is not available", HttpStatus.NOT_FOUND);
     }
@@ -40,7 +41,7 @@ public class WikidataController {
       throws InterruptedException {
     try {
       return wikidataService.searchWikidata(search);
-    } catch (IOException e) {
+    } catch (IOException | JacksonException e) {
       throw new WikidataServiceErrorException(
           "The wikidata service is not available", HttpStatus.NOT_FOUND);
     }

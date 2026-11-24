@@ -1,7 +1,7 @@
 package com.odde.donut.services.wikidataApis.thirdPartyEntities;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 @Data
 public class WikidataDatavalue {
@@ -17,12 +17,12 @@ public class WikidataDatavalue {
 
   public String mustGetStringValue() {
     assertType("string");
-    return value.textValue();
+    return value.stringValue(null);
   }
 
   public String mustGetWikibaseEntityId() {
     assertType("wikibase-entityid");
-    return value.get("id").textValue();
+    return value.get("id").stringValue(null);
   }
 
   public JsonNode tryGetGlobeCoordinate() {
@@ -34,6 +34,6 @@ public class WikidataDatavalue {
 
   public String mustGetISOTime() {
     assertType("time");
-    return getValue().get("time").textValue();
+    return getValue().get("time").stringValue(null);
   }
 }

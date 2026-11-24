@@ -1,6 +1,5 @@
 package com.odde.donut.services.wikidataApis;
 
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.donut.controllers.dto.WikidataEntityData;
 import com.odde.donut.exceptions.WikidataServiceErrorException;
 import com.odde.donut.services.httpQuery.QueryBuilder;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
+import tools.jackson.databind.exc.MismatchedInputException;
 
 public record WikidataApi(QueryBuilder queryBuilder) {
 

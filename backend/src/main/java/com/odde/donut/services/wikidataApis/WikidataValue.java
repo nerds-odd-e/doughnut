@@ -1,9 +1,9 @@
 package com.odde.donut.services.wikidataApis;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.entities.Coordinate;
 import com.odde.donut.services.wikidataApis.thirdPartyEntities.WikidataDatavalue;
 import com.odde.donut.utils.TimestampOperations;
+import tools.jackson.databind.JsonNode;
 
 public record WikidataValue(WikidataDatavalue datavalue) {
 
