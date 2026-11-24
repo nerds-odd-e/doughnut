@@ -1,17 +1,6 @@
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.springframework.boot.gradle.tasks.run.BootRun
 
-buildscript {
-  repositories {
-    gradlePluginPortal()
-    mavenCentral()
-    // Google Maven mirror as fallback for CI/CD environments
-    maven {
-      url = uri("https://maven-central.storage-download.googleapis.com/maven2/")
-    }
-  }
-}
-
 plugins {
   id 'java'
   id 'org.springframework.boot' version '4.2.0'
@@ -59,7 +48,6 @@ configurations {
 }
 
 repositories {
-  gradlePluginPortal()
   mavenCentral()
   // Google Maven mirror as fallback for CI/CD environments
   maven {
