@@ -2,8 +2,8 @@
 #
 # Small public preparation entry point for a fresh worktree.
 #
-# A freshly created worktree has tracked source (.agents/skills/*) but is
-# missing the generated, gitignored Claude discovery links (.claude/skills/*)
+# A freshly created worktree has the tracked Open Dough install but is
+# missing the generated Claude discovery links for Donut's own skills
 # that scripts/nix_shell_hook.sh normally creates as part of the full
 # interactive Nix shell hook, and its committed dependency graph
 # (pnpm-lock.yaml/package.json) is not yet installed into node_modules. This

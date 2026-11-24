@@ -1,0 +1,107 @@
+# Work item identity
+
+One contract for what identifies a work item. Every backlog operation, every
+reference to a story or correction, and every reconciliation uses it. Do not
+restate a competing allocation rule elsewhere.
+
+## The contract
+
+1. **A work item has exactly one identity, allocated once.** Take it from the
+   work item's canonical home: a story's seed ID with the story's anchor,
+   including a new correction's story. A correction whose plan was already its
+   home keeps the plan-path identity it recorded. A completed ad hoc story
+   takes its identity from its [originating session](#completed-ad-hoc-work).
+   Never give new work a plan-path identity to replace later, invent a number,
+   keep a registry, or renumber. A story's plan records that story's identity
+   and is never listed as work of its own.
+2. **The identity is recorded, not derived.** Record it in the canonical home
+   and, when listed in the backlog, in the entry beside the link. An entry
+   that records nothing is still identified by the link it carries, until
+   its identity is recorded.
+3. **The link is navigation, not identity.** It says where the canonical home
+   is now. Renaming the file, moving it to another directory, or changing the
+   story anchor is a reference change: the recorded identity carries across
+   unchanged, and the work item is still the same work item. Label story links
+   with their titles and point them at their anchors (whole seeds with seed
+   titles); link removed sections at a revision retaining them, and resolve
+   unclear targets from evidence or flag them.
+4. **A recorded value is never reallocated.** Repeating or resuming an
+   operation reuses the identity that is already recorded. Two work items never
+   share an identity, and one canonical home is never listed twice.
+5. **Ambiguity stops for a human.** Conflicting recorded identities, a home
+   that claims work another entry already claims, and an identity that cannot
+   be read back from the entry it would be written into are refusals, not
+   guesses. Report them and change nothing.
+
+## Completed ad hoc work
+
+A completed ad hoc session with no story has identity `ad-hoc#<session UUID>`.
+Record it in the local Done attachment or in the published close and done
+record. The done record beside the backlog is the published story's home.
+Reuse the recorded identity on repeated close and give follow-ups separate
+session UUIDs under the same story. Preserve a session's existing association
+and older standalone records. Allocate seed-based identities for planned work
+through the usual backlog rules.
+
+## In the backlog entry
+
+    - [<title>](<canonical link>) — <identity> ([plan](<plan link>))
+
+The identity and the plan link are each written only when the work item has
+one. Omit the identity when the link already spells it exactly, which is the
+ordinary case for a plan-homed correction still living at the path it was
+identified by.
+
+An older entry may carry only a seed ID where the identity now goes. It still
+names the work item that seed ID plus the link's anchor named when it was
+written; keep that work item's identity when you write the entry out in full.
+
+## When the canonical home moves
+
+The moved document's own recorded identity is what establishes that it is the
+same work item. Record the identity in the moved document first, then update
+the entry's link. Leave no second document recording the same identity.
+
+## Allocate a new identity
+
+Allocate only for new work. Take, resume, Preparing assignment, and moving a
+canonical home keep the identity already recorded and allocate nothing. A new
+seed number is above every seed number observed in the active seed directory,
+in the done records and catalog beside the backlog, and in the published trunk
+history of those directories. A new story anchor within an
+existing seed yields a full identity none of those sources records. Removing a
+seed file or story section never frees its identity.
+
+Read that evidence with the
+[identity-evidence operation](../SKILL.md#choose-a-new-identity) instead of
+reading filenames. It reserves nothing; the canonical home records what you
+choose.
+
+The reader preserves numeric reservations from seed metadata and filenames and
+recovers explicit identities from readable legacy homes, including old heading
+layouts and nonnumeric identities. It examines later versions of unnumbered
+historical paths so an earlier context-only version cannot hide an allocation.
+Readable context documents allocate nothing; they are not missing identities.
+Malformed identity records and unreadable evidence remain gaps. A declared
+historical story is reported under `history.story` and is already used, even
+without a done record.
+
+- Run it from a checkout current with trunk: history covers only what that
+  checkout reaches, at the `revision` the history source names.
+- Number a new seed `next` or above, which exceeds the reported `highest`.
+- Check the full candidate with `--identity <candidate>`. It is unused only
+  when `candidate.status` is `unlisted` with no `history.record`, and, for a
+  new seed number, no `history.seed`. Any other result means the identity was
+  used: choose another.
+- Treat every entry in `gaps` as unresolved before you publish a new home or
+  claim; a report with gaps is not complete evidence. Rebuild an absent or
+  mismatched catalog with `catalog-done` when done records exist, deepen a
+  shallow clone, and read or ask about an unreadable record. A gap you cannot
+  resolve stops the allocation for a person.
+- Keep the project's naming, numeric padding, and anchor conventions.
+  Renumbering a story whose identity is already published, or choosing
+  between already published conflicting identities, stays with a person.
+
+When `add` or startup admission refuses an identity because a done record
+names it, allocate a different identity under this section, record it in the
+draft, and leave the done record unchanged.

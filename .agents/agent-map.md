@@ -31,11 +31,13 @@ Never hand-edit `packages/generated/donut-backend-api/**` or `open_api_docs.yaml
 
 ## Worktree setup
 
-A freshly created `git worktree` has tracked source but is missing the
-generated Claude skill-discovery links and its own installed dependencies.
+A freshly created `git worktree` includes the tracked Open Dough skills in
+both native skill roots. Use names outside the reserved `dough-*` namespace
+for Donut-owned skills in `.agents/skills/`.
 `./scripts/run.sh bash scripts/worktree_setup.sh` is the public preparation
-entry point: it links skill discovery and installs dependencies (fingerprint-
-gated, so repeats are cheap) without starting MySQL/Redis or a Biome daemon.
+entry point. It generates Claude links for Donut-owned skills and installs
+dependencies when their fingerprint changes. It starts no MySQL, Redis, or
+Biome daemon.
 Cursor's `.cursor/worktrees.json` `setup-worktree` hook already invokes this
 script (`CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh`) when
 Cursor creates a worktree, so Cursor-created worktrees prepare automatically.

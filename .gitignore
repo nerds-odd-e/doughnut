@@ -138,9 +138,13 @@ mb.pid
 
 *.jsonl
 
-# AI assistants
-.claude/*
-!.claude/settings.json
+# Claude project settings and the physical Open Dough skill install are tracked.
+# Donut's generated skill links and local Claude files stay ignored.
+/.claude/*
+!/.claude/settings.json
+!/.claude/skills/
+/.claude/skills/*
+!/.claude/skills/dough-*/
 .serena/
 frontend/vitest-test-results/
 frontend/.vitest-attachments/

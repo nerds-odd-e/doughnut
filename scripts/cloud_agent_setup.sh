@@ -9,9 +9,7 @@ set -e
 cd /workspace
 echo "==> Setting up Cursor Cloud Agent environment..."
 
-# Keep .claude/skills/ symlinked to .agents/skills/ so Claude Code picks up this
-# repo's skills here too (mirrors the sync nix_shell_hook.sh does for local dev;
-# .claude/ is gitignored so it can't just be committed there directly).
+# Expose Donut's own skills to Claude Code as in the local Nix shell.
 source /workspace/scripts/shell_setup.sh
 setup_claude_skills
 

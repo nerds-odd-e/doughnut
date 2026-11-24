@@ -34,8 +34,8 @@ setup_fzf() {
   fi
 }
 
-# Expose .agents/skills/ to Claude Code, which only discovers skills under
-# .claude/skills/ (gitignored, so this can't just be committed there directly).
+# Link Donut's own skills for Claude Code. The dough-* namespace is reserved
+# for Open Dough and tracked as a physical install under .claude/skills/.
 setup_claude_skills() {
   local skills_src="${PWD}/.agents/skills"
   local skills_dst="${PWD}/.claude/skills"
@@ -43,19 +43,24 @@ setup_claude_skills() {
 
   mkdir -p "${skills_dst}"
 
-  # Drop stale symlinks whose source skill no longer exists.
+  # Drop only stale links made here, including dangling ones.
   local link name
-  for link in "${skills_dst}"/*/; do
-    [ -L "${link%/}" ] || continue
-    name="$(basename "${link}")"
-    [ -d "${skills_src}/${name}" ] || rm -f "${skills_dst}/${name}"
+  for link in "${skills_dst}"/*; do
+    [ -L "${link}" ] || continue
+    name="${link##*/}"
+    [ -d "${skills_src}/${name}" ] && continue
+    [ "$(readlink "${link}")" = "../../.agents/skills/${name}" ] && rm -f "${link}"
   done
 
   local dir
   for dir in "${skills_src}"/*/; do
-    name="$(basename "${dir}")"
+    [ -d "${dir}" ] || continue
+    name="${dir%/}"
+    name="${name##*/}"
+    case "${name}" in dough-*) continue ;; esac
+    link="${skills_dst}/${name}"
     # -n: a concurrent shell may have just created the link; never descend into it
-    [ -e "${skills_dst}/${name}" ] || ln -sfn "../../.agents/skills/${name}" "${skills_dst}/${name}"
+    [ -e "${link}" ] || [ -L "${link}" ] || ln -sfn "../../.agents/skills/${name}" "${link}"
   done
 }
 
