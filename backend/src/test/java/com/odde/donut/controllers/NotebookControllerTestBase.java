@@ -1,6 +1,6 @@
 package com.odde.donut.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.donut.controllers.dto.NotebookCatalogItem;
 import com.odde.donut.controllers.dto.NotebookCatalogNotebookItem;
@@ -15,6 +15,7 @@ import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.NotebookGroupService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.json.JsonMapper;
 
 abstract class NotebookControllerTestBase extends ControllerTestBase {
 
@@ -26,7 +27,7 @@ abstract class NotebookControllerTestBase extends ControllerTestBase {
   @Autowired NotebookRepository notebookRepository;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
   @Autowired NotebookGroupService notebookGroupService;
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   Note topNote;
 
   static NotebookSettings copyNotebookSettings(Notebook notebook) {

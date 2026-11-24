@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.donut.controllers.dto.BookBlockDepthRequest;
 import com.odde.donut.controllers.dto.BookBlockMutationResponse;
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.JsonNode;
 
 class NotebookBooksBlockDepthControllerTest extends NotebookBooksBlockControllerTestBase {
 
@@ -193,7 +193,7 @@ class NotebookBooksBlockDepthControllerTest extends NotebookBooksBlockController
           bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(blockA.getId());
       assertThat(aCbs, hasSize(1));
       assertThat(
-          objectMapper.readTree(aCbs.getFirst().getRawData()).get("text").asText(), equalTo("B"));
+          objectMapper.readTree(aCbs.getFirst().getRawData()).get("text").asString(), equalTo("B"));
     }
 
     @Test
@@ -216,10 +216,10 @@ class NotebookBooksBlockDepthControllerTest extends NotebookBooksBlockController
           bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(blockA.getId());
       assertThat(aCbs, hasSize(2));
       JsonNode headingRaw = objectMapper.readTree(aCbs.get(0).getRawData());
-      assertThat(headingRaw.get("text").asText(), equalTo("B"));
+      assertThat(headingRaw.get("text").asString(), equalTo("B"));
       assertThat(headingRaw.has("text_level"), equalTo(false));
       assertThat(
-          objectMapper.readTree(aCbs.get(1).getRawData()).get("text").asText(),
+          objectMapper.readTree(aCbs.get(1).getRawData()).get("text").asString(),
           equalTo("Body of B"));
     }
   }

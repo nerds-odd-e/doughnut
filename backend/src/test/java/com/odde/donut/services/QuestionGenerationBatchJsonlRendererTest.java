@@ -3,8 +3,6 @@ package com.odde.donut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -25,6 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
   @Autowired QuestionGenerationBatchJsonlRenderer jsonlRenderer;
@@ -33,7 +33,7 @@ class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired StructuredResponseCreateParamsSerializer paramsSerializer;
 
-  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+  private final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   private User user;
   private Timestamp currentTime;

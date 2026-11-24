@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
@@ -43,7 +42,7 @@ class QuestionGenerationBatchImportServiceTest extends SpringTestBase {
   GeneratedMcq generatedMcq;
 
   @BeforeEach
-  void setup() throws JsonProcessingException {
+  void setup() {
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
 
@@ -148,7 +147,7 @@ class QuestionGenerationBatchImportServiceTest extends SpringTestBase {
     }
 
     @Test
-    void invalidSemanticAnswerSetFailsWithoutCreatingRecallPrompt() throws JsonProcessingException {
+    void invalidSemanticAnswerSetFailsWithoutCreatingRecallPrompt() {
       QuestionGenerationBatchRequest invalidRequest =
           createRequest(
               "invalid-semantic-answers", QuestionGenerationBatchRequestStatus.OUTPUT_READY);

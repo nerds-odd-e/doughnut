@@ -7,8 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -20,13 +19,15 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class RecallConversationExclusionProposalControllerTest
     extends ConversationMessageControllerTestBase {
   private static final String PROPOSAL_TOOL = "AmbiguousQuestionExclusionProposal";
 
   @Autowired RecallPromptController recallPromptController;
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   Note note;
   MemoryTracker tracker;
@@ -74,9 +75,9 @@ class RecallConversationExclusionProposalControllerTest
 
     JsonNode attempt = objectMapper.readTree(attemptContext.substring(attemptContext.indexOf('{')));
     assertThat(
-        attempt.get("attemptExcludedAsAmbiguous").get("reason").asText(),
+        attempt.get("attemptExcludedAsAmbiguous").get("reason").asString(),
         equalTo("both tenses fit"));
-    assertThat(attempt.get("userAnswerWasMarkedAs").asText(), equalTo("incorrect"));
+    assertThat(attempt.get("userAnswerWasMarkedAs").asString(), equalTo("incorrect"));
   }
 
   private RecallPrompt wronglyAnsweredMcqPrompt() throws Exception {

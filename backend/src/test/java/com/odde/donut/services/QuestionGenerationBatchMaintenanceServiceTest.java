@@ -5,7 +5,6 @@ import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTes
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
@@ -45,7 +44,7 @@ class QuestionGenerationBatchMaintenanceServiceTest extends SpringTestBase {
   QuestionGenerationBatchRequest request;
 
   @BeforeEach
-  void setup() throws JsonProcessingException {
+  void setup() {
     openAiBatches = new OpenAiBatchApiMock(officialClient);
     User user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();

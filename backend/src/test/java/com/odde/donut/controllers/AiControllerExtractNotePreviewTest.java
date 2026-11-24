@@ -4,7 +4,6 @@ import static com.odde.donut.controllers.AiControllerExtractNoteTestSupport.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -45,8 +44,7 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldReturnExtractionPreviewWithoutPersisting()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+    void shouldReturnExtractionPreviewWithoutPersisting() throws UnexpectedNoAccessRightException {
       Note testNote = extractableNote();
       String originalContent = testNote.getContent();
       long noteCountBefore = noteRepository.count();
@@ -67,8 +65,7 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldCallExtractNoteWithStructuredInstructions()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+    void shouldCallExtractNoteWithStructuredInstructions() throws UnexpectedNoAccessRightException {
       Note testNote = extractableNote();
       stubExtraction(
           "Extracted Note", "Expanded content for the new note.", "Updated parent with summary.");
@@ -106,7 +103,7 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
 
     @Test
     void shouldStripLeadingMarkdownHeadingThatRepeatsExtractedTitle()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+        throws UnexpectedNoAccessRightException {
       Note testNote = extractableNote();
       stubExtraction(
           "Key Suggestion", "# Key Suggestion\n\nBody that should remain.", "Updated parent.");
@@ -119,8 +116,7 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldConvertPathSeparatorsInExtractionPreview()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+    void shouldConvertPathSeparatorsInExtractionPreview() throws UnexpectedNoAccessRightException {
       Note testNote = extractableNote();
       stubExtraction(
           "foo/bar: baz",
@@ -139,7 +135,7 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
 
     @Test
     void shouldKeepSlashInPathShapedWikiTargetsInExtractionPreview()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+        throws UnexpectedNoAccessRightException {
       Note testNote = extractableNote();
       stubExtraction(
           "Extracted Note",
@@ -157,7 +153,7 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
 
     @Test
     void shouldTrimSurroundingWhitespaceFromExtractionPreviewTitle()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+        throws UnexpectedNoAccessRightException {
       Note testNote = extractableNote();
       stubExtraction("\u3000Extracted Note\u3000", "Expanded content.", "Updated parent.");
 

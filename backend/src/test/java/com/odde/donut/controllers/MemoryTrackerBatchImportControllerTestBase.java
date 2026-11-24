@@ -4,8 +4,7 @@ import static com.odde.donut.controllers.dto.Randomization.RandomStrategy.first;
 import static com.odde.donut.services.QuestionGenerationBatchImportPayloadSupport.batchSuccessLine;
 import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.stubCompletedOpenAiBatch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.Randomization;
 import com.odde.donut.entities.Grade;
@@ -28,6 +27,8 @@ import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 abstract class MemoryTrackerBatchImportControllerTestBase extends MemoryTrackerControllerTestBase {
   static final String ORIGINAL = "---\ntype: Note\n---\nThe observatory opens at nine.";
@@ -41,7 +42,7 @@ abstract class MemoryTrackerBatchImportControllerTestBase extends MemoryTrackerC
   @Autowired NotebookGitHistoryService notebookGitHistory;
   @Autowired TextContentController textContentController;
   @Autowired EntityManager entityManager;
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   MemoryTracker tracker;
   QuestionGenerationBatch batch;

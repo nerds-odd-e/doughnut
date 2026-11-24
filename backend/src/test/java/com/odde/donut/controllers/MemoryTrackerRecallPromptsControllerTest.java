@@ -4,8 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.RecallPromptHistoryItem;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.MemoryTracker;
@@ -15,11 +14,12 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTestBase {
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   @Nested
   class GetRecallPrompts {

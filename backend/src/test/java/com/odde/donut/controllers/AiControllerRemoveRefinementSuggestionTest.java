@@ -4,7 +4,6 @@ import static com.odde.donut.controllers.AiControllerExtractNoteTestSupport.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.RefinedContentResponseDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -42,7 +41,7 @@ class AiControllerRemoveRefinementSuggestionTest extends ControllerTestBase {
 
     @Test
     void shouldReturnRegeneratedContentAfterRemovingSelectedLayoutPoints()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+        throws UnexpectedNoAccessRightException {
       openAiStructuredResponseMock.stubStructuredResponse(
           new RegeneratedNoteContent("Remaining content."));
       String originalContent = "Original with a suggestion to remove.";

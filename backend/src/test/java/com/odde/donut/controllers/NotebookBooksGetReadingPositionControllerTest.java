@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.controllers.dto.BookUserLastReadPositionResponse;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.JsonNode;
 
 class NotebookBooksGetReadingPositionControllerTest extends NotebookBooksControllerTestBase {
 

@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -19,6 +18,7 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.json.JsonMapper;
 
 class TextContentControllerUpdateNoteTitleTests extends TextContentControllerTestBase {
   @Autowired NoteController noteController;
@@ -35,7 +35,7 @@ class TextContentControllerUpdateNoteTitleTests extends TextContentControllerTes
 
   @Test
   void shouldPersistTitleWithoutSurroundingCrLfFromJson() throws Exception {
-    ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+    JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
     NoteUpdateTitleDTO titleDto =
         objectMapper.readValue("{\"newTitle\": \"\\r\\nAfter\\r\\n\"}", NoteUpdateTitleDTO.class);
     assertThat(controller.updateNoteTitle(note, titleDto).getNote().getTitle(), equalTo("After"));

@@ -1,22 +1,20 @@
 package com.odde.donut.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.services.ai.GeneratedMcq;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public final class QuestionGenerationBatchImportPayloadSupport {
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapperConfig().objectMapper();
+  private static final JsonMapper OBJECT_MAPPER = ObjectMapperConfig.handWrittenJsonMapper();
 
   private QuestionGenerationBatchImportPayloadSupport() {}
 
   public static String batchSuccessLine(
-      QuestionGenerationBatchRequest request, GeneratedMcq generatedMcq)
-      throws JsonProcessingException {
+      QuestionGenerationBatchRequest request, GeneratedMcq generatedMcq) {
     String fingerprint = FocusNoteFingerprint.of(request.getMemoryTracker().getNote());
     ObjectNode metadata =
         OBJECT_MAPPER.createObjectNode().put("focus_note_fingerprint", fingerprint);
@@ -24,8 +22,7 @@ public final class QuestionGenerationBatchImportPayloadSupport {
   }
 
   public static String batchSuccessLine(
-      QuestionGenerationBatchRequest request, GeneratedMcq generatedMcq, JsonNode metadata)
-      throws JsonProcessingException {
+      QuestionGenerationBatchRequest request, GeneratedMcq generatedMcq, JsonNode metadata) {
     String structuredOutput = OBJECT_MAPPER.writeValueAsString(generatedMcq);
     String responseBody =
         """

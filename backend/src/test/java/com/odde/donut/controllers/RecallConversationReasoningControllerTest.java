@@ -5,8 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.Mcq;
@@ -20,10 +19,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class RecallConversationReasoningControllerTest extends ConversationMessageControllerTestBase {
   @Autowired EntityManager entityManager;
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   Conversation conversation;
 
@@ -76,17 +77,18 @@ class RecallConversationReasoningControllerTest extends ConversationMessageContr
     String attemptContext = message(input, 1).content().asTextInput();
     JsonNode attempt = objectMapper.readTree(attemptContext.substring(attemptContext.indexOf('{')));
     JsonNode original = attempt.get("originalQuestionDefinition");
-    assertThat(original.get("questionStem").asText(), equalTo("What does co-movement establish?"));
+    assertThat(
+        original.get("questionStem").asString(), equalTo("What does co-movement establish?"));
     assertThat(
         original.get("responseChoices"),
         equalTo(objectMapper.valueToTree(List.of("Correlation", "Causation", "Independence"))));
     assertThat(original.get("correctAnswerIndex").asInt(), equalTo(0));
     assertThat(attempt.get("userAnswer").asInt(), equalTo(1));
-    assertThat(attempt.get("userAnswerWasMarkedAs").asText(), equalTo("incorrect"));
+    assertThat(attempt.get("userAnswerWasMarkedAs").asString(), equalTo("incorrect"));
     assertThat(
-        original.get("testedFocus").asText(), equalTo("Correlation versus causal inference"));
+        original.get("testedFocus").asString(), equalTo("Correlation versus causal inference"));
     assertThat(
-        original.get("validationRationale").asText(),
+        original.get("validationRationale").asString(),
         equalTo("The observation alone does not establish causation"));
     assertThat(
         input.subList(0, 4).stream()

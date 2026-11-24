@@ -9,7 +9,6 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -54,7 +53,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
     @NullAndEmptySource
     @ValueSource(strings = {"   "})
     void shouldReturnEmptyListWhenNoteContentIsBlank(String content)
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+        throws UnexpectedNoAccessRightException {
       testNote.setContent(content);
 
       assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
@@ -62,7 +61,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
 
     @Test
     void shouldCallResponsesApiWithStructuredInstructions()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+        throws UnexpectedNoAccessRightException {
       openAiStructuredResponseMock.stubStructuredResponse(
           new NoteRefinementLayout(
               List.of(
@@ -106,7 +105,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
 
     @Test
     void returnsCompleteHierarchyWhenLayoutBudgetIsThreeThousandTokens()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+        throws UnexpectedNoAccessRightException {
       NoteRefinementLayout complete =
           new NoteRefinementLayout(
               List.of(
@@ -140,7 +139,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
 
     @Test
     void shouldAppendQuestionLedGuidanceWhenQuestionContextProvided()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+        throws UnexpectedNoAccessRightException {
       NoteRefinementLayoutItem marked =
           NoteRefinementLayoutItems.leaf("p1", "Capital of France", false, true);
       openAiStructuredResponseMock.stubStructuredResponse(
@@ -178,8 +177,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldExplainWhenAiReturnsInvalidLayout()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+    void shouldExplainWhenAiReturnsInvalidLayout() throws UnexpectedNoAccessRightException {
       LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
       Logger validatorLogger = loggerContext.getLogger(NoteRefinementLayoutValidator.class);
       Level originalLevel = validatorLogger.getLevel();

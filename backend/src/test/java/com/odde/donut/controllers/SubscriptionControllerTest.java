@@ -6,8 +6,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.SubscriptionDTO;
 import com.odde.donut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.donut.entities.Circle;
@@ -25,12 +24,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class SubscriptionControllerTest extends ControllerTestBase {
   @Autowired private SubscriptionRepository subscriptionRepository;
   @Autowired SubscriptionController controller;
   @Autowired NotebookGroupService notebookGroupService;
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   private Notebook notebook;
 
   @BeforeEach

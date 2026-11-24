@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import tools.jackson.databind.json.JsonMapper;
 
 class NoteExportControllerPropertyHistoryTests extends ControllerTestBase {
   @Autowired MockMvc mockMvc;
@@ -129,6 +129,6 @@ class NoteExportControllerPropertyHistoryTests extends ControllerTestBase {
             .andReturn()
             .getResponse()
             .getContentAsString();
-    return new ObjectMapper().readTree(response).get("markdown").asText();
+    return new JsonMapper().readTree(response).get("markdown").asString();
   }
 }

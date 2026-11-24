@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.donut.controllers.dto.AttachBookLayoutRequest;
 import java.nio.file.Path;
@@ -20,10 +18,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 class MineruContentListLayoutBuilderTest {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final JsonMapper MAPPER = new JsonMapper();
 
   @ParameterizedTest(name = "{0}")
   @MethodSource("bboxCases")

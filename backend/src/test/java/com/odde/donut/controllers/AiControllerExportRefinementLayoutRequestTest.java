@@ -4,7 +4,6 @@ import static com.odde.donut.controllers.AiControllerExtractNoteTestSupport.newR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -65,8 +64,7 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
     }
 
     @Test
-    void exportedOutputTokenBudgetMatchesGeneration()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+    void exportedOutputTokenBudgetMatchesGeneration() throws UnexpectedNoAccessRightException {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       long[] generationBudget = {0L};
       new OpenAiStructuredResponseMock(officialClient)

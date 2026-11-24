@@ -6,7 +6,6 @@ import static com.odde.donut.services.QuestionGenerationBatchImportPayloadSuppor
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.Randomization;
 import com.odde.donut.entities.FocusNoteInput;
 import com.odde.donut.entities.Mcq;
@@ -44,7 +43,7 @@ class QuestionGenerationBatchRowImportServiceTest extends SpringTestBase {
   GeneratedMcq generatedMcq;
 
   @BeforeEach
-  void setup() throws JsonProcessingException {
+  void setup() {
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
 

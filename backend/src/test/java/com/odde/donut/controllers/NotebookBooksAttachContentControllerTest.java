@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.donut.entities.Book;
 import com.odde.donut.entities.BookBlock;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 class NotebookBooksAttachContentControllerTest extends NotebookBooksControllerTestBase {
 
@@ -90,7 +90,7 @@ class NotebookBooksAttachContentControllerTest extends NotebookBooksControllerTe
       assertThat(wireCbs.size(), equalTo(2));
       assertThat(wireCbs.get(0).get("id").asInt(), equalTo(cbs.get(0).getId()));
       assertThat(wireCbs.get(1).get("id").asInt(), equalTo(cbs.get(1).getId()));
-      assertThat(wireCbs.get(0).get("type").asText(), equalTo("text"));
+      assertThat(wireCbs.get(0).get("type").asString(), equalTo("text"));
       assertThat(wireCbs.get(1).get("pageIdx").asInt(), equalTo(1));
       assertThat(wireCbs.get(0).get("raw"), nullValue());
       assertThat(wireCbs.get(1).get("raw"), nullValue());

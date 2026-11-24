@@ -8,7 +8,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
@@ -109,45 +108,41 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
     return inCommittedTransaction(
         transactionManager,
         () -> {
-          try {
-            User committedUser = makeMe.aUser("batch-import-atomic-" + UUID.randomUUID()).please();
-            Timestamp committedTime = makeMe.aTimestamp().please();
-            Note note = makeMe.aNote().notebookOwnedBy(committedUser).please();
-            MemoryTracker committedMemoryTracker =
-                makeMe
-                    .aMemoryTrackerFor(note)
-                    .nextRecallAt(
-                        new Timestamp(committedTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-                    .please();
+          User committedUser = makeMe.aUser("batch-import-atomic-" + UUID.randomUUID()).please();
+          Timestamp committedTime = makeMe.aTimestamp().please();
+          Note note = makeMe.aNote().notebookOwnedBy(committedUser).please();
+          MemoryTracker committedMemoryTracker =
+              makeMe
+                  .aMemoryTrackerFor(note)
+                  .nextRecallAt(
+                      new Timestamp(committedTime.getTime() + TimeUnit.HOURS.toMillis(24)))
+                  .please();
 
-            QuestionGenerationBatch batch =
-                makeMe
-                    .aQuestionGenerationBatch()
-                    .forUser(committedUser)
-                    .status(QuestionGenerationBatchStatus.COMPLETED)
-                    .plannedAt(committedTime)
-                    .please();
-            makeMe.entityPersister.flush();
+          QuestionGenerationBatch batch =
+              makeMe
+                  .aQuestionGenerationBatch()
+                  .forUser(committedUser)
+                  .status(QuestionGenerationBatchStatus.COMPLETED)
+                  .plannedAt(committedTime)
+                  .please();
+          makeMe.entityPersister.flush();
 
-            GeneratedMcq committedMcq = makeMe.aGeneratedMcq().please();
+          GeneratedMcq committedMcq = makeMe.aGeneratedMcq().please();
 
-            long contextSeed = UUID.randomUUID().getMostSignificantBits();
-            QuestionGenerationBatchRequest request =
-                makeMe
-                    .aQuestionGenerationBatchRequest()
-                    .batch(batch)
-                    .memoryTracker(committedMemoryTracker)
-                    .contextSeed(contextSeed)
-                    .status(QuestionGenerationBatchRequestStatus.OUTPUT_READY)
-                    .please();
-            request.setRawSuccessPayload(batchSuccessLine(request, committedMcq));
-            batchRequestRepository.saveAndFlush(request);
+          long contextSeed = UUID.randomUUID().getMostSignificantBits();
+          QuestionGenerationBatchRequest request =
+              makeMe
+                  .aQuestionGenerationBatchRequest()
+                  .batch(batch)
+                  .memoryTracker(committedMemoryTracker)
+                  .contextSeed(contextSeed)
+                  .status(QuestionGenerationBatchRequestStatus.OUTPUT_READY)
+                  .please();
+          request.setRawSuccessPayload(batchSuccessLine(request, committedMcq));
+          batchRequestRepository.saveAndFlush(request);
 
-            return new CommittedImportFixture(
-                request.getId(), committedMemoryTracker.getId(), contextSeed);
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-          }
+          return new CommittedImportFixture(
+              request.getId(), committedMemoryTracker.getId(), contextSeed);
         });
   }
 

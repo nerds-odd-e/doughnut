@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.GlobalSettingsService;
 import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
@@ -46,7 +45,7 @@ class AiNoteAutomationServiceTest extends SpringTestBase {
   @Nested
   class GenerateNoteRefinementLayout {
     @Test
-    void shouldReturnNoteRefinementLayout() throws JsonProcessingException {
+    void shouldReturnNoteRefinementLayout() {
       NoteRefinementLayout layout = new NoteRefinementLayout();
       layout.setItems(
           List.of(

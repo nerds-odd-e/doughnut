@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +27,7 @@ class NoteQuestionGenerationServiceTests extends NoteQuestionGenerationServiceTe
     }
 
     @Test
-    void shouldUseQuestionGenerationModelNameFromGlobalSettings() throws JsonProcessingException {
+    void shouldUseQuestionGenerationModelNameFromGlobalSettings() {
       globalSettingsService
           .globalSettingQuestionGeneration()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-question-generation");
@@ -44,7 +43,7 @@ class NoteQuestionGenerationServiceTests extends NoteQuestionGenerationServiceTe
     }
 
     @Test
-    void shouldReturnNullWhenStructuredResponseIsAbsent() throws JsonProcessingException {
+    void shouldReturnNullWhenStructuredResponseIsAbsent() {
       openAiStructuredResponseMock.stubStructuredResponse(null);
 
       GeneratedMcq result = service.generateQuestion(testNote, null);

@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.GlobalSettingsService;
@@ -27,7 +25,6 @@ class StructuredResponseCreateParamsSerializerTest extends SpringTestBase {
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired StructuredResponseCreateParamsSerializer paramsSerializer;
 
-  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
   private User user;
 
   @BeforeEach

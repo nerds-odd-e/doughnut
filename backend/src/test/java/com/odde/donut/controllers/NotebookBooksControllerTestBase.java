@@ -1,6 +1,6 @@
 package com.odde.donut.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.donut.controllers.dto.AttachBookLayoutRequest;
 import com.odde.donut.controllers.dto.AttachBookRequest;
@@ -31,6 +31,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.json.JsonMapper;
 
 abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
 
@@ -42,7 +43,7 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   @Autowired BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
   @Autowired BookContentBlockRepository bookContentBlockRepository;
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   @Autowired EntityManager entityManager;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;

@@ -5,7 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.controllers.dto.FolderRenameRequest;
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -36,12 +36,13 @@ import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.json.JsonMapper;
 
 abstract class NotebookGitWebContentControllerTestBase extends NotebookGitControllerTestBase {
   static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   static final String EDITED_CONTENT = "---\ntype: Note\n---\nedited content";
 
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   @Autowired MemoryTrackerController memoryTrackerController;
   @Autowired TextContentController textContentController;
   @Autowired NoteController noteController;

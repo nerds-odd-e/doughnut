@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.MemoryTracker;
@@ -61,8 +60,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
   }
 
   @Test
-  void shouldPassOldQuestionAndContestResultToOpenAiApi()
-      throws JsonProcessingException, UnexpectedNoAccessRightException {
+  void shouldPassOldQuestionAndContestResultToOpenAiApi() throws UnexpectedNoAccessRightException {
     Note current =
         reifyTrackedProperty(recallPrompt.getMemoryTracker(), "Current regeneration evidence");
     makeMe
@@ -98,8 +96,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
         paramsCaptor.getValue().rawParams().input().flatMap(input -> input.text()).orElse("");
     assertThat(inputText, containsString("<focus_note>\nTitle: " + current.getTitle() + "\n"));
     String previousQuestionJson =
-        new ObjectMapperConfig()
-            .objectMapper()
+        ObjectMapperConfig.handWrittenJsonMapper()
             .writerWithDefaultPrettyPrinter()
             .writeValueAsString(
                 new GeneratedMcq(
@@ -121,8 +118,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
   }
 
   @Test
-  void shouldRegenerateStoredQuestionWithoutChoices()
-      throws JsonProcessingException, UnexpectedNoAccessRightException {
+  void shouldRegenerateStoredQuestionWithoutChoices() throws UnexpectedNoAccessRightException {
     makeMe.anMcq().mcq(recallPrompt.getMcq()).choices((List<String>) null).please();
     makeMe.refresh(recallPrompt.getMcq());
     openAiStructuredResponseMock.stubStructuredResponse(

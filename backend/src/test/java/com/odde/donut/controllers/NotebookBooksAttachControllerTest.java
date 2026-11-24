@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.donut.controllers.dto.AttachBookRequest;
@@ -23,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import tools.jackson.databind.JsonNode;
 
 class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase {
   @Autowired BooksController booksController;
@@ -99,9 +99,9 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       assertThat(blocks.get(0).get("depth").asInt(), equalTo(0));
       assertThat(blocks.get(1).get("depth").asInt(), equalTo(1));
       assertThat(blocks.get(2).get("depth").asInt(), equalTo(1));
-      assertThat(blocks.get(0).get("title").asText(), equalTo("Chapter 1"));
-      assertThat(blocks.get(1).get("title").asText(), equalTo("Section 1.1"));
-      assertThat(blocks.get(2).get("title").asText(), equalTo("Section 1.2"));
+      assertThat(blocks.get(0).get("title").asString(), equalTo("Chapter 1"));
+      assertThat(blocks.get(1).get("title").asString(), equalTo("Section 1.1"));
+      assertThat(blocks.get(2).get("title").asString(), equalTo("Section 1.2"));
       List<BookBlock> byLayoutSeq = blocksByLayoutOrder(detail);
       for (int i = 0; i < 3; i++) {
         assertThat(blocks.get(i).get("id").asInt(), equalTo(byLayoutSeq.get(i).getId()));

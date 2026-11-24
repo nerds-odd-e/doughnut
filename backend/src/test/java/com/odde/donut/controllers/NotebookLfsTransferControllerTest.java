@@ -10,8 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
@@ -29,13 +28,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 class NotebookLfsTransferControllerTest extends ControllerTestBase {
   private static final MediaType LFS_JSON =
       MediaType.parseMediaType(NotebookLfsTransferController.LFS_JSON);
 
   @Autowired MockMvc mockMvc;
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
   @Autowired NotebookAttachmentContent notebookAttachmentContent;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
 
@@ -76,7 +77,7 @@ class NotebookLfsTransferControllerTest extends ControllerTestBase {
               .readTree(batchUpload.getResponse().getContentAsString())
               .at("/objects/0/actions/upload/href");
       assertThat(
-          uploadHref.asText(),
+          uploadHref.asString(),
           containsString("/api/notebooks/" + notebook.getId() + "/lfs/objects/"));
 
       mockMvc

@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.JsonNode;
 
 class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
@@ -109,8 +109,8 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       assertThat(tree.has("headNoteId"), is(false));
       JsonNode notebookPayload = tree.get("notebook");
       assertThat(notebookPayload.get("id").asInt(), equalTo(nb.getId()));
-      assertThat(notebookPayload.get("name").asText(), equalTo("API Shape NB"));
-      assertThat(notebookPayload.get("description").asText(), equalTo("Blurb"));
+      assertThat(notebookPayload.get("name").asString(), equalTo("API Shape NB"));
+      assertThat(notebookPayload.get("description").asString(), equalTo("Blurb"));
       assertThat(tree.get("readonly").asBoolean(), is(false));
     }
   }

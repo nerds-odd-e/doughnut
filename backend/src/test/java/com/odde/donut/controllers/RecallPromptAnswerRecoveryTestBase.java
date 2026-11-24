@@ -3,8 +3,7 @@ package com.odde.donut.controllers;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.AnswerDTO;
 import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.AnsweredQuestion;
@@ -25,13 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 abstract class RecallPromptAnswerRecoveryTestBase extends RecallPromptControllerTestBase {
   @Autowired PlatformTransactionManager transactionManager;
   @Autowired EntityManager entityManager;
   @Autowired RecallPromptRepository repository;
-  @Autowired ObjectMapper objectMapper;
+  final JsonMapper objectMapper = ObjectMapperConfig.handWrittenJsonMapper();
 
   final String fixtureUser = "recall-answer-recovery-" + UUID.randomUUID();
 
