@@ -138,6 +138,11 @@ row index to filter rename presets. It renewed the affected browser specs,
 both Cypress features, and both frontend typechecks. Its reasoning and
 consumer trace are recorded in `slice-1-refactor.md`. No generation applies.
 
+The [execution review revision](https://github.com/nerds-odd-e/doughnut/commit/ce09115bcf82bb818d1bc8594f4f67636870998f)
+passed [branch CI](https://github.com/nerds-odd-e/doughnut/actions/runs/45303392453)
+and its observer shut down with no unread events. The earlier attempt's package
+download stall is documented in [the CI diagnosis](diagnosis-canvas-package-timeout.md).
+
 ## Plan review
 
 One Behavior covers both ways to name the same saved link. They use the
