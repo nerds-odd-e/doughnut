@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Jane-chan",
-  "email": "jane-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-134#add-values-to-an-existing-note-property",
-  "host": "codex",
-  "model": "gpt-6.2-sol"
-}
