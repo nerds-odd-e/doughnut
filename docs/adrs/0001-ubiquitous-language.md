@@ -235,7 +235,7 @@ External tutoring commissioned by Donut:
 
 - **Failure report** — Consecutive run of similar failures. One admin
   list entry and one GitHub issue. Short UI: **Failure Reports**.
-  Similarity, consecutive-run, GitHub count updates, and fail-loud usage:
+  Similarity, consecutive runs, and GitHub count updates are defined in
   [ADR 0006](./0006-failure-handling-accepted.md).
 
 ## Alignment policy
@@ -250,4 +250,4 @@ External tutoring commissioned by Donut:
 - Same nouns in UI, API, and schema, with **minimum DTO**. Do not
   introduce a translation type that wraps one as the other.
 - Agents follow this glossary for naming, ADR 0003 for spaced-repetition domain
-  concepts, and ADR 0006 for failure handling.
+  concepts, and ADR 0006 for Failure reports.

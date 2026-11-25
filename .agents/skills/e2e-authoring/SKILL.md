@@ -128,5 +128,5 @@ steps can move separately.
 
 `@badeball/cypress-cucumber-preprocessor` defaults Before hooks to order `10000`. The shared DB reset Before uses **`order: 0`** so it runs before tagged setup. Hooks that start long-lived side effects (e.g. `@interactiveCLI` PTY at order `2`) must stay **after** that reset; otherwise truncate can block on MySQL locks held by the PTY’s HTTP traffic.
 
-For failure handling in steps and page objects, follow
-[ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md#usage).
+Follow [Open Dough failure guidance](../dough-slice-planning/references/architectural-thinking.md#runtime-failure-handling)
+when handling exceptions in steps and page objects.

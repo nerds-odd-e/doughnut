@@ -9,7 +9,7 @@ for test boundaries, observable assertions, synchronization, and file-specific
 convention selection. Use the stack skills for commands, test entry points, and
 fixture and mock helpers.
 
-For which failure outcomes to test, follow [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md#usage).
+For tests of Donut’s failure paths, follow [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md#reporting-and-tests).
 
 ## Removal proof
 

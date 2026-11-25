@@ -25,7 +25,7 @@ Portable digest (details live in the cited skills — keep `AGENTS.md` and `CLAU
 2. Keep it simple — minimum code; no defensive programming (`dough-post-change-refactor` skill)
 3. Capability naming — no planning sequence numbers in product artifacts (`dough-story-refinement` planning reference)
 4. Use [shared test guidance](.agents/skills/dough-execute-plan/references/test-entry-rules.md) and [Donut test conventions](.agents/skills/unit-testing/SKILL.md)
-5. Failure handling — fail loudly is legitimate; catch for a business outcome or a clearer message (ADR 0006)
+5. Follow [Open Dough runtime failure guidance](.agents/skills/dough-slice-planning/references/architectural-thinking.md#runtime-failure-handling) and [Donut’s Failure report rules](docs/adrs/0006-failure-handling-accepted.md).
 6. Prefer committing all changes and leaving none local; partial commits are deliberate exceptions, not forbidden
 7. Removals leave no trace — when removing something:
    - Delete it outright and transitively: the thing, its tests, and everything only it used (services, endpoints, DTOs, columns, helpers, fixtures, prompts, mocks, ratchet entries), repeated until nothing is orphaned. Shared code that other callers use stays.

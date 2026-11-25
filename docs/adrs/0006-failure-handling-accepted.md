@@ -40,30 +40,14 @@ Each Failure report has one GitHub issue. Further occurrences of that report
 update the issue with the latest count. Count updates are debounced at six
 hours. Investigation detail stays in Donut.
 
-### Usage
+### Reporting and tests
 
-Letting a failure surface **loudly** is a legitimate production solution. An
-uncaught failure becomes a Failure report so developers see that something
-went wrong.
+Donut records unexpected failures that reach its reporting boundary as
+Failure reports.
 
-Handle an exception when a **business requirement** needs a specific
-outcome, or when wrapping **improves the failure message**. Those handled
-paths are the ones that need tests for the chosen outcome.
-
-Code that is allowed to fail loudly needs no unit test of the failure. The
-loud failure itself plays the same role as a unit test: it tells developers
-something went wrong.
-
-When a failure exists, prefer this order:
-
-1. **Prevent** — make the invalid state unrepresentable.
-2. **Propagate** — leave the failure visible in tests and production.
-3. **Enrich** — add context when the raw failure would be unclear; keep the
-   original cause.
-4. **Catch** — recover, retry, compensate, contain a best-effort operation,
-   or improve the message as above.
-
-A catch always has one of those deliberate outcomes.
+Test the outcome when Donut handles a failure or enriches its message. A path
+that relies on Donut’s existing Failure report mechanism needs no unit test
+solely to prove propagation.
 
 ## Consequences
 
@@ -71,14 +55,11 @@ A catch always has one of those deliberate outcomes.
   the failures stay similar and consecutive.
 - Developers investigate in Donut; GitHub carries identity and count.
 - HTTP and scheduled failures share one consecutive sequence.
-- Loud production failures are an intended signal; handled exceptions are
-  the tested ones.
 
 ## Pros
 
 - One name already on the admin screen.
 - Consecutive grouping matches a broken run of the same failure.
-- Fail-loud is an explicit production strategy.
 
 ## Cons
 
