@@ -74,7 +74,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springframework.security:spring-security-oauth2-authorization-server'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.2.1'
-  implementation 'com.openai:openai-java:4.111.0'
+  implementation 'com.openai:openai-java:4.113.0'
   implementation 'org.yaml:snakeyaml'
   implementation 'net.javacrumbs.shedlock:shedlock-spring:7.11.0'
   implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.11.0'
