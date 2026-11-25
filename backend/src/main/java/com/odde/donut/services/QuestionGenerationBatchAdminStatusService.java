@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.configs.OpenAiProperties;
 import com.odde.donut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
 import com.odde.donut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
@@ -10,7 +11,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
@@ -28,13 +28,13 @@ public class QuestionGenerationBatchAdminStatusService {
   public QuestionGenerationBatchAdminStatusService(
       QuestionGenerationBatchRepository batchRepository,
       QuestionGenerationBatchRequestRepository batchRequestRepository,
-      @Value("${spring.openai.token}") String openAiToken,
+      OpenAiProperties openAiProperties,
       Environment environment,
       List<ScheduledTaskHolder> scheduledTaskHolders,
       QuestionGenerationBatchMaintenanceRunService maintenanceRunService) {
     this.batchRepository = batchRepository;
     this.batchRequestRepository = batchRequestRepository;
-    this.openAiToken = openAiToken;
+    this.openAiToken = openAiProperties.token();
     this.environment = environment;
     this.scheduledTaskHolders = scheduledTaskHolders;
     this.maintenanceRunService = maintenanceRunService;

@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.odde.donut.configs.OpenAiProperties;
 import com.odde.donut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
 import com.odde.donut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
@@ -135,7 +136,7 @@ class QuestionGenerationBatchAdminStatusServiceTest extends SpringTestBase {
     return new QuestionGenerationBatchAdminStatusService(
         batchRepository,
         requestRepository,
-        "configured-token",
+        new OpenAiProperties("configured-token"),
         environment,
         taskHolders,
         maintenanceRunService);

@@ -1,6 +1,7 @@
 package com.odde.donut.services.openAiApis;
 
 import com.odde.donut.configs.ObjectMapperConfig;
+import com.odde.donut.configs.OpenAiProperties;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.OpenAiUnauthorizedException;
 import com.odde.donut.testability.TestabilitySettings;
@@ -24,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
@@ -41,10 +41,10 @@ public class OpenAiApiHandler {
   public OpenAiApiHandler(
       @Qualifier("officialOpenAiClient") OpenAIClient officialClient,
       TestabilitySettings testabilitySettings,
-      @Value("${spring.openai.token}") String defaultOpenAiToken) {
+      OpenAiProperties openAiProperties) {
     this.officialClient = officialClient;
     this.testabilitySettings = testabilitySettings;
-    this.defaultOpenAiToken = defaultOpenAiToken;
+    this.defaultOpenAiToken = openAiProperties.token();
   }
 
   private void assertOpenAiAvailable() {

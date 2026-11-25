@@ -5,7 +5,7 @@ import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -20,6 +20,7 @@ import org.springframework.web.context.annotation.RequestScope;
  * client for testing purposes.
  */
 @Configuration
+@EnableConfigurationProperties(OpenAiProperties.class)
 public class OpenAiApiConfig {
 
   // Official OpenAI Java SDK - Non-prod: request scope so each request reads the current
@@ -30,13 +31,12 @@ public class OpenAiApiConfig {
   @RequestScope
   @Qualifier("officialOpenAiClient")
   public OpenAIClient getOfficialOpenAiClientNonProd(
-      @Value("${spring.openai.token}") String openAiToken,
-      @Autowired TestabilitySettings testabilitySettings) {
+      OpenAiProperties openAiProperties, @Autowired TestabilitySettings testabilitySettings) {
     String baseUrl = testabilitySettings.getOpenAiApiUrl();
     if (baseUrl == null || baseUrl.isEmpty()) {
       baseUrl = "https://api.openai.com/v1/";
     }
-    return OpenAIOkHttpClient.builder().apiKey(openAiToken).baseUrl(baseUrl).build();
+    return OpenAIOkHttpClient.builder().apiKey(openAiProperties.token()).baseUrl(baseUrl).build();
   }
 
   // Official OpenAI Java SDK - Prod: provide the same qualified bean without request scope for
@@ -45,12 +45,11 @@ public class OpenAiApiConfig {
   @Profile("prod")
   @Qualifier("officialOpenAiClient")
   public OpenAIClient getOfficialOpenAiClientProd(
-      @Value("${spring.openai.token}") String openAiToken,
-      @Autowired TestabilitySettings testabilitySettings) {
+      OpenAiProperties openAiProperties, @Autowired TestabilitySettings testabilitySettings) {
     String baseUrl = testabilitySettings.getOpenAiApiUrl();
     if (baseUrl == null || baseUrl.isEmpty()) {
       baseUrl = "https://api.openai.com/v1/";
     }
-    return OpenAIOkHttpClient.builder().apiKey(openAiToken).baseUrl(baseUrl).build();
+    return OpenAIOkHttpClient.builder().apiKey(openAiProperties.token()).baseUrl(baseUrl).build();
   }
 }
