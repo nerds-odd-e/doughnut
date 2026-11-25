@@ -183,7 +183,7 @@ settings:
 
 overrides:
   '@anev/ts-mountebank>superagent': '>=10.3.0'
-  '@hono/node-server': 2.1.9
+  '@hono/node-server': 2.1.11
   '@isaacs/brace-expansion': '>=5.0.5'
   '@tootallnate/once': '>=3.0.1'
   '@xmldom/xmldom': '>=0.9.12'
@@ -271,8 +271,8 @@ importers:
         specifier: 0.99.0
         version: 0.99.0(typescript@6.0.3)
       '@hono/node-server':
-        specifier: 2.1.9
-        version: 2.1.9(hono@4.13.19)
+        specifier: 2.1.11
+        version: 2.1.11(hono@4.13.21)
       '@mbtest/mountebank':
         specifier: 2.10.0
         version: 2.10.0(supports-color@8.1.1)
@@ -310,8 +310,8 @@ importers:
         specifier: 16.2.0
         version: 16.2.0
       hono:
-        specifier: 4.13.19
-        version: 4.13.19
+        specifier: 4.13.21
+        version: 4.13.21
       npm-run-all2:
         specifier: 9.1.0
         version: 9.1.0
@@ -1226,8 +1226,8 @@ packages:
   '@hey-api/types@0.1.4':
     resolution: {integrity: sha512-thWfawrDIP7wSI9ioT13I5soaaqB5vAPIiZmgD8PbeEVKNrkonc0N/Sjj97ezl7oQgusZmaNphGdMKipPO6IBg==}
 
-  '@hono/node-server@2.1.9':
-    resolution: {integrity: sha512-Sk4NQd3GFY0WZWCzndwFMPwJhtD0y9qjsQ+pjID0/03nK9pxyBCUoUHCho8QYBLBVhi0ssL8UkNPHqbgSOFPIQ==}
+  '@hono/node-server@2.1.11':
+    resolution: {integrity: sha512-KzKz9vl4vvr1vgLHamj+g5uonbrj5NwAdO3yzOS6cd2HjALVeOgTgeZOyAzNxejbkfOOPIcvuf/Tg8l1pEFLog==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4 || ^5.0.0-0
@@ -3582,8 +3582,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.13.19:
-    resolution: {integrity: sha512-KmXvQAXwcAHV+muzbIwoJ23niEB5nMoDVr9WcRkU8mvjUECm/1+7v4Jgp7P7a+H6MLFrh+vXrGonGrGS+RQfkA==}
+  hono@4.13.21:
+    resolution: {integrity: sha512-h9UsguqfVk4kjUwLvQpHOmOaJpW10jz9lp8bvKUUa04wJG/fabKFBqXZ06D6LFaeKQZtUZRVeg0gfkTTEsX7Mw==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -6794,9 +6794,9 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hono/node-server@2.1.9(hono@4.13.19)':
+  '@hono/node-server@2.1.11(hono@4.13.21)':
     dependencies:
-      hono: 4.13.19
+      hono: 4.13.21
 
   '@inkjs/ui@2.0.0(ink@8.0.0(@types/react@19.3.0)(react@19.3.1))(react@19.3.1)':
     dependencies:
@@ -6924,7 +6924,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.32.2(supports-color@8.1.1)(zod@4.6.7)':
     dependencies:
-      '@hono/node-server': 2.1.9(hono@4.13.19)
+      '@hono/node-server': 2.1.11(hono@4.13.21)
       ajv: 8.20.0
       ajv-formats: 3.0.1
       content-type: 1.0.5
@@ -6934,7 +6934,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@8.1.1)
       express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@8.1.1)
-      hono: 4.13.19
+      hono: 4.13.21
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -9172,7 +9172,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.13.19: {}
+  hono@4.13.21: {}
 
   hookable@5.5.3: {}
 
