@@ -97,15 +97,15 @@ trustLockfile: true
 
 # Resolution-only cooldown exemptions; add pkg@version to adopt a fresh release.
 minimumReleaseAgeExclude:
-  - '@biomejs/biome@2.5.4'
-  - '@biomejs/cli-darwin-arm64@2.5.4'
-  - '@biomejs/cli-darwin-x64@2.5.4'
-  - '@biomejs/cli-linux-arm64-musl@2.5.4'
-  - '@biomejs/cli-linux-arm64@2.5.4'
-  - '@biomejs/cli-linux-x64-musl@2.5.4'
-  - '@biomejs/cli-linux-x64@2.5.4'
-  - '@biomejs/cli-win32-arm64@2.5.4'
-  - '@biomejs/cli-win32-x64@2.5.4'
+  - '@biomejs/biome@2.5.4 || 2.6.9'
+  - '@biomejs/cli-darwin-arm64@2.5.4 || 2.6.9'
+  - '@biomejs/cli-darwin-x64@2.5.4 || 2.6.9'
+  - '@biomejs/cli-linux-arm64-musl@2.5.4 || 2.6.9'
+  - '@biomejs/cli-linux-arm64@2.5.4 || 2.6.9'
+  - '@biomejs/cli-linux-x64-musl@2.5.4 || 2.6.9'
+  - '@biomejs/cli-linux-x64@2.5.4 || 2.6.9'
+  - '@biomejs/cli-win32-arm64@2.5.4 || 2.6.9'
+  - '@biomejs/cli-win32-x64@2.5.4 || 2.6.9'
   - '@lucide/vue@1.25.0 || 1.63.0'
   - '@redocly/cli@2.40.0 || 2.69.0'
   - '@redocly/openapi-core@2.40.0'
@@ -133,4 +133,6 @@ minimumReleaseAgeExclude:
   - '@storybook/vue3@10.6.5'
   - storybook@10.6.5
   - cypress@16.2.1
+  - '@biomejs/cli-android-arm64@2.6.9'
+  - '@biomejs/cli-android-x64@2.6.9'
 
