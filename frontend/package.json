@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.9",
-    "@lucide/vue": "1.77.0",
+    "@lucide/vue": "1.78.0",
     "@storybook/addon-docs": "10.6.7",
     "@storybook/vue3": "10.6.7",
     "@storybook/vue3-vite": "10.6.7",
@@ -50,7 +50,7 @@
     "@vue/compiler-core": "3.5.46",
     "@vue/server-renderer": "3.5.46",
     "@vue/test-utils": "2.6.0",
-    "daisyui": "5.8.1",
+    "daisyui": "5.8.2",
     "donut-test-fixtures": "workspace:*",
     "es-toolkit": "1.53.2",
     "esbuild": "0.28.2",

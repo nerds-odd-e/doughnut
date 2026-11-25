@@ -441,8 +441,8 @@ importers:
         specifier: 2.6.9
         version: 2.6.9
       '@lucide/vue':
-        specifier: 1.77.0
-        version: 1.77.0(vue@3.5.46(typescript@6.0.3))
+        specifier: 1.78.0
+        version: 1.78.0(vue@3.5.46(typescript@6.0.3))
       '@storybook/addon-docs':
         specifier: 10.6.7
         version: 10.6.7(@types/react@19.3.0)(storybook@10.6.7(@types/react@19.3.0)(react@19.3.1))
@@ -492,8 +492,8 @@ importers:
         specifier: 2.6.0
         version: 2.6.0(@vue/compiler-dom@3.5.46)(@vue/server-renderer@3.5.46)(vue@3.5.46(typescript@6.0.3))
       daisyui:
-        specifier: 5.8.1
-        version: 5.8.1
+        specifier: 5.8.2
+        version: 5.8.2
       donut-test-fixtures:
         specifier: workspace:*
         version: link:../packages/donut-test-fixtures
@@ -1282,8 +1282,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@lucide/vue@1.77.0':
-    resolution: {integrity: sha512-B+okr/d8qC2imLzNPJ5tW8Nf7uKC19DgiOafxU0bOMfLnkd5Tkss4GW640+s5FierTJjgl99LpuO40u+yni0qQ==}
+  '@lucide/vue@1.78.0':
+    resolution: {integrity: sha512-yIh9Fv8cuPRuUmo6fTBlhWfUdl8v9IEnV9Fge29d79WEpbWOMu5XfcwAveLfjFe47HfAfNcJF10sXAzwaZfWRg==}
     peerDependencies:
       vue: '>=3.0.1'
 
@@ -2984,8 +2984,8 @@ packages:
     resolution: {integrity: sha512-MOqHvMWF9/9MX6nza0KgvFH4HpMU0EF5uUDXqX/BtxtU8NfB0QzRtJ8Oe/6SuS4kbhyzVJwjd97EA4PKrzJ8bw==}
     engines: {node: '>=0.12'}
 
-  daisyui@5.8.1:
-    resolution: {integrity: sha512-ptP4WHOJ6WltNnA5zwkg3GypOLhsyUM2FHuXCckWVEpWviioInFKsjnShCWYGYHsQ5P9bUCOH1tn45cKLeTUpg==}
+  daisyui@5.8.2:
+    resolution: {integrity: sha512-InScsDXX0pbfgvWyPQ8iTHV4rNMZdfbMo85KqlQUn62/PCIjwczViw5lbotzoXy/nPrn4qjDMmx/fspuUnjBtA==}
 
   dashdash@1.14.1:
     resolution: {integrity: sha512-jRFi8UDGo6j+odZiEpjazZaWqEal3w/basFjQHQEwVtZJGDpxbH1MeYluwCS8Xq5wmLJooDlMgvVarmWfGM44g==}
@@ -6859,7 +6859,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@lucide/vue@1.77.0(vue@3.5.46(typescript@6.0.3))':
+  '@lucide/vue@1.78.0(vue@3.5.46(typescript@6.0.3))':
     dependencies:
       vue: 3.5.46(typescript@6.0.3)
 
@@ -8531,7 +8531,7 @@ snapshots:
       es5-ext: 0.10.64
       type: 2.7.3
 
-  daisyui@5.8.1: {}
+  daisyui@5.8.2: {}
 
   dashdash@1.14.1:
     dependencies:
